@@ -1,0 +1,70 @@
+{
+  "scope": "Actual disposable Electron window, authorized GNOME42.9 X11 host; no Debian release-matrix claim",
+  "runtime": {
+    "versions": {
+      "node": "24.22.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "150",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.11",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2026e",
+      "undici": "7.29.1",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.6.75.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "45.0.0",
+      "chrome": "156.0.8078.48"
+    },
+    "pid": 995159,
+    "argv": [
+      "/tmp/linuxcast-s0-06/node_modules/.bun/electron@45.0.0/node_modules/electron/dist/electron",
+      "--inspect=0",
+      "--remote-debugging-port=0",
+      "--force-renderer-accessibility=complete",
+      "/tmp/linuxcast-s0-06/spikes/workflow-ui/tests/electron-main.mjs"
+    ],
+    "windowId": 127926275,
+    "accessible": true,
+    "sandbox": true,
+    "contextIsolation": true,
+    "nodeIntegration": false
+  },
+  "rendererSandbox": {
+    "sandboxed": true,
+    "contextIsolated": true
+  },
+  "kernel": "7.1.1-76070101-generic",
+  "zoomMetrics": {
+    "viewportWidth": 720,
+    "documentWidth": 712
+  },
+  "distro": "PRETTY_NAME=\"Pop!_OS 22.04 LTS\"",
+  "assertions": [
+    "sandboxed/no renderer Node",
+    "keyboard add/configure/connect/remove",
+    "dark/light axe WCAG A/AA",
+    "loading/empty/error/permission/cancelled/disabled fixtures on Electron",
+    "actual Electron zoom 200%",
+    "forced colors/reduced motion on Electron"
+  ],
+  "accessibility": "Screen reader is not established by this command alone"
+}

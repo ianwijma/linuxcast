@@ -1,0 +1,7 @@
+# Actual Orca on isolated Xvfb: incomplete
+
+23 October 2026; Pop!_OS22.04, installed Orca42.0 and Speech Dispatcher0.11.1, actual Electron45.0.0 on a disposable Xvfb display. All session/AT buses, profiles, sockets and preferences are private; GSettings is memory-only. Speech uses `sd_dummy` and explicit ALSA `null`; braille is disabled. No audible/tactile quality assurance is claimed.
+
+`node spikes/workflow-ui/tests/xvfb-orca.ts` exits3 (unavailable/incomplete), not a passing gate. Actual Electron checks and native AT roles/focus events pass. Actual Orca startup and Speech Dispatcher delivery are observed. The final run generates presentation after the native Tab key for `Node label`; `Apply configuration` and `Move node down` miss the10s presentation deadline. Overall debug contains known-label utterances for the first two controls, but this does not prove presentation after each tested focus event.
+
+`orca.json` records only known synthetic label booleans and process/startup outcomes. An earlier diagnostic run showed real native focus on the `Move node down` push button, Orca locus-of-focus change and speech generation, then a stall in ancestor-context traversal from the preceding connection-list button. Repeat runs vary between one and two of the three focus transitions producing presentation; all remain incomplete. Raw debug and private profiles are not committed. A target Debian13 assistive-technology rerun is required; the host's older Orca result cannot waive S0-06-UI.

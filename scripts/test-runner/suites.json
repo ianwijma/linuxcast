@@ -12,7 +12,11 @@
       "spikes/ai/oauth.contract.test.ts"
     ]
   },
-  "ui": {},
+  "ui": {
+    "S0-06": [
+      "spikes/workflow-ui/tests/workflow-ui.test.ts"
+    ]
+  },
   "integration": {},
   "security": {
     "S0-05": [

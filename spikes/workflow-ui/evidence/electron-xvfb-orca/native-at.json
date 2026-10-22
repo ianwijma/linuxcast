@@ -1,0 +1,132 @@
+{
+  "status": "native-exposure-and-focus-events-observed",
+  "snapshots": [
+    {
+      "status": "observed",
+      "applications": 1,
+      "controls": [
+        {
+          "label": "Search palette",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Search palette",
+          "role": "entry",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "entry",
+          "focused": true
+        },
+        {
+          "label": "Apply configuration",
+          "role": "push button",
+          "focused": false
+        },
+        {
+          "label": "Move node down",
+          "role": "push button",
+          "focused": false
+        }
+      ],
+      "focus_events": [
+        "Search palette",
+        "Node label"
+      ]
+    },
+    {
+      "status": "observed",
+      "applications": 1,
+      "controls": [
+        {
+          "label": "Search palette",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Search palette",
+          "role": "entry",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "entry",
+          "focused": false
+        },
+        {
+          "label": "Apply configuration",
+          "role": "push button",
+          "focused": true
+        },
+        {
+          "label": "Move node down",
+          "role": "push button",
+          "focused": false
+        }
+      ],
+      "focus_events": [
+        "Search palette",
+        "Node label",
+        "Search palette",
+        "Apply configuration"
+      ]
+    },
+    {
+      "status": "observed",
+      "applications": 1,
+      "controls": [
+        {
+          "label": "Search palette",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Search palette",
+          "role": "entry",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "static",
+          "focused": false
+        },
+        {
+          "label": "Node label",
+          "role": "entry",
+          "focused": false
+        },
+        {
+          "label": "Apply configuration",
+          "role": "push button",
+          "focused": false
+        },
+        {
+          "label": "Move node down",
+          "role": "push button",
+          "focused": true
+        }
+      ],
+      "focus_events": [
+        "Search palette",
+        "Node label",
+        "Search palette",
+        "Apply configuration",
+        "Search palette",
+        "Move node down"
+      ]
+    }
+  ],
+  "limitation": "Actual native controls and focus events observed. Screen-reader presentation/audio are separate evidence."
+}
