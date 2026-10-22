@@ -1,0 +1,17 @@
+{
+  "processCounts": {
+    "gnome-shell": 0,
+    "kwin_wayland": 0,
+    "kwin_x11": 0,
+    "Xvfb": 0,
+    "electron": 0,
+    "node": 0,
+    "gdb": 0,
+    "dbus-daemon": 2
+  },
+  "privateRootsAbsent": true,
+  "inputMarkerAbsent": true,
+  "stagedHarnessRemoved": true,
+  "checkedUtc": "2026-10-22T20:47:50.199118+00:00",
+  "hostPolicyChanged": false
+}

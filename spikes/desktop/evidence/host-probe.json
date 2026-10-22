@@ -1,0 +1,65 @@
+{
+  "task": "S0-02",
+  "evidenceKind": "authorized-host-probe; not supported-target companion acceptance",
+  "platform": {
+    "os": "Pop!_OS 22.04 LTS",
+    "kernel": "7.1.1-76070101-generic",
+    "architecture": "x64",
+    "shellVersion": "42.9",
+    "gjs": "gjs 1.72.4"
+  },
+  "gnome48": {
+    "state": "unsupported",
+    "reason": "COMPANION_VERSION_MISMATCH",
+    "action": "Use the GNOME 48 companion on its supported session",
+    "generation": 1
+  },
+  "kwinBusOwned": false,
+  "spikeCompanionBusOwned": false,
+  "installedGiApiShapeOnly": {
+    "selectionTransferAsync": true,
+    "selectionTransferFinish": true,
+    "selectionMimeTypes": true,
+    "windowFrameGeometry": true,
+    "windowMoveResize": true,
+    "stClipboardContent": true
+  },
+  "synthetic": {
+    "backend": "GTK3/GDK-X11 own-window/private-selection",
+    "clipboardTouched": false,
+    "finalGeometry": {
+      "height": 217,
+      "width": 360,
+      "x": 1970,
+      "y": 1162
+    },
+    "initialGeometry": {
+      "height": 157,
+      "width": 280,
+      "x": 1970,
+      "y": 1162
+    },
+    "liveGeometryChanged": true,
+    "ownerEvents": 1,
+    "privateSelectionMimes": [
+      "COMPOUND_TEXT",
+      "MULTIPLE",
+      "STRING",
+      "TARGETS",
+      "TEXT",
+      "TIMESTAMP",
+      "UTF8_STRING",
+      "text/plain",
+      "text/plain;charset=utf-8"
+    ],
+    "privateSelectionReleased": true,
+    "privateSelectionTextMatches": true,
+    "state": "passed"
+  },
+  "limitations": [
+    "No companion was installed or enabled",
+    "No global clipboard or private window title was read",
+    "GNOME48 and Plasma6.3 live companion protocols remain unverified",
+    "X11 canary is not native Wayland control proof"
+  ]
+}

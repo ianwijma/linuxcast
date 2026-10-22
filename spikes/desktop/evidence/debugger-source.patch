@@ -1,0 +1,423 @@
+diff --git a/spikes/desktop/guest/build.ts b/spikes/desktop/guest/build.ts
+index 22788d6..c6e863a 100644
+--- a/spikes/desktop/guest/build.ts
++++ b/spikes/desktop/guest/build.ts
+@@ -21,14 +21,15 @@ export async function buildGuestHarness(destination = join(source, 'dist')): Pro
+   await copyFile(join(source,'run-session.py'),join(destination,'run-session.py'));
+   await copyFile(join(source,'supervision.py'),join(destination,'supervision.py'));
+   await copyFile(join(source,'private_context.py'),join(destination,'private_context.py'));
++  await copyFile(join(source,'debugger_filter.py'),join(destination,'debugger_filter.py'));
+   await copyFile(join(source,'gnome-extension.js'),join(destination,'extension.js'));
+   await writeFile(join(destination,'metadata.json'),JSON.stringify({uuid:'s002-native@linuxcast.invalid',name:'Linuxcast S0-02 isolated native canary',description:'Disposable guest-only API evidence; never a production companion',version:1,'shell-version':['48']},null,2));
+   await copyFile(join(source,'../native/own-canary.py'),join(destination,'x11-private-selection.py'));
+-  const files = ['../adapters.ts','../window-adapters.ts','../protocol.ts','../model.ts','gnome-extension.js','kwin-script.js','queue-helper.ts','clipboard-client.ts','kwin-bus.py','run-session.py','restart-helper.ts','restart-script.js','restart-bus.py','restart-driver.py','supervision.py','native-pipe.ts','../helper-epoch.ts','canary.py','selection-event.py','../native/own-canary.py','build.ts','desktop-api.ts','private_context.py'];
++  const files = ['../adapters.ts','../window-adapters.ts','../protocol.ts','../model.ts','gnome-extension.js','kwin-script.js','queue-helper.ts','clipboard-client.ts','kwin-bus.py','run-session.py','restart-helper.ts','restart-script.js','restart-bus.py','restart-driver.py','supervision.py','native-pipe.ts','../helper-epoch.ts','canary.py','selection-event.py','../native/own-canary.py','build.ts','desktop-api.ts','private_context.py','debugger_filter.py'];
+   const hashes: Record<string,string> = {};
+   for (const file of files) hashes[file] = createHash('sha256').update(await readFile(join(source,file))).digest('hex');
+   const outputs=['desktop-api.js','kwin-script.js','restart-script.js','restart-helper.mjs','queue-helper.mjs','clipboard-client.mjs',
+-    'restart-bus.py','restart-driver.py','canary.py','kwin-bus.py','selection-event.py','run-session.py','supervision.py','extension.js','metadata.json','x11-private-selection.py','private_context.py'];
++    'restart-bus.py','restart-driver.py','canary.py','kwin-bus.py','selection-event.py','run-session.py','supervision.py','extension.js','metadata.json','x11-private-selection.py','private_context.py','debugger_filter.py'];
+   const outputHashes: Record<string,string> = {};
+   for (const file of outputs) outputHashes[file] = createHash('sha256').update(await readFile(join(destination,file))).digest('hex');
+   await writeFile(join(destination,'manifest.json'),JSON.stringify({kind:'task-owned-real-adapter-guest-harness',sourceSha256:hashes,outputSha256:outputHashes},null,2));
+diff --git a/spikes/desktop/guest/canary.py b/spikes/desktop/guest/canary.py
+index b916160..2f2df04 100644
+--- a/spikes/desktop/guest/canary.py
++++ b/spikes/desktop/guest/canary.py
+@@ -1,11 +1,12 @@
+ #!/usr/bin/python3
+ """Persistent public GTK window; no clipboard, keyboard capture or host display."""
+ import os
++import json
+ import sys
+ import gi
+ 
+ gi.require_version('Gtk', '3.0')
+-from gi.repository import Gtk, Gio
++from gi.repository import Gtk, Gio, Gdk
+ 
+ if os.environ.get('LINUXCAST_S002_PRIVATE_GUEST') != '1':
+     sys.exit(3)
+@@ -16,6 +17,24 @@ def activate(application):
+     window = Gtk.ApplicationWindow(application=application, title='Linuxcast public native canary')
+     window.set_default_size(280, 160)
+     window.add(Gtk.Label(label='Public Linuxcast native API canary\nNo user clipboard or private window content'))
++    observations = []
++    def configured(_window, event):
++        # Only the first eight events of this synthetic window leave stdout.
++        # The runner keeps this private log transient and exports this schema.
++        if len(observations) >= 8: return False
++        client = tuple(window.get_size())
++        if any(not isinstance(value, int) or not 0 < value <= 16384 for value in (event.width, event.height, *client)):
++            return False
++        state = window.get_window().get_state()
++        observations.append({'width':event.width,'height':event.height,
++            'clientWidth':client[0],'clientHeight':client[1],
++            'maximized':bool(state & Gdk.WindowState.MAXIMIZED),
++            'fullscreen':bool(state & Gdk.WindowState.FULLSCREEN),
++            'iconified':bool(state & Gdk.WindowState.ICONIFIED),
++            'resizable':window.get_resizable()})
++        print(json.dumps({'ownConfigureEvents':observations}),flush=True)
++        return False
++    window.connect('configure-event', configured)
+     window.show_all()
+ 
+ app.connect('activate', activate)
+diff --git a/spikes/desktop/guest/debugger_filter.py b/spikes/desktop/guest/debugger_filter.py
+new file mode 100644
+index 0000000..d9901c0
+--- /dev/null
++++ b/spikes/desktop/guest/debugger_filter.py
+@@ -0,0 +1,106 @@
++"""Child-only GDB diagnostic. Export categories, never stack arguments or addresses."""
++import json
++import os
++
++MODULES = {
++    'libkwin.so.6': 'KWIN',
++    'libQt6Qml.so.6': 'QT_QML',
++    'libQt6Quick.so.6': 'QT_QUICK',
++    'libQt6Core.so.6': 'QT_CORE',
++    'libQt6Gui.so.6': 'QT_GUI',
++    'libQt6WaylandClient.so.6': 'QT_WAYLAND',
++    'libwayland-server.so.0': 'WAYLAND_SERVER',
++    'libwayland-client.so.0': 'WAYLAND_CLIENT',
++    'libc.so.6': 'LIBC',
++    'libstdc++.so.6': 'LIBSTDCXX',
++    'libEGL_mesa.so.0': 'MESA_EGL',
++    'libgbm.so.1': 'GBM',
++    'kwin_wayland': 'KWIN_EXECUTABLE',
++}
++FUNCTIONS = {
++    'KWin::QPA::EGLPlatformContext::swapBuffers(': 'KWIN_QPA_SWAP_BUFFERS',
++    'KWin::QPA::BackingStore::flush(': 'KWIN_QPA_BACKING_STORE_FLUSH',
++    'KWin::Window::moveResize(': 'KWIN_MOVE_RESIZE',
++    'KWin::XdgToplevelWindow::moveResizeInternal(': 'KWIN_XDG_MOVE_RESIZE',
++    'KWin::WaylandCompositor::composite(': 'KWIN_WAYLAND_COMPOSITE',
++    'KWin::Script::callDBus(': 'KWIN_SCRIPT_DBUS',
++    'KWin::': 'KWIN_OTHER',
++    'QJSEngine::': 'QT_JS_ENGINE',
++    'QV4::': 'QT_JS_RUNTIME',
++    'QQuickWindow::': 'QT_QUICK_WINDOW',
++    'QQuick': 'QT_QUICK_OTHER',
++    'QCoreApplication::': 'QT_EVENT_DELIVERY',
++    'QObject::': 'QT_OBJECT',
++}
++
++
++def module_category(path):
++    name = os.path.basename(path or '')
++    if name.startswith('libkwin.so.6.'): return 'KWIN'
++    if name.startswith('libgallium-') and name.endswith('.so'): return 'MESA_GALLIUM'
++    return MODULES.get(name, 'UNKNOWN')
++
++
++def function_category(name):
++    for prefix, category in FUNCTIONS.items():
++        if (name or '').startswith(prefix): return category
++    return 'UNKNOWN'
++
++
++def parse_report(value):
++    if not isinstance(value, dict) or set(value) != {'signal', 'frames', 'inspectionFailed'}: return None
++    if value['signal'] not in ('NONE', 'SIGSEGV', 'SIGABRT', 'OTHER_SIGNAL') or type(value['inspectionFailed']) is not bool: return None
++    frames = value['frames']
++    if not isinstance(frames, list) or len(frames) > 16: return None
++    modules = set(MODULES.values()) | {'UNKNOWN', 'MESA_GALLIUM'}
++    functions = set(FUNCTIONS.values()) | {'UNKNOWN'}
++    for frame in frames:
++        if not isinstance(frame, dict) or set(frame) != {'module', 'function'}: return None
++        if not isinstance(frame['module'], str) or frame['module'] not in modules: return None
++        if not isinstance(frame['function'], str) or frame['function'] not in functions: return None
++    return value
++
++
++def main():
++    import gdb
++    signal = 'NONE'
++
++    def stopped(event):
++        nonlocal signal
++        if isinstance(event, gdb.SignalEvent):
++            signal = event.stop_signal if event.stop_signal in ('SIGSEGV', 'SIGABRT') else 'OTHER_SIGNAL'
++
++    gdb.events.stop.connect(stopped)
++    # These affect only this debugger and its child. No attach, remote target,
++    # inferior function calls, startup files, auto-load or symbol network fetch.
++    for setting in ('auto-load off', 'debuginfod enabled off', 'pagination off',
++                    'confirm off', 'startup-with-shell off', 'disable-randomization off',
++                    'may-call-functions off'):
++        gdb.execute('set ' + setting, to_string=True)
++    gdb.execute('handle SIGPIPE nostop noprint pass', to_string=True)
++    failed = False
++    try:
++        gdb.execute('run', to_string=True)
++    except gdb.error:
++        failed = True
++    frames = []
++    try:
++        frame = gdb.newest_frame()
++        while frame is not None and len(frames) < 16:
++            library = gdb.solib_name(frame.pc())
++            if library is None: library = gdb.current_progspace().filename
++            frames.append({'module': module_category(library), 'function': function_category(frame.name())})
++            frame = frame.older()
++    except gdb.error:
++        failed = True
++    gdb.write('LINUXCAST_S002_DEBUGGER:' + json.dumps({'signal': signal, 'frames': frames, 'inspectionFailed': failed}) + '\n')
++    try:
++        gdb.execute('kill', to_string=True)
++    except gdb.error:
++        pass
++    # A debugger wrapper exit is not relabelled the original child exit/signal.
++    gdb.execute('quit 86', to_string=True)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/spikes/desktop/guest/restart-preparation.test.ts b/spikes/desktop/guest/restart-preparation.test.ts
+index 609dd2d..dd4621d 100644
+--- a/spikes/desktop/guest/restart-preparation.test.ts
++++ b/spikes/desktop/guest/restart-preparation.test.ts
+@@ -1,5 +1,5 @@
+ import {afterAll,beforeAll,expect,test} from 'vitest';
+-import {spawn} from 'node:child_process';
++import {spawn,execFileSync} from 'node:child_process';
+ import {createInterface} from 'node:readline';
+ import {mkdtempSync,readFileSync,rmSync,existsSync} from 'node:fs';
+ import {tmpdir} from 'node:os';
+@@ -143,3 +143,54 @@ print('bounded-platform-guard-passed')`;
+   const child=spawn('/usr/bin/python3',['-c',code],{env:{PATH:process.env.PATH},stdio:'ignore'});
+   expect(await new Promise<number|null>(resolve=>child.once('close',resolve))).toBe(0);
+ });
++
++test('native failure diagnostics export only bounded synthetic configure records',()=>{
++  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
++import json, pathlib, runpy, sys, tempfile
++sys.path.insert(0,sys.argv[1])
++probe=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))['canary_progress']
++entry=dict(width=280,height=160,clientWidth=280,clientHeight=160,maximized=False,fullscreen=False,iconified=False,resizable=True)
++with tempfile.TemporaryDirectory(dir=sys.argv[2]) as directory:
++    root=pathlib.Path(directory)
++    file=root/'private-canary.log'
++    assert probe(root) is None
++    valid={'ownConfigureEvents':[entry]}
++    file.write_text('unstructured private diagnostic must never escape\n'+json.dumps(valid)+'\n')
++    assert probe(root)==valid
++    invalid=[{'ownConfigureEvents':[dict(entry,caption='private')]},
++             {'ownConfigureEvents':[dict(entry,width=True)]},
++             {'ownConfigureEvents':[dict(entry,clientHeight=16385)]},
++             {'ownConfigureEvents':[entry]*9},
++             {'ownConfigureEvents':[entry],'error':'private'}]
++    for value in invalid:
++        file.write_text(json.dumps(value)+'\n')
++        assert probe(root) is None
++    file.write_text('x'*20000+'\n'+json.dumps(valid)+'\n')
++    assert probe(root)==valid
++print('bounded-own-configure-schema-passed')
++`,new URL('.',import.meta.url).pathname,root],{encoding:'utf8',timeout:5000,maxBuffer:16384});
++  expect(result.trim()).toBe('bounded-own-configure-schema-passed');
++});
++
++test('debugger filtering retains fixed categories and rejects raw frame details',()=>{
++  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
++import pathlib,runpy,sys
++module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'debugger_filter.py'))
++assert module['module_category']('/private/location/libQt6Qml.so.6')=='QT_QML'
++assert module['module_category']('/private/libkwin.so.6.3.6')=='KWIN'
++assert module['module_category']('/private/application-name')=='UNKNOWN'
++assert module['function_category']('KWin::Window::moveResize(private args)')=='KWIN_MOVE_RESIZE'
++assert module['function_category']('unrecognized private function 0x1234')=='UNKNOWN'
++parse=module['parse_report']
++valid={'signal':'SIGSEGV','frames':[{'module':'KWIN','function':'KWIN_MOVE_RESIZE'}],'inspectionFailed':False}
++assert parse(valid)==valid
++for value in [dict(valid,raw='private'),dict(valid,signal='private signal'),dict(valid,inspectionFailed=0),
++              dict(valid,frames=valid['frames']*17),
++              dict(valid,frames=[{'module':'KWIN','function':'UNKNOWN','address':'0x1234'}]),
++              dict(valid,frames=[{'module':'/private/library','function':'UNKNOWN'}]),
++              dict(valid,frames=[{'module':'KWIN','function':'private(args)'}])]:
++    assert parse(value) is None
++print('bounded-debugger-filter-passed')
++`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
++  expect(result.trim()).toBe('bounded-debugger-filter-passed');
++});
+diff --git a/spikes/desktop/guest/run-session.py b/spikes/desktop/guest/run-session.py
+index 0070c87..ff1c72f 100644
+--- a/spikes/desktop/guest/run-session.py
++++ b/spikes/desktop/guest/run-session.py
+@@ -15,6 +15,7 @@ import tempfile
+ import time
+ from supervision import Supervisor, Cancelled
+ import private_context as _context
++from debugger_filter import parse_report as parse_debugger_report
+ 
+ HERE=pathlib.Path(__file__).resolve().parent
+ BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
+@@ -45,6 +46,24 @@ def read_result(path):
+     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
+     return value
+ 
++def canary_progress(root):
++    file=root/'private-canary.log'
++    if not file.exists(): return None
++    with file.open('rb') as stream:
++        stream.seek(max(0,file.stat().st_size-16384)); content=stream.read(16384).decode('utf8','replace')
++    for line in reversed(content.splitlines()):
++        try: value=json.loads(line)
++        except ValueError: continue
++        if not isinstance(value,dict) or set(value)!= {'ownConfigureEvents'}: continue
++        entries=value['ownConfigureEvents']
++        if not isinstance(entries,list) or not 1<=len(entries)<=8: continue
++        keys={'width','height','clientWidth','clientHeight','maximized','fullscreen','iconified','resizable'}
++        if all(isinstance(item,dict) and set(item)==keys
++               and all(type(item[key]) is int and 0<item[key]<=16384 for key in ('width','height','clientWidth','clientHeight'))
++               and all(type(item[key]) is bool for key in ('maximized','fullscreen','iconified','resizable')) for item in entries):
++            return value
++    return None
++
+ def native_progress(root):
+     # Only own exact static stage labels escape the private compositor log.
+     stages={'SCRIPT_ENTERED','CONTEXT_CALLBACK','OWN_WINDOW_FOUND','NATIVE_ADAPTER_READY','LOOP_START','OWN_WINDOW_DEADLINE','SCRIPT_EXCEPTION'}
+@@ -63,10 +82,17 @@ def native_progress(root):
+         number=int(match.group(1))
+         if 0<number<=1000000 and number not in error_lines: error_lines.append(number)
+         if len(error_lines)>=8: break
++    debugger=None
++    for line in content.splitlines():
++        if 'LINUXCAST_S002_DEBUGGER:' not in line: continue
++        try: candidate=json.loads(line.split('LINUXCAST_S002_DEBUGGER:',1)[1])
++        except ValueError: continue
++        debugger=parse_debugger_report(candidate)
++        if debugger is not None: break
+     return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
+-            'wire':read_result(root/'kwin-progress.json')}
++            'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root),'debugger':debugger}
+ 
+-def inner(backend,root,restart=False):
++def inner(backend,root,restart=False,debugger=False):
+     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
+     for key in ('DISPLAY','XAUTHORITY'):
+@@ -94,21 +120,33 @@ def inner(backend,root,restart=False):
+     signal.signal(signal.SIGTERM,interrupted)
+     signal.signal(signal.SIGINT,interrupted)
+     rawlog=(root/'private-compositor.log').open('w')
++    canarylog=(root/'private-canary.log').open('w')
+     try:
+         if backend.startswith('gnome'):
+             setting=bounded(['gsettings','set','org.gnome.shell','enabled-extensions',"['s002-native@linuxcast.invalid']"],env)
+             if setting.returncode: return report_unavailable('PRIVATE_EXTENSION_CONFIGURATION_FAILED')
+-        compositor=subprocess.Popen([executable,*args],env=env,stdout=rawlog,stderr=rawlog,start_new_session=True)
++        command=[executable,*args]
++        def no_core():
++            import resource
++            resource.setrlimit(resource.RLIMIT_CORE,(0,0))
++        if debugger:
++            if not pathlib.Path('/usr/bin/gdb').is_file(): return report_unavailable('GUEST_DEBUGGER_PACKAGE_REQUIRED')
++            env['DEBUGINFOD_URLS']=''
++            command=['/usr/bin/gdb','--quiet','--nx','--nh','--batch',
++                     '-iex','set auto-load off','-iex','set debuginfod enabled off',
++                     '-iex','set startup-with-shell off','-iex','set disable-randomization off',
++                     '-x',str(HERE/'debugger_filter.py'),'--args',*command]
++        compositor=subprocess.Popen(command,env=env,stdout=rawlog,stderr=rawlog,start_new_session=True,preexec_fn=no_core if debugger else None)
+         children.append(compositor)
+         deadline=time.monotonic()+15
+         bus_name='org.gnome.Shell' if backend.startswith('gnome') else 'org.kde.KWin'
+         while time.monotonic()<deadline:
+-            if compositor.poll() is not None: return report_unavailable('NATIVE_COMPOSITOR_START_FAILED')
++            if compositor.poll() is not None: return report_unavailable('NATIVE_COMPOSITOR_START_FAILED',native_progress(root) if debugger else None)
+             owner=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',bus_name],env)
+             if 'true' in owner.stdout and (not wayland or (pathlib.Path(env['XDG_RUNTIME_DIR'])/socket).exists()): break
+             time.sleep(0.1)
+         else: return report_unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
+-        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
++        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True)
+         children.append(canary)
+         if backend.startswith('kwin'):
+             env['LINUXCAST_S002_CANARY_PID']=str(canary.pid)
+@@ -142,7 +180,8 @@ def inner(backend,root,restart=False):
+         while time.monotonic()<deadline:
+             if canary.poll() is not None:
+                 progress=native_progress(root) if backend.startswith('kwin') else {}
+-                progress.update(canaryExitCode=canary.returncode,compositorExitCode=compositor.poll())
++                progress['canaryExitCode']=canary.returncode
++                progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
+                 return report_unavailable('OWN_NATIVE_CANARY_FAILED',progress)
+             result=read_result(result_path)
+             if result: break
+@@ -172,6 +211,7 @@ def inner(backend,root,restart=False):
+     finally:
+         for child in reversed(children): terminate(child)
+         rawlog.close()
++        canarylog.close()
+ 
+ def main():
+     parser=argparse.ArgumentParser(description=__doc__)
+@@ -179,15 +219,18 @@ def main():
+     parser.add_argument('--private-guest',action='store_true')
+     parser.add_argument('--inner',type=pathlib.Path)
+     parser.add_argument('--restart-scenario',action='store_true')
++    parser.add_argument('--debugger-scenario',action='store_true')
+     arguments=parser.parse_args()
+     if not arguments.private_guest or not _context.guest_allowed(pathlib.Path('/etc/os-release').read_text(),os.getuid(),pathlib.Path('/run/linuxcast-input-spike-lab').exists()):
+         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
++    if arguments.debugger_scenario and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
++        return report_unavailable('DEBUGGER_ONLY_KWIN_WAYLAND_SUCCESS_SCENARIO')
+     if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
+         return report_unavailable('KWIN_RESTART_BACKEND_REQUIRED')
+     if arguments.inner:
+         try: root=_context.private_context(str(arguments.inner),arguments.backend)
+         except (OSError,ValueError,RuntimeError): return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
+-        return inner(arguments.backend,root,arguments.restart_scenario)
++        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario)
+     root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-',dir='/tmp'))
+     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+     for name in _context.DIRECTORIES.values(): (root/name).mkdir(mode=0o700)
+@@ -201,6 +244,7 @@ def main():
+         if (HERE/filename).exists(): shutil.copyfile(HERE/filename,extension/filename)
+     command=['dbus-run-session','--config-file',str(config),'--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
+     if arguments.restart_scenario: command.append('--restart-scenario')
++    if arguments.debugger_scenario: command.append('--debugger-scenario')
+     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
+         command=['xvfb-run','-a','-f',str(root/'xauthority'),'-s','-screen 0 1280x720x24 -nolisten tcp',*command]
+     try:
+diff --git a/spikes/desktop/native/own-canary.py b/spikes/desktop/native/own-canary.py
+index 0703736..f6fcca5 100644
+--- a/spikes/desktop/native/own-canary.py
++++ b/spikes/desktop/native/own-canary.py
+@@ -27,7 +27,8 @@ def main():
+     clipboard = Gtk.Clipboard.get_for_display(display, atom)
+     result = {"state": "running", "backend": "GTK3/GDK-X11 own-window/private-selection",
+               "ownerEvents": 0, "clipboardTouched": False, "privateSelectionTextMatches": False,
+-              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None}
++              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None,
++              "configureEvents": [], "configureEventCount": 0, "invalidOwnConfigureObserved": False}
+     clipboard.connect("owner-change", lambda *_args: result.update(ownerEvents=result["ownerEvents"] + 1))
+     clipboard.set_text("public Linuxcast private-selection canary", -1)
+     owned = Gdk.selection_owner_get_for_display(display, atom)
+@@ -54,6 +55,25 @@ def main():
+         mapped_by_server = True
+         return False
+     window.connect("map-event", mapped)
++    def configured(_window, event):
++        result["configureEventCount"] = min(255, result["configureEventCount"] + 1)
++        client = tuple(window.get_size())
++        values = (event.width, event.height, *client)
++        if any(not isinstance(value, int) or not 0 < value <= 16384 for value in values):
++            result["invalidOwnConfigureObserved"] = True
++            return False
++        if len(result["configureEvents"]) < 8:
++            state = window.get_window().get_state()
++            result["configureEvents"].append({
++                "width": event.width, "height": event.height,
++                "clientWidth": client[0], "clientHeight": client[1],
++                "requestSent": result["initialGeometry"] is not None,
++                "maximized": bool(state & Gdk.WindowState.MAXIMIZED),
++                "fullscreen": bool(state & Gdk.WindowState.FULLSCREEN),
++                "iconified": bool(state & Gdk.WindowState.ICONIFIED),
++                "resizable": window.get_resizable()})
++        return False
++    window.connect("configure-event", configured)
+     window.show_all()
+ 
+     def rectangle():

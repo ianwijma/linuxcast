@@ -1,0 +1,22 @@
+{
+  "kind": "no-GUI-preparation-privacy-check",
+  "command": "node node_modules/vitest/vitest.mjs run spikes/desktop/guest/restart-preparation.test.ts",
+  "outcome": "passed",
+  "passed": 24,
+  "failed": 0,
+  "skippedOrTodo": 0,
+  "startedLocal": "2026-10-23 05:43:45 Australia/Sydney",
+  "startedUtc": "2026-10-22T18:43:45Z",
+  "durationSeconds": 2.2,
+  "nodeVersion": "24.22.1",
+  "bunVersion": "1.4.4",
+  "sourceHashCount": 24,
+  "builtHashCount": 18,
+  "manifestSha256": "077d73da129977c6a360a7699cc654937f02cae6d1c865536dd7de8bc4f39335",
+  "debuggerFilterSha256": "48b23784c3ad6731c094783999598c2cdca912731eaff8535ba83a935fec273e",
+  "testFileSha256": "ac14d6d356398eb9cc1f56f50968172832bbb9ad35c186f9c330127cb8e2dde7",
+  "hostGuiUsed": false,
+  "guestAccessUsed": false,
+  "finerCategoryNativeRunExecuted": false,
+  "readOnlyControlImplementedOrExecuted": false
+}

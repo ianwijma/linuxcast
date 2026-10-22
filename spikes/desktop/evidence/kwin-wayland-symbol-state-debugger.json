@@ -1,0 +1,260 @@
+{
+  "backend": "kwin-wayland",
+  "restart": false,
+  "debugger": true,
+  "readOnlyControl": false,
+  "startedUtc": "2026-10-22T19:32:56.601808+00:00",
+  "staging": {
+    "sourceCommit": "72dc8e10c8361d79f466d0045cb64a7293dcf4dc",
+    "sourceDirty": false,
+    "reviewedDiffSha256": "771318ea54fe529f920dc8eff23a134aeef3967d09331221a20424a1b17f2b61",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "c1b77e4f9a3df33de5d2212a0046de36810c5526609e8c8510ab68b1027b9f50",
+    "sourceManifest": {
+      "kind": "task-owned-real-adapter-guest-harness",
+      "sourceSha256": {
+        "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+        "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+        "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+        "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+        "gnome-extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "kwin-script.js": "47c4e5bc746806b4df9c17f9ae43944fb2cbc1eff1420d38d507b06c44361c09",
+        "queue-helper.ts": "c257b89f7dfa60fd33ab9dbc9463b22fc33802611ffeb713182457d1444b06fa",
+        "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+        "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+        "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+        "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+        "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+        "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+        "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "../native/own-canary.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "build.ts": "f9e997e159666237c7b6623078b0df769d798af007faa6f8b890f43b417f6c15",
+        "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+      },
+      "outputSha256": {
+        "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+        "kwin-script.js": "67045a7e3dffe13eff14687c2b54edbc00f5f08d5a56748b30353b86d76df72d",
+        "restart-script.js": "197f72a35acb4a4d86b839fd9e7e0f69a7638c78f541e11d06cc3213b3990c41",
+        "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+        "queue-helper.mjs": "9ca605659365f5ca747155692e348ac7574d9d70615d12117b2d51e1222e2a7d",
+        "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+        "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+        "x11-private-selection.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+      }
+    },
+    "guestExecution": false
+  },
+  "exitCode": 3,
+  "results": [
+    {
+      "state": "unavailable",
+      "reason": "OWN_NATIVE_CANARY_FAILED",
+      "physicalDesktopMatrixEstablished": false,
+      "nativeProgress": {
+        "stages": [
+          "SCRIPT_ENTERED",
+          "CONTEXT_CALLBACK",
+          "OWN_WINDOW_FOUND",
+          "NATIVE_ADAPTER_READY",
+          "LOOP_START"
+        ],
+        "scriptEvaluationErrorLogged": false,
+        "publicBundleErrorLines": [],
+        "wire": {
+          "authenticatedRequests": {
+            "CanaryContext": 1,
+            "Handshake": 1,
+            "NextCommand": 3,
+            "Ack": 2,
+            "CanaryObservation": 0
+          },
+          "replies": {
+            "CanaryContext": 1,
+            "Handshake": 1,
+            "NextCommand": 3,
+            "Ack": 2,
+            "CanaryObservation": 0
+          },
+          "nodeExited": false
+        },
+        "ownClient": {
+          "ownConfigureEvents": [
+            {
+              "width": 379,
+              "height": 249,
+              "clientWidth": 327,
+              "clientHeight": 160,
+              "maximized": false,
+              "fullscreen": false,
+              "iconified": false,
+              "resizable": true
+            },
+            {
+              "width": 379,
+              "height": 249,
+              "clientWidth": 327,
+              "clientHeight": 160,
+              "maximized": false,
+              "fullscreen": false,
+              "iconified": false,
+              "resizable": true
+            },
+            {
+              "width": 452,
+              "height": 292,
+              "clientWidth": 400,
+              "clientHeight": 203,
+              "maximized": false,
+              "fullscreen": false,
+              "iconified": false,
+              "resizable": true
+            }
+          ]
+        },
+        "debugger": {
+          "signal": "SIGSEGV",
+          "frames": [
+            {
+              "module": "QT_GUI",
+              "function": "UNKNOWN",
+              "symbolState": "ABSENT"
+            },
+            {
+              "module": "QT_GUI",
+              "function": "UNKNOWN",
+              "symbolState": "ABSENT"
+            },
+            {
+              "module": "QT_GUI",
+              "function": "UNKNOWN",
+              "symbolState": "ABSENT"
+            },
+            {
+              "module": "QT_GUI",
+              "function": "QT_PAINTER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_WAYLAND_COMPOSITE",
+              "symbolState": "CLASSIFIED"
+            },
+            {
+              "module": "QT_CORE",
+              "function": "UNKNOWN",
+              "symbolState": "ABSENT"
+            },
+            {
+              "module": "KWIN",
+              "function": "KWIN_OTHER",
+              "symbolState": "CLASSIFIED"
+            }
+          ],
+          "inspectionFailed": false
+        },
+        "canaryExitCode": 1,
+        "debuggerWrapperExitCode": null
+      }
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1,
+      "gdb": 0
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1,
+      "gdb": 0
+    },
+    "noNewPrivateRoots": true,
+    "inputMarkerAbsent": true
+  },
+  "physicalDesktopMatrixEstablished": false,
+  "transport": {
+    "archiveSha256": "ddc033f320a35ebcca5d23facb415957e438a23c35fe35cda9f32b4350bf7476",
+    "archiveBytes": 44527796,
+    "archiveHashVerifiedInsideGuest": true,
+    "builtOutputHashesVerifiedInsideGuest": 19,
+    "nodeHashVerifiedInsideGuest": true
+  }
+}

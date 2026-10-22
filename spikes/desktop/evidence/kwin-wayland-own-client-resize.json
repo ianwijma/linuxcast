@@ -1,0 +1,282 @@
+{
+  "startedUtc": "2026-10-22T20:12:14.125576+00:00",
+  "finishedUtc": "2026-10-22T20:12:29.766578+00:00",
+  "exitCode": 4,
+  "report": {
+    "backend": "kwin-wayland",
+    "state": "diagnostic",
+    "adapter": {
+      "kind": "diagnostic",
+      "state": "diagnostic",
+      "diagnosticStatus": "OWN_CLIENT_RESIZE_GEOMETRY_READY",
+      "kindEvidence": "own-client-resize-not-placement-or-clipboard-acceptance",
+      "nativePlacementAttempted": false,
+      "placementAcceptanceEstablished": false,
+      "clipboardAcceptanceEstablished": false,
+      "nativeGeometryChanged": true,
+      "pollingStopped": true,
+      "observations": [
+        {
+          "x": 476,
+          "y": 261,
+          "width": 327,
+          "height": 197
+        },
+        {
+          "x": 476,
+          "y": 261,
+          "width": 400,
+          "height": 240
+        },
+        {
+          "x": 476,
+          "y": 261,
+          "width": 400,
+          "height": 240
+        }
+      ],
+      "requested": null,
+      "transportAckCount": 3,
+      "outcomes": [
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "terminalReason": "COMPANION_RESTARTED",
+      "normalClipboardTouched": false
+    },
+    "clipboard": {
+      "state": "not-exercised",
+      "reason": "OWN_CLIENT_RESIZE_DIAGNOSTIC_CONTROL"
+    },
+    "evidenceKind": "actual-isolated-own-client-resize-diagnostic",
+    "packages": [
+      "gjs\t1.82.3-1",
+      "gnome-shell\t48.7-0+deb13u2",
+      "kwin-wayland\t4:6.3.6-1",
+      "kwin-x11\t4:6.3.6-1",
+      "libgl1-mesa-dri:amd64\t25.0.7-2+deb13u1",
+      "mutter\t48.7-0+deb13u1",
+      "wl-clipboard\t2.2.1-2"
+    ],
+    "sourceManifest": {
+      "kind": "task-owned-real-adapter-guest-harness",
+      "sourceSha256": {
+        "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+        "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+        "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+        "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+        "gnome-extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "kwin-script.js": "47c4e5bc746806b4df9c17f9ae43944fb2cbc1eff1420d38d507b06c44361c09",
+        "queue-helper.ts": "cbd1f96f8a8df20bc3ee85dd2607f5c6f930c14a395a741f84143526f6c29c7d",
+        "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+        "kwin-bus.py": "16bd0c984c5a2663b172010a3a5c84195a7491a81d7a4a8662fd86ba11186fee",
+        "run-session.py": "c94ccd94fc4a6b3fcab47f5645001cd307ed40961bc4d8aee7897d4696190f85",
+        "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+        "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+        "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+        "canary.py": "6b1d33b139543aac6c4b3b60b997591e879fda2cfb95cdd2f342c7713d7d7231",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "../native/own-canary.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "build.ts": "c426f4d2c8f61da81a101a449e9bd2536ba9d7d210153b3c6535d432f7d5f82f",
+        "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4",
+        "client_resize.py": "371009a6bf7d29727e5328f25114569ef2437b0dbad5e10db23f5504904dc22c"
+      },
+      "outputSha256": {
+        "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+        "kwin-script.js": "67045a7e3dffe13eff14687c2b54edbc00f5f08d5a56748b30353b86d76df72d",
+        "restart-script.js": "197f72a35acb4a4d86b839fd9e7e0f69a7638c78f541e11d06cc3213b3990c41",
+        "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+        "queue-helper.mjs": "60f065dce469231b9a413ff43d019d4d6507d61d953e32492f3040bcc67bf969",
+        "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "canary.py": "6b1d33b139543aac6c4b3b60b997591e879fda2cfb95cdd2f342c7713d7d7231",
+        "kwin-bus.py": "16bd0c984c5a2663b172010a3a5c84195a7491a81d7a4a8662fd86ba11186fee",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "run-session.py": "c94ccd94fc4a6b3fcab47f5645001cd307ed40961bc4d8aee7897d4696190f85",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+        "x11-private-selection.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4",
+        "client_resize.py": "371009a6bf7d29727e5328f25114569ef2437b0dbad5e10db23f5504904dc22c"
+      }
+    },
+    "kernel": "6.12.113+deb13-amd64",
+    "scale": 1,
+    "rendering": "software-requested; no GPU passthrough; actual renderer must be recorded separately",
+    "physicalDesktopMatrixEstablished": false,
+    "hostDisplayClipboardOrSettingsUsed": false,
+    "postStopQuiet": {
+      "seconds": 5.0,
+      "completed": true,
+      "allOwnProcessesAlive": true,
+      "controlTrafficStable": true,
+      "reason": "POST_STOP_QUIET_COMPLETE"
+    },
+    "diagnosticStatus": "OWN_CLIENT_RESIZE_CONTROL_COMPLETE",
+    "diagnosticScenario": "own-client-resize-control",
+    "nativePlacementAttempted": false,
+    "requestedPlacement": null,
+    "actualRestartTested": false,
+    "placementAcceptanceEstablished": false,
+    "clipboardAcceptanceEstablished": false,
+    "ownClient": {
+      "ownConfigureEvents": [
+        {
+          "width": 379,
+          "height": 249,
+          "clientWidth": 327,
+          "clientHeight": 160,
+          "maximized": false,
+          "fullscreen": false,
+          "iconified": false,
+          "resizable": true
+        },
+        {
+          "width": 379,
+          "height": 249,
+          "clientWidth": 327,
+          "clientHeight": 160,
+          "maximized": false,
+          "fullscreen": false,
+          "iconified": false,
+          "resizable": true
+        },
+        {
+          "width": 452,
+          "height": 292,
+          "clientWidth": 400,
+          "clientHeight": 203,
+          "maximized": false,
+          "fullscreen": false,
+          "iconified": false,
+          "resizable": true
+        }
+      ],
+      "clientResizeControl": {
+        "resizeAttemptCount": 1,
+        "requestedClientSize": {
+          "width": 400,
+          "height": 203
+        },
+        "initialClient": {
+          "clientWidth": 327,
+          "clientHeight": 160,
+          "maximized": false,
+          "fullscreen": false,
+          "iconified": false,
+          "resizable": true
+        },
+        "configureCountAtRequest": 2,
+        "requestPipeClosed": true,
+        "state": "requested",
+        "reason": "FIXED_REQUEST_APPLIED"
+      }
+    },
+    "clientResizeChecks": {
+      "resizeAttemptCount": 1,
+      "clientConfigureMatched": true,
+      "nativeFrameSizeMatched": true,
+      "geometryChanged": true
+    }
+  },
+  "before": {
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateRootsAbsent": true,
+    "inputMarkerAbsent": true
+  },
+  "after": {
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateRootsAbsent": true,
+    "inputMarkerAbsent": true
+  },
+  "sourceBaselineCommit": "3f31c83936e074888daf2023092eaf8fec2a6b85",
+  "sourceDirty": true,
+  "sourceSigned": false,
+  "reviewedPatchSha256": "c9af4d351d0ff53b5c6c546e91b4dbc547d7aeb424ce99eab5da295860fc77e9",
+  "manifestSha256": "c07d2ac038a988623fa3ece8dfee2974fd06b258cb60acf2b1e32afe1289fcf4",
+  "archiveSha256": "19192a89a32c812a6e90ed7db77629ba008fde48ab35535add721fd1b7988b0b",
+  "sourceManifest": {
+    "kind": "task-owned-real-adapter-guest-harness",
+    "sourceSha256": {
+      "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+      "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+      "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+      "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+      "gnome-extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+      "kwin-script.js": "47c4e5bc746806b4df9c17f9ae43944fb2cbc1eff1420d38d507b06c44361c09",
+      "queue-helper.ts": "cbd1f96f8a8df20bc3ee85dd2607f5c6f930c14a395a741f84143526f6c29c7d",
+      "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+      "kwin-bus.py": "16bd0c984c5a2663b172010a3a5c84195a7491a81d7a4a8662fd86ba11186fee",
+      "run-session.py": "c94ccd94fc4a6b3fcab47f5645001cd307ed40961bc4d8aee7897d4696190f85",
+      "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+      "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+      "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+      "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+      "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+      "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+      "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+      "canary.py": "6b1d33b139543aac6c4b3b60b997591e879fda2cfb95cdd2f342c7713d7d7231",
+      "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+      "../native/own-canary.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+      "build.ts": "c426f4d2c8f61da81a101a449e9bd2536ba9d7d210153b3c6535d432f7d5f82f",
+      "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f",
+      "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+      "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+      "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4",
+      "client_resize.py": "371009a6bf7d29727e5328f25114569ef2437b0dbad5e10db23f5504904dc22c"
+    },
+    "outputSha256": {
+      "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+      "kwin-script.js": "67045a7e3dffe13eff14687c2b54edbc00f5f08d5a56748b30353b86d76df72d",
+      "restart-script.js": "197f72a35acb4a4d86b839fd9e7e0f69a7638c78f541e11d06cc3213b3990c41",
+      "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+      "queue-helper.mjs": "60f065dce469231b9a413ff43d019d4d6507d61d953e32492f3040bcc67bf969",
+      "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+      "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+      "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+      "canary.py": "6b1d33b139543aac6c4b3b60b997591e879fda2cfb95cdd2f342c7713d7d7231",
+      "kwin-bus.py": "16bd0c984c5a2663b172010a3a5c84195a7491a81d7a4a8662fd86ba11186fee",
+      "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+      "run-session.py": "c94ccd94fc4a6b3fcab47f5645001cd307ed40961bc4d8aee7897d4696190f85",
+      "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+      "extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+      "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+      "x11-private-selection.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+      "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+      "debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+      "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4",
+      "client_resize.py": "371009a6bf7d29727e5328f25114569ef2437b0dbad5e10db23f5504904dc22c"
+    }
+  },
+  "physicalDesktopMatrixEstablished": false
+}

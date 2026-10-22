@@ -1,0 +1,153 @@
+{
+  "backend": "gnome-wayland",
+  "restart": false,
+  "startedUtc": "2026-10-22T17:41:02.453900+00:00",
+  "staging": {
+    "sourceCommit": "6895209551d0b0a771294cf9b8a016939f773fbd",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "6703a684359df89c8b63614897f4a8b82d80b4a8b72c1ae80b5c92bdcb788eab",
+    "guestExecution": false
+  },
+  "exitCode": 3,
+  "results": [
+    {
+      "backend": "gnome-wayland",
+      "state": "failed",
+      "adapter": {
+        "kind": "actual-GNOME48-native-private-selection-and-own-window",
+        "state": "failed",
+        "normalClipboardTouched": false,
+        "privateSelection": true,
+        "ownerEvents": 4,
+        "ownFrameIsArray": false,
+        "ownFrameFieldsNumeric": true,
+        "ownFramePositive": true,
+        "stage": "PRIVATE_SELECTION_TRANSFER",
+        "windowApiPresent": true,
+        "nativeWaylandClient": true,
+        "adapterFrameFieldsNumeric": true,
+        "adapterFramePositive": true,
+        "initialGeometry": {
+          "x": 477,
+          "y": 262,
+          "width": 327,
+          "height": 197
+        },
+        "workArea": {
+          "x": 0,
+          "y": 32,
+          "width": 1280,
+          "height": 688
+        },
+        "requested": {
+          "x": 32,
+          "y": 64,
+          "width": 400,
+          "height": 240
+        },
+        "finalGeometry": {
+          "x": 477,
+          "y": 262,
+          "width": 327,
+          "height": 197
+        },
+        "liveGeometryChanged": false,
+        "targetApplied": false,
+        "mimeObserved": true,
+        "publicPayloadMatches": true,
+        "nativeByteLimit": true,
+        "oversizeDetectable": true,
+        "nativeCancellation": true,
+        "unsupportedMimeObserved": true,
+        "unsupportedMimeRejected": true,
+        "privateSelectionReleased": true,
+        "reason": "NATIVE_ASSERTION_FAILED"
+      },
+      "clipboard": null,
+      "evidenceKind": "actual-isolated-software-compositor-native-API",
+      "packages": [
+        "gjs\t1.82.3-1",
+        "gnome-shell\t48.7-0+deb13u2",
+        "kwin-wayland\t4:6.3.6-1",
+        "kwin-x11\t4:6.3.6-1",
+        "libgl1-mesa-dri:amd64\t25.0.7-2+deb13u1",
+        "mutter\t48.7-0+deb13u1",
+        "wl-clipboard\t2.2.1-2"
+      ],
+      "sourceManifest": {
+        "kind": "task-owned-real-adapter-guest-harness",
+        "sourceSha256": {
+          "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+          "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+          "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+          "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+          "gnome-extension.js": "e4b55728b29afded957915e11a2250e62c4ee263d395554b4b3c01545b157438",
+          "kwin-script.js": "e35b06e82b87de8545e4da8d85bcfff58bfa35bbb41d180e6a2b40990336f63d",
+          "queue-helper.ts": "174d6aac625a11d79b150cbd94c99359845b1ed691800ed739adb4120d886b29",
+          "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+          "kwin-bus.py": "817db1fcb17f72ea0d64e6922984edd9f5c2e61f8c01444a5a93f42bfa077c24",
+          "run-session.py": "833dae01f79dd298c39e301c25ce9a3c683643c01505bbdf623a947d87cdbddb",
+          "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+          "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+          "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+          "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+          "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+          "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+          "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+          "canary.py": "d93c5fb2c57b49e405b2c9052e7058db44c8f5586eee251967a58e8f3ca9d4e1",
+          "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+          "../native/own-canary.py": "f28c9b18812ca4cbc90a1e44428ec60f1cacd892ef7f4c9f4e47b0d404bbd12e",
+          "build.ts": "837afb335640c8cbc3335e723c643c9640cfd0e268c93d4496f3e3a2761242b3",
+          "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f"
+        },
+        "outputSha256": {
+          "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+          "kwin-script.js": "54ed556df8b1d88300a9bb7fb39b61afaec61cde32f35511d3aeec00ebc95b21",
+          "restart-script.js": "9cd19ac3dd02feeda954755ca18699648a7085627c7f4def345e7f44804c2ec5",
+          "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+          "queue-helper.mjs": "93d45cf4644e70493989cfaea1c81c88e7def6fb910654a5c669e0e34597f48d",
+          "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+          "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+          "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+          "canary.py": "d93c5fb2c57b49e405b2c9052e7058db44c8f5586eee251967a58e8f3ca9d4e1",
+          "kwin-bus.py": "817db1fcb17f72ea0d64e6922984edd9f5c2e61f8c01444a5a93f42bfa077c24",
+          "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+          "run-session.py": "833dae01f79dd298c39e301c25ce9a3c683643c01505bbdf623a947d87cdbddb",
+          "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+          "extension.js": "e4b55728b29afded957915e11a2250e62c4ee263d395554b4b3c01545b157438",
+          "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+          "x11-private-selection.py": "f28c9b18812ca4cbc90a1e44428ec60f1cacd892ef7f4c9f4e47b0d404bbd12e"
+        }
+      },
+      "kernel": "6.12.113+deb13-amd64",
+      "scale": 1,
+      "rendering": "software-requested; no GPU passthrough; actual renderer must be recorded separately",
+      "physicalDesktopMatrixEstablished": false,
+      "hostDisplayClipboardOrSettingsUsed": false
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

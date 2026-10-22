@@ -18,7 +18,7 @@ Accepted F1-01 PR4/5; S0-05 PR7/8; S0-04 PR9/10; S0-06 PR11/12. S0-02 source PR1
 | Work | Isolated worktree / branch | PR and current state |
 |---|---|---|
 | S0-01 | `/tmp/linuxcast-s0-01`, `codex/s0-01-launcher` | Draft PR15 published `d8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab`; current CI39854073475 green |
-| S0-03 | `/tmp/linuxcast-s0-03`, `codex/s0-03-input` | Draft PR13 published `3a2bffc53660d946261ede9c47fc4eaaab85bcbe`; new reviewed source/evidence signed5cd8f7b; shared commit/merge/push pending |
+| S0-03 | `/tmp/linuxcast-s0-03`, `codex/s0-03-input` | Draft PR13 published `3a2bffc53660d946261ede9c47fc4eaaab85bcbe`; new reviewed source/evidence signed5cd8f7b; shared147c7ea committed; merge/push pending |
 | S0-02 completion | `/tmp/linuxcast-s002-accepted`, `codex/s0-02-accepted` | PR16 merged; no further work |
 
 Root owns shared Cargo/registry/cards/checkpoint/integration. Agent `/root/review_f1_01` owns S003 input paths except Cargo; `/root/s0_05_provider` owns S001; `/root/s0_06_workflow_ui` performs read-only independent review. Do not regress accepted main metadata when merging older branches. Existing CI is planning-only; full application CI is future work, gh lacks workflow scope; no bypass.
@@ -39,7 +39,7 @@ Actual evidence under `spikes/input/evidence/`:
 
 Public reproducible evidence: collector bundleef4426d3/mapping1e620b42 exact11 bounded regular source members; frozen17 diffgzip44d0 decompresses d83; exact Cargo snapshotf111/registrationf7c93 separate13-line target change. Final `denial-actual-results.md` SHAfe94321e314075b85a2b6cb202eecf062649685c3ae1ccd543bc8943538920e2 /JSON42f07442b2632f9cae46803d5fe59d803781ca537b1703a5e3d65b2184c8b0cf map all14 artifact hashes and explicit unsigned execution/earlier binary reuse. Root+006 final notes/provenance/metadata CLEAN.
 
-**Immediate integration queue:** Agent003 signed owned34-file commit5cd8f7b8386f549e12e208a986d4961225b62001, all17source hashes match frozenexecution; signature verified with ephemeral configured-public-key signers file, no configuration change. Slot released. Root commits shared Cargo/registry/card/checkpoint, merges accepted developfc0 preserving S002, validates combined head and pushes draftPR13. No task merge/AC closure or new VM/source increment yet.
+**Immediate integration queue:** Agent003 signed owned34-file commit5cd8f7b8386f549e12e208a986d4961225b62001, all17source hashes match frozenexecution; signature verified with ephemeral configured-public-key signers file, no configuration change. Slot released. Root shared Cargo/registry/card/checkpoint commit147c7ea is signed. Accepted developfc0 merge is in progress, PROGRESS resolved to this current checkpoint; S002 and accepted tasks preserved. Combined typecheck and21 plan regressions pass; stage resolved files/sign merge/push draftPR13 pending. No task merge/AC closure or new VM/source increment yet.
 
 Next bounded source increment after current commit: trusted root-to-ordinary helper bootstrap and live veto in actual supervisor BEFORE device/worker bootstrap. Preserve parent authentication, trusted accepted-peer duplicate/generation, empty groups/caps/env, FD allowlist, no Allow and fixed6s engineering lifetime/nonblocking watchdog. Current supervisor starts worker before client and uses fixture context. AC01 physical-held/compositor recovery and AC02 locked/inactive graphical enforcement remain required; sandbox socket denial evidence must survive. No host policy changes.
 
