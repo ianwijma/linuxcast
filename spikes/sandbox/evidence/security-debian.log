@@ -2,29 +2,29 @@ $ node scripts/test-runner/run.ts security "S0-04"
 
  RUN  v4.1.12 /tmp/linuxcast-source
 
- ✓ spikes/sandbox/host.security.test.ts (17 tests) 130652ms
-   ✓ real broker works while actual direct host access is denied  6878ms
-   ✓ host survives and cleans up hostile oversized fixture  8648ms
-   ✓ host survives and cleans up hostile bad-json fixture  8615ms
-   ✓ host survives and cleans up hostile truncated fixture  8140ms
-   ✓ host survives and cleans up hostile stderr-flood fixture  8590ms
-   ✓ host survives and cleans up hostile frame-flood fixture  7852ms
-   ✓ host survives and cleans up hostile stale-session fixture  8584ms
-   ✓ host survives and cleans up hostile unknown-method fixture  7994ms
-   ✓ host survives and cleans up hostile spoof-principal fixture  7853ms
-   ✓ host survives and cleans up hostile crash fixture  8095ms
-   ✓ namespace setup failure reports unavailable and never executes Node  7319ms
-   ✓ cancellation kills a real detached descendant and verifies empty cgroup  5821ms
-   ✓ wall deadline is independent of a noncooperative runtime  8219ms
-   ✓ memory pressure is contained by the kernel memory controller  9642ms
-   ✓ task pressure is bounded by the kernel task controller  9010ms
-   ✓ CPU quota throttles parallel worker load before independent deadline  9274ms
- ✓ spikes/sandbox/protocol.test.ts (3 tests) 150ms
- ✓ spikes/sandbox/supervisor.test.ts (2 tests) 36ms
+ ✓ spikes/sandbox/host.security.test.ts (17 tests) 128539ms
+   ✓ real broker works while actual direct host access is denied  7143ms
+   ✓ host survives and cleans up hostile oversized fixture  8378ms
+   ✓ host survives and cleans up hostile bad-json fixture  7865ms
+   ✓ host survives and cleans up hostile truncated fixture  8267ms
+   ✓ host survives and cleans up hostile stderr-flood fixture  8201ms
+   ✓ host survives and cleans up hostile frame-flood fixture  8054ms
+   ✓ host survives and cleans up hostile stale-session fixture  8652ms
+   ✓ host survives and cleans up hostile unknown-method fixture  7527ms
+   ✓ host survives and cleans up hostile spoof-principal fixture  8303ms
+   ✓ host survives and cleans up hostile crash fixture  7893ms
+   ✓ namespace setup failure reports unavailable and never executes Node  7026ms
+   ✓ cancellation kills a real detached descendant and verifies empty cgroup  6349ms
+   ✓ wall deadline is independent of a noncooperative runtime  8401ms
+   ✓ memory pressure is contained by the kernel memory controller  9524ms
+   ✓ task pressure is bounded by the kernel task controller  9353ms
+   ✓ CPU quota throttles parallel worker load before independent deadline  7474ms
+ ✓ spikes/sandbox/protocol.test.ts (3 tests) 154ms
+ ✓ spikes/sandbox/supervisor.test.ts (2 tests) 34ms
 
  Test Files  3 passed (3)
       Tests  22 passed (22)
-   Start at  15:44:23
-   Duration  139.78s (transform 1.57s, setup 0ms, import 2.24s, tests 130.84s, environment 3ms)
+   Start at  15:52:30
+   Duration  136.38s (transform 1.19s, setup 0ms, import 1.80s, tests 128.73s, environment 8ms)
 
-JSON report written to /tmp/linuxcast-test-report-jTsxEQ/results.json
+JSON report written to /tmp/linuxcast-test-report-nFykCo/results.json

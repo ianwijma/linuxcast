@@ -396,41 +396,55 @@
         {
           "id": "S0-04-AC01",
           "text": "An allowed broker fixture works while direct host access fails.",
-          "status": "blocked",
+          "status": "passed",
           "conditional": null,
-          "justification": "Required CPU cgroup control is not delegated on the authorized host. User declined administrator policy change. Required real-profile checks remain unexecuted while an isolated Debian VM is investigated.",
+          "justification": "",
           "evidence": [
             {
-              "command": "node spikes/sandbox/probe.ts; bun run test:security -- S0-04",
-              "outcome": "Actual host probe exits3 CPU_CONTROLLER_UNAVAILABLE with cleanup verified; full suite exits1 with7passed/15failed because required CPU cgroup delegation is missing. User declined system policy change; no override/reload/restart applied. Investigating isolated Debian test VM.",
-              "platform": "Pop!_OS22.04 amd64, GNOME42.9/X11 host, systemd249,bubblewrap0.6.1,Node24.22.1. Not Debian13 acceptance.",
-              "reference": "spikes/sandbox/evidence/host-probe.json; security-suite.log; controllers.txt; source e41771a, independent coordinator review."
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian probe passes20boundary checks; named security suite passes22/22 with no skips. Broker allow/deny, direct host-resource denial, strict framing, detached descendant cleanup and actual memory/pids/CPU pressure are verified. Final task helper must report completed/taskCreationDenied with bounded child count plus kernel pids.events max>0.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
             }
           ]
         },
         {
           "id": "S0-04-AC02",
           "text": "Missing user namespaces or bubblewrap gives unavailable capability.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian kernel namespace denial returns NAMESPACES_UNAVAILABLE with no fixture execution and verified cleanup; guest limit restored. Missing-backend fixtures return unavailable without direct-Node fallback. Pop!_OS host CPU delegation gap separately fails closed; user declined host policy change and none occurred.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         },
         {
           "id": "S0-04-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Fixed engineering CLI/fixture prototype only; no product renderer or user-facing application UI introduced.",
           "evidence": []
         },
         {
           "id": "S0-04-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Source and evidence review finds public synthetic file/socket/database/environment canaries and operational metadata only. No user files, input, clipboard, credentials, raw stderr, VM keys or private disk/seed data committed.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         }
       ],
       "validation": [
@@ -438,14 +452,14 @@
         "bun run test:security -- S0-04"
       ],
       "evidence": [
-        "Source e41771a independently reviewed by coordinator; five pure checks independently pass. Actual probe exposed removed-cgroup ENODEV cleanup race, fixed by coordinator and rerun to safe unavailable/cleanupVerified=true. Required security suite remains nonzero, not accepted for integration."
+        "PR #9 source independently reviewed by coordinator; reviewer review_f1_01 reviewed coordinator changes. Removed-cgroup ENODEV race fixed; low-RSS task helper report-field finding fixed with stronger completed-result assertions. Final Debian suite22/22 and probe20/20 pass, actual namespace denial/cleanup verified. Final review, current-head CI and integration pending."
       ],
       "owner": "review_f1_01",
       "branch": "codex/s0-04-sandbox",
       "limitations": [
-        "Current host delegates memory/pids without CPU. Required runtime containment is unavailable and no package fixture executes. User explicitly declined administrator policy changes.",
-        "Debian13 real allowed-broker/adversarial/resource tests and complete security suite remain outstanding; isolated VM investigation is in progress.",
-        "Spike tool paths, staged fixture runtime and development seccomp generator are not production packaging/helper implementation."
+        "Pop!_OS22.04 host user manager lacks CPU delegation, so mandatory profile remains unavailable there. User declined host administrator policy changes; none were applied.",
+        "Debian VM proves kernel/systemd sandbox behavior, not GNOME/KDE desktop, Wayland, physical input, performance or whole-release gates.",
+        "Spike uses development tool paths, a staged pinned runtime and test-only C emitters/pressure helper; production native helper/SDK/package validation, policy audit, permission revocation integration and release packaging remain owning-task work."
       ]
     },
     {

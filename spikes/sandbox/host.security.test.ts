@@ -103,9 +103,10 @@ test('memory pressure is contained by the kernel memory controller', async () =>
 
 test('task pressure is bounded by the kernel task controller', async () => {
   const result = await runFixture({ mode: 'tasks', deadlineMs: 5000 });
-  expect(['completed', 'failed'], JSON.stringify(result)).toContain(result.status);
-  if (result.status === 'completed') expect(result.report?.taskCreationDenied).toBe(true);
-  else expect(result.code).toMatch(/^CHILD_EXIT_/);
+  expect(result.status, JSON.stringify(result)).toBe('completed');
+  expect(result.report?.taskCreationDenied).toBe(true);
+  expect(result.report?.children).toBeGreaterThan(0);
+  expect(result.report?.children).toBeLessThan(100);
   expect(result.controls?.pidsEvents).toMatch(/max [1-9]/);
   expect(result.cleanupVerified).toBe(true);
 }, 30000);

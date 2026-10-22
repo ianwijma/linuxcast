@@ -25,6 +25,6 @@ int main(void) {
     for (unsigned i = 0; i < count; ++i) {
         while (waitpid(children[i], NULL, 0) < 0 && errno == EINTR) {}
     }
-    printf("{\"threadCreationDenied\":%s,\"workers\":%u}\n", denied ? "true" : "false", count);
+    printf("{\"taskCreationDenied\":%s,\"children\":%u}\n", denied ? "true" : "false", count);
     return denied ? 0 : 1;
 }

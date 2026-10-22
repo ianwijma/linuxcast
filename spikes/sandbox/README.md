@@ -76,7 +76,7 @@ Primary references: [bubblewrap v0.6.1](https://github.com/containers/bubblewrap
 | Criterion | Current evidence / gap |
 | --- | --- |
 | S0-04-AC01 | Debian13 probe passes all20boundary checks; complete22-check suite proves broker/direct denial and hostile resource handling. Pop!_OS host remains unavailable without CPU delegation. |
-| S0-04-AC02 | Missing-backend fixtures and deterministic namespace-startup denial exercise unavailable results, no fixture startup and no direct-Node fallback; actual host CPU-controller failure demonstrates the same fail-closed policy. Independent review/criterion recording is coordinator-owned. |
+| S0-04-AC02 | Missing-backend fixtures plus real Debian guest namespace denial return unavailable with no fixture startup and verified cleanup. Guest namespace limit was restored; host CPU-controller absence separately demonstrates fail-closed profile handling. See evidence/debian-namespace-denial.json. |
 | S0-04-UI | Conditional N/A proposed: no user-facing product view or behavior is introduced. CLI capability diagnostics are engineering evidence only. |
 | S0-04-PRIVACY | Only public synthetic file/database/socket/environment strings, dependency/runtime hashes and operational controller/version metadata. No actual credentials, user files, browser profile, keyboard data, screenshots or raw stderr are included. |
 
