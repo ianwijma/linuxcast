@@ -1,20 +1,25 @@
 # Coordinator checkpoint
 
-The complete local 1.0 goal remains active; no application task has completed integration and acceptance.
+The complete local 1.0 goal is active. F1-01 is integrated and accepted; the remaining 96 application tasks and release gates remain outstanding.
 
-- Integrated prerequisites: criterion-level acceptance tracking PR #2 (`a7d8d18`); approved Bun workspace documentation PR #3 (`4cf9504`). All 389 criteria were pending on that baseline.
-- Active task: F1-01, `docs/implementation/tasks/F1-01.md`; worktree `/tmp/linuxcast-f1-01-bun`; branch `codex/f1-01-bun`, based on develop `4cf9504`.
-- Earlier work preserved: `/home/ian/.codex/worktrees/f1-01-bootstrap/linuxcast` contains uncommitted pnpm bootstrap files; superseded by the approved Bun task. Do not overwrite or use its old package manager contract.
-- Implemented in active worktree: pinned Bun workspace/lockfile, Electron 45/React 19/TypeScript 6/Tailwind 4 toolchain, scoped Vitest/Playwright runner, strict invalid/unavailable selector failures, Rust 2024 workspace pinned to 1.95.0 and age 0.12.1 smoke check.
-- Evidence so far: plan validation and 21 Python regressions pass; local lint/typecheck pass. Frozen dependency install resolves in a clean Debian 13.7 amd64 container using Bun 1.4.4 and Node 24.22.1; lint/typecheck, scoped/full 20-test suites and explicit empty-selector rejection pass. AC01/AC02/PRIVACY have evidence; UI is conditionally not applicable. F1-01 remains in-progress until independent review and integration.
-- Rust: Debian 13 container `rust@sha256:f49565f188ee00bc2a18dd418183f2c5f23ef7d6e691890517ed341a598f67c3`; `cargo test --workspace` passed age passphrase round trip and corrupted-stream rejection; Cargo.lock generated. This proves build compatibility, not backup feature acceptance.
-- Debian Node build image: `node@sha256:016f604a11c4c725f0a4c62e29ff11adab153d297bf97046c9bf2ddb9f1011d3`. Container access and network dependency installation require normal environment escalation; authorization is in the goal objective.
-- Next: independent review of the complete F1-01 change; open a focused PR, inspect current-head CI/reviews, then integrate. Record the resulting integrated commit before marking F1-01 done.
-- Limitations: real GNOME/KDE Wayland/X11, keyboard devices, packaging, native-addon rebuild and product UI checks remain outstanding in their owning tasks. Empty suites/package commands return explicit unavailable errors, never success.
+## Integrated work
 
-- Bun 1.3.9 was rejected after the public command dropped an empty selector; the pin is now 1.4.4, verified by the public-script regression. The Debian build image is local ID `6188a7225ee2`; exact source/verification recipe is in `scripts/test-runner/Dockerfile.debian`.
-- Review evidence: `docs/implementation/bootstrap.md`, development/Rust inventories, recorded audit (18 advisories; not clean), and `scripts/test-runner/evidence/F1-01-debian.log`. Native tests/rustfmt/clippy also pass.
+- Acceptance tracking: PR #2, develop `a7d8d18`; stable individual criteria, required evidence, conditional N/A and generated-card validation.
+- Approved Bun tooling contract: PR #3, develop `4cf9504`.
+- F1-01: [PR #4](https://github.com/ianwijma/linuxcast/pull/4), develop `e3f9a769467a903d5d257c644d1afcd06d0afb50`; identical tree to reviewed head `1646497ffbb95f12b430218831a05d9c65bb06e9`.
+- F1-01 acceptance: AC01/AC02/PRIVACY passed; UI conditionally N/A. Clean Debian13.7 amd64 Bun1.4.4/Node24.22.1 install and Electron45 runtime load;20 scoped/full JS checks;21 planning regressions; Debian13.5/Rust1.95.0 two native tests plus actual Rust/Go-age1.2.1 interoperability, clippy and fmt. Evidence: `docs/implementation/bootstrap.md`, `scripts/test-runner/evidence/` and audit/license inventories.
+- Independent `review_f1_01` verified the final implementation and closed its age interoperability/security finding. [Current-head GitHub validate](https://github.com/ianwijma/linuxcast/actions/runs/39798244044/job/119891232957) passed; no requested GitHub reviewer or review bot was present. Internal review is not represented as GitHub approval.
 
-- First criterion passes exposed Python fixture dependence on real F1-01 status. The coordinator now normalizes only temporary test registries to a pending baseline and regenerates fixture cards; all 21 Python regressions pass with the real acceptance evidence retained. Independent review is active in `/tmp/linuxcast-f1-01-review`, branch `codex/f1-01-review`.
+## Current work and next actions
 
-- PR #4: https://github.com/ianwijma/linuxcast/pull/4, implementation branch pushed. Internal review verified20 JS checks and21 planning regressions; one finding required actual age interoperability/security evidence. Both Rust/Go-age directions now pass, with two native tests; RustSec audit0.22.2 reports zero known vulnerabilities and one retained basic-toml maintenance warning. Final follow-up review pending. GitHub validate run39797418984/job119888206740 was queued at last inspection; do not merge until current-head CI completes.
+- Coordinator integration-evidence branch: `codex/f1-01-integration-evidence`, worktree `/tmp/linuxcast-f1-01-evidence`; record completion after source integration, regenerate cards and integrate this focused tracking update.
+- Newly ready: S0-01 launcher, S0-02 compositor/clipboard, S0-03 native input recovery, S0-04 sandbox, S0-05 provider lifecycle, S0-06 workflow UI. Read each full card and its normative references; allocate disjoint isolated branches before implementation.
+- Retained source/review worktrees: `/tmp/linuxcast-f1-01-bun` (`codex/f1-01-bun`), `/tmp/linuxcast-f1-01-review` (`codex/f1-01-review`). Older uncommitted pnpm prototype at `/home/ian/.codex/worktrees/f1-01-bootstrap/linuxcast` is preserved and superseded by Bun; do not overwrite it.
+
+## Open limitations and release obligations
+
+- Bun audit reports18 advisories across five transitive development dependency families. No finding was suppressed or treated as a clean audit. Review compatible upgrades/build paths before packaging/release; do not use these tools to process arbitrary user extension archives.
+- RustSec audit0.22.2 found zero known vulnerabilities at revision `640bf5a9f06e66d8721e8772766531fe77c8630d`, retaining basic-toml0.1.10 maintenance warning through age's build macros. Renew security and full shipped-content license review before release.
+- Application build CI is not wired; current GitHub workflow checks planning/acceptance tooling. Current CLI credential lacks workflow write scope. Native addon ABI, .deb and package lifecycle checks remain owning-task work.
+- Real Debian GNOME48/KDE6.3 Wayland/X11, screen-reader and physical-keyboard gates remain unverified. The execution environment exposes no `/dev/input`, `/dev/uinput` or `/dev/kvm`; default sandbox denies session-bus access. Discover an available authorized desktop runner or request the specific external access needed; never substitute a headless result for these gates.
+- No release artifact or whole-feature implementation is claimed complete. R1-01/R1-02/R1-03 remain planned.
