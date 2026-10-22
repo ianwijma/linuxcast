@@ -17,7 +17,7 @@ import time
 from private import private_root, private_environment, target_guard
 from supervision import Supervisor, Cancelled
 from artifacts import public_manifest, fallback_result, publish
-from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample
+from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample, readiness
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
@@ -78,14 +78,25 @@ def inner(backend,root):
         try:
             owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
             deadline=time.monotonic()+45
+            transport_ready=False
             while time.monotonic()<deadline:
                 if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
-                if has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists()): break
+                if not transport_ready:
+                    transport_ready=has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists())
+                    if transport_ready and monitor:
+                        # Same one diagnostic query at the original transport
+                        # boundary, sharing this original startup deadline.
+                        monitor.set_info(query_once(env,deadline))
+                if monitor:
+                    if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+                    observer_state=readiness(monitor.snapshot())
+                    if observer_state in ('rejected','disabled'): return unavailable('PRIVATE_OBSERVER_START_REJECTED')
+                    if transport_ready and observer_state=='ready': break
+                elif transport_ready: break
+                # Once transport is latched, only the private pipe snapshot is
+                # polled; no new bus queries or separate wait window are added.
                 time.sleep(0.2)
             else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
-            if monitor:
-                monitor.set_info(query_once(env,deadline))
-                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
             if family=='kwin':
                 subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
                 deadline=time.monotonic()+5
@@ -101,7 +112,10 @@ def inner(backend,root):
             if monitor:
                 lifecycle['beforeChecker']=runtime_sample(compositor,monitor)
                 before_checker=monitor.snapshot()
+                if readiness(before_checker)!='ready': return unavailable('PRIVATE_OBSERVER_START_REJECTED')
                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
+                if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
+                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
             driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             try: return driver.wait(timeout=180)
             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')

@@ -375,7 +375,10 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
   }
 }, 6000);
 
-for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline', 'readiness-schema',
+  'runner-ready-delayed', 'runner-ready-missing-accepted', 'runner-ready-missing-poll', 'runner-ready-missing-tick', 'runner-ready-all-missing', 'runner-ready-no-transport',
+  'runner-ready-rejected', 'runner-ready-disabled', 'runner-ready-query-deadline', 'runner-ready-exit', 'runner-ready-late-exit', 'runner-ready-late-disabled',
+  'runner-ready-last-boundary-deadline', 'runner-ready-kwin-unchanged']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
   const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
   expect(result.status, result.stderr).toBe(0);
   expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);

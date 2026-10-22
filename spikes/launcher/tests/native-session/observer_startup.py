@@ -39,6 +39,16 @@ def snapshot(value):
     return {'checkpoints':list(checkpoints),'requests':safe,'extensionInfo':info(value['extensionInfo'])}
 
 
+def readiness(value):
+    # One strict, locked monitor snapshot supplies all markers. Its lifetime
+    # deduplicated checkpoints retain bad transitions, even after later enables.
+    markers=set(snapshot(value)['checkpoints'])
+    if 'PRIVATE_CONTEXT_REJECTED' in markers: return 'rejected'
+    if 'DISABLED' in markers: return 'disabled'
+    if {'PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK'}<=markers: return 'ready'
+    return 'pending'
+
+
 def lifecycle_sample(value):
     if type(value) is not dict or set(value)!= {'compositor','drain'}: raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
     process=value['compositor'];drain=value['drain']
