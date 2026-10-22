@@ -182,20 +182,34 @@
         {
           "id": "S0-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- S0-01; bun run test:integration -- S0-01; node spikes/launcher/tests/at/xvfb-orca.ts; independent source/artifact/screenshot review",
+              "outcome": "All eight unit/fixture and ten host integration checks pass. Actual Debian AT five native focus/presentation/delivery checks pass. Public app-only labels/screenshots and allowlisted diagnostics only; seeded private canaries are not echoed, no user clipboard/window/file/key streams captured. Private raw Orca logs are discarded.",
+              "platform": "Pop!_OS22.04/GNOME42.9 X11 plus isolated Debian13.7 privateXvfb/Orca48.1, Electron45/Node24.22.1/Bun1.4.4; no native target compositor/audible proof.",
+              "reference": "spikes/launcher/evidence/; spikes/launcher/evidence/at/debian-orca48/{runtime.json,native-at.json,orca.json,report.json,source-sha256.txt,cleanup.json}; reviewed source9fb4c0f/b126d46/93871ba and final AT/evidence6b1a619; exact executed hashes verified by coordinator."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:integration -- S0-01"
       ],
-      "evidence": [],
+      "evidence": [
+        "Reviewed launcher source9fb4c0f plus coordinator security/recovery fixesb126d46 and action-panel focus fix93871ba; accepted workflow baseline merged efb32cc and pinned root Electron/route1310054. Eight unit/fixture checks and ten actual Electron45/GNOME42.9 X11 integration checks pass. Actual XTest activation, fixed WM_CLASS, focus/conflict/recovery, resident hide/explicit quit, strict IPC/sandbox, keyboard/axe/200% zoom and eight affected-state screenshots are recorded in spikes/launcher/evidence/.",
+        "Final owned AT/evidence commit6b1a619. Actual isolated Debian13.7 kernel6.12.113+deb13-amd64/Electron45/Orca48.1/private Xvfb/AT-SPI/SpeechDispatcher: five exact native focus/event/role checks plus five fresh generated presentations and five per-label speech deliveries pass. Executed checker SHA2568ce79039f2bc25c7c9de5adf72f2b8ffae80ae413ace3bc81ccd3d0cf2fc4168 and observered6e62081e75d851a4223f6bfe42e2a82ecae0540e5e7972495c65abc0dbf197 match reviewed source. Root inspected all three final dark/light screenshots. See spikes/launcher/evidence/at/debian-orca48/. Earlier host42 and target setup/role failures remain preserved.",
+        "Final AT source delta independently reviewed by coordinator: exact toggle-button role follows real aria-pressed Record control; five strict fresh focus/presentation/delivery assertions unchanged. Guest test processes/temp removed and input lab marker remained absent before release to S002. No audible/tactile or native compositor proof inferred."
+      ],
       "owner": "s0_06_workflow_ui",
       "branch": "codex/s0-01-launcher",
-      "limitations": []
+      "limitations": [
+        "Required Debian GNOME48/Plasma6.3 native Wayland/X11 activation, placement and lifecycle matrix remains unexecuted. Wayland component-required behavior is explicit; actual portal allow/deny/cancel/rebind/effective-binding behavior remains unverified. HostGNOME42 and privateXvfb AT are separate evidence.",
+        "UI states/keyboard/axe/zoom and actual Orca generated/delivered presentation are verified, but target-session accessibility and audible/tactile/manual user QA remain outstanding. No companion, desktop preference, accessibility setting, autostart, input policy or service was installed/enabled on host."
+      ]
     },
     {
       "id": "S0-02",
