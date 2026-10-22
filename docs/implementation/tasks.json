@@ -200,7 +200,7 @@
     {
       "id": "S0-02",
       "title": "Prove compositor and clipboard transport",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -272,8 +272,8 @@
         "bun run test:integration -- S0-02"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-02-desktop",
       "limitations": []
     },
     {
@@ -396,10 +396,17 @@
         {
           "id": "S0-04-AC01",
           "text": "An allowed broker fixture works while direct host access fails.",
-          "status": "pending",
+          "status": "blocked",
           "conditional": null,
-          "justification": "",
-          "evidence": []
+          "justification": "Required CPU cgroup control is not delegated on the authorized host. User declined administrator policy change. Required real-profile checks remain unexecuted while an isolated Debian VM is investigated.",
+          "evidence": [
+            {
+              "command": "node spikes/sandbox/probe.ts; bun run test:security -- S0-04",
+              "outcome": "Actual host probe exits3 CPU_CONTROLLER_UNAVAILABLE with cleanup verified; full suite exits1 with7passed/15failed because required CPU cgroup delegation is missing. User declined system policy change; no override/reload/restart applied. Investigating isolated Debian test VM.",
+              "platform": "Pop!_OS22.04 amd64, GNOME42.9/X11 host, systemd249,bubblewrap0.6.1,Node24.22.1. Not Debian13 acceptance.",
+              "reference": "spikes/sandbox/evidence/host-probe.json; security-suite.log; controllers.txt; source e41771a, independent coordinator review."
+            }
+          ]
         },
         {
           "id": "S0-04-AC02",
@@ -430,10 +437,16 @@
         "bun run typecheck",
         "bun run test:security -- S0-04"
       ],
-      "evidence": [],
+      "evidence": [
+        "Source e41771a independently reviewed by coordinator; five pure checks independently pass. Actual probe exposed removed-cgroup ENODEV cleanup race, fixed by coordinator and rerun to safe unavailable/cleanupVerified=true. Required security suite remains nonzero, not accepted for integration."
+      ],
       "owner": "review_f1_01",
       "branch": "codex/s0-04-sandbox",
-      "limitations": []
+      "limitations": [
+        "Current host delegates memory/pids without CPU. Required runtime containment is unavailable and no package fixture executes. User explicitly declined administrator policy changes.",
+        "Debian13 real allowed-broker/adversarial/resource tests and complete security suite remain outstanding; isolated VM investigation is in progress.",
+        "Spike tool paths, staged fixture runtime and development seccomp generator are not production packaging/helper implementation."
+      ]
     },
     {
       "id": "S0-05",

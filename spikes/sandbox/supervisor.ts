@@ -117,7 +117,9 @@ function verifyControls(value: NonNullable<Result['controls']>): void {
 function emptyCgroup(cgroup: string): boolean {
   try { return readFileSync(join(cgroup, 'cgroup.events'), 'utf8').includes('populated 0'); }
   catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return true;
+    // kernfs can leave a removed cgroup's inode visible briefly while reads
+    // already fail with ENODEV. A dead/removed cgroup cannot retain processes.
+    if (['ENOENT', 'ENODEV'].includes((error as NodeJS.ErrnoException).code ?? '')) return true;
     throw error;
   }
 }

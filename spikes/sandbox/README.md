@@ -38,7 +38,9 @@ Actual required named-command result: `bun run test:security -- S0-04` exits **1
 
 After delegation is available, rerun the complete named security suite and retain actual results for all direct file/sibling/database/network/display/D-Bus/environment attempts, allowed and denied broker calls, malformed/framed output, actual cancellation/descendant cleanup and memory/tasks/CPU pressure. Do not mark S0-04-AC01 passed based on source inspection or pure fixtures. The committed hostile fixture cases are executable checks, not current success evidence.
 
-## Proposed administrative remedy — not applied
+## Proposed administrative remedy — declined, not applied
+
+The user explicitly chose to leave system policy unchanged. No override, manager reload or session restart was applied. This proposal is retained only as reviewed context; it is not authorization to apply it. An isolated Debian13 VM is being investigated for the missing execution evidence.
 
 There is no user-scope-only workaround: a manager cannot delegate a CPU controller that it did not receive. The narrowly scoped proposed override is for the current UID **1000**, not every user's manager. An administrator should review existing overrides first; if a different machine already delegates more controllers, preserve them when adding `cpu`.
 
@@ -73,3 +75,5 @@ Primary references: [bubblewrap v0.6.1](https://github.com/containers/bubblewrap
 | S0-04-PRIVACY | Only public synthetic file/database/socket/environment strings, dependency/runtime hashes and operational controller/version metadata. No actual credentials, user files, browser profile, keyboard data, screenshots or raw stderr are included. |
 
 F0-01 should require a typed unavailable reason for **each** missing containment component, retain a supervisor-owned pre-exec resource gate and cgroup-based cancellation (process groups alone miss `setsid` descendants), bind principal/session to parent-owned channels, and keep native runtime/package mounts explicit. Production E1-01 must replace spike tool paths/staging with immutable packaged resources, reviewed native-helper launch/lifecycle code and frozen contracts. Package validation, runtime/native-addon tampering, descriptor-relative file grants, broker network policy, revocation integration, automatic repeated-violation suspension and real user-facing unavailable/remediation UI remain their owning tasks. This spike neither weakens those requirements nor completes a release security gate.
+
+Coordinator review found a removed-cgroup kernfs race: reading `cgroup.events` can fail with ENODEV while the collected inode is briefly visible. Cleanup now recognizes that dead cgroup alongside ENOENT; the actual host rerun returns safe unavailable with cleanup verified.
