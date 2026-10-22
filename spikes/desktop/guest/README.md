@@ -1,6 +1,6 @@
 # Prepared guest-native restart scenario
 
-Source preparation only: no VM compositor or helper process has been started for this scenario. Build, syntax/type/lint and deterministic preparation checks do not establish native restart acceptance.
+The actual restart scenario remains unexecuted. Ordinary native compositor attempts have begun after coordinator-approved guest provisioning and are recorded separately in the parent README, including their failures. Build, syntax/type/lint and deterministic preparation checks do not establish native restart acceptance.
 
 After the coordinator releases the disposable Debian guest, the same private session runner can select a **separate** real-helper restart experiment:
 

@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import pathlib
+import re
 import shutil
 import signal
 import subprocess
@@ -20,8 +21,10 @@ BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwi
 def bounded(command,env,timeout=5):
     return subprocess.run(command,env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,timeout=timeout)
 
-def report_unavailable(reason):
-    print(json.dumps({'state':'unavailable','reason':reason,'physicalDesktopMatrixEstablished':False}))
+def report_unavailable(reason,progress=None):
+    value={'state':'unavailable','reason':reason,'physicalDesktopMatrixEstablished':False}
+    if progress is not None: value['nativeProgress']=progress
+    print(json.dumps(value))
     return 3
 
 def terminate(child):
@@ -40,6 +43,27 @@ def read_result(path):
     value=json.loads(path.read_text())
     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
     return value
+
+def native_progress(root):
+    # Only own exact static stage labels escape the private compositor log.
+    stages={'SCRIPT_ENTERED','CONTEXT_CALLBACK','OWN_WINDOW_FOUND','NATIVE_ADAPTER_READY','LOOP_START','OWN_WINDOW_DEADLINE','SCRIPT_EXCEPTION'}
+    file=root/'private-compositor.log'
+    content=''
+    if file.exists():
+        with file.open('rb') as stream:
+            stream.seek(max(0,file.stat().st_size-131072)); content=stream.read(131072).decode('utf8','replace')
+    observed=[]
+    for line in content.splitlines():
+        if 'LINUXCAST_S002_STAGE:' not in line: continue
+        label=line.split('LINUXCAST_S002_STAGE:',1)[1].strip()
+        if label in stages and label not in observed: observed.append(label)
+    error_lines=[]
+    for match in re.finditer(r'kwin-script\.js:([0-9]{1,7}): error:',content):
+        number=int(match.group(1))
+        if 0<number<=1000000 and number not in error_lines: error_lines.append(number)
+        if len(error_lines)>=8: break
+    return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
+            'wire':read_result(root/'kwin-progress.json')}
 
 def inner(backend,root,restart=False):
     env=dict(os.environ)
@@ -116,7 +140,7 @@ def inner(backend,root,restart=False):
             result=read_result(result_path)
             if result: break
             time.sleep(0.1)
-        if not result: return report_unavailable('NATIVE_ADAPTER_PROBE_DEADLINE')
+        if not result: return report_unavailable('NATIVE_ADAPTER_PROBE_DEADLINE',native_progress(root) if backend.startswith('kwin') else None)
         clipboard=None
         if backend=='kwin-wayland':
             native=bounded([env.get('LINUXCAST_S002_NODE','/usr/bin/node'),str(HERE/'clipboard-client.mjs')],env,timeout=10)

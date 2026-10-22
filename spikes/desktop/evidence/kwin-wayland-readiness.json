@@ -1,0 +1,43 @@
+{
+  "backend": "kwin-wayland",
+  "restart": false,
+  "startedUtc": "2026-10-22T17:41:18.509247+00:00",
+  "staging": {
+    "sourceCommit": "6895209551d0b0a771294cf9b8a016939f773fbd",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "6703a684359df89c8b63614897f4a8b82d80b4a8b72c1ae80b5c92bdcb788eab",
+    "guestExecution": false
+  },
+  "exitCode": 3,
+  "results": [
+    {
+      "state": "unavailable",
+      "reason": "NATIVE_ADAPTER_PROBE_DEADLINE",
+      "physicalDesktopMatrixEstablished": false
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

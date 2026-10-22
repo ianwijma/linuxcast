@@ -77,8 +77,14 @@ export default class NativeCanary extends Extension {
         this._result.requested = target;
         this._result.stage = 'NATIVE_PLACEMENT';
         this._native.place(target);
-        await this._delay(300);
-        this._result.finalGeometry = parseRect(this._native.geometry());
+        // Native Wayland resize/configure is asynchronous. Observe one request;
+        // never resend it or force focus while waiting for the actual frame.
+        for (let attempt = 0; attempt < 50; attempt++) {
+            await this._delay(100);
+            this._result.finalGeometry = parseRect(this._native.geometry());
+            this._result.placementObservationCount = attempt + 1;
+            if (Object.keys(target).every(key => Math.abs(target[key]-this._result.finalGeometry[key]) <= 1)) break;
+        }
         this._result.liveGeometryChanged = JSON.stringify(before) !== JSON.stringify(this._result.finalGeometry);
         this._result.targetApplied = Object.keys(target).every(key => Math.abs(target[key]-this._result.finalGeometry[key]) <= 1);
         // A distinct native manager is deliberately NOT global.display.get_selection().

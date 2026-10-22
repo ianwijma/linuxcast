@@ -25,6 +25,10 @@ def main():
     connection = Gio.bus_get_sync(Gio.BusType.SESSION,None)
     waiting = {}
     serial = 0
+    counts={name:0 for name in METHODS}; replies={name:0 for name in METHODS}
+    def progress():
+        (ROOT/'kwin-progress.json').write_text(json.dumps({'authenticatedRequests':counts,'replies':replies,'nodeExited':child.poll() is not None}))
+    progress()
     def reply(invocation,value):
         invocation.return_value(GLib.Variant('(s)',(json.dumps(value),)))
     def method(_connection,sender,_path,_interface,name,params,invocation):
@@ -36,6 +40,7 @@ def main():
                 raise ValueError()
             body = json.loads(encoded)
             if not isinstance(body,dict): raise ValueError()
+            counts[name]+=1; progress()
             serial += 1
             waiting[serial] = (invocation,name)
             child.stdin.write(json.dumps({'id':serial,'peer':sender,'method':name,'body':body})+'\n')
@@ -48,6 +53,7 @@ def main():
         try:
             frame=json.loads(line)
             invocation,name=waiting.pop(frame['id'])
+            replies[name]+=1; progress()
             reply(invocation,frame['reply'])
             if name=='CanaryObservation':
                 (ROOT/'kwin-result.json').write_text(json.dumps(frame['reply']))
