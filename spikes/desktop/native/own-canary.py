@@ -27,7 +27,8 @@ def main():
     clipboard = Gtk.Clipboard.get_for_display(display, atom)
     result = {"state": "running", "backend": "GTK3/GDK-X11 own-window/private-selection",
               "ownerEvents": 0, "clipboardTouched": False, "privateSelectionTextMatches": False,
-              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None}
+              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None,
+              "configureEvents": [], "configureEventCount": 0, "invalidOwnConfigureObserved": False}
     clipboard.connect("owner-change", lambda *_args: result.update(ownerEvents=result["ownerEvents"] + 1))
     clipboard.set_text("public Linuxcast private-selection canary", -1)
     owned = Gdk.selection_owner_get_for_display(display, atom)
@@ -54,6 +55,25 @@ def main():
         mapped_by_server = True
         return False
     window.connect("map-event", mapped)
+    def configured(_window, event):
+        result["configureEventCount"] = min(255, result["configureEventCount"] + 1)
+        client = tuple(window.get_size())
+        values = (event.width, event.height, *client)
+        if any(not isinstance(value, int) or not 0 < value <= 16384 for value in values):
+            result["invalidOwnConfigureObserved"] = True
+            return False
+        if len(result["configureEvents"]) < 8:
+            state = window.get_window().get_state()
+            result["configureEvents"].append({
+                "width": event.width, "height": event.height,
+                "clientWidth": client[0], "clientHeight": client[1],
+                "requestSent": result["initialGeometry"] is not None,
+                "maximized": bool(state & Gdk.WindowState.MAXIMIZED),
+                "fullscreen": bool(state & Gdk.WindowState.FULLSCREEN),
+                "iconified": bool(state & Gdk.WindowState.ICONIFIED),
+                "resizable": window.get_resizable()})
+        return False
+    window.connect("configure-event", configured)
     window.show_all()
 
     def rectangle():

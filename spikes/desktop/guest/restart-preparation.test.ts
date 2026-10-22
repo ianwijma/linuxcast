@@ -1,5 +1,5 @@
 import {afterAll,beforeAll,expect,test} from 'vitest';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {createInterface} from 'node:readline';
 import {mkdtempSync,readFileSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -142,4 +142,61 @@ assert not guest_allowed('ID=debian\\nVERSION_ID="12"\\n',1000,False)
 print('bounded-platform-guard-passed')`;
   const child=spawn('/usr/bin/python3',['-c',code],{env:{PATH:process.env.PATH},stdio:'ignore'});
   expect(await new Promise<number|null>(resolve=>child.once('close',resolve))).toBe(0);
+});
+
+test('native failure diagnostics export only bounded synthetic configure records',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import json, pathlib, runpy, sys, tempfile
+sys.path.insert(0,sys.argv[1])
+probe=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))['canary_progress']
+entry=dict(width=280,height=160,clientWidth=280,clientHeight=160,maximized=False,fullscreen=False,iconified=False,resizable=True)
+with tempfile.TemporaryDirectory(dir=sys.argv[2]) as directory:
+    root=pathlib.Path(directory)
+    file=root/'private-canary.log'
+    assert probe(root) is None
+    valid={'ownConfigureEvents':[entry]}
+    file.write_text('unstructured private diagnostic must never escape\n'+json.dumps(valid)+'\n')
+    assert probe(root)==valid
+    invalid=[{'ownConfigureEvents':[dict(entry,caption='private')]},
+             {'ownConfigureEvents':[dict(entry,width=True)]},
+             {'ownConfigureEvents':[dict(entry,clientHeight=16385)]},
+             {'ownConfigureEvents':[entry]*9},
+             {'ownConfigureEvents':[entry],'error':'private'}]
+    for value in invalid:
+        file.write_text(json.dumps(value)+'\n')
+        assert probe(root) is None
+    file.write_text('x'*20000+'\n'+json.dumps(valid)+'\n')
+    assert probe(root)==valid
+print('bounded-own-configure-schema-passed')
+`,new URL('.',import.meta.url).pathname,root],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('bounded-own-configure-schema-passed');
+});
+
+test('debugger filtering retains fixed categories and rejects raw frame details',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import pathlib,runpy,sys
+module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'debugger_filter.py'))
+assert module['module_category']('/private/location/libQt6Qml.so.6')=='QT_QML'
+assert module['module_category']('/private/libkwin.so.6.3.6')=='KWIN'
+assert module['module_category']('/private/application-name')=='UNKNOWN'
+assert module['function_category']('KWin::Window::moveResize(private args)')=='KWIN_MOVE_RESIZE'
+assert module['function_category']('unrecognized private function 0x1234')=='UNKNOWN'
+for prefix, category in [('QPainter::','QT_PAINTER'),('QRasterPaintEngine::','QT_RASTER_PAINT_ENGINE'),
+                         ('QPaintEngine::','QT_PAINT_ENGINE'),('QImage::','QT_IMAGE'),('QRegion::','QT_REGION'),
+                         ('QBackingStore::','QT_BACKING_STORE'),('QOpenGLContext::','QT_OPENGL_CONTEXT'),
+                         ('QPlatformWindow::','QT_PLATFORM_WINDOW'),('QSpanData::','QT_RASTER_DATA')]:
+    assert module['function_category'](prefix+'privateMethod(private arguments)')==category
+
+parse=module['parse_report']
+valid={'signal':'SIGSEGV','frames':[{'module':'KWIN','function':'KWIN_MOVE_RESIZE'}],'inspectionFailed':False}
+assert parse(valid)==valid
+for value in [dict(valid,raw='private'),dict(valid,signal='private signal'),dict(valid,inspectionFailed=0),
+              dict(valid,frames=valid['frames']*17),
+              dict(valid,frames=[{'module':'KWIN','function':'UNKNOWN','address':'0x1234'}]),
+              dict(valid,frames=[{'module':'/private/library','function':'UNKNOWN'}]),
+              dict(valid,frames=[{'module':'KWIN','function':'private(args)'}])]:
+    assert parse(value) is None
+print('bounded-debugger-filter-passed')
+`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('bounded-debugger-filter-passed');
 });

@@ -1,0 +1,73 @@
+{
+  "backend": "kwin-wayland",
+  "restart": false,
+  "startedUtc": "2026-10-22T18:16:48.547280+00:00",
+  "staging": {
+    "sourceCommit": "ee564d10d40178ef6835ef664b2c401e9dfa09ba",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "e87312a84f1b6277c525d18463cb27c6ac7607922e22a3726490d5662ed37a99",
+    "guestExecution": false
+  },
+  "exitCode": 3,
+  "results": [
+    {
+      "state": "unavailable",
+      "reason": "OWN_NATIVE_CANARY_FAILED",
+      "physicalDesktopMatrixEstablished": false,
+      "nativeProgress": {
+        "stages": [
+          "SCRIPT_ENTERED",
+          "CONTEXT_CALLBACK",
+          "OWN_WINDOW_FOUND",
+          "NATIVE_ADAPTER_READY",
+          "LOOP_START"
+        ],
+        "scriptEvaluationErrorLogged": false,
+        "publicBundleErrorLines": [],
+        "wire": {
+          "authenticatedRequests": {
+            "CanaryContext": 1,
+            "Handshake": 1,
+            "NextCommand": 2,
+            "Ack": 2,
+            "CanaryObservation": 0
+          },
+          "replies": {
+            "CanaryContext": 1,
+            "Handshake": 1,
+            "NextCommand": 2,
+            "Ack": 2,
+            "CanaryObservation": 0
+          },
+          "nodeExited": false
+        },
+        "canaryExitCode": 1,
+        "compositorExitCode": -11
+      }
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

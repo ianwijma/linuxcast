@@ -15,6 +15,7 @@ import tempfile
 import time
 from supervision import Supervisor, Cancelled
 import private_context as _context
+from debugger_filter import parse_report as parse_debugger_report
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
@@ -45,6 +46,24 @@ def read_result(path):
     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
     return value
 
+def canary_progress(root):
+    file=root/'private-canary.log'
+    if not file.exists(): return None
+    with file.open('rb') as stream:
+        stream.seek(max(0,file.stat().st_size-16384)); content=stream.read(16384).decode('utf8','replace')
+    for line in reversed(content.splitlines()):
+        try: value=json.loads(line)
+        except ValueError: continue
+        if not isinstance(value,dict) or set(value)!= {'ownConfigureEvents'}: continue
+        entries=value['ownConfigureEvents']
+        if not isinstance(entries,list) or not 1<=len(entries)<=8: continue
+        keys={'width','height','clientWidth','clientHeight','maximized','fullscreen','iconified','resizable'}
+        if all(isinstance(item,dict) and set(item)==keys
+               and all(type(item[key]) is int and 0<item[key]<=16384 for key in ('width','height','clientWidth','clientHeight'))
+               and all(type(item[key]) is bool for key in ('maximized','fullscreen','iconified','resizable')) for item in entries):
+            return value
+    return None
+
 def native_progress(root):
     # Only own exact static stage labels escape the private compositor log.
     stages={'SCRIPT_ENTERED','CONTEXT_CALLBACK','OWN_WINDOW_FOUND','NATIVE_ADAPTER_READY','LOOP_START','OWN_WINDOW_DEADLINE','SCRIPT_EXCEPTION'}
@@ -63,10 +82,17 @@ def native_progress(root):
         number=int(match.group(1))
         if 0<number<=1000000 and number not in error_lines: error_lines.append(number)
         if len(error_lines)>=8: break
+    debugger=None
+    for line in content.splitlines():
+        if 'LINUXCAST_S002_DEBUGGER:' not in line: continue
+        try: candidate=json.loads(line.split('LINUXCAST_S002_DEBUGGER:',1)[1])
+        except ValueError: continue
+        debugger=parse_debugger_report(candidate)
+        if debugger is not None: break
     return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
-            'wire':read_result(root/'kwin-progress.json')}
+            'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root),'debugger':debugger}
 
-def inner(backend,root,restart=False):
+def inner(backend,root,restart=False,debugger=False):
     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
     for key in ('DISPLAY','XAUTHORITY'):
@@ -94,21 +120,33 @@ def inner(backend,root,restart=False):
     signal.signal(signal.SIGTERM,interrupted)
     signal.signal(signal.SIGINT,interrupted)
     rawlog=(root/'private-compositor.log').open('w')
+    canarylog=(root/'private-canary.log').open('w')
     try:
         if backend.startswith('gnome'):
             setting=bounded(['gsettings','set','org.gnome.shell','enabled-extensions',"['s002-native@linuxcast.invalid']"],env)
             if setting.returncode: return report_unavailable('PRIVATE_EXTENSION_CONFIGURATION_FAILED')
-        compositor=subprocess.Popen([executable,*args],env=env,stdout=rawlog,stderr=rawlog,start_new_session=True)
+        command=[executable,*args]
+        def no_core():
+            import resource
+            resource.setrlimit(resource.RLIMIT_CORE,(0,0))
+        if debugger:
+            if not pathlib.Path('/usr/bin/gdb').is_file(): return report_unavailable('GUEST_DEBUGGER_PACKAGE_REQUIRED')
+            env['DEBUGINFOD_URLS']=''
+            command=['/usr/bin/gdb','--quiet','--nx','--nh','--batch',
+                     '-iex','set auto-load off','-iex','set debuginfod enabled off',
+                     '-iex','set startup-with-shell off','-iex','set disable-randomization off',
+                     '-x',str(HERE/'debugger_filter.py'),'--args',*command]
+        compositor=subprocess.Popen(command,env=env,stdout=rawlog,stderr=rawlog,start_new_session=True,preexec_fn=no_core if debugger else None)
         children.append(compositor)
         deadline=time.monotonic()+15
         bus_name='org.gnome.Shell' if backend.startswith('gnome') else 'org.kde.KWin'
         while time.monotonic()<deadline:
-            if compositor.poll() is not None: return report_unavailable('NATIVE_COMPOSITOR_START_FAILED')
+            if compositor.poll() is not None: return report_unavailable('NATIVE_COMPOSITOR_START_FAILED',native_progress(root) if debugger else None)
             owner=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',bus_name],env)
             if 'true' in owner.stdout and (not wayland or (pathlib.Path(env['XDG_RUNTIME_DIR'])/socket).exists()): break
             time.sleep(0.1)
         else: return report_unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
-        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True)
         children.append(canary)
         if backend.startswith('kwin'):
             env['LINUXCAST_S002_CANARY_PID']=str(canary.pid)
@@ -142,7 +180,8 @@ def inner(backend,root,restart=False):
         while time.monotonic()<deadline:
             if canary.poll() is not None:
                 progress=native_progress(root) if backend.startswith('kwin') else {}
-                progress.update(canaryExitCode=canary.returncode,compositorExitCode=compositor.poll())
+                progress['canaryExitCode']=canary.returncode
+                progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
                 return report_unavailable('OWN_NATIVE_CANARY_FAILED',progress)
             result=read_result(result_path)
             if result: break
@@ -172,6 +211,7 @@ def inner(backend,root,restart=False):
     finally:
         for child in reversed(children): terminate(child)
         rawlog.close()
+        canarylog.close()
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -179,15 +219,18 @@ def main():
     parser.add_argument('--private-guest',action='store_true')
     parser.add_argument('--inner',type=pathlib.Path)
     parser.add_argument('--restart-scenario',action='store_true')
+    parser.add_argument('--debugger-scenario',action='store_true')
     arguments=parser.parse_args()
     if not arguments.private_guest or not _context.guest_allowed(pathlib.Path('/etc/os-release').read_text(),os.getuid(),pathlib.Path('/run/linuxcast-input-spike-lab').exists()):
         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
+    if arguments.debugger_scenario and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
+        return report_unavailable('DEBUGGER_ONLY_KWIN_WAYLAND_SUCCESS_SCENARIO')
     if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
         return report_unavailable('KWIN_RESTART_BACKEND_REQUIRED')
     if arguments.inner:
         try: root=_context.private_context(str(arguments.inner),arguments.backend)
         except (OSError,ValueError,RuntimeError): return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
-        return inner(arguments.backend,root,arguments.restart_scenario)
+        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario)
     root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-',dir='/tmp'))
     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
     for name in _context.DIRECTORIES.values(): (root/name).mkdir(mode=0o700)
@@ -201,6 +244,7 @@ def main():
         if (HERE/filename).exists(): shutil.copyfile(HERE/filename,extension/filename)
     command=['dbus-run-session','--config-file',str(config),'--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
     if arguments.restart_scenario: command.append('--restart-scenario')
+    if arguments.debugger_scenario: command.append('--debugger-scenario')
     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
         command=['xvfb-run','-a','-f',str(root/'xauthority'),'-s','-screen 0 1280x720x24 -nolisten tcp',*command]
     try:
