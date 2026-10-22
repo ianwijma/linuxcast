@@ -1,0 +1,43 @@
+{
+  "mode": "Actual installed Orca process on disposable Xvfb/private buses; private Speech Dispatcher sd_dummy only, braille disabled",
+  "orcaVersion": "42.0",
+  "process": {
+    "running": true
+  },
+  "startupCompleted": true,
+  "speechDispatcherDeliveryObserved": true,
+  "utterances": [
+    {
+      "label": "Node label",
+      "generated": true
+    },
+    {
+      "label": "Apply configuration",
+      "generated": true
+    },
+    {
+      "label": "Move node down",
+      "generated": false
+    }
+  ],
+  "presentation": [
+    {
+      "label": "Node label",
+      "generatedAfterNativeFocus": true,
+      "input": "native Xvfb Tab key"
+    },
+    {
+      "label": "Apply configuration",
+      "generatedAfterNativeFocus": false,
+      "deadlineMs": 10000
+    },
+    {
+      "label": "Move node down",
+      "generatedAfterNativeFocus": false,
+      "deadlineMs": 10000
+    }
+  ],
+  "status": "incomplete-presentation",
+  "lastOperation": null,
+  "limitation": "Generated presentation/debug evidence only; no audible or tactile QA, no GNOME/KDE/Wayland integration claim."
+}

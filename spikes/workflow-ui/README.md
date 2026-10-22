@@ -38,7 +38,7 @@ Inter 400/600 and JetBrains Mono 400 are loaded from pinned local `@fontsource/*
 
 ## Acceptance evidence
 
-Executed 2026-10-23 on Pop!_OS 22.04 amd64, Linux 7.1.1-76070101-generic; Node 24.22.1, Bun 1.4.4, React 19.3.1, React Flow 12.12.0, Vite 7.3.7, Playwright 1.64.1 / headless Chromium 156.0.8078.4, axe-core Playwright 4.14.0. **Browser renderer proof only.** No Debian desktop, compositor, Wayland/X11, screen-reader or packaged Electron evidence is established by this spike. S0-06-UI remains pending because DESIGN requires actual Electron and screen-reader validation; headless evidence is partial.
+Executed 2026-10-23 on Pop!_OS 22.04 amd64, Linux 7.1.1-76070101-generic; Node 24.22.1, Bun 1.4.4, React 19.3.1, React Flow 12.12.0, Vite 7.3.7, Playwright 1.64.1 / headless Chromium 156.0.8078.4, axe-core Playwright 4.14.0. **The original scoped suite below is browser-renderer proof only.** It establishes no Debian desktop, compositor, screen-reader or packaged Electron evidence. Additional actual Electron and partial screen-reader evidence is described below; S0-06-UI remains pending until the complete actual screen-reader path passes.
 
 `bun run typecheck`, `bun run lint` and `python3 scripts/validate_plan.py` pass. The scoped UI suite has 13 executed tests, no skips, with this mapping:
 
@@ -51,6 +51,25 @@ Executed 2026-10-23 on Pop!_OS 22.04 amd64, Linux 7.1.1-76070101-generic; Node 2
 
 Screenshots: [dark ready and focus](evidence/dark-ready.png), [light ready and focus](evidence/light-ready.png), [loading](evidence/dark-loading.png), [empty](evidence/dark-empty.png), [error/retry](evidence/dark-error.png), [permission](evidence/light-permission.png), [cancelled](evidence/light-cancelled.png), [invalid edge](evidence/dark-invalid-edge.png), [forced colors and 200% text](evidence/forced-colors-text-200.png). These are visual evidence, not automatic pixel-diff baselines. Tests also assert semantic states and geometry rather than relying on screenshot resemblance.
 
-Remaining limitations are intentional task boundaries: no persistence/package lifecycle, full node catalogue/registry schemas, live extension process, execution authority, permission grants, desktop effects, production D1 components, real assistive-technology session or Electron text-scaling validation. Those requirements remain assigned to their downstream tasks and release gates. The coordinator owns integration, acceptance status and PR references.
+Remaining feature boundaries: no persistence/package lifecycle, full node catalogue/registry schemas, live extension process, execution authority, permission grants, desktop effects or production D1 components. Those implementations remain assigned to downstream tasks. Accessibility validation is not waived by those boundaries: current actual Electron and screen-reader results below determine the outstanding S0-06-UI gate. The coordinator owns integration, acceptance status and PR references.
 
 Independent review of f6747c6 found three issues: duplicate source-edge order after deletion, unenforced disabled Form actions, and arrow navigation stopping at disabled rows. Coordinator fixed all three with focused regression checks; the final scoped suite passes13/13. Review and real Electron/assistive-technology acceptance remain separate gates.
+
+## Actual Electron and isolated screen-reader checks
+
+The additional task-local commands are:
+
+```sh
+node spikes/workflow-ui/tests/private-session.ts
+node spikes/workflow-ui/tests/xvfb-orca.ts
+```
+
+The first opens only a disposable synthetic Electron45 window on the authorized GNOME42.9/X11 host. It explicitly enables Playwright's Chromium sandbox, checks the actual process has no `--no-sandbox`, verifies sandbox/context-isolation/no-renderer-Node preferences, and covers keyboard add/configure/connect/remove, dark/light axe, actual 200% Electron zoom, forced colors/reduced motion, and native AT-SPI names/roles/focus events. Theme screenshots and runtime/native reports are in [evidence/electron](evidence/electron/runtime.json). They are actual Electron evidence, not a packaged-client or Debian desktop-matrix pass.
+
+Both commands create new session and accessibility buses, a private0700 runtime directory, a real AT-SPI registry, disposable HOME/preferences and memory-only GSettings. A minimal test-only `org.a11y.Bus` discovery/status service supplies the private address and enabled status at the standard `/org/a11y/bus` path. It does not alter the host service or global accessibility settings. The native observer refuses a bus containing unexpected process IDs before reading any content and traverses only the synthetic Electron process; it records only known fixture labels, roles and focus events.
+
+The second command additionally creates a new Xvfb display, then starts actual installed Orca42 there. Full Orca input hooks cannot affect the user's host display. Speech Dispatcher uses only its dummy module and explicit ALSA `null` device on a private socket; braille is disabled. Only allowlisted booleans for generated presentation after fixed native Xvfb Tab keys are retained; raw Orca debug/preferences are deleted with the private profile. Native AT exposure is distinct from actual Orca event handling, and neither is audible/tactile quality assurance.
+
+Current actual Orca evidence is **incomplete**: startup and native focus succeed, but the host's Orca42 stalls in ancestor-context generation when moving from a connection-list button to `Move node down`. The command returns exit3 rather than calling this a pass. [evidence/electron-xvfb-orca/orca.json](evidence/electron-xvfb-orca/orca.json) records the exact boundary. S0-06-UI remains pending until the complete screen-reader path passes; do not treat this host-version limitation as a waived requirement. Debian13's target assistive-technology version and manual auditory/tactile validation remain distinct checks.
+
+Primary runtime guidance: [Playwright Electron API](https://playwright.dev/docs/api/class-electron), [Electron accessibility](https://www.electronjs.org/docs/latest/tutorial/accessibility), and [Chromium accessibility modes](https://chromium.googlesource.com/chromium/src/+/main/docs/accessibility/overview.md). The installed Orca42 and Speech Dispatcher0.11.1 startup/configuration sources were inspected before running the isolated processes. No host settings, privileged service or session policy was changed.
