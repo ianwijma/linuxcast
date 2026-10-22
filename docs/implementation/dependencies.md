@@ -128,7 +128,7 @@ flowchart TD
   S0_04 --> E1_01
   F0_01 --> E1_01
   F3_01 --> E1_01
-  E1_02["E1-02: Implement scripts and background refresh"]
+  E1_02["E1-02: Implement scripts and in-session inline refresh"]
   E1_01 --> E1_02
   L1_01 --> E1_02
   E1_03["E1-03: Implement package installation and catalogue"]
@@ -301,6 +301,7 @@ flowchart TD
   E1_05 --> R1_01
   F2_03 --> R1_01
   L2_07 --> R1_01
+  E1_06 --> R1_01
   R1_02["R1-02: Verify visual accessibility and performance budgets"]
   R1_01 --> R1_02
   R1_03["R1-03: Validate package lifecycle and publish release assets"]
@@ -353,4 +354,8 @@ flowchart TD
   W4_09["W4-09: Implement media, sound and speech outputs"]
   W3_03 --> W4_09
   U2_01 --> W4_09
+  E1_06["E1-06: Integrate extension background schedules"]
+  E1_02 --> E1_06
+  E1_03 --> E1_06
+  A4_01 --> E1_06
 ```

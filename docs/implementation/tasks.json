@@ -1910,7 +1910,7 @@
     },
     {
       "id": "E1-02",
-      "title": "Implement scripts and background refresh",
+      "title": "Implement scripts and in-session inline refresh",
       "status": "planned",
       "phase": "implementation",
       "lane": "E1",
@@ -1938,12 +1938,12 @@
         "Dependency output contracts and shared deterministic fixtures"
       ],
       "outputs": [
-        "Implement scripts and background refresh with documented capability/error states",
+        "Implement scripts and in-session inline refresh with documented capability/error states",
         "Task-scoped tests and recorded acceptance evidence"
       ],
       "steps": [
         "Parse native metadata and safe argv arguments; discover explicitly granted interpreters.",
-        "Implement bounded streamed/full/compact/inline/silent output and nonoverlapping refresh."
+        "Implement bounded streamed/full/compact/inline/silent output and nonoverlapping in-session refresh. Persistent package background schedules are integrated in E1-06 through the shared scheduler."
       ],
       "acceptance": [
         "ANSI/oversized output is sanitized and cancellation terminates process tree.",
@@ -3972,7 +3972,8 @@
         "A3-03",
         "E1-05",
         "F2-03",
-        "L2-07"
+        "L2-07",
+        "E1-06"
       ],
       "ownedPaths": [
         "tests/e2e/",
@@ -4795,6 +4796,57 @@
       "validation": [
         "pnpm typecheck",
         "pnpm test:integration -- W4-09"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-06",
+      "title": "Integrate extension background schedules",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-02",
+        "E1-03",
+        "A4-01"
+      ],
+      "ownedPaths": [
+        "packages/extension-background/"
+      ],
+      "featureIds": [
+        "extensions",
+        "scripts",
+        "schedules"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Background command scheduler bridge with visible status and remediation",
+        "Task-scoped restart/revoke/update fixtures"
+      ],
+      "steps": [
+        "Register disabled-by-default manifest background commands with the shared resident scheduler and explicit background.run grants.",
+        "Pin package versions per invocation, honour coalescing/timeout/cancellation, and revoke schedules on disable/remove without deleting unrelated schedules."
+      ],
+      "acceptance": [
+        "No separate persistent timer engine or automatic startup exists inside extension code.",
+        "Sleeping/restarting/updating/removing a package cannot replay missed effects or broaden grants."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- E1-06"
       ],
       "evidence": [],
       "owner": null,

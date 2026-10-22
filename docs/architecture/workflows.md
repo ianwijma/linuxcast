@@ -397,7 +397,7 @@ The v1 task catalogue must expose the following native operations, each with its
 | output.writeFile | Granted destination; create-new default, append or replace explicit. UTF-8 text/binary handle; atomic replace where filesystem supports it; never silently overwrite. |
 | output.sound | Packaged/granted audio reference and volume; cancellation stops playback. |
 | output.speak | Text/language/voice/rate via configured speech provider; local default where installed, external provider requires explicit data transfer permission. |
-| output.keyCombo | Explicit keys, target token and timeout; synthetic modifier ownership/release managed by native input broker. No raw /dev access. |
+| output.keyCombo | Explicit bounded chord, target token and timeout with input.shortcut permission. Only a consented RemoteDesktop/libei or supported X11 adapter may execute it, managing modifier ownership/release. Otherwise return Unavailable. Privileged inputd remains limited to Hyper, snippet and fixed paste operations; no generic event-stream or /dev access. |
 | output.call | Same semantics as action.workflow; returning data allowed. Caller/callee permissions cannot be unioned to bypass either policy. |
 
 ## 7. Snippet workflow, selection and paste transactions

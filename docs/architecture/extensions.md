@@ -102,10 +102,13 @@ Manifest optional fields:
 | workflowNodes | Typed node contributions with config/input/output schemas, declared effects and handler IDs. No custom renderer components or native code. |
 | skills | Bundled Markdown instructions with stable IDs, descriptions and optional resources; treated as extension content, not host policy. |
 | mcp | Explicit supported remote or sandboxed stdio connection declarations; no auto-connection on install. |
+| modelContributions | Declarative compatible-model definitions using the host schema below; no executable adapter code, credentials or automatic selection. |
 | dependencies | Required applications/runtimes/capabilities displayed as setup requirements; never install-time shell commands. |
 | homepage/repository/issues | HTTPS metadata URLs. Opening them is a user action; no tracking requests on render. |
 
 All manifests use strict JSON Schema validation. Unknown execution fields or unsupported major versions block activation with an actionable message. An icon or README cannot introduce scripts, remote resources or hidden capabilities.
+
+Compatible model contributions are a strict array of `{id, title, baseUrl, modelId, protocol, capabilities, credentialMode}`. `protocol` is `openai-chat-completions` in v1; `credentialMode` is `none` or `user-api-key`. Capabilities use the shared AI schema. The host validates URL/origin and remote TLS/local endpoint policy, prompts for a separately stored profile credential if needed, and attaches it only to that approved origin. Installation never selects a model or starts inference. Updates changing origin or capabilities require review; removal makes a selected contribution unavailable without switching provider. This is declarative metadata, not permission for package code to handle credentials or bypass the global AI broker.
 
 Shared settings and permission interface:
 
@@ -246,7 +249,7 @@ A service being in the SDK is not a permission to call it. Every operation check
 | applications | Search/list/open/reveal, running/focused app metadata and graceful quit | applications.read/launch/control |
 | urls | Open allowed schemes/URLs via host selection | url.open |
 | commands | Invoke declared host commands with typed inputs; nested calls audited/cancelled | commands.invoke scoped IDs |
-| keyboard/input | Insert text or explicit key combination against target token | input.paste/input.shortcut; no raw event subscription |
+| keyboard/input | Insert text or explicit key combination against target token; general shortcuts require a consented RemoteDesktop/libei or X11 backend | input.paste/input.shortcut; no raw event subscription; privileged inputd is not a generic shortcut backend |
 | windows | Query/manage windows only through advertised desktop adapter | windows.read/control |
 | browser | Tabs/title/URL/search/activate/navigate/selection through approved companion | browser.tabs/content/actions with origin scope |
 | feedback | Toast, HUD, host confirmation and notification, common progress/cancel UI | Local transient feedback basic; notifications.show separately granted |

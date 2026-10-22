@@ -2,7 +2,7 @@
 
 This is the execution handoff for [the approved plan](../PLAN.md). All application tasks are initially **planned**. The documentation PR does not implement the client.
 
-The authoritative [task registry](tasks.json) contains 96 bounded task cards, each with ownership, dependencies, normative contracts, design references, steps, tests and acceptance checks. The [full dependency graph](dependencies.md) is generated from that registry. Read [testing and release](testing-release.md) for command semantics and desktop evidence requirements.
+The authoritative [task registry](tasks.json) contains 97 bounded task cards, each with ownership, dependencies, normative contracts, design references, steps, tests and acceptance checks. The [full dependency graph](dependencies.md) is generated from that registry. Read [testing and release](testing-release.md) for command semantics and desktop evidence requirements.
 
 ## Start sequence
 
@@ -22,7 +22,7 @@ The authoritative [task registry](tasks.json) contains 96 bounded task cards, ea
 | Launcher/utilities | Search, applications, commands, files, links, calculator, dictionary, emoji | L1-01–L1-03; L2-01–L2-07 | UI/storage; platform capabilities where needed |
 | Desktop | Portals, GNOME, KDE, X11, windows | P1-01–P1-05 | Broker/contracts; separate adapters may run concurrently |
 | Keyboard/text | Supervisor/worker, Hyper, triggers, clipboard, insertion, snippets | P2-01–P2-04; P3-01–P3-03 | Native proof and capability/context contracts |
-| Extensions | Sandbox, SDK, scripts, catalogue, developer tools | E1-01–E1-05 | Permissions/storage; shared views |
+| Extensions | Sandbox, SDK, scripts, catalogue, developer tools | E1-01–E1-06 | Permissions/storage; shared views |
 | Workflows | Runtime, editor and node families | W1-01–W1-03; W2-01–W2-03; W3-01–W3-05; W4-01–W4-09 | Editor and engine parallel after contracts; integration joins nodes/services |
 | AI | Providers, conversations, context, tools, agents, memory, harnesses | A1-01–A1-03; A2-01–A2-05; A3-01–A3-05 | Global broker first; UI and provider adapters parallel |
 | Automation | Durable occurrence scheduler and UI | A4-01–A4-02 | Workflow journal and conversation runtime |

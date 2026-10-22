@@ -69,6 +69,7 @@ Every effect carries a trusted principal and invocation ID. The broker derives e
 | `clipboard.read` | Current clipboard only; history access is a distinct grant |
 | `clipboard.history` | Specific history queries through storage, subject to user collection preferences and exclusions |
 | `clipboard.write` / `input.paste` | Explicit content action, bounded size; paste needs a fresh intent/context and available backend |
+| `input.shortcut` | One bounded explicit chord against a fresh target token, using consented RemoteDesktop/libei or supported X11 only; unavailable otherwise. Never forwarded to privileged inputd as arbitrary events. |
 | `applications.launch` | Validated application ID or scoped file-open operation; no arbitrary shell |
 | `windows.control` | Fixed operation on a valid session-scoped window handle |
 | `ai.generate` | Configured provider/model through broker; no provider key returned to caller |
