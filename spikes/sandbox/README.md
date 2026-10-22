@@ -34,6 +34,8 @@ The coordinator must add these exact owned files to the security mapping: `spike
 
 Pure framing/principal and missing-backend fixtures pass **5 checks**. A targeted host fixture separately covers a deterministic namespace-startup failure and missing bubblewrap. The namespace fixture is an explicit supervisor stand-in; it does not claim to disable the host kernel's namespaces. It returns the real bubblewrap error shape before any package execution and verifies that no fallback emits fixture protocol. Filtered tests are not represented as a passing full security suite. On this host the complete security suite must remain nonzero because its real allowed-broker/adversarial/resource scenarios cannot execute under the required profile.
 
+Actual required named-command result: `bun run test:security -- S0-04` exits **1**, with **7 passed and 15 failed** out of 22 checks. All 15 real-profile cases report `CPU_CONTROLLER_UNAVAILABLE` and verified cleanup before fixture startup; none establishes successful adversarial containment. The full unsuppressed result is retained in [security-suite.log](evidence/security-suite.log).
+
 After delegation is available, rerun the complete named security suite and retain actual results for all direct file/sibling/database/network/display/D-Bus/environment attempts, allowed and denied broker calls, malformed/framed output, actual cancellation/descendant cleanup and memory/tasks/CPU pressure. Do not mark S0-04-AC01 passed based on source inspection or pure fixtures. The committed hostile fixture cases are executable checks, not current success evidence.
 
 ## Proposed administrative remedy — not applied

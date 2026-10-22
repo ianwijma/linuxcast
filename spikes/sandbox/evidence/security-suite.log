@@ -1,0 +1,159 @@
+$ node scripts/test-runner/run.ts security "S0-04"
+
+ RUN  v4.1.12 /tmp/linuxcast-s0-04
+
+ ✓ spikes/sandbox/protocol.test.ts (3 tests) 13ms
+ ✓ spikes/sandbox/supervisor.test.ts (2 tests) 3ms
+ ❯ spikes/sandbox/host.security.test.ts (17 tests | 15 failed) 22787ms
+   × real broker works while actual direct host access is denied 1496ms
+   × host survives and cleans up hostile oversized fixture 1491ms
+   × host survives and cleans up hostile bad-json fixture 1475ms
+   × host survives and cleans up hostile truncated fixture 1480ms
+   × host survives and cleans up hostile stderr-flood fixture 1478ms
+   × host survives and cleans up hostile frame-flood fixture 1464ms
+   × host survives and cleans up hostile stale-session fixture 1440ms
+   × host survives and cleans up hostile unknown-method fixture 1487ms
+   × host survives and cleans up hostile spoof-principal fixture 1489ms
+   × host survives and cleans up hostile crash fixture 1506ms
+   ✓ missing bubblewrap reports unavailable without executing fixture code 1ms
+   ✓ namespace setup failure reports unavailable and never executes Node  497ms
+   × cancellation kills a real detached descendant and verifies empty cgroup 1502ms
+   × wall deadline is independent of a noncooperative runtime 1478ms
+   × memory pressure is contained by the kernel memory controller 1490ms
+   × thread pressure is bounded by the kernel task controller 1499ms
+   × CPU quota throttles parallel worker load before independent deadline 1504ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > real broker works while actual direct host access is denied
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'completed' // Object.is equality
+
+Expected: "completed"
+Received: "unavailable"
+
+ ❯ spikes/sandbox/host.security.test.ts:37:49
+     35| test('real broker works while actual direct host access is denied', as…
+     36|   const result = await runFixture({ mode: 'boundaries', canaries });
+     37|   expect(result.status, JSON.stringify(result)).toBe('completed');
+       |                                                 ^
+     38|   expect(result.cleanupVerified).toBe(true);
+     39|   expect(Object.keys(result.report ?? {}).length).toBeGreaterThanOrEqu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile oversized fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile bad-json fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile stderr-flood fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile frame-flood fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile stale-session fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile unknown-method fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile spoof-principal fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile crash fixture
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "unavailable"
+
+ ❯ spikes/sandbox/host.security.test.ts:48:49
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile truncated fixture
+Error: ENODEV: no such device, read
+ ❯ emptyCgroup spikes/sandbox/supervisor.ts:118:16
+    116|
+    117| function emptyCgroup(cgroup: string): boolean {
+    118|   try { return readFileSync(join(cgroup, 'cgroup.events'), 'utf8').inc…
+       |                ^
+    119|   catch (error) {
+    120|     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return tru…
+ ❯ runFixture spikes/sandbox/supervisor.ts:282:21
+ ❯ spikes/sandbox/host.security.test.ts:47:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > cancellation kills a real detached descendant and verifies empty cgroup
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'cancelled' // Object.is equality
+
+Expected: "cancelled"
+Received: "unavailable"
+
+ ❯ spikes/sandbox/host.security.test.ts:81:49
+     79|   const result = await runFixture({ mode: 'descendants', signal: contr…
+     80|     onReady: () => { setTimeout(() => controller.abort(), 500); } });
+     81|   expect(result.status, JSON.stringify(result)).toBe('cancelled');
+       |                                                 ^
+     82|   expect(result.report?.detachedDescendantStarted).toBe(true);
+     83|   expect(result.cleanupVerified).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > wall deadline is independent of a noncooperative runtime
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "unavailable"
+
+ ❯ spikes/sandbox/host.security.test.ts:88:49
+     86| test('wall deadline is independent of a noncooperative runtime', async…
+     87|   const result = await runFixture({ mode: 'idle', deadlineMs: 200 });
+     88|   expect(result.status, JSON.stringify(result)).toBe('failed');
+       |                                                 ^
+     89|   expect(result.code).toBe('DEADLINE');
+     90|   expect(result.cleanupVerified).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > memory pressure is contained by the kernel memory controller
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "unavailable"
+
+ ❯ spikes/sandbox/host.security.test.ts:95:49
+     93| test('memory pressure is contained by the kernel memory controller', a…
+     94|   const result = await runFixture({ mode: 'allocate', deadlineMs: 5000…
+     95|   expect(result.status, JSON.stringify(result)).toBe('failed');
+       |                                                 ^
+     96|   expect(result.code).toMatch(/^CHILD_EXIT_/);
+     97|   expect(result.controls?.memoryMax).toBe('268435456');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > thread pressure is bounded by the kernel task controller
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected [ 'completed', 'failed' ] to include 'unavailable'
+ ❯ spikes/sandbox/host.security.test.ts:104:59
+    102| test('thread pressure is bounded by the kernel task controller', async…
+    103|   const result = await runFixture({ mode: 'threads', deadlineMs: 5000 …
+    104|   expect(['completed', 'failed'], JSON.stringify(result)).toContain(re…
+       |                                                           ^
+    105|   if (result.status === 'completed') expect(result.report?.threadCreat…
+    106|   else expect(result.code).toMatch(/^CHILD_EXIT_/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  spikes/sandbox/host.security.test.ts > CPU quota throttles parallel worker load before independent deadline
+AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'CPU_CONTROLLER_UNAVAILABLE' to be 'DEADLINE' // Object.is equality
+
+Expected: "DEADLINE"
+Received: "CPU_CONTROLLER_UNAVAILABLE"
+
+ ❯ spikes/sandbox/host.security.test.ts:113:47
+    111| test('CPU quota throttles parallel worker load before independent dead…
+    112|   const result = await runFixture({ mode: 'cpu', deadlineMs: 1200 });
+    113|   expect(result.code, JSON.stringify(result)).toBe('DEADLINE');
+       |                                               ^
+    114|   expect(result.controls?.cpuStat).toMatch(/nr_throttled [1-9]/);
+    115|   expect(result.cleanupVerified).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  15 failed | 7 passed (22)
+   Start at  02:21:30
+   Duration  22.96s (transform 134ms, setup 0ms, import 189ms, tests 22.80s, environment 0ms)
+
+JSON report written to /tmp/linuxcast-test-report-Eemfvq/results.json
+error: script "test:security" exited with code 1

@@ -156,6 +156,7 @@ export async function runFixture(options: Options): Promise<Result> {
   let cgroup: string | undefined;
   let startupDiagnostics = '';
   let stopping = false;
+  let stoppedAt = 0;
   let killTimer: ReturnType<typeof setTimeout> | undefined;
   let deadline: ReturnType<typeof setTimeout> | undefined;
   let sampling: ReturnType<typeof setInterval> | undefined;
@@ -172,6 +173,7 @@ export async function runFixture(options: Options): Promise<Result> {
   const stop = (status: Result['status'], code: string) => {
     if (stopping) return;
     stopping = true;
+    stoppedAt = Date.now();
     result.status = status;
     result.code = code;
     if (cgroup) { try { result.controls = readControls(cgroup); } catch { /* collected */ } }
@@ -268,6 +270,11 @@ export async function runFixture(options: Options): Promise<Result> {
   }
   if (cgroup) {
     try { result.controls = readControls(cgroup); } catch { /* collected scope */ }
+  }
+  // Preserve the TERM grace period for any surviving scope members even when
+  // the direct launcher has already exited. Empty scopes need no extra wait.
+  while (stopping && cgroup && !emptyCgroup(cgroup) && Date.now() < stoppedAt + 1000) {
+    await new Promise(done => setTimeout(done, 20));
   }
   if (killTimer) clearTimeout(killTimer);
   terminateScope('SIGKILL');
