@@ -9,3 +9,9 @@ On the Pop!_OS 22.04 host, using pinned Node 24.22.1 / Bun 1.4.4:
 - The direct GNOME callback regression verifies positive integer dimensions for subpixel input and rejects invalid dimensions before calling the API-shaped Meta fixture; KWin fractional-geometry checks remain passing.
 
 No Debian guest command or compositor/helper execution was performed for this restart scenario. The prepared live driver must still prove real KWin D-Bus reply loss, watchdog failure, no replay and explicit reload recovery. GNOME/KWin Wayland/X11 live API, clipboard and full physical desktop/session matrix acceptance remain outstanding. All harness protocols remain provisional spike code, not F0 contract acceptance or production backends. No UI acceptance claim is added by this source-only change.
+
+## Invocation guard revision
+
+Source 95c329d adds sixteen preparation cases: a valid exact context, an actual harmless private pathname bus, and rejection/order checks for external HOME/XDG directories, dconf, bus fallback/abstract/external addresses, loader overrides, symlinks/shared modes, inherited displays and root/non-Debian/input-marker contexts. These are local guards, not guest compositor acceptance.
+
+On 23 October 2026 at 05:11:18 Australia/Sydney (22 October 18:11:18 UTC), the two affected files pass **85/85**: 63 transport plus 22 preparation checks, no skipped/todo checks. The previous 71-check mapped result remains historical and includes two host native checks not repeated by this local run.
