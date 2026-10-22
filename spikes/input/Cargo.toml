@@ -29,3 +29,12 @@ path = "src/bin/synthetic-lab.rs"
 [[bin]]
 name = "linuxcast-input-spike-context-probe"
 path = "src/bin/context-probe.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-peer-probe"
+path = "src/bin/peer-probe.rs"
+
+[[test]]
+name = "peer-observer-private"
+path = "tests/peer-observer-private.rs"
+harness = false
