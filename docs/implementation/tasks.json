@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defaultImplementer": "GPT 6.1 Sol, high reasoning effort",
   "tasks": [
     {
@@ -41,8 +41,38 @@
         "Wire the stable no-write lint/typecheck and task-scoped test commands; document exact prerequisites and compiler choice."
       ],
       "acceptance": [
-        "Clean install resolves on Debian13 amd64.",
-        "Unknown task selector fails; omitted selector runs the suite; no placeholder success scripts."
+        {
+          "id": "F1-01-AC01",
+          "text": "Clean install resolves on Debian13 amd64.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-01-AC02",
+          "text": "Unknown task selector fails; omitted selector runs the suite; no placeholder success scripts.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -50,7 +80,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-01",
@@ -89,8 +120,38 @@
         "Exercise focus/activation/placement across all four desktop sessions and record capability fallback."
       ],
       "acceptance": [
-        "Native Wayland windows can regain focus through a supported path or record a component requirement.",
-        "Closing the launcher retains resident process; explicit Quit exits."
+        {
+          "id": "S0-01-AC01",
+          "text": "Native Wayland windows can regain focus through a supported path or record a component requirement.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-01-AC02",
+          "text": "Closing the launcher retains resident process; explicit Quit exits.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -98,7 +159,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-02",
@@ -137,8 +199,38 @@
         "Record MIME, window-identity and protocol limits without treating XWayland as universal."
       ],
       "acceptance": [
-        "GNOME and KDE fixtures cover clipboard events and live window geometry.",
-        "Missing/restarted companion and unsupported formats produce actionable states."
+        {
+          "id": "S0-02-AC01",
+          "text": "GNOME and KDE fixtures cover clipboard events and live window geometry.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-02-AC02",
+          "text": "Missing/restarted companion and unsupported formats produce actionable states.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -146,7 +238,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-03",
@@ -186,8 +279,38 @@
         "Implement only passthrough, fixed emergency disarm and lease expiry for destructive-recovery experiments."
       ],
       "acceptance": [
-        "SIGKILL of worker/supervisor releases grabs and virtual modifiers.",
-        "Locked/inactive/TTY sessions never arm; plugin processes cannot access control socket."
+        {
+          "id": "S0-03-AC01",
+          "text": "SIGKILL of worker/supervisor releases grabs and virtual modifiers.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-03-AC02",
+          "text": "Locked/inactive/TTY sessions never arm; plugin processes cannot access control socket.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -195,7 +318,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-04",
@@ -234,8 +358,38 @@
         "Attempt denied host-file/network/display/DBus access; verify no unsafe fallback."
       ],
       "acceptance": [
-        "An allowed broker fixture works while direct host access fails.",
-        "Missing user namespaces or bubblewrap gives unavailable capability."
+        {
+          "id": "S0-04-AC01",
+          "text": "An allowed broker fixture works while direct host access fails.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-04-AC02",
+          "text": "Missing user namespaces or bubblewrap gives unavailable capability.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -243,7 +397,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-05",
@@ -283,8 +438,38 @@
         "Verify cancel/partial error/tool approval pause and OAuth adapter registration feasibility without harvesting credentials."
       ],
       "acceptance": [
-        "Partial output on transport failure is not committed as success.",
-        "A denied tool never executes and reconnect does not duplicate it."
+        {
+          "id": "S0-05-AC01",
+          "text": "Partial output on transport failure is not committed as success.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-05-AC02",
+          "text": "A denied tool never executes and reconnect does not duplicate it.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -292,7 +477,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "S0-06",
@@ -332,8 +518,38 @@
         "Demonstrate non-drag editing and separate graph layout from execution."
       ],
       "acceptance": [
-        "Keyboard path can add/configure/connect/remove a node.",
-        "Unsupported ViewModel fields and invalid edge types are rejected."
+        {
+          "id": "S0-06-AC01",
+          "text": "Keyboard path can add/configure/connect/remove a node.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-06-AC02",
+          "text": "Unsupported ViewModel fields and invalid edge types are rejected.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-06-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "S0-06-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -341,7 +557,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F0-01",
@@ -388,8 +605,38 @@
         "Mirror native wire examples in Serde fixture tests and publish contract ownership/change rules."
       ],
       "acceptance": [
-        "Invalid/oversized/unknown-version messages fail with typed errors.",
-        "TS and Rust accept/reject the same cross-language fixtures."
+        {
+          "id": "F0-01-AC01",
+          "text": "Invalid/oversized/unknown-version messages fail with typed errors.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F0-01-AC02",
+          "text": "TS and Rust accept/reject the same cross-language fixtures.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F0-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F0-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -397,7 +644,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F1-02",
@@ -437,8 +685,38 @@
         "Enforce sandbox/context isolation/CSP/navigation restrictions and explicit Quit shutdown."
       ],
       "acceptance": [
-        "Renderer cannot access Node or create unrestricted navigation.",
-        "Second invocation toggles existing launcher and malformed deep links are rejected."
+        {
+          "id": "F1-02-AC01",
+          "text": "Renderer cannot access Node or create unrestricted navigation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-02-AC02",
+          "text": "Second invocation toggles existing launcher and malformed deep links are rejected.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -446,7 +724,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F2-01",
@@ -485,9 +764,46 @@
         "Add versioned migrations, pre-migration backup and interrupted-upgrade recovery."
       ],
       "acceptance": [
-        "Concurrent clients do not open independent writers.",
-        "Migration failure restores/reports recoverably; newer schema refuses unsafe downgrade.",
-        "Packaged SQLite runtime reports version >=3.51.3 (WAL-reset fix); backups use SQLite backup API rather than copying an active DB without WAL."
+        {
+          "id": "F2-01-AC01",
+          "text": "Concurrent clients do not open independent writers.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-01-AC02",
+          "text": "Migration failure restores/reports recoverably; newer schema refuses unsafe downgrade.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-01-AC03",
+          "text": "Packaged SQLite runtime reports version >=3.51.3 (WAL-reset fix); backups use SQLite backup API rather than copying an active DB without WAL.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -495,7 +811,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F2-02",
@@ -535,8 +852,38 @@
         "Implement export/backup redaction, retention services and resettable local diagnostics."
       ],
       "acceptance": [
-        "No secret reaches renderer logs/exports or insecure basic_text storage.",
-        "Clear/export/delete controls operate on intended categories only."
+        {
+          "id": "F2-02-AC01",
+          "text": "No secret reaches renderer logs/exports or insecure basic_text storage.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-02-AC02",
+          "text": "Clear/export/delete controls operate on intended categories only.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -544,7 +891,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F3-01",
@@ -584,8 +932,38 @@
         "Expose once/persistent/deny decisions with resource scopes and redacted audit records."
       ],
       "acceptance": [
-        "Spoofed caller IDs never expand access.",
-        "Revocation cancels pending sensitive operations and shows remediation."
+        {
+          "id": "F3-01-AC01",
+          "text": "Spoofed caller IDs never expand access.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F3-01-AC02",
+          "text": "Revocation cancels pending sensitive operations and shows remediation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F3-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F3-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -593,7 +971,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "D1-01",
@@ -633,8 +1012,38 @@
         "Implement focus, keycaps, buttons, text fields, loading/error/empty primitives and theme context."
       ],
       "acceptance": [
-        "Dark/light/opaque and reduced-motion examples pass visual checks.",
-        "Keyboard focus, labels and text scaling remain usable."
+        {
+          "id": "D1-01-AC01",
+          "text": "Dark/light/opaque and reduced-motion examples pass visual checks.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-01-AC02",
+          "text": "Keyboard focus, labels and text scaling remain usable.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -642,7 +1051,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "D1-02",
@@ -683,8 +1093,38 @@
         "Implement stable selection, navigation stack, action footer, safe Markdown and forms."
       ],
       "acceptance": [
-        "Malformed/custom executable views cannot render host code.",
-        "Async results preserve selection; keyboard-only actions/forms work."
+        {
+          "id": "D1-02-AC01",
+          "text": "Malformed/custom executable views cannot render host code.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-02-AC02",
+          "text": "Async results preserve selection; keyboard-only actions/forms work.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -692,7 +1132,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "D1-03",
@@ -734,8 +1175,38 @@
         "Expose provider, data, desktop/input integration state without leaking secrets."
       ],
       "acceptance": [
-        "Denied/unavailable capabilities never appear enabled.",
-        "Pending approvals survive navigation and cannot submit twice."
+        {
+          "id": "D1-03-AC01",
+          "text": "Denied/unavailable capabilities never appear enabled.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-03-AC02",
+          "text": "Pending approvals survive navigation and cannot submit twice.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "D1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -743,7 +1214,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F1-03",
@@ -783,8 +1255,38 @@
         "Add desktop file, native-messaging manifests and disabled system service assets through reviewed maintainer scripts."
       ],
       "acceptance": [
-        "Fresh Debian user needs no developer Node to launch.",
-        "Install/upgrade/remove do not silently enable keyboard capture."
+        {
+          "id": "F1-03-AC01",
+          "text": "Fresh Debian user needs no developer Node to launch.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-03-AC02",
+          "text": "Install/upgrade/remove do not silently enable keyboard capture.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -792,7 +1294,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L1-01",
@@ -833,8 +1336,38 @@
         "Merge bounded results with stable IDs and explicit fallback/AI actions."
       ],
       "acceptance": [
-        "Late provider completion cannot shift selected identity.",
-        "Empty query/disabled command/ranking reset and cancellation fixtures pass."
+        {
+          "id": "L1-01-AC01",
+          "text": "Late provider completion cannot shift selected identity.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-01-AC02",
+          "text": "Empty query/disabled command/ranking reset and cancellation fixtures pass.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -842,7 +1375,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L1-02",
@@ -882,8 +1416,38 @@
         "Separate URI/file/argv/shell commands and persist clearable run history."
       ],
       "acceptance": [
-        "Malformed Exec fields and untrusted URLs cannot interpolate shell syntax.",
-        "Applications with spaces/arguments and unavailable executables report accurately."
+        {
+          "id": "L1-02-AC01",
+          "text": "Malformed Exec fields and untrusted URLs cannot interpolate shell syntax.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-02-AC02",
+          "text": "Applications with spaces/arguments and unavailable executables report accurately.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -891,7 +1455,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L1-03",
@@ -934,8 +1499,38 @@
         "Expose closed native deep-link routes and stable settings links."
       ],
       "acceptance": [
-        "Reserved/conflicting shortcuts have remediation.",
-        "External deep links cannot execute arbitrary shell actions."
+        {
+          "id": "L1-03-AC01",
+          "text": "Reserved/conflicting shortcuts have remediation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-03-AC02",
+          "text": "External deep links cannot execute arbitrary shell actions.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -943,7 +1538,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-01",
@@ -984,8 +1580,38 @@
         "Reconcile rename/deletion/watch overflow with cancellation and progress."
       ],
       "acceptance": [
-        "100k-path fixture search returns current paths after reconciliation.",
-        "Permission failures and excluded mounts never stall the whole index."
+        {
+          "id": "L2-01-AC01",
+          "text": "100k-path fixture search returns current paths after reconciliation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-01-AC02",
+          "text": "Permission failures and excluded mounts never stall the whole index.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -993,7 +1619,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-02",
@@ -1035,8 +1662,38 @@
         "Add opt-in MIME-limited content extraction with size/time budgets."
       ],
       "acceptance": [
-        "Content is not indexed until a root opts in.",
-        "Corrupt/large files and cancelled extraction do not hang the host."
+        {
+          "id": "L2-02-AC01",
+          "text": "Content is not indexed until a root opts in.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-02-AC02",
+          "text": "Corrupt/large files and cancelled extraction do not hang the host.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1044,7 +1701,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-03",
@@ -1087,8 +1745,38 @@
         "Add move/rename/trash/open-with/terminal actions with conflict/effect policy."
       ],
       "acceptance": [
-        "Actions respect cardinality and never replace permanent-delete confirmation.",
-        "Preview/index cache deletion cannot delete source files."
+        {
+          "id": "L2-03-AC01",
+          "text": "Actions respect cardinality and never replace permanent-delete confirmation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-03-AC02",
+          "text": "Preview/index cache deletion cannot delete source files.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1096,7 +1784,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-04",
@@ -1136,8 +1825,38 @@
         "Provide opt-in configured currency/crypto adapter with timestamped fixture-backed cache."
       ],
       "acceptance": [
-        "No eval or background query transmission; ordinary words do not hijack search.",
-        "DST/unit/colour fixtures pass and stale/offline rates are labelled."
+        {
+          "id": "L2-04-AC01",
+          "text": "No eval or background query transmission; ordinary words do not hijack search.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-04-AC02",
+          "text": "DST/unit/colour fixtures pass and stale/offline rates are labelled.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1145,7 +1864,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-05",
@@ -1187,8 +1907,38 @@
         "Provide argument forms, browser/open-with, tags and native export."
       ],
       "acceptance": [
-        "URL components encode untrusted values without changing executable structure.",
-        "Recursive/missing/unsupported cursor placeholders produce explicit errors."
+        {
+          "id": "L2-05-AC01",
+          "text": "URL components encode untrusted values without changing executable structure.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-05-AC02",
+          "text": "Recursive/missing/unsupported cursor placeholders produce explicit errors.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1196,7 +1946,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-06",
@@ -1237,8 +1988,38 @@
         "Pin licensed Unicode metadata, aliases/tone/favourites and keyboard grid actions."
       ],
       "acceptance": [
-        "No unlicensed dictionary dataset silently downloads.",
-        "Unicode/combining-character results copy correctly and unsupported paste explains fallback."
+        {
+          "id": "L2-06-AC01",
+          "text": "No unlicensed dictionary dataset silently downloads.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-06-AC02",
+          "text": "Unicode/combining-character results copy correctly and unsupported paste explains fallback.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-06-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-06-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1246,7 +2027,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P1-01",
@@ -1286,8 +2068,38 @@
         "Persist shortcut identity and model denial/revocation/restart states."
       ],
       "acceptance": [
-        "All four session reports distinguish unsupported from denied.",
-        "linuxcast --toggle remains an available recovery command."
+        {
+          "id": "P1-01-AC01",
+          "text": "All four session reports distinguish unsupported from denied.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-01-AC02",
+          "text": "linuxcast --toggle remains an available recovery command.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1295,7 +2107,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P1-02",
@@ -1337,8 +2150,38 @@
         "Add enable/version/disable diagnostics and context epochs."
       ],
       "acceptance": [
-        "Window identity survives unrelated focus changes but stale handles fail.",
-        "Shell restart clears transactions and resumes only after fresh validation."
+        {
+          "id": "P1-02-AC01",
+          "text": "Window identity survives unrelated focus changes but stale handles fail.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-02-AC02",
+          "text": "Shell restart clears transactions and resumes only after fresh validation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1346,7 +2189,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P1-03",
@@ -1388,8 +2232,38 @@
         "Implement focus/layout epochs and bounded queue expiry."
       ],
       "acceptance": [
-        "No callDBus reply is assumed to provide unsupported synchronous control.",
-        "Restart/missing protocol and stale acknowledgements fail safely."
+        {
+          "id": "P1-03-AC01",
+          "text": "No callDBus reply is assumed to provide unsupported synchronous control.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-03-AC02",
+          "text": "Restart/missing protocol and stale acknowledgements fail safely.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1397,7 +2271,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P1-04",
@@ -1436,8 +2311,38 @@
         "Keep native Wayland objects outside X11-only capability claims."
       ],
       "acceptance": [
-        "X11 tests cover current window, geometry and MIME ownership.",
-        "Mixed XWayland session cannot report native Wayland operations as available."
+        {
+          "id": "P1-04-AC01",
+          "text": "X11 tests cover current window, geometry and MIME ownership.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-04-AC02",
+          "text": "Mixed XWayland session cannot report native Wayland operations as available.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1445,7 +2350,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P1-05",
@@ -1486,8 +2392,38 @@
         "Implement window search and app-menu commands only when accessible APIs exist."
       ],
       "acceptance": [
-        "Fractional scaling/work areas and disappearing windows have fixtures.",
-        "Applying a layout skips missing identities instead of moving unrelated apps."
+        {
+          "id": "P1-05-AC01",
+          "text": "Fractional scaling/work areas and disappearing windows have fixtures.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-05-AC02",
+          "text": "Applying a layout skips missing identities instead of moving unrelated apps.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P1-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1495,7 +2431,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P2-01",
@@ -1537,8 +2474,38 @@
         "Pass validated FDs to dedicated worker, close parent copies, and enforce hardening/leases."
       ],
       "acceptance": [
-        "UID/path/socket substitution and remote/TTY/locked sessions are rejected.",
-        "Install/enable/cancel/disable and new-versus-selected keyboard cases pass."
+        {
+          "id": "P2-01-AC01",
+          "text": "UID/path/socket substitution and remote/TTY/locked sessions are rejected.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-01-AC02",
+          "text": "Install/enable/cancel/disable and new-versus-selected keyboard cases pass.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "cargo test --workspace",
@@ -1547,7 +2514,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P2-02",
@@ -1585,8 +2553,38 @@
         "Handle SYN_DROPPED, virtual-device exclusion, emergency disarm and worker watchdog."
       ],
       "acceptance": [
-        "Pre-held modifiers/multiple keyboards/repeat do not release user-held keys.",
-        "Worker/supervisor death and unplug recover physical input without stuck keys."
+        {
+          "id": "P2-02-AC01",
+          "text": "Pre-held modifiers/multiple keyboards/repeat do not release user-held keys.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-02-AC02",
+          "text": "Worker/supervisor death and unplug recover physical input without stuck keys.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "cargo test --workspace",
@@ -1595,7 +2593,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P2-03",
@@ -1638,8 +2637,38 @@
         "Track focus/layout/IME/session epochs and emit only trigger IDs/nonces."
       ],
       "acceptance": [
-        "Synthetic output never recursively triggers; immediate-prefix conflicts fail.",
-        "Unknown layout/composition/sensitivity pauses matching; no raw typing in logs."
+        {
+          "id": "P2-03-AC01",
+          "text": "Synthetic output never recursively triggers; immediate-prefix conflicts fail.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-03-AC02",
+          "text": "Unknown layout/composition/sensitivity pauses matching; no raw typing in logs.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "cargo test --workspace",
@@ -1648,7 +2677,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P2-04",
@@ -1689,8 +2719,38 @@
         "Integrate stop-before-upgrade/uninstall and no automatic crash-loop rearm."
       ],
       "acceptance": [
-        "Emergency chord and lease/watchdog timeouts meet acceptance on real keyboards.",
-        "Removal or failure leaves physical keyboards usable and no secret buffers retained."
+        {
+          "id": "P2-04-AC01",
+          "text": "Emergency chord and lease/watchdog timeouts meet acceptance on real keyboards.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-04-AC02",
+          "text": "Removal or failure leaves physical keyboards usable and no secret buffers retained.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P2-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "cargo test --workspace",
@@ -1699,7 +2759,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P3-01",
@@ -1743,8 +2804,38 @@
         "Keep PRIMARY separate and filter internal snippet/dictation writes."
       ],
       "acceptance": [
-        "Images/files/HTML retain supported formats and unsupported ones are disclosed.",
-        "Paused/excluded/sensitive-known events do not enter history."
+        {
+          "id": "P3-01-AC01",
+          "text": "Images/files/HTML retain supported formats and unsupported ones are disclosed.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-01-AC02",
+          "text": "Paused/excluded/sensitive-known events do not enter history.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1752,7 +2843,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P3-02",
@@ -1795,8 +2887,38 @@
         "Add generation-guarded explicit clipboard restore and manual copy fallback."
       ],
       "acceptance": [
-        "Focus changes or further typing abort without late paste/compensating deletion.",
-        "Concurrent user copies cannot be overwritten by restoration."
+        {
+          "id": "P3-02-AC01",
+          "text": "Focus changes or further typing abort without late paste/compensating deletion.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-02-AC02",
+          "text": "Concurrent user copies cannot be overwritten by restoration.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1804,7 +2926,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "P3-03",
@@ -1847,8 +2970,38 @@
         "Resolve dynamic placeholders before deletion and dispatch workflow trigger IDs unprivileged."
       ],
       "acceptance": [
-        "Conflicting scope bindings require resolution; no silent workflow precedence.",
-        "Long-running workflow output falls back to explicit copy when target token expires."
+        {
+          "id": "P3-03-AC01",
+          "text": "Conflicting scope bindings require resolution; no silent workflow precedence.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-03-AC02",
+          "text": "Long-running workflow output falls back to explicit copy when target token expires.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "P3-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1856,7 +3009,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-01",
@@ -1897,8 +3051,38 @@
         "Implement storage/network/files/clipboard/UI actions with scoped secret references and cancellation."
       ],
       "acceptance": [
-        "Direct host HOME/env/DBus/display/network access is denied.",
-        "Missing sandbox disables execution; denied calls cannot be spoofed by payload IDs."
+        {
+          "id": "E1-01-AC01",
+          "text": "Direct host HOME/env/DBus/display/network access is denied.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-01-AC02",
+          "text": "Missing sandbox disables execution; denied calls cannot be spoofed by payload IDs.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1906,7 +3090,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-02",
@@ -1946,8 +3131,38 @@
         "Implement bounded streamed/full/compact/inline/silent output and nonoverlapping in-session refresh. Persistent package background schedules are integrated in E1-06 through the shared scheduler."
       ],
       "acceptance": [
-        "ANSI/oversized output is sanitized and cancellation terminates process tree.",
-        "No npm postinstall/native-addon download or shell interpolation fallback."
+        {
+          "id": "E1-02-AC01",
+          "text": "ANSI/oversized output is sanitized and cancellation terminates process tree.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-02-AC02",
+          "text": "No npm postinstall/native-addon download or shell interpolation fallback.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -1955,7 +3170,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-03",
@@ -1998,8 +3214,38 @@
         "Implement enable/remove/update and permission expansion review with pinned source metadata."
       ],
       "acceptance": [
-        "Traversal/symlinks/oversized archives and incompatible versions are rejected.",
-        "An update cannot silently broaden grants or destroy user settings."
+        {
+          "id": "E1-03-AC01",
+          "text": "Traversal/symlinks/oversized archives and incompatible versions are rejected.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-03-AC02",
+          "text": "An update cannot silently broaden grants or destroy user settings.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2007,7 +3253,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-04",
@@ -2048,8 +3295,38 @@
         "Ship declarative sample plus optional installed-op item/bookmark adapter with native auth."
       ],
       "acceptance": [
-        "Development mode does not bypass broker permissions.",
-        "Password integration never persists secret values or harvests another app credential."
+        {
+          "id": "E1-04-AC01",
+          "text": "Development mode does not bypass broker permissions.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-04-AC02",
+          "text": "Password integration never persists secret values or harvests another app credential.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2057,7 +3334,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W1-01",
@@ -2096,8 +3374,38 @@
         "Create run snapshots, scoped variables and deterministic branch copies."
       ],
       "acceptance": [
-        "Raw cycles/dangling edges/type mismatch fail before execution.",
-        "One branch cannot mutate another branch or live configuration."
+        {
+          "id": "W1-01-AC01",
+          "text": "Raw cycles/dangling edges/type mismatch fail before execution.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-01-AC02",
+          "text": "One branch cannot mutate another branch or live configuration.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2105,7 +3413,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W1-02",
@@ -2144,8 +3453,38 @@
         "Implement error ports, bounded foreach, cross-workflow depth and explicit retry policy."
       ],
       "acceptance": [
-        "Stale script-filter generations never render results.",
-        "Cancel and nested failure stop intended jobs without duplicate external effects."
+        {
+          "id": "W1-02-AC01",
+          "text": "Stale script-filter generations never render results.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-02-AC02",
+          "text": "Cancel and nested failure stop intended jobs without duplicate external effects.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2153,7 +3492,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W1-03",
@@ -2192,8 +3532,38 @@
         "Recover uncertain effectful steps as interrupted-review; retry only declared idempotent work."
       ],
       "acceptance": [
-        "Crash between side effect and acknowledgement never silently replays.",
-        "Secret values and oversized output do not leak into durable logs."
+        {
+          "id": "W1-03-AC01",
+          "text": "Crash between side effect and acknowledgement never silently replays.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-03-AC02",
+          "text": "Secret values and oversized output do not leak into durable logs.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2201,7 +3571,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W2-01",
@@ -2239,8 +3610,38 @@
         "Provide equivalent keyboard/list operations and validation feedback."
       ],
       "acceptance": [
-        "Add/connect/edit/delete works without dragging.",
-        "Layout edits never alter execution semantics and undo restores graph state."
+        {
+          "id": "W2-01-AC01",
+          "text": "Add/connect/edit/delete works without dragging.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-01-AC02",
+          "text": "Layout edits never alter execution semantics and undo restores graph state.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2248,7 +3649,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W2-02",
@@ -2286,8 +3688,38 @@
         "Validate missing settings/secrets without exporting secret values."
       ],
       "acceptance": [
-        "Invalid settings cannot start a run.",
-        "Reusable-group edits preserve stable IDs and clear package defaults versus local overrides."
+        {
+          "id": "W2-02-AC01",
+          "text": "Invalid settings cannot start a run.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-02-AC02",
+          "text": "Reusable-group edits preserve stable IDs and clear package defaults versus local overrides.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2295,7 +3727,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W2-03",
@@ -2333,8 +3766,38 @@
         "Add test-run/cancel/retry controls gated by runtime effect policy."
       ],
       "acceptance": [
-        "Navigating editor does not restart a run or lose pending approval.",
-        "Large output remains inspectable via bounded previews, not frozen rendering."
+        {
+          "id": "W2-03-AC01",
+          "text": "Navigating editor does not restart a run or lose pending approval.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-03-AC02",
+          "text": "Large output remains inspectable via bounded previews, not frozen rendering.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2342,7 +3805,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W3-01",
@@ -2381,8 +3845,38 @@
         "Support rich stable result IDs, actions, autocomplete and 150ms latest-wins filtering."
       ],
       "acceptance": [
-        "Script results follow native schema and stale generations are discarded.",
-        "External input validates types and app-scope/hotkey rules apply."
+        {
+          "id": "W3-01-AC01",
+          "text": "Script results follow native schema and stale generations are discarded.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-01-AC02",
+          "text": "External input validates types and app-scope/hotkey rules apply.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2390,7 +3884,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W3-02",
@@ -2428,8 +3923,38 @@
         "Make join concatenate values, not an implicit asynchronous branch barrier."
       ],
       "acceptance": [
-        "Boundary/error/loop-depth/time-budget fixtures match documented semantics.",
-        "Expression parsing cannot execute arbitrary host JavaScript."
+        {
+          "id": "W3-02-AC01",
+          "text": "Boundary/error/loop-depth/time-budget fixtures match documented semantics.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-02-AC02",
+          "text": "Expression parsing cannot execute arbitrary host JavaScript.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2437,7 +3962,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W3-03",
@@ -2478,8 +4004,38 @@
         "Resolve placeholders from snapshots and classify effectful actions for recovery."
       ],
       "acceptance": [
-        "Permission denial flows to explicit node errors.",
-        "Script/HTTP/file changes cannot evade scoped grants or replay after uncertain crash."
+        {
+          "id": "W3-03-AC01",
+          "text": "Permission denial flows to explicit node errors.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-03-AC02",
+          "text": "Script/HTTP/file changes cannot evade scoped grants or replay after uncertain crash.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2487,7 +4043,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W3-04",
@@ -2527,8 +4084,38 @@
         "Add streaming AI and structured-output nodes inheriting global route."
       ],
       "acceptance": [
-        "Paused run resumes only once with validated input.",
-        "Missing model capability fails before sending unsupported payload."
+        {
+          "id": "W3-04-AC01",
+          "text": "Paused run resumes only once with validated input.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-04-AC02",
+          "text": "Missing model capability fails before sending unsupported payload.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2536,7 +4123,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W3-05",
@@ -2589,8 +4177,38 @@
         "Exercise editing, debugging, cancellation, export/import and failure recovery for each."
       ],
       "acceptance": [
-        "All examples run with declared prerequisites on target sessions.",
-        "Export contains no secrets/history and imported typed triggers remain disabled."
+        {
+          "id": "W3-05-AC01",
+          "text": "All examples run with declared prerequisites on target sessions.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-05-AC02",
+          "text": "Export contains no secrets/history and imported typed triggers remain disabled.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W3-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2598,7 +4216,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A1-01",
@@ -2639,8 +4258,38 @@
         "Keep keyring refs in trusted process and normalize auth/quota/partial errors."
       ],
       "acceptance": [
-        "Quick/command/workflow callers share one configured route.",
-        "Settings changes do not alter active run; failed stream is not success."
+        {
+          "id": "A1-01-AC01",
+          "text": "Quick/command/workflow callers share one configured route.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-01-AC02",
+          "text": "Settings changes do not alter active run; failed stream is not success.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2648,7 +4297,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A1-02",
@@ -2687,8 +4337,38 @@
         "Implement tool/image/structured capabilities and provider-specific stream termination."
       ],
       "acceptance": [
-        "Captured fixtures validate each protocol without flattening incompatible fields.",
-        "No retry after visible output or provider switch without explicit action."
+        {
+          "id": "A1-02-AC01",
+          "text": "Captured fixtures validate each protocol without flattening incompatible fields.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-02-AC02",
+          "text": "No retry after visible output or provider switch without explicit action.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2696,7 +4376,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A1-03",
@@ -2734,8 +4415,38 @@
         "Require declared capabilities and preserve stale catalog after refresh failure."
       ],
       "acceptance": [
-        "Unavailable or removed selected model yields actionable error, never silent replacement.",
-        "Local mode never falls back to hosted inference; endpoint grants restrict credential destination."
+        {
+          "id": "A1-03-AC01",
+          "text": "Unavailable or removed selected model yields actionable error, never silent replacement.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-03-AC02",
+          "text": "Local mode never falls back to hosted inference; endpoint grants restrict credential destination.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2743,7 +4454,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A2-01",
@@ -2784,8 +4496,38 @@
         "Implement translation languages/detection/swap and diff-preview UI; use safe copy output until the final insertion/context integration is accepted."
       ],
       "acceptance": [
-        "Typing root queries alone makes no inference request.",
-        "No enabled replacement/handoff control before the corresponding integration capability is available; copy remains usable."
+        {
+          "id": "A2-01-AC01",
+          "text": "Typing root queries alone makes no inference request.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-01-AC02",
+          "text": "No enabled replacement/handoff control before the corresponding integration capability is available; copy remains usable.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2793,7 +4535,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A2-02",
@@ -2832,8 +4575,38 @@
         "Implement edit/regenerate/branch/context compaction with bounded attachments/results."
       ],
       "acceptance": [
-        "Interrupted responses remain visibly interrupted after restart.",
-        "Editing old turns branches correctly and compaction preserves referenced context."
+        {
+          "id": "A2-02-AC01",
+          "text": "Interrupted responses remain visibly interrupted after restart.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-02-AC02",
+          "text": "Editing old turns branches correctly and compaction preserves referenced context.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2841,7 +4614,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A2-03",
@@ -2879,8 +4653,38 @@
         "Preserve drafts and approvals across navigation; use capability-gated model controls."
       ],
       "acceptance": [
-        "Keyboard-only use and dark/light/error/streaming states pass.",
-        "Repeated submit/notification handling cannot duplicate a turn."
+        {
+          "id": "A2-03-AC01",
+          "text": "Keyboard-only use and dark/light/error/streaming states pass.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-03-AC02",
+          "text": "Repeated submit/notification handling cannot duplicate a turn.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2888,7 +4692,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A2-04",
@@ -2931,8 +4736,38 @@
         "Exclude own/protected surfaces where identifiable; explain unsupported context and enforce vision/tool limits."
       ],
       "acceptance": [
-        "Unselected or unsupported content is never silently transmitted.",
-        "Focus/layout changes prevent late text replacement; copy fallback remains available."
+        {
+          "id": "A2-04-AC01",
+          "text": "Unselected or unsupported content is never silently transmitted.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-04-AC02",
+          "text": "Focus/layout changes prevent late text replacement; copy fallback remains available.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2940,7 +4775,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A3-01",
@@ -2982,8 +4818,38 @@
         "Implement inspectable arguments, once/persistent/deny, progress, timeout/cancel and bounded outputs."
       ],
       "acceptance": [
-        "A skill/server cannot grant its own permissions.",
-        "Token expiry/server restart/approval navigation cannot execute an effect twice."
+        {
+          "id": "A3-01-AC01",
+          "text": "A skill/server cannot grant its own permissions.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-01-AC02",
+          "text": "Token expiry/server restart/approval navigation cannot execute an effect twice.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -2991,7 +4857,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A3-02",
@@ -3031,8 +4898,38 @@
         "Treat imported instructions as untrusted and inherit one global model."
       ],
       "acceptance": [
-        "Project context does not bleed into unrelated conversations.",
-        "Skill files cannot enable tools, expand filesystem scope or override permission policy."
+        {
+          "id": "A3-02-AC01",
+          "text": "Project context does not bleed into unrelated conversations.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-02-AC02",
+          "text": "Skill files cannot enable tools, expand filesystem scope or override permission policy.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3040,7 +4937,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A3-03",
@@ -3080,8 +4978,38 @@
         "Route explicit/opt-in memory processing through the selected AI broker."
       ],
       "acceptance": [
-        "Disabled memory causes no hidden inference or retrieval.",
-        "Reset removes only intended scope and sensitive exports are explicit."
+        {
+          "id": "A3-03-AC01",
+          "text": "Disabled memory causes no hidden inference or retrieval.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-03-AC02",
+          "text": "Reset removes only intended scope and sensitive exports are explicit.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3089,7 +5017,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A3-04",
@@ -3129,8 +5058,38 @@
         "Detect installed Codex and adapt session/turn/approval/cancel events within approved directory boundaries."
       ],
       "acceptance": [
-        "No client secret, token harvesting or API-billing fallback.",
-        "Refresh/restart preserves explicit session identity and cannot replay completed tools."
+        {
+          "id": "A3-04-AC01",
+          "text": "No client secret, token harvesting or API-billing fallback.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-04-AC02",
+          "text": "Refresh/restart preserves explicit session identity and cannot replay completed tools.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3138,7 +5097,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A3-05",
@@ -3177,8 +5137,38 @@
         "Detect unchanged Claude Code with its own native auth and document Gemini CLI credential boundary."
       ],
       "acceptance": [
-        "App never reads/reuses Claude/Gemini subscription token files.",
-        "Harness grants remain bounded, cancellation works and unavailable binaries have clear setup instructions."
+        {
+          "id": "A3-05-AC01",
+          "text": "App never reads/reuses Claude/Gemini subscription token files.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-05-AC02",
+          "text": "Harness grants remain bounded, cancellation works and unavailable binaries have clear setup instructions.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A3-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3186,7 +5176,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A4-01",
@@ -3227,8 +5218,38 @@
         "Coalesce latest missed run, skip nonexistent DST time, run repeated time once and never wake host."
       ],
       "acceptance": [
-        "Restart/sleep cannot replay every missed occurrence or duplicate an occurrence.",
-        "Uncertain side effect pauses for review and approval waits survive restart."
+        {
+          "id": "A4-01-AC01",
+          "text": "Restart/sleep cannot replay every missed occurrence or duplicate an occurrence.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-01-AC02",
+          "text": "Uncertain side effect pauses for review and approval waits survive restart.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3236,7 +5257,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A4-02",
@@ -3275,8 +5297,38 @@
         "Handle deleted/archived destination and disallow recursive automation creation."
       ],
       "acceptance": [
-        "Changing schedule affects only future unstarted occurrences.",
-        "Busy/detached targets and explicit app Quit are clearly represented."
+        {
+          "id": "A4-02-AC01",
+          "text": "Changing schedule affects only future unstarted occurrences.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-02-AC02",
+          "text": "Busy/detached targets and explicit app Quit are clearly represented.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A4-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3284,7 +5336,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "B1-01",
@@ -3324,8 +5377,38 @@
         "Capture activeTab URL/title/selection/content only after explicit action."
       ],
       "acceptance": [
-        "No localhost unauthenticated service or arbitrary extension client is accepted.",
-        "Multiple profiles/stale active tabs cannot attach the wrong page."
+        {
+          "id": "B1-01-AC01",
+          "text": "No localhost unauthenticated service or arbitrary extension client is accepted.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-01-AC02",
+          "text": "Multiple profiles/stale active tabs cannot attach the wrong page.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3333,7 +5416,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "B1-02",
@@ -3373,8 +5457,38 @@
         "Apply focus-session site rules with explicit browser/profile limitations."
       ],
       "acceptance": [
-        "Revoking history permission removes access immediately.",
-        "Unsupported browsers have clear missing-component state rather than false blocking."
+        {
+          "id": "B1-02-AC01",
+          "text": "Revoking history permission removes access immediately.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-02-AC02",
+          "text": "Unsupported browsers have clear missing-component state rather than false blocking.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3382,7 +5496,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U1-01",
@@ -3422,8 +5537,38 @@
         "Persist autosave/drafts, pin/archive/trash/restore and Markdown export."
       ],
       "acceptance": [
-        "Crash recovers last committed content and pending draft where possible.",
-        "Markdown round trip preserves text/tasks and declares unsupported styling."
+        {
+          "id": "U1-01-AC01",
+          "text": "Crash recovers last committed content and pending draft where possible.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-01-AC02",
+          "text": "Markdown round trip preserves text/tasks and declares unsupported styling.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3431,7 +5576,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U1-02",
@@ -3473,8 +5619,38 @@
         "Parse recurring/timezone data and isolate account credential references."
       ],
       "acceptance": [
-        "Read-only ICS cannot expose writable success paths.",
-        "Recurrence exceptions, timezone changes and expired credentials have fixtures."
+        {
+          "id": "U1-02-AC01",
+          "text": "Read-only ICS cannot expose writable success paths.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-02-AC02",
+          "text": "Recurrence exceptions, timezone changes and expired credentials have fixtures.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3482,7 +5658,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U1-03",
@@ -3524,8 +5701,38 @@
         "Implement reminders, meeting-app preference and explicit optional autojoin controls."
       ],
       "acceptance": [
-        "Read-only/unsupported RSVP is explained; camera state is never changed silently.",
-        "DST/reminder/repeated occurrence and offline-source views are correct."
+        {
+          "id": "U1-03-AC01",
+          "text": "Read-only/unsupported RSVP is explained; camera state is never changed silently.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-03-AC02",
+          "text": "DST/reminder/repeated occurrence and offline-source views are correct.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3533,7 +5740,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U2-01",
@@ -3574,8 +5782,38 @@
         "Bind effect/confirmation policy and supported desktop display/theme controls."
       ],
       "acceptance": [
-        "Failed or unsupported hardware operation never reports success.",
-        "Selected media player and per-app audio actions target the intended resource."
+        {
+          "id": "U2-01-AC01",
+          "text": "Failed or unsupported hardware operation never reports success.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-01-AC02",
+          "text": "Selected media player and per-app audio actions target the intended resource.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3583,7 +5821,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U2-02",
@@ -3626,8 +5865,38 @@
         "Implement disabled-by-default per-app idle close, three-minute default and foreground/media exclusions."
       ],
       "acceptance": [
-        "No root firewall/DNS changes or kill fallback.",
-        "Focus end/crash restores rules; autoquit excludes system/session processes."
+        {
+          "id": "U2-02-AC01",
+          "text": "No root firewall/DNS changes or kill fallback.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-02-AC02",
+          "text": "Focus end/crash restores rules; autoquit excludes system/session processes.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3635,7 +5904,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U2-03",
@@ -3675,8 +5945,38 @@
         "Pause only configured shortcuts while game context is active and retain recovery."
       ],
       "acceptance": [
-        "Stale catalogue entries fail cleanly.",
-        "Focus/exit/helper restart restores shortcut state exactly once."
+        {
+          "id": "U2-03-AC01",
+          "text": "Stale catalogue entries fail cleanly.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-03-AC02",
+          "text": "Focus/exit/helper restart restores shortcut state exactly once.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3684,7 +5984,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "U2-04",
@@ -3726,8 +6027,38 @@
         "Expose diagnostics, usage reset, backups and explicit data-category export controls."
       ],
       "acceptance": [
-        "Theme import cannot inject CSS/scripts or hide required focus state.",
-        "Default export excludes secrets/content histories and redacts diagnostics."
+        {
+          "id": "U2-04-AC01",
+          "text": "Theme import cannot inject CSS/scripts or hide required focus state.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-04-AC02",
+          "text": "Default export excludes secrets/content histories and redacts diagnostics.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "U2-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3735,7 +6066,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "M1-01",
@@ -3778,8 +6110,38 @@
         "Add portal capture and safe preview/open/reveal/delete actions."
       ],
       "acceptance": [
-        "Cancelled capture creates no result.",
-        "Cache retention does not delete source media; permanent deletion is explicit."
+        {
+          "id": "M1-01-AC01",
+          "text": "Cancelled capture creates no result.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-01-AC02",
+          "text": "Cache retention does not delete source media; permanent deletion is explicit.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3787,7 +6149,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "M1-02",
@@ -3830,8 +6193,38 @@
         "Index OCR text and expose copy/search/retry without automatic AI transmission."
       ],
       "acceptance": [
-        "Corrupt/large images cancel or error without blocking UI.",
-        "Missing language/download failure is actionable and no media leaks to providers."
+        {
+          "id": "M1-02-AC01",
+          "text": "Corrupt/large images cancel or error without blocking UI.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-02-AC02",
+          "text": "Missing language/download failure is actionable and no media leaks to providers.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3839,7 +6232,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "M2-01",
@@ -3880,8 +6274,38 @@
         "Provide language/vocabulary, timing and recording-state events independent of AI."
       ],
       "acceptance": [
-        "Cancelled recording yields no transcription/insertion.",
-        "Offline model/audio-device changes and permission revocation recover visibly."
+        {
+          "id": "M2-01-AC01",
+          "text": "Cancelled recording yields no transcription/insertion.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-01-AC02",
+          "text": "Offline model/audio-device changes and permission revocation recover visibly.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3889,7 +6313,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "M2-02",
@@ -3933,8 +6358,38 @@
         "Add explicit selected-model cleanup/context styles and optional recording/transcription for meeting context."
       ],
       "acceptance": [
-        "No cleanup request until opt-in and no automatic submit unless separately enabled.",
-        "Focus change/cancel prevents paste; audio/text never enters keyboard-service logs."
+        {
+          "id": "M2-02-AC01",
+          "text": "No cleanup request until opt-in and no automatic submit unless separately enabled.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-02-AC02",
+          "text": "Focus change/cancel prevents paste; audio/text never enters keyboard-service logs.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "M2-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -3942,7 +6397,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "R1-01",
@@ -4004,8 +6460,38 @@
         "Record versions, results, denied/unavailable paths and recovery evidence per feature."
       ],
       "acceptance": [
-        "No missing desktop run is counted as pass.",
-        "All v1 feature tasks have actual acceptance evidence."
+        {
+          "id": "R1-01-AC01",
+          "text": "No missing desktop run is counted as pass.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-01-AC02",
+          "text": "All v1 feature tasks have actual acceptance evidence.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4013,7 +6499,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "R1-02",
@@ -4053,8 +6540,38 @@
         "Measure warm launch/search p95 and total process-tree memory on recorded reference machines."
       ],
       "acceptance": [
-        "100k-path fixed fixture and 100 launch trials have reproducible results.",
-        "Mockups are not substituted for application screenshots and failed budgets remain visible."
+        {
+          "id": "R1-02-AC01",
+          "text": "100k-path fixed fixture and 100 launch trials have reproducible results.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-02-AC02",
+          "text": "Mockups are not substituted for application screenshots and failed budgets remain visible.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4062,7 +6579,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "R1-03",
@@ -4104,8 +6622,38 @@
         "Produce deb/checksums/SBOM/licences/release notes/capability matrix with manual package-upgrade instructions."
       ],
       "acceptance": [
-        "Uninstall or update disarms input before replacing binaries.",
-        "No secrets/private content enter artifacts; all critical acceptance gates pass."
+        {
+          "id": "R1-03-AC01",
+          "text": "Uninstall or update disarms input before replacing binaries.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-03-AC02",
+          "text": "No secrets/private content enter artifacts; all critical acceptance gates pass.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "R1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4113,7 +6661,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "A2-05",
@@ -4155,8 +6704,38 @@
         "Enable selection replacement only through the shared context/insertion transaction."
       ],
       "acceptance": [
-        "Handoff preserves history and cannot repeat a pending tool approval.",
-        "Changed target or unsupported selection replacement returns copy/preview without late typing."
+        {
+          "id": "A2-05-AC01",
+          "text": "Handoff preserves history and cannot repeat a pending tool approval.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-05-AC02",
+          "text": "Changed target or unsupported selection replacement returns copy/preview without late typing.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "A2-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4164,7 +6743,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "L2-07",
@@ -4203,8 +6783,38 @@
         "Validate returned values against the pinned Unicode dataset and preserve offline local search."
       ],
       "acceptance": [
-        "Typing/search alone causes no inference.",
-        "Cancelled/error/unrecognized AI suggestions never replace valid local results."
+        {
+          "id": "L2-07-AC01",
+          "text": "Typing/search alone causes no inference.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-07-AC02",
+          "text": "Cancelled/error/unrecognized AI suggestions never replace valid local results.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-07-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "L2-07-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4212,7 +6822,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-05",
@@ -4253,8 +6864,38 @@
         "Route credential attachment and inference through host broker; package code cannot supply a second hidden AI route."
       ],
       "acceptance": [
-        "Package install does not select a model or transmit data.",
-        "Contribution removal leaves unavailable selected-profile state; origin changes require new consent."
+        {
+          "id": "E1-05-AC01",
+          "text": "Package install does not select a model or transmit data.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-05-AC02",
+          "text": "Contribution removal leaves unavailable selected-profile state; origin changes require new consent.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4262,7 +6903,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "F2-03",
@@ -4303,8 +6945,38 @@
         "Add optional retained passphrase in secure SecretStore, disabled daily/weekly/monthly resident schedules, keep5 and skipbattery defaults."
       ],
       "acceptance": [
-        "Wrong passphrase/tampering/traversal/oversize/newer schema leaves existing data untouched.",
-        "Locked/missing keyring skips scheduled backup visibly; credentials/grants are never exported."
+        {
+          "id": "F2-03-AC01",
+          "text": "Wrong passphrase/tampering/traversal/oversize/newer schema leaves existing data untouched.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-03-AC02",
+          "text": "Locked/missing keyring skips scheduled backup visibly; credentials/grants are never exported.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "F2-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4312,7 +6984,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "B1-03",
@@ -4353,8 +7026,38 @@
         "Keep page script execution as separate high-trust concrete-operation consent; no normal install or read-only permission grants it."
       ],
       "acceptance": [
-        "Stale profile/tab/origin tokens cannot act on a replacement page.",
-        "Denied advanced operation cannot be rerouted as generic script execution."
+        {
+          "id": "B1-03-AC01",
+          "text": "Stale profile/tab/origin tokens cannot act on a replacement page.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-03-AC02",
+          "text": "Denied advanced operation cannot be rerouted as generic script execution.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "B1-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4362,7 +7065,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-01",
@@ -4400,8 +7104,38 @@
         "Use linear-time regex, explicit locale/timezone choices and strict JSON Pointer/encoding validation."
       ],
       "acceptance": [
-        "Empty arrays, bad UTF8/Base64/regex, DST ambiguity and prototype keys match documented outcomes.",
-        "Untrusted expressions cannot invoke arbitrary code."
+        {
+          "id": "W4-01-AC01",
+          "text": "Empty arrays, bad UTF8/Base64/regex, DST ambiguity and prototype keys match documented outcomes.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-01-AC02",
+          "text": "Untrusted expressions cannot invoke arbitrary code.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-01-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-01-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4409,7 +7143,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-02",
@@ -4448,8 +7183,38 @@
         "Implement previewed folder difference plan with confirmation bound to its hash before overwrite/delete."
       ],
       "acceptance": [
-        "Symlink/rename races recheck target containment.",
-        "Changed sync plan invalidates confirmation and no normal copy becomes destructive mirroring."
+        {
+          "id": "W4-02-AC01",
+          "text": "Symlink/rename races recheck target containment.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-02-AC02",
+          "text": "Changed sync plan invalidates confirmation and no normal copy becomes destructive mirroring.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-02-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-02-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4457,7 +7222,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-03",
@@ -4496,8 +7262,38 @@
         "Default outputs to new files, preserve originals and constrain decompression/memory/time."
       ],
       "acceptance": [
-        "Corrupt/decompression-bomb/large input cancels with bounded resources.",
-        "Geometry/alpha/orientation fixtures preserve documented semantics."
+        {
+          "id": "W4-03-AC01",
+          "text": "Corrupt/decompression-bomb/large input cancels with bounded resources.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-03-AC02",
+          "text": "Geometry/alpha/orientation fixtures preserve documented semantics.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-03-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-03-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4505,7 +7301,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-04",
@@ -4545,8 +7342,38 @@
         "Add combine/extract-pages/text/render operations with page/size limits and new-file outputs."
       ],
       "acceptance": [
-        "Malformed/encrypted/huge PDFs fail or request supported credentials without code execution.",
-        "Page ordering/ranges and output files match fixtures; cancellation stops worker."
+        {
+          "id": "W4-04-AC01",
+          "text": "Malformed/encrypted/huge PDFs fail or request supported credentials without code execution.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-04-AC02",
+          "text": "Page ordering/ranges and output files match fixtures; cancellation stops worker.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-04-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-04-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4554,7 +7381,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-05",
@@ -4599,8 +7427,38 @@
         "Require each operation schema, availability and effect policy; implement contact/snippet triggers using typed context."
       ],
       "acceptance": [
-        "Missing desktop/app API returns unavailable, not fabricated data.",
-        "No task obtains broader authority than the corresponding direct command."
+        {
+          "id": "W4-05-AC01",
+          "text": "Missing desktop/app API returns unavailable, not fabricated data.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-05-AC02",
+          "text": "No task obtains broader authority than the corresponding direct command.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-05-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-05-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4608,7 +7466,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-06",
@@ -4647,8 +7506,38 @@
         "Make advanced page execution require concrete origin/code approval at use time."
       ],
       "acceptance": [
-        "Workflow install cannot grant advanced browser execution.",
-        "Navigation/profile changes invalidate pending target and cancelled tasks stop."
+        {
+          "id": "W4-06-AC01",
+          "text": "Workflow install cannot grant advanced browser execution.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-06-AC02",
+          "text": "Navigation/profile changes invalidate pending target and cancelled tasks stop.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-06-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-06-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4656,7 +7545,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-07",
@@ -4694,8 +7584,38 @@
         "Preview destructive restore/clean path changes and bind confirmation to repository state."
       ],
       "acceptance": [
-        "Repository changes invalidate destructive confirmation.",
-        "No path from a script becomes a filesystem grant and hook execution policy is explicit."
+        {
+          "id": "W4-07-AC01",
+          "text": "Repository changes invalidate destructive confirmation.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-07-AC02",
+          "text": "No path from a script becomes a filesystem grant and hook execution policy is explicit.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-07-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-07-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4703,7 +7623,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-08",
@@ -4741,8 +7662,38 @@
         "Advertise supported inspect/export formats; expose unavailable capability when converter is absent."
       ],
       "acceptance": [
-        "No current-document or Apple-iWork API is invented.",
-        "Malicious macros/external links cannot run/fetch; timeout kills conversion process tree."
+        {
+          "id": "W4-08-AC01",
+          "text": "No current-document or Apple-iWork API is invented.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-08-AC02",
+          "text": "Malicious macros/external links cannot run/fetch; timeout kills conversion process tree.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-08-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-08-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4750,7 +7701,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "W4-09",
@@ -4790,8 +7742,38 @@
         "Play bounded local audio and speak via installed speech-dispatcher; expose missing voices/providers."
       ],
       "acceptance": [
-        "Cancel stops sound/speech and player identity remains stable.",
-        "Library/rating operations are unavailable when provider supports transport only."
+        {
+          "id": "W4-09-AC01",
+          "text": "Cancel stops sound/speech and player identity remains stable.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-09-AC02",
+          "text": "Library/rating operations are unavailable when provider supports transport only.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-09-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "W4-09-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4799,7 +7781,8 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
     },
     {
       "id": "E1-06",
@@ -4841,8 +7824,38 @@
         "Pin package versions per invocation, honour coalescing/timeout/cancellation, and revoke schedules on disable/remove without deleting unrelated schedules."
       ],
       "acceptance": [
-        "No separate persistent timer engine or automatic startup exists inside extension code.",
-        "Sleeping/restarting/updating/removing a package cannot replay missed effects or broaden grants."
+        {
+          "id": "E1-06-AC01",
+          "text": "No separate persistent timer engine or automatic startup exists inside extension code.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-06-AC02",
+          "text": "Sleeping/restarting/updating/removing a package cannot replay missed effects or broaden grants.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-06-UI",
+          "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+          "status": "pending",
+          "conditional": "This task introduces or changes user-facing behaviour.",
+          "justification": "",
+          "evidence": []
+        },
+        {
+          "id": "E1-06-PRIVACY",
+          "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+          "status": "pending",
+          "conditional": null,
+          "justification": "",
+          "evidence": []
+        }
       ],
       "validation": [
         "pnpm typecheck",
@@ -4850,7 +7863,20 @@
       ],
       "evidence": [],
       "owner": null,
-      "branch": null
+      "branch": null,
+      "limitations": []
+    }
+  ],
+  "sharedAcceptance": [
+    {
+      "id": "UI",
+      "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
+      "conditional": "This task introduces or changes user-facing behaviour."
+    },
+    {
+      "id": "PRIVACY",
+      "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
+      "conditional": null
     }
   ]
 }

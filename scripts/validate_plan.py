@@ -6,6 +6,8 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+from acceptance import validate_registry
+from render_tasks import render_files
 
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
@@ -59,6 +61,7 @@ def local_ref(target, base, label):
         check(unquote(fragment) in anchors(path),f"{label}: missing anchor {target}")
 
 def main():
+    errors.clear()
     source_data=read_json("docs/research/sources.json")
     sources=source_data.get("sources",[]) if isinstance(source_data,dict) else source_data
     source_ids=unique(sources,"sources")
@@ -67,7 +70,14 @@ def main():
         check(bool(s.get("accessed")) and bool(s.get("title")),f"source {s.get('id')}: missing provenance")
     features=read_json("docs/product/features.json").get("features",[])
     feature_ids=unique(features,"features")
-    tasks=read_json("docs/implementation/tasks.json").get("tasks",[])
+    registry=read_json("docs/implementation/tasks.json")
+    acceptance_errors=validate_registry(registry)
+    errors.extend(acceptance_errors)
+    if acceptance_errors:
+        print("Planning validation failed:")
+        for err in errors: print("-", err)
+        return 1
+    tasks=registry.get("tasks",[])
     task_ids=unique(tasks,"tasks")
     for f in features:
         check(bool(f.get("behaviour")) and bool(f.get("linuxApproach")),f"feature {f['id']}: missing behaviour/disposition")
@@ -106,6 +116,11 @@ def main():
         for dep in task_ids[ident].get("dependsOn",[]):visit(dep,trail+[ident])
         visiting.remove(ident);visited.add(ident)
     for ident in task_ids:visit(ident,[])
+    if not errors:
+        for name, expected in render_files(registry).items():
+            path=ROOT/name
+            check(path.exists() and path.read_text()==expected,
+                  f"{name}: stale generated file; run python3 scripts/render_tasks.py")
     release="R1-03"
     release_ancestors=set()
     def collect(ident):

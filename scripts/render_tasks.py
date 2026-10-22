@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Render task cards and dependency diagram from the authoritative task registry."""
 import json
+import sys
 from pathlib import Path
+from acceptance import render_acceptance, validate_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "docs/implementation/tasks.json"
@@ -9,10 +11,10 @@ REGISTRY = ROOT / "docs/implementation/tasks.json"
 def link(path):
     return f"[{path}](../../../{path})"
 
-def main():
-    tasks = json.loads(REGISTRY.read_text())["tasks"]
-    out = ROOT / "docs/implementation/tasks"
-    out.mkdir(parents=True, exist_ok=True)
+def render_files(data):
+    """Pure rendering: verification state is read verbatim, never inferred or reset."""
+    tasks = data["tasks"]
+    files = {}
     for task in tasks:
         lines = [f"# {task['id']} — {task['title']}", "",
                  f"Status: **{task['status']}**. Lane: `{task['lane']}`. Target implementer: GPT 6.1 Sol, high reasoning effort.", "",
@@ -32,13 +34,16 @@ def main():
         lines += [f"{i}. {x}" for i,x in enumerate(task["steps"], 1)]
         lines += [f"{len(task['steps'])+1}. Add deterministic fixtures for the documented success, error, permission and cancellation boundaries relevant to this task. Keep mocks distinct from real desktop/provider evidence.",
                   f"{len(task['steps'])+2}. Integrate only after dependencies are accepted. Record limitations and request coordinator-owned interface changes explicitly.", "", "## Acceptance", ""]
-        lines += [f"- [ ] {x}" for x in task["acceptance"]]
-        lines += ["- [ ] Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-                  "- [ ] No secrets/private content enter fixtures, diagnostics or screenshots.", "", "## Validation", "",
+        lines += render_acceptance(task["acceptance"])
+        lines += ["", "## Validation", "",
                   "The following application checks are introduced by foundation tasks; they do not exist in the documentation-only baseline. Run the relevant command after implementation and record its real outcome. Desktop checks require a supported session, not a silent skip.", "", "```sh"]
         lines += task["validation"] + ["```", "", "## Completion evidence", "",
                   "Coordinator records the implementation PR/commit, check outcomes, desktop/backend versions where relevant, visual evidence for UI changes, and any outstanding limitation in `tasks.json`. Do not mark done merely because the document or a mock exists.", ""]
-        (out / f"{task['id']}.md").write_text("\n".join(lines))
+        lines += [f"- {record}" for record in task["evidence"]] or ["No completion evidence recorded."]
+        lines += ["", "## Outstanding limitations", ""]
+        lines += [f"- {limitation}" for limitation in task["limitations"]] or ["No limitations recorded; pending criteria still require verification."]
+        lines += [""]
+        files[f"docs/implementation/tasks/{task['id']}.md"] = "\n".join(lines)
     graph = ["# Task dependency graph", "", "Generated from [tasks.json](tasks.json). An edge means the destination depends on the source. Use [the roadmap](ROADMAP.md) for readable lane guidance.", "", "```mermaid", "flowchart TD"]
     for task in tasks:
         node=task["id"].replace("-","_")
@@ -46,8 +51,23 @@ def main():
         for dep in task["dependsOn"]:
             graph.append(f'  {dep.replace("-","_")} --> {node}')
     graph += ["```", ""]
-    (ROOT / "docs/implementation/dependencies.md").write_text("\n".join(graph))
-    print(f"Rendered {len(tasks)} task cards and dependency graph")
+    files["docs/implementation/dependencies.md"] = "\n".join(graph)
+    return files
+
+
+def main():
+    data = json.loads(REGISTRY.read_text())
+    errors = validate_registry(data)
+    if errors:
+        print("Cannot render unsupported acceptance claims:")
+        print("\n".join(errors))
+        return 1
+    for name, content in render_files(data).items():
+        path = ROOT / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+    print(f"Rendered {len(data['tasks'])} task cards and dependency graph")
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
