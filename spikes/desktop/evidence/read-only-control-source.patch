@@ -1,0 +1,511 @@
+diff --git a/spikes/desktop/guest/build.ts b/spikes/desktop/guest/build.ts
+index c6e863a..e2802d1 100644
+--- a/spikes/desktop/guest/build.ts
++++ b/spikes/desktop/guest/build.ts
+@@ -22,14 +22,15 @@ export async function buildGuestHarness(destination = join(source, 'dist')): Pro
+   await copyFile(join(source,'supervision.py'),join(destination,'supervision.py'));
+   await copyFile(join(source,'private_context.py'),join(destination,'private_context.py'));
+   await copyFile(join(source,'debugger_filter.py'),join(destination,'debugger_filter.py'));
++  await copyFile(join(source,'post_stop.py'),join(destination,'post_stop.py'));
+   await copyFile(join(source,'gnome-extension.js'),join(destination,'extension.js'));
+   await writeFile(join(destination,'metadata.json'),JSON.stringify({uuid:'s002-native@linuxcast.invalid',name:'Linuxcast S0-02 isolated native canary',description:'Disposable guest-only API evidence; never a production companion',version:1,'shell-version':['48']},null,2));
+   await copyFile(join(source,'../native/own-canary.py'),join(destination,'x11-private-selection.py'));
+-  const files = ['../adapters.ts','../window-adapters.ts','../protocol.ts','../model.ts','gnome-extension.js','kwin-script.js','queue-helper.ts','clipboard-client.ts','kwin-bus.py','run-session.py','restart-helper.ts','restart-script.js','restart-bus.py','restart-driver.py','supervision.py','native-pipe.ts','../helper-epoch.ts','canary.py','selection-event.py','../native/own-canary.py','build.ts','desktop-api.ts','private_context.py','debugger_filter.py'];
++  const files = ['../adapters.ts','../window-adapters.ts','../protocol.ts','../model.ts','gnome-extension.js','kwin-script.js','queue-helper.ts','clipboard-client.ts','kwin-bus.py','run-session.py','restart-helper.ts','restart-script.js','restart-bus.py','restart-driver.py','supervision.py','native-pipe.ts','../helper-epoch.ts','canary.py','selection-event.py','../native/own-canary.py','build.ts','desktop-api.ts','private_context.py','debugger_filter.py','post_stop.py'];
+   const hashes: Record<string,string> = {};
+   for (const file of files) hashes[file] = createHash('sha256').update(await readFile(join(source,file))).digest('hex');
+   const outputs=['desktop-api.js','kwin-script.js','restart-script.js','restart-helper.mjs','queue-helper.mjs','clipboard-client.mjs',
+-    'restart-bus.py','restart-driver.py','canary.py','kwin-bus.py','selection-event.py','run-session.py','supervision.py','extension.js','metadata.json','x11-private-selection.py','private_context.py','debugger_filter.py'];
++    'restart-bus.py','restart-driver.py','canary.py','kwin-bus.py','selection-event.py','run-session.py','supervision.py','extension.js','metadata.json','x11-private-selection.py','private_context.py','debugger_filter.py','post_stop.py'];
+   const outputHashes: Record<string,string> = {};
+   for (const file of outputs) outputHashes[file] = createHash('sha256').update(await readFile(join(destination,file))).digest('hex');
+   await writeFile(join(destination,'manifest.json'),JSON.stringify({kind:'task-owned-real-adapter-guest-harness',sourceSha256:hashes,outputSha256:outputHashes},null,2));
+diff --git a/spikes/desktop/guest/kwin-script.js b/spikes/desktop/guest/kwin-script.js
+index 00e79fe..ecc58f6 100644
+--- a/spikes/desktop/guest/kwin-script.js
++++ b/spikes/desktop/guest/kwin-script.js
+@@ -28,6 +28,7 @@ send('CanaryContext',{protocolVersion:1},encoded => {
+         diagnostic('NATIVE_ADAPTER_READY');
+         const observations = [];
+         let requested = null;
++        let nativePlacementAttempted = false;
+         const loop = kwinLoop(callDBus,timer,command => {
+             if (JSON.stringify(command.handle) !== JSON.stringify(handle) || !native.alive()) return 'denied';
+             if (command.operation === 'geometry') {
+@@ -39,12 +40,13 @@ send('CanaryContext',{protocolVersion:1},encoded => {
+             const rect = parseRect(command.rect);
+             if (rect.x < area.x || rect.y < area.y || rect.x+rect.width > area.x+area.width || rect.y+rect.height > area.y+area.height) return 'denied';
+             requested = rect;
++            nativePlacementAttempted = true;
+             native.place(rect);
+             return 'ok';
+         },(reason,action) => {
+             // The loop is stopped before this fixed observation method. No
+             // second NextCommand/Ack is outstanding and no control is forwarded.
+-            send('CanaryObservation',{protocolVersion:1,reason,action,observations,requested},() => native.dispose());
++            send('CanaryObservation',{protocolVersion:1,reason,action,observations,requested,nativePlacementAttempted},() => native.dispose());
+         });
+         diagnostic('LOOP_START');
+         loop.start();
+diff --git a/spikes/desktop/guest/post_stop.py b/spikes/desktop/guest/post_stop.py
+new file mode 100644
+index 0000000..be2b7fe
+--- /dev/null
++++ b/spikes/desktop/guest/post_stop.py
+@@ -0,0 +1,43 @@
++"""Bounded own-process/control-wire observation after the KWin loop has stopped."""
++import time
++
++QUIET_SECONDS = 5.0
++METHOD_COUNTS = {'CanaryContext': 1, 'Handshake': 1, 'NextCommand': 4, 'Ack': 3, 'CanaryObservation': 1}
++
++
++def quiescent_wire(value):
++    if not isinstance(value, dict) or set(value) != {'authenticatedRequests', 'replies', 'nodeExited'}: return False
++    if value['nodeExited'] is not False: return False
++    for key in ('authenticatedRequests', 'replies'):
++        counts = value[key]
++        if not isinstance(counts, dict) or set(counts) != set(METHOD_COUNTS): return False
++        if any(type(counts[name]) is not int or counts[name] != expected for name, expected in METHOD_COUNTS.items()): return False
++    return True
++
++
++def observe_post_stop(processes, read_wire, clock=time.monotonic, pause=time.sleep):
++    # No D-Bus request is issued or held here. Both comparison scenarios use
++    # this same fixed interval only after their explicit end-of-loop report.
++    started = clock()
++    value = {'seconds': QUIET_SECONDS, 'completed': False, 'allOwnProcessesAlive': False,
++             'controlTrafficStable': False, 'reason': 'POST_STOP_PROTOCOL_NOT_QUIESCENT'}
++    if len(processes) != 3:
++        value['reason'] = 'OWN_PROCESS_SET_REQUIRED'
++        return value
++    if not quiescent_wire(read_wire()): return value
++    value['controlTrafficStable'] = True
++    while True:
++        if any(child.poll() is not None for child in processes):
++            value['allOwnProcessesAlive'] = False
++            value['reason'] = 'OWN_PROCESS_EXITED_AFTER_STOP'
++            return value
++        value['allOwnProcessesAlive'] = True
++        if not quiescent_wire(read_wire()):
++            value['controlTrafficStable'] = False
++            value['reason'] = 'CONTROL_TRAFFIC_CHANGED_AFTER_STOP'
++            return value
++        remaining = QUIET_SECONDS - (clock() - started)
++        if remaining <= 0:
++            value.update(completed=True, reason='POST_STOP_QUIET_COMPLETE')
++            return value
++        pause(min(0.1, remaining))
+diff --git a/spikes/desktop/guest/queue-helper.ts b/spikes/desktop/guest/queue-helper.ts
+index 94b37e1..0ca4cad 100644
+--- a/spikes/desktop/guest/queue-helper.ts
++++ b/spikes/desktop/guest/queue-helper.ts
+@@ -8,9 +8,11 @@ const pid = Number(process.env.LINUXCAST_S002_CANARY_PID);
+ const root = process.env.LINUXCAST_S002_RESULT_DIR ?? '';
+ if (process.env.LINUXCAST_S002_PRIVATE_GUEST !== '1' || !root.startsWith('/tmp/linuxcast-s002-') || !Number.isSafeInteger(pid) || pid <= 0) process.exit(3);
+ const instance = newCompanionInstance();
++const readOnlyControl = process.env.LINUXCAST_S002_READ_ONLY_CONTROL === '1';
+ let peer = '';
+ let stage = 0;
+ let outcomes: string[] = [];
++let terminalReplySent = false;
+ const queue = new CommandQueue(undefined, value => value === peer && peer.startsWith(':'));
+ const handle = {session:'isolated-debian-guest',instance,generation:1,id:'own-canary'};
+ const geometry = () => queue.enqueue(peer,handle.generation,{operation:'geometry',handle},1000);
+@@ -30,10 +32,10 @@ async function request(encoded: string) {
+     if (frame.method === 'CanaryContext' && keys === 'protocolVersion') {
+       answer(id,{pid,handle});
+     } else if (frame.method === 'Handshake' && keys === 'backend,protocolVersion' && value.backend === 'kwin6.3') {
+-      peer = frame.peer; handle.generation = queue.handshake(peer); stage = 0; outcomes = []; geometry();
++      peer = frame.peer; handle.generation = queue.handshake(peer); stage = 0; outcomes = []; terminalReplySent = false; geometry();
+       answer(id,{protocolVersion:1,generation:handle.generation});
+     } else if (frame.method === 'NextCommand' && keys === 'generation,protocolVersion' && frame.peer === peer && value.generation === handle.generation) {
+-      if (stage === 3) answer(id,{kind:'reconnect',reason:'CANARY_COMPLETED'});
++      if (stage === 3) { terminalReplySent = true; answer(id,{kind:'reconnect',reason:'CANARY_COMPLETED'}); }
+       else answer(id,await queue.next(peer,handle.generation));
+     } else if (frame.method === 'Ack' && keys === 'generation,id,outcome,protocolVersion' && frame.peer === peer && value.generation === handle.generation && typeof value.id === 'string') {
+       if (!['ok','denied','expired','failed'].includes(String(value.outcome))) throw new Error();
+@@ -41,18 +43,29 @@ async function request(encoded: string) {
+       outcomes.push(String(value.outcome));
+       stage++;
+       answer(id,{kind:'ack'});
+-      if (stage === 1) placement();
++      if (stage === 1) { if (readOnlyControl) geometry(); else placement(); }
+       else if (stage === 2) setTimeout(geometry,250);
+-    } else if (frame.method === 'CanaryObservation' && keys === 'action,observations,protocolVersion,reason,requested' && frame.peer === peer) {
+-      if (typeof value.reason !== 'string' || !['COMPANION_RESTARTED','COMPANION_DBUS_TIMEOUT','COMPANION_PROTOCOL_FAILURE'].includes(value.reason)
+-          || !Array.isArray(value.observations) || value.observations.length > 3) throw new Error();
++    } else if (frame.method === 'CanaryObservation' && keys === 'action,nativePlacementAttempted,observations,protocolVersion,reason,requested' && frame.peer === peer) {
++      if (typeof value.action !== 'string' || value.action.length > 256 || typeof value.reason !== 'string' || !['COMPANION_RESTARTED','COMPANION_DBUS_TIMEOUT','COMPANION_PROTOCOL_FAILURE'].includes(value.reason)
++          || typeof value.nativePlacementAttempted !== 'boolean' || !Array.isArray(value.observations) || value.observations.length > 3) throw new Error();
+       const observations = value.observations.map(parseRect);
+       const requested = value.requested === null ? null : parseRect(value.requested);
+       const changed = observations.length === 2 && JSON.stringify(observations[0]) !== JSON.stringify(observations[1]);
+       const applied = requested !== null && JSON.stringify(requested) === JSON.stringify(observations[1]);
+-      answer(id,{kind:'observed',state:stage === 3 && changed && applied && outcomes.every(outcome => outcome === 'ok') && value.reason === 'COMPANION_RESTARTED' ? 'passed' : 'failed',
++      if (readOnlyControl) {
++        const stable = observations.length === 3 && observations.every(rect => JSON.stringify(rect) === JSON.stringify(observations[0]));
++        const complete = stage === 3 && terminalReplySent && outcomes.every(outcome => outcome === 'ok') && stable
++          && value.nativePlacementAttempted === false && requested === null && value.reason === 'COMPANION_RESTARTED';
++        answer(id,{kind:'diagnostic',state:'diagnostic',diagnosticStatus:complete ? 'READ_ONLY_CONTROL_COMPLETE' : 'READ_ONLY_CONTROL_FAILED',
++          kindEvidence:'read-only-control-not-placement-or-clipboard-acceptance',nativePlacementAttempted:value.nativePlacementAttempted,
++          placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,nativeGeometryStable:stable,
++          pollingStopped:terminalReplySent,observations,requested,transportAckCount:stage,outcomes,
++          terminalReason:value.reason,normalClipboardTouched:false});
++        return;
++      }
++      answer(id,{kind:'observed',state:stage === 3 && terminalReplySent && changed && applied && value.nativePlacementAttempted && outcomes.every(outcome => outcome === 'ok') && value.reason === 'COMPANION_RESTARTED' ? 'passed' : 'failed',
+         kindEvidence:'actual-KWin6.3-script-native-window-and-current-queue',liveGeometryChanged:changed,targetApplied:applied,observations,requested,transportAckCount:stage,outcomes,
+-        terminalReason:value.reason,normalClipboardTouched:false});
++        nativePlacementAttempted:value.nativePlacementAttempted,pollingStopped:terminalReplySent,terminalReason:value.reason,normalClipboardTouched:false});
+     } else throw new Error();
+   } catch { answer(id,{kind:'error',reason:'INVALID_PRIVATE_GUEST_REQUEST'}); }
+ }
+diff --git a/spikes/desktop/guest/restart-preparation.test.ts b/spikes/desktop/guest/restart-preparation.test.ts
+index 8777cdd..be87c51 100644
+--- a/spikes/desktop/guest/restart-preparation.test.ts
++++ b/spikes/desktop/guest/restart-preparation.test.ts
+@@ -12,11 +12,9 @@ const root=mkdtempSync(join(tmpdir(),'linuxcast-s002-restart-preparation-'));
+ let bundle: string;
+ beforeAll(async()=>{bundle=await buildGuestHarness(join(root,'build'));});
+ afterAll(()=>rmSync(root,{recursive:true,force:true}));
+-function start(phase:'crash'|'fresh',old?:Handle) {
+-  const child=spawn(process.execPath,[join(bundle,'restart-helper.mjs')],{env:{PATH:process.env.PATH,HOME:root,
+-    LINUXCAST_S002_PRIVATE_GUEST:'1',LINUXCAST_S002_RESULT_DIR:root,LINUXCAST_S002_CANARY_PID:'100',
+-    LINUXCAST_S002_RESTART_PHASE:phase,LINUXCAST_S002_GENERATION_BASE:String(old?.generation ?? 0),
+-    ...(old ? {LINUXCAST_S002_OLD_HANDLE:JSON.stringify(old)} : {})},stdio:['pipe','pipe','ignore']});
++function startProcess(file:'restart-helper.mjs'|'queue-helper.mjs',extraEnv:Record<string,string>) {
++  const child=spawn(process.execPath,[join(bundle,file)],{env:{PATH:process.env.PATH,HOME:root,
++    LINUXCAST_S002_PRIVATE_GUEST:'1',LINUXCAST_S002_RESULT_DIR:root,LINUXCAST_S002_CANARY_PID:'100',...extraEnv},stdio:['pipe','pipe','ignore']});
+   const lines=createInterface({input:child.stdout});
+   let serial=0;
+   const pending=new Map<number,{resolve(reply:Record<string,unknown>):void;reject(error:Error):void}>();
+@@ -35,6 +33,11 @@ function start(phase:'crash'|'fresh',old?:Handle) {
+   };
+   return {call,close};
+ }
++function start(phase:'crash'|'fresh',old?:Handle) {
++  return startProcess('restart-helper.mjs',{LINUXCAST_S002_RESTART_PHASE:phase,
++    LINUXCAST_S002_GENERATION_BASE:String(old?.generation ?? 0),
++    ...(old ? {LINUXCAST_S002_OLD_HANDLE:JSON.stringify(old)} : {})});
++}
+ test('restart preparation leaves an actual queue placement in flight after the initial acknowledged geometry',async()=>{
+   const helper=start('crash');
+   try {
+@@ -200,3 +203,114 @@ print('bounded-debugger-filter-passed')
+ `,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+   expect(result.trim()).toBe('bounded-debugger-filter-passed');
+ });
++
++
++async function exerciseQueueFixture(control:boolean) {
++  const helper=startProcess('queue-helper.mjs',control ? {LINUXCAST_S002_READ_ONLY_CONTROL:'1'} : {});
++  try {
++    const context=await helper.call('CanaryContext',{});
++    const handle=context.handle as Handle;
++    await helper.call('Handshake',{backend:'kwin6.3'});
++    const operations:string[]=[];
++    for(let slot=0;slot<3;slot++) {
++      const frame=await helper.call('NextCommand',{generation:handle.generation});
++      const command=frame.command as {id:string;operation:string;rect?:unknown};
++      operations.push(command.operation);
++      if(!control && slot===1) expect(command.rect).toEqual({x:32,y:32,width:400,height:240});
++      await helper.call('Ack',{generation:handle.generation,id:command.id,outcome:'ok'});
++    }
++    return {helper,handle,operations};
++  } catch(error) {await helper.close();throw error;}
++}
++const fixtureInitial={x:0,y:0,width:327,height:197};
++const fixtureTarget={x:32,y:32,width:400,height:240};
++function fixtureObservation(control:boolean) {
++  return {reason:'COMPANION_RESTARTED',action:'Reload the explicit test script',
++    observations:control ? [fixtureInitial,fixtureInitial,fixtureInitial] : [fixtureInitial,fixtureTarget],
++    requested:control ? null : fixtureTarget,nativePlacementAttempted:!control};
++}
++test('read-only queue control retains three command/ack slots and cannot report ordinary acceptance',async()=>{
++  const {helper,handle,operations}=await exerciseQueueFixture(true);
++  try {
++    expect(operations).toEqual(['geometry','geometry','geometry']);
++    const terminal=await helper.call('NextCommand',{generation:handle.generation});
++    expect(terminal).toEqual({kind:'reconnect',reason:'CANARY_COMPLETED'});
++    const body=fixtureObservation(true);
++    const result=await helper.call('CanaryObservation',body);
++    expect(result).toMatchObject({kind:'diagnostic',state:'diagnostic',diagnosticStatus:'READ_ONLY_CONTROL_COMPLETE',
++      nativePlacementAttempted:false,placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,
++      nativeGeometryStable:true,pollingStopped:true,transportAckCount:3,outcomes:['ok','ok','ok']});
++  } finally {await helper.close();}
++});
++test('ordinary queue fixture retains exact placement and fails a wrong observed target',async()=>{
++  const {helper,handle,operations}=await exerciseQueueFixture(false);
++  try {
++    expect(operations).toEqual(['geometry','place','geometry']);
++    await helper.call('NextCommand',{generation:handle.generation});
++    const body=fixtureObservation(false);
++    const result=await helper.call('CanaryObservation',body);
++    expect(result).toMatchObject({kind:'observed',state:'passed',nativePlacementAttempted:true,targetApplied:true,transportAckCount:3});
++    const wrong=await helper.call('CanaryObservation',{...body,observations:[fixtureInitial,{...fixtureTarget,width:399}]});
++    expect(wrong).toMatchObject({state:'failed',targetApplied:false});
++  } finally {await helper.close();}
++});
++test('control fixture rejects premature stop, native placement and geometry drift as diagnostic failure',async()=>{
++  const {helper,handle}=await exerciseQueueFixture(true);
++  try {
++    const body=fixtureObservation(true);
++    expect(await helper.call('CanaryObservation',body)).toMatchObject({state:'diagnostic',diagnosticStatus:'READ_ONLY_CONTROL_FAILED',pollingStopped:false});
++    await helper.call('NextCommand',{generation:handle.generation});
++    expect(await helper.call('CanaryObservation',{...body,nativePlacementAttempted:true})).toMatchObject({diagnosticStatus:'READ_ONLY_CONTROL_FAILED',nativePlacementAttempted:true});
++    expect(await helper.call('CanaryObservation',{...body,observations:[fixtureInitial,fixtureInitial,fixtureTarget]})).toMatchObject({diagnosticStatus:'READ_ONLY_CONTROL_FAILED',nativeGeometryStable:false});
++    expect(await helper.call('CanaryObservation',{...body,nativePlacementAttempted:'false'})).toEqual({kind:'error',reason:'INVALID_PRIVATE_GUEST_REQUEST'});
++  } finally {await helper.close();}
++});
++
++test('post-stop fixture waits the same bounded quiet interval without control calls and fails drift or exit',()=>{
++  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
++import pathlib,runpy,sys,copy
++module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'post_stop.py'))
++observe=module['observe_post_stop'];counts=module['METHOD_COUNTS']
++valid=dict(authenticatedRequests=dict(counts),replies=dict(counts),nodeExited=False)
++class Clock:
++    now=0.0
++    def read(self): return self.now
++    def pause(self,seconds): self.now+=seconds
++class Child:
++    def __init__(self,poll): self.poll=poll
++for scenario in ('quiet','traffic','process','node','initial-invalid','empty'):
++    clock=Clock()
++    def wire():
++        value=copy.deepcopy(valid)
++        if scenario=='traffic' and clock.now>=1: value['authenticatedRequests']['NextCommand']+=1
++        if scenario=='node' and clock.now>=1: value['nodeExited']=True
++        if scenario=='initial-invalid': value['replies']['Ack']=2
++        return value
++    children=[Child(lambda:1 if scenario=='process' and clock.now>=1 else None) for _ in range(3)]
++    result=observe([] if scenario=='empty' else children,wire,clock.read,clock.pause)
++    assert result['seconds']==5.0
++    if scenario=='quiet':
++        assert result['completed'] and result['allOwnProcessesAlive'] and result['controlTrafficStable']
++        assert 5<=clock.now<=5.001
++    else:
++        assert not result['completed'] and clock.now<5
++        if scenario=='process': assert not result['allOwnProcessesAlive']
++        if scenario in ('traffic','node'): assert not result['controlTrafficStable']
++print('bounded-post-stop-fixture-passed')
++`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
++  expect(result.trim()).toBe('bounded-post-stop-fixture-passed');
++});
++test('read-only control flags reject other backends and restart before any native call',()=>{
++  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
++import pathlib,runpy,sys
++from unittest.mock import patch
++sys.path.insert(0,sys.argv[1])
++module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))
++main=module['main'];context=module['_context']
++for backend,extra in [('gnome-wayland',[]),('gnome-x11',[]),('kwin-x11',[]),('kwin-wayland',['--restart-scenario'])]:
++    with patch.object(context,'guest_allowed',return_value=True),patch.object(sys,'argv',['run-session.py',backend,'--private-guest','--read-only-control',*extra]),patch('subprocess.Popen',side_effect=AssertionError('NATIVE_CALL_FORBIDDEN')):
++        assert main()==3
++print('bounded-read-only-flag-guard-passed')
++`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
++  expect(result.trim().endsWith('bounded-read-only-flag-guard-passed')).toBe(true);
++});
+diff --git a/spikes/desktop/guest/run-session.py b/spikes/desktop/guest/run-session.py
+index ff1c72f..311f939 100644
+--- a/spikes/desktop/guest/run-session.py
++++ b/spikes/desktop/guest/run-session.py
+@@ -16,6 +16,7 @@ import time
+ from supervision import Supervisor, Cancelled
+ import private_context as _context
+ from debugger_filter import parse_report as parse_debugger_report
++from post_stop import QUIET_SECONDS, observe_post_stop
+ 
+ HERE=pathlib.Path(__file__).resolve().parent
+ BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
+@@ -23,9 +24,10 @@ BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwi
+ def bounded(command,env,timeout=5):
+     return subprocess.run(command,env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,timeout=timeout)
+ 
+-def report_unavailable(reason,progress=None):
++def report_unavailable(reason,progress=None,scenario=None):
+     value={'state':'unavailable','reason':reason,'physicalDesktopMatrixEstablished':False}
+     if progress is not None: value['nativeProgress']=progress
++    if scenario is not None: value['diagnosticScenario']=scenario
+     print(json.dumps(value))
+     return 3
+ 
+@@ -92,7 +94,9 @@ def native_progress(root):
+     return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
+             'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root),'debugger':debugger}
+ 
+-def inner(backend,root,restart=False,debugger=False):
++def inner(backend,root,restart=False,debugger=False,read_only_control=False):
++    def unavailable(reason,progress=None):
++        return report_unavailable(reason,progress,'read-only-control' if read_only_control else None)
+     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
+     for key in ('DISPLAY','XAUTHORITY'):
+@@ -104,6 +108,7 @@ def inner(backend,root,restart=False,debugger=False):
+     env['QT_QUICK_BACKEND']='software'
+     env['LINUXCAST_S002_PRIVATE_GUEST']='1'
+     env['LINUXCAST_S002_RESULT_DIR']=str(root)
++    if read_only_control: env['LINUXCAST_S002_READ_ONLY_CONTROL']='1'
+     socket='linuxcast-s002-wayland'
+     if wayland: env['WAYLAND_DISPLAY']=socket
+     if backend.startswith('gnome'):
+@@ -113,7 +118,7 @@ def inner(backend,root,restart=False,debugger=False):
+     else:
+         executable=shutil.which('kwin_wayland' if wayland else 'kwin_x11')
+         args=['--virtual','--socket',socket,'--width','1280','--height','720','--no-lockscreen','--no-global-shortcuts','--no-kactivities'] if wayland else ['--replace']
+-    if not executable: return report_unavailable('GUEST_COMPOSITOR_PACKAGE_REQUIRED')
++    if not executable: return unavailable('GUEST_COMPOSITOR_PACKAGE_REQUIRED')
+     children=[]
+     def interrupted(_signal,_frame):
+         raise InterruptedError()
+@@ -124,13 +129,13 @@ def inner(backend,root,restart=False,debugger=False):
+     try:
+         if backend.startswith('gnome'):
+             setting=bounded(['gsettings','set','org.gnome.shell','enabled-extensions',"['s002-native@linuxcast.invalid']"],env)
+-            if setting.returncode: return report_unavailable('PRIVATE_EXTENSION_CONFIGURATION_FAILED')
++            if setting.returncode: return unavailable('PRIVATE_EXTENSION_CONFIGURATION_FAILED')
+         command=[executable,*args]
+         def no_core():
+             import resource
+             resource.setrlimit(resource.RLIMIT_CORE,(0,0))
+         if debugger:
+-            if not pathlib.Path('/usr/bin/gdb').is_file(): return report_unavailable('GUEST_DEBUGGER_PACKAGE_REQUIRED')
++            if not pathlib.Path('/usr/bin/gdb').is_file(): return unavailable('GUEST_DEBUGGER_PACKAGE_REQUIRED')
+             env['DEBUGINFOD_URLS']=''
+             command=['/usr/bin/gdb','--quiet','--nx','--nh','--batch',
+                      '-iex','set auto-load off','-iex','set debuginfod enabled off',
+@@ -141,11 +146,11 @@ def inner(backend,root,restart=False,debugger=False):
+         deadline=time.monotonic()+15
+         bus_name='org.gnome.Shell' if backend.startswith('gnome') else 'org.kde.KWin'
+         while time.monotonic()<deadline:
+-            if compositor.poll() is not None: return report_unavailable('NATIVE_COMPOSITOR_START_FAILED',native_progress(root) if debugger else None)
++            if compositor.poll() is not None: return unavailable('NATIVE_COMPOSITOR_START_FAILED',native_progress(root) if debugger else None)
+             owner=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',bus_name],env)
+             if 'true' in owner.stdout and (not wayland or (pathlib.Path(env['XDG_RUNTIME_DIR'])/socket).exists()): break
+             time.sleep(0.1)
+-        else: return report_unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
++        else: return unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
+         canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True)
+         children.append(canary)
+         if backend.startswith('kwin'):
+@@ -154,26 +159,26 @@ def inner(backend,root,restart=False,debugger=False):
+                 driver=subprocess.Popen(['/usr/bin/python3',str(HERE/'restart-driver.py')],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
+                 children.append(driver)
+                 try: driver.communicate(timeout=20)
+-                except subprocess.TimeoutExpired: return report_unavailable('NATIVE_RESTART_SCENARIO_DEADLINE')
++                except subprocess.TimeoutExpired: return unavailable('NATIVE_RESTART_SCENARIO_DEADLINE')
+                 result=read_result(root/'restart-result.json')
+-                if not result: return report_unavailable('NATIVE_RESTART_RESULT_REQUIRED')
++                if not result: return unavailable('NATIVE_RESTART_RESULT_REQUIRED')
+                 print(json.dumps(result))
+                 return 0 if driver.returncode==0 and result.get('state')=='passed' else 3
+             helper=subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+             children.append(helper)
+             helper_deadline=time.monotonic()+5
+             while time.monotonic()<helper_deadline:
+-                if helper.poll() is not None: return report_unavailable('PRIVATE_COMPANION_START_FAILED')
++                if helper.poll() is not None: return unavailable('PRIVATE_COMPANION_START_FAILED')
+                 present=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner','io.github.ianwijma.Linuxcast.Spike.Desktop1'],env)
+                 if present.returncode==0 and 'true' in present.stdout: break
+                 time.sleep(0.05)
+-            else: return report_unavailable('PRIVATE_COMPANION_START_DEADLINE')
++            else: return unavailable('PRIVATE_COMPANION_START_DEADLINE')
+             loaded=bounded(['gdbus','call','--session','--dest','org.kde.KWin','--object-path','/Scripting','--method','org.kde.kwin.Scripting.loadScript',str(HERE/'kwin-script.js'),'linuxcast-s002-canary'],env)
+             import re
+             match=re.search(r'\((?:int32 )?([0-9]+),?\)',loaded.stdout)
+-            if loaded.returncode or not match: return report_unavailable('KWIN_SCRIPT_LOAD_FAILED')
++            if loaded.returncode or not match: return unavailable('KWIN_SCRIPT_LOAD_FAILED')
+             started=bounded(['gdbus','call','--session','--dest','org.kde.KWin','--object-path','/Scripting/Script'+match.group(1),'--method','org.kde.kwin.Script.run'],env)
+-            if started.returncode: return report_unavailable('KWIN_SCRIPT_START_FAILED')
++            if started.returncode: return unavailable('KWIN_SCRIPT_START_FAILED')
+         result_path=root/('gnome-result.json' if backend.startswith('gnome') else 'kwin-result.json')
+         deadline=time.monotonic()+25
+         result=None
+@@ -182,13 +187,20 @@ def inner(backend,root,restart=False,debugger=False):
+                 progress=native_progress(root) if backend.startswith('kwin') else {}
+                 progress['canaryExitCode']=canary.returncode
+                 progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
+-                return report_unavailable('OWN_NATIVE_CANARY_FAILED',progress)
++                return unavailable('OWN_NATIVE_CANARY_FAILED',progress)
+             result=read_result(result_path)
+             if result: break
+             time.sleep(0.1)
+-        if not result: return report_unavailable('NATIVE_ADAPTER_PROBE_DEADLINE',native_progress(root) if backend.startswith('kwin') else None)
+-        clipboard=None
++        if not result: return unavailable('NATIVE_ADAPTER_PROBE_DEADLINE',native_progress(root) if backend.startswith('kwin') else None)
++        quiet=None
+         if backend=='kwin-wayland':
++            if result.get('pollingStopped') is True:
++                quiet=observe_post_stop([compositor,canary,helper],lambda:read_result(root/'kwin-progress.json'))
++            else:
++                quiet={'seconds':QUIET_SECONDS,'completed':False,'allOwnProcessesAlive':False,
++                       'controlTrafficStable':False,'reason':'POST_STOP_REPORT_REQUIRED'}
++        clipboard=None
++        if backend=='kwin-wayland' and not read_only_control and quiet is not None and quiet['completed']:
+             native=bounded([env.get('LINUXCAST_S002_NODE','/usr/bin/node'),str(HERE/'clipboard-client.mjs')],env,timeout=10)
+             clipboard=read_result(root/'clipboard-result.json')
+             if not clipboard: clipboard={'state':'unavailable','reason':'NATIVE_CLIPBOARD_CLIENT_REQUIRED'}
+@@ -201,13 +213,30 @@ def inner(backend,root,restart=False,debugger=False):
+                 'evidenceKind':'actual-isolated-software-compositor-native-API','packages':packages.stdout.splitlines(),
+                 'sourceManifest':json.loads((HERE/'manifest.json').read_text()),
+                 'kernel':os.uname().release,'scale':1,'rendering':'software-requested; no GPU passthrough; actual renderer must be recorded separately',
+-                'physicalDesktopMatrixEstablished':False,'hostDisplayClipboardOrSettingsUsed':False}
++                'physicalDesktopMatrixEstablished':False,'hostDisplayClipboardOrSettingsUsed':False,'postStopQuiet':quiet}
++        if quiet is not None and not quiet['completed']:
++            report['state']='unavailable'
++            report['reason']='POST_STOP_QUIET_FAILED'
++            progress=native_progress(root)
++            progress['canaryExitCode']=canary.poll()
++            progress['privateHelperExitCode']=helper.poll()
++            progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
++            report['nativeProgress']=progress
+         if clipboard and clipboard.get('state')!='passed': report['state']='unavailable'
++        if read_only_control:
++            complete=(result.get('state')=='diagnostic' and result.get('diagnosticStatus')=='READ_ONLY_CONTROL_COMPLETE'
++                      and result.get('nativePlacementAttempted') is False and quiet is not None and quiet['completed'])
++            report.update(state='diagnostic',diagnosticStatus='READ_ONLY_CONTROL_COMPLETE' if complete else 'READ_ONLY_CONTROL_FAILED',
++                          diagnosticScenario='read-only-control',evidenceKind='actual-isolated-read-only-diagnostic-control',
++                          nativePlacementAttempted=result.get('nativePlacementAttempted'),actualRestartTested=False,
++                          placementAcceptanceEstablished=False,clipboardAcceptanceEstablished=False,
++                          clipboard={'state':'not-exercised','reason':'READ_ONLY_DIAGNOSTIC_CONTROL'})
+         (root/'report.json').write_text(json.dumps(report))
+         print(json.dumps(report))
++        if read_only_control: return 4 if report['diagnosticStatus']=='READ_ONLY_CONTROL_COMPLETE' else 3
+         return 0 if report['state']=='passed' else 3
+     except (OSError,ValueError,subprocess.TimeoutExpired):
+-        return report_unavailable('PRIVATE_GUEST_NATIVE_HARNESS_FAILED')
++        return unavailable('PRIVATE_GUEST_NATIVE_HARNESS_FAILED')
+     finally:
+         for child in reversed(children): terminate(child)
+         rawlog.close()
+@@ -220,9 +249,12 @@ def main():
+     parser.add_argument('--inner',type=pathlib.Path)
+     parser.add_argument('--restart-scenario',action='store_true')
+     parser.add_argument('--debugger-scenario',action='store_true')
++    parser.add_argument('--read-only-control',action='store_true')
+     arguments=parser.parse_args()
+     if not arguments.private_guest or not _context.guest_allowed(pathlib.Path('/etc/os-release').read_text(),os.getuid(),pathlib.Path('/run/linuxcast-input-spike-lab').exists()):
+         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
++    if arguments.read_only_control and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
++        return report_unavailable('READ_ONLY_CONTROL_REQUIRES_KWIN_WAYLAND_WITHOUT_RESTART')
+     if arguments.debugger_scenario and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
+         return report_unavailable('DEBUGGER_ONLY_KWIN_WAYLAND_SUCCESS_SCENARIO')
+     if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
+@@ -230,7 +262,7 @@ def main():
+     if arguments.inner:
+         try: root=_context.private_context(str(arguments.inner),arguments.backend)
+         except (OSError,ValueError,RuntimeError): return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
+-        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario)
++        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario,arguments.read_only_control)
+     root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-',dir='/tmp'))
+     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+     for name in _context.DIRECTORIES.values(): (root/name).mkdir(mode=0o700)
+@@ -245,6 +277,7 @@ def main():
+     command=['dbus-run-session','--config-file',str(config),'--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
+     if arguments.restart_scenario: command.append('--restart-scenario')
+     if arguments.debugger_scenario: command.append('--debugger-scenario')
++    if arguments.read_only_control: command.append('--read-only-control')
+     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
+         command=['xvfb-run','-a','-f',str(root/'xauthority'),'-s','-screen 0 1280x720x24 -nolisten tcp',*command]
+     try:

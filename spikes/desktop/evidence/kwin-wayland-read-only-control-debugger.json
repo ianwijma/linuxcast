@@ -1,0 +1,230 @@
+{
+  "backend": "kwin-wayland",
+  "restart": false,
+  "debugger": true,
+  "readOnlyControl": true,
+  "startedUtc": "2026-10-22T19:08:07.494897+00:00",
+  "staging": {
+    "sourceCommit": "10c070c471a568b85cf9203999a9ff478ed5caa2",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "df140d19fdd94063767564eedde78925ed612983f6135f7552d0d8ac6c58a191",
+    "guestExecution": false,
+    "sourceDirty": true,
+    "reviewedDiffSha256": "937fe6889aff47dfa9e6802ec618151b66879de7bba8233eaedd2a0b76777882",
+    "reviewedDiffPaths": [
+      "spikes/desktop/guest/build.ts",
+      "spikes/desktop/guest/kwin-script.js",
+      "spikes/desktop/guest/queue-helper.ts",
+      "spikes/desktop/guest/run-session.py",
+      "spikes/desktop/guest/post_stop.py",
+      "spikes/desktop/guest/restart-preparation.test.ts"
+    ],
+    "sourceManifest": {
+      "kind": "task-owned-real-adapter-guest-harness",
+      "sourceSha256": {
+        "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+        "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+        "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+        "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+        "gnome-extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "kwin-script.js": "47c4e5bc746806b4df9c17f9ae43944fb2cbc1eff1420d38d507b06c44361c09",
+        "queue-helper.ts": "c257b89f7dfa60fd33ab9dbc9463b22fc33802611ffeb713182457d1444b06fa",
+        "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+        "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+        "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+        "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+        "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+        "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+        "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "../native/own-canary.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "build.ts": "f9e997e159666237c7b6623078b0df769d798af007faa6f8b890f43b417f6c15",
+        "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "48b23784c3ad6731c094783999598c2cdca912731eaff8535ba83a935fec273e",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+      },
+      "outputSha256": {
+        "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+        "kwin-script.js": "67045a7e3dffe13eff14687c2b54edbc00f5f08d5a56748b30353b86d76df72d",
+        "restart-script.js": "197f72a35acb4a4d86b839fd9e7e0f69a7638c78f541e11d06cc3213b3990c41",
+        "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+        "queue-helper.mjs": "9ca605659365f5ca747155692e348ac7574d9d70615d12117b2d51e1222e2a7d",
+        "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+        "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+        "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+        "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+        "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+        "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+        "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+        "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+        "extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+        "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+        "x11-private-selection.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+        "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+        "debugger_filter.py": "48b23784c3ad6731c094783999598c2cdca912731eaff8535ba83a935fec273e",
+        "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+      }
+    }
+  },
+  "exitCode": 4,
+  "results": [
+    {
+      "backend": "kwin-wayland",
+      "state": "diagnostic",
+      "adapter": {
+        "kind": "diagnostic",
+        "state": "diagnostic",
+        "diagnosticStatus": "READ_ONLY_CONTROL_COMPLETE",
+        "kindEvidence": "read-only-control-not-placement-or-clipboard-acceptance",
+        "nativePlacementAttempted": false,
+        "placementAcceptanceEstablished": false,
+        "clipboardAcceptanceEstablished": false,
+        "nativeGeometryStable": true,
+        "pollingStopped": true,
+        "observations": [
+          {
+            "x": 476,
+            "y": 261,
+            "width": 327,
+            "height": 197
+          },
+          {
+            "x": 476,
+            "y": 261,
+            "width": 327,
+            "height": 197
+          },
+          {
+            "x": 476,
+            "y": 261,
+            "width": 327,
+            "height": 197
+          }
+        ],
+        "requested": null,
+        "transportAckCount": 3,
+        "outcomes": [
+          "ok",
+          "ok",
+          "ok"
+        ],
+        "terminalReason": "COMPANION_RESTARTED",
+        "normalClipboardTouched": false
+      },
+      "clipboard": {
+        "state": "not-exercised",
+        "reason": "READ_ONLY_DIAGNOSTIC_CONTROL"
+      },
+      "evidenceKind": "actual-isolated-read-only-diagnostic-control",
+      "packages": [
+        "gjs\t1.82.3-1",
+        "gnome-shell\t48.7-0+deb13u2",
+        "kwin-wayland\t4:6.3.6-1",
+        "kwin-x11\t4:6.3.6-1",
+        "libgl1-mesa-dri:amd64\t25.0.7-2+deb13u1",
+        "mutter\t48.7-0+deb13u1",
+        "wl-clipboard\t2.2.1-2"
+      ],
+      "sourceManifest": {
+        "kind": "task-owned-real-adapter-guest-harness",
+        "sourceSha256": {
+          "../adapters.ts": "60589405f57d149c6c9d087913b4861ea0305f05a70b632c1519e6a128887e48",
+          "../window-adapters.ts": "7b1073d6f46d9ba5e3c2164dfffae3116681f4de8389b9fb1b474dfb570ebba5",
+          "../protocol.ts": "81dd26fcd0b52817cde7eda7f87877d1f74b0fa9079fad873ba1750abecec155",
+          "../model.ts": "55bfa825f14dbca994fc4f6060727127cec565301f491fa90d2ea1f7b66732a4",
+          "gnome-extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+          "kwin-script.js": "47c4e5bc746806b4df9c17f9ae43944fb2cbc1eff1420d38d507b06c44361c09",
+          "queue-helper.ts": "c257b89f7dfa60fd33ab9dbc9463b22fc33802611ffeb713182457d1444b06fa",
+          "clipboard-client.ts": "5eae39dbdbe28c659c4c7547c8b2db5edf4c16546ff5a747ef1e7b66fe3d5688",
+          "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+          "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+          "restart-helper.ts": "de0d6f3cd4b8b1303a4920eb23ba5ca0fa0303ed06deb15629ed270efb5079c6",
+          "restart-script.js": "92dd2f34249a165dddd2f8eb11b8e9d25ff0aed4bba0bc0dd54cebe6c14249dd",
+          "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+          "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+          "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+          "native-pipe.ts": "0cc7f13a14df83afbf23fb2b754dd8c33e7328bc4623031180029668c8b12d03",
+          "../helper-epoch.ts": "413e12fa79863db330d611958605d0e425fc144ad88861d7e8c733cda7a0ff34",
+          "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+          "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+          "../native/own-canary.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+          "build.ts": "f9e997e159666237c7b6623078b0df769d798af007faa6f8b890f43b417f6c15",
+          "desktop-api.ts": "3feea205a2428a9b977d4e77f3992f7b96b697595d71fbfd1d357cd54e32336f",
+          "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+          "debugger_filter.py": "48b23784c3ad6731c094783999598c2cdca912731eaff8535ba83a935fec273e",
+          "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+        },
+        "outputSha256": {
+          "desktop-api.js": "db06c7380e335295c8990a2c57e25e6d3cff3b7853cb830e0c4d2eddae28455f",
+          "kwin-script.js": "67045a7e3dffe13eff14687c2b54edbc00f5f08d5a56748b30353b86d76df72d",
+          "restart-script.js": "197f72a35acb4a4d86b839fd9e7e0f69a7638c78f541e11d06cc3213b3990c41",
+          "restart-helper.mjs": "45d03b81301d6502e32325ed063e6f5ba64f4ad2dbfd89a2eae5a3ff45f9802b",
+          "queue-helper.mjs": "9ca605659365f5ca747155692e348ac7574d9d70615d12117b2d51e1222e2a7d",
+          "clipboard-client.mjs": "c760ae2ef7fa2ae09483fd5b62d4ea7c2b56b2fb779735c3c20e7d1d7ee7b348",
+          "restart-bus.py": "819cdc4aabdb46ec83dd5c0489ee18e91054fe5ccf4c9326ed74b04b5b2e6405",
+          "restart-driver.py": "43803cc62d70175e416abf2cafbf9a1b00ebc218d37c8e9d7dbc43bd235a6203",
+          "canary.py": "82f4306cd4bfbbe7d0c610c8771f3e3573caf9cb3f4d7c81f6b4484ade489870",
+          "kwin-bus.py": "38383e7a38952c154b788d2a3b2a52b04ab0874187a2b42d78263adf695531bd",
+          "selection-event.py": "505005ae1493747107dff1b0ab5c847c8a5564a09ba8300f439e5ab73a08d314",
+          "run-session.py": "583f9f580456e39c98ccee8777e68955cbce02581e07b6e781bb41ad608d190b",
+          "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+          "extension.js": "3d908b912eb241664897c8b111dc4cb29b9cdf4b3a5f3480344d930083d8c4e4",
+          "metadata.json": "1e147442e14d3511966fc2b5fcce3b55baad73a7458f9ae96e08fba71a4670f4",
+          "x11-private-selection.py": "76cc33ef184ba51f1cbe88d830dc67c42d9bc31ed23ae3ee5f5965502b630d76",
+          "private_context.py": "04ab03aa26fdbe659fc291d5cf82cd2c63dd93e63bd2ce140a9e663fd398a9b0",
+          "debugger_filter.py": "48b23784c3ad6731c094783999598c2cdca912731eaff8535ba83a935fec273e",
+          "post_stop.py": "ad652298cee21b305f4d77cd10b11e59ee06cbc9a1fae0a59fc3df4c5d47d0a4"
+        }
+      },
+      "kernel": "6.12.113+deb13-amd64",
+      "scale": 1,
+      "rendering": "software-requested; no GPU passthrough; actual renderer must be recorded separately",
+      "physicalDesktopMatrixEstablished": false,
+      "hostDisplayClipboardOrSettingsUsed": false,
+      "postStopQuiet": {
+        "seconds": 5.0,
+        "completed": true,
+        "allOwnProcessesAlive": true,
+        "controlTrafficStable": true,
+        "reason": "POST_STOP_QUIET_COMPLETE"
+      },
+      "diagnosticStatus": "READ_ONLY_CONTROL_COMPLETE",
+      "diagnosticScenario": "read-only-control",
+      "nativePlacementAttempted": false,
+      "actualRestartTested": false,
+      "placementAcceptanceEstablished": false,
+      "clipboardAcceptanceEstablished": false
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1,
+      "gdb": 0
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1,
+      "gdb": 0
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

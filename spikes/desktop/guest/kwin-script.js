@@ -28,6 +28,7 @@ send('CanaryContext',{protocolVersion:1},encoded => {
         diagnostic('NATIVE_ADAPTER_READY');
         const observations = [];
         let requested = null;
+        let nativePlacementAttempted = false;
         const loop = kwinLoop(callDBus,timer,command => {
             if (JSON.stringify(command.handle) !== JSON.stringify(handle) || !native.alive()) return 'denied';
             if (command.operation === 'geometry') {
@@ -39,12 +40,13 @@ send('CanaryContext',{protocolVersion:1},encoded => {
             const rect = parseRect(command.rect);
             if (rect.x < area.x || rect.y < area.y || rect.x+rect.width > area.x+area.width || rect.y+rect.height > area.y+area.height) return 'denied';
             requested = rect;
+            nativePlacementAttempted = true;
             native.place(rect);
             return 'ok';
         },(reason,action) => {
             // The loop is stopped before this fixed observation method. No
             // second NextCommand/Ack is outstanding and no control is forwarded.
-            send('CanaryObservation',{protocolVersion:1,reason,action,observations,requested},() => native.dispose());
+            send('CanaryObservation',{protocolVersion:1,reason,action,observations,requested,nativePlacementAttempted},() => native.dispose());
         });
         diagnostic('LOOP_START');
         loop.start();

@@ -12,11 +12,9 @@ const root=mkdtempSync(join(tmpdir(),'linuxcast-s002-restart-preparation-'));
 let bundle: string;
 beforeAll(async()=>{bundle=await buildGuestHarness(join(root,'build'));});
 afterAll(()=>rmSync(root,{recursive:true,force:true}));
-function start(phase:'crash'|'fresh',old?:Handle) {
-  const child=spawn(process.execPath,[join(bundle,'restart-helper.mjs')],{env:{PATH:process.env.PATH,HOME:root,
-    LINUXCAST_S002_PRIVATE_GUEST:'1',LINUXCAST_S002_RESULT_DIR:root,LINUXCAST_S002_CANARY_PID:'100',
-    LINUXCAST_S002_RESTART_PHASE:phase,LINUXCAST_S002_GENERATION_BASE:String(old?.generation ?? 0),
-    ...(old ? {LINUXCAST_S002_OLD_HANDLE:JSON.stringify(old)} : {})},stdio:['pipe','pipe','ignore']});
+function startProcess(file:'restart-helper.mjs'|'queue-helper.mjs',extraEnv:Record<string,string>) {
+  const child=spawn(process.execPath,[join(bundle,file)],{env:{PATH:process.env.PATH,HOME:root,
+    LINUXCAST_S002_PRIVATE_GUEST:'1',LINUXCAST_S002_RESULT_DIR:root,LINUXCAST_S002_CANARY_PID:'100',...extraEnv},stdio:['pipe','pipe','ignore']});
   const lines=createInterface({input:child.stdout});
   let serial=0;
   const pending=new Map<number,{resolve(reply:Record<string,unknown>):void;reject(error:Error):void}>();
@@ -34,6 +32,11 @@ function start(phase:'crash'|'fresh',old?:Handle) {
     child.stdin.end();await ended;lines.close();
   };
   return {call,close};
+}
+function start(phase:'crash'|'fresh',old?:Handle) {
+  return startProcess('restart-helper.mjs',{LINUXCAST_S002_RESTART_PHASE:phase,
+    LINUXCAST_S002_GENERATION_BASE:String(old?.generation ?? 0),
+    ...(old ? {LINUXCAST_S002_OLD_HANDLE:JSON.stringify(old)} : {})});
 }
 test('restart preparation leaves an actual queue placement in flight after the initial acknowledged geometry',async()=>{
   const helper=start('crash');
@@ -199,4 +202,115 @@ for value in [dict(valid,raw='private'),dict(valid,signal='private signal'),dict
 print('bounded-debugger-filter-passed')
 `,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
   expect(result.trim()).toBe('bounded-debugger-filter-passed');
+});
+
+
+async function exerciseQueueFixture(control:boolean) {
+  const helper=startProcess('queue-helper.mjs',control ? {LINUXCAST_S002_READ_ONLY_CONTROL:'1'} : {});
+  try {
+    const context=await helper.call('CanaryContext',{});
+    const handle=context.handle as Handle;
+    await helper.call('Handshake',{backend:'kwin6.3'});
+    const operations:string[]=[];
+    for(let slot=0;slot<3;slot++) {
+      const frame=await helper.call('NextCommand',{generation:handle.generation});
+      const command=frame.command as {id:string;operation:string;rect?:unknown};
+      operations.push(command.operation);
+      if(!control && slot===1) expect(command.rect).toEqual({x:32,y:32,width:400,height:240});
+      await helper.call('Ack',{generation:handle.generation,id:command.id,outcome:'ok'});
+    }
+    return {helper,handle,operations};
+  } catch(error) {await helper.close();throw error;}
+}
+const fixtureInitial={x:0,y:0,width:327,height:197};
+const fixtureTarget={x:32,y:32,width:400,height:240};
+function fixtureObservation(control:boolean) {
+  return {reason:'COMPANION_RESTARTED',action:'Reload the explicit test script',
+    observations:control ? [fixtureInitial,fixtureInitial,fixtureInitial] : [fixtureInitial,fixtureTarget],
+    requested:control ? null : fixtureTarget,nativePlacementAttempted:!control};
+}
+test('read-only queue control retains three command/ack slots and cannot report ordinary acceptance',async()=>{
+  const {helper,handle,operations}=await exerciseQueueFixture(true);
+  try {
+    expect(operations).toEqual(['geometry','geometry','geometry']);
+    const terminal=await helper.call('NextCommand',{generation:handle.generation});
+    expect(terminal).toEqual({kind:'reconnect',reason:'CANARY_COMPLETED'});
+    const body=fixtureObservation(true);
+    const result=await helper.call('CanaryObservation',body);
+    expect(result).toMatchObject({kind:'diagnostic',state:'diagnostic',diagnosticStatus:'READ_ONLY_CONTROL_COMPLETE',
+      nativePlacementAttempted:false,placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,
+      nativeGeometryStable:true,pollingStopped:true,transportAckCount:3,outcomes:['ok','ok','ok']});
+  } finally {await helper.close();}
+});
+test('ordinary queue fixture retains exact placement and fails a wrong observed target',async()=>{
+  const {helper,handle,operations}=await exerciseQueueFixture(false);
+  try {
+    expect(operations).toEqual(['geometry','place','geometry']);
+    await helper.call('NextCommand',{generation:handle.generation});
+    const body=fixtureObservation(false);
+    const result=await helper.call('CanaryObservation',body);
+    expect(result).toMatchObject({kind:'observed',state:'passed',nativePlacementAttempted:true,targetApplied:true,transportAckCount:3});
+    const wrong=await helper.call('CanaryObservation',{...body,observations:[fixtureInitial,{...fixtureTarget,width:399}]});
+    expect(wrong).toMatchObject({state:'failed',targetApplied:false});
+  } finally {await helper.close();}
+});
+test('control fixture rejects premature stop, native placement and geometry drift as diagnostic failure',async()=>{
+  const {helper,handle}=await exerciseQueueFixture(true);
+  try {
+    const body=fixtureObservation(true);
+    expect(await helper.call('CanaryObservation',body)).toMatchObject({state:'diagnostic',diagnosticStatus:'READ_ONLY_CONTROL_FAILED',pollingStopped:false});
+    await helper.call('NextCommand',{generation:handle.generation});
+    expect(await helper.call('CanaryObservation',{...body,nativePlacementAttempted:true})).toMatchObject({diagnosticStatus:'READ_ONLY_CONTROL_FAILED',nativePlacementAttempted:true});
+    expect(await helper.call('CanaryObservation',{...body,observations:[fixtureInitial,fixtureInitial,fixtureTarget]})).toMatchObject({diagnosticStatus:'READ_ONLY_CONTROL_FAILED',nativeGeometryStable:false});
+    expect(await helper.call('CanaryObservation',{...body,nativePlacementAttempted:'false'})).toEqual({kind:'error',reason:'INVALID_PRIVATE_GUEST_REQUEST'});
+  } finally {await helper.close();}
+});
+
+test('post-stop fixture waits the same bounded quiet interval without control calls and fails drift or exit',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import pathlib,runpy,sys,copy
+module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'post_stop.py'))
+observe=module['observe_post_stop'];counts=module['METHOD_COUNTS']
+valid=dict(authenticatedRequests=dict(counts),replies=dict(counts),nodeExited=False)
+class Clock:
+    now=0.0
+    def read(self): return self.now
+    def pause(self,seconds): self.now+=seconds
+class Child:
+    def __init__(self,poll): self.poll=poll
+for scenario in ('quiet','traffic','process','node','initial-invalid','empty'):
+    clock=Clock()
+    def wire():
+        value=copy.deepcopy(valid)
+        if scenario=='traffic' and clock.now>=1: value['authenticatedRequests']['NextCommand']+=1
+        if scenario=='node' and clock.now>=1: value['nodeExited']=True
+        if scenario=='initial-invalid': value['replies']['Ack']=2
+        return value
+    children=[Child(lambda:1 if scenario=='process' and clock.now>=1 else None) for _ in range(3)]
+    result=observe([] if scenario=='empty' else children,wire,clock.read,clock.pause)
+    assert result['seconds']==5.0
+    if scenario=='quiet':
+        assert result['completed'] and result['allOwnProcessesAlive'] and result['controlTrafficStable']
+        assert 5<=clock.now<=5.001
+    else:
+        assert not result['completed'] and clock.now<5
+        if scenario=='process': assert not result['allOwnProcessesAlive']
+        if scenario in ('traffic','node'): assert not result['controlTrafficStable']
+print('bounded-post-stop-fixture-passed')
+`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('bounded-post-stop-fixture-passed');
+});
+test('read-only control flags reject other backends and restart before any native call',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import pathlib,runpy,sys
+from unittest.mock import patch
+sys.path.insert(0,sys.argv[1])
+module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))
+main=module['main'];context=module['_context']
+for backend,extra in [('gnome-wayland',[]),('gnome-x11',[]),('kwin-x11',[]),('kwin-wayland',['--restart-scenario'])]:
+    with patch.object(context,'guest_allowed',return_value=True),patch.object(sys,'argv',['run-session.py',backend,'--private-guest','--read-only-control',*extra]),patch('subprocess.Popen',side_effect=AssertionError('NATIVE_CALL_FORBIDDEN')):
+        assert main()==3
+print('bounded-read-only-flag-guard-passed')
+`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim().endsWith('bounded-read-only-flag-guard-passed')).toBe(true);
 });

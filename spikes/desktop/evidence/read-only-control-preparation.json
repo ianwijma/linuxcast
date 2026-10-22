@@ -1,0 +1,34 @@
+{
+  "parentCommit": "10c070c471a568b85cf9203999a9ff478ed5caa2",
+  "sourceDirty": true,
+  "reviewedDiffSha256": "937fe6889aff47dfa9e6802ec618151b66879de7bba8233eaedd2a0b76777882",
+  "reviewedDiffPaths": [
+    "spikes/desktop/guest/build.ts",
+    "spikes/desktop/guest/kwin-script.js",
+    "spikes/desktop/guest/queue-helper.ts",
+    "spikes/desktop/guest/run-session.py",
+    "spikes/desktop/guest/post_stop.py",
+    "spikes/desktop/guest/restart-preparation.test.ts"
+  ],
+  "manifestSha256": "df140d19fdd94063767564eedde78925ed612983f6135f7552d0d8ac6c58a191",
+  "sourceHashCount": 25,
+  "builtHashCount": 19,
+  "command": "node node_modules/vitest/vitest.mjs run spikes/desktop/guest/restart-preparation.test.ts",
+  "outcome": "passed",
+  "passed": 29,
+  "failed": 0,
+  "skippedOrTodo": 0,
+  "startedLocal": "2026-10-23 06:03:35 Australia/Sydney",
+  "startedUtc": "2026-10-22T19:03:35Z",
+  "durationSeconds": 3.08,
+  "checksAlsoPassed": [
+    "typecheck",
+    "lint",
+    "guestBuild",
+    "PythonSyntax",
+    "validate_plan"
+  ],
+  "hostGuiUsed": false,
+  "guestAccessUsed": false,
+  "nativeReadOnlyControlExecuted": false
+}
