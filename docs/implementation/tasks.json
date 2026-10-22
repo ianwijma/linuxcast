@@ -1,0 +1,4856 @@
+{
+  "schemaVersion": 1,
+  "defaultImplementer": "GPT 6.1 Sol, high reasoning effort",
+  "tasks": [
+    {
+      "id": "F1-01",
+      "title": "Bootstrap workspace and scoped test runners",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F1",
+      "dependsOn": [],
+      "ownedPaths": [
+        "package.json",
+        "pnpm-workspace.yaml",
+        "pnpm-lock.yaml",
+        "tsconfig.base.json",
+        "apps/desktop/package.json",
+        "scripts/test-runner/"
+      ],
+      "featureIds": [
+        "foundation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/stack.md",
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Bootstrap workspace and scoped test runners with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Create pnpm workspace with locked compatible Electron/React/TS/Tailwind toolchain and Rust workspace.",
+        "Wire the stable no-write lint/typecheck and task-scoped test commands; document exact prerequisites and compiler choice."
+      ],
+      "acceptance": [
+        "Clean install resolves on Debian13 amd64.",
+        "Unknown task selector fails; omitted selector runs the suite; no placeholder success scripts."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- F1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-01",
+      "title": "Prove launcher activation and desktop identity",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/launcher/"
+      ],
+      "featureIds": [
+        "foundation",
+        "launcher"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove launcher activation and desktop identity with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build a disposable Electron launcher with fixed desktop identity and global shortcut registration.",
+        "Exercise focus/activation/placement across all four desktop sessions and record capability fallback."
+      ],
+      "acceptance": [
+        "Native Wayland windows can regain focus through a supported path or record a component requirement.",
+        "Closing the launcher retains resident process; explicit Quit exits."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- S0-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-02",
+      "title": "Prove compositor and clipboard transport",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/desktop/"
+      ],
+      "featureIds": [
+        "foundation",
+        "clipboard",
+        "windows"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove compositor and clipboard transport with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Probe GNOME48 clipboard/window APIs and KWin6.3 script queue/ack transport.",
+        "Record MIME, window-identity and protocol limits without treating XWayland as universal."
+      ],
+      "acceptance": [
+        "GNOME and KDE fixtures cover clipboard events and live window geometry.",
+        "Missing/restarted companion and unsupported formats produce actionable states."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- S0-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-03",
+      "title": "Prove native input failure recovery",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/input/"
+      ],
+      "featureIds": [
+        "foundation",
+        "hyper",
+        "snippets"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove native input failure recovery with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Prototype descriptor handoff to an unprivileged libevdev worker and close supervisor copies.",
+        "Implement only passthrough, fixed emergency disarm and lease expiry for destructive-recovery experiments."
+      ],
+      "acceptance": [
+        "SIGKILL of worker/supervisor releases grabs and virtual modifiers.",
+        "Locked/inactive/TTY sessions never arm; plugin processes cannot access control socket."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- S0-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-04",
+      "title": "Prove extension sandbox boundaries",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/sandbox/"
+      ],
+      "featureIds": [
+        "foundation",
+        "extensions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove extension sandbox boundaries with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Prototype bundled Node in bwrap with private mounts and broker pipe.",
+        "Attempt denied host-file/network/display/DBus access; verify no unsafe fallback."
+      ],
+      "acceptance": [
+        "An allowed broker fixture works while direct host access fails.",
+        "Missing user namespaces or bubblewrap gives unavailable capability."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- S0-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-05",
+      "title": "Prove streaming provider and approval lifecycle",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/ai/"
+      ],
+      "featureIds": [
+        "foundation",
+        "ai-provider",
+        "ai-chat"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove streaming provider and approval lifecycle with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Use fixture-backed OpenRouter-compatible streaming plus opt-in live smoke.",
+        "Verify cancel/partial error/tool approval pause and OAuth adapter registration feasibility without harvesting credentials."
+      ],
+      "acceptance": [
+        "Partial output on transport failure is not committed as success.",
+        "A denied tool never executes and reconnect does not duplicate it."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- S0-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "S0-06",
+      "title": "Prove visual workflow and declarative view integration",
+      "status": "planned",
+      "phase": "feasibility",
+      "lane": "S0",
+      "dependsOn": [
+        "F1-01"
+      ],
+      "ownedPaths": [
+        "spikes/workflow-ui/"
+      ],
+      "featureIds": [
+        "foundation",
+        "workflow-editor",
+        "extensions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/extensions.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Prove visual workflow and declarative view integration with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Render one graph and a host List/Form from versioned ViewModel fixtures.",
+        "Demonstrate non-drag editing and separate graph layout from execution."
+      ],
+      "acceptance": [
+        "Keyboard path can add/configure/connect/remove a node.",
+        "Unsupported ViewModel fields and invalid edge types are rejected."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- S0-06"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F0-01",
+      "title": "Freeze shared contracts and compatibility fixtures",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F0",
+      "dependsOn": [
+        "S0-01",
+        "S0-02",
+        "S0-03",
+        "S0-04",
+        "S0-05",
+        "S0-06"
+      ],
+      "ownedPaths": [
+        "packages/contracts/",
+        "docs/decisions/"
+      ],
+      "featureIds": [
+        "foundation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/overview.md",
+        "docs/architecture/extensions.md",
+        "docs/architecture/workflows.md",
+        "docs/architecture/ai.md",
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Freeze shared contracts and compatibility fixtures with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement versioned Zod contracts for commands/views/capabilities/workflows/providers/native IPC.",
+        "Mirror native wire examples in Serde fixture tests and publish contract ownership/change rules."
+      ],
+      "acceptance": [
+        "Invalid/oversized/unknown-version messages fail with typed errors.",
+        "TS and Rust accept/reject the same cross-language fixtures."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- F0-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F1-02",
+      "title": "Build resident shell and secure windows",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F1",
+      "dependsOn": [
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/main/",
+        "apps/desktop/src/preload/"
+      ],
+      "featureIds": [
+        "foundation",
+        "launcher"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/overview.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build resident shell and secure windows with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement single instance, deep-link dispatch, window lifecycle and narrow preload API.",
+        "Enforce sandbox/context isolation/CSP/navigation restrictions and explicit Quit shutdown."
+      ],
+      "acceptance": [
+        "Renderer cannot access Node or create unrestricted navigation.",
+        "Second invocation toggles existing launcher and malformed deep links are rejected."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- F1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F2-01",
+      "title": "Create storage owner and migration lifecycle",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F2",
+      "dependsOn": [
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "packages/storage/"
+      ],
+      "featureIds": [
+        "foundation",
+        "local-data"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Create storage owner and migration lifecycle with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement the single SQLite owner and typed transactional repositories.",
+        "Add versioned migrations, pre-migration backup and interrupted-upgrade recovery."
+      ],
+      "acceptance": [
+        "Concurrent clients do not open independent writers.",
+        "Migration failure restores/reports recoverably; newer schema refuses unsafe downgrade.",
+        "Packaged SQLite runtime reports version >=3.51.3 (WAL-reset fix); backups use SQLite backup API rather than copying an active DB without WAL."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- F2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F2-02",
+      "title": "Implement secrets and local data controls",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F2",
+      "dependsOn": [
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/secrets/",
+        "packages/data-controls/"
+      ],
+      "featureIds": [
+        "local-data",
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement secrets and local data controls with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Integrate secure keyring references with session-only fallback.",
+        "Implement export/backup redaction, retention services and resettable local diagnostics."
+      ],
+      "acceptance": [
+        "No secret reaches renderer logs/exports or insecure basic_text storage.",
+        "Clear/export/delete controls operate on intended categories only."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- F2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F3-01",
+      "title": "Implement capability and permission brokers",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F3",
+      "dependsOn": [
+        "F0-01",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/permissions/",
+        "packages/platform-contracts/"
+      ],
+      "featureIds": [
+        "foundation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/security.md",
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement capability and permission brokers with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement operation states, grants, revocation and connection-derived identities.",
+        "Expose once/persistent/deny decisions with resource scopes and redacted audit records."
+      ],
+      "acceptance": [
+        "Spoofed caller IDs never expand access.",
+        "Revocation cancels pending sensitive operations and shows remediation."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- F3-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "D1-01",
+      "title": "Bind tokens and accessible host primitives",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "D1",
+      "dependsOn": [
+        "F1-01",
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "packages/ui/src/tokens/",
+        "packages/ui/src/primitives/"
+      ],
+      "featureIds": [
+        "design",
+        "actions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#tokens"
+      ],
+      "specRefs": [
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Bind tokens and accessible host primitives with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Translate design tokens into semantic CSS/Tailwind variables and licensed fonts.",
+        "Implement focus, keycaps, buttons, text fields, loading/error/empty primitives and theme context."
+      ],
+      "acceptance": [
+        "Dark/light/opaque and reduced-motion examples pass visual checks.",
+        "Keyboard focus, labels and text scaling remain usable."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- D1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "D1-02",
+      "title": "Implement declarative view renderer",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "D1",
+      "dependsOn": [
+        "D1-01",
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "packages/ui/src/views/"
+      ],
+      "featureIds": [
+        "design",
+        "actions",
+        "extensions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#tokens"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement declarative view renderer with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Render List/Grid/Detail/Form/ActionPanel from validated ViewModels.",
+        "Implement stable selection, navigation stack, action footer, safe Markdown and forms."
+      ],
+      "acceptance": [
+        "Malformed/custom executable views cannot render host code.",
+        "Async results preserve selection; keyboard-only actions/forms work."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- D1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "D1-03",
+      "title": "Implement shared settings and consent surfaces",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "D1",
+      "dependsOn": [
+        "D1-01",
+        "F3-01",
+        "F2-02"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/settings/",
+        "packages/ui/src/permissions/"
+      ],
+      "featureIds": [
+        "design",
+        "settings"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#tokens"
+      ],
+      "specRefs": [
+        "docs/architecture/security.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement shared settings and consent surfaces with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build searchable settings routes and reusable capability/permission cards.",
+        "Expose provider, data, desktop/input integration state without leaking secrets."
+      ],
+      "acceptance": [
+        "Denied/unavailable capabilities never appear enabled.",
+        "Pending approvals survive navigation and cannot submit twice."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- D1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F1-03",
+      "title": "Package bundled runtimes and desktop assets",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F1",
+      "dependsOn": [
+        "F1-02",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packaging/",
+        "apps/desktop/forge.config.ts"
+      ],
+      "featureIds": [
+        "foundation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/stack.md",
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Package bundled runtimes and desktop assets with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build amd64 .deb with Electron native addon rebuild, standalone Node and helper locations.",
+        "Add desktop file, native-messaging manifests and disabled system service assets through reviewed maintainer scripts."
+      ],
+      "acceptance": [
+        "Fresh Debian user needs no developer Node to launch.",
+        "Install/upgrade/remove do not silently enable keyboard capture."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- F1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L1-01",
+      "title": "Implement root registry and ranking",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L1",
+      "dependsOn": [
+        "F1-02",
+        "F2-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/search/",
+        "apps/desktop/src/features/launcher/"
+      ],
+      "featureIds": [
+        "launcher"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#shell-and-navigation"
+      ],
+      "specRefs": [
+        "docs/architecture/overview.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement root registry and ranking with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement providers, query generations, exact aliases, fuzzy matching and local frecency/favourites.",
+        "Merge bounded results with stable IDs and explicit fallback/AI actions."
+      ],
+      "acceptance": [
+        "Late provider completion cannot shift selected identity.",
+        "Empty query/disabled command/ranking reset and cancellation fixtures pass."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- L1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L1-02",
+      "title": "Discover applications and typed launch actions",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L1",
+      "dependsOn": [
+        "L1-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/applications/"
+      ],
+      "featureIds": [
+        "launcher",
+        "run"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#shell-and-navigation"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Discover applications and typed launch actions with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Read desktop entries through native GIO and parse typed launch arguments.",
+        "Separate URI/file/argv/shell commands and persist clearable run history."
+      ],
+      "acceptance": [
+        "Malformed Exec fields and untrusted URLs cannot interpolate shell syntax.",
+        "Applications with spaces/arguments and unavailable executables report accurately."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- L1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L1-03",
+      "title": "Implement aliases, shortcuts and deep links",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L1",
+      "dependsOn": [
+        "L1-01",
+        "D1-03",
+        "P1-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/command-settings/"
+      ],
+      "featureIds": [
+        "launcher",
+        "settings",
+        "actions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#shell-and-navigation"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement aliases, shortcuts and deep links with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add alias/hotkey recorder, conflict resolution, per-app scope and command visibility.",
+        "Expose closed native deep-link routes and stable settings links."
+      ],
+      "acceptance": [
+        "Reserved/conflicting shortcuts have remediation.",
+        "External deep links cannot execute arbitrary shell actions."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- L1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-01",
+      "title": "Build file metadata index and watcher recovery",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "F2-01",
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "native/platform/src/index/",
+        "packages/file-index/"
+      ],
+      "featureIds": [
+        "files"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build file metadata index and watcher recovery with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Crawl selected roots into metadata/FTS storage with ignore and mount policies.",
+        "Reconcile rename/deletion/watch overflow with cancellation and progress."
+      ],
+      "acceptance": [
+        "100k-path fixture search returns current paths after reconciliation.",
+        "Permission failures and excluded mounts never stall the whole index."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- L2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-02",
+      "title": "Add file search UI and content extractors",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L2-01",
+        "L1-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/builtins/file-search/",
+        "packages/file-extractors/"
+      ],
+      "featureIds": [
+        "files"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Add file search UI and content extractors with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement dedicated filter/sort/path navigation and recent files.",
+        "Add opt-in MIME-limited content extraction with size/time budgets."
+      ],
+      "acceptance": [
+        "Content is not indexed until a root opts in.",
+        "Corrupt/large files and cancelled extraction do not hang the host."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- L2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-03",
+      "title": "Implement universal actions and file buffer",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L2-02",
+        "F3-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/builtins/universal-actions/",
+        "packages/builtins/previews/"
+      ],
+      "featureIds": [
+        "universal-actions",
+        "large-type"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement universal actions and file buffer with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement typed text/URL/file-list actions, ordered multi-file buffer and safe preview/large-text windows.",
+        "Add move/rename/trash/open-with/terminal actions with conflict/effect policy."
+      ],
+      "acceptance": [
+        "Actions respect cardinality and never replace permanent-delete confirmation.",
+        "Preview/index cache deletion cannot delete source files."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- L2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-04",
+      "title": "Implement calculator and explicit rate adapters",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L1-01",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/calculator/"
+      ],
+      "featureIds": [
+        "calculator"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/security.md",
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement calculator and explicit rate adapters with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build deterministic parser for arithmetic, functions, units, dates/timezones and colours.",
+        "Provide opt-in configured currency/crypto adapter with timestamped fixture-backed cache."
+      ],
+      "acceptance": [
+        "No eval or background query transmission; ordinary words do not hijack search.",
+        "DST/unit/colour fixtures pass and stale/offline rates are labelled."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- L2-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-05",
+      "title": "Implement quicklinks, web searches and placeholders",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L1-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/templates/",
+        "packages/builtins/quicklinks/"
+      ],
+      "featureIds": [
+        "quicklinks",
+        "placeholders"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement quicklinks, web searches and placeholders with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement snapshot placeholder parser, validated templates and nonrecursive snippet inclusion.",
+        "Provide argument forms, browser/open-with, tags and native export."
+      ],
+      "acceptance": [
+        "URL components encode untrusted values without changing executable structure.",
+        "Recursive/missing/unsupported cursor placeholders produce explicit errors."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- L2-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-06",
+      "title": "Implement dictionary and emoji datasets",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L1-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/builtins/dictionary/",
+        "packages/builtins/emoji/"
+      ],
+      "featureIds": [
+        "dictionary",
+        "emoji"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement dictionary and emoji datasets with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add installed Hunspell/definition-data discovery with missing-language guidance.",
+        "Pin licensed Unicode metadata, aliases/tone/favourites and keyboard grid actions."
+      ],
+      "acceptance": [
+        "No unlicensed dictionary dataset silently downloads.",
+        "Unicode/combining-character results copy correctly and unsupported paste explains fallback."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- L2-06"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P1-01",
+      "title": "Implement portals and desktop capability discovery",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P1",
+      "dependsOn": [
+        "F1-02",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "native/platform/src/portals/",
+        "packages/platform/"
+      ],
+      "featureIds": [
+        "foundation",
+        "launcher"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement portals and desktop capability discovery with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement shortcut/capture/session portal requests and runtime capability probes.",
+        "Persist shortcut identity and model denial/revocation/restart states."
+      ],
+      "acceptance": [
+        "All four session reports distinguish unsupported from denied.",
+        "linuxcast --toggle remains an available recovery command."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P1-02",
+      "title": "Implement GNOME companion and bridge",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P1",
+      "dependsOn": [
+        "F0-01",
+        "F3-01",
+        "P1-01"
+      ],
+      "ownedPaths": [
+        "integrations/gnome/",
+        "native/platform/src/gnome/"
+      ],
+      "featureIds": [
+        "windows",
+        "clipboard"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement GNOME companion and bridge with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build GNOME48 window/clipboard/focus/layout bridge with bounded authenticated messages.",
+        "Add enable/version/disable diagnostics and context epochs."
+      ],
+      "acceptance": [
+        "Window identity survives unrelated focus changes but stale handles fail.",
+        "Shell restart clears transactions and resumes only after fresh validation."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P1-03",
+      "title": "Implement KDE companion and clipboard backend",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P1",
+      "dependsOn": [
+        "F0-01",
+        "F3-01",
+        "P1-01"
+      ],
+      "ownedPaths": [
+        "integrations/kwin/",
+        "native/platform/src/kde/"
+      ],
+      "featureIds": [
+        "windows",
+        "clipboard"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement KDE companion and clipboard backend with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build KWin6.3 script polling/ack adapter and supported clipboard protocol.",
+        "Implement focus/layout epochs and bounded queue expiry."
+      ],
+      "acceptance": [
+        "No callDBus reply is assumed to provide unsupported synchronous control.",
+        "Restart/missing protocol and stale acknowledgements fail safely."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P1-04",
+      "title": "Implement X11 window, clipboard and insertion backend",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P1",
+      "dependsOn": [
+        "F0-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "native/platform/src/x11/"
+      ],
+      "featureIds": [
+        "windows",
+        "clipboard"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement X11 window, clipboard and insertion backend with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement EWMH windows, XFixes clipboard and XTest insertion behind same contracts.",
+        "Keep native Wayland objects outside X11-only capability claims."
+      ],
+      "acceptance": [
+        "X11 tests cover current window, geometry and MIME ownership.",
+        "Mixed XWayland session cannot report native Wayland operations as available."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P1-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P1-05",
+      "title": "Implement window commands and layout persistence",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P1",
+      "dependsOn": [
+        "P1-02",
+        "P1-03",
+        "P1-04",
+        "L1-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/windows/"
+      ],
+      "featureIds": [
+        "windows"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement window commands and layout persistence with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add tiling presets/custom geometry, restore, monitor/workspace and named layouts.",
+        "Implement window search and app-menu commands only when accessible APIs exist."
+      ],
+      "acceptance": [
+        "Fractional scaling/work areas and disappearing windows have fixtures.",
+        "Applying a layout skips missing identities instead of moving unrelated apps."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P1-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P2-01",
+      "title": "Build privileged consent and device supervisor",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P2",
+      "dependsOn": [
+        "S0-03",
+        "F0-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "native/input/supervisor/",
+        "native/input/inputctl/"
+      ],
+      "featureIds": [
+        "hyper",
+        "snippets"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build privileged consent and device supervisor with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement fixed polkit operations, authorized-user records, udev device identity and seat0 active-session gating.",
+        "Pass validated FDs to dedicated worker, close parent copies, and enforce hardening/leases."
+      ],
+      "acceptance": [
+        "UID/path/socket substitution and remote/TTY/locked sessions are rejected.",
+        "Install/enable/cancel/disable and new-versus-selected keyboard cases pass."
+      ],
+      "validation": [
+        "cargo test --workspace",
+        "pnpm test:security -- P2-01",
+        "pnpm test:integration -- P2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P2-02",
+      "title": "Build passthrough and Hyper state machine",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P2",
+      "dependsOn": [
+        "P2-01"
+      ],
+      "ownedPaths": [
+        "native/input/engine/src/device/",
+        "native/input/engine/src/hyper/"
+      ],
+      "featureIds": [
+        "hyper"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build passthrough and Hyper state machine with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Forward per-device events and implement 200ms Caps tap/hold with logical/physical modifier ownership.",
+        "Handle SYN_DROPPED, virtual-device exclusion, emergency disarm and worker watchdog."
+      ],
+      "acceptance": [
+        "Pre-held modifiers/multiple keyboards/repeat do not release user-held keys.",
+        "Worker/supervisor death and unplug recover physical input without stuck keys."
+      ],
+      "validation": [
+        "cargo test --workspace",
+        "pnpm test:security -- P2-02",
+        "pnpm test:integration -- P2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P2-03",
+      "title": "Build bounded trigger matcher and context leases",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P2",
+      "dependsOn": [
+        "P2-02",
+        "P1-02",
+        "P1-03",
+        "P1-04"
+      ],
+      "ownedPaths": [
+        "native/input/engine/src/triggers/",
+        "native/input/engine/src/context/"
+      ],
+      "featureIds": [
+        "snippets"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build bounded trigger matcher and context leases with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement literal tables, trigger conflicts/delimiter modes and bounded memory-only suffix state.",
+        "Track focus/layout/IME/session epochs and emit only trigger IDs/nonces."
+      ],
+      "acceptance": [
+        "Synthetic output never recursively triggers; immediate-prefix conflicts fail.",
+        "Unknown layout/composition/sensitivity pauses matching; no raw typing in logs."
+      ],
+      "validation": [
+        "cargo test --workspace",
+        "pnpm test:security -- P2-03",
+        "pnpm test:integration -- P2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P2-04",
+      "title": "Verify input lifecycle and package integration",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P2",
+      "dependsOn": [
+        "P2-03",
+        "F1-03"
+      ],
+      "ownedPaths": [
+        "tests/input/",
+        "packaging/input/"
+      ],
+      "featureIds": [
+        "hyper",
+        "snippets"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Verify input lifecycle and package integration with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Run crash/CPU-pressure/blocked-IPC/hotplug/session matrix and record measured recovery.",
+        "Integrate stop-before-upgrade/uninstall and no automatic crash-loop rearm."
+      ],
+      "acceptance": [
+        "Emergency chord and lease/watchdog timeouts meet acceptance on real keyboards.",
+        "Removal or failure leaves physical keyboards usable and no secret buffers retained."
+      ],
+      "validation": [
+        "cargo test --workspace",
+        "pnpm test:security -- P2-04",
+        "pnpm test:integration -- P2-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P3-01",
+      "title": "Implement clipboard storage and MIME views",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P3",
+      "dependsOn": [
+        "F2-01",
+        "P1-02",
+        "P1-03",
+        "P1-04",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/clipboard/",
+        "packages/builtins/clipboard/"
+      ],
+      "featureIds": [
+        "clipboard"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#results-and-actions"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement clipboard storage and MIME views with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Capture supported MIME with bounds, retention, pin/search and app/format excludes.",
+        "Keep PRIMARY separate and filter internal snippet/dictation writes."
+      ],
+      "acceptance": [
+        "Images/files/HTML retain supported formats and unsupported ones are disclosed.",
+        "Paused/excluded/sensitive-known events do not enter history."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P3-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P3-02",
+      "title": "Implement focus-safe insertion transactions",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P3",
+      "dependsOn": [
+        "P3-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/insertion/"
+      ],
+      "featureIds": [
+        "clipboard",
+        "snippets",
+        "ai-context",
+        "dictation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#results-and-actions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement focus-safe insertion transactions with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Validate target/session/layout epochs before deletion and insertion, serialize per-seat transactions.",
+        "Add generation-guarded explicit clipboard restore and manual copy fallback."
+      ],
+      "acceptance": [
+        "Focus changes or further typing abort without late paste/compensating deletion.",
+        "Concurrent user copies cannot be overwritten by restoration."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P3-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "P3-03",
+      "title": "Implement snippet management and workflow triggers",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "P3",
+      "dependsOn": [
+        "P2-03",
+        "P3-02",
+        "L2-05",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/builtins/snippets/"
+      ],
+      "featureIds": [
+        "snippets",
+        "placeholders"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#results-and-actions"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement snippet management and workflow triggers with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build snippet/tag/pin editor and per-app trigger configuration with disabled imports.",
+        "Resolve dynamic placeholders before deletion and dispatch workflow trigger IDs unprivileged."
+      ],
+      "acceptance": [
+        "Conflicting scope bindings require resolution; no silent workflow precedence.",
+        "Long-running workflow output falls back to explicit copy when target token expires."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- P3-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-01",
+      "title": "Implement sandbox runtime and SDK broker",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "S0-04",
+        "F0-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/extension-host/",
+        "packages/sdk/"
+      ],
+      "featureIds": [
+        "extensions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement sandbox runtime and SDK broker with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Launch per-package bundled Node in mandatory bwrap and expose brokered manifest grants.",
+        "Implement storage/network/files/clipboard/UI actions with scoped secret references and cancellation."
+      ],
+      "acceptance": [
+        "Direct host HOME/env/DBus/display/network access is denied.",
+        "Missing sandbox disables execution; denied calls cannot be spoofed by payload IDs."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- E1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-02",
+      "title": "Implement scripts and in-session inline refresh",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-01",
+        "L1-01"
+      ],
+      "ownedPaths": [
+        "packages/script-host/"
+      ],
+      "featureIds": [
+        "scripts",
+        "run"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement scripts and in-session inline refresh with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Parse native metadata and safe argv arguments; discover explicitly granted interpreters.",
+        "Implement bounded streamed/full/compact/inline/silent output and nonoverlapping in-session refresh. Persistent package background schedules are integrated in E1-06 through the shared scheduler."
+      ],
+      "acceptance": [
+        "ANSI/oversized output is sanitized and cancellation terminates process tree.",
+        "No npm postinstall/native-addon download or shell interpolation fallback."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- E1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-03",
+      "title": "Implement package installation and catalogue",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-01",
+        "F2-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/package-manager/",
+        "packages/builtins/catalogue/",
+        "catalogue/"
+      ],
+      "featureIds": [
+        "packages",
+        "extensions"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement package installation and catalogue with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build safe archive validation, atomic install/rollback and native static index/detail UI.",
+        "Implement enable/remove/update and permission expansion review with pinned source metadata."
+      ],
+      "acceptance": [
+        "Traversal/symlinks/oversized archives and incompatible versions are rejected.",
+        "An update cannot silently broaden grants or destroy user settings."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- E1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-04",
+      "title": "Build extension developer tools and sample package",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-02",
+        "E1-03"
+      ],
+      "ownedPaths": [
+        "packages/devtools/",
+        "examples/extensions/"
+      ],
+      "featureIds": [
+        "extensions",
+        "password-integration"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build extension developer tools and sample package with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement package validation, development reload and redacted logs using the same sandbox.",
+        "Ship declarative sample plus optional installed-op item/bookmark adapter with native auth."
+      ],
+      "acceptance": [
+        "Development mode does not bypass broker permissions.",
+        "Password integration never persists secret values or harvests another app credential."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- E1-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W1-01",
+      "title": "Implement graph validation and run model",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W1",
+      "dependsOn": [
+        "F0-01",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/workflows/src/graph/",
+        "packages/workflows/src/run/"
+      ],
+      "featureIds": [
+        "workflow-runtime"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement graph validation and run model with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Validate schema/version/ports/edges/config and keep presentation layout separate.",
+        "Create run snapshots, scoped variables and deterministic branch copies."
+      ],
+      "acceptance": [
+        "Raw cycles/dangling edges/type mismatch fail before execution.",
+        "One branch cannot mutate another branch or live configuration."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- W1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W1-02",
+      "title": "Implement execution, cancellation and failure routes",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W1",
+      "dependsOn": [
+        "W1-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/workflows/src/engine/"
+      ],
+      "featureIds": [
+        "workflow-runtime"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement execution, cancellation and failure routes with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Execute bounded async nodes with queues/latest-wins policies, timeout and cancellation.",
+        "Implement error ports, bounded foreach, cross-workflow depth and explicit retry policy."
+      ],
+      "acceptance": [
+        "Stale script-filter generations never render results.",
+        "Cancel and nested failure stop intended jobs without duplicate external effects."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- W1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W1-03",
+      "title": "Implement durable journal and debugger events",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W1",
+      "dependsOn": [
+        "W1-02",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/workflows/src/journal/"
+      ],
+      "featureIds": [
+        "workflow-runtime"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement durable journal and debugger events with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Persist run/step states and redacted debugger events with bounded payload handles.",
+        "Recover uncertain effectful steps as interrupted-review; retry only declared idempotent work."
+      ],
+      "acceptance": [
+        "Crash between side effect and acknowledgement never silently replays.",
+        "Secret values and oversized output do not leak into durable logs."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W2-01",
+      "title": "Build workflow canvas and accessible graph editing",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W2",
+      "dependsOn": [
+        "D1-02",
+        "F0-01"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/workflows/canvas/"
+      ],
+      "featureIds": [
+        "workflow-editor"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build workflow canvas and accessible graph editing with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build styled ReactFlow canvas, selection, connections, pan/zoom and undo/redo.",
+        "Provide equivalent keyboard/list operations and validation feedback."
+      ],
+      "acceptance": [
+        "Add/connect/edit/delete works without dragging.",
+        "Layout edits never alter execution semantics and undo restores graph state."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- W2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W2-02",
+      "title": "Build palette, configuration and reusable groups",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W2",
+      "dependsOn": [
+        "W2-01",
+        "W1-01"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/workflows/editor/"
+      ],
+      "featureIds": [
+        "workflow-editor"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build palette, configuration and reusable groups with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement searchable node palette, favourites, typed config forms, notes and reusable groups.",
+        "Validate missing settings/secrets without exporting secret values."
+      ],
+      "acceptance": [
+        "Invalid settings cannot start a run.",
+        "Reusable-group edits preserve stable IDs and clear package defaults versus local overrides."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- W2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W2-03",
+      "title": "Build workflow debugger and run controls",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W2",
+      "dependsOn": [
+        "W2-02",
+        "W1-03"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/workflows/debugger/"
+      ],
+      "featureIds": [
+        "workflow-editor"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build workflow debugger and run controls with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Render node inputs/outputs/status/duration, break-on-error and redaction from run events.",
+        "Add test-run/cancel/retry controls gated by runtime effect policy."
+      ],
+      "acceptance": [
+        "Navigating editor does not restart a run or lose pending approval.",
+        "Large output remains inspectable via bounded previews, not frozen rendering."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- W2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W3-01",
+      "title": "Implement trigger and filter node families",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W3",
+      "dependsOn": [
+        "W1-02",
+        "L1-03",
+        "E1-02"
+      ],
+      "ownedPaths": [
+        "packages/workflow-nodes/src/inputs/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement trigger and filter node families with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement keyword/hotkey/external/universal action triggers and list/script filters.",
+        "Support rich stable result IDs, actions, autocomplete and 150ms latest-wins filtering."
+      ],
+      "acceptance": [
+        "Script results follow native schema and stale generations are discarded.",
+        "External input validates types and app-scope/hotkey rules apply."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- W3-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W3-02",
+      "title": "Implement transform and control node families",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W3",
+      "dependsOn": [
+        "W1-02",
+        "L2-05"
+      ],
+      "ownedPaths": [
+        "packages/workflow-nodes/src/control/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement transform and control node families with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement arguments/variables/split/join/condition/expression/random/delay/bounded iteration.",
+        "Make join concatenate values, not an implicit asynchronous branch barrier."
+      ],
+      "acceptance": [
+        "Boundary/error/loop-depth/time-budget fixtures match documented semantics.",
+        "Expression parsing cannot execute arbitrary host JavaScript."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- W3-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W3-03",
+      "title": "Implement action and output node families",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W3",
+      "dependsOn": [
+        "W1-02",
+        "E1-02",
+        "P3-02",
+        "L2-03"
+      ],
+      "ownedPaths": [
+        "packages/workflow-nodes/src/actions/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/extensions.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement action and output node families with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement file/open/HTTP/script/clipboard/notification/sound/speech outputs through broker.",
+        "Resolve placeholders from snapshots and classify effectful actions for recovery."
+      ],
+      "acceptance": [
+        "Permission denial flows to explicit node errors.",
+        "Script/HTTP/file changes cannot evade scoped grants or replay after uncertain crash."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- W3-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W3-04",
+      "title": "Implement interactive and AI nodes",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W3",
+      "dependsOn": [
+        "W1-02",
+        "D1-02",
+        "A1-01"
+      ],
+      "ownedPaths": [
+        "packages/workflow-nodes/src/interactive/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement interactive and AI nodes with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add form/grid/text/PDF preview and approval/user-input pause nodes.",
+        "Add streaming AI and structured-output nodes inheriting global route."
+      ],
+      "acceptance": [
+        "Paused run resumes only once with validated input.",
+        "Missing model capability fails before sending unsupported payload."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W3-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W3-05",
+      "title": "Package and verify ten example workflows",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W3",
+      "dependsOn": [
+        "W3-01",
+        "W3-02",
+        "W3-03",
+        "W3-04",
+        "W2-03",
+        "P3-03",
+        "W4-01",
+        "W4-02",
+        "W4-03",
+        "W4-04",
+        "W4-05",
+        "W4-06",
+        "W4-07",
+        "W4-08",
+        "W4-09"
+      ],
+      "ownedPaths": [
+        "examples/workflows/",
+        "tests/workflows/"
+      ],
+      "featureIds": [
+        "workflow-nodes",
+        "packages"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Package and verify ten example workflows with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Create the ten specified native example packages with config/defaults and safe permissions.",
+        "Exercise editing, debugging, cancellation, export/import and failure recovery for each."
+      ],
+      "acceptance": [
+        "All examples run with declared prerequisites on target sessions.",
+        "Export contains no secrets/history and imported typed triggers remain disabled."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W3-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A1-01",
+      "title": "Implement global AI broker and OpenRouter",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A1",
+      "dependsOn": [
+        "F0-01",
+        "F2-02",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/ai/src/broker/",
+        "packages/ai/src/providers/openrouter/"
+      ],
+      "featureIds": [
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement global AI broker and OpenRouter with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement provider/model snapshots, catalog/cache/capabilities and SSE streaming/cancel/usage.",
+        "Keep keyring refs in trusted process and normalize auth/quota/partial errors."
+      ],
+      "acceptance": [
+        "Quick/command/workflow callers share one configured route.",
+        "Settings changes do not alter active run; failed stream is not success."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- A1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A1-02",
+      "title": "Implement direct provider adapters",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A1",
+      "dependsOn": [
+        "A1-01"
+      ],
+      "ownedPaths": [
+        "packages/ai/src/providers/openai/",
+        "packages/ai/src/providers/anthropic/",
+        "packages/ai/src/providers/gemini/"
+      ],
+      "featureIds": [
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement direct provider adapters with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add OpenAI Responses, Anthropic Messages and Gemini native serializers.",
+        "Implement tool/image/structured capabilities and provider-specific stream termination."
+      ],
+      "acceptance": [
+        "Captured fixtures validate each protocol without flattening incompatible fields.",
+        "No retry after visible output or provider switch without explicit action."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:contracts -- A1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A1-03",
+      "title": "Implement local and compatible providers",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A1",
+      "dependsOn": [
+        "A1-01"
+      ],
+      "ownedPaths": [
+        "packages/ai/src/providers/ollama/",
+        "packages/ai/src/providers/compatible/"
+      ],
+      "featureIds": [
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement local and compatible providers with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add Ollama discovery/lifecycle and configurable compatible endpoints with named presets.",
+        "Require declared capabilities and preserve stale catalog after refresh failure."
+      ],
+      "acceptance": [
+        "Unavailable or removed selected model yields actionable error, never silent replacement.",
+        "Local mode never falls back to hosted inference; endpoint grants restrict credential destination."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A2-01",
+      "title": "Build Quick AI and saved commands",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A2",
+      "dependsOn": [
+        "A1-01",
+        "D1-02",
+        "L1-01"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/quick-ai/",
+        "packages/builtins/ai-commands/"
+      ],
+      "featureIds": [
+        "ai-quick",
+        "translation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build Quick AI and saved commands with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement explicit root AI invocation, follow-ups and reusable prompt/argument command UI against global broker fixtures; final conversation/context integration is A2-05.",
+        "Implement translation languages/detection/swap and diff-preview UI; use safe copy output until the final insertion/context integration is accepted."
+      ],
+      "acceptance": [
+        "Typing root queries alone makes no inference request.",
+        "No enabled replacement/handoff control before the corresponding integration capability is available; copy remains usable."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- A2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A2-02",
+      "title": "Implement conversation runtime and persistence",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A2",
+      "dependsOn": [
+        "A1-01",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/conversations/"
+      ],
+      "featureIds": [
+        "ai-chat"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement conversation runtime and persistence with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Persist messages/branches/drafts, streaming state, cancellation and queued follow-ups.",
+        "Implement edit/regenerate/branch/context compaction with bounded attachments/results."
+      ],
+      "acceptance": [
+        "Interrupted responses remain visibly interrupted after restart.",
+        "Editing old turns branches correctly and compaction preserves referenced context."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A2-03",
+      "title": "Build full chat workspace and history",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A2",
+      "dependsOn": [
+        "A2-02",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/chat/"
+      ],
+      "featureIds": [
+        "ai-chat"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build full chat workspace and history with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build sidebar/projects/history, composer/attachments, search, pin/archive/trash/restore and notifications.",
+        "Preserve drafts and approvals across navigation; use capability-gated model controls."
+      ],
+      "acceptance": [
+        "Keyboard-only use and dark/light/error/streaming states pass.",
+        "Repeated submit/notification handling cannot duplicate a turn."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- A2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A2-04",
+      "title": "Implement contextual attachments and replacement",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A2",
+      "dependsOn": [
+        "A2-02",
+        "P1-01",
+        "P3-02",
+        "B1-01"
+      ],
+      "ownedPaths": [
+        "packages/context/"
+      ],
+      "featureIds": [
+        "ai-context",
+        "translation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement contextual attachments and replacement with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Capture explicit file/clipboard/selection/window/region/browser sources with preview.",
+        "Exclude own/protected surfaces where identifiable; explain unsupported context and enforce vision/tool limits."
+      ],
+      "acceptance": [
+        "Unselected or unsupported content is never silently transmitted.",
+        "Focus/layout changes prevent late text replacement; copy fallback remains available."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A2-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A3-01",
+      "title": "Integrate approved extension tools and MCP",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A3",
+      "dependsOn": [
+        "A2-02",
+        "E1-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/ai-tools/",
+        "packages/mcp/"
+      ],
+      "featureIds": [
+        "ai-tools"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate approved extension tools and MCP with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Bridge extension tools and stdio/StreamableHTTP MCP with scoped auth and server lifecycle.",
+        "Implement inspectable arguments, once/persistent/deny, progress, timeout/cancel and bounded outputs."
+      ],
+      "acceptance": [
+        "A skill/server cannot grant its own permissions.",
+        "Token expiry/server restart/approval navigation cannot execute an effect twice."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- A3-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A3-02",
+      "title": "Implement agents, skills and project contexts",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A3",
+      "dependsOn": [
+        "A2-03",
+        "A3-01"
+      ],
+      "ownedPaths": [
+        "packages/agents/",
+        "packages/skills/",
+        "packages/projects/"
+      ],
+      "featureIds": [
+        "ai-agents"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement agents, skills and project contexts with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add reusable instruction/tool scopes, project working directories and on-demand SKILL.md catalog.",
+        "Treat imported instructions as untrusted and inherit one global model."
+      ],
+      "acceptance": [
+        "Project context does not bleed into unrelated conversations.",
+        "Skill files cannot enable tools, expand filesystem scope or override permission policy."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- A3-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A3-03",
+      "title": "Implement opt-in personal memory",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A3",
+      "dependsOn": [
+        "A3-02",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/memory/"
+      ],
+      "featureIds": [
+        "ai-memory"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement opt-in personal memory with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement editable static user profile separately from generated global/project memory; empty profile is the default and changes affect subsequent runs.",
+        "Store separate global/project memory with inspect/edit/reset/disable/export.",
+        "Route explicit/opt-in memory processing through the selected AI broker."
+      ],
+      "acceptance": [
+        "Disabled memory causes no hidden inference or retrieval.",
+        "Reset removes only intended scope and sensitive exports are explicit."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A3-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A3-04",
+      "title": "Integrate ChatGPT plan and Codex app-server",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A3",
+      "dependsOn": [
+        "A1-02",
+        "A3-01"
+      ],
+      "ownedPaths": [
+        "packages/ai/src/providers/chatgpt-plan/",
+        "packages/harnesses/codex/"
+      ],
+      "featureIds": [
+        "ai-harness"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate ChatGPT plan and Codex app-server with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement registered public-client PKCE/consent/refresh/revocation with dedicated eligible-request serializer.",
+        "Detect installed Codex and adapt session/turn/approval/cancel events within approved directory boundaries."
+      ],
+      "acceptance": [
+        "No client secret, token harvesting or API-billing fallback.",
+        "Refresh/restart preserves explicit session identity and cannot replay completed tools."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A3-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A3-05",
+      "title": "Integrate Copilot and Claude harness routes",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A3",
+      "dependsOn": [
+        "A3-01"
+      ],
+      "ownedPaths": [
+        "packages/harnesses/copilot/",
+        "packages/harnesses/claude/"
+      ],
+      "featureIds": [
+        "ai-harness"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate Copilot and Claude harness routes with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Use official Copilot SDK login/OAuth and supported Claude SDK BYOK routes.",
+        "Detect unchanged Claude Code with its own native auth and document Gemini CLI credential boundary."
+      ],
+      "acceptance": [
+        "App never reads/reuses Claude/Gemini subscription token files.",
+        "Harness grants remain bounded, cancellation works and unavailable binaries have clear setup instructions."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A3-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A4-01",
+      "title": "Implement resident scheduler and occurrence journal",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A4",
+      "dependsOn": [
+        "W1-03",
+        "A2-02",
+        "F2-01"
+      ],
+      "ownedPaths": [
+        "packages/scheduler/"
+      ],
+      "featureIds": [
+        "schedules"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/workflows.md",
+        "docs/architecture/data.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement resident scheduler and occurrence journal with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Persist IANA timezone schedules/unique occurrences and one-active-run policy.",
+        "Coalesce latest missed run, skip nonexistent DST time, run repeated time once and never wake host."
+      ],
+      "acceptance": [
+        "Restart/sleep cannot replay every missed occurrence or duplicate an occurrence.",
+        "Uncertain side effect pauses for review and approval waits survive restart."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A4-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A4-02",
+      "title": "Build automation configuration and activity UI",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A4",
+      "dependsOn": [
+        "A4-01",
+        "D1-03"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/automations/"
+      ],
+      "featureIds": [
+        "schedules"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build automation configuration and activity UI with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement once/hourly/daily/weekly/cron forms, next-run preview and enabled state.",
+        "Handle deleted/archived destination and disallow recursive automation creation."
+      ],
+      "acceptance": [
+        "Changing schedule affects only future unstarted occurrences.",
+        "Busy/detached targets and explicit app Quit are clearly represented."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- A4-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "B1-01",
+      "title": "Build paired browser companion and active context",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "B1",
+      "dependsOn": [
+        "F1-02",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "integrations/browser/",
+        "packages/browser-host/"
+      ],
+      "featureIds": [
+        "browser"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build paired browser companion and active context with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement Chromium/Firefox native-messaging pairing, ID allowlist and profile/window identity.",
+        "Capture activeTab URL/title/selection/content only after explicit action."
+      ],
+      "acceptance": [
+        "No localhost unauthenticated service or arbitrary extension client is accepted.",
+        "Multiple profiles/stale active tabs cannot attach the wrong page."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- B1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "B1-02",
+      "title": "Add bookmark/history/tab and focus-site capabilities",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "B1",
+      "dependsOn": [
+        "B1-01"
+      ],
+      "ownedPaths": [
+        "integrations/browser/features/",
+        "packages/builtins/browser/"
+      ],
+      "featureIds": [
+        "browser",
+        "focus"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Add bookmark/history/tab and focus-site capabilities with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Request separate optional permissions and expose searchable bookmarks/tabs/history.",
+        "Apply focus-session site rules with explicit browser/profile limitations."
+      ],
+      "acceptance": [
+        "Revoking history permission removes access immediately.",
+        "Unsupported browsers have clear missing-component state rather than false blocking."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- B1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U1-01",
+      "title": "Build notes editor and recovery",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U1",
+      "dependsOn": [
+        "F2-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/notes/",
+        "apps/desktop/src/features/notes/"
+      ],
+      "featureIds": [
+        "notes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build notes editor and recovery with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement Tiptap OSS editor, slash commands/tasks, quick notes and title/content search.",
+        "Persist autosave/drafts, pin/archive/trash/restore and Markdown export."
+      ],
+      "acceptance": [
+        "Crash recovers last committed content and pending draft where possible.",
+        "Markdown round trip preserves text/tasks and declares unsupported styling."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- U1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U1-02",
+      "title": "Implement contacts and calendar data sources",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U1",
+      "dependsOn": [
+        "F2-02",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "packages/contacts/",
+        "packages/calendar/sources/"
+      ],
+      "featureIds": [
+        "contacts",
+        "calendar"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement contacts and calendar data sources with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add local vCard/ICS, CardDAV and CalDAV adapters with source capabilities.",
+        "Parse recurring/timezone data and isolate account credential references."
+      ],
+      "acceptance": [
+        "Read-only ICS cannot expose writable success paths.",
+        "Recurrence exceptions, timezone changes and expired credentials have fixtures."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- U1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U1-03",
+      "title": "Build agenda, reminders and meeting actions",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U1",
+      "dependsOn": [
+        "U1-02",
+        "D1-02",
+        "P1-01"
+      ],
+      "ownedPaths": [
+        "packages/calendar/actions/",
+        "apps/desktop/src/features/calendar/"
+      ],
+      "featureIds": [
+        "calendar"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build agenda, reminders and meeting actions with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build agenda/search/next-meeting and create/edit/delete/RSVP where supported.",
+        "Implement reminders, meeting-app preference and explicit optional autojoin controls."
+      ],
+      "acceptance": [
+        "Read-only/unsupported RSVP is explained; camera state is never changed silently.",
+        "DST/reminder/repeated occurrence and offline-source views are correct."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- U1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U2-01",
+      "title": "Implement media and system adapters",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U2",
+      "dependsOn": [
+        "P1-01",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "native/platform/src/system/",
+        "packages/builtins/system/"
+      ],
+      "featureIds": [
+        "system"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement media and system adapters with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add logind/MPRIS/PipeWire/NetworkManager/BlueZ capability adapters and commands.",
+        "Bind effect/confirmation policy and supported desktop display/theme controls."
+      ],
+      "acceptance": [
+        "Failed or unsupported hardware operation never reports success.",
+        "Selected media player and per-app audio actions target the intended resource."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- U2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U2-02",
+      "title": "Implement focus and graceful auto-quit",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U2",
+      "dependsOn": [
+        "P1-05",
+        "B1-02",
+        "U2-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/focus/",
+        "packages/builtins/autoquit/"
+      ],
+      "featureIds": [
+        "focus",
+        "autoquit"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement focus and graceful auto-quit with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build timed/unlimited sessions with goals/rules/pause/resume and visible status.",
+        "Implement disabled-by-default per-app idle close, three-minute default and foreground/media exclusions."
+      ],
+      "acceptance": [
+        "No root firewall/DNS changes or kill fallback.",
+        "Focus end/crash restores rules; autoquit excludes system/session processes."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- U2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U2-03",
+      "title": "Implement game catalogues and shortcut game mode",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U2",
+      "dependsOn": [
+        "L1-02",
+        "L1-03",
+        "P1-05"
+      ],
+      "ownedPaths": [
+        "packages/builtins/games/"
+      ],
+      "featureIds": [
+        "games"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement game catalogues and shortcut game mode with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Discover Steam/.desktop games, manual classification and optional Heroic/Lutris adapters.",
+        "Pause only configured shortcuts while game context is active and retain recovery."
+      ],
+      "acceptance": [
+        "Stale catalogue entries fail cleanly.",
+        "Focus/exit/helper restart restores shortcut state exactly once."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- U2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "U2-04",
+      "title": "Build theme editor and settings data tools",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "U2",
+      "dependsOn": [
+        "D1-03",
+        "F2-02"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/themes/",
+        "apps/desktop/src/features/data/"
+      ],
+      "featureIds": [
+        "themes",
+        "settings",
+        "local-data"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#settings-and-permissions"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build theme editor and settings data tools with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Build live semantic-token light/dark preview and native theme import/export validation.",
+        "Expose diagnostics, usage reset, backups and explicit data-category export controls."
+      ],
+      "acceptance": [
+        "Theme import cannot inject CSS/scripts or hide required focus state.",
+        "Default export excludes secrets/content histories and redacts diagnostics."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- U2-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "M1-01",
+      "title": "Implement screenshot capture and media library",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "M1",
+      "dependsOn": [
+        "P1-01",
+        "F2-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "packages/media/",
+        "apps/desktop/src/features/media/"
+      ],
+      "featureIds": [
+        "screenshots",
+        "large-type"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement screenshot capture and media library with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Watch selected folders, create cancellable thumbnails and browse images/videos with filters/pins.",
+        "Add portal capture and safe preview/open/reveal/delete actions."
+      ],
+      "acceptance": [
+        "Cancelled capture creates no result.",
+        "Cache retention does not delete source media; permanent deletion is explicit."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- M1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "M1-02",
+      "title": "Integrate local OCR, QR and media search",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "M1",
+      "dependsOn": [
+        "M1-01",
+        "P3-01"
+      ],
+      "ownedPaths": [
+        "packages/ocr/",
+        "packages/qr/"
+      ],
+      "featureIds": [
+        "ocr",
+        "screenshots",
+        "clipboard"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate local OCR, QR and media search with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Run Tesseract and QR decoding locally with verified language assets and resource limits.",
+        "Index OCR text and expose copy/search/retry without automatic AI transmission."
+      ],
+      "acceptance": [
+        "Corrupt/large images cancel or error without blocking UI.",
+        "Missing language/download failure is actionable and no media leaks to providers."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- M1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "M2-01",
+      "title": "Integrate local microphone and Whisper pipeline",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "M2",
+      "dependsOn": [
+        "F1-03",
+        "F3-01",
+        "D1-01"
+      ],
+      "ownedPaths": [
+        "packages/speech/"
+      ],
+      "featureIds": [
+        "dictation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/linux-integration.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate local microphone and Whisper pipeline with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Bundle whisper.cpp, select/checksum optional models, and implement microphone/record/cancel/finish.",
+        "Provide language/vocabulary, timing and recording-state events independent of AI."
+      ],
+      "acceptance": [
+        "Cancelled recording yields no transcription/insertion.",
+        "Offline model/audio-device changes and permission revocation recover visibly."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- M2-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "M2-02",
+      "title": "Build dictation UI, style and safe output",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "M2",
+      "dependsOn": [
+        "M2-01",
+        "P3-02",
+        "A1-01",
+        "D1-02"
+      ],
+      "ownedPaths": [
+        "apps/desktop/src/features/dictation/",
+        "packages/dictation/"
+      ],
+      "featureIds": [
+        "dictation",
+        "calendar"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#states-and-motion"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/data.md",
+        "docs/product/builtins.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Build dictation UI, style and safe output with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement hold/toggle pill, history/retry/deletion/local stats and note/chat destinations.",
+        "Add explicit selected-model cleanup/context styles and optional recording/transcription for meeting context."
+      ],
+      "acceptance": [
+        "No cleanup request until opt-in and no automatic submit unless separately enabled.",
+        "Focus change/cancel prevents paste; audio/text never enters keyboard-service logs."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- M2-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "R1-01",
+      "title": "Run desktop and workflow acceptance matrix",
+      "status": "planned",
+      "phase": "release",
+      "lane": "R1",
+      "dependsOn": [
+        "W3-05",
+        "P2-04",
+        "A4-02",
+        "A3-04",
+        "A3-05",
+        "A2-04",
+        "U1-01",
+        "U1-03",
+        "U2-02",
+        "U2-03",
+        "U2-04",
+        "M1-02",
+        "M2-02",
+        "L2-04",
+        "L2-06",
+        "E1-04",
+        "A1-03",
+        "A2-05",
+        "A3-03",
+        "E1-05",
+        "F2-03",
+        "L2-07",
+        "E1-06"
+      ],
+      "ownedPaths": [
+        "tests/e2e/",
+        "docs/implementation/evidence/"
+      ],
+      "featureIds": [
+        "foundation",
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/linux-integration.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Run desktop and workflow acceptance matrix with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Run every release scenario on four supported sessions with GTK/Qt/Chromium/terminal targets.",
+        "Record versions, results, denied/unavailable paths and recovery evidence per feature."
+      ],
+      "acceptance": [
+        "No missing desktop run is counted as pass.",
+        "All v1 feature tasks have actual acceptance evidence."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- R1-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "R1-02",
+      "title": "Verify visual accessibility and performance budgets",
+      "status": "planned",
+      "phase": "release",
+      "lane": "R1",
+      "dependsOn": [
+        "R1-01"
+      ],
+      "ownedPaths": [
+        "tests/visual/",
+        "tests/performance/",
+        "docs/implementation/evidence/"
+      ],
+      "featureIds": [
+        "design",
+        "foundation"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/overview.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Verify visual accessibility and performance budgets with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Capture actual dark/light/error/permission/streaming/editor states and keyboard/screen-reader checks.",
+        "Measure warm launch/search p95 and total process-tree memory on recorded reference machines."
+      ],
+      "acceptance": [
+        "100k-path fixed fixture and 100 launch trials have reproducible results.",
+        "Mockups are not substituted for application screenshots and failed budgets remain visible."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:ui -- R1-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "R1-03",
+      "title": "Validate package lifecycle and publish release assets",
+      "status": "planned",
+      "phase": "release",
+      "lane": "R1",
+      "dependsOn": [
+        "R1-02",
+        "F1-03"
+      ],
+      "ownedPaths": [
+        "packaging/release/",
+        "docs/releases/"
+      ],
+      "featureIds": [
+        "foundation",
+        "local-data"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/stack.md",
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Validate package lifecycle and publish release assets with documented capability/error states",
+        "Task-scoped tests and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Exercise clean install/upgrade/failure/uninstall, ABI/runtime completeness and data recovery.",
+        "Produce deb/checksums/SBOM/licences/release notes/capability matrix with manual package-upgrade instructions."
+      ],
+      "acceptance": [
+        "Uninstall or update disarms input before replacing binaries.",
+        "No secrets/private content enter artifacts; all critical acceptance gates pass."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- R1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "A2-05",
+      "title": "Integrate Quick AI handoff and guarded replacement",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "A2",
+      "dependsOn": [
+        "A2-01",
+        "A2-03",
+        "A2-04"
+      ],
+      "ownedPaths": [
+        "packages/quick-ai-integration/"
+      ],
+      "featureIds": [
+        "ai-quick",
+        "translation",
+        "ai-context"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#chat-and-notes"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Integrate Quick AI handoff and guarded replacement with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Connect Quick AI and saved commands to conversation handoff preserving messages/context/approvals.",
+        "Enable selection replacement only through the shared context/insertion transaction."
+      ],
+      "acceptance": [
+        "Handoff preserves history and cannot repeat a pending tool approval.",
+        "Changed target or unsupported selection replacement returns copy/preview without late typing."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- A2-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "L2-07",
+      "title": "Add explicit semantic emoji assistance",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "L2",
+      "dependsOn": [
+        "L2-06",
+        "A1-01"
+      ],
+      "ownedPaths": [
+        "packages/builtins/emoji/assist/"
+      ],
+      "featureIds": [
+        "emoji",
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#list-grid-detail-and-form"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Add explicit semantic emoji assistance with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add a deliberate no-match semantic lookup action through global broker.",
+        "Validate returned values against the pinned Unicode dataset and preserve offline local search."
+      ],
+      "acceptance": [
+        "Typing/search alone causes no inference.",
+        "Cancelled/error/unrecognized AI suggestions never replace valid local results."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- L2-07"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-05",
+      "title": "Register extension-provided compatible model definitions",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-03",
+        "A1-03"
+      ],
+      "ownedPaths": [
+        "packages/model-contributions/"
+      ],
+      "featureIds": [
+        "extensions",
+        "ai-provider"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/ai.md",
+        "docs/architecture/extensions.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Register extension-provided compatible model definitions with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Accept declarative compatible endpoint/model/capability contributions from reviewed package metadata.",
+        "Route credential attachment and inference through host broker; package code cannot supply a second hidden AI route."
+      ],
+      "acceptance": [
+        "Package install does not select a model or transmit data.",
+        "Contribution removal leaves unavailable selected-profile state; origin changes require new consent."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- E1-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "F2-03",
+      "title": "Implement encrypted portable backups and schedules",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "F2",
+      "dependsOn": [
+        "F2-02",
+        "A4-01"
+      ],
+      "ownedPaths": [
+        "packages/backups/",
+        "native/platform/src/backup/"
+      ],
+      "featureIds": [
+        "encrypted-backups",
+        "local-data"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/data.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement encrypted portable backups and schedules with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Create versioned portable backup manifest and standard age passphrase encryption/decryption with bounded staging validation.",
+        "Add optional retained passphrase in secure SecretStore, disabled daily/weekly/monthly resident schedules, keep5 and skipbattery defaults."
+      ],
+      "acceptance": [
+        "Wrong passphrase/tampering/traversal/oversize/newer schema leaves existing data untouched.",
+        "Locked/missing keyring skips scheduled backup visibly; credentials/grants are never exported."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- F2-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "B1-03",
+      "title": "Implement scoped browser action bridge",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "B1",
+      "dependsOn": [
+        "B1-02",
+        "F3-01"
+      ],
+      "ownedPaths": [
+        "integrations/browser/actions/"
+      ],
+      "featureIds": [
+        "browser",
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement scoped browser action bridge with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Implement tab/window open/close/activate/navigate and selected-page actions with profile/origin identity.",
+        "Keep page script execution as separate high-trust concrete-operation consent; no normal install or read-only permission grants it."
+      ],
+      "acceptance": [
+        "Stale profile/tab/origin tokens cannot act on a replacement page.",
+        "Denied advanced operation cannot be rerouted as generic script execution."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- B1-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-01",
+      "title": "Implement structured data and text automation tasks",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-02",
+        "L2-04"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/data/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement structured data and text automation tasks with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add typed arrays/text/date/JSON/encoding/checksum operations using shared safe parsers.",
+        "Use linear-time regex, explicit locale/timezone choices and strict JSON Pointer/encoding validation."
+      ],
+      "acceptance": [
+        "Empty arrays, bad UTF8/Base64/regex, DST ambiguity and prototype keys match documented outcomes.",
+        "Untrusted expressions cannot invoke arbitrary code."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:unit -- W4-01"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-02",
+      "title": "Implement file automation and reviewed folder sync",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-03",
+        "L2-03"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/files/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement file automation and reviewed folder sync with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add file stat/hash/path/list/copy/move/rename/trash/symlink/executable-bit tasks through scoped grants.",
+        "Implement previewed folder difference plan with confirmation bound to its hash before overwrite/delete."
+      ],
+      "acceptance": [
+        "Symlink/rename races recheck target containment.",
+        "Changed sync plan invalidates confirmation and no normal copy becomes destructive mirroring."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- W4-02"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-03",
+      "title": "Implement image transformation automation",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "M1-01",
+        "W3-03"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/images/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement image transformation automation with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Use isolated host Sharp/libvips worker for dimensions/crop/resize/rotate/flip/convert/optimize.",
+        "Default outputs to new files, preserve originals and constrain decompression/memory/time."
+      ],
+      "acceptance": [
+        "Corrupt/decompression-bomb/large input cancels with bounded resources.",
+        "Geometry/alpha/orientation fixtures preserve documented semantics."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W4-03"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-04",
+      "title": "Implement safe PDF automation and preview",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-04",
+        "M1-01"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/pdf/"
+      ],
+      "featureIds": [
+        "workflow-nodes",
+        "large-type"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement safe PDF automation and preview with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Use pdf-lib assembly and isolated PDF.js extraction/render with scripting disabled.",
+        "Add combine/extract-pages/text/render operations with page/size limits and new-file outputs."
+      ],
+      "acceptance": [
+        "Malformed/encrypted/huge PDFs fail or request supported credentials without code execution.",
+        "Page ordering/ranges and output files match fixtures; cancellation stops worker."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W4-04"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-05",
+      "title": "Expose desktop and built-in service automation",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "P1-05",
+        "P3-03",
+        "U1-01",
+        "U1-03",
+        "U2-01",
+        "U2-02",
+        "M1-02",
+        "M2-02"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/desktop/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Expose desktop and built-in service automation with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Wrap app/window/menu/appearance/wallpaper/clipboard/capture and native productivity command registries.",
+        "Require each operation schema, availability and effect policy; implement contact/snippet triggers using typed context."
+      ],
+      "acceptance": [
+        "Missing desktop/app API returns unavailable, not fabricated data.",
+        "No task obtains broader authority than the corresponding direct command."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W4-05"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-06",
+      "title": "Expose browser workflow automation",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "B1-03",
+        "W3-03"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/browser/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/extensions.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Expose browser workflow automation with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Wrap scoped browser tab/window/selection operations with native node schemas.",
+        "Make advanced page execution require concrete origin/code approval at use time."
+      ],
+      "acceptance": [
+        "Workflow install cannot grant advanced browser execution.",
+        "Navigation/profile changes invalidate pending target and cancelled tasks stop."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- W4-06"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-07",
+      "title": "Implement reviewed Git automation",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-03"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/git/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement reviewed Git automation with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Add granted-repository status/root/stage/commit operations with argv-only process adapter.",
+        "Preview destructive restore/clean path changes and bind confirmation to repository state."
+      ],
+      "acceptance": [
+        "Repository changes invalidate destructive confirmation.",
+        "No path from a script becomes a filesystem grant and hook execution policy is explicit."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- W4-07"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-08",
+      "title": "Implement optional office conversion automation",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-03"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/office/"
+      ],
+      "featureIds": [
+        "workflow-nodes"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/security.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement optional office conversion automation with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Detect optional LibreOffice and run selected-file conversion in isolated temporary profile/output roots with macros disabled.",
+        "Advertise supported inspect/export formats; expose unavailable capability when converter is absent."
+      ],
+      "acceptance": [
+        "No current-document or Apple-iWork API is invented.",
+        "Malicious macros/external links cannot run/fetch; timeout kills conversion process tree."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:security -- W4-08"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "W4-09",
+      "title": "Implement media, sound and speech outputs",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "W4",
+      "dependsOn": [
+        "W3-03",
+        "U2-01"
+      ],
+      "ownedPaths": [
+        "packages/automation-tasks/media/"
+      ],
+      "featureIds": [
+        "workflow-nodes",
+        "system"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#workflows"
+      ],
+      "specRefs": [
+        "docs/architecture/workflows.md",
+        "docs/architecture/linux-integration.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Implement media, sound and speech outputs with explicit error/capability states",
+        "Task-scoped fixtures and recorded acceptance evidence"
+      ],
+      "steps": [
+        "Wrap MPRIS player controls and library-only actions behind provider capabilities.",
+        "Play bounded local audio and speak via installed speech-dispatcher; expose missing voices/providers."
+      ],
+      "acceptance": [
+        "Cancel stops sound/speech and player identity remains stable.",
+        "Library/rating operations are unavailable when provider supports transport only."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- W4-09"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    },
+    {
+      "id": "E1-06",
+      "title": "Integrate extension background schedules",
+      "status": "planned",
+      "phase": "implementation",
+      "lane": "E1",
+      "dependsOn": [
+        "E1-02",
+        "E1-03",
+        "A4-01"
+      ],
+      "ownedPaths": [
+        "packages/extension-background/"
+      ],
+      "featureIds": [
+        "extensions",
+        "scripts",
+        "schedules"
+      ],
+      "designRefs": [
+        "docs/design/DESIGN.md#review-gate"
+      ],
+      "specRefs": [
+        "docs/architecture/extensions.md",
+        "docs/architecture/workflows.md",
+        "docs/implementation/testing-release.md"
+      ],
+      "inputs": [
+        "Approved feature behaviour and normative references below",
+        "Dependency output contracts and shared deterministic fixtures"
+      ],
+      "outputs": [
+        "Background command scheduler bridge with visible status and remediation",
+        "Task-scoped restart/revoke/update fixtures"
+      ],
+      "steps": [
+        "Register disabled-by-default manifest background commands with the shared resident scheduler and explicit background.run grants.",
+        "Pin package versions per invocation, honour coalescing/timeout/cancellation, and revoke schedules on disable/remove without deleting unrelated schedules."
+      ],
+      "acceptance": [
+        "No separate persistent timer engine or automatic startup exists inside extension code.",
+        "Sleeping/restarting/updating/removing a package cannot replay missed effects or broaden grants."
+      ],
+      "validation": [
+        "pnpm typecheck",
+        "pnpm test:integration -- E1-06"
+      ],
+      "evidence": [],
+      "owner": null,
+      "branch": null
+    }
+  ]
+}

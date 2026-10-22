@@ -1,0 +1,1144 @@
+{
+  "schemaVersion": 1,
+  "snapshot": "2026-10-22",
+  "features": [
+    {
+      "id": "foundation",
+      "title": "Application foundation",
+      "behaviour": "Process isolation, contracts, SQLite, permissions, packaging and verification harness.",
+      "sourceIds": [],
+      "evidence": "design-decision",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "F1-01",
+        "S0-01",
+        "S0-02",
+        "S0-03",
+        "S0-04",
+        "S0-05",
+        "S0-06",
+        "F0-01",
+        "F1-02",
+        "F2-01",
+        "F3-01",
+        "F1-03",
+        "P1-01",
+        "R1-01",
+        "R1-02",
+        "R1-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "design",
+      "title": "Shared visual system",
+      "behaviour": "Raycast-inspired Linuxcast tokens, keyboard interactions, host components, accessible workflows and original assets.",
+      "sourceIds": [
+        "core-ray-v2"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "D1-01",
+        "D1-02",
+        "D1-03",
+        "R1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "launcher",
+      "title": "Root search and applications",
+      "behaviour": "Fuzzy application/command search, stable ranking, favourites, frecency, compact mode, URL/fallback and deep links.",
+      "sourceIds": [
+        "core-ray-search-bar",
+        "core-alf-default-results"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-01",
+        "F1-02",
+        "L1-01",
+        "L1-02",
+        "L1-03",
+        "P1-01"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "actions",
+      "title": "Actions and navigation",
+      "behaviour": "Searchable action panel, primary/secondary actions, nested views, modifier hints and stable keyboard focus.",
+      "sourceIds": [
+        "core-ray-action-panel"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "D1-01",
+        "D1-02",
+        "L1-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "settings",
+      "title": "Settings and command customisation",
+      "behaviour": "Searchable settings, aliases/hotkeys/conflicts, visibility, ranking reset, export and diagnostics.",
+      "sourceIds": [
+        "core-ray-settings"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "D1-03",
+        "L1-03",
+        "U2-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "files",
+      "title": "File and content search",
+      "behaviour": "Metadata/path indexing, optional content extraction, filters, sorting, recent files and path navigation.",
+      "sourceIds": [
+        "core-ray-file-search",
+        "core-alf-file-search"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-01",
+        "L2-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "universal-actions",
+      "title": "Universal and file actions",
+      "behaviour": "Text/URL/files context, multi-file buffer, open/reveal/rename/move/trash, preview and extension actions.",
+      "sourceIds": [
+        "core-alf-universal-actions",
+        "core-alf-previews"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "run",
+      "title": "Run and terminal",
+      "behaviour": "Distinct file/URI/argv/shell actions, working directory and clearable history.",
+      "sourceIds": [
+        "core-alf-terminal"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L1-02",
+        "E1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "clipboard",
+      "title": "Clipboard history",
+      "behaviour": "MIME preservation, text/image/file search, pins, pause/excludes, conversion, retention and safe insertion.",
+      "sourceIds": [
+        "core-ray-clipboard-history"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-02",
+        "P1-02",
+        "P1-03",
+        "P1-04",
+        "P3-01",
+        "P3-02",
+        "M1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "snippets",
+      "title": "Snippets and typed expansion",
+      "behaviour": "Collections/tags, keywords, delimiter modes, app scope, conflict checks, insertion and safe manual fallback.",
+      "sourceIds": [
+        "core-ray-snippets"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-03",
+        "P2-01",
+        "P2-03",
+        "P2-04",
+        "P3-02",
+        "P3-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "placeholders",
+      "title": "Dynamic placeholders",
+      "behaviour": "Snapshot-based argument/clipboard/date/selection/UUID/snippet/browser/calculator expansion without recursive code.",
+      "sourceIds": [
+        "core-ray-dynamic-placeholders"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-05",
+        "P3-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "quicklinks",
+      "title": "Quicklinks and web searches",
+      "behaviour": "Templated URL/file/URI actions, browser choice, tags and native import/export.",
+      "sourceIds": [
+        "core-ray-quicklinks",
+        "core-alf-web-search"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "browser",
+      "title": "Browser context",
+      "behaviour": "Explicit active page/selection plus separately granted bookmark/tab/history access across profiles.",
+      "sourceIds": [
+        "core-ray-browser",
+        "core-alf-bookmarks"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "B1-01",
+        "B1-02",
+        "B1-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "calculator",
+      "title": "Calculator and conversion",
+      "behaviour": "Arithmetic/functions/units/date/timezone/colours; timestamped optional currency/crypto rate adapters.",
+      "sourceIds": [
+        "core-ray-calculator"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "dictionary",
+      "title": "Dictionary and spelling",
+      "behaviour": "Installed language dictionaries, definitions/thesaurus datasets, copy/paste and missing-data states.",
+      "sourceIds": [
+        "core-alf-dictionary"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-06"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "emoji",
+      "title": "Emoji and symbols",
+      "behaviour": "Unicode metadata search, categories/tone/custom aliases/favourites, configurable grid and copy/paste.",
+      "sourceIds": [
+        "core-ray-emoji-symbols"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-06",
+        "L2-07"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "translation",
+      "title": "Translation and Quick Fix",
+      "behaviour": "Explicit text translation, language detection/swap and diff-based replacement through global AI.",
+      "sourceIds": [
+        "core-ray-translate",
+        "core-ai-ai-commands"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A2-01",
+        "A2-04",
+        "A2-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "windows",
+      "title": "Window management",
+      "behaviour": "Window search, geometry presets/custom layouts, restore, monitor/workspace moves and capability limits.",
+      "sourceIds": [
+        "core-ray-navigation"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-02",
+        "P1-02",
+        "P1-03",
+        "P1-04",
+        "P1-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "hyper",
+      "title": "Hyper remapping",
+      "behaviour": "Opt-in selected-device Caps tap/hold remapping with explicit modifier ownership and recovery.",
+      "sourceIds": [
+        "core-ray-hyper-key"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-03",
+        "P2-01",
+        "P2-02",
+        "P2-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "system",
+      "title": "System and media commands",
+      "behaviour": "logind power/session, MPRIS media, PipeWire audio and capability-based desktop/network/device controls.",
+      "sourceIds": [
+        "core-ray-system-commands"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U2-01",
+        "W4-09"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "autoquit",
+      "title": "Auto quit",
+      "behaviour": "Per-app idle policy, foreground/media exemptions and graceful close only.",
+      "sourceIds": [
+        "core-ray-auto-quit"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U2-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "games",
+      "title": "Game launcher and game mode",
+      "behaviour": "Steam/desktop classification, optional launcher adapters and reversible shortcut pausing.",
+      "sourceIds": [
+        "core-ray-games"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "Notes",
+      "behaviour": "Quick note, rich/Markdown-compatible editor, tasks/search, autosave/recovery and export.",
+      "sourceIds": [
+        "core-ray-notes"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U1-01"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "contacts",
+      "title": "Contacts",
+      "behaviour": "Local vCard and optional CardDAV, name/address search and explicit field/open/email actions.",
+      "sourceIds": [
+        "core-alf-contacts"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "calendar",
+      "title": "Calendar and meetings",
+      "behaviour": "Local/ICS/CalDAV agenda, recurring events, mutations/RSVP where source supports, reminders and join links.",
+      "sourceIds": [
+        "core-ray-calendar"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U1-02",
+        "U1-03",
+        "M2-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "focus",
+      "title": "Focus sessions",
+      "behaviour": "Timed/unlimited goals, pause/resume and capability-limited app/site allow/block rules.",
+      "sourceIds": [
+        "core-ray-focus"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "B1-02",
+        "U2-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "screenshots",
+      "title": "Screenshots and media library",
+      "behaviour": "Selected folders, grid/filter/pin, preview/capture, OCR text search, index/cache retention without deleting originals.",
+      "sourceIds": [
+        "core-ray-screenshots"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "M1-01",
+        "M1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ocr",
+      "title": "Local OCR and QR",
+      "behaviour": "On-device OCR language assets, cancellation, confidence display and local QR decode.",
+      "sourceIds": [
+        "core-ray-screenshots",
+        "core-ray-clipboard-history"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "M1-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "dictation",
+      "title": "Local dictation",
+      "behaviour": "Whisper model selection, recording controls, language/vocabulary, history, optional selected-model cleanup and safe insertion.",
+      "sourceIds": [
+        "core-ai-dictation"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "P3-02",
+        "M2-01",
+        "M2-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "scripts",
+      "title": "Script commands",
+      "behaviour": "Native metadata/arguments, bounded streamed/full/compact/inline/silent output, refresh and sandboxed interpreters.",
+      "sourceIds": [
+        "core-ray-script"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "E1-02",
+        "E1-06"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "extensions",
+      "title": "Native extension SDK",
+      "behaviour": "Declarative ViewModels, commands/actions, brokered APIs, sandbox lifecycle and development diagnostics.",
+      "sourceIds": [
+        "core-ray-sdk"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-04",
+        "S0-06",
+        "D1-02",
+        "E1-01",
+        "E1-03",
+        "E1-04",
+        "E1-05",
+        "E1-06"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "packages",
+      "title": "Package discovery and lifecycle",
+      "behaviour": "Native local/static catalogue, detail/install/updates, permission review, atomic extraction and rollback.",
+      "sourceIds": [
+        "core-ray-store",
+        "core-alf-gallery"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "E1-03",
+        "W3-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "workflow-editor",
+      "title": "Visual workflow editor",
+      "behaviour": "Palette, typed edges, configuration, notes/groups, undo/redo, keyboard alternative and debug inspector.",
+      "sourceIds": [
+        "core-alf-workflows"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-06",
+        "W2-01",
+        "W2-02",
+        "W2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "workflow-runtime",
+      "title": "Workflow execution",
+      "behaviour": "Typed native graphs, variables/branches, cancellation, limits, run journal and explicit failure routes.",
+      "sourceIds": [
+        "core-alf-workflows"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "W1-01",
+        "W1-02",
+        "W1-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "workflow-nodes",
+      "title": "Workflow node catalogue",
+      "behaviour": "Triggers/filters/forms/previews/actions/control/output/AI nodes and ten example workflows.",
+      "sourceIds": [
+        "core-alf-workflows"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "W3-01",
+        "W3-02",
+        "W3-03",
+        "W3-04",
+        "W3-05",
+        "R1-01",
+        "B1-03",
+        "W4-01",
+        "W4-02",
+        "W4-03",
+        "W4-04",
+        "W4-05",
+        "W4-06",
+        "W4-07",
+        "W4-08",
+        "W4-09"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-provider",
+      "title": "Provider and model configuration",
+      "behaviour": "OpenRouter plus direct/compatible/local providers, one global route, explicit capabilities, streaming/errors/usage.",
+      "sourceIds": [
+        "core-ai-custom-providers",
+        "core-ai-local-models"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-05",
+        "F2-02",
+        "A1-01",
+        "A1-02",
+        "A1-03",
+        "L2-07",
+        "E1-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-quick",
+      "title": "Quick AI and commands",
+      "behaviour": "Explicit root invocation, follow-up/handoff, reusable prompts/arguments and intended-target replacement.",
+      "sourceIds": [
+        "core-ai-quick-ai",
+        "core-ai-ai-commands"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A2-01",
+        "A2-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-chat",
+      "title": "AI chat lifecycle",
+      "behaviour": "Streaming, cancellation, editing/branching, regeneration, search, archive/trash, draft and context compaction.",
+      "sourceIds": [
+        "core-ai-ai-chat"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "S0-05",
+        "A2-02",
+        "A2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-context",
+      "title": "Screen and content context",
+      "behaviour": "Preview selected window/region/text/file/clipboard/browser attachments and enforce model capabilities.",
+      "sourceIds": [
+        "core-ai-screen-awareness"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "P3-02",
+        "A2-04",
+        "A2-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-tools",
+      "title": "AI tools and MCP",
+      "behaviour": "Approved extension tools, stdio/HTTP MCP lifecycle, OAuth, inspectable progress and bounded results.",
+      "sourceIds": [
+        "core-ai-ai-extensions",
+        "core-ai-model-context-protocol"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A3-01"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-agents",
+      "title": "Agents, skills and projects",
+      "behaviour": "Reusable instructions/tools, project scope, skill catalog/on-demand loading and untrusted-content boundaries.",
+      "sourceIds": [
+        "core-ai-agents",
+        "core-ai-skills",
+        "core-ai-projects"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A3-02"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-memory",
+      "title": "Personal memory",
+      "behaviour": "Opt-in global/project memory, inspect/edit/reset/disable/export with isolation.",
+      "sourceIds": [
+        "core-ai-personalization"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A3-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "schedules",
+      "title": "Workflow and AI schedules",
+      "behaviour": "Resident local timezone-aware scheduler, missed-run coalescing, approval pause and durable recovery.",
+      "sourceIds": [
+        "core-ai-automations"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A4-01",
+        "A4-02",
+        "E1-06"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "ai-harness",
+      "title": "Supported plan and harness integrations",
+      "behaviour": "Official ChatGPT/Codex/Copilot routes, Claude BYOK or unchanged native CLI; no extracted subscription tokens.",
+      "sourceIds": [
+        "core-ai-custom-providers"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "A3-04",
+        "A3-05"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "themes",
+      "title": "Themes and appearance",
+      "behaviour": "Native semantic-token theme editor, dark/light assignments, preview, validation and native export.",
+      "sourceIds": [
+        "core-ray-themes"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "U2-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "large-type",
+      "title": "Preview and large text",
+      "behaviour": "Safe image/PDF/text preview and a keyboard-accessible large-type window.",
+      "sourceIds": [
+        "core-alf-previews",
+        "core-alf-large-type"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "L2-03",
+        "M1-01",
+        "W4-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "password-integration",
+      "title": "Optional password-manager integration",
+      "behaviour": "Use installed op CLI for explicit item/bookmark open actions without indexing vault secrets.",
+      "sourceIds": [
+        "core-alf-1password",
+        "core-1password"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "E1-04"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "local-data",
+      "title": "Local diagnostics and data tools",
+      "behaviour": "Backup/import/export, retention controls, redacted diagnostics, resettable local usage without hosted telemetry.",
+      "sourceIds": [
+        "core-ray-settings"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Native Linuxcast implementation; capability gates and defaults follow the linked specifications.",
+      "taskIds": [
+        "F2-01",
+        "F2-02",
+        "U2-04",
+        "R1-03",
+        "F2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "cloud",
+      "title": "Cloud sync and accounts",
+      "behaviour": "Document selective sync, exclusions and account behaviour; no v1 sync service.",
+      "sourceIds": [
+        "core-ray-web"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "post-v1",
+      "linuxApproach": "Requires a separately approved cloud identity/storage/conflict design.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "teams",
+      "title": "Teams and enterprise",
+      "behaviour": "Document sharing, managed policy, SSO/SCIM and enterprise administration.",
+      "sourceIds": [
+        "core-ray-web"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "post-v1",
+      "linuxApproach": "Requires hosted identity/administration and separate product scope.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "mobile",
+      "title": "Mobile and remote clients",
+      "behaviour": "Document Raycast mobile and Alfred Remote interaction families.",
+      "sourceIds": [
+        "core-ray-web",
+        "core-alf-remote"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "post-v1",
+      "linuxApproach": "Initial release is Debian desktop only.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "legacy-compat",
+      "title": "Legacy SDK/package compatibility",
+      "behaviour": "Record Raycast SDK/Alfred package semantics as research, not compatible file formats.",
+      "sourceIds": [
+        "core-ray-sdk",
+        "core-alf-workflows"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "excluded",
+      "linuxApproach": "User explicitly chose native formats; no importer or SDK shim.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "web-business",
+      "title": "Marketing, billing and hosted marketplace",
+      "behaviour": "Document website/store/gallery navigation, billing and publishing services.",
+      "sourceIds": [
+        "core-ray-web",
+        "core-ray-store",
+        "core-alf-gallery"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "post-v1",
+      "linuxApproach": "Static native package catalogue ships; hosted publishing/billing does not.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "mac-only",
+      "title": "Nonportable Apple-specific commands",
+      "behaviour": "Record AppleScript/JXA/Shortcuts/EventKit/Spotlight/Finder-only operations and native counterparts.",
+      "sourceIds": [
+        "core-alf-workflows",
+        "core-alf-file-search"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "platform-limited",
+      "linuxApproach": "Linux primitives provide native equivalents; arbitrary Apple runtimes are unsupported.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "community",
+      "title": "Every third-party community integration",
+      "behaviour": "Catalogue ecosystem mechanisms and representative native integrations.",
+      "sourceIds": [
+        "core-ray-store",
+        "core-alf-gallery"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "excluded",
+      "linuxApproach": "No commitment to reproduce every independent Store or Gallery package.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "preview",
+      "title": "Alfred 6 preview",
+      "behaviour": "Record preview announcements separately from released Alfred behaviour.",
+      "sourceIds": [
+        "core-alf-v6"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "research-only",
+      "linuxApproach": "Preview status does not silently add unstable requirements to v1.",
+      "taskIds": [],
+      "status": "planned",
+      "specRefs": [
+        "docs/product/builtins.md"
+      ]
+    },
+    {
+      "id": "encrypted-backups",
+      "title": "Encrypted portable and scheduled backups",
+      "behaviour": "Native encrypted portable configuration/data backups, selective exports, scheduled retention and staged restore.",
+      "sourceIds": [
+        "core-ray-import-export"
+      ],
+      "evidence": "official-documentation",
+      "disposition": "v1",
+      "linuxApproach": "Standard age format via maintained Rust implementation; internal pre-migration snapshots remain clearly labelled private plaintext.",
+      "taskIds": [
+        "F2-03"
+      ],
+      "status": "planned",
+      "specRefs": [
+        "docs/architecture/data.md"
+      ]
+    }
+  ]
+}

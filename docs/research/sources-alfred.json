@@ -1,0 +1,434 @@
+[
+  {
+    "id": "alf-home",
+    "url": "https://www.alfredapp.com/",
+    "title": "Alfred homepage",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Homepage advertised Alfred 5.8.1 build 2349 and separately promoted Alfred 6 preview; dated observation, not an installed-runtime check."
+  },
+  {
+    "id": "alf-preview",
+    "url": "https://www.alfredapp.com/v6/",
+    "title": "Alfred 6 preview",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Preview-only evidence: native UI toolkit, optional BYOK AI, refreshed preferences and other announced improvements; not a stable SDK contract."
+  },
+  {
+    "id": "alf-workflows-site",
+    "url": "https://www.alfredapp.com/workflows/",
+    "title": "Alfred Workflows product page",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Visual workflows, Gallery and community distribution."
+  },
+  {
+    "id": "alf-features",
+    "url": "https://www.alfredapp.com/help/features/",
+    "title": "Alfred feature documentation index",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Index of stable documented core client features."
+  },
+  {
+    "id": "alf-default-results",
+    "url": "https://www.alfredapp.com/help/features/default-results/",
+    "title": "Default Results",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Search types/scopes/fallbacks and application matching."
+  },
+  {
+    "id": "alf-file-search",
+    "url": "https://www.alfredapp.com/help/features/file-search/",
+    "title": "File Search",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Filename/content search, browsing, file buffer, sorting and recent documents."
+  },
+  {
+    "id": "alf-universal-actions",
+    "url": "https://www.alfredapp.com/help/features/universal-actions/",
+    "title": "Universal Actions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Typed actions over selected files, URLs and text, including workflow contributions."
+  },
+  {
+    "id": "alf-web-search",
+    "url": "https://www.alfredapp.com/help/features/web-search/",
+    "title": "Web Search",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Built-in/custom searches, URL encoding, discovery and optional URL history."
+  },
+  {
+    "id": "alf-bookmarks",
+    "url": "https://www.alfredapp.com/help/features/bookmarks/",
+    "title": "Browser Bookmarks",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Safari/Chrome bookmarks and source/default browser behavior; Mac-specific support does not establish Linux capability."
+  },
+  {
+    "id": "alf-clipboard",
+    "url": "https://www.alfredapp.com/help/features/clipboard/",
+    "title": "Clipboard History",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Types, opt-in history, retention, merging, snippet creation, excluded apps and concealed-data behavior."
+  },
+  {
+    "id": "alf-snippets",
+    "url": "https://www.alfredapp.com/help/features/snippets/",
+    "title": "Snippets and Text Expansion",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Plain/rich text, collections, affixes, search and expansion; secure-field claim is specific to Alfred/macOS."
+  },
+  {
+    "id": "alf-snippet-expansion",
+    "url": "https://www.alfredapp.com/help/features/snippets/auto-expansion/",
+    "title": "Setting Up Text Auto-Expansion",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Enablement, keyword suggestions and secure-text-field behavior as documented for macOS."
+  },
+  {
+    "id": "alf-snippet-advanced",
+    "url": "https://www.alfredapp.com/help/features/snippets/advanced/",
+    "title": "Advanced Snippet Expansion Preferences",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "App exclusions, matching within strings, key-event timing and clipboard restore controls."
+  },
+  {
+    "id": "alf-placeholders",
+    "url": "https://www.alfredapp.com/help/workflows/advanced/placeholders/",
+    "title": "Dynamic Placeholders",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Dynamic data/date/time/clipboard formatting and placeholders; Linuxcast uses native parsing rules."
+  },
+  {
+    "id": "alf-calculator",
+    "url": "https://www.alfredapp.com/help/features/calculator/",
+    "title": "Calculator",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Inline/chained arithmetic, advanced functions, locale formatting."
+  },
+  {
+    "id": "alf-dictionary",
+    "url": "https://www.alfredapp.com/help/features/dictionary/",
+    "title": "Dictionary",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Definition/spelling/dictionary choice and Dictionary.app thesaurus integration."
+  },
+  {
+    "id": "alf-contacts",
+    "url": "https://www.alfredapp.com/help/features/contacts/",
+    "title": "Contacts and Email",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Search, inline cards, contact-field actions and supported email composition adapters."
+  },
+  {
+    "id": "alf-music",
+    "url": "https://www.alfredapp.com/help/features/itunes/",
+    "title": "Music Mini Player",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Music.app library, playback, ratings, random albums, artwork and indexing."
+  },
+  {
+    "id": "alf-passwords",
+    "url": "https://www.alfredapp.com/help/features/1password/",
+    "title": "1Password Integration",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Distinguishes legacy bookmark integration and 1Password 8 workflow; legacy support is not password extraction."
+  },
+  {
+    "id": "alf-system",
+    "url": "https://www.alfredapp.com/help/features/system/",
+    "title": "System Commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Power/session, apps, trash, volume and eject behavior."
+  },
+  {
+    "id": "alf-terminal",
+    "url": "https://www.alfredapp.com/help/features/terminal/",
+    "title": "Terminal and Shell",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Explicit terminal mode and customizable terminal integration."
+  },
+  {
+    "id": "alf-previews",
+    "url": "https://www.alfredapp.com/help/features/previews/",
+    "title": "Previews and QuickLook",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Inline and larger file previews; native Linuxcast preview is independent."
+  },
+  {
+    "id": "alf-large-type",
+    "url": "https://www.alfredapp.com/help/features/large-type/",
+    "title": "Large Type",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Oversized text display and appearance."
+  },
+  {
+    "id": "alf-appearance",
+    "url": "https://www.alfredapp.com/help/appearance/",
+    "title": "Appearance and Theming",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Theme editing, import/export, dimensions, colors, fonts and display placement."
+  },
+  {
+    "id": "alf-advanced",
+    "url": "https://www.alfredapp.com/help/advanced/",
+    "title": "Advanced Preferences",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Query history, input source, modifiers, indexing maintenance and syncing references."
+  },
+  {
+    "id": "alf-sync",
+    "url": "https://www.alfredapp.com/help/advanced/sync/",
+    "title": "Syncing Your Alfred Settings Between Macs",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Preferences syncing/backup and machine-specific settings; Linuxcast cloud sync deferred."
+  },
+  {
+    "id": "alf-usage",
+    "url": "https://www.alfredapp.com/help/usage/",
+    "title": "Usage",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Feature totals and recent usage graph."
+  },
+  {
+    "id": "alf-remote",
+    "url": "https://www.alfredapp.com/remote/",
+    "title": "Alfred Remote",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Separate iOS companion/local-network product, outside initial Debian client platform scope."
+  },
+  {
+    "id": "alf-gallery",
+    "url": "https://alfred.app/",
+    "title": "Alfred Gallery",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official workflow discovery and categories; open-ended third-party catalogue not fully ported by capability support."
+  },
+  {
+    "id": "alf-workflow-overview",
+    "url": "https://www.alfredapp.com/help/workflows/",
+    "title": "Workflows Help",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Seven object categories, editor, install/export and advanced topic index."
+  },
+  {
+    "id": "alf-triggers",
+    "url": "https://www.alfredapp.com/help/workflows/triggers/",
+    "title": "Workflow Triggers",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "All documented trigger object types."
+  },
+  {
+    "id": "alf-inputs",
+    "url": "https://www.alfredapp.com/help/workflows/inputs/",
+    "title": "Workflow Inputs",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Keyword, file/running-app/dictionary/list/script filter input categories."
+  },
+  {
+    "id": "alf-actions",
+    "url": "https://www.alfredapp.com/help/workflows/actions/",
+    "title": "Workflow Actions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "File/app/URL/terminal/script actions and moved automation categories."
+  },
+  {
+    "id": "alf-automations",
+    "url": "https://www.alfredapp.com/help/workflows/automations/",
+    "title": "Automation Objects",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Automation task, Shortcuts, system and music objects."
+  },
+  {
+    "id": "alf-automation-task",
+    "url": "https://www.alfredapp.com/help/workflows/automations/automation-task/",
+    "title": "Automation Tasks",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "No-code task chaining, task installation/update and configuration state."
+  },
+  {
+    "id": "alf-automation-list",
+    "url": "https://www.alfredapp.com/help/workflows/automations/automation-task/list/",
+    "title": "Automation Tasks List",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Dated operation-family inventory, including platform-specific Apple/browser tasks; not an immutable API."
+  },
+  {
+    "id": "alf-ui",
+    "url": "https://www.alfredapp.com/help/workflows/user-interface/",
+    "title": "Workflow User Interface",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Stable documented Grid, Image, Text and PDF View objects."
+  },
+  {
+    "id": "alf-utilities",
+    "url": "https://www.alfredapp.com/help/workflows/utilities/",
+    "title": "Workflow Utilities",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Arguments/variables, branching, data transforms, delay, JSON configuration and debug object categories."
+  },
+  {
+    "id": "alf-outputs",
+    "url": "https://www.alfredapp.com/help/workflows/outputs/",
+    "title": "Workflow Outputs",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Notifications, large type, clipboard, files, audio, speech, keys and external calls."
+  },
+  {
+    "id": "alf-script-filter",
+    "url": "https://www.alfredapp.com/help/workflows/inputs/script-filter/",
+    "title": "Script Filter Input",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Argument modes, debounce/queue/cancel behavior, trim settings and host filtering."
+  },
+  {
+    "id": "alf-script-filter-json",
+    "url": "https://www.alfredapp.com/help/workflows/inputs/script-filter/json/",
+    "title": "Script Filter JSON Format",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Result identities, arguments, actions, modifiers, metadata, variables, caching and reruns; not Linuxcast's schema."
+  },
+  {
+    "id": "alf-run-script",
+    "url": "https://www.alfredapp.com/help/workflows/actions/run-script/",
+    "title": "Run Script Action",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Argv recommendation, external interpreters and sequential/concurrent execution."
+  },
+  {
+    "id": "alf-variables",
+    "url": "https://www.alfredapp.com/help/workflows/advanced/variables/",
+    "title": "Using Variables in Workflows",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Dynamic/static workflow variables and script environment distinction."
+  },
+  {
+    "id": "alf-script-environment",
+    "url": "https://www.alfredapp.com/help/workflows/script-environment-variables/",
+    "title": "Workflow Script Environment Variables",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Workflow data/cache/environment values provided to scripts."
+  },
+  {
+    "id": "alf-alternative-actions",
+    "url": "https://www.alfredapp.com/help/workflows/advanced/alternative-actions/",
+    "title": "Using Alternative Actions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Modifier routes and retaining launcher window between inputs."
+  },
+  {
+    "id": "alf-sharing",
+    "url": "https://www.alfredapp.com/help/workflows/advanced/sharing-workflows/",
+    "title": "Exporting and Sharing Workflows",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Bundle identity, version/about/configuration, notes and .alfredworkflow export; archive internals unverified."
+  },
+  {
+    "id": "alf-snippet-trigger",
+    "url": "https://www.alfredapp.com/help/workflows/triggers/snippet/",
+    "title": "Snippet Trigger",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Prefix/suffix, app scoping, precedence and stripping automatic bindings on import."
+  },
+  {
+    "id": "sdk-raycast-api",
+    "url": "https://developers.raycast.com/api-reference",
+    "title": "Raycast Extension API Reference",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Capability comparison only: native Linuxcast ViewModel/SDK is independently specified."
+  },
+  {
+    "id": "sdk-raycast-manifest",
+    "url": "https://developers.raycast.com/information/manifest",
+    "title": "Raycast Extension Manifest",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Reference command/preferences/tool/background/AI contribution surfaces; no manifest compatibility."
+  },
+  {
+    "id": "sdk-react-flow",
+    "url": "https://reactflow.dev/learn",
+    "title": "React Flow Quick Start",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official controlled node/edge UI documentation; canvas library does not define workflow execution semantics."
+  },
+  {
+    "id": "sdk-bubblewrap",
+    "url": "https://github.com/containers/bubblewrap",
+    "title": "Bubblewrap upstream source and README",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Namespace/mount sandbox building block; caller must define policy and avoid dangerous host sockets."
+  },
+  {
+    "id": "sdk-wayland-text",
+    "url": "https://cgit.freedesktop.org/wayland/wayland-protocols/tree/unstable/text-input/text-input-unstable-v3.xml",
+    "title": "Wayland text-input protocol source",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Primary protocol source distinguishes preedit/commit, focus state and sensitive/password hints; availability is not universal."
+  },
+  {
+    "id": "sdk-wayland-data",
+    "url": "https://wayland.freedesktop.org/docs/html/apa.html#protocol-spec-wl_data_source",
+    "title": "Wayland data-transfer protocol",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Clipboard transfer/ownership is asynchronous; data-source send is not confirmation of insertion into intended field."
+  },
+  {
+    "id": "sdk-xkb-compose",
+    "url": "https://xkbcommon.org/doc/current/group__compose.html",
+    "title": "libxkbcommon Compose and dead-keys",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Compose states and cancellation/locale behavior; raw key reconstruction does not establish universal IME committed text."
+  }
+]

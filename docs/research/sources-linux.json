@@ -1,0 +1,586 @@
+[
+  {
+    "id": "lin-debian-13-announcement",
+    "url": "https://www.debian.org/News/2025/20250809",
+    "title": "Debian 13 trixie released",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Distribution baseline: GNOME 48 and KDE Plasma 6.3. This does not prove Linuxcast integration works."
+  },
+  {
+    "id": "lin-debian-trixie",
+    "url": "https://www.debian.org/releases/trixie/",
+    "title": "Debian trixie release information",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Supported distribution baseline and release documentation."
+  },
+  {
+    "id": "lin-package-portal-gnome",
+    "url": "https://packages.debian.org/trixie/xdg-desktop-portal-gnome",
+    "title": "Debian trixie xdg-desktop-portal-gnome package",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Observed version 48.0-2 used to bound GNOME portal API assumptions; security updates remain supported."
+  },
+  {
+    "id": "lin-package-portal-kde",
+    "url": "https://packages.debian.org/trixie/xdg-desktop-portal-kde",
+    "title": "Debian trixie xdg-desktop-portal-kde package",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Observed version 6.3.5-1 used to bound Plasma portal API assumptions."
+  },
+  {
+    "id": "lin-package-kwin",
+    "url": "https://packages.debian.org/trixie/kwin-wayland",
+    "title": "Debian trixie kwin-wayland package",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Observed version 4:6.3.6-1; inspect versioned KWin source rather than assuming newest Wayland protocols."
+  },
+  {
+    "id": "lin-package-libei",
+    "url": "https://packages.debian.org/trixie/libei1",
+    "title": "Debian trixie libei1 package",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Observed version 1.3.901-1 informs portal input-emulation build/test baseline."
+  },
+  {
+    "id": "lin-package-bubblewrap",
+    "url": "https://packages.debian.org/trixie/bubblewrap",
+    "title": "Debian trixie bubblewrap package",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Observed version 0.12.0-1~deb13u1; runtime namespace/resource profile still needs validation."
+  },
+  {
+    "id": "arch-electron-releases",
+    "url": "https://releases.electronjs.org/?channel=stable",
+    "title": "Electron stable releases",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research snapshot identifies Electron 45.0.0 release on 2026-10-20; selected initial baseline, not an indefinite version pin."
+  },
+  {
+    "id": "arch-electron-policy",
+    "url": "https://www.electronjs.org/docs/latest/tutorial/electron-timelines",
+    "title": "Electron versioning and release timelines",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Latest three stable major versions are supported; plan requires ongoing supported-major/security updates."
+  },
+  {
+    "id": "lin-electron-global-shortcut",
+    "url": "https://www.electronjs.org/docs/latest/api/global-shortcut/",
+    "title": "Electron globalShortcut API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Portal shortcut support and registration behavior; desktop identity and runtime failure/conflicts require validation."
+  },
+  {
+    "id": "arch-electron-security",
+    "url": "https://www.electronjs.org/docs/latest/tutorial/security/",
+    "title": "Electron security checklist",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Context isolation, sandboxing, IPC sender validation, navigation and external-content controls."
+  },
+  {
+    "id": "arch-electron-sandbox",
+    "url": "https://www.electronjs.org/docs/latest/tutorial/sandbox",
+    "title": "Electron process sandboxing",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Renderer sandbox boundary; not a substitute for the separate untrusted Node extension sandbox."
+  },
+  {
+    "id": "arch-electron-browser-window",
+    "url": "https://github.com/electron/electron/blob/main/docs/api/browser-window.md",
+    "title": "Electron BrowserWindow API source documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Wayland limitations on ordinary client positioning, focus and related window control; companion capabilities require testing."
+  },
+  {
+    "id": "arch-electron-safe-storage",
+    "url": "https://github.com/electron/electron/blob/main/docs/api/safe-storage.md",
+    "title": "Electron safeStorage API source documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Linux backend selection and basic_text fallback; persistent secrets must require an OS-backed backend."
+  },
+  {
+    "id": "arch-electron-utility-process",
+    "url": "https://github.com/electron/electron/blob/main/docs/api/utility-process.md",
+    "title": "Electron utilityProcess API source documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Trusted background process mechanism for storage and workflow execution; not the untrusted plugin boundary."
+  },
+  {
+    "id": "arch-electron-rebuild",
+    "url": "https://github.com/electron/rebuild",
+    "title": "Electron rebuild",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Rebuild trusted native SQLite addon for the exact packaged Electron ABI."
+  },
+  {
+    "id": "arch-electron-updater",
+    "url": "https://www.electronjs.org/docs/latest/api/auto-updater/",
+    "title": "Electron autoUpdater API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "No built-in Linux auto-updating support; initial releases use normal Debian package installation."
+  },
+  {
+    "id": "arch-forge-deb",
+    "url": "https://www.electronforge.io/config/makers/deb",
+    "title": "Electron Forge Debian maker",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Selected .deb packaging mechanism; native/system integration files and disabled service require package tests."
+  },
+  {
+    "id": "arch-forge-vite",
+    "url": "https://www.electronforge.io/config/plugins/vite",
+    "title": "Electron Forge Vite plugin",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Plugin documented as experimental; plan selects explicit Vite/esbuild build before Forge packaging."
+  },
+  {
+    "id": "arch-react-flow",
+    "url": "https://reactflow.dev/learn",
+    "title": "React Flow documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Visual graph editing foundation; graph execution semantics and accessibility of custom nodes remain Linuxcast responsibilities."
+  },
+  {
+    "id": "arch-playwright-electron",
+    "url": "https://playwright.dev/docs/api/class-electronapplication",
+    "title": "Playwright ElectronApplication API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Electron UI/process test support; does not replace real compositor/input-device validation."
+  },
+  {
+    "id": "arch-sqlite-fts5",
+    "url": "https://www.sqlite.org/fts5.html",
+    "title": "SQLite FTS5 extension",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local full-text candidate retrieval; ranking and source-content preservation are application design decisions."
+  },
+  {
+    "id": "arch-node-permissions",
+    "url": "https://github.com/nodejs/node/blob/main/doc/api/permissions.md",
+    "title": "Node.js permission-model documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Defense-in-depth permission controls; not treated as the untrusted extension security boundary."
+  },
+  {
+    "id": "arch-bubblewrap",
+    "url": "https://github.com/containers/bubblewrap",
+    "title": "Bubblewrap source and documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Namespace/mount sandbox construction primitives; Linuxcast must define policy and fail closed if required isolation cannot be applied."
+  },
+  {
+    "id": "lin-gnome-48-developers",
+    "url": "https://release.gnome.org/48/developers/",
+    "title": "GNOME 48 developer release notes",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "GNOME 48 global-shortcut portal support and desktop generation context."
+  },
+  {
+    "id": "lin-portal-global-shortcuts",
+    "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.GlobalShortcuts.html",
+    "title": "XDG GlobalShortcuts portal",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Session-based global shortcut registration/permission protocol."
+  },
+  {
+    "id": "lin-portal-clipboard",
+    "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Clipboard.html",
+    "title": "XDG Clipboard portal",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Clipboard support extends RemoteDesktop/InputCapture sessions; not a universal clipboard-history permission API."
+  },
+  {
+    "id": "lin-portal-remote-desktop",
+    "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.RemoteDesktop.html",
+    "title": "XDG RemoteDesktop portal",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Consented remote-input sessions and input-emulation path; grant/revocation behavior must be tested."
+  },
+  {
+    "id": "lin-portal-screenshot",
+    "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Screenshot.html",
+    "title": "XDG Screenshot portal",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "User-mediated screenshot capture API."
+  },
+  {
+    "id": "lin-portal-screencast",
+    "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.ScreenCast.html",
+    "title": "XDG ScreenCast portal",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "User-mediated capture/session protocol for supported capture features."
+  },
+  {
+    "id": "lin-libei",
+    "url": "https://libinput.pages.freedesktop.org/libei/",
+    "title": "libei documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Input-emulation client/server mechanism used with compatible desktop permissions; not arbitrary Wayland access."
+  },
+  {
+    "id": "lin-desktop-entry",
+    "url": "https://xdg.pages.freedesktop.org/xdg-specs/desktop-entry/latest-single/",
+    "title": "Desktop Entry specification",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Application metadata, visibility, actions and launch semantics; Exec is not passed to a shell."
+  },
+  {
+    "id": "lin-gio-launch",
+    "url": "https://gnome.pages.gitlab.gnome.org/gtk/gio/method.AppInfo.launch.html",
+    "title": "GIO AppInfo launch",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Platform application launch adapter selected over hand-built shell execution."
+  },
+  {
+    "id": "lin-xdg-basedir",
+    "url": "https://specifications.freedesktop.org/basedir/0.8/",
+    "title": "XDG Base Directory specification",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Config/data/cache/state/runtime placement, honoring environment values and specified fallbacks."
+  },
+  {
+    "id": "lin-xdg-autostart",
+    "url": "https://specifications.freedesktop.org/autostart/latest/",
+    "title": "Desktop Application Autostart specification",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Explicit per-user startup preference; unrelated to enabling privileged capture."
+  },
+  {
+    "id": "lin-ewmh",
+    "url": "https://specifications.freedesktop.org/wm/latest-single/",
+    "title": "Extended Window Manager Hints specification",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "X11 window control/interoperability; not a native Wayland control API."
+  },
+  {
+    "id": "lin-logind",
+    "url": "https://freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html",
+    "title": "org.freedesktop.login1 D-Bus API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Session/seat state and device-controller semantics; Linuxcast must not force takeover of the compositor's session controller."
+  },
+  {
+    "id": "lin-mpris",
+    "url": "https://wiki.freedesktop.org/www/Specifications/mpris-spec/",
+    "title": "MPRIS specification",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Desktop media player control protocol."
+  },
+  {
+    "id": "lin-systemd-exec",
+    "url": "https://www.freedesktop.org/software/systemd/man/257/systemd.exec.html",
+    "title": "systemd 257 execution environment controls",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Debian-compatible service hardening; exact input-device/capability interactions require runtime tests."
+  },
+  {
+    "id": "lin-systemd-resources",
+    "url": "https://www.freedesktop.org/software/systemd/man/257/systemd.resource-control.html",
+    "title": "systemd 257 resource control",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Cgroup resource and device policy primitives; required limits are selected product policy."
+  },
+  {
+    "id": "lin-polkit",
+    "url": "https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html",
+    "title": "Polkit documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Authorization for narrowly scoped input-service administration."
+  },
+  {
+    "id": "lin-pkexec",
+    "url": "https://www.freedesktop.org/software/polkit/docs/latest/pkexec.1.html",
+    "title": "pkexec documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Administrative execution context/caller identity; fixed helper actions only, never general root commands."
+  },
+  {
+    "id": "lin-kernel-uinput",
+    "url": "https://kernel.org/doc/html/latest/input/uinput.html",
+    "title": "Linux kernel uinput documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Userspace virtual input device mechanism; device lifetime and recovery require actual tests."
+  },
+  {
+    "id": "lin-libevdev",
+    "url": "https://www.freedesktop.org/software/libevdev/doc/latest/",
+    "title": "libevdev documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Selected evdev event/forwarding library for dedicated input worker."
+  },
+  {
+    "id": "lin-libevdev-sync",
+    "url": "https://www.freedesktop.org/software/libevdev/doc/latest/syn_dropped.html",
+    "title": "libevdev SYN_DROPPED handling",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Resynchronize device state after dropped events, clear typed-trigger inference and avoid reconstructing committed text."
+  },
+  {
+    "id": "lin-libevdev-init",
+    "url": "https://www.freedesktop.org/software/libevdev/doc/latest/group__init.html",
+    "title": "libevdev initialization and device lifetime",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "File descriptor and grab lifecycle; supervisor must not retain duplicate grab-owning descriptors after handoff."
+  },
+  {
+    "id": "lin-libevdev-uinput",
+    "url": "https://www.freedesktop.org/software/libevdev/doc/latest/group__uinput.html",
+    "title": "libevdev uinput devices",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Virtual device creation/destruction and identity behavior."
+  },
+  {
+    "id": "lin-xkbcommon",
+    "url": "https://xkbcommon.org/doc/current/index.html",
+    "title": "libxkbcommon documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Keyboard map/state processing; not proof of committed application text or protected-field status."
+  },
+  {
+    "id": "lin-xkbcommon-compose",
+    "url": "https://xkbcommon.org/doc/current/group__compose.html",
+    "title": "libxkbcommon compose API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Compose-state support and limitations relevant to raw-key snippet matching."
+  },
+  {
+    "id": "lin-espanso-linux",
+    "url": "https://espanso.org/docs/install/linux/",
+    "title": "Espanso Linux installation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Related text-expander platform constraints; evidence for investigation, not an implementation dependency or parity claim."
+  },
+  {
+    "id": "lin-gnome-extension-development",
+    "url": "https://gjs.guide/extensions/development/creating.html",
+    "title": "GNOME Shell extension development",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Bundled companion structure and explicit Shell-version compatibility."
+  },
+  {
+    "id": "lin-kwin-data-control",
+    "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/wayland/datacontroldevicemanager_v1.cpp",
+    "title": "KWin 6.3.6 data-control implementation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Versioned source confirms zwlr_data_control_manager_v1 baseline rather than assuming newer ext-data-control."
+  },
+  {
+    "id": "lin-kwin-workspace",
+    "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/scripting/workspace_wrapper.h",
+    "title": "KWin 6.3.6 scripting workspace API",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Window enumeration, active window and work-area API basis for fixed script operations."
+  },
+  {
+    "id": "lin-kwin-window",
+    "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/window.h",
+    "title": "KWin 6.3.6 window API",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Geometry/maximization API basis; compositor-specific behavior remains an integration test gate."
+  },
+  {
+    "id": "lin-kwin-scripting",
+    "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/scripting/scripting.cpp",
+    "title": "KWin 6.3.6 scripting implementation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Outbound asynchronous callDBus mechanism; helper-owned bounded NextCommand transport is proposed, not already tested."
+  },
+  {
+    "id": "lin-mutter-selection",
+    "url": "https://github.com/GNOME/mutter/blob/48.0/src/core/meta-selection.c",
+    "title": "Mutter 48 selection implementation",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Clipboard selection ownership notifications used by optional GNOME companion."
+  },
+  {
+    "id": "lin-shell-clipboard",
+    "url": "https://github.com/GNOME/gnome-shell/blob/48.0/src/st/st-clipboard.h",
+    "title": "GNOME Shell 48 StClipboard API",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Clipboard MIME/content access in Shell companion; transfer races and limits require implementation."
+  },
+  {
+    "id": "lin-mutter-display",
+    "url": "https://github.com/GNOME/mutter/blob/48.0/src/meta/display.h",
+    "title": "Mutter 48 display API",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Window/focus API basis for companion integration."
+  },
+  {
+    "id": "lin-keyd",
+    "url": "https://github.com/rvaiya/keyd",
+    "title": "keyd keyboard remapping daemon",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Existing evdev/uinput remapping pattern; no claim that Linuxcast inherits its implementation or security properties."
+  },
+  {
+    "id": "lin-kanata-linux",
+    "url": "https://github.com/jtroo/kanata/blob/main/docs/setup-linux.md",
+    "title": "Kanata Linux setup",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Existing Linux remapper device-access/setup patterns; Linuxcast instead uses a fixed opt-in supervisor with no broad input-group grant."
+  },
+  {
+    "id": "arch-sqlite-backup",
+    "url": "https://www.sqlite.org/backup.html",
+    "title": "SQLite Online Backup API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Consistent snapshot backup of a live database; plan rejects copying a database file while ignoring WAL state."
+  },
+  {
+    "id": "arch-sqlite-wal",
+    "url": "https://www.sqlite.org/wal.html",
+    "title": "SQLite Write-Ahead Logging",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local-filesystem requirement, WAL lifetime/checkpointing and documented WAL-reset fix in SQLite 3.51.3; packaged runtime version must be checked."
+  },
+  {
+    "id": "arch-sqlite-synchronous",
+    "url": "https://www.sqlite.org/pragma.html#pragma_synchronous",
+    "title": "SQLite synchronous pragma",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Durability modes; FULL is the selected initial content/checkpoint policy, subject to explicit measured review."
+  },
+  {
+    "id": "arch-rage",
+    "url": "https://github.com/str4d/rage",
+    "title": "rage: Rust implementation of age",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Maintained Rust age implementation, standard passphrase encryption and interoperable library/CLI format; selected for portable backups."
+  },
+  {
+    "id": "arch-age-crate",
+    "url": "https://docs.rs/age/latest/age/",
+    "title": "age Rust crate API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Passphrase/streaming APIs and interoperability. Inspected 0.12.1 documentation explicitly calls pre-1.0 APIs beta; exact version/toolchain and security review are required at bootstrap."
+  },
+  {
+    "id": "arch-age-scrypt-recipient",
+    "url": "https://docs.rs/age/latest/age/scrypt/struct.Recipient.html",
+    "title": "age scrypt Recipient API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Public work-factor control for standard age passphrase encryption; plan selects factor 18 as a resource/security default."
+  },
+  {
+    "id": "arch-age-scrypt-identity",
+    "url": "https://docs.rs/age/latest/age/scrypt/struct.Identity.html",
+    "title": "age scrypt Identity API",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Maximum accepted work-factor control and denial-of-service considerations for untrusted encrypted files; plan selects maximum 20."
+  },
+  {
+    "id": "arch-rust-regex",
+    "url": "https://github.com/rust-lang/regex",
+    "title": "Rust regex crate",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Finite-automata regular-expression implementation; selected with pattern/input bounds and no backtracking-engine fallback."
+  },
+  {
+    "id": "arch-sharp",
+    "url": "https://sharp.pixelplumbing.com/",
+    "title": "Sharp image processing documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Selected Sharp/libvips image-transform family; exact version/native ABI, license and parser-security gates remain implementation work."
+  },
+  {
+    "id": "arch-pdf-lib",
+    "url": "https://pdf-lib.js.org/",
+    "title": "pdf-lib documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Pure-JavaScript PDF creation/modification and split/merge basis; selected for contained assembly jobs."
+  },
+  {
+    "id": "arch-pdfjs",
+    "url": "https://mozilla.github.io/pdf.js/",
+    "title": "Mozilla PDF.js",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "PDF parsing/rendering foundation; Linuxcast must disable document scripts/eval/external access and validate isolation."
+  },
+  {
+    "id": "arch-libreoffice-headless",
+    "url": "https://help.libreoffice.org/latest/en-US/text/shared/guide/start_parameters.html",
+    "title": "LibreOffice startup parameters",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Headless conversion and writable profile requirements; optional installed-tool adapter uses a disposable sandbox profile and must test the detected Debian version."
+  },
+  {
+    "id": "arch-speech-dispatcher",
+    "url": "https://github.com/brailcom/speechd",
+    "title": "Speech Dispatcher",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Local speech synthesis service/library; selected optional installed-service adapter with unavailable state when absent."
+  }
+]

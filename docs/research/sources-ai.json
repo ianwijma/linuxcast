@@ -1,0 +1,746 @@
+[
+  {
+    "id": "ray-home",
+    "url": "https://www.raycast.com/",
+    "title": "Raycast — Your shortcut to everything",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Marketing/product and ecosystem entry points; read as web content, not native runtime evidence."
+  },
+  {
+    "id": "ray-quickstart",
+    "url": "https://manual.raycast.com/quickstart",
+    "title": "Raycast Manual — Quickstart",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current manual navigation and baseline client entry points; source-derived."
+  },
+  {
+    "id": "ray-new-v2",
+    "url": "https://manual.raycast.com/new-in-v2",
+    "title": "Raycast Manual — New in Raycast v2",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current v2 baseline, renamed Agents/Projects and revised UI/features; do not substitute historical beta pages."
+  },
+  {
+    "id": "ray-search",
+    "url": "https://manual.raycast.com/search-bar",
+    "title": "Raycast Manual — Search Bar",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Root search, ranking, arguments, contacts, compact mode, favorites and context actions; mixed OS content."
+  },
+  {
+    "id": "ray-actions",
+    "url": "https://manual.raycast.com/action-panel",
+    "title": "Raycast Manual — Action Panel",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Context actions and keyboard interaction; no runtime timing measurement."
+  },
+  {
+    "id": "ray-hotkeys",
+    "url": "https://manual.raycast.com/command-aliases-and-hotkeys",
+    "title": "Raycast Manual — Command Aliases & Hotkeys",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Side-specific and modifier gestures, conflict handling and layout semantics; native Linux feasibility separately specified."
+  },
+  {
+    "id": "ray-settings",
+    "url": "https://manual.raycast.com/settings",
+    "title": "Raycast Manual — Settings",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Settings/search, launcher/input/network configuration; macOS/Windows-specific options distinguished."
+  },
+  {
+    "id": "ray-import-export",
+    "url": "https://manual.raycast.com/import-export",
+    "title": "Raycast Manual — Import & Export",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Configuration backup and selective restoration; Linuxcast explicitly uses native formats only."
+  },
+  {
+    "id": "ray-snippets",
+    "url": "https://manual.raycast.com/snippets",
+    "title": "Raycast Manual — Snippets",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Text/rich snippets, keyword expansion and management; no source-format compatibility promised."
+  },
+  {
+    "id": "ray-quicklinks",
+    "url": "https://manual.raycast.com/quicklinks",
+    "title": "Raycast Manual — Quicklinks",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Links, templates, context creation, tags and actions."
+  },
+  {
+    "id": "ray-clipboard",
+    "url": "https://manual.raycast.com/clipboard-history",
+    "title": "Raycast Manual — Clipboard History",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "MIME families, OCR/QR, search/actions and retention."
+  },
+  {
+    "id": "ray-notes",
+    "url": "https://manual.raycast.com/notes",
+    "title": "Raycast Manual — Notes",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Separate note UI and editing/search family; native client not executed."
+  },
+  {
+    "id": "ray-focus",
+    "url": "https://manual.raycast.com/focus",
+    "title": "Raycast Manual — Focus",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local focus sessions and app/site restrictions; Linux adapters need independent verification."
+  },
+  {
+    "id": "ray-files",
+    "url": "https://manual.raycast.com/file-search",
+    "title": "Raycast Manual — File Search",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Indexing, root/dedicated search, filters and ignore rules."
+  },
+  {
+    "id": "ray-applications",
+    "url": "https://manual.raycast.com/applications",
+    "title": "Raycast Manual — Applications",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Launch and app actions; each OS-specific action is not universal."
+  },
+  {
+    "id": "ray-extensions",
+    "url": "https://manual.raycast.com/extensions",
+    "title": "Raycast Manual — Extensions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Discovery, installation/configuration/update/development lifecycle; not exhaustive inspection of Store packages."
+  },
+  {
+    "id": "ray-translate",
+    "url": "https://manual.raycast.com/translate",
+    "title": "Raycast Manual — Translate",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Language-pair and selected-text interactions; Linuxcast global-model policy is a deliberate product decision."
+  },
+  {
+    "id": "ray-emoji",
+    "url": "https://manual.raycast.com/emoji-symbols",
+    "title": "Raycast Manual — Emoji & Symbols",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local Unicode search/grid, history and optional AI assistance."
+  },
+  {
+    "id": "ray-calendar",
+    "url": "https://manual.raycast.com/calendar",
+    "title": "Raycast Manual — Calendar",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Schedule and meeting actions, macOS personal-data services; external transcription is separate."
+  },
+  {
+    "id": "ray-calculator",
+    "url": "https://manual.raycast.com/calculator",
+    "title": "Raycast Manual — Calculator",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Arithmetic/unit/date/currency/color families; no calculator implementation reverse engineering."
+  },
+  {
+    "id": "ray-screenshots",
+    "url": "https://manual.raycast.com/screenshots",
+    "title": "Raycast Manual — Screenshots",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Media index and OCR/filter/paste behavior; acquisition and indexing are distinct."
+  },
+  {
+    "id": "ray-windows",
+    "url": "https://manual.raycast.com/window-management",
+    "title": "Raycast Manual — Window Management",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Positions/layouts/displays/workspaces; Linux compositor capability work remains required."
+  },
+  {
+    "id": "ray-navigation",
+    "url": "https://manual.raycast.com/navigation",
+    "title": "Raycast Manual — Navigation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Application menu/window search and accessibility dependencies."
+  },
+  {
+    "id": "ray-hyper",
+    "url": "https://manual.raycast.com/hyper-key",
+    "title": "Raycast Manual — Hyper Key",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Modifier remapping and tap/device behavior; Linux privileged-input design is independent."
+  },
+  {
+    "id": "ray-placeholders",
+    "url": "https://manual.raycast.com/dynamic-placeholders",
+    "title": "Raycast Manual — Dynamic Placeholders",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Shared dynamic content families and transformations; native Linuxcast grammar required."
+  },
+  {
+    "id": "ray-system",
+    "url": "https://manual.raycast.com/system-commands",
+    "title": "Raycast Manual — System Commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Session/audio/display/files/app actions with platform distinctions."
+  },
+  {
+    "id": "ray-scripts",
+    "url": "https://manual.raycast.com/script-commands",
+    "title": "Raycast Manual — Script Commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Script discovery/metadata/invocation and working directory; no format importer."
+  },
+  {
+    "id": "ray-themes",
+    "url": "https://manual.raycast.com/themes",
+    "title": "Raycast Manual — Themes",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local theme editor and sharing; sources are reference behavior, not copied assets."
+  },
+  {
+    "id": "ray-autoquit",
+    "url": "https://manual.raycast.com/auto-quit",
+    "title": "Raycast Manual — Auto Quit",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Per-app inactivity behavior and playback/recording/focus exclusions."
+  },
+  {
+    "id": "ray-run",
+    "url": "https://manual.raycast.com/run",
+    "title": "Raycast Manual — Run",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Windows-oriented commands/path/URI/history feature; Linux equivalents specified separately."
+  },
+  {
+    "id": "ray-games",
+    "url": "https://manual.raycast.com/games",
+    "title": "Raycast Manual — Games",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Windows-oriented game discovery and foreground hotkey suppression; no blanket Linux launcher compatibility."
+  },
+  {
+    "id": "ray-ai-index",
+    "url": "https://manual.raycast.com/ai",
+    "title": "Raycast Manual — AI",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "AI feature-family index for current manual."
+  },
+  {
+    "id": "ray-quick-ai",
+    "url": "https://manual.raycast.com/ai/quick-ai",
+    "title": "Raycast Manual — Quick AI",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Root entry, followups, attachments and full-chat handoff."
+  },
+  {
+    "id": "ray-ai-chat",
+    "url": "https://manual.raycast.com/ai/ai-chat",
+    "title": "Raycast Manual — AI Chat",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Persistent conversation lifecycle, queue/steer, history and context management; native runtime not tested."
+  },
+  {
+    "id": "ray-dictation",
+    "url": "https://manual.raycast.com/ai/dictation",
+    "title": "Raycast Manual — Dictation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Recording/styles/history/vocabulary/device and output behavior; some contextual submission features experimental."
+  },
+  {
+    "id": "ray-screen-awareness",
+    "url": "https://manual.raycast.com/ai/screen-awareness",
+    "title": "Raycast Manual — Screen Awareness",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Independent context sources and capture inspection; permissions are OS-dependent."
+  },
+  {
+    "id": "ray-ai-commands",
+    "url": "https://manual.raycast.com/ai/ai-commands",
+    "title": "Raycast Manual — AI Commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Prompt CRUD, context/output modes and Quick Fix billing distinction."
+  },
+  {
+    "id": "ray-ai-extensions",
+    "url": "https://manual.raycast.com/ai/ai-extensions",
+    "title": "Raycast Manual — AI Extensions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Tools, discovery and permission modes; app-specific tool inventory is not a transferable entitlement."
+  },
+  {
+    "id": "ray-automations",
+    "url": "https://manual.raycast.com/ai/automations",
+    "title": "Raycast Manual — Automations",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local recurring work, coalescing and conversation state; Linuxcast deletion policy intentionally explicit."
+  },
+  {
+    "id": "ray-agents",
+    "url": "https://manual.raycast.com/ai/agents",
+    "title": "Raycast Manual — Agents",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current name for Presets and reusable agent configuration; Linuxcast omits per-agent model override."
+  },
+  {
+    "id": "ray-mcp",
+    "url": "https://manual.raycast.com/ai/model-context-protocol",
+    "title": "Raycast Manual — Model Context Protocol",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Stdio/HTTP/OAuth and server lifecycle; no actual server connected during research."
+  },
+  {
+    "id": "ray-skills",
+    "url": "https://manual.raycast.com/ai/skills",
+    "title": "Raycast Manual — Skills",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Metadata indexing, on-demand loading, directories and limitations."
+  },
+  {
+    "id": "ray-projects",
+    "url": "https://manual.raycast.com/ai/projects",
+    "title": "Raycast Manual — Projects",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current grouping/instructions/directory/memory features; formerly folders."
+  },
+  {
+    "id": "ray-personalization",
+    "url": "https://manual.raycast.com/ai/personalization",
+    "title": "Raycast Manual — Personalization",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Profile, global/project memory and controls; Linuxcast opt-in defaults are design decisions."
+  },
+  {
+    "id": "ray-credits",
+    "url": "https://manual.raycast.com/ai/ai-credits",
+    "title": "Raycast Manual — AI Credits",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Usage/credit service; no price or fixed quota copied into implementation requirements."
+  },
+  {
+    "id": "ray-local-models",
+    "url": "https://manual.raycast.com/ai/local-models",
+    "title": "Raycast Manual — Local Models",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Ollama lifecycle and feature limitations; local response does not imply all product processing is local."
+  },
+  {
+    "id": "ray-extension-models",
+    "url": "https://manual.raycast.com/ai/extension-models",
+    "title": "Raycast Manual — Extension Models",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Provider-extension catalog and setup/caching behavior."
+  },
+  {
+    "id": "ray-provide-models",
+    "url": "https://developers.raycast.com/ai/provide-ai-models",
+    "title": "Raycast Developers — Provide AI Models",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Model discovery/streaming contract and capability declarations; Linuxcast creates an independent API."
+  },
+  {
+    "id": "ray-custom-providers",
+    "url": "https://manual.raycast.com/ai/custom-providers",
+    "title": "Raycast Manual — Custom Providers",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Direct compatible endpoints, config watching and tool services; do not copy plaintext-secret storage."
+  },
+  {
+    "id": "ray-byok",
+    "url": "https://manual.raycast.com/ai/bring-your-own-key",
+    "title": "Raycast Manual — Bring Your Own Key",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Provider-specific routing/catalog/billing behavior; Raycast hosted services distinct."
+  },
+  {
+    "id": "ray-subscriptions",
+    "url": "https://manual.raycast.com/ai/bring-your-own-subscription",
+    "title": "Raycast Manual — Bring Your Own Subscription",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Raycast original CLI integrations; not evidence of permission transferable to Linuxcast."
+  },
+  {
+    "id": "ray-privacy",
+    "url": "https://manual.raycast.com/ai/raycast-ai-privacy-security",
+    "title": "Raycast Manual — AI Privacy & Security",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Feature-specific context/storage/processing and service boundaries; source policy not a Linuxcast guarantee."
+  },
+  {
+    "id": "ray-browser",
+    "url": "https://www.raycast.com/browser-extension",
+    "title": "Raycast — Browser Extension",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Browser page context and supported browser marketing; no extension installed or traffic tested."
+  },
+  {
+    "id": "ray-store",
+    "url": "https://www.raycast.com/store",
+    "title": "Raycast Store",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Discovery and extension ecosystem web surface; dynamic catalog not exhaustively enumerated."
+  },
+  {
+    "id": "ray-store-linear",
+    "url": "https://www.raycast.com/linear/linear",
+    "title": "Raycast Store — Linear",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "Representative extension-detail surface; no integration account or commands exercised."
+  },
+  {
+    "id": "ray-account",
+    "url": "https://manual.raycast.com/account-management",
+    "title": "Raycast Manual — Account Management",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Identity/profile/organization and creator-account functionality."
+  },
+  {
+    "id": "ray-billing",
+    "url": "https://manual.raycast.com/billing",
+    "title": "Raycast Manual — Billing",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Billing/account lifecycle; prices intentionally not fixed in plan."
+  },
+  {
+    "id": "ray-cloud",
+    "url": "https://manual.raycast.com/cloud-sync",
+    "title": "Raycast Manual — Cloud Sync",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current beta label, category/device/exclusion controls; encryption claims do not establish E2EE."
+  },
+  {
+    "id": "ray-team-sharing",
+    "url": "https://manual.raycast.com/teams/shared-features",
+    "title": "Raycast Manual — Shared Features",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Shared content and private extensions; shared Skills marked coming soon."
+  },
+  {
+    "id": "ray-team-roles",
+    "url": "https://manual.raycast.com/teams/roles-and-permissions",
+    "title": "Raycast Manual — Roles & Permissions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Organization role distinctions; cloud/teams deferred."
+  },
+  {
+    "id": "ray-enterprise",
+    "url": "https://manual.raycast.com/enterprise",
+    "title": "Raycast Manual — Enterprise",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "SSO/provisioning/device/data/provider policy families; current platform limitations require release-time review."
+  },
+  {
+    "id": "ray-teams-v1",
+    "url": "https://manual.raycast.com/v1/getting-started-with-teams",
+    "title": "Raycast Manual v1 — Getting Started with Teams",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Historical redirect encountered; retained as version warning, not current feature authority."
+  },
+  {
+    "id": "ai-openrouter-quickstart",
+    "url": "https://openrouter.ai/docs/quickstart",
+    "title": "OpenRouter — Quickstart",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Required direct API and catalog integration; models and terms remain live."
+  },
+  {
+    "id": "ai-openrouter-auth",
+    "url": "https://openrouter.ai/docs/api_reference/authentication",
+    "title": "OpenRouter — Authentication",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "API-key ownership and bearer authentication."
+  },
+  {
+    "id": "ai-openrouter-routing",
+    "url": "https://openrouter.ai/docs/guides/routing/provider-selection",
+    "title": "OpenRouter — Provider Selection",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Upstream routing is distinct from Linuxcast global model selection."
+  },
+  {
+    "id": "ai-openai-text",
+    "url": "https://developers.openai.com/api/docs/guides/text",
+    "title": "OpenAI API — Text generation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official Responses integration overview; API reference fetch separately exceeded tool content size."
+  },
+  {
+    "id": "ai-openai-responses",
+    "url": "https://platform.openai.com/docs/api-reference/responses",
+    "title": "OpenAI API — Responses reference",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Fetch attempted but content-size limit prevented full extraction; supplementary reference, not sole evidence."
+  },
+  {
+    "id": "ai-siwc-quickstart",
+    "url": "https://developers.openai.com/siwc/quickstart",
+    "title": "OpenAI — Sign in with ChatGPT quickstart",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official plan-backed integration; open-source eligibility is not automatic account entitlement."
+  },
+  {
+    "id": "ai-siwc-signin",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/sign-in",
+    "title": "OpenAI — SIWC registration and sign-in",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Dynamic bootstrap/issued client ID, stable host identifier, loopback PKCE, identity versus inference scopes."
+  },
+  {
+    "id": "ai-siwc-sessions",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions",
+    "title": "OpenAI — SIWC profiles and sessions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Secure session persistence, refresh serialization and revocation."
+  },
+  {
+    "id": "ai-siwc-models",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference",
+    "title": "OpenAI — SIWC models and inference",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Public account catalog and Responses, explicit history, streaming and terminal status."
+  },
+  {
+    "id": "ai-siwc-limitations",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations",
+    "title": "OpenAI — SIWC preview limitations",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Dedicated supported-field/tool profile; cannot assume all API capabilities."
+  },
+  {
+    "id": "ai-siwc-errors",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery",
+    "title": "OpenAI — SIWC errors and recovery",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Eligibility/quota/unavailability separation and transparent recovery."
+  },
+  {
+    "id": "ai-siwc-codex",
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server",
+    "title": "OpenAI — SIWC with Codex app-server",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official public Responses provider config, child-only credential and restart/resume lifecycle."
+  },
+  {
+    "id": "ai-codex-platform",
+    "url": "https://developers.openai.com/blog/codex-as-a-platform",
+    "title": "OpenAI — Codex as a platform",
+    "accessed": "2026-10-22",
+    "kind": "official-source",
+    "notes": "CLI/SDK/app-server role distinction; official product source."
+  },
+  {
+    "id": "ai-codex-app-server",
+    "url": "https://learn.chatgpt.com/docs/app-server",
+    "title": "OpenAI — Codex app-server",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Current destination reached from developers.openai.com/codex/app-server; stdio lifecycle/schema must be version pinned."
+  },
+  {
+    "id": "ai-claude-sdk",
+    "url": "https://code.claude.com/docs/en/agent-sdk/overview",
+    "title": "Anthropic — Agent SDK overview",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "SDK capabilities and prohibition on third-party claude.ai login absent approval; distinguish unmodified CLI path."
+  },
+  {
+    "id": "ai-claude-sdk-start",
+    "url": "https://code.claude.com/docs/en/agent-sdk/quickstart",
+    "title": "Anthropic — Agent SDK quickstart",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "API/cloud auth and native binary packaging; no consumer-token extraction."
+  },
+  {
+    "id": "ai-claude-legal",
+    "url": "https://code.claude.com/docs/en/legal-and-compliance",
+    "title": "Anthropic — Legal and compliance",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Unmodified Claude Code product integration conditions and end-user auth/billing; release-time terms review required."
+  },
+  {
+    "id": "ai-copilot-auth",
+    "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/auth/authenticate",
+    "title": "GitHub — Copilot SDK authentication",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Official CLI/user/OAuth routes and credential support; explicitly selected identity."
+  },
+  {
+    "id": "ai-copilot-byok",
+    "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/auth/byok",
+    "title": "GitHub — Copilot SDK BYOK",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Provider-key route distinct from Copilot subscription entitlement."
+  },
+  {
+    "id": "ai-copilot-setup",
+    "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/setup",
+    "title": "GitHub — Copilot SDK setup",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "SDK/CLI dependency and runtime setup."
+  },
+  {
+    "id": "ai-gemini-faq",
+    "url": "https://geminicli.com/docs/resources/faq/",
+    "title": "Google — Gemini CLI FAQ",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Third-party OAuth harvesting/piggyback restrictions; headless interface is not blanket authorization."
+  },
+  {
+    "id": "ai-gemini-quota",
+    "url": "https://geminicli.com/docs/resources/quota-and-pricing/",
+    "title": "Google — Gemini CLI quota and pricing",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "CLI free/paid quota distinctions; not transferable API entitlement."
+  },
+  {
+    "id": "ai-gemini-headless",
+    "url": "https://geminicli.com/docs/cli/headless/",
+    "title": "Google — Gemini CLI headless mode",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Structured execution/output capabilities; auth/terms remain separate."
+  },
+  {
+    "id": "ai-gemini-auth",
+    "url": "https://geminicli.com/docs/get-started/authentication/",
+    "title": "Google — Gemini CLI authentication",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "CLI sign-in, API-key and supported cloud routes."
+  },
+  {
+    "id": "ai-gemini-api",
+    "url": "https://ai.google.dev/gemini-api/docs/api-key",
+    "title": "Google — Gemini API keys",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Direct Gemini API credential route; account/subscription login not equivalent."
+  },
+  {
+    "id": "ai-ollama",
+    "url": "https://docs.ollama.com/api/openai-compatibility",
+    "title": "Ollama — OpenAI compatibility",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Local compatible subset and distinct remote/cloud endpoints; capabilities require testing."
+  },
+  {
+    "id": "ai-groq",
+    "url": "https://console.groq.com/docs/openai",
+    "title": "Groq — OpenAI compatibility",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Compatible-provider preset source; no assumption of complete API parity."
+  },
+  {
+    "id": "ai-together",
+    "url": "https://docs.together.ai/docs/inference/openai-compatibility",
+    "title": "Together AI — OpenAI compatibility",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Compatible-provider preset source; separate key/billing."
+  },
+  {
+    "id": "ai-deepseek",
+    "url": "https://api-docs.deepseek.com/",
+    "title": "DeepSeek — API documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Compatible endpoint/provider source; model IDs are live data."
+  },
+  {
+    "id": "ai-mistral",
+    "url": "https://docs.mistral.ai/studio",
+    "title": "Mistral — Studio documentation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Additional direct provider option; do not infer consumer subscription API access."
+  },
+  {
+    "id": "ai-electron-secrets",
+    "url": "https://www.electronjs.org/docs/latest/api/safe-storage",
+    "title": "Electron — safeStorage",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Linux backend security and insecure basic_text fallback; pin API behavior to shipped Electron version."
+  }
+]
