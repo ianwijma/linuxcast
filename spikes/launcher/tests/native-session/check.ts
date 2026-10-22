@@ -9,8 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, parseObservation, requireNativeTarget } from './protocol.ts';
-import type { Backend, Observation } from './protocol.ts';
+import { BACKENDS, contained, NativeTrace, requireNativeTarget } from './protocol.ts';
+import type { Backend, NativePhase, Observation } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
 const root = process.env.LINUXCAST_S001_MATRIX_ROOT ?? '';
@@ -39,34 +39,37 @@ let application: ElectronApplication | undefined;
 let stage = 'build';
 let request = 0;
 let pid = 0;
+const nativeTrace = new NativeTrace();
 const decoy = spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
 decoy.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
-const observe = async (operation: 'observe' | 'activate-decoy' = 'observe'): Promise<Observation> => {
+const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePhase): Promise<Observation> => {
   const serial = ++request;
   if (!Number.isSafeInteger(pid) || !decoy.pid) throw new Error('OWN_PIDS_REQUIRED');
   writeFileSync(join(root, 'context-next.json'), JSON.stringify({ request: serial, pid, decoyPid: decoy.pid, operation }), { mode: 0o600 });
   renameSync(join(root, 'context-next.json'), join(root, 'context.json'));
+  nativeTrace.begin(phase);
   let observation: Observation | undefined;
   await expect.poll(() => {
     const path = join(root, 'observation.json');
-    if (!existsSync(path) || lstatSync(path).size > 8192) return false;
+    if (!existsSync(path)) return false;
+    if (lstatSync(path).size > 8192) { nativeTrace.reject(); return false; }
     try {
       const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
       if (value.request !== serial) return false;
-      observation = parseObservation(value, serial); return true;
-    } catch { return false; }
+      observation = nativeTrace.reply(value, serial); return !!observation;
+    } catch { nativeTrace.reject(); return false; }
   }, { timeout: 8000 }).toBe(true);
   return observation!;
 };
-const observed = async (phase: string, predicate: (observation: Observation) => boolean) => {
+const observed = async (phase: NativePhase, predicate: (observation: Observation) => boolean) => {
   let value: Observation | undefined;
-  await expect.poll(async () => { value = await observe(); return predicate(value); }, { timeout: 12_000 }).toBe(true);
+  await expect.poll(async () => { value = await observe('observe', phase); const met = predicate(value); nativeTrace.predicate(met); return met; }, { timeout: 12_000 }).toBe(true);
   observations.push({ phase, native: value! }); return value!;
 };
 const challenge = async () => {
-  const native = await observed('decoy-native-ready', value => value.decoy.count === 1 && value.decoy.identityMatches);
+  const native = await observed('decoy-native-ready', value => value.decoy.count === 1 && value.decoy.identityMatches && !!value.decoy.geometry && !!value.decoy.workArea);
   requireNativeTarget(native.decoy, backend);
-  const setup = await observe('activate-decoy');
+  const setup = await observe('activate-decoy', 'decoy-activation-request');
   expect(setup.decoyActivationIssued).toBe(true);
   report.decoyActivationUsedForChallengeSetup = true;
   await observed('decoy-focused-before-ordinary-show', value => value.decoy.focused && !value.launcher.focused);
@@ -142,7 +145,7 @@ try {
   stage = 'first-launch';
   let page = await launch();
   stage = 'native-initial-identity';
-  const initial = await observed('initial-native-launch', value => value.launcher.count === 1);
+  const initial = await observed('initial-native-launch', value => value.launcher.count === 1 && (!value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
   requireNativeTarget(initial.launcher, backend);
   report.initialPlacementInsideWorkArea = contained(initial.launcher);
   if (!wayland) expect(contained(initial.launcher)).toBe(true);
@@ -222,5 +225,7 @@ finally {
   // The outer process-local supervisor independently reaps every descendant.
   rmSync(profile, { recursive: true, force: true });
   report.stage = stage;
+  const diagnostic = nativeTrace.snapshot();
+  if (diagnostic) report.nativeDiagnostic = diagnostic;
   writeFileSync(join(root, 'result.json'), JSON.stringify(report), { mode: 0o600 });
 }

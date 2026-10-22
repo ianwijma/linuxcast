@@ -4,6 +4,7 @@ import os
 import sys
 import gi
 from private import private_root, read_context, target_guard
+from artifacts import observation
 gi.require_version('Gio','2.0')
 from gi.repository import Gio, GLib
 
@@ -25,11 +26,11 @@ def main():
             context=read_context(root)
             if name=='Context' and encoded=='{}': result=context
             elif name=='Observation':
-                value=json.loads(encoded)
-                if not context or not isinstance(value,dict) or set(value)!=set(('request','launcher','decoy','decoyActivationIssued')) or value['request']!=context['request'] or type(value['decoyActivationIssued']) is not bool:
+                value=observation(json.loads(encoded))
+                if not context or value['request']!=context['request']:
                     raise ValueError('OBSERVATION_SCHEMA')
-                # This file is private and Node validates every nested scalar
-                # before public evidence. Only the actual KWin owner may write.
+                # Python reconstructs the complete allowlist before this private
+                # write; Node independently validates before durable evidence.
                 (root/'observation.json').write_text(json.dumps(value))
                 result={'accepted':True}
         except (ValueError,KeyError,OSError,GLib.Error): pass

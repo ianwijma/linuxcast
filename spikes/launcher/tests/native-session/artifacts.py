@@ -14,6 +14,7 @@ SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py','
 OUTPUTS=('extension.js','kwin-script.js','metadata.json')
 STAGES=('build','first-launch','native-initial-identity','resident-close','decoy-challenge','ordinary-cli-show','actual-x11-global-shortcut','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session')
 PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
+DIAGNOSTIC_PHASES=(*PHASES,'decoy-activation-request')
 FLAGS=('initialPlacementInsideWorkArea','closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','explicitUiQuitExited','hiddenCliQuitExited')
 ACTIVATION=('normal-show-focused-component-placement-still-required','actionable-component-required','normal-show-and-shortcut-native-focus-observed')
 
@@ -54,10 +55,38 @@ def native_window(value):
         raise ValueError('PUBLIC_NATIVE_IDENTITY')
     return result
 
+def window_diagnostic(value,native):
+    object_keys(value,('pidMatch','primaryIdentity','secondaryIdentity','geometry','workArea'))
+    identities=('not-inspected','non-string','empty','mismatch','match');rectangles=('not-inspected','not-ready','ready')
+    if value['pidMatch'] not in ('none','single','multiple') or any(value[key] not in identities for key in ('primaryIdentity','secondaryIdentity')) or any(value[key] not in rectangles for key in ('geometry','workArea')): raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+    if value['pidMatch']!=('none' if native['count']==0 else 'single' if native['count']==1 else 'multiple'): raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+    if native['count']!=1:
+        if any(value[key]!='not-inspected' for key in ('primaryIdentity','secondaryIdentity','geometry','workArea')): raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+    else:
+        if any(value[key]=='not-inspected' for key in ('primaryIdentity','secondaryIdentity')) or native['identityMatches']!=(value['primaryIdentity']=='match' or value['secondaryIdentity']=='match'): raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+        if not native['identityMatches']:
+            if value['geometry']!='not-inspected' or value['workArea']!='not-inspected': raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+        elif value['geometry']!=('not-ready' if native['geometry'] is None else 'ready') or value['workArea']!=('not-ready' if native['workArea'] is None else 'ready'): raise ValueError('PUBLIC_NATIVE_DIAGNOSTIC')
+    return {key:value[key] for key in ('pidMatch','primaryIdentity','secondaryIdentity','geometry','workArea')}
+
 def observation(value):
-    object_keys(value,('request','launcher','decoy','decoyActivationIssued'))
-    return {'request':integer(value['request'],1,1000),'launcher':native_window(value['launcher']),'decoy':native_window(value['decoy']),
+    object_keys(value,('request','launcher','decoy','decoyActivationIssued'),('diagnostics',))
+    result={'request':integer(value['request'],1,1000),'launcher':native_window(value['launcher']),'decoy':native_window(value['decoy']),
             'decoyActivationIssued':boolean(value['decoyActivationIssued'])}
+    if 'diagnostics' in value:
+        object_keys(value['diagnostics'],('launcher','decoy'))
+        result['diagnostics']={key:window_diagnostic(value['diagnostics'][key],result[key]) for key in ('launcher','decoy')}
+    return result
+
+def native_diagnostic(value):
+    object_keys(value,('phase','state'),('lastObservation',))
+    if value['phase'] not in DIAGNOSTIC_PHASES or value['state'] not in ('request-written','reply-rejected','parsed','predicate-met','predicate-unmet'): raise ValueError('PUBLIC_NATIVE_PROGRESS')
+    result={'phase':value['phase'],'state':value['state']}
+    if 'lastObservation' in value:
+        last=value['lastObservation'];object_keys(last,('phase','native'))
+        if last['phase'] not in DIAGNOSTIC_PHASES: raise ValueError('PUBLIC_NATIVE_PROGRESS')
+        result['lastObservation']={'phase':last['phase'],'native':observation(last['native'])}
+    return result
 
 def runtime(value,backend):
     object_keys(value,('electron','chrome','ozone','noSandbox','sandbox','contextIsolation','nodeIntegration','webSecurity','renderer'))
@@ -81,7 +110,7 @@ def shortcut(value,backend):
 
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic'))
     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
@@ -100,6 +129,7 @@ def public_result(value,backend):
         last=native['request'];result['observations'].append({'phase':row['phase'],'native':native})
     for flag in FLAGS:
         if flag in value: result[flag]=boolean(value[flag])
+    if 'nativeDiagnostic' in value: result['nativeDiagnostic']=native_diagnostic(value['nativeDiagnostic'])
     if 'runtime' in value: result['runtime']=runtime(value['runtime'],backend)
     if 'shortcut' in value: result['shortcut']=shortcut(value['shortcut'],backend)
     if 'activationOutcome' in value:

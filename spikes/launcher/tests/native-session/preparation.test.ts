@@ -6,8 +6,9 @@ import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { buildNativeSession } from './build.ts';
-import { parseObservation, requireNativeTarget } from './protocol.ts';
+import { NativeTrace, parseNativeDiagnostic, parseObservation, requireNativeTarget } from './protocol.ts';
 import type { NativeWindow } from './protocol.ts';
+import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
 const native = (): NativeWindow => ({ count: 1, identityMatches: true, nativeBackend: 'wayland', focused: false, hidden: false,
   geometry: { x: 32, y: 32, width: 720, height: 560 }, workArea: { x: 0, y: 0, width: 1280, height: 900 } });
@@ -34,6 +35,69 @@ test('public observation parsing rejects stale replies, arbitrary content and un
   expect(() => parseObservation({ ...row, launcher: { ...native(), geometry: { x: 0, y: 0, width: NaN, height: 1 } } }, 7)).toThrow('NATIVE_RECT');
   expect(() => parseObservation({ ...row, launcher: { ...native(), count: -1 } }, 7)).toThrow('NATIVE_SCHEMA');
   expect(() => parseObservation({ ...row, launcher: { ...native(), count: 0 } }, 7)).toThrow('NATIVE_IDENTITY_SCHEMA');
+});
+
+for (const family of ['gnome', 'kwin'] as const) {
+  test(`${family} hook never reads identity/geometry outside the exact launched PID`, () => {
+    const foreign = syntheticWindow(303, 'synthetic-private-canary'); foreign.forbidMetadata = true;
+    const row = hookFixture(family, [foreign]).observe(true);
+    expect(row.launcher.count).toBe(0); expect(row.decoy.count).toBe(0);
+    expect(row.diagnostics?.launcher.pidMatch).toBe('none');
+    expect(foreign.identityReads).toBe(0); expect(foreign.geometryReads).toBe(0);
+    expect(row.decoyActivationIssued).toBe(false);
+  });
+  test(`${family} hook retains only fixed identity outcomes and never reads geometry on mismatch`, () => {
+    const own = syntheticWindow(101, 'synthetic-private-canary');
+    const row = hookFixture(family, [own]).observe();
+    expect(row.launcher.identityMatches).toBe(false);
+    expect(row.diagnostics?.launcher.primaryIdentity).toBe('mismatch');
+    expect(row.diagnostics?.launcher.geometry).toBe('not-inspected');
+    expect(own.geometryReads).toBe(0);
+    expect(JSON.stringify(row)).not.toContain('synthetic-private-canary');
+  });
+  test(`${family} hook reports zero geometry without accepting or activating it, then observes readiness`, () => {
+    const launcher = syntheticWindow(101, 'io.github.ianwijma.Linuxcast');
+    const decoy = syntheticWindow(202, 'io.github.ianwijma.Linuxcast.S001Decoy');
+    launcher.width = 0; decoy.width = 0;
+    const fixture = hookFixture(family, [launcher, decoy]);
+    const zero = fixture.observe(true);
+    expect(zero.diagnostics?.launcher.geometry).toBe('not-ready');
+    expect(zero.launcher.geometry).toBeNull();
+    expect(() => requireNativeTarget(zero.launcher, 'gnome-wayland')).toThrow('OWN_NATIVE_IDENTITY_REQUIRED');
+    expect(fixture.activations()).toBe(0);
+    launcher.width = 720; decoy.width = 360;
+    const ready = fixture.observe(true);
+    requireNativeTarget(ready.launcher, 'gnome-wayland');
+    expect(ready.diagnostics?.launcher.geometry).toBe('ready');
+    expect(fixture.activations()).toBe(1);
+  });
+}
+
+test('native trace distinguishes no reply, rejected reply and an unmet predicate without losing safe evidence', () => {
+  const trace = new NativeTrace();
+  trace.begin('initial-native-launch');
+  expect(trace.snapshot()).toEqual({ phase: 'initial-native-launch', state: 'request-written' });
+  const row = { request: 1, launcher: native(), decoy: native(), decoyActivationIssued: false };
+  expect(trace.reply(row, 1)).toBeDefined(); trace.predicate(false);
+  expect(trace.snapshot()?.state).toBe('predicate-unmet');
+  trace.begin('decoy-native-ready');
+  expect(trace.reply({ ...row, request: 2, private: 'synthetic-private-canary' }, 2)).toBeUndefined();
+  const state = trace.snapshot();
+  expect(state?.state).toBe('reply-rejected'); expect(state?.lastObservation?.native.request).toBe(1);
+  expect(JSON.stringify(state)).not.toContain('synthetic-private-canary');
+  expect(() => parseNativeDiagnostic({ ...state, private: 'synthetic-private-canary' })).toThrow();
+  expect(() => parseNativeDiagnostic({ ...state, lastObservation: { phase: 'initial-native-launch', native: { ...row, launcher: { ...native(), private: 'synthetic-private-canary' } } } })).toThrow();
+});
+
+test('native diagnostics reject nested private fields, object-valued enums and inconsistent readiness', () => {
+  const own = syntheticWindow(101, 'io.github.ianwijma.Linuxcast');
+  const row = hookFixture('kwin', [own]).observe();
+  const probe = row.diagnostics!.launcher;
+  expect(() => parseObservation({ ...row, diagnostics: { ...row.diagnostics, launcher: { ...probe, private: 'synthetic-private-canary' } } }, row.request)).toThrow();
+  expect(() => parseObservation({ ...row, diagnostics: { ...row.diagnostics, launcher: { ...probe, geometry: { private: 'synthetic-private-canary', toString: () => 'ready' } } } }, row.request)).toThrow();
+  expect(() => parseObservation({ ...row, diagnostics: { ...row.diagnostics, launcher: { ...probe, pidMatch: 'none' } } }, row.request)).toThrow();
+  expect(() => parseObservation({ ...row, diagnostics: { ...row.diagnostics, launcher: { ...probe, geometry: 'not-ready' } } }, row.request)).toThrow();
+  expect(() => parseObservation({ ...row, request: Infinity }, Infinity)).toThrow('NATIVE_REQUEST');
 });
 
 test('offline build records the actual launcher and retained cleanup implementation hashes', async () => {
@@ -88,7 +152,8 @@ for (const scenario of ['valid', 'real-private-bus', 'platform-denied', 'externa
 });
 
 for (const scenario of ['valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
-  'manifest-extra', 'manifest-source-extra', 'manifest-hash-private', 'native-extra', 'missing-success-observations', 'forged-native-backend']) test(`strict artifact boundary ${scenario}`, () => {
+  'manifest-extra', 'manifest-source-extra', 'manifest-hash-private', 'native-extra', 'missing-success-observations', 'forged-native-backend',
+  'valid-diagnostic', 'valid-zero-geometry', 'diagnostic-extra', 'diagnostic-last-private', 'diagnostic-state-private', 'diagnostic-role-private', 'diagnostic-inconsistent', 'forged-success-not-ready']) test(`strict artifact boundary ${scenario}`, () => {
   const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
   expect(child.status).toBe(0);
   const value = JSON.parse(child.stdout);
