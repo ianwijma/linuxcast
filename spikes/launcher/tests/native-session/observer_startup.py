@@ -39,10 +39,38 @@ def snapshot(value):
     return {'checkpoints':list(checkpoints),'requests':safe,'extensionInfo':info(value['extensionInfo'])}
 
 
+def lifecycle_sample(value):
+    if type(value) is not dict or set(value)!= {'compositor','drain'}: raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
+    process=value['compositor'];drain=value['drain']
+    if type(process) is not dict or set(process)!= {'state','exitCode'}: raise ValueError('OBSERVER_PROCESS_SCHEMA')
+    code=process['exitCode']
+    if process['state']=='running':
+        if code is not None: raise ValueError('OBSERVER_PROCESS_SCHEMA')
+    elif process['state']=='exited':
+        if type(code) is not int or not -64<=code<=255: raise ValueError('OBSERVER_PROCESS_SCHEMA')
+    else: raise ValueError('OBSERVER_PROCESS_SCHEMA')
+    if type(drain) is not dict or set(drain)!= {'eofObserved','readerAlive','stopRequested'} or any(type(v) is not bool for v in drain.values()):
+        raise ValueError('OBSERVER_DRAIN_SCHEMA')
+    return {'compositor':{'state':process['state'],'exitCode':code},'drain':{key:drain[key] for key in ('eofObserved','readerAlive','stopRequested')}}
+
+
+def lifecycle(value):
+    if type(value) is not dict or 'finally' not in value or not set(value)<= {'beforeChecker','afterChecker','finally'}:
+        raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
+    return {key:lifecycle_sample(value[key]) for key in ('beforeChecker','afterChecker','finally') if key in value}
+
+
+def runtime_sample(process,drain):
+    # Only this own Popen is sampled. No process enumeration, wait or signal.
+    code=process.poll()
+    return lifecycle_sample({'compositor':{'state':'running' if code is None else 'exited','exitCode':code},'drain':drain.health()})
+
+
 def diagnostic(value):
-    if type(value) is not dict or 'latest' not in value or not set(value)<= {'beforeChecker','latest'}: raise ValueError('OBSERVER_STARTUP_SCHEMA')
+    if type(value) is not dict or 'latest' not in value or not set(value)<= {'beforeChecker','latest','lifecycle'}: raise ValueError('OBSERVER_STARTUP_SCHEMA')
     result={'latest':snapshot(value['latest'])}
     if 'beforeChecker' in value: result['beforeChecker']=snapshot(value['beforeChecker'])
+    if 'lifecycle' in value: result['lifecycle']=lifecycle(value['lifecycle'])
     return result
 
 
@@ -83,6 +111,7 @@ class FixedOutput:
 class ShellDrain(FixedOutput):
     def __init__(self,stream):
         super().__init__();self.stream=stream;self.stop_event=threading.Event()
+        self.eof_observed=False
         os.set_blocking(stream.fileno(),False)
         self.shutdown_deadline=0.0
         self.thread=threading.Thread(target=self._drain,daemon=True);self.thread.start()
@@ -97,7 +126,9 @@ class ShellDrain(FixedOutput):
                     continue
                 try: data=os.read(self.stream.fileno(),4096)
                 except BlockingIOError: continue
-                if not data: return
+                if not data:
+                    with self.lock: self.eof_observed=True
+                    return
                 self.feed(data)
         except (OSError,ValueError): pass
 
@@ -105,6 +136,12 @@ class ShellDrain(FixedOutput):
         self.shutdown_deadline=time.monotonic()+0.15
         self.stop_event.set();self.thread.join(timeout=0.2);self.stream.close()
         with self.lock: self.line.clear();self.discard=False
+
+    def health(self):
+        # Independent observed facts: EOF does not imply process exit, and a
+        # live reader can outlast an exited parent whose child holds the pipe.
+        with self.lock:
+            return {'eofObserved':self.eof_observed,'readerAlive':self.thread.is_alive(),'stopRequested':self.stop_event.is_set()}
 
 
 def extract_info(reply):

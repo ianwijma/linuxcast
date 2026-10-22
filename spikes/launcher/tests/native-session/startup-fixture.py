@@ -11,6 +11,7 @@ import types
 from unittest.mock import patch
 import observer_startup as startup
 import private
+from supervision import Supervisor
 
 case=sys.argv[1]
 
@@ -73,6 +74,64 @@ elif case=='schema':
         try:startup.diagnostic(value)
         except ValueError:pass
         else:raise AssertionError('PRIVATE_STARTUP_ACCEPTED')
+elif case=='lifecycle-schema':
+    drain={'eofObserved':False,'readerAlive':True,'stopRequested':False}
+    running={'compositor':{'state':'running','exitCode':None},'drain':drain}
+    exited={'compositor':{'state':'exited','exitCode':-15},'drain':{'eofObserved':True,'readerAlive':False,'stopRequested':True}}
+    base={'latest':{'checkpoints':[],'requests':[],'extensionInfo':{'status':'INFO_UNAVAILABLE'}},
+          'lifecycle':{'beforeChecker':running,'afterChecker':exited,'finally':exited}}
+    assert startup.diagnostic(base)==base
+    for code in (0,255,-64):
+        value=copy.deepcopy(base);value['lifecycle']['finally']['compositor']['exitCode']=code
+        assert startup.diagnostic(value)==value
+    for mutate in (lambda v:v['lifecycle'].update(private='synthetic-private-canary'),
+                   lambda v:v['lifecycle'].pop('finally'),
+                   lambda v:v['lifecycle']['finally'].update(private='synthetic-private-canary'),
+                   lambda v:v['lifecycle']['finally']['compositor'].update(error='synthetic-private-canary'),
+                   lambda v:v['lifecycle']['finally']['compositor'].update(state='crashed'),
+                   lambda v:v['lifecycle']['beforeChecker']['compositor'].update(exitCode=0),
+                   lambda v:v['lifecycle']['finally']['drain'].update(readerAlive='synthetic-private-canary'),
+                   lambda v:v['lifecycle']['finally']['drain'].update(private='synthetic-private-canary')):
+        value=copy.deepcopy(base);mutate(value)
+        try:startup.diagnostic(value)
+        except ValueError:pass
+        else:raise AssertionError('PRIVATE_LIFECYCLE_ACCEPTED')
+    for code in (None,True,False,float('nan'),float('inf'),-65,256,1.5,'synthetic-private-canary'):
+        value=copy.deepcopy(base);value['lifecycle']['finally']['compositor']['exitCode']=code
+        try:startup.diagnostic(value)
+        except ValueError:pass
+        else:raise AssertionError('INVALID_EXIT_CODE_ACCEPTED')
+elif case=='lifecycle-eof-running':
+    # A process may close stdout while it remains alive. No display/bus is used.
+    drain=None;process=None
+    try:
+        with Supervisor(grace=0.1):
+            process=subprocess.Popen(['/usr/bin/python3','-c','import os,sys; os.close(1); os.close(2); sys.stdin.buffer.read(1)'],
+                                     stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,bufsize=0,start_new_session=True)
+            drain=startup.ShellDrain(process.stdout);drain.thread.join(timeout=2)
+            value=startup.runtime_sample(process,drain)
+            assert value=={'compositor':{'state':'running','exitCode':None},'drain':{'eofObserved':True,'readerAlive':False,'stopRequested':False}}
+            process.stdin.write(b'x');process.stdin.close();assert process.wait(timeout=2)==0
+    finally:
+        if drain:drain.close()
+        if process:process.poll()
+    assert Supervisor.descendants()=={} and drain.health()['stopRequested'] is True
+elif case=='lifecycle-exited-pipe-held':
+    # The own process can exit while its detached child retains the output pipe.
+    # The existing supervisor must remove that child before the fixture returns.
+    drain=None;process=None
+    try:
+        with Supervisor(grace=0.1):
+            held='import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)'
+            code='import subprocess,sys; subprocess.Popen([sys.executable,"-c",'+repr(held)+'],start_new_session=True); sys.exit(7)'
+            process=subprocess.Popen(['/usr/bin/python3','-c',code],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,bufsize=0,start_new_session=True)
+            drain=startup.ShellDrain(process.stdout);assert process.wait(timeout=2)==7
+            value=startup.runtime_sample(process,drain)
+            assert value=={'compositor':{'state':'exited','exitCode':7},'drain':{'eofObserved':False,'readerAlive':True,'stopRequested':False}}
+    finally:
+        if drain:drain.close()
+        if process:process.poll()
+    assert Supervisor.descendants()=={} and not drain.thread.is_alive()
 elif case=='query-deadline':
     calls=[];now=[10.0];env={'public-private-env':'fixed'}
     def run(command,**kwargs):
@@ -119,8 +178,9 @@ elif case in ('runner-order','runner-deadline'):
     with tempfile.TemporaryDirectory(prefix='linuxcast-s001-matrix-startup-') as temporary:
         root=pathlib.Path(temporary)
         class Monitor(startup.FixedOutput):
-            def __init__(self,_stream):super().__init__();self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
-            def close(self):events.append('drain-close')
+            def __init__(self,_stream):super().__init__();self.closed=False;self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
+            def close(self):self.closed=True;events.append('drain-close')
+            def health(self):return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
         class Child:
             stdout=None
             def poll(self):return None
@@ -138,11 +198,16 @@ elif case in ('runner-order','runner-deadline'):
             assert runner.inner('gnome-x11',root)==3
         if case=='runner-deadline':
             assert events==['shell','owner','one-info','drain-close']
-            assert 'beforeChecker' not in startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
+            value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
+            assert 'beforeChecker' not in value and set(value['lifecycle'])=={'finally'}
             print('startup-'+case+'-passed');sys.exit(0)
         assert events==['shell','owner','one-info','checker','driver-wait','drain-close']
         value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
         assert value['beforeChecker']['extensionInfo']=={'status':'NOT_FOUND'}
+        assert set(value['lifecycle'])=={'beforeChecker','afterChecker','finally'}
+        assert value['lifecycle']['beforeChecker']['drain']['stopRequested'] is False
+        assert value['lifecycle']['afterChecker']['drain']['stopRequested'] is False
+        assert value['lifecycle']['finally']['drain']['stopRequested'] is True
 
 else:raise ValueError('UNKNOWN_STARTUP_FIXTURE')
 print('startup-'+case+'-passed')

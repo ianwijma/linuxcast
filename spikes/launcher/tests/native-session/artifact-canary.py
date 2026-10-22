@@ -42,6 +42,18 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         value=diagnostic_report();value['stage']='resident-close'
         value['nativeDiagnostic'].update(phase='after-close-native-hidden',state='hook-failed',hookFailure={'request':2,'hookFailure':{'stage':'launcher','outcome':'native-read-failed'}})
         return value
+    consumer={'request':2,'pollCount':3,'outcomes':{'missing':2,'other-serial':1,'matching':0,'parse-rejected':0,'poll-error':0},
+              'pollsCapped':False,'elapsedMs':100,'elapsedCapped':False}
+    if case in ('valid-consumer','valid-consumer-zero','valid-consumer-capped'):
+        report['consumerRead']=copy.deepcopy(consumer)
+        if case=='valid-consumer-zero':
+            report['consumerRead'].update(pollCount=0,outcomes={name:0 for name in consumer['outcomes']})
+        if case=='valid-consumer-capped':
+            report['consumerRead'].update(pollCount=255,outcomes={name:255 if name=='missing' else 0 for name in consumer['outcomes']},pollsCapped=True,elapsedMs=180000,elapsedCapped=True)
+        status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
+        assert status==3 and state=='unavailable'
+        assert json.loads((destination/'report.json').read_text())['consumerRead']==report['consumerRead']
+        print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
     if case=='valid-hook-failed':
         report=hook_report()
         status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
@@ -72,7 +84,27 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         assert status==3 and state=='unavailable'
         assert json.loads((destination/'report.json').read_text())['physicalDesktopMatrixEstablished'] is False
         print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
-    if case=='unknown-top-level': report['private']='synthetic-private-canary'
+    if case.startswith('consumer-'):
+        report['consumerRead']=copy.deepcopy(consumer);saved=report['consumerRead']
+        if case=='consumer-private':saved['private']='synthetic-private-canary'
+        elif case=='consumer-outcome-private':saved['outcomes']['private']='synthetic-private-canary'
+        elif case=='consumer-request-bool':saved['request']=True
+        elif case=='consumer-count-bool':saved['pollCount']=True
+        elif case=='consumer-count-over':saved['pollCount']=256
+        elif case=='consumer-count-negative':saved['pollCount']=-1
+        elif case=='consumer-count-fraction':saved['pollCount']=1.5
+        elif case=='consumer-count-nan':saved['pollCount']=float('nan')
+        elif case=='consumer-sum':saved['outcomes']['missing']=1
+        elif case=='consumer-poll-cap':saved['pollsCapped']=True
+        elif case=='consumer-flag-type':saved['pollsCapped']=1
+        elif case=='consumer-outcome-type':saved['outcomes']['missing']='synthetic-private-canary'
+        elif case=='consumer-outcome-bool':saved['outcomes']['missing']=True
+        elif case=='consumer-elapsed-cap':saved['elapsedCapped']=True
+        elif case=='consumer-elapsed-nan':saved['elapsedMs']=float('nan')
+        elif case=='consumer-elapsed-inf':saved['elapsedMs']=float('inf')
+        elif case=='consumer-elapsed-over':saved['elapsedMs']=180001
+        else:raise ValueError('UNKNOWN_CONSUMER_CASE')
+    elif case=='unknown-top-level': report['private']='synthetic-private-canary'
     elif case=='nested-private-canary':
         report['runtime']=copy.deepcopy(runtime);report['runtime']['renderer']['runtime']['private']='synthetic-private-canary'
     elif case=='forged-physical': report['physicalDesktopMatrixEstablished']=True

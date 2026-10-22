@@ -121,6 +121,56 @@ export class NativeTrace {
   predicate(met: boolean) { if (this.current && this.current.state !== 'hook-failed') this.current.state = met ? 'predicate-met' : 'predicate-unmet'; }
   snapshot(): NativeDiagnostic | undefined { return this.current ? parseNativeDiagnostic(this.current) : undefined; }
 }
+
+export const CONSUMER_OUTCOMES = ['missing', 'other-serial', 'matching', 'parse-rejected', 'poll-error'] as const;
+export type ConsumerOutcome = typeof CONSUMER_OUTCOMES[number];
+export type ConsumerRead = { request: number; pollCount: number; outcomes: Record<ConsumerOutcome, number>;
+  pollsCapped: boolean; elapsedMs: number; elapsedCapped: boolean };
+export function parseConsumerRead(value: unknown): ConsumerRead {
+  const row = object(value); keys(row, ['request', 'pollCount', 'outcomes', 'pollsCapped', 'elapsedMs', 'elapsedCapped']);
+  if (!Number.isSafeInteger(row.request) || Number(row.request) < 1 || Number(row.request) > 1000
+    || !Number.isSafeInteger(row.pollCount) || Number(row.pollCount) < 0 || Number(row.pollCount) > 255
+    || typeof row.pollsCapped !== 'boolean' || typeof row.elapsedCapped !== 'boolean'
+    || !Number.isSafeInteger(row.elapsedMs) || Number(row.elapsedMs) < 0 || Number(row.elapsedMs) > 180_000) throw new Error('CONSUMER_SCHEMA');
+  const counts = object(row.outcomes); keys(counts, [...CONSUMER_OUTCOMES]);
+  const outcomes = {} as ConsumerRead['outcomes'];
+  for (const name of CONSUMER_OUTCOMES) {
+    if (!Number.isSafeInteger(counts[name]) || Number(counts[name]) < 0 || Number(counts[name]) > 255) throw new Error('CONSUMER_COUNT');
+    outcomes[name] = Number(counts[name]);
+  }
+  if (Object.values(outcomes).reduce((sum, count) => sum + count, 0) !== row.pollCount
+    || row.pollsCapped && row.pollCount !== 255 || row.elapsedCapped && row.elapsedMs !== 180_000) throw new Error('CONSUMER_RELATION');
+  return { request: Number(row.request), pollCount: Number(row.pollCount), outcomes, pollsCapped: row.pollsCapped,
+    elapsedMs: Number(row.elapsedMs), elapsedCapped: row.elapsedCapped };
+}
+/** Only the last own request survives; clocks stay private and are never correlated. */
+export class ConsumerTrace {
+  private current: ConsumerRead | undefined;
+  private started = 0n;
+  private readonly now: () => bigint;
+  constructor(now: () => bigint) { this.now = now; }
+  begin(request: number) {
+    this.current = parseConsumerRead({ request, pollCount: 0, outcomes: Object.fromEntries(CONSUMER_OUTCOMES.map(name => [name, 0])),
+      pollsCapped: false, elapsedMs: 0, elapsedCapped: false });
+    this.started = this.now();
+    if (typeof this.started !== 'bigint') throw new Error('CONSUMER_CLOCK');
+  }
+  record(outcome: ConsumerOutcome) {
+    if (!this.current || !CONSUMER_OUTCOMES.includes(outcome)) throw new Error('CONSUMER_REQUEST');
+    // Saturate all counts together: the sum always equals recorded callbacks.
+    if (this.current.pollCount === 255) { this.current.pollsCapped = true; return; }
+    this.current.pollCount++; this.current.outcomes[outcome]++;
+  }
+  finish() {
+    if (!this.current) throw new Error('CONSUMER_REQUEST');
+    const finished = this.now();
+    if (typeof finished !== 'bigint' || finished < this.started) throw new Error('CONSUMER_CLOCK');
+    const delta = finished - this.started, limit = 180_000_000_000n;
+    this.current.elapsedCapped = delta > limit;
+    this.current.elapsedMs = Number((delta > limit ? limit : delta) / 1_000_000n);
+  }
+  snapshot(): ConsumerRead | undefined { return this.current ? parseConsumerRead(this.current) : undefined; }
+}
 export function requireNativeTarget(window: NativeWindow, backend: Backend) {
   if (window.count !== 1 || !window.identityMatches || !window.geometry || !window.workArea) throw new Error('OWN_NATIVE_IDENTITY_REQUIRED');
   if (window.nativeBackend !== (backend.endsWith('wayland') ? 'wayland' : 'x11')) throw new Error('NATIVE_BACKEND_MISMATCH');
@@ -136,7 +186,24 @@ export const OBSERVER_EVENTS = ['REQUEST_VALIDATED', 'REPLY_PUBLISHED', 'HOOK_FA
 export type ObserverSnapshot = { checkpoints: typeof OBSERVER_CHECKPOINTS[number][];
   requests: { event: typeof OBSERVER_EVENTS[number]; request: number }[];
   extensionInfo: { status: 'INFO_UNAVAILABLE' | 'NOT_FOUND' } | { status: 'INFO_AVAILABLE'; state: number; enabled: boolean } };
-export type ObserverStartup = { latest: ObserverSnapshot; beforeChecker?: ObserverSnapshot };
+export type ObserverLifecycleSample = {
+  compositor: { state: 'running'; exitCode: null } | { state: 'exited'; exitCode: number };
+  drain: { eofObserved: boolean; readerAlive: boolean; stopRequested: boolean };
+};
+export type ObserverLifecycle = { beforeChecker?: ObserverLifecycleSample; afterChecker?: ObserverLifecycleSample; finally: ObserverLifecycleSample };
+export type ObserverStartup = { latest: ObserverSnapshot; beforeChecker?: ObserverSnapshot; lifecycle?: ObserverLifecycle };
+function observerLifecycleSample(value: unknown): ObserverLifecycleSample {
+  const row = object(value); keys(row, ['compositor', 'drain']);
+  const process = object(row.compositor); keys(process, ['state', 'exitCode']);
+  let compositor: ObserverLifecycleSample['compositor'];
+  if (process.state === 'running' && process.exitCode === null) compositor = { state: 'running', exitCode: null };
+  else if (process.state === 'exited' && Number.isSafeInteger(process.exitCode) && Number(process.exitCode) >= -64 && Number(process.exitCode) <= 255) {
+    compositor = { state: 'exited', exitCode: Number(process.exitCode) };
+  } else throw new Error('OBSERVER_PROCESS_SCHEMA');
+  const drain = object(row.drain); keys(drain, ['eofObserved', 'readerAlive', 'stopRequested']);
+  if (typeof drain.eofObserved !== 'boolean' || typeof drain.readerAlive !== 'boolean' || typeof drain.stopRequested !== 'boolean') throw new Error('OBSERVER_DRAIN_SCHEMA');
+  return { compositor, drain: { eofObserved: drain.eofObserved, readerAlive: drain.readerAlive, stopRequested: drain.stopRequested } };
+}
 function observerSnapshot(value: unknown): ObserverSnapshot {
   const row = object(value); keys(row, ['checkpoints', 'requests', 'extensionInfo']);
   if (!Array.isArray(row.checkpoints) || row.checkpoints.length > OBSERVER_CHECKPOINTS.length
@@ -161,8 +228,14 @@ function observerSnapshot(value: unknown): ObserverSnapshot {
   return { checkpoints: [...row.checkpoints] as ObserverSnapshot['checkpoints'], requests, extensionInfo };
 }
 export function parseObserverStartup(value: unknown): ObserverStartup {
-  const row = object(value); keys(row, ['latest'], ['beforeChecker']);
+  const row = object(value); keys(row, ['latest'], ['beforeChecker', 'lifecycle']);
   const result: ObserverStartup = { latest: observerSnapshot(row.latest) };
   if ('beforeChecker' in row) result.beforeChecker = observerSnapshot(row.beforeChecker);
+  if ('lifecycle' in row) {
+    const states = object(row.lifecycle); keys(states, ['finally'], ['beforeChecker', 'afterChecker']);
+    result.lifecycle = { finally: observerLifecycleSample(states.finally) };
+    if ('beforeChecker' in states) result.lifecycle.beforeChecker = observerLifecycleSample(states.beforeChecker);
+    if ('afterChecker' in states) result.lifecycle.afterChecker = observerLifecycleSample(states.afterChecker);
+  }
   return result;
 }

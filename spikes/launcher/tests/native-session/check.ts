@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, NativeTrace, requireNativeTarget } from './protocol.ts';
+import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget } from './protocol.ts';
 import type { Backend, NativePhase, Observation } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
@@ -40,6 +40,7 @@ let stage = 'build';
 let request = 0;
 let pid = 0;
 const nativeTrace = new NativeTrace();
+const consumerTrace = new ConsumerTrace(() => process.hrtime.bigint());
 class NativeHookFailed extends Error { constructor() { super('NATIVE_HOOK_FAILURE'); } }
 const decoy = spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
 decoy.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
@@ -49,20 +50,27 @@ const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePha
   writeFileSync(join(root, 'context-next.json'), JSON.stringify({ request: serial, pid, decoyPid: decoy.pid, operation }), { mode: 0o600 });
   renameSync(join(root, 'context-next.json'), join(root, 'context.json'));
   nativeTrace.begin(phase);
+  consumerTrace.begin(serial);
   let observation: Observation | undefined;
   let hookFailed = false;
-  await expect.poll(() => {
-    const path = join(root, 'observation.json');
-    if (!existsSync(path)) return false;
-    if (lstatSync(path).size > 8192) { nativeTrace.reject(); return false; }
-    try {
-      const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
-      if (value.request !== serial) return false;
-      observation = nativeTrace.reply(value, serial);
-      hookFailed = nativeTrace.snapshot()?.state === 'hook-failed';
-      return !!observation || hookFailed;
-    } catch { nativeTrace.reject(); return false; }
-  }, { timeout: 8000 }).toBe(true);
+  try {
+    await expect.poll(() => {
+      const path = join(root, 'observation.json');
+      if (!existsSync(path)) { consumerTrace.record('missing'); return false; }
+      let size: number;
+      try { size = lstatSync(path).size; }
+      catch (error) { consumerTrace.record('poll-error'); throw error; }
+      if (size > 8192) { consumerTrace.record('parse-rejected'); nativeTrace.reject(); return false; }
+      try {
+        const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
+        if (value.request !== serial) { consumerTrace.record('other-serial'); return false; }
+        observation = nativeTrace.reply(value, serial);
+        hookFailed = nativeTrace.snapshot()?.state === 'hook-failed';
+        consumerTrace.record(observation || hookFailed ? 'matching' : 'parse-rejected');
+        return !!observation || hookFailed;
+      } catch { consumerTrace.record('parse-rejected'); nativeTrace.reject(); return false; }
+    }, { timeout: 8000 }).toBe(true);
+  } finally { consumerTrace.finish(); }
   if (hookFailed) throw new NativeHookFailed();
   return observation!;
 };
@@ -239,5 +247,7 @@ finally {
   report.stage = stage;
   const diagnostic = nativeTrace.snapshot();
   if (diagnostic) report.nativeDiagnostic = diagnostic;
+  const consumer = consumerTrace.snapshot();
+  if (consumer) report.consumerRead = consumer;
   writeFileSync(join(root, 'result.json'), JSON.stringify(report), { mode: 0o600 });
 }

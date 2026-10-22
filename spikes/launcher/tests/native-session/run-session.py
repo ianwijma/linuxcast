@@ -17,7 +17,7 @@ import time
 from private import private_root, private_environment, target_guard
 from supervision import Supervisor, Cancelled
 from artifacts import public_manifest, fallback_result, publish
-from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic
+from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
@@ -74,6 +74,7 @@ def inner(backend,root):
             stderr=subprocess.STDOUT if family=='gnome' else log,start_new_session=True,bufsize=0)
         monitor=ShellDrain(compositor.stdout) if family=='gnome' else None
         before_checker=None
+        lifecycle={}
         try:
             owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
             deadline=time.monotonic()+45
@@ -98,16 +99,21 @@ def inner(backend,root):
             node=env.get('LINUXCAST_S001_NODE')
             if not node: return unavailable('PINNED_NODE_REQUIRED')
             if monitor:
+                lifecycle['beforeChecker']=runtime_sample(compositor,monitor)
                 before_checker=monitor.snapshot()
                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
             driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             try: return driver.wait(timeout=180)
             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
+            finally:
+                if monitor: lifecycle['afterChecker']=runtime_sample(compositor,monitor)
         finally:
             if monitor:
                 monitor.close()
+                lifecycle['finally']=runtime_sample(compositor,monitor)
                 value={'latest':monitor.snapshot()}
                 if before_checker is not None: value['beforeChecker']=before_checker
+                value['lifecycle']=lifecycle
                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic(value)))
 
 def main():

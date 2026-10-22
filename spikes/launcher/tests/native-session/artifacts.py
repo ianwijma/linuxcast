@@ -99,6 +99,18 @@ def native_diagnostic(value):
         if 'lastObservation' in result and result['hookFailure']['request']<=result['lastObservation']['native']['request']: raise ValueError('PUBLIC_HOOK_REQUEST')
     return result
 
+
+def consumer_read(value):
+    names=('missing','other-serial','matching','parse-rejected','poll-error')
+    object_keys(value,('request','pollCount','outcomes','pollsCapped','elapsedMs','elapsedCapped'))
+    request=integer(value['request'],1,1000);count=integer(value['pollCount'],0,255)
+    object_keys(value['outcomes'],names)
+    outcomes={name:integer(value['outcomes'][name],0,255) for name in names}
+    polls_capped=boolean(value['pollsCapped']);elapsed=integer(value['elapsedMs'],0,180000);elapsed_capped=boolean(value['elapsedCapped'])
+    if sum(outcomes.values())!=count or polls_capped and count!=255 or elapsed_capped and elapsed!=180000:
+        raise ValueError('PUBLIC_CONSUMER_RELATION')
+    return {'request':request,'pollCount':count,'outcomes':outcomes,'pollsCapped':polls_capped,'elapsedMs':elapsed,'elapsedCapped':elapsed_capped}
+
 def runtime(value,backend):
     object_keys(value,('electron','chrome','ozone','noSandbox','sandbox','contextIsolation','nodeIntegration','webSecurity','renderer'))
     renderer=value['renderer'];object_keys(renderer,('runtime','process','require'))
@@ -121,7 +133,7 @@ def shortcut(value,backend):
 
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead'))
     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
@@ -141,6 +153,7 @@ def public_result(value,backend):
     for flag in FLAGS:
         if flag in value: result[flag]=boolean(value[flag])
     if 'nativeDiagnostic' in value: result['nativeDiagnostic']=native_diagnostic(value['nativeDiagnostic'])
+    if 'consumerRead' in value: result['consumerRead']=consumer_read(value['consumerRead'])
     if 'observerStartup' in value:
         if not backend.startswith('gnome'): raise ValueError('PUBLIC_OBSERVER_BACKEND')
         result['observerStartup']=startup_diagnostic(value['observerStartup'])

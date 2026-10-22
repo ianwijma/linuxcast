@@ -5,9 +5,11 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { stripTypeScriptTypes } from 'node:module';
+import { runInNewContext } from 'node:vm';
 import { buildNativeSession } from './build.ts';
-import { NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
-import type { NativeWindow } from './protocol.ts';
+import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
 const native = (): NativeWindow => ({ count: 1, identityMatches: true, nativeBackend: 'wayland', focused: false, hidden: false,
@@ -35,6 +37,139 @@ test('public observation parsing rejects stale replies, arbitrary content and un
   expect(() => parseObservation({ ...row, launcher: { ...native(), geometry: { x: 0, y: 0, width: NaN, height: 1 } } }, 7)).toThrow('NATIVE_RECT');
   expect(() => parseObservation({ ...row, launcher: { ...native(), count: -1 } }, 7)).toThrow('NATIVE_SCHEMA');
   expect(() => parseObservation({ ...row, launcher: { ...native(), count: 0 } }, 7)).toThrow('NATIVE_IDENTITY_SCHEMA');
+});
+
+// Execute the production observe function, type-only stripped, with synthetic
+// file operations and a deterministic poll scheduler. No guard, GUI or real
+// observation files are evaluated by this fixture.
+async function consumerFixture(options: { exists?: boolean; raw?: string; size?: number; callbacks?: number;
+  metadataError?: Error; readError?: Error; elapsedNs?: bigint } = {}) {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('const observe = async'), end = text.indexOf('const observed = async', begin);
+  expect(begin).toBeGreaterThanOrEqual(0); expect(end).toBeGreaterThan(begin);
+  const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureObserve = observe;`);
+  const fs = { write: 0, rename: 0, exists: 0, stat: 0, read: 0 };
+  const nativeTrace = new NativeTrace();
+  let clock = 9_000_000_000n;
+  const consumerTrace = new ConsumerTrace(() => clock);
+  const raw = options.raw ?? '{}', timeout = new Error('SYNTHETIC_POLL_DEADLINE');
+  class SyntheticHookFailed extends Error {}
+  const context = {
+    request: 1, pid: 101, decoy: { pid: 202 }, root: '/synthetic', join,
+    nativeTrace, consumerTrace, NativeHookFailed: SyntheticHookFailed,
+    writeFileSync: (path: string, body: string, mode: { mode: number }) => {
+      fs.write++; expect(path).toBe('/synthetic/context-next.json');
+      expect(JSON.parse(body)).toEqual({ request: 2, pid: 101, decoyPid: 202, operation: 'observe' });
+      expect(mode.mode).toBe(0o600);
+    },
+    renameSync: (from: string, to: string) => { fs.rename++; expect(from).toBe('/synthetic/context-next.json'); expect(to).toBe('/synthetic/context.json'); },
+    existsSync: (path: string) => { fs.exists++; expect(path).toBe('/synthetic/observation.json'); return options.exists !== false; },
+    lstatSync: (path: string) => { fs.stat++; expect(path).toBe('/synthetic/observation.json'); if (options.metadataError) throw options.metadataError; return { size: options.size ?? raw.length }; },
+    readFileSync: (path: string, encoding: string) => { fs.read++; expect(path).toBe('/synthetic/observation.json'); expect(encoding).toBe('utf8'); if (options.readError) throw options.readError; return raw; },
+    expect: { poll: (callback: () => boolean, config: { timeout: number }) => {
+      expect(config.timeout).toBe(8000);
+      return { toBe: async (expected: boolean) => {
+        expect(expected).toBe(true);
+        try {
+          for (let index = 0; index < (options.callbacks ?? 1); index++) if (callback()) return;
+          throw timeout;
+        } finally { clock += options.elapsedNs ?? 25_000_000n; }
+      } };
+    } },
+    fixtureObserve: undefined as undefined | ((operation: 'observe', phase: 'after-close-native-hidden') => Promise<Observation>),
+  };
+  runInNewContext(program, context, { timeout: 1000 });
+  let returned: Observation | undefined, error: unknown;
+  try { returned = await context.fixtureObserve!('observe', 'after-close-native-hidden'); } catch (value) { error = value; }
+  return { fs, returned, error, timeout, hookFailed: error instanceof SyntheticHookFailed,
+    native: nativeTrace.snapshot(), consumer: consumerTrace.snapshot()! };
+}
+
+const consumerCases: { name: string; options: Parameters<typeof consumerFixture>[0]; outcome: ConsumerOutcome; state: string; stat: number; read: number }[] = [
+  { name: 'missing-file', options: { exists: false }, outcome: 'missing', state: 'request-written', stat: 0, read: 0 },
+  { name: 'old-serial', options: { raw: '{"request":1}' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
+  { name: 'missing-serial', options: { raw: '{}' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
+  { name: 'scalar-json', options: { raw: '17' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
+  { name: 'null-json', options: { raw: 'null' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
+  { name: 'malformed-json', options: { raw: '{synthetic-private-canary' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
+  { name: 'matching-invalid-schema', options: { raw: '{"request":2,"private":"synthetic-private-canary"}' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
+  { name: 'oversize', options: { size: 8193 }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 0 },
+  { name: 'read-error', options: { readError: new Error('synthetic-private-canary') }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
+];
+for (const row of consumerCases) test(`actual consumer callback ${row.name} preserves file operations and native trace`, async () => {
+  const value = await consumerFixture(row.options);
+  expect(value.error).toBe(value.timeout); expect(value.returned).toBeUndefined();
+  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: row.stat, read: row.read });
+  expect(value.native?.state).toBe(row.state);
+  expect(value.consumer).toEqual({ request: 2, pollCount: 1, outcomes: Object.fromEntries(CONSUMER_OUTCOMES.map(name => [name, name === row.outcome ? 1 : 0])),
+    pollsCapped: false, elapsedMs: 25, elapsedCapped: false });
+  expect(JSON.stringify({ consumer: value.consumer, native: value.native })).not.toContain('synthetic-private-canary');
+});
+
+test('actual consumer metadata error rethrows the identical exception without reading or rejecting the old trace', async () => {
+  const metadataError = new Error('synthetic-private-canary');
+  const value = await consumerFixture({ metadataError });
+  expect(value.error).toBe(metadataError);
+  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: 1, read: 0 });
+  expect(value.consumer.outcomes['poll-error']).toBe(1); expect(value.consumer.elapsedMs).toBe(25);
+  expect(value.native?.state).toBe('request-written');
+  expect(JSON.stringify(value.consumer)).not.toContain('synthetic-private-canary');
+});
+
+test('actual consumer distinguishes parsed native observation from terminal typed hook failure without retrying', async () => {
+  const observation = { request: 2, launcher: native(), decoy: native(), decoyActivationIssued: false };
+  const parsed = await consumerFixture({ raw: JSON.stringify(observation), callbacks: 5 });
+  expect(parsed.error).toBeUndefined(); expect(parsed.returned).toEqual(observation); expect(parsed.native?.state).toBe('parsed');
+  const failed = await consumerFixture({ raw: JSON.stringify({ request: 2, hookFailure: { stage: 'launcher', outcome: 'native-read-failed' } }), callbacks: 5 });
+  expect(failed.hookFailed).toBe(true); expect(failed.returned).toBeUndefined(); expect(failed.native?.state).toBe('hook-failed');
+  for (const value of [parsed, failed]) {
+    expect(value.consumer.pollCount).toBe(1); expect(value.consumer.outcomes.matching).toBe(1);
+    expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: 1, read: 1 });
+  }
+});
+
+test('actual consumer exports zero callbacks when the scheduler never invokes it and finishes elapsed on timeout', async () => {
+  const value = await consumerFixture({ callbacks: 0, elapsedNs: 8_000_000_000n });
+  expect(value.error).toBe(value.timeout); expect(value.consumer.pollCount).toBe(0); expect(value.consumer.elapsedMs).toBe(8000);
+  expect(Object.values(value.consumer.outcomes)).toEqual([0, 0, 0, 0, 0]);
+  expect(value.native?.state).toBe('request-written');
+  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 0, stat: 0, read: 0 });
+});
+
+test('actual consumer saturation bounds the exported counts without adding or suppressing existing file operations', async () => {
+  const value = await consumerFixture({ callbacks: 300, raw: '{"request":1}' });
+  expect(value.error).toBe(value.timeout); expect(value.consumer.pollCount).toBe(255); expect(value.consumer.pollsCapped).toBe(true);
+  expect(value.consumer.outcomes['other-serial']).toBe(255); expect(Object.values(value.consumer.outcomes).reduce((a, b) => a + b, 0)).toBe(255);
+  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 300, stat: 300, read: 300 });
+  expect(value.native?.state).toBe('request-written');
+});
+
+test('consumer keeps only the last own request and exports bounded own elapsed time without absolute clock values', () => {
+  let clock = 99_000_000_000_000n;
+  const trace = new ConsumerTrace(() => clock);
+  expect(trace.snapshot()).toBeUndefined();
+  trace.begin(1); trace.record('missing'); clock += 1_234_567n; trace.finish();
+  expect(trace.snapshot()?.elapsedMs).toBe(1);
+  trace.begin(2); expect(trace.snapshot()?.pollCount).toBe(0);
+  for (let i = 0; i < 255; i++) trace.record('matching');
+  clock += 180_000_000_000n; trace.finish();
+  expect(trace.snapshot()?.pollsCapped).toBe(false); expect(trace.snapshot()?.elapsedCapped).toBe(false);
+  trace.record('missing'); clock += 1n; trace.finish();
+  expect(trace.snapshot()).toEqual({ request: 2, pollCount: 255, outcomes: { missing: 0, 'other-serial': 0, matching: 255, 'parse-rejected': 0, 'poll-error': 0 }, pollsCapped: true, elapsedMs: 180000, elapsedCapped: true });
+  expect(JSON.stringify(trace.snapshot())).not.toContain('99000000000000');
+});
+
+test('consumer parsers reject private, wrong-typed, unbounded and inconsistent fields', () => {
+  const base = { request: 2, pollCount: 1, outcomes: { missing: 1, 'other-serial': 0, matching: 0, 'parse-rejected': 0, 'poll-error': 0 }, pollsCapped: false, elapsedMs: 1, elapsedCapped: false };
+  expect(parseConsumerRead(base)).toEqual(base);
+  const invalid = [{ ...base, private: 'synthetic-private-canary' }, { ...base, outcomes: { ...base.outcomes, private: 'synthetic-private-canary' } },
+    ...[true, 0, -1, 1001, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(request => ({ ...base, request })),
+    ...[true, -1, 256, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(pollCount => ({ ...base, pollCount })),
+    ...[true, -1, 256, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(missing => ({ ...base, outcomes: { ...base.outcomes, missing } })),
+    ...[true, -1, 180001, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(elapsedMs => ({ ...base, elapsedMs })),
+    { ...base, outcomes: { ...base.outcomes, matching: 1 } }, { ...base, pollsCapped: true }, { ...base, elapsedCapped: true },
+    { ...base, pollsCapped: 1 }, { ...base, elapsedCapped: 1 }];
+  for (const value of invalid) expect(() => parseConsumerRead(value)).toThrow();
 });
 
 for (const family of ['gnome', 'kwin'] as const) {
@@ -211,7 +346,9 @@ for (const scenario of ['valid', 'real-private-bus', 'platform-denied', 'externa
   if (scenario === 'real-private-bus') expect(value.wrapperPwdValidated).toBe(true);
 });
 
-for (const scenario of ['valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
+for (const scenario of ['valid-consumer', 'valid-consumer-zero', 'valid-consumer-capped', 'consumer-private', 'consumer-outcome-private', 'consumer-request-bool',
+  'consumer-count-bool', 'consumer-count-over', 'consumer-count-negative', 'consumer-count-fraction', 'consumer-count-nan', 'consumer-sum', 'consumer-poll-cap', 'consumer-flag-type',
+  'consumer-outcome-type', 'consumer-outcome-bool', 'consumer-elapsed-cap', 'consumer-elapsed-nan', 'consumer-elapsed-inf', 'consumer-elapsed-over', 'valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
   'manifest-extra', 'manifest-source-extra', 'manifest-hash-private', 'native-extra', 'missing-success-observations', 'forged-native-backend',
   'valid-diagnostic', 'valid-zero-geometry', 'valid-startup', 'startup-extra', 'startup-nested-private', 'startup-unknown-marker', 'startup-state-type', 'startup-request-private', 'startup-request-bound', 'valid-hook-failed', 'hook-extra', 'hook-nested-private', 'hook-stage-private', 'hook-outcome-private', 'hook-stale', 'hook-missing', 'hook-wrong-state', 'hook-forged-success', 'hook-kwin', 'diagnostic-extra', 'diagnostic-last-private', 'diagnostic-state-private', 'diagnostic-role-private', 'diagnostic-inconsistent', 'forged-success-not-ready']) test(`strict artifact boundary ${scenario}`, () => {
   const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
@@ -238,7 +375,7 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
   }
 }, 6000);
 
-for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
   const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
   expect(result.status, result.stderr).toBe(0);
   expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);
@@ -271,6 +408,32 @@ test('typed startup artifacts reject private fields, overbounds and unsupported 
     { latest: { ...snapshot, extensionInfo: { ...snapshot.extensionInfo, state: NaN } } },
     { latest: { ...snapshot, requests: Array.from({ length: 17 }, () => ({ event: 'REQUEST_VALIDATED', request: 1 })) } }]) {
     expect(() => parseObserverStartup(value)).toThrow();
+  }
+});
+
+test('typed lifecycle records distinguish own process state from independent pipe health', () => {
+  const latest = { checkpoints: [], requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } };
+  const running = { compositor: { state: 'running', exitCode: null }, drain: { eofObserved: true, readerAlive: false, stopRequested: false } };
+  for (const exitCode of [0, 255, -15, -64]) {
+    const exited = { compositor: { state: 'exited', exitCode }, drain: { eofObserved: false, readerAlive: true, stopRequested: false } };
+    const value = { latest, lifecycle: { beforeChecker: running, afterChecker: exited, finally: exited } };
+    expect(parseObserverStartup(value)).toEqual(value);
+  }
+  expect(parseObserverStartup({ latest })).toEqual({ latest });
+});
+
+test('typed lifecycle rejects inconsistent state, missing final sample and nested private values', () => {
+  const latest = { checkpoints: [], requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } };
+  const sample = { compositor: { state: 'exited', exitCode: 0 }, drain: { eofObserved: true, readerAlive: false, stopRequested: true } };
+  for (const lifecycle of [{}, { finally: sample, private: 'synthetic-private-canary' },
+    { finally: { ...sample, private: 'synthetic-private-canary' } },
+    { finally: { ...sample, compositor: { ...sample.compositor, error: 'synthetic-private-canary' } } },
+    { finally: { ...sample, compositor: { state: 'crashed', exitCode: -11 } } },
+    { finally: { ...sample, compositor: { state: 'running', exitCode: 0 } } },
+    { finally: { ...sample, drain: { ...sample.drain, private: 'synthetic-private-canary' } } },
+    { finally: { ...sample, drain: { ...sample.drain, readerAlive: 'synthetic-private-canary' } } },
+    ...[null, true, false, NaN, Infinity, -65, 256, 1.5, 'synthetic-private-canary'].map(exitCode => ({ finally: { ...sample, compositor: { state: 'exited', exitCode } } }))]) {
+    expect(() => parseObserverStartup({ latest, lifecycle })).toThrow();
   }
 });
 
