@@ -97,6 +97,9 @@ void *lc_prepare(int input,int output) {
     if (libevdev_new_from_fd(input,&d->input)<0) {free(d);return NULL;}
     libevdev_set_name(d->input,"Linuxcast S0-03 passthrough virtual");
     libevdev_set_phys(d->input,"linuxcast-s0-03/passthrough");
+    /* libevdev1.13.4 copies capabilities/name/IDs, not phys. Set the kernel
+       identity explicitly on the handed-off uinput descriptor before CREATE. */
+    if (ioctl(output,UI_SET_PHYS,"linuxcast-s0-03/passthrough")<0) {libevdev_free(d->input);free(d);return NULL;}
     if (libevdev_uinput_create_from_device(d->input,output,&d->output)<0) {libevdev_free(d->input);free(d);return NULL;}
     return d;
 }
@@ -136,6 +139,7 @@ void *lc_synthetic(int uinput,const char *phys) {
     struct libevdev *d=libevdev_new(); if(!d)return NULL;
     libevdev_set_name(d,"Linuxcast S0-03 synthetic source");libevdev_set_phys(d,phys);
     libevdev_set_id_bustype(d,BUS_VIRTUAL);
+    if(ioctl(uinput,UI_SET_PHYS,phys)<0){libevdev_free(d);return NULL;}
     const unsigned codes[]={KEY_LEFTCTRL,KEY_RIGHTCTRL,KEY_ESC,KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_LEFTALT,KEY_RIGHTALT,KEY_LEFTMETA,KEY_RIGHTMETA,KEY_F24};
     for(unsigned i=0;i<sizeof(codes)/sizeof(codes[0]);i++) if(libevdev_enable_event_code(d,EV_KEY,codes[i],NULL)<0){libevdev_free(d);return NULL;}
     struct libevdev_uinput *ui=NULL;int rc=libevdev_uinput_create_from_device(d,uinput,&ui);libevdev_free(d);return rc<0?NULL:ui;
