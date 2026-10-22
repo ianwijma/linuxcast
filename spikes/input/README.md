@@ -207,3 +207,83 @@ An independent outer capture bounded execution/cleanup, bytes and row counts, th
 [Guest cleanup/release verification](evidence/peer-wrapper-guest-cleanup.json) ties both artifact hashes to the frozen runtime/binary and records cleanup after each run: wrapper reaped, its own process group absent, observer temporary paths absent, guest staging directory/binary removed, and the owned container staging file removed. At release, fixed compositor/Xvfb/Electron/Node/GDB counts were all0, DBus remained at its baseline2, private matrix roots were absent and the exact input-lab marker was absent. No input devices, input permissions, PAM/sshd settings, services, session activation, compositor or policy were changed. The exclusive guest reservation was returned clean before another task resumed; no further guest calls were made.
 
 **AC01/AC02 remain pending.** This wrapper is not integrated with the input supervisor/worker and cannot Arm. Real supervisor refusal, desktop lock/inactive transitions, supported companion freshness and physical held-key/compositor recovery remain outstanding. The successful read-only SSH/PTY evidence does not establish a native desktop session or close the privileged-input security gate.
+
+## Device-free live-denial decisions: source increment
+
+The reviewed [proposal](live-denial-proposal.md) is implemented as source for
+independent review, with **no new live context or input execution**. The existing
+root-only `supervisor --synthetic-lab` now calls `decision::DecisionState` for
+request/lease/context decisions. It explicitly selects the legacy synthetic
+policy; its manufactured-device and no-graphical-session guards are unchanged.
+This does not declare that existing input entry point live-enforced. Its same14
+actual manufactured-kernel scenarios and mapped security route must be rerun
+after independent review and a separate guest reservation.
+
+The fixed `linuxcast-input-spike-denial-probe --observe-private-denial` engineering
+driver selects only the live-denial policy. Its otherwise eligible trusted
+fixture cannot override a live veto. The **same decision functions** called by
+the supervisor decide Arm/Renew/running checks; there is no armed-live
+constructor, positive helper grant, or caller-selected policy/principal/path.
+The device-free driver never launches a worker, opens input descriptors or
+sends worker IPC. A pending observation, negative context, missing authenticated
+companion, stale data, helper timeout/death, channel failure or epoch change can
+only deny. Arm/Renew veto terminally disarms that connection; later reports or a
+new same-UID connection cannot revive it.
+
+`denial_observer.rs` launches a dedicated exact sibling helper with an empty
+environment and private bounded seqpacket channel. The helper rejects any
+environment entry before library work, verifies real/effective/saved identity,
+empty capabilities, no-new-privileges, no-core, parent-death/race binding and
+descriptor closure. Its bootstrap receives exactly one duplicate of the actual
+server-accepted metadata socket, trusted expected UID equal to its real UID,
+and a parent-issued connection generation. Client protocol bytes/rights cannot
+provide those values. Socketpair creator credentials identify the expected
+parent; they are **not** used to authenticate the helper as a child. The parent
+owns the actual direct unreaped child and private endpoint. Metadata binding
+still derives SO_PEERCRED/SO_PEERPIDFD from the accepted connection itself.
+
+This launcher is intentionally restricted to its ordinary real UID. It does not
+implement a root-to-client-UID drop adapter for a future input service; that
+separately reviewed adapter would need trusted UID/GID/group/capability handling.
+No helper is spawned in the running supervisor loop. All startup/query/cleanup
+waits occur outside that loop; the observer's poll handles at most one bounded
+nonblocking packet and a nonblocking child-liveness check. There is one pending
+request, sampling no faster than250ms, a300ms parent request deadline, the
+existing250ms query limit and1000ms freshness ceiling. Sequence, connection,
+epoch, timestamp/duration, schema, byte and descriptor checks fail terminally.
+The helper's6s lifetime and independent7s driver guard bound this experiment.
+
+Public rows distinguish **`evidenceVeto`**, the latest validated helper evidence
+or transport failure, from **`decisionVeto`**, the first terminal decision veto.
+For example a decision latched on REMOTE remains denied when later evidence
+reports PEER_DEAD. This is expected nonrevival, not a claim the peer stayed alive.
+Only fixed phases/veto enums and denial/effect booleans are emitted (at most20
+rows,512 bytes each); no principal, session, connection generation, path, raw
+error or protocol content is exported. Unsupported/failed observation is an
+explicit incomplete nonzero result. Parent-owned children have PDEATHSIG and
+bounded cleanup; generated0700 directory/0600 socket paths are removed before
+queries. As with the earlier wrapper, external uncatchable termination during
+the short startup window can leave only an empty directory/socket; no payload
+is stored there.
+
+The no-device checks include synthetic positive Arm/Renew/lease preservation,
+otherwise eligible fixture plus an actual kernel-peer/private mocked-bus remote
+negative consumed by the shared decision, prearmed test-state revocation,
+terminal no-revival, missing/stale/timing mismatch, malformed/oversized/trailing
+packets, extra rights, wrong sequence/connection/epoch, unsupported capability,
+peer death and helper fault. A deliberately stalled helper leaves simulated
+worker-heartbeat ticks progressing with bounded parent polls. The private suite
+also checks an injected non-CLOEXEC descriptor is closed, fixed invocation and
+arbitrary/logging/bus environment rejection, parent SIGKILL cleanup, and an
+actual independent7s deadline. These session/bus replies are **private mocks**,
+not new live logind proof. The C fixture's fixed numeric observation export
+uses the existing Rust conversion; the production native bridge is unchanged.
+
+See [checks/platform metadata](evidence/denial-checks.json),
+[native test log](evidence/denial-nondevice-tests.log),
+[clippy](evidence/denial-clippy.log),
+[source hashes](evidence/denial-source-sha256.txt) and
+[binary hashes](evidence/denial-binary-sha256.txt).
+AC01/AC02 remain pending. This source increment does not establish actual
+supervisor refusal using live context, authenticated graphical lock/inactive
+transitions, physical held-key/compositor recovery or a production input grant.

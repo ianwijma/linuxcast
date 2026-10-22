@@ -1,0 +1,183 @@
+{
+  "sourceDiffSha256": "d83d44dd8d096cbd59cc9e91867ee042ff647605ad22031bd05c3df3b82b3892",
+  "transport": "SSH_ALLOCATED_PTY",
+  "observation": {
+    "schemaVersion": 1,
+    "task": "S0-03",
+    "outcome": "ACTUAL_NEGATIVE_DECISION_CONSUMPTION",
+    "runtime": {
+      "distribution": "Debian",
+      "debianVersion": "13.7",
+      "architecture": "x86_64",
+      "kernel": "6.12.113+deb13-amd64",
+      "libsystemdVersion": "257.13-1~deb13u1",
+      "selfType": "tty",
+      "stdinIsTty": true
+    },
+    "elapsedMs": 4942.378,
+    "exitCode": 0,
+    "outerTimeout": false,
+    "boundsRejected": false,
+    "schemaRejected": false,
+    "stdoutBytes": 2619,
+    "stderrBytes": 0,
+    "rows": [
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PENDING",
+        "decisionVeto": "PENDING",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "REMOTE",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "evidenceVeto": "PEER_DEAD",
+        "decisionVeto": "REMOTE",
+        "canArm": false,
+        "workerArmEmitted": false
+      }
+    ],
+    "diagnostics": [],
+    "wrapperReaped": true,
+    "ownedProcessGroupAbsent": true,
+    "survivingGroupDetected": false,
+    "observerTemporaryPathsAbsent": true,
+    "binaryHashesAfter": {
+      "linuxcast-input-spike-denial-probe": "b6c526b5bb853cab416b27bea36c0b216c2cd11bd946de266dc7e301eef7b7d4",
+      "linuxcast-input-spike-denial-helper": "f0e96dbc18b9a2726b52f3a80ad9b0b6f8e2973146d849a48c2d90f563b1a9e2"
+    },
+    "complete": true,
+    "inputOperationsPerformed": false,
+    "supervisorLiveEnforcementEstablished": false,
+    "ac01Complete": false,
+    "ac02Complete": false
+  },
+  "captureStageRemoved": true,
+  "complete": true
+}

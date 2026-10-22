@@ -92,7 +92,7 @@ static struct lc_context *binding(struct client *client) {
     c->peer_session_fn = fake_session; c->peer_uid_fn = fake_uid;
     return c;
 }
-static pid_t private_bus(struct lc_context *c, pid_t expire) {
+static pid_t private_bus_mode(struct lc_context *c, pid_t expire, int mode) {
     int fd[2];
     if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fd) < 0) return -1;
     pid_t child = fork();
@@ -101,7 +101,7 @@ static pid_t private_bus(struct lc_context *c, pid_t expire) {
         /* This server must not itself retain the client's monitor transport. */
         close(c->peer_socket);
         sd_bus *server = NULL;
-        struct fixture fixture = { .uid = getuid(), .expire_peer = expire, .expire_pidfd = c->peer_pidfd };
+        struct fixture fixture = { .mode = mode, .uid = getuid(), .expire_peer = expire, .expire_pidfd = c->peer_pidfd };
         sd_id128_t id = SD_ID128_MAKE(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
         if (sd_bus_new(&server) < 0 || sd_bus_set_fd(server, fd[1], fd[1]) < 0 ||
             sd_bus_set_server(server, 1, id) < 0 || sd_bus_add_filter(server, NULL, handler, &fixture) < 0 || sd_bus_start(server) < 0) _exit(3);
@@ -117,6 +117,27 @@ static pid_t private_bus(struct lc_context *c, pid_t expire) {
     close(fd[1]);
     if (sd_bus_new(&c->bus) < 0 || sd_bus_set_fd(c->bus, fd[0], fd[0]) < 0 || sd_bus_start(c->bus) < 0) return -1;
     return child;
+}
+static pid_t private_bus(struct lc_context *c, pid_t expire) {
+    return private_bus_mode(c, expire, 0);
+}
+static int export_negative_observation(void) {
+    struct client peer = connect_child(0);
+    struct lc_context *c = binding(&peer);
+    if (!c) { cleanup_client(&peer); return 3; }
+    pid_t server = private_bus_mode(c, 0, 7); /* mocked Remote=true */
+    if (server < 0) { lc_context_close(c); cleanup_client(&peer); return 3; }
+    struct lc_context_observation value;
+    lc_context_sample_peer(c, &value);
+    int valid = value.status == LC_CONTEXT_OK && (value.flags & LC_PID_BOUND) &&
+        !(value.flags & LC_LOCAL);
+    lc_context_close(c); cleanup_client(&peer);
+    int status; waitpid(server, &status, 0);
+    if (!valid || !WIFEXITED(status) || WEXITSTATUS(status) != 0) return 3;
+    printf("{\"epoch\":%llu,\"started_ms\":%llu,\"observed_ms\":%llu,\"flags\":%u,\"status\":%u}\n",
+        (unsigned long long)value.epoch, (unsigned long long)value.started_ms,
+        (unsigned long long)value.observed_ms, value.flags, value.status);
+    return 0;
 }
 static int normal_and_retained_death(void) {
     struct client peer = connect_child(1);
@@ -212,6 +233,9 @@ static int denial_boundaries(void) {
     return valid;
 }
 int main(int argc, char **argv) {
+    if (argc == 2 && strcmp(argv[1], "--denial-observation") == 0 && peer_environment_empty()) {
+        alarm(5); return export_negative_observation();
+    }
     if (argc == 2 && strcmp(argv[1], "--environment-denial") == 0) {
         struct lc_context_observation observation;
         struct lc_context *c = lc_context_open_peer(-1, getuid(), &observation);

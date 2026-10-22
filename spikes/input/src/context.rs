@@ -5,13 +5,14 @@ use std::os::fd::AsRawFd;
 use std::os::unix::net::UnixStream;
 
 #[repr(C)]
-#[derive(Default, Clone, Copy)]
-struct NativeObservation {
-    epoch: u64,
-    started_ms: u64,
-    observed_ms: u64,
-    flags: u32,
-    status: u32,
+#[derive(Default, Clone, Copy, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct NativeObservation {
+    pub(crate) epoch: u64,
+    pub(crate) started_ms: u64,
+    pub(crate) observed_ms: u64,
+    pub(crate) flags: u32,
+    pub(crate) status: u32,
 }
 unsafe extern "C" {
     fn lc_context_open(out: *mut NativeObservation) -> *mut c_void;
@@ -88,7 +89,7 @@ pub struct Report {
     pub logind_lock_hint_locked: bool,
     pub denials: Vec<Denial>,
 }
-fn report(value: NativeObservation, now_ms: u64) -> Report {
+pub(crate) fn report(value: NativeObservation, now_ms: u64) -> Report {
     let valid = value.status == 0 && value.flags & !KNOWN_FLAGS == 0;
     let fresh = valid
         && value.started_ms <= value.observed_ms

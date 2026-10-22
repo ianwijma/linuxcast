@@ -1,7 +1,9 @@
 use linuxcast_input_spike::{
-    Result, device, fail,
-    protocol::{Decoder, Operation, Reply},
-    safety::{Context, Guard, WORKER_WATCHDOG_MS},
+    Result,
+    decision::{DecisionState, Effect},
+    device, fail,
+    protocol::{Decoder, Reply},
+    safety::{Context, WORKER_WATCHDOG_MS},
     unix::{self, Boot, Internal},
 };
 use std::{
@@ -156,7 +158,8 @@ fn run() -> Result<()> {
         return Err(fail("WORKER_NOT_READY"));
     }
     unix::send(lab.as_raw_fd(), &ready, &[])?;
-    let mut guard = Guard::default();
+    // This entry remains root-only manufactured-fixture recovery, not live enforcement.
+    let mut decision = DecisionState::synthetic_lab(boot.client_uid);
     let mut context: Option<Context> = None;
     let mut last_heartbeat = unix::monotonic_ms();
     // connection deadline, independent rate window, and partial-frame deadline
@@ -172,19 +175,12 @@ fn run() -> Result<()> {
         if now.saturating_sub(last_heartbeat) >= WORKER_WATCHDOG_MS {
             break "WORKER_WATCHDOG";
         }
-        if guard.armed
-            && (!guard.valid(guard.generation, now)
-                || !context.as_ref().is_some_and(|c| {
-                    c.generation == guard.generation && c.eligible(boot.client_uid, now)
-                }))
-        {
+        if !decision.check_running(context.as_ref(), now) {
             break "LEASE_OR_CONTEXT_EXPIRED";
         }
         match unix::receive::<Internal>(lab.as_raw_fd(), 0) {
             Ok(Some((Internal::Context { context: c }, _))) => {
-                if guard.armed
-                    && (c.generation != guard.generation || !c.eligible(boot.client_uid, now))
-                {
+                if !decision.check_running(Some(&c), now) {
                     break "CONTEXT_REVOKED";
                 }
                 context = Some(c);
@@ -266,50 +262,44 @@ fn run() -> Result<()> {
                     match decoder.feed(&bytes[..n]) {
                         Ok(Some(request)) => {
                             *partial = None;
-                            let eligible = context.as_ref().is_some_and(|c| {
-                                c.eligible(boot.client_uid, now)
-                                    && c.generation == request.generation
-                            });
-                            let mut reason = "READY";
-                            match request.operation {
-                                Operation::Handshake if !*handshake && eligible => {
-                                    *handshake = true;
-                                }
-                                Operation::Status if *handshake && eligible => {}
-                                Operation::Arm
-                                    if *handshake
-                                        && guard.arm(request.generation, now, eligible, true) =>
-                                {
+                            let outcome = decision.request(
+                                request.operation,
+                                request.generation,
+                                handshake,
+                                context.as_ref(),
+                                true,
+                                now,
+                            );
+                            match outcome.effect {
+                                Effect::Arm => {
                                     unix::send(
                                         control.as_raw_fd(),
                                         &Internal::Arm {
                                             generation: request.generation,
-                                            lease_until: guard.lease_until,
+                                            lease_until: decision.lease_until(),
                                         },
                                         &[],
                                     )?;
                                     arming = true;
                                 }
-                                Operation::Renew
-                                    if *handshake
-                                        && guard.renew(request.generation, now, eligible) =>
-                                {
+                                Effect::Renew => {
                                     unix::send(
                                         control.as_raw_fd(),
                                         &Internal::Renew {
                                             generation: request.generation,
-                                            lease_until: guard.lease_until,
+                                            lease_until: decision.lease_until(),
                                         },
                                         &[],
                                     )?;
                                 }
-                                Operation::Disarm if *handshake => break "EXPLICIT_DISARM",
-                                _ => {
-                                    if armed || arming || guard.terminal {
-                                        break "CONTROL_CONTEXT_DENIED_DISARM";
-                                    }
-                                    reason = "CONTEXT_OR_CONTROL_DENIED";
+                                Effect::Disarm => {
+                                    break if outcome.reason == "EXPLICIT_DISARM" {
+                                        "EXPLICIT_DISARM"
+                                    } else {
+                                        "CONTROL_CONTEXT_DENIED_DISARM"
+                                    };
                                 }
+                                Effect::None => {}
                             }
                             if reply(
                                 stream,
@@ -321,7 +311,7 @@ fn run() -> Result<()> {
                                 } else {
                                     "dormant"
                                 },
-                                reason,
+                                outcome.reason,
                             )
                             .is_err()
                             {
@@ -338,7 +328,7 @@ fn run() -> Result<()> {
         }
         std::thread::sleep(Duration::from_millis(2));
     };
-    guard.disarm();
+    decision.disarm();
     if reason == "WORKER_WATCHDOG" {
         let detected_ms = unix::monotonic_ms();
         // Record only after the actual successful SIGKILL syscall, before
@@ -375,7 +365,7 @@ fn run() -> Result<()> {
                 lab.as_raw_fd(),
                 &Internal::LeaseDisarm {
                     timing: unix::LeaseDisarm {
-                        lease_until_ms: guard.lease_until,
+                        lease_until_ms: decision.lease_until(),
                         requested_ms,
                     },
                 },

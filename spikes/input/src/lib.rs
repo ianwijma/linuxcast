@@ -1,5 +1,6 @@
 //! S0-03 synthetic-device safety spike. Not an installable input service.
 pub mod context;
+pub mod decision;
 pub mod device;
 pub mod diagnostics;
 pub mod protocol;
