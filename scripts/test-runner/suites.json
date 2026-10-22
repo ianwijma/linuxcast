@@ -13,7 +13,12 @@
     ]
   },
   "ui": {},
-  "integration": {},
+  "integration": {
+    "S0-02": [
+      "spikes/desktop/transport.test.ts",
+      "spikes/desktop/native.integration.test.ts"
+    ]
+  },
   "security": {
     "S0-05": [
       "spikes/ai/oauth.contract.test.ts"
