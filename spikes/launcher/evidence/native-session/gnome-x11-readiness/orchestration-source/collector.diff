@@ -1,0 +1,270 @@
+--- a/collect.py
++++ b/collect.py
+@@ -18,12 +18,16 @@
+ import tempfile
+ 
+ BACKEND = 'gnome-x11'
+-SIGNED_BASELINE = 'd8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab'
+-INCREMENT_MANIFEST = '4f84be42701e6200622c49df226ce326080a222cefd63e1eca2f1bdfd3b5d167'
+-INCREMENT = 'efdbc5d72bdc0169484fe5ca55b45c8a0bf08ff64c8d5d24e0c19260d8b54103'
+-ARCHIVE_HASH = '7bae027914e1ce33ddb0ed384e48b7924f6e4b0579ae051916bcba7541e971fd'
+-AUTHORITY_HASH = '85fc6343bdc6888e00cfa5182a1f8ca78d515cbeb5b73fbac933a82b92565e92'
+-MANIFEST_HASH = '6cb4791f7ca07ddf034585dca2778bc3d1067b17e511c9fe8f103dc061d74422'
++SIGNED_RUNTIME = 'e0fea79b96877a881ca398a55376cd98e3d8e58e'
++SOURCE_SCOPE = 'declared-runtime-and-static-inputs'
++ARCHIVE_BASELINE = '03df170788c2cd2358b15e93cf65dde51919db0c'
++INCREMENT_MANIFEST = 'a04051fc594ceab5105e1e18623bfa200a85e2663548da33c2bb83338c6a228d'
++INCREMENT = 'f2e583c714037467faa4c90b8fd84e007816a38f1ae956f77889b8dc0c270242'
++ARCHIVE_HASH = 'be366f332ba713ee33f2bf972aa99f9d2a52f0ca689f46cf0a4a676db2715dde'
++AUTHORITY_HASH = 'f7fcdd5a79f563389ae99ef69129ccc2ac2f8b35091b1d1c475408336896c7dc'
++MANIFEST_HASH = '82b20010c6dbe4ea05e22d627cdfd9ae423ef7f4573e0406312d7da0465f9e3d'
++ARCHIVE_CONSTRUCTION = {'baselineCommit': ARCHIVE_BASELINE, 'overlaySourceCommit': SIGNED_RUNTIME,
++                        'reviewedIncrementSha256': INCREMENT, 'unsignedWhenPrepared': True}
+ HOME = pathlib.Path('/home/debian')
+ RELATIVE = pathlib.Path('spikes/launcher/tests/native-session')
+ MARKER = pathlib.Path('/run/linuxcast-input-spike-lab')
+@@ -71,15 +75,22 @@
+     raw = regular_bytes(authority_path, 32768)
+     require(digest(raw) == AUTHORITY_HASH)
+     authority = json.loads(raw)
+-    require(digest(regular_bytes(archive, 64 * 1024 * 1024)) == ARCHIVE_HASH)
+-    require(authority['archiveSha256'] == ARCHIVE_HASH and authority['signedSourceBaselineCommit'] == SIGNED_BASELINE)
+-    require(authority['reviewedIncrementSha256'] == INCREMENT and authority['sourceDirty'] is True and authority['sourceSigned'] is False)
+-    require(authority['reviewedIncrementManifestSha256'] == INCREMENT_MANIFEST and authority['buildManifestSha256'] == MANIFEST_HASH)
+-    require(authority['reviewedComponentIncrementSha256'] == [
+-        '43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1',
+-        '5ddf091419ba927790d785879b9e3185a29a3d90eb32b7a56469ac2ca0507bf6'])
++    require(digest(regular_bytes(archive, 8 * 1024 * 1024)) == ARCHIVE_HASH)
++    require(type(authority) is dict and set(authority) == {'sourceStatusScope', 'sourceSigned', 'sourceDirty',
++        'runtimeInputsMatchSignedCommit', 'signedRuntimeCommit', 'verifiedRuntimeCommit', 'archiveRepresentsWholeSignedTree',
++        'archiveConstruction', 'reviewedIncrementSha256', 'reviewedIncrementManifestSha256', 'reviewedDiffPaths',
++        'reviewedPatchedFileSha256', 'archiveSha256', 'buildManifestSha256', 'sourceSha256', 'outputSha256',
++        'designTokensSha256', 'launcherDesktopFileSha256', 'dependencyAuthority'})
++    require(authority['archiveSha256'] == ARCHIVE_HASH and authority['signedRuntimeCommit'] == SIGNED_RUNTIME)
++    require(authority['verifiedRuntimeCommit'] == SIGNED_RUNTIME and authority['sourceStatusScope'] == SOURCE_SCOPE)
++    require(authority['sourceSigned'] is True and authority['sourceDirty'] is False and authority['runtimeInputsMatchSignedCommit'] is True)
++    require(authority['archiveRepresentsWholeSignedTree'] is False)
++    require(type(authority['archiveConstruction']) is dict and authority['archiveConstruction'] == ARCHIVE_CONSTRUCTION)
++    require(authority['archiveConstruction']['unsignedWhenPrepared'] is True)
++    require(authority['reviewedIncrementSha256'] == INCREMENT and authority['reviewedIncrementManifestSha256'] == INCREMENT_MANIFEST)
++    require(authority['buildManifestSha256'] == MANIFEST_HASH)
+     source = stage / RELATIVE
+-    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 8)
++    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 4)
+     for name, expected in authority['sourceSha256'].items():
+         file = pathlib.Path(os.path.abspath(source / name))
+         require(file.is_relative_to(stage) and digest(regular_bytes(file, 16 * 1024 * 1024)) == expected)
+@@ -309,11 +320,12 @@
+                    'hostSettingsOrDisplaysChanged': False, 'physicalDesktopMatrixEstablished': False}
+         provenance = {'task': 'S0-01', 'backend': BACKEND, 'collectorOutcome': outcome,
+             'startedUtc': started, 'finishedUtc': finished, 'exitCode': status,
+-            'executedRuntimeCommit': None, 'runtimeInputsMatchSignedCommit': False,
+-            'signedSourceBaselineCommit': SIGNED_BASELINE, 'sourceSigned': False, 'sourceDirty': True, 'reviewedIncrementSha256': INCREMENT,
++            'executedRuntimeCommit': SIGNED_RUNTIME if outcome == 'completed' and type(status) is int and unchanged else None,
++            'runtimeInputsMatchSignedCommit': True, 'signedRuntimeCommit': SIGNED_RUNTIME, 'verifiedRuntimeCommit': SIGNED_RUNTIME,
++            'sourceStatusScope': SOURCE_SCOPE, 'sourceSigned': True, 'sourceDirty': False, 'reviewedIncrementSha256': INCREMENT,
+             'archiveRepresentsWholeSignedTree': False, 'collectorSha256': collector_hash,
+             'privateSocketPathMaxBytes': SOCKET_PATH_LIMIT, 'privateSocketPathLengths': socket_path_lengths,
+-            'archiveConstruction': {'baselineCommit': SIGNED_BASELINE, 'reviewedIncrementSha256': INCREMENT, 'unsignedWhenPrepared': True},
++            'archiveConstruction': dict(ARCHIVE_CONSTRUCTION),
+             'archiveSha256': ARCHIVE_HASH, 'sourceArchiveAuthoritySha256': AUTHORITY_HASH,
+             'sourceInputsVerified': 24, 'sourceSha256': authority['sourceSha256'],
+             'outputSha256': manifest['outputSha256'], 'designTokensSha256': authority['designTokensSha256'],
+--- a/host.py
++++ b/host.py
+@@ -19,10 +19,10 @@
+ import threading
+ 
+ HERE = pathlib.Path(__file__).resolve().parent
+-IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-consumer-immutable')
++IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
+ SOURCE = pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/tests/native-session')
+ # Filled only when the final reviewed collector/phase is frozen.
+-COLLECTOR_HASH = 'b9791ee62da4d27d5070360f69f1925cb01892eb8b94a49b8571cb0f47eb6aa1'
++COLLECTOR_HASH = 'a9c76185a153db804dfd9c149cd47419400ab628945db12aaef460f5b1fd77b1'
+ PHASE_HASH = 'bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754'
+ CONTAINER = 'linuxcast-s0-04-vm'
+ SSH = ['docker', 'exec', '-i', CONTAINER, '/usr/bin/ssh', '-i', '/lab/test-key', '-p', '2222',
+@@ -76,7 +76,7 @@
+ 
+ def public_provenance(value, collector, authority, manifest, image_names):
+     exact_keys(value, ('task', 'backend', 'collectorOutcome', 'startedUtc', 'finishedUtc', 'exitCode',
+-        'executedRuntimeCommit', 'runtimeInputsMatchSignedCommit', 'signedSourceBaselineCommit', 'sourceSigned', 'sourceDirty', 'reviewedIncrementSha256', 'archiveRepresentsWholeSignedTree', 'collectorSha256',
++        'executedRuntimeCommit', 'runtimeInputsMatchSignedCommit', 'signedRuntimeCommit', 'verifiedRuntimeCommit', 'sourceStatusScope', 'sourceSigned', 'sourceDirty', 'reviewedIncrementSha256', 'archiveRepresentsWholeSignedTree', 'collectorSha256',
+         'privateSocketPathMaxBytes', 'privateSocketPathLengths', 'archiveConstruction', 'archiveSha256', 'sourceArchiveAuthoritySha256', 'sourceInputsVerified', 'sourceSha256',
+         'outputSha256', 'designTokensSha256', 'launcherDesktopFileSha256', 'sourceUnchangedDuringRun',
+         'rendererPixelsCaptured', 'screenshotKind', 'physicalDesktopMatrixEstablished'))
+@@ -86,16 +86,19 @@
+     timestamp(value['finishedUtc'])
+     require(value['finishedUtc'] >= value['startedUtc'])
+     require(value['exitCode'] is None or (type(value['exitCode']) is int and -64 <= value['exitCode'] <= 255))
+-    require(value['executedRuntimeCommit'] is None and value['runtimeInputsMatchSignedCommit'] is False)
+-    require(value['signedSourceBaselineCommit'] == collector.SIGNED_BASELINE and value['sourceSigned'] is False and value['sourceDirty'] is True)
+-    require(value['reviewedIncrementSha256'] == collector.INCREMENT)
++    boolean(value['sourceUnchangedDuringRun'])
++    confirmed = value['collectorOutcome'] == 'completed' and type(value['exitCode']) is int and value['sourceUnchangedDuringRun']
++    require(value['executedRuntimeCommit'] == (collector.SIGNED_RUNTIME if confirmed else None))
++    require(value['runtimeInputsMatchSignedCommit'] is True and value['sourceStatusScope'] == collector.SOURCE_SCOPE)
++    require(value['signedRuntimeCommit'] == collector.SIGNED_RUNTIME and value['verifiedRuntimeCommit'] == collector.SIGNED_RUNTIME)
++    require(value['sourceSigned'] is True and value['sourceDirty'] is False and value['reviewedIncrementSha256'] == collector.INCREMENT)
+     require(value['archiveRepresentsWholeSignedTree'] is False and value['collectorSha256'] == COLLECTOR_HASH)
+     require(type(value['privateSocketPathMaxBytes']) is int and value['privateSocketPathMaxBytes'] == 107)
+     require(value['privateSocketPathLengths'] == collector.socket_layout(pathlib.Path('/home/debian/lc1-xxxxxxxx/source')))
+     require(all(type(length) is int for length in value['privateSocketPathLengths'].values()))
+-    exact_keys(value['archiveConstruction'], ('baselineCommit', 'reviewedIncrementSha256', 'unsignedWhenPrepared'))
++    exact_keys(value['archiveConstruction'], ('baselineCommit', 'overlaySourceCommit', 'reviewedIncrementSha256', 'unsignedWhenPrepared'))
+     require(value['archiveConstruction']['unsignedWhenPrepared'] is True)
+-    require(value['archiveConstruction'] == {'baselineCommit': collector.SIGNED_BASELINE, 'reviewedIncrementSha256': collector.INCREMENT, 'unsignedWhenPrepared': True})
++    require(value['archiveConstruction'] == collector.ARCHIVE_CONSTRUCTION)
+     require(value['archiveSha256'] == collector.ARCHIVE_HASH and value['sourceArchiveAuthoritySha256'] == collector.AUTHORITY_HASH)
+     require(type(value['sourceInputsVerified']) is int and value['sourceInputsVerified'] == 24)
+     require(value['sourceSha256'] == authority['sourceSha256'] and value['outputSha256'] == manifest['outputSha256'])
+--- a/test_collect.py
++++ b/test_collect.py
+@@ -48,8 +48,8 @@
+             collect.public_report(self.report, artifacts)
+ 
+     def capture_fixture(self):
+-        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/build-manifest.json')).read_text())
+-        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/authority.json').read_text())
++        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/build-manifest.json')).read_text())
++        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_text())
+         (self.root / 'report.json').write_text(json.dumps(self.report))
+         (self.root / 'source-manifest.json').write_text(json.dumps(manifest))
+         return authority, manifest
+@@ -81,7 +81,7 @@
+     def test_postrun_build_rejects_self_consistent_manifest_or_output_change(self):
+         directory = self.root / 'dist'
+         directory.mkdir()
+-        original = (pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/build-manifest.json')).read_bytes()
++        original = (pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/build-manifest.json')).read_bytes()
+         (directory / 'manifest.json').write_bytes(original)
+         manifest = json.loads(original)
+         altered = copy.deepcopy(manifest)
+@@ -105,7 +105,7 @@
+             collect.capture(self.root, authority, artifacts, 3, manifest)
+ 
+     def test_authority_rejects_tampered_renderer_and_each_new_consumer_runtime_input(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-consumer-immutable')
++        original = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         stage = self.root / 'source'
+         stage.mkdir()
+@@ -127,10 +127,37 @@
+             collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+ 
+     def test_authority_cannot_fall_back_to_the_previous_signed_runtime(self):
+-        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable'):
++        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable', '/tmp/linuxcast-s001-consumer-immutable'):
+             old = pathlib.Path(path)
+             with self.assertRaises(ValueError):
+                 collect.verify_authority(self.root, old / 'source.tgz', old / 'authority.json')
++
++    def test_injected_authority_hash_cannot_bypass_scoped_signed_schema(self):
++        original = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
++        authority = json.loads((original / 'authority.json').read_text())
++        mutations = [lambda row: row.update(private='private-canary'),
++                     lambda row: row.update(sourceSigned=False), lambda row: row.update(sourceDirty=True),
++                     lambda row: row.update(runtimeInputsMatchSignedCommit=False), lambda row: row.update(sourceSigned=1),
++                     lambda row: row.update(sourceStatusScope='whole-archive'), lambda row: row.update(signedRuntimeCommit='a'*40),
++                     lambda row: row.update(verifiedRuntimeCommit='a'*40), lambda row: row.update(archiveRepresentsWholeSignedTree=True),
++                     lambda row: row['archiveConstruction'].update(baselineCommit='a'*40),
++                     lambda row: row['archiveConstruction'].update(overlaySourceCommit='a'*40),
++                     lambda row: row['archiveConstruction'].update(unsignedWhenPrepared=False),
++                     lambda row: row['archiveConstruction'].update(unsignedWhenPrepared=1),
++                     lambda row: row['archiveConstruction'].update(private='private-canary')]
++        for change in mutations:
++            modified = copy.deepcopy(authority)
++            change(modified)
++            file = self.root / 'modified-authority.json'
++            file.write_text(json.dumps(modified))
++            reads = []
++            regular = collect.regular_bytes
++            def read(path, *args, **kwargs):
++                reads.append(path)
++                return regular(path, *args, **kwargs)
++            with patch.object(collect, 'AUTHORITY_HASH', collect.digest(file.read_bytes())), patch.object(collect, 'regular_bytes', side_effect=read):
++                with self.assertRaises(ValueError):collect.verify_authority(self.root, original / 'source.tgz', file)
++            self.assertEqual(reads, [file, original / 'source.tgz'])
+ 
+     def test_cleanup_and_package_types(self):
+         for field, value in (('privateProcessTreeCleanupVerified', 1), ('packages', ['/private/canary']),
+--- a/test_orchestration.py
++++ b/test_orchestration.py
+@@ -41,11 +41,11 @@
+                    'hostSettingsOrDisplaysChanged': False, 'physicalDesktopMatrixEstablished': False}
+         provenance = {'task': 'S0-01', 'backend': 'gnome-x11', 'collectorOutcome': 'completed',
+             'startedUtc': '2026-10-23T00:00:00+00:00', 'finishedUtc': '2026-10-23T00:00:01+00:00', 'exitCode': 3,
+-            'executedRuntimeCommit': None, 'runtimeInputsMatchSignedCommit': False,
+-            'signedSourceBaselineCommit': collect.SIGNED_BASELINE, 'sourceSigned': False, 'sourceDirty': True, 'reviewedIncrementSha256': collect.INCREMENT,
++            'executedRuntimeCommit': collect.SIGNED_RUNTIME, 'runtimeInputsMatchSignedCommit': True,
++            'signedRuntimeCommit': collect.SIGNED_RUNTIME, 'verifiedRuntimeCommit': collect.SIGNED_RUNTIME, 'sourceStatusScope': collect.SOURCE_SCOPE, 'sourceSigned': True, 'sourceDirty': False, 'reviewedIncrementSha256': collect.INCREMENT,
+             'archiveRepresentsWholeSignedTree': False, 'collectorSha256': host.COLLECTOR_HASH,
+             'privateSocketPathMaxBytes': 107, 'privateSocketPathLengths': collect.socket_layout(pathlib.Path('/home/debian/lc1-xxxxxxxx/source')),
+-            'archiveConstruction': {'baselineCommit': collect.SIGNED_BASELINE, 'reviewedIncrementSha256': collect.INCREMENT, 'unsignedWhenPrepared': True},
++            'archiveConstruction': dict(collect.ARCHIVE_CONSTRUCTION),
+             'archiveSha256': collect.ARCHIVE_HASH, 'sourceArchiveAuthoritySha256': collect.AUTHORITY_HASH,
+             'sourceInputsVerified': 24, 'sourceSha256': self.authority['sourceSha256'], 'outputSha256': self.manifest['outputSha256'],
+             'designTokensSha256': self.authority['designTokensSha256'], 'launcherDesktopFileSha256': self.authority['launcherDesktopFileSha256'],
+@@ -97,15 +97,30 @@
+             with self.assertRaises(ValueError):
+                 self.validate(value)
+ 
+-    def test_unsigned_increment_cannot_be_promoted_to_a_signed_runtime(self):
+-        mutations = {'executedRuntimeCommit': collect.SIGNED_BASELINE, 'runtimeInputsMatchSignedCommit': True,
+-                     'sourceSigned': True, 'sourceDirty': False, 'signedSourceBaselineCommit': 'a' * 40,
+-                     'reviewedIncrementSha256': '0' * 64}
++    def test_scoped_signed_runtime_and_unsigned_archive_claims_are_exact(self):
++        mutations = {'executedRuntimeCommit': None, 'runtimeInputsMatchSignedCommit': False,
++                     'sourceSigned': False, 'sourceDirty': True, 'signedRuntimeCommit': 'a'*40,
++                     'verifiedRuntimeCommit': 'a'*40, 'sourceStatusScope': 'whole-archive', 'reviewedIncrementSha256': '0'*64}
+         for key, changed in mutations.items():
+             value = self.response()
+             self.edit_file(value, 'provenance.json', lambda item: item.update({key: changed}))
+-            with self.assertRaises(ValueError):
+-                self.validate(value)
++            with self.assertRaises(ValueError):self.validate(value)
++        for key, changed in {'baselineCommit': 'a'*40, 'overlaySourceCommit': 'a'*40,
++                             'unsignedWhenPrepared': False, 'private': 'private-canary'}.items():
++            value = self.response()
++            self.edit_file(value, 'provenance.json', lambda item: item['archiveConstruction'].update({key: changed}))
++            with self.assertRaises(ValueError):self.validate(value)
++
++    def test_unconfirmed_or_changed_invocation_has_no_executed_commit(self):
++        for outcome, unchanged in (('collector-rejected', True), ('runner-timeout', True), ('cancelled', True), ('completed', False)):
++            value = self.response()
++            def change(item):item.update(collectorOutcome=outcome, sourceUnchangedDuringRun=unchanged, executedRuntimeCommit=None)
++            self.edit_file(value, 'provenance.json', change)
++            files, _ = self.validate(value)
++            saved = json.loads(files['provenance.json'])
++            self.assertIsNone(saved['executedRuntimeCommit']);self.assertEqual(saved['verifiedRuntimeCommit'], collect.SIGNED_RUNTIME)
++            self.edit_file(value, 'provenance.json', lambda item: item.update(executedRuntimeCommit=collect.SIGNED_RUNTIME))
++            with self.assertRaises(ValueError):self.validate(value)
+ 
+     def test_lifecycle_public_report_roundtrip_and_nested_private_rejection(self):
+         state = {'compositor': {'state': 'running', 'exitCode': None},
+--- a/README.md
++++ b/README.md
+@@ -1,15 +1,13 @@
+-# S0-01 unsigned consumer collector preparation
++# S0-01 readiness: local collector preparation
+ 
+-LOCAL ONLY: this source bundle neither accesses the guest nor authorizes a native run. It updates the previously reviewed3f084a lifecycle collector only for the new exact consumer+ lifecycle authority. No retries, new backend, source behavior, readiness wait, native effect or timing budget is introduced. Phase is byte-identical bbe00ac5.
++LOCAL ONLY. No guest, native, staging, signing or publication action is authorized by this bundle. Source and collector require coordinator+independent review and a separate explicit one-run reservation.
+ 
+-Immutable inputs: /tmp/linuxcast-s001-consumer-immutable/source.tgz (7bae0279), authority.json (85fc6343), build-manifest.json (6cb4791f). Source derives from signed baseline d8b6 + exact8 reviewed efdbc5d7 overlays, component increments43922(lifecycle) and5ddf0914(consumer). Authority pins reviewed4f84 manifest, all8overlay files,24runtime inputs,3static outputs, tokens and desktop file. archive-path-index.json lists all455regular file hashes/modes and66directory paths/modes. No installed dependencies, new evidence or unrelated worktree state is included.
++Scoped signed runtime: all24runtime and2static inputs match e0fea79b96877a881ca398a55376cd98e3d8e58e Git blobs; coordinator verified its normal SSH signature. sourceStatusScope=declared-runtime-and-static-inputs, sourceSigned=true, sourceDirty=false, runtimeInputsMatchSignedCommit=true, signedRuntimeCommit=verifiedRuntimeCommit=e0. These constants describe the prepared declared inputs, not a signed archive, continuous health or native success. sourceUnchangedDuringRun remains a separate checked fact. executedRuntimeCommit=e0 ONLY when collectorOutcome=completed, integer runner status observed and source unchanged; it is null on ambiguous/unavailable/rejected/changed-source results while verified anchor remains e0.
+ 
+-Five runtime inputs differ from d8: check.ts, protocol.ts, run-session.py, observer_startup.py and artifacts.py. Provenance must remain executedRuntimeCommit=null, runtimeInputsMatchSignedCommit=false, signedSourceBaselineCommit=d8b6, sourceSigned=false, sourceDirty=true, reviewedIncrementSha256=efdbc5d7; whole archive is not a signed tree. Old439/216/6ec0 and51ed authority are not accepted as this run. The authority records both component hashes. New authority, archive, manifest and collector are exact pins; no permissive fallback.
++Unsigned mixed archive: source snapshot /tmp/linuxcast-s001-readiness-immutable/source.tgz is5,718,329bytes (existing8MiB cap unchanged), SHAbe366f33; authorityf7fcdd5a, rawbuildmanifest82b20010, index148e8c9d. Exact03df170 baseline469regular/68directories plus ONLY4f2e overlays pulled directly from signed e0 Git blobs. archiveConstruction must equal baseline03df/overlaye0/reviewed f2e/unsignedWhenPrepared=true; archiveRepresentsWholeSignedTree=false always. Full e0 archive17,343,546bytes was too large; no cap increase. No symlinks/submodules/extra paths/modes, working metadata or recursive new evidence copied. Complete path/type/mode/hash index is in immutable snapshot. Only2runtime files change from03df; all24inputs andtokens/desktop match e0 exactly.
+ 
+-Native boundary unchanged: run-session original45s startup/180s checker/240s total; collector300s/phase330s/transport920s, once only. Fixed gnome-x11. No request replay, source fixes or retries. Short lc1- collection/source/t layout retains private socket numeric bounds78/96/77/95(max107), private owned0700/inode/O_NOFOLLOW/O_EXCL paths, historical roots detection, minimal environment, exact Node/Bun hashes and private install caches. HUP teardown shield and reviewed Supervisor remain unchanged. Source preflight, exact build-manifest rawhash/equality after execution, strict publisher/host schemas and verified cleanup-before-delete remain enforced.
++Collector changes over783d are only new exact pins, strict scoped-signed authority/provenance schema and related fixtures. Every old authority, extra root/construction field, incorrect flag/scope/base/overlay/anchor and false executed-commit claim is rejected. Authority tests inject a matching raw hash for malformed schemas and prove rejection before any runtime source read. Existing renderer/consumer source tamper, signed-output/manifestrawhash/equality, private nested artifact field and old-provenance rejection fixtures remain.
+ 
+-Reports may optionally contain only the exact reconstructed consumerRead schema. Matching includes terminal typed hook failure, so it is not success evidence; diagnostic saturation does not alter polling. Host rejects private fields, booleans masquerading as counts, impossible sums and unsaturated cap claims. Earlier actual lifecycle/short-layout outcomes remain INCOMPLETE and are not reinterpreted.
++Phase byte-identical bbe00ac5. Original45startup/180checker/240outer/300collector/330phase/920transport budgets; no retries/new queries/new backend/effect replay. Retains lc1/source/t/socket107 bound, HUP teardown protection, exact own0700/inode/regular/O_NOFOLLOW/O_EXCL ownership, collision preservation, cleanup-before-root-delete, exact Node/Bun pins and private install caches. Runtime readiness behavior is already-reviewed signed f2e, not modified by collector. No host policies or services touched.
+ 
+-Harmless checks52/52 PASS1.173s on host Python3.10.12; no bus/display/guest/native runner is invoked. Includes same original49checks (private Unix bind107/108, owned detached child and repeatedHUP cleanup, bounded overflow, path/type/inode collisions, tools/caches) plus3consumer public-schema/old-provenance regressions. Expanded tamper test rejects renderer and each of3new consumer runtime files. Python AST and exact archive455regular/66directories/eight-only overlay comparisons pass. Source163configured preparation and strictTS were independently passed by coordinator before this archive.
+-
+-Execution requires coordinator and independent review of the exact manifest and a separate explicit reservation. No signing, staging, publishing or guest preparation was performed.
++Harmless local checks54/54 PASS1.245s (30collector/24orchestration), Python AST and phase pin/all24signed archive checks pass. All baseline469files/68dirs with exactly4overlays and all26signed inputs were independently compared during preparation. Tests do not use a guest or desktop; private Unix socket and owned process/cancellation fixtures are explicit synthetic local checks. Historical7bae/783d/efdbc and actual incomplete artifacts remain immutable.

@@ -1,0 +1,228 @@
+diff --git a/spikes/launcher/tests/native-session/observer_startup.py b/spikes/launcher/tests/native-session/observer_startup.py
+index 5c901a0..4458fc9 100644
+--- a/spikes/launcher/tests/native-session/observer_startup.py
++++ b/spikes/launcher/tests/native-session/observer_startup.py
+@@ -39,6 +39,16 @@ def snapshot(value):
+     return {'checkpoints':list(checkpoints),'requests':safe,'extensionInfo':info(value['extensionInfo'])}
+ 
+ 
++def readiness(value):
++    # One strict, locked monitor snapshot supplies all markers. Its lifetime
++    # deduplicated checkpoints retain bad transitions, even after later enables.
++    markers=set(snapshot(value)['checkpoints'])
++    if 'PRIVATE_CONTEXT_REJECTED' in markers: return 'rejected'
++    if 'DISABLED' in markers: return 'disabled'
++    if {'PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK'}<=markers: return 'ready'
++    return 'pending'
++
++
+ def lifecycle_sample(value):
+     if type(value) is not dict or set(value)!= {'compositor','drain'}: raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
+     process=value['compositor'];drain=value['drain']
+diff --git a/spikes/launcher/tests/native-session/preparation.test.ts b/spikes/launcher/tests/native-session/preparation.test.ts
+index 55a0a5a..b36b134 100644
+--- a/spikes/launcher/tests/native-session/preparation.test.ts
++++ b/spikes/launcher/tests/native-session/preparation.test.ts
+@@ -375,7 +375,10 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
+   }
+ }, 6000);
+ 
+-for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
++for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline', 'readiness-schema',
++  'runner-ready-delayed', 'runner-ready-missing-accepted', 'runner-ready-missing-poll', 'runner-ready-missing-tick', 'runner-ready-all-missing', 'runner-ready-no-transport',
++  'runner-ready-rejected', 'runner-ready-disabled', 'runner-ready-query-deadline', 'runner-ready-exit', 'runner-ready-late-exit', 'runner-ready-late-disabled',
++  'runner-ready-last-boundary-deadline', 'runner-ready-kwin-unchanged']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+   const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+   expect(result.status, result.stderr).toBe(0);
+   expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);
+diff --git a/spikes/launcher/tests/native-session/run-session.py b/spikes/launcher/tests/native-session/run-session.py
+index 61485b2..c234d50 100644
+--- a/spikes/launcher/tests/native-session/run-session.py
++++ b/spikes/launcher/tests/native-session/run-session.py
+@@ -17,7 +17,7 @@ import time
+ from private import private_root, private_environment, target_guard
+ from supervision import Supervisor, Cancelled
+ from artifacts import public_manifest, fallback_result, publish
+-from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample
++from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample, readiness
+ 
+ HERE=pathlib.Path(__file__).resolve().parent
+ BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
+@@ -78,14 +78,25 @@ def inner(backend,root):
+         try:
+             owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
+             deadline=time.monotonic()+45
++            transport_ready=False
+             while time.monotonic()<deadline:
+                 if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
+-                if has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists()): break
++                if not transport_ready:
++                    transport_ready=has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists())
++                    if transport_ready and monitor:
++                        # Same one diagnostic query at the original transport
++                        # boundary, sharing this original startup deadline.
++                        monitor.set_info(query_once(env,deadline))
++                if monitor:
++                    if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
++                    observer_state=readiness(monitor.snapshot())
++                    if observer_state in ('rejected','disabled'): return unavailable('PRIVATE_OBSERVER_START_REJECTED')
++                    if transport_ready and observer_state=='ready': break
++                elif transport_ready: break
++                # Once transport is latched, only the private pipe snapshot is
++                # polled; no new bus queries or separate wait window are added.
+                 time.sleep(0.2)
+             else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+-            if monitor:
+-                monitor.set_info(query_once(env,deadline))
+-                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+             if family=='kwin':
+                 subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                 deadline=time.monotonic()+5
+@@ -101,7 +112,10 @@ def inner(backend,root):
+             if monitor:
+                 lifecycle['beforeChecker']=runtime_sample(compositor,monitor)
+                 before_checker=monitor.snapshot()
++                if readiness(before_checker)!='ready': return unavailable('PRIVATE_OBSERVER_START_REJECTED')
+                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
++                if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
++                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+             driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+             try: return driver.wait(timeout=180)
+             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
+diff --git a/spikes/launcher/tests/native-session/startup-fixture.py b/spikes/launcher/tests/native-session/startup-fixture.py
+index 228a3c0..de691d7 100644
+--- a/spikes/launcher/tests/native-session/startup-fixture.py
++++ b/spikes/launcher/tests/native-session/startup-fixture.py
+@@ -171,6 +171,120 @@ elif case=='gio-call':
+         except ValueError:pass
+         else:raise AssertionError('QUERY_BEFORE_PRIVATE_GUARD')
+     assert len(calls)==1
++elif case=='readiness-schema':
++    required=('PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK')
++    def value(markers):return {'checkpoints':list(markers),'requests':[],'extensionInfo':{'status':'INFO_UNAVAILABLE'}}
++    assert startup.readiness(value(required))=='ready'
++    assert startup.readiness(value((*required,'CONTEXT_NOT_OBSERVED')))=='ready'
++    for missing in required:
++        assert startup.readiness(value([marker for marker in required if marker!=missing]))=='pending'
++    active=value(());active['extensionInfo']={'status':'INFO_AVAILABLE','state':1,'enabled':True}
++    assert startup.readiness(active)=='pending'
++    for bad,state in (('PRIVATE_CONTEXT_REJECTED','rejected'),('DISABLED','disabled')):
++        output=startup.FixedOutput()
++        for marker in (*required,bad,'ENABLE_ENTERED',*required):output.feed(startup.PREFIX+marker.encode()+b'\n')
++        assert startup.readiness(output.snapshot())==state
++    assert startup.readiness(value((*required,'DISABLED','PRIVATE_CONTEXT_REJECTED')))=='rejected'
++    # Independently incomplete snapshots never combine their evidence.
++    assert startup.readiness(value(required[:2]))=='pending'
++    assert startup.readiness(value(required[2:]))=='pending'
++    output=startup.FixedOutput()
++    for marker in required:
++        line=startup.PREFIX+marker.encode()
++        output.feed(line[:12]);assert startup.readiness(output.snapshot())=='pending'
++        output.feed(line[12:]+b'synthetic-private-canary\n')
++        assert startup.readiness(output.snapshot())=='pending'
++        output.feed(b'x'*257+line+b'\n')
++        assert startup.readiness(output.snapshot())=='pending'
++    for marker in required:
++        line=startup.PREFIX+marker.encode()+b'\n'
++        output.feed(line[:12]);output.feed(line[12:])
++    assert startup.readiness(output.snapshot())=='ready'
++    assert 'synthetic-private-canary' not in json.dumps(output.snapshot())
++    invalid=value(required);invalid['private']='synthetic-private-canary'
++    try:startup.readiness(invalid)
++    except ValueError:pass
++    else:raise AssertionError('READINESS_PRIVATE_ACCEPTED')
++elif case.startswith('runner-ready-'):
++    scenario=case.removeprefix('runner-ready-')
++    assert scenario in ('delayed','missing-accepted','missing-poll','missing-tick','all-missing','no-transport',
++                        'rejected','disabled','query-deadline','exit','late-exit','late-disabled','last-boundary-deadline','kwin-unchanged')
++    spec=importlib.util.spec_from_file_location('readiness_runner',pathlib.Path(__file__).with_name('run-session.py'))
++    runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
++    events=[];now=[100.0];monitors=[];queried=[False];owner_calls=[];driver_starts=[]
++    required=('PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK')
++    with tempfile.TemporaryDirectory(prefix='linuxcast-s001-readiness-fixture-') as temporary:
++        root=pathlib.Path(temporary)
++        class Monitor(startup.FixedOutput):
++            def __init__(self,_stream):
++                super().__init__();self.closed=False;monitors.append(self)
++                self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
++                if scenario in ('rejected','disabled','late-exit','late-disabled','last-boundary-deadline'):
++                    for marker in required:self.feed(startup.PREFIX+marker.encode()+b'\n')
++                if scenario in ('rejected','disabled'):
++                    self.feed(startup.PREFIX+('PRIVATE_CONTEXT_REJECTED' if scenario=='rejected' else 'DISABLED').encode()+b'\n')
++            def close(self):self.closed=True;events.append('drain-close')
++            def health(self):
++                if scenario=='late-disabled':self.feed(startup.PREFIX+b'DISABLED\n')
++                if scenario=='last-boundary-deadline':now[0]=145.0
++                return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
++        class Child:
++            stdout=None
++            def poll(self):
++                if scenario=='exit' and now[0]>=100.4:return -9
++                if scenario=='late-exit' and queried[0]:
++                    # First post-query poll is the immediate pre-driver recheck.
++                    return -9
++                return None
++            def wait(self,timeout):assert timeout==180;events.append('driver-wait');return 3
++        def spawn(command,**kwargs):
++            if command[0]=='/fixed-shell':events.append('shell')
++            elif command[0]=='/usr/bin/python3':
++                assert scenario=='kwin-unchanged' and command[-1].endswith('kwin-bus.py');events.append('kwin-bus')
++            else:
++                assert command[0]=='/fixed-node';events.append('checker');driver_starts.append(now[0])
++                if scenario!='kwin-unchanged':
++                    assert startup.readiness(monitors[0].snapshot())=='ready'
++                    assert now[0]>=100.6
++                    assert (root/'observer-startup.json').exists()
++            return Child()
++        def owner(name,_env):
++            owner_calls.append(name)
++            # All extension markers can be ready without transport; this must
++            # not start the checker or spend an extension info call.
++            return scenario!='no-transport'
++        def query(_env,deadline):
++            assert deadline==145.0 and not queried[0]
++            queried[0]=True;events.append('one-info')
++            if scenario=='query-deadline':now[0]=145.0
++            return {'status':'INFO_UNAVAILABLE'}
++        def sleep(seconds):
++            assert seconds==0.2
++            now[0]=round(now[0]+seconds,6)
++            if now[0]>=100.6 and monitors:
++                missing={'missing-accepted':'PRIVATE_CONTEXT_ACCEPTED','missing-poll':'POLL_INSTALLED','missing-tick':'FIRST_POLL_TICK'}.get(scenario)
++                for marker in required:
++                    if marker!=missing and scenario!='all-missing':monitors[0].feed(startup.PREFIX+marker.encode()+b'\n')
++        backend='kwin-x11' if scenario=='kwin-unchanged' else 'gnome-x11'
++        with patch.object(runner,'private_root',return_value=root),patch.dict(os.environ,{'DBUS_SESSION_BUS_ADDRESS':'private-fixture','LINUXCAST_S001_NODE':'/fixed-node','DISPLAY':':99','XAUTHORITY':str(root/'xauthority')},clear=True),patch.object(runner.shutil,'which',return_value='/fixed-shell'),patch.object(runner,'bounded',return_value=types.SimpleNamespace(returncode=0,stdout='(int32 1,)')),patch.object(runner,'has_owner',side_effect=owner),patch.object(runner.time,'monotonic',side_effect=lambda:now[0]),patch.object(runner.time,'sleep',side_effect=sleep),patch.object(runner.subprocess,'Popen',side_effect=spawn),patch.object(runner,'ShellDrain',Monitor),patch.object(runner,'query_once',side_effect=query):
++            assert runner.inner(backend,root)==3
++        if scenario=='kwin-unchanged':
++            assert events==['shell','kwin-bus','checker','driver-wait']
++            assert owner_calls==['org.kde.KWin',runner.BUS,runner.BUS]
++            assert not monitors and not queried[0] and driver_starts==[100.0]
++        else:
++            value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
++            assert events[-1]=='drain-close'
++            assert queried[0] is (scenario!='no-transport')
++            assert owner_calls.count('org.gnome.Shell')==(225 if scenario=='no-transport' else 1)
++            assert set(value['lifecycle'])==({'beforeChecker','afterChecker','finally'} if scenario=='delayed' else {'beforeChecker','finally'} if scenario in ('late-exit','late-disabled','last-boundary-deadline') else {'finally'})
++            if scenario=='delayed':
++                assert driver_starts==[100.6]
++                assert value['beforeChecker']['extensionInfo']=={'status':'INFO_UNAVAILABLE'}
++                assert startup.readiness(value['beforeChecker'])=='ready'
++            else:assert not driver_starts and 'driver-wait' not in events
++            if scenario in ('all-missing','missing-accepted','missing-poll','missing-tick','no-transport','query-deadline','last-boundary-deadline'):assert now[0]==145.0
++
+ elif case in ('runner-order','runner-deadline'):
+     spec=importlib.util.spec_from_file_location('startup_runner',pathlib.Path(__file__).with_name('run-session.py'))
+     runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
+@@ -178,7 +292,10 @@ elif case in ('runner-order','runner-deadline'):
+     with tempfile.TemporaryDirectory(prefix='linuxcast-s001-matrix-startup-') as temporary:
+         root=pathlib.Path(temporary)
+         class Monitor(startup.FixedOutput):
+-            def __init__(self,_stream):super().__init__();self.closed=False;self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
++            def __init__(self,_stream):
++                super().__init__();self.closed=False
++                for marker in ('MODULE_ENTERED','PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK'):
++                    self.feed(startup.PREFIX+marker.encode()+b'\n')
+             def close(self):self.closed=True;events.append('drain-close')
+             def health(self):return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
+         class Child:
