@@ -1,0 +1,8 @@
+{
+  "monitorProcessesAbsent": true,
+  "stagedGuestFilesRemoved": true,
+  "stagedHostLabFilesRemoved": true,
+  "inputLabMarkerAbsent": true,
+  "noSettingsPolicyOrInputChanges": true,
+  "guestReservationReturnedToS002": true
+}
