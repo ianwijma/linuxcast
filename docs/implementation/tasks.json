@@ -121,7 +121,7 @@
     {
       "id": "S0-01",
       "title": "Prove launcher activation and desktop identity",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -193,14 +193,14 @@
         "bun run test:integration -- S0-01"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_06_workflow_ui",
+      "branch": "codex/s0-01-launcher",
       "limitations": []
     },
     {
       "id": "S0-02",
       "title": "Prove compositor and clipboard transport",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -272,14 +272,14 @@
         "bun run test:integration -- S0-02"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-02-desktop",
       "limitations": []
     },
     {
       "id": "S0-03",
       "title": "Prove native input failure recovery",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -352,14 +352,14 @@
         "bun run test:security -- S0-03"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-03-input",
       "limitations": []
     },
     {
       "id": "S0-04",
       "title": "Prove extension sandbox boundaries",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -396,49 +396,77 @@
         {
           "id": "S0-04-AC01",
           "text": "An allowed broker fixture works while direct host access fails.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian probe passes20boundary checks; named security suite passes22/22 with no skips. Broker allow/deny, direct host-resource denial, strict framing, detached descendant cleanup and actual memory/pids/CPU pressure are verified. Final task helper must report completed/taskCreationDenied with bounded child count plus kernel pids.events max>0.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         },
         {
           "id": "S0-04-AC02",
           "text": "Missing user namespaces or bubblewrap gives unavailable capability.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian kernel namespace denial returns NAMESPACES_UNAVAILABLE with no fixture execution and verified cleanup; guest limit restored. Missing-backend fixtures return unavailable without direct-Node fallback. Pop!_OS host CPU delegation gap separately fails closed; user declined host policy change and none occurred.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         },
         {
           "id": "S0-04-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Fixed engineering CLI/fixture prototype only; no product renderer or user-facing application UI introduced.",
           "evidence": []
         },
         {
           "id": "S0-04-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Source and evidence review finds public synthetic file/socket/database/environment canaries and operational metadata only. No user files, input, clipboard, credentials, raw stderr, VM keys or private disk/seed data committed.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:security -- S0-04"
       ],
-      "evidence": [],
+      "evidence": [
+        "Integrated PR #9 https://github.com/ianwijma/linuxcast/pull/9 into develop8baac2e5a94e49182003619d311d96f5dfa91d29. Coordinator independently reviewed implementation and executed actual Debian13 suite22/22/probe20/20/namespace-denial; review_f1_01 independently reviewed coordinator changes and evidence at31618cf, with no remaining findings after ENODEV and pressure-report fixes.",
+        "Current-head GitHub validate passed for31618cf: https://github.com/ianwijma/linuxcast/actions/runs/39809772686/job/119932564597. No requested reviewers/bots/comments were present. Exact source hashes and VM/host limitations are retained in spike evidence; no host policy change occurred."
+      ],
       "owner": "review_f1_01",
       "branch": "codex/s0-04-sandbox",
-      "limitations": []
+      "limitations": [
+        "Pop!_OS22.04 host user manager lacks CPU delegation, so mandatory profile remains unavailable there. User declined host administrator policy changes; none were applied.",
+        "Debian VM proves kernel/systemd sandbox behavior, not GNOME/KDE desktop, Wayland, physical input, performance or whole-release gates.",
+        "Spike uses development tool paths, a staged pinned runtime and test-only C emitters/pressure helper; production native helper/SDK/package validation, policy audit, permission revocation integration and release packaging remain owning-task work."
+      ]
     },
     {
       "id": "S0-05",
       "title": "Prove streaming provider and approval lifecycle",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -532,7 +560,8 @@
         "bun run test:contracts -- S0-05"
       ],
       "evidence": [
-        "Implementation d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7 independently reviewed by coordinator against S0-05 and normative references. Two findings (hanging tool deadline, malformed OAuth expiry) addressed and independently rerun: lint/typecheck,63 contract checks and26 OAuth security checks pass. Integration/PR CI pending."
+        "Integrated PR #7 https://github.com/ianwijma/linuxcast/pull/7 into develop c9a9b9566b510e93bd7082f306473207cc62aece. Source d5a36ac independently reviewed by coordinator; metadata 033c6f47 independently reviewed by s0_05_provider. Hanging-tool deadline and malformed OAuth expiry findings fixed and verified.",
+        "Lint/typecheck pass;63 contract checks and26 OAuth security checks pass with actual local HTTP transport failure/cancellation fixtures. Current-head GitHub validate passed for 033c6f47: https://github.com/ianwijma/linuxcast/actions/runs/39802346250/job/119906184636. No requested GitHub reviewers or review bot were present. Platform and remaining live-account/durability limits are recorded per criterion and in spikes/ai/evidence.md."
       ],
       "owner": "s0_05_provider",
       "branch": "codex/s0-05-provider",
@@ -546,7 +575,7 @@
     {
       "id": "S0-06",
       "title": "Prove visual workflow and declarative view integration",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -584,44 +613,78 @@
         {
           "id": "S0-06-AC01",
           "text": "Keyboard path can add/configure/connect/remove a node.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:ui -- S0-06; node spikes/workflow-ui/tests/private-session.ts; node spikes/workflow-ui/tests/xvfb-orca.ts; independent source/evidence and screenshot review",
+              "outcome": "13/13 scoped UI checks pass without skips; keyboard-only add/configure/connect/remove also passes on actual Electron. Layout is separate from execution; focus and cancellation recover. Coordinator fixed unique edge order after deletion and reviewed final source.",
+              "platform": "Browser suite on Pop!_OS22.04 amd64; actual sandboxed Electron45 on authorized GNOME42.9/X11 host and Debian13.7 software VM, kernel6.12.113, Orca48.1/AT-SPI2.56.2/SpeechDispatcher0.12 on private Xvfb. Node24.22.1/Bun1.4.4; no compositor or audible/tactile release claim.",
+              "reference": "spikes/workflow-ui/README.md; spikes/workflow-ui/evidence/; spikes/workflow-ui/evidence/debian13-electron-orca/README.md; reviewed source455c84b; final executed electron-check.ts SHA256 a5940859228e7e0c6d9c5b33128623af194bcc86e467fb417542837086af3f96. Integrated PR #11 into develop93a4dc63796abe4fab952e0c002b8bdde084a2b6; reviewed PR headbaeea78019010a6a3c7d0a96686226c06b9e69b3."
+            }
+          ]
         },
         {
           "id": "S0-06-AC02",
           "text": "Unsupported ViewModel fields and invalid edge types are rejected.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:ui -- S0-06; node spikes/workflow-ui/tests/private-session.ts; node spikes/workflow-ui/tests/xvfb-orca.ts; independent source/evidence and screenshot review",
+              "outcome": "Strict versioned spike-local List/Form validation rejects unknown/nested fields, unsupported kinds, duplicate identities, invalid revisions/prototypes and bounded UTF-8/frame excess. Invalid types/ports/nodes/duplicates/cycles cannot create an edge; source-port ordering regression passes.",
+              "platform": "Browser suite on Pop!_OS22.04 amd64; actual sandboxed Electron45 on authorized GNOME42.9/X11 host and Debian13.7 software VM, kernel6.12.113, Orca48.1/AT-SPI2.56.2/SpeechDispatcher0.12 on private Xvfb. Node24.22.1/Bun1.4.4; no compositor or audible/tactile release claim.",
+              "reference": "spikes/workflow-ui/README.md; spikes/workflow-ui/evidence/; spikes/workflow-ui/evidence/debian13-electron-orca/README.md; reviewed source455c84b; final executed electron-check.ts SHA256 a5940859228e7e0c6d9c5b33128623af194bcc86e467fb417542837086af3f96. Integrated PR #11 into develop93a4dc63796abe4fab952e0c002b8bdde084a2b6; reviewed PR headbaeea78019010a6a3c7d0a96686226c06b9e69b3."
+            }
+          ]
         },
         {
           "id": "S0-06-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "passed",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:ui -- S0-06; node spikes/workflow-ui/tests/private-session.ts; node spikes/workflow-ui/tests/xvfb-orca.ts; independent source/evidence and screenshot review",
+              "outcome": "Inspected synthetic dark/light/error/permission screenshots; keyboard/dirty/cancel/disabled/focus paths and automated AA pass. Actual Electron200% zoom, forced colors/reduced motion and sandbox checks pass. Real Debian Orca48 starts, delivers generated speech to private Speech Dispatcher and generates3/3 fresh presentations after native private-Xvfb focus keys; native roles/focus3/3. Older hostOrca42 failure remains preserved.",
+              "platform": "Browser suite on Pop!_OS22.04 amd64; actual sandboxed Electron45 on authorized GNOME42.9/X11 host and Debian13.7 software VM, kernel6.12.113, Orca48.1/AT-SPI2.56.2/SpeechDispatcher0.12 on private Xvfb. Node24.22.1/Bun1.4.4; no compositor or audible/tactile release claim.",
+              "reference": "spikes/workflow-ui/README.md; spikes/workflow-ui/evidence/; spikes/workflow-ui/evidence/debian13-electron-orca/README.md; reviewed source455c84b; final executed electron-check.ts SHA256 a5940859228e7e0c6d9c5b33128623af194bcc86e467fb417542837086af3f96. Integrated PR #11 into develop93a4dc63796abe4fab952e0c002b8bdde084a2b6; reviewed PR headbaeea78019010a6a3c7d0a96686226c06b9e69b3."
+            }
+          ]
         },
         {
           "id": "S0-06-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:ui -- S0-06; node spikes/workflow-ui/tests/private-session.ts; node spikes/workflow-ui/tests/xvfb-orca.ts; independent source/evidence and screenshot review",
+              "outcome": "Coordinator source/evidence review finds synthetic data only. No effects execute; permission/cancel states are explicit. Private buses/preferences/display/audio and PID/label allowlists isolate AT observation; no raw debug/private content/keys/disks committed. Browser request/canary check passes.",
+              "platform": "Browser suite on Pop!_OS22.04 amd64; actual sandboxed Electron45 on authorized GNOME42.9/X11 host and Debian13.7 software VM, kernel6.12.113, Orca48.1/AT-SPI2.56.2/SpeechDispatcher0.12 on private Xvfb. Node24.22.1/Bun1.4.4; no compositor or audible/tactile release claim.",
+              "reference": "spikes/workflow-ui/README.md; spikes/workflow-ui/evidence/; spikes/workflow-ui/evidence/debian13-electron-orca/README.md; reviewed source455c84b; final executed electron-check.ts SHA256 a5940859228e7e0c6d9c5b33128623af194bcc86e467fb417542837086af3f96. Integrated PR #11 into develop93a4dc63796abe4fab952e0c002b8bdde084a2b6; reviewed PR headbaeea78019010a6a3c7d0a96686226c06b9e69b3."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:ui -- S0-06"
       ],
-      "evidence": [],
+      "evidence": [
+        "Integrated PR #11 https://github.com/ianwijma/linuxcast/pull/11 into develop93a4dc63796abe4fab952e0c002b8bdde084a2b6. Coordinator independently reviewed implementation/final AT harness/evidence and target screenshots; original implementer re-reviewed coordinator edge-order/disabled-Form/navigation fixes without remaining findings. Independent metadata review verified acceptance and corrected separate harness invocations.",
+        "Current-head GitHub validate passed forbaeea78019010a6a3c7d0a96686226c06b9e69b3: https://github.com/ianwijma/linuxcast/actions/runs/39814189939/job/119948205536. No requested reviewers/bots, review submissions or comments. Final integrated-baseline13/13 UI checks/typecheck/lint/plan/diff checks pass. Actual Debian Electron45/Orca48 run exit0 with native focus3/3 and generated presentation3/3; source hash and older hostOrca42 incomplete evidence retained."
+      ],
       "owner": "s0_06_workflow_ui",
       "branch": "codex/s0-06-workflow-ui",
-      "limitations": []
+      "limitations": [
+        "Bounded feasibility renderer and spike-local host primitives/schemas only; production D1/shared contracts, full node registry, execution, persistence, permissions and extension transport remain owning-task work.",
+        "Real Debian Electron/Orca generated presentation is on isolated Xvfb; no audible/tactile QA, native GNOME/KDE/Wayland compositor, physical input, packaging or release-matrix claim. HostOrca42 incomplete presentation retained separately."
+      ]
     },
     {
       "id": "F0-01",

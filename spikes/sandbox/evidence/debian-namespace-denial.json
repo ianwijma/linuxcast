@@ -1,0 +1,27 @@
+{
+  "task": "S0-04",
+  "platform": {
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.12.113+deb13-cloud-amd64",
+    "architecture": "x64",
+    "bwrap": "bubblewrap 0.12.0",
+    "systemd": "systemd 257 (257.13-1~deb13u1)",
+    "node": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "userControllers": "cpu memory pids"
+  },
+  "result": {
+    "status": "unavailable",
+    "code": "NAMESPACES_UNAVAILABLE",
+    "cleanupVerified": true,
+    "diagnosticsBytes": 105,
+    "controls": {
+      "memoryMax": "268435456",
+      "tasksMax": "64",
+      "cpuMax": "100000 100000",
+      "memoryEvents": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+      "pidsEvents": "max 0",
+      "cpuStat": "usage_usec 6473\nuser_usec 0\nsystem_usec 6473\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+    }
+  }
+}
