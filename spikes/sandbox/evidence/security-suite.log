@@ -2,26 +2,26 @@ $ node scripts/test-runner/run.ts security "S0-04"
 
  RUN  v4.1.12 /tmp/linuxcast-s0-04
 
- ✓ spikes/sandbox/protocol.test.ts (3 tests) 13ms
- ✓ spikes/sandbox/supervisor.test.ts (2 tests) 3ms
- ❯ spikes/sandbox/host.security.test.ts (17 tests | 15 failed) 22787ms
-   × real broker works while actual direct host access is denied 1496ms
-   × host survives and cleans up hostile oversized fixture 1491ms
-   × host survives and cleans up hostile bad-json fixture 1475ms
-   × host survives and cleans up hostile truncated fixture 1480ms
-   × host survives and cleans up hostile stderr-flood fixture 1478ms
-   × host survives and cleans up hostile frame-flood fixture 1464ms
-   × host survives and cleans up hostile stale-session fixture 1440ms
-   × host survives and cleans up hostile unknown-method fixture 1487ms
-   × host survives and cleans up hostile spoof-principal fixture 1489ms
-   × host survives and cleans up hostile crash fixture 1506ms
+ ✓ spikes/sandbox/protocol.test.ts (3 tests) 12ms
+ ✓ spikes/sandbox/supervisor.test.ts (2 tests) 4ms
+ ❯ spikes/sandbox/host.security.test.ts (17 tests | 15 failed) 23465ms
+   × real broker works while actual direct host access is denied 1555ms
+   × host survives and cleans up hostile oversized fixture 1530ms
+   × host survives and cleans up hostile bad-json fixture 1525ms
+   × host survives and cleans up hostile truncated fixture 1533ms
+   × host survives and cleans up hostile stderr-flood fixture 1539ms
+   × host survives and cleans up hostile frame-flood fixture 1524ms
+   × host survives and cleans up hostile stale-session fixture 1543ms
+   × host survives and cleans up hostile unknown-method fixture 1551ms
+   × host survives and cleans up hostile spoof-principal fixture 1534ms
+   × host survives and cleans up hostile crash fixture 1517ms
    ✓ missing bubblewrap reports unavailable without executing fixture code 1ms
-   ✓ namespace setup failure reports unavailable and never executes Node  497ms
-   × cancellation kills a real detached descendant and verifies empty cgroup 1502ms
-   × wall deadline is independent of a noncooperative runtime 1478ms
-   × memory pressure is contained by the kernel memory controller 1490ms
-   × thread pressure is bounded by the kernel task controller 1499ms
-   × CPU quota throttles parallel worker load before independent deadline 1504ms
+   ✓ namespace setup failure reports unavailable and never executes Node  548ms
+   × cancellation kills a real detached descendant and verifies empty cgroup 1489ms
+   × wall deadline is independent of a noncooperative runtime 1491ms
+   × memory pressure is contained by the kernel memory controller 1516ms
+   × thread pressure is bounded by the kernel task controller 1524ms
+   × CPU quota throttles parallel worker load before independent deadline 1534ms
 
 ⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
 
@@ -43,6 +43,7 @@ Received: "unavailable"
 
  FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile oversized fixture
  FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile bad-json fixture
+ FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile truncated fixture
  FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile stderr-flood fixture
  FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile frame-flood fixture
  FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile stale-session fixture
@@ -59,20 +60,6 @@ Received: "unavailable"
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
 
- FAIL  spikes/sandbox/host.security.test.ts > host survives and cleans up hostile truncated fixture
-Error: ENODEV: no such device, read
- ❯ emptyCgroup spikes/sandbox/supervisor.ts:118:16
-    116|
-    117| function emptyCgroup(cgroup: string): boolean {
-    118|   try { return readFileSync(join(cgroup, 'cgroup.events'), 'utf8').inc…
-       |                ^
-    119|   catch (error) {
-    120|     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return tru…
- ❯ runFixture spikes/sandbox/supervisor.ts:282:21
- ❯ spikes/sandbox/host.security.test.ts:47:18
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
-
  FAIL  spikes/sandbox/host.security.test.ts > cancellation kills a real detached descendant and verifies empty cgroup
 AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'cancelled' // Object.is equality
 
@@ -87,7 +74,7 @@ Received: "unavailable"
      82|   expect(result.report?.detachedDescendantStarted).toBe(true);
      83|   expect(result.cleanupVerified).toBe(true);
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
 
  FAIL  spikes/sandbox/host.security.test.ts > wall deadline is independent of a noncooperative runtime
 AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'failed' // Object.is equality
@@ -103,7 +90,7 @@ Received: "unavailable"
      89|   expect(result.code).toBe('DEADLINE');
      90|   expect(result.cleanupVerified).toBe(true);
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
 
  FAIL  spikes/sandbox/host.security.test.ts > memory pressure is contained by the kernel memory controller
 AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'unavailable' to be 'failed' // Object.is equality
@@ -119,7 +106,7 @@ Received: "unavailable"
      96|   expect(result.code).toMatch(/^CHILD_EXIT_/);
      97|   expect(result.controls?.memoryMax).toBe('268435456');
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
 
  FAIL  spikes/sandbox/host.security.test.ts > thread pressure is bounded by the kernel task controller
 AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected [ 'completed', 'failed' ] to include 'unavailable'
@@ -131,7 +118,7 @@ AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cle
     105|   if (result.status === 'completed') expect(result.report?.threadCreat…
     106|   else expect(result.code).toMatch(/^CHILD_EXIT_/);
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
 
  FAIL  spikes/sandbox/host.security.test.ts > CPU quota throttles parallel worker load before independent deadline
 AssertionError: {"status":"unavailable","code":"CPU_CONTROLLER_UNAVAILABLE","cleanupVerified":true,"diagnosticsBytes":0}: expected 'CPU_CONTROLLER_UNAVAILABLE' to be 'DEADLINE' // Object.is equality
@@ -147,13 +134,13 @@ Received: "CPU_CONTROLLER_UNAVAILABLE"
     114|   expect(result.controls?.cpuStat).toMatch(/nr_throttled [1-9]/);
     115|   expect(result.cleanupVerified).toBe(true);
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
 
 
  Test Files  1 failed | 2 passed (3)
       Tests  15 failed | 7 passed (22)
-   Start at  02:21:30
-   Duration  22.96s (transform 134ms, setup 0ms, import 189ms, tests 22.80s, environment 0ms)
+   Start at  02:29:37
+   Duration  23.65s (transform 153ms, setup 0ms, import 210ms, tests 23.48s, environment 0ms)
 
-JSON report written to /tmp/linuxcast-test-report-Eemfvq/results.json
+JSON report written to /tmp/linuxcast-test-report-AEBMHt/results.json
 error: script "test:security" exited with code 1
