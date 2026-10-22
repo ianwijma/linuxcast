@@ -183,7 +183,12 @@ fn run() -> Result<()> {
             _ => break "LAB_CONTEXT_DISCONNECTED",
         }
         match unix::receive::<Internal>(control.as_raw_fd(), 0) {
-            Ok(Some((Internal::Heartbeat, _))) => last_heartbeat = now,
+            Ok(Some((Internal::Heartbeat, _))) => {
+                last_heartbeat = now;
+                // Operational-only observation lets the synthetic watchdog
+                // experiment stop immediately after a fresh heartbeat.
+                unix::send(lab.as_raw_fd(), &Internal::Heartbeat, &[])?;
+            }
             Ok(Some((Internal::Armed, _))) if arming => {
                 armed = true;
                 arming = false;
@@ -324,13 +329,25 @@ fn run() -> Result<()> {
         std::thread::sleep(Duration::from_millis(2));
     };
     guard.disarm();
-    let _ = unix::send(control.as_raw_fd(), &Internal::Disarm, &[]);
-    let end = unix::monotonic_ms() + 100;
-    while unix::monotonic_ms() < end {
-        if child.0.try_wait()?.is_some() {
-            break;
+    let cooperative = matches!(
+        reason,
+        "EXPLICIT_DISARM"
+            | "CLIENT_DISCONNECTED"
+            | "LEASE_OR_CONTEXT_EXPIRED"
+            | "CONTEXT_REVOKED"
+            | "CONTROL_CONTEXT_DENIED_DISARM"
+    );
+    // An expired500ms watchdog is already the last safety deadline: do not
+    // add a grace period for a stopped/nonresponsive worker.
+    if cooperative {
+        let _ = unix::send(control.as_raw_fd(), &Internal::Disarm, &[]);
+        let end = unix::monotonic_ms() + 100;
+        while unix::monotonic_ms() < end {
+            if child.0.try_wait()?.is_some() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(2));
         }
-        std::thread::sleep(Duration::from_millis(2));
     }
     // The supervisor never respawns/regrabs. Drop kills any noncooperative
     // worker, then wait reaps it before this process reports terminal state.

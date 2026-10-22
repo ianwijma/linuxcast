@@ -25,19 +25,27 @@ test('actual reviewed Debian synthetic input recovery; missing runner fails this
     'worker-sigkill', 'supervisor-sigkill', 'worker-watchdog', 'app-lease', 'emergency',
     'locked', 'unknown-lock', 'inactive', 'tty', 'remote', 'stale-context', 'stale-generation',
     'peer-credentials-and-context-revoke',
+    'prearm-completed-input-backlog',
   ]);
-  for (const result of report.results.slice(0, 5)) {
+  for (const [index, result] of report.results.slice(0, 5).entries()) {
     expect(result.syntheticModifiersObserved).toBe(true);
     expect(result.otherClientRegrabbed).toBe(true);
     expect(result.virtualDeviceRemoved).toBe(true);
     expect(result.noAutomaticRearm).toBe(true);
     expect(result.recoveryMs).toBeTypeOf('number');
-    expect(result.recoveryMs).toBeLessThanOrEqual(1500);
+    const mechanismDeadlineMs = [250, 250, 500, 1000, 100][index]!;
+    expect(result.mechanismDeadlineMs).toBe(mechanismDeadlineMs);
+    expect(result.observerToleranceMs).toBe(75);
+    expect(result.recoveryMs).toBeLessThanOrEqual(mechanismDeadlineMs + 75);
   }
   for (const result of report.results.slice(5, 12)) {
     expect(result.armDenied).toBe(true);
     expect(result.otherClientCanGrab).toBe(true);
   }
   expect(report.results[12]?.wrongUidDenied).toBe(true);
+  expect(report.results[12]?.rootPeerPassedDAC).toBe(true);
+  expect(report.results[12]?.rootPeerUidDeniedBeforeAuthorizedClient).toBe(true);
   expect(report.results[12]?.contextRevocationDisarms).toBe(true);
+  expect(report.results[13]?.preArmCompletedInputNotForwarded).toBe(true);
+  expect(report.results[13]?.freshPostArmInputObserved).toBe(true);
 }, 180_000);

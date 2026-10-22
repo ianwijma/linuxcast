@@ -90,6 +90,12 @@ fn run() -> Result<()> {
                 if device.grab().is_err() {
                     break "GRAB_DENIED";
                 }
+                // The barrier is after the grab: legacy completed presses in
+                // either queue are discarded, never replayed into the virtual
+                // device. An ambiguous/nonempty bound fails closed.
+                if device.discard_backlog().is_err() || !device.all_released() {
+                    break "PREARM_BACKLOG_OR_HELD_DISARM";
+                }
                 generation = g;
                 lease_until = until;
                 armed = true;
@@ -147,6 +153,8 @@ fn run() -> Result<()> {
             if let Some(code) = failure {
                 break code;
             }
+        } else if device.discard_backlog().is_err() {
+            break "DORMANT_BACKLOG_DISARM";
         }
         std::thread::sleep(Duration::from_millis(2));
     };

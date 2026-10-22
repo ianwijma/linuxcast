@@ -97,6 +97,12 @@ struct Client {
 }
 impl Client {
     fn new(path: &str, uid: u32) -> Result<Self> {
+        Self::connect(path, uid, false)
+    }
+    fn denied_peer(path: &str, uid: u32) -> Result<Self> {
+        Self::connect(path, uid, true)
+    }
+    fn connect(path: &str, uid: u32, initial_denial: bool) -> Result<Self> {
         let (parent, child) = UnixStream::pair()?;
         parent.set_read_timeout(Some(Duration::from_secs(2)))?;
         parent.set_write_timeout(Some(Duration::from_secs(2)))?;
@@ -132,7 +138,12 @@ impl Client {
                 }
                 loop {
                     let request: Request = read_frame(&mut channel)?;
-                    remote.write_all(&protocol::frame(&request)?)?;
+                    // A rejected peer receives a bounded denial at accept,
+                    // before any request. Read it without a racy write after
+                    // the server has already closed that rejected connection.
+                    if !initial_denial {
+                        remote.write_all(&protocol::frame(&request)?)?;
+                    }
                     let reply: Reply = read_frame(&mut remote)?;
                     channel.write_all(&protocol::frame(&reply)?)?;
                 }
@@ -172,7 +183,7 @@ struct Case {
     supervisor: std::process::Child,
     worker: u32,
     worker_pidfd: OwnedFd,
-    client: Client,
+    client: Option<Client>,
     context: Context,
     path: String,
 }
@@ -268,7 +279,6 @@ impl Case {
             },
             &[],
         )?;
-        let client = Client::new(&path, client_uid)?;
         Ok(Self {
             source,
             probe,
@@ -277,7 +287,7 @@ impl Case {
             supervisor,
             worker: worker_pid,
             worker_pidfd,
-            client,
+            client: None,
             context,
             path,
         })
@@ -297,6 +307,40 @@ impl Case {
         }
         Ok(())
     }
+    fn stop_worker(&self) -> Result<()> {
+        self.signal_worker(libc::SIGSTOP)?;
+        let deadline = unix::monotonic_ms() + 100;
+        loop {
+            let status = fs::read_to_string(format!("/proc/{}/status", self.worker))?;
+            if status
+                .lines()
+                .any(|line| line.starts_with("State:\tT") || line.starts_with("State:\tt"))
+            {
+                return Ok(());
+            }
+            if unix::monotonic_ms() >= deadline {
+                return Err(fail("WORKER_STOP_NOT_OBSERVED"));
+            }
+            std::thread::sleep(Duration::from_millis(1));
+        }
+    }
+    fn fresh_worker_heartbeat(&self) -> Result<()> {
+        let mut empty = false;
+        for _ in 0..32 {
+            if unix::receive::<Internal>(self.control.as_raw_fd(), 0)?.is_none() {
+                empty = true;
+                break;
+            }
+        }
+        if !empty {
+            return Err(fail("HEARTBEAT_OBSERVER_BOUND"));
+        }
+        let (packet, _) = unix::wait_receive::<Internal>(self.control.as_raw_fd(), 0, 300)?;
+        if !matches!(packet, Internal::Heartbeat) {
+            return Err(fail("NO_FRESH_WORKER_HEARTBEAT"));
+        }
+        Ok(())
+    }
     fn refresh(&mut self) -> Result<()> {
         self.context.observed_ms = unix::monotonic_ms();
         unix::send(
@@ -307,30 +351,43 @@ impl Case {
             &[],
         )
     }
-    fn arm(&mut self) -> Result<()> {
-        let r = self.client.request(Operation::Handshake, 1)?;
+    fn client(&mut self) -> Result<&mut Client> {
+        if self.client.is_none() {
+            self.client = Some(Client::new(&self.path, self.context.uid)?);
+        }
+        Ok(self.client.as_mut().expect("client initialized"))
+    }
+    fn begin_arm(&mut self) -> Result<()> {
+        let r = self.client()?.request(Operation::Handshake, 1)?;
         if r.reason != "READY" {
             return Err(fail("LAB_HANDSHAKE_DENIED"));
         }
-        let r = self.client.request(Operation::Arm, 1)?;
+        let r = self.client()?.request(Operation::Arm, 1)?;
         if r.reason != "READY" {
             return Err(fail("LAB_ARM_DENIED"));
         }
+        Ok(())
+    }
+    fn await_arm(&mut self) -> Result<()> {
         let end = unix::monotonic_ms() + 500;
         loop {
-            let r = self.client.request(Operation::Status, 1)?;
+            let r = self.client()?.request(Operation::Status, 1)?;
             if r.state == "armed" {
                 break;
             }
             if unix::monotonic_ms() >= end {
                 return Err(fail("ARM_ACK_TIMEOUT"));
             }
-            std::thread::sleep(Duration::from_millis(5));
+            std::thread::sleep(Duration::from_millis(20));
         }
         if device::regrab(&self.probe) {
             return Err(fail("NO_ACTUAL_GRAB"));
         }
         Ok(())
+    }
+    fn arm(&mut self) -> Result<()> {
+        self.begin_arm()?;
+        self.await_arm()
     }
     fn hold_modifiers(&self) -> Result<()> {
         self.source.emit(29, 1)?;
@@ -344,8 +401,8 @@ impl Case {
         }
         Ok(())
     }
-    fn recovered(&mut self, limit: u64, keep_context: bool) -> Result<u64> {
-        let start = unix::monotonic_ms();
+    fn recovered(&mut self, start: u64, limit: u64, keep_context: bool) -> Result<u64> {
+        let mut refreshed = start;
         loop {
             if device::regrab(&self.probe) && device::removed(&self.output) {
                 return Ok(unix::monotonic_ms() - start);
@@ -353,8 +410,9 @@ impl Case {
             if unix::monotonic_ms() - start > limit {
                 return Err(fail("KERNEL_RECOVERY_TIMEOUT"));
             }
-            if keep_context {
+            if keep_context && unix::monotonic_ms().saturating_sub(refreshed) >= 100 {
                 let _ = self.refresh();
+                refreshed = unix::monotonic_ms();
             }
             std::thread::sleep(Duration::from_millis(10));
         }
@@ -419,6 +477,12 @@ fn run() -> Result<()> {
         let mut case = Case::start(index as u32, uid, gid, 1000)?;
         case.arm()?;
         case.hold_modifiers()?;
+        if *name == "worker-watchdog" {
+            case.fresh_worker_heartbeat()?;
+        }
+        // Timing starts before the triggering action; it includes signal or
+        // chord delivery and observer polling, not device staging/startup.
+        let trigger = unix::monotonic_ms();
         match *name {
             "worker-sigkill" => {
                 case.signal_worker(libc::SIGKILL)?;
@@ -427,7 +491,7 @@ fn run() -> Result<()> {
                 case.supervisor.kill()?;
             }
             "worker-watchdog" => {
-                case.signal_worker(libc::SIGSTOP)?;
+                case.stop_worker()?;
             }
             "app-lease" => {}
             "emergency" => {
@@ -436,12 +500,18 @@ fn run() -> Result<()> {
             }
             _ => unreachable!(),
         }
-        let elapsed = case.recovered(1500, true)?;
+        let (deadline, tolerance) = match *name {
+            "worker-watchdog" => (500, 75),
+            "app-lease" => (1000, 75),
+            "emergency" => (100, 75),
+            _ => (250, 75),
+        };
+        let elapsed = case.recovered(trigger, deadline + tolerance, true)?;
         std::thread::sleep(Duration::from_millis(550));
         if !device::regrab(&case.probe) || !device::removed(&case.output) {
             return Err(fail("AUTOMATIC_REARM_DETECTED"));
         }
-        results.push(serde_json::json!({"scenario":name,"syntheticModifiersObserved":true,"otherClientRegrabbed":true,"virtualDeviceRemoved":true,"noAutomaticRearm":true,"recoveryMs":elapsed}));
+        results.push(serde_json::json!({"scenario":name,"syntheticModifiersObserved":true,"otherClientRegrabbed":true,"virtualDeviceRemoved":true,"noAutomaticRearm":true,"recoveryMs":elapsed,"mechanismDeadlineMs":deadline,"observerToleranceMs":tolerance}));
     }
     for (index, name) in [
         "locked",
@@ -475,11 +545,11 @@ fn run() -> Result<()> {
         )?;
         // Allow supervisor to consume context before client request.
         std::thread::sleep(Duration::from_millis(20));
-        let reply = case.client.request(Operation::Handshake, 1)?;
+        let reply = case.client()?.request(Operation::Handshake, 1)?;
         if reply.reason == "READY" {
             return Err(fail("INELIGIBLE_HANDSHAKE_ACCEPTED"));
         }
-        let reply = case.client.request(Operation::Arm, 1)?;
+        let reply = case.client()?.request(Operation::Arm, 1)?;
         if reply.reason == "READY"
             || !device::regrab(&case.probe)
             || device::key_down(&case.output, 29)
@@ -489,6 +559,14 @@ fn run() -> Result<()> {
         results.push(serde_json::json!({"scenario":name,"armDenied":true,"otherClientCanGrab":true,"contextEvidence":"root-owned synthetic fixture, not a live logind transition"}));
     }
     let mut case = Case::start(30, uid, gid, 1000)?;
+    // No authorized client exists yet. Root passes the unchanged0600 DAC,
+    // isolating the server's SO_PEERCRED rejection from busy/DAC failures.
+    let mut root_peer = Client::denied_peer(&case.path, 0)?;
+    let reply = root_peer.request(Operation::Handshake, 1)?;
+    if reply.state != "denied" || reply.reason != "PEER_UID_OR_BUSY" {
+        return Err(fail("ROOT_PEER_UID_NOT_DENIED"));
+    }
+    drop(root_peer);
     let mut wrong = Client::new(&case.path, uid)?;
     if wrong.request(Operation::Handshake, 1).is_ok() {
         return Err(fail("WRONG_UID_REACHED_CONTROL"));
@@ -496,9 +574,43 @@ fn run() -> Result<()> {
     case.arm()?;
     case.hold_modifiers()?;
     case.context.unlocked = Some(false);
+    let revoked = unix::monotonic_ms();
     case.refresh()?;
-    case.recovered(1000, false)?;
-    results.push(serde_json::json!({"scenario":"peer-credentials-and-context-revoke","wrongUidDenied":true,"contextRevocationDisarms":true}));
+    case.recovered(revoked, 175, false)?;
+    results.push(serde_json::json!({"scenario":"peer-credentials-and-context-revoke","rootPeerPassedDAC":true,"rootPeerUidDeniedBeforeAuthorizedClient":true,"wrongUidDenied":true,"contextRevocationDisarms":true}));
+    drop(case);
+    // A stopped dormant worker guarantees that a completedF24 press/release
+    // is queued before Arm. Key-state snapshots alone would miss this cycle.
+    let mut case = Case::start(31, uid, gid, 1000)?;
+    if device::synthetic_key_events(&case.output)? != 0 {
+        return Err(fail("UNEXPECTED_DORMANT_OUTPUT"));
+    }
+    case.stop_worker()?;
+    case.source.emit(194, 1)?;
+    case.source.emit(194, 0)?;
+    case.begin_arm()?;
+    case.signal_worker(libc::SIGCONT)?;
+    case.await_arm()?;
+    let until = unix::monotonic_ms() + 100;
+    while unix::monotonic_ms() < until {
+        if device::synthetic_key_events(&case.output)? != 0 {
+            return Err(fail("PREARM_INPUT_REPLAYED"));
+        }
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    // Positive control: the exact same observer must see new post-arm input.
+    case.source.emit(194, 1)?;
+    case.source.emit(194, 0)?;
+    let until = unix::monotonic_ms() + 300;
+    let mut observed = 0;
+    while observed < 2 {
+        observed += device::synthetic_key_events(&case.output)?;
+        if unix::monotonic_ms() >= until {
+            return Err(fail("FRESH_INPUT_NOT_OBSERVED"));
+        }
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    results.push(serde_json::json!({"scenario":"prearm-completed-input-backlog","preArmCompletedInputNotForwarded":true,"freshPostArmInputObserved":true}));
     println!(
         "{}",
         serde_json::to_string_pretty(

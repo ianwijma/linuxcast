@@ -98,6 +98,17 @@ impl Device {
             Ok(())
         }
     }
+    /// Discard all pre-arm events in both libevdev and kernel buffers. Reaching
+    /// EAGAIN is the barrier; held state alone cannot detect completed typing.
+    /// A flood, SYN_DROPPED or read error is ambiguous and refuses arming.
+    pub fn discard_backlog(&self) -> Result<()> {
+        for _ in 0..256 {
+            if self.next()?.is_none() {
+                return Ok(());
+            }
+        }
+        Err(fail("PREARM_BACKLOG_BOUND"))
+    }
     pub fn next(&self) -> Result<Option<libc::input_event>> {
         let mut event = std::mem::MaybeUninit::uninit();
         let rc = unsafe { lc_next(self.native.as_ptr(), event.as_mut_ptr()) };
@@ -119,6 +130,36 @@ impl Device {
             Ok(())
         }
     }
+}
+
+/// Synthetic observer only. Raw events never leave this local helper or logs.
+pub fn synthetic_key_events(fd: &OwnedFd) -> Result<usize> {
+    let mut total = 0;
+    for _ in 0..4 {
+        let mut events: [libc::input_event; 64] = unsafe { std::mem::zeroed() };
+        let n = unsafe {
+            libc::read(
+                fd.as_raw_fd(),
+                events.as_mut_ptr().cast(),
+                std::mem::size_of_val(&events),
+            )
+        };
+        if n < 0 {
+            let error = std::io::Error::last_os_error();
+            if error.kind() == std::io::ErrorKind::WouldBlock {
+                return Ok(total);
+            }
+            return Err(fail("SYNTHETIC_OBSERVER_READ_FAILED"));
+        }
+        if n == 0 || !(n as usize).is_multiple_of(std::mem::size_of::<libc::input_event>()) {
+            return Err(fail("SYNTHETIC_OBSERVER_FRAME_FAILED"));
+        }
+        total += events[..n as usize / std::mem::size_of::<libc::input_event>()]
+            .iter()
+            .filter(|e| e.type_ == 1)
+            .count();
+    }
+    Err(fail("SYNTHETIC_OBSERVER_BOUND"))
 }
 impl Drop for Device {
     fn drop(&mut self) {
