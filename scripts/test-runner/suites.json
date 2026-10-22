@@ -22,6 +22,9 @@
       "spikes/sandbox/protocol.test.ts",
       "spikes/sandbox/supervisor.test.ts",
       "spikes/sandbox/host.security.test.ts"
+    ],
+    "S0-03": [
+      "spikes/input/kernel.security.test.ts"
     ]
   },
   "perf": {}
