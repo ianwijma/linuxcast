@@ -40,6 +40,7 @@ let stage = 'build';
 let request = 0;
 let pid = 0;
 const nativeTrace = new NativeTrace();
+class NativeHookFailed extends Error { constructor() { super('NATIVE_HOOK_FAILURE'); } }
 const decoy = spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
 decoy.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
 const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePhase): Promise<Observation> => {
@@ -49,6 +50,7 @@ const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePha
   renameSync(join(root, 'context-next.json'), join(root, 'context.json'));
   nativeTrace.begin(phase);
   let observation: Observation | undefined;
+  let hookFailed = false;
   await expect.poll(() => {
     const path = join(root, 'observation.json');
     if (!existsSync(path)) return false;
@@ -56,14 +58,24 @@ const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePha
     try {
       const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
       if (value.request !== serial) return false;
-      observation = nativeTrace.reply(value, serial); return !!observation;
+      observation = nativeTrace.reply(value, serial);
+      hookFailed = nativeTrace.snapshot()?.state === 'hook-failed';
+      return !!observation || hookFailed;
     } catch { nativeTrace.reject(); return false; }
   }, { timeout: 8000 }).toBe(true);
+  if (hookFailed) throw new NativeHookFailed();
   return observation!;
 };
 const observed = async (phase: NativePhase, predicate: (observation: Observation) => boolean) => {
   let value: Observation | undefined;
-  await expect.poll(async () => { value = await observe('observe', phase); const met = predicate(value); nativeTrace.predicate(met); return met; }, { timeout: 12_000 }).toBe(true);
+  let hookFailed = false;
+  await expect.poll(async () => {
+    try { value = await observe('observe', phase); }
+    catch (error) { if (error instanceof NativeHookFailed) { hookFailed = true; return true; } throw error; }
+    const met = predicate(value); nativeTrace.predicate(met); return met;
+  }, { timeout: 12_000 }).toBe(true);
+  // A matching fixed hook failure is terminal: never retry an uncertain action.
+  if (hookFailed) throw new NativeHookFailed();
   observations.push({ phase, native: value! }); return value!;
 };
 const challenge = async () => {

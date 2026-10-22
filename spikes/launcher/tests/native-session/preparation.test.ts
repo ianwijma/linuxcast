@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { buildNativeSession } from './build.ts';
-import { NativeTrace, parseNativeDiagnostic, parseObservation, requireNativeTarget } from './protocol.ts';
+import { NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
 import type { NativeWindow } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
@@ -72,6 +72,66 @@ for (const family of ['gnome', 'kwin'] as const) {
     expect(fixture.activations()).toBe(1);
   });
 }
+
+test('GNOME nullable closing actors do not prevent exact own-PID observation or read foreign metadata', () => {
+  const launcher = syntheticWindow(101, 'io.github.ianwijma.Linuxcast');
+  const foreign = syntheticWindow(303, 'synthetic-private-canary'); foreign.forbidMetadata = true;
+  const fixture = hookFixture('gnome', [launcher, foreign], { nullActors: true });
+  const row = fixture.observe();
+  requireNativeTarget(row.launcher, 'gnome-wayland');
+  expect(row.launcher.count).toBe(1); expect(foreign.identityReads).toBe(0); expect(foreign.geometryReads).toBe(0);
+  fixture.removeWindow(101);
+  expect(fixture.observe().launcher.count).toBe(0);
+  expect(foreign.identityReads).toBe(0); expect(foreign.geometryReads).toBe(0);
+});
+
+for (const stage of ['enumerate', 'launcher', 'decoy', 'activation', 'publish'] as const) test(`GNOME ${stage} failure exports only a fixed failure after a validated request`, () => {
+  const launcher = syntheticWindow(101, 'io.github.ianwijma.Linuxcast');
+  const decoy = syntheticWindow(202, 'io.github.ianwijma.Linuxcast.S001Decoy');
+  if (stage === 'launcher') launcher.failGeometry = true;
+  if (stage === 'decoy') decoy.failGeometry = true;
+  const fixture = hookFixture('gnome', [launcher, decoy], stage === 'launcher' || stage === 'decoy' ? {} : { failStage: stage });
+  const reply = fixture.reply(true);
+  expect(parseHookFailureReply(reply, 1)).toEqual({ request: 1, hookFailure: { stage, outcome: 'native-read-failed' } });
+  expect(() => parseObservation(reply, 1)).toThrow();
+  expect(JSON.stringify(reply)).not.toContain('synthetic-private-exception-canary');
+  if (stage !== 'publish') expect(fixture.activations()).toBe(0);
+  const attempts = fixture.activationAttempts();
+  expect(fixture.repeatRequest()).toBeUndefined();
+  expect(fixture.activationAttempts()).toBe(attempts);
+});
+
+test('GNOME cannot repeat activation when both normal and failure publications fail', () => {
+  const fixture = hookFixture('gnome', [syntheticWindow(101, 'io.github.ianwijma.Linuxcast'), syntheticWindow(202, 'io.github.ianwijma.Linuxcast.S001Decoy')], { failAllPublication: true });
+  expect(fixture.reply(true)).toBeUndefined(); expect(fixture.activationAttempts()).toBe(1);
+  expect(fixture.repeatRequest()).toBeUndefined(); expect(fixture.activationAttempts()).toBe(1);
+});
+
+for (const contextOverride of [{ pid: 303, decoyPid: 303 }, { pid: 'synthetic-private-canary' }, { extra: 'synthetic-private-canary' }, { request: 1001 }]) test('GNOME invalid context emits no native observation or failure reply', () => {
+  const foreign = syntheticWindow(303, 'synthetic-private-canary'); foreign.forbidMetadata = true;
+  const fixture = hookFixture('gnome', [foreign], { contextOverride, failStage: 'enumerate' });
+  expect(fixture.reply()).toBeUndefined(); expect(foreign.identityReads).toBe(0); expect(foreign.geometryReads).toBe(0);
+});
+
+test('hook failure matching and trace retain the last safe observation while rejecting private or stale fields', () => {
+  const trace = new NativeTrace();
+  const row = { request: 1, launcher: native(), decoy: native(), decoyActivationIssued: false };
+  trace.begin('initial-native-launch'); trace.reply(row, 1); trace.predicate(true); trace.begin('after-close-native-hidden');
+  const failure = { request: 2, hookFailure: { stage: 'launcher', outcome: 'native-read-failed' } };
+  expect(trace.reply(failure, 2)).toBeUndefined(); trace.predicate(true);
+  expect(trace.snapshot()).toEqual({ phase: 'after-close-native-hidden', state: 'hook-failed', lastObservation: { phase: 'initial-native-launch', native: row }, hookFailure: failure });
+  for (const value of [{ ...failure, private: 'synthetic-private-canary' }, { ...failure, request: 1 },
+    { ...failure, hookFailure: { ...failure.hookFailure, private: 'synthetic-private-canary' } },
+    { ...failure, hookFailure: { stage: { toString: () => 'launcher' }, outcome: 'native-read-failed' } },
+    { ...failure, hookFailure: { stage: 'launcher', outcome: 'synthetic-private-canary' } }]) {
+    expect(() => parseHookFailureReply(value, 2)).toThrow();
+    expect(trace.reply(value, 2)).toBeUndefined();
+    expect(trace.snapshot()?.state).toBe('reply-rejected'); expect(trace.snapshot()?.lastObservation?.native.request).toBe(1);
+    expect(JSON.stringify(trace.snapshot())).not.toContain('synthetic-private-canary');
+  }
+  expect(() => parseNativeDiagnostic({ phase: 'after-close-native-hidden', state: 'hook-failed' })).toThrow();
+  expect(() => parseNativeDiagnostic({ phase: 'after-close-native-hidden', state: 'parsed', hookFailure: failure })).toThrow();
+});
 
 test('native trace distinguishes no reply, rejected reply and an unmet predicate without losing safe evidence', () => {
   const trace = new NativeTrace();
@@ -153,7 +213,7 @@ for (const scenario of ['valid', 'real-private-bus', 'platform-denied', 'externa
 
 for (const scenario of ['valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
   'manifest-extra', 'manifest-source-extra', 'manifest-hash-private', 'native-extra', 'missing-success-observations', 'forged-native-backend',
-  'valid-diagnostic', 'valid-zero-geometry', 'diagnostic-extra', 'diagnostic-last-private', 'diagnostic-state-private', 'diagnostic-role-private', 'diagnostic-inconsistent', 'forged-success-not-ready']) test(`strict artifact boundary ${scenario}`, () => {
+  'valid-diagnostic', 'valid-zero-geometry', 'valid-startup', 'startup-extra', 'startup-nested-private', 'startup-unknown-marker', 'startup-state-type', 'startup-request-private', 'startup-request-bound', 'valid-hook-failed', 'hook-extra', 'hook-nested-private', 'hook-stage-private', 'hook-outcome-private', 'hook-stale', 'hook-missing', 'hook-wrong-state', 'hook-forged-success', 'hook-kwin', 'diagnostic-extra', 'diagnostic-last-private', 'diagnostic-state-private', 'diagnostic-role-private', 'diagnostic-inconsistent', 'forged-success-not-ready']) test(`strict artifact boundary ${scenario}`, () => {
   const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
   expect(child.status).toBe(0);
   const value = JSON.parse(child.stdout);
@@ -177,3 +237,88 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
     rmSync(root, { recursive: true, force: true });
   }
 }, 6000);
+
+for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+  const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+  expect(result.status, result.stderr).toBe(0);
+  expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);
+});
+
+test('GNOME startup literals distinguish module, rejected enable and polling before any context exists', () => {
+  const denied = hookFixture('gnome', [], { rejectedContext: true }); denied.tick();
+  expect(denied.checkpoints()).toEqual(['MODULE_ENTERED', 'ENABLE_ENTERED', 'PRIVATE_CONTEXT_REJECTED'].map(v => `LINUXCAST_S001_OBSERVER:${v}`));
+  expect(denied.fileReads()).toBe(0); expect(denied.nativeEnumerations()).toBe(0);
+  const ready = hookFixture('gnome', [], { contextMissing: true }); ready.tick(); ready.tick();
+  expect(ready.checkpoints()).toEqual(['MODULE_ENTERED', 'ENABLE_ENTERED', 'PRIVATE_CONTEXT_ACCEPTED', 'POLL_INSTALLED', 'FIRST_POLL_TICK', 'CONTEXT_NOT_OBSERVED'].map(v => `LINUXCAST_S001_OBSERVER:${v}`));
+  expect(ready.fileReads()).toBe(0); expect(ready.nativeEnumerations()).toBe(0);
+  ready.disable(); expect(ready.checkpoints().at(-1)).toBe('LINUXCAST_S001_OBSERVER:DISABLED');
+});
+
+test('GNOME operational markers contain only a validated serial and fixed publication result', () => {
+  const fixture = hookFixture('gnome', [syntheticWindow(101, 'io.github.ianwijma.Linuxcast')]); fixture.observe();
+  expect(fixture.checkpoints().slice(-2)).toEqual(['LINUXCAST_S001_OBSERVER:REQUEST_VALIDATED:1', 'LINUXCAST_S001_OBSERVER:REPLY_PUBLISHED:1']);
+  const invalid = hookFixture('gnome', [], { contextOverride: { pid: 'synthetic-private-canary' } }); invalid.reply();
+  expect(invalid.checkpoints().some(v => v.includes('REQUEST_VALIDATED'))).toBe(false);
+  expect(invalid.checkpoints().join()).not.toContain('synthetic-private-canary');
+});
+
+test('typed startup artifacts reject private fields, overbounds and unsupported state types', () => {
+  const snapshot = { checkpoints: ['PRIVATE_CONTEXT_REJECTED'], requests: [], extensionInfo: { status: 'INFO_AVAILABLE', state: 1, enabled: true } };
+  expect(parseObserverStartup({ latest: snapshot })).toEqual({ latest: snapshot });
+  for (const value of [{ latest: { ...snapshot, private: 'synthetic-private-canary' } },
+    { latest: { ...snapshot, extensionInfo: { ...snapshot.extensionInfo, error: 'synthetic-private-canary' } } },
+    { latest: { ...snapshot, extensionInfo: { ...snapshot.extensionInfo, state: '1' } } },
+    { latest: { ...snapshot, extensionInfo: { ...snapshot.extensionInfo, state: NaN } } },
+    { latest: { ...snapshot, requests: Array.from({ length: 17 }, () => ({ event: 'REQUEST_VALIDATED', request: 1 })) } }]) {
+    expect(() => parseObserverStartup(value)).toThrow();
+  }
+});
+
+const prevalidationCases: { name: string; marker: string; options: NonNullable<Parameters<typeof hookFixture>[2]>; reads: number; queries: number }[] = [
+  { name: 'missing', marker: 'CONTEXT_NOT_OBSERVED', options: { contextMissing: true }, reads: 0, queries: 1 },
+  { name: 'unqueryable', marker: 'CONTEXT_NOT_OBSERVED', options: { contextFailure: 'query' }, reads: 0, queries: 1 },
+  { name: 'file-setup', marker: 'PREVALIDATION_FAILED', options: { contextFailure: 'file' }, reads: 0, queries: 0 },
+  { name: 'read', marker: 'READ_FAILED', options: { contextFailure: 'read' }, reads: 1, queries: 1 },
+  { name: 'oversize', marker: 'SIZE_REJECTED', options: { contextRaw: 'synthetic-private-canary'.repeat(300) }, reads: 1, queries: 1 },
+  { name: 'decode', marker: 'DECODE_FAILED', options: { contextFailure: 'decode' }, reads: 1, queries: 1 },
+  { name: 'JSON', marker: 'JSON_REJECTED', options: { contextRaw: '{synthetic-private-canary' }, reads: 1, queries: 1 },
+  ...[null, [], 17, {}, { request: 1, private: 'synthetic-private-canary' }].map((contextValue, index) => ({ name: `shape-${index}`, marker: 'SCHEMA_REJECTED', options: { contextValue }, reads: 1, queries: 1 })),
+  ...[{ pid: 0 }, { pid: 4194305 }, { pid: 'synthetic-private-canary' }, { decoyPid: 101 }, { operation: 'synthetic-private-canary' },
+    { request: 0 }, { request: -1 }, { request: 1001 }, { request: 1.5 }, { request: 'synthetic-private-canary' }].map((contextOverride, index) => ({ name: `schema-${index}`, marker: 'SCHEMA_REJECTED', options: { contextOverride }, reads: 1, queries: 1 })),
+];
+for (const { name, marker, options, reads, queries } of prevalidationCases) test(`GNOME ${name} prevalidation emits one fixed category and no native work`, () => {
+  const record = syntheticWindow(101, 'synthetic-private-canary'); record.forbidMetadata = true;
+  const fixture = hookFixture('gnome', [record], options);
+  expect(fixture.reply(true)).toBeUndefined(); expect(fixture.repeatRequest()).toBeUndefined();
+  expect(fixture.checkpoints().filter(value => value === `LINUXCAST_S001_OBSERVER:${marker}`)).toHaveLength(1);
+  expect(fixture.checkpoints().some(value => value.includes('REQUEST_VALIDATED:'))).toBe(false);
+  expect(fixture.checkpoints().join()).not.toContain('synthetic-private');
+  expect(fixture.fileReads()).toBe(reads * 2); expect(fixture.fileQueries()).toBe(queries * 2);
+  expect(fixture.nativeEnumerations()).toBe(0); expect(fixture.activationAttempts()).toBe(0); expect(fixture.publicationCalls()).toBe(0);
+  expect(record.identityReads).toBe(0); expect(record.geometryReads).toBe(0);
+});
+
+test('a consumed request is a deduplicated stale category without native replay', () => {
+  const fixture = hookFixture('gnome', [syntheticWindow(202, 'io.github.ianwijma.Linuxcast.S001Decoy')]);
+  fixture.observe(true);
+  const before = [fixture.nativeEnumerations(), fixture.activationAttempts(), fixture.publicationCalls()];
+  expect(fixture.repeatRequest()).toBeUndefined(); expect(fixture.repeatRequest()).toBeUndefined();
+  expect([fixture.nativeEnumerations(), fixture.activationAttempts(), fixture.publicationCalls()]).toEqual(before);
+  expect(fixture.checkpoints().filter(v => v === 'LINUXCAST_S001_OBSERVER:STALE_REQUEST')).toHaveLength(1);
+});
+
+test('prevalidation categories are capped at eight literals per enable, with no private values', () => {
+  const options: NonNullable<Parameters<typeof hookFixture>[2]> = {};
+  const fixture = hookFixture('gnome', [], options);
+  for (const row of prevalidationCases) {
+    for (const key of Object.keys(options)) delete options[key as keyof typeof options];
+    Object.assign(options, row.options); fixture.reply(); fixture.repeatRequest();
+  }
+  for (const key of Object.keys(options)) delete options[key as keyof typeof options];
+  fixture.observe(); fixture.repeatRequest(); fixture.repeatRequest();
+  const categories = new Set(prevalidationCases.map(v => `LINUXCAST_S001_OBSERVER:${v.marker}`)); categories.add('LINUXCAST_S001_OBSERVER:STALE_REQUEST');
+  const actual = fixture.checkpoints().filter(v => categories.has(v));
+  expect(actual).toHaveLength(8); expect(new Set(actual).size).toBe(8);
+  expect(actual.join()).not.toContain('synthetic-private');
+  expect(parseObserverStartup({ latest: { checkpoints: actual.map(v => v.replace('LINUXCAST_S001_OBSERVER:', '')), requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } } }).latest.checkpoints).toHaveLength(8);
+});

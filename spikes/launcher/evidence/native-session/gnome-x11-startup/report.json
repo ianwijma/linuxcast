@@ -1,0 +1,64 @@
+{
+  "task": "S0-01",
+  "backend": "gnome-x11",
+  "status": "incomplete",
+  "physicalDesktopMatrixEstablished": false,
+  "evidenceKind": "actual-isolated-software-compositor-launcher",
+  "kernel": "6.12.113+deb13-amd64",
+  "hostDisplayClipboardInputOrSettingsUsed": false,
+  "launcherCompanionActivationOrPlacementUsed": false,
+  "stage": "native-initial-identity",
+  "observations": [],
+  "nativeDiagnostic": {
+    "phase": "initial-native-launch",
+    "state": "request-written"
+  },
+  "observerStartup": {
+    "latest": {
+      "checkpoints": [
+        "MODULE_ENTERED",
+        "ENABLE_ENTERED",
+        "PRIVATE_CONTEXT_ACCEPTED",
+        "POLL_INSTALLED",
+        "FIRST_POLL_TICK"
+      ],
+      "requests": [],
+      "extensionInfo": {
+        "status": "INFO_UNAVAILABLE"
+      }
+    },
+    "beforeChecker": {
+      "checkpoints": [],
+      "requests": [],
+      "extensionInfo": {
+        "status": "INFO_UNAVAILABLE"
+      }
+    }
+  },
+  "runtime": {
+    "electron": "45.0.0",
+    "chrome": "156.0.8078.48",
+    "ozone": "x11",
+    "noSandbox": false,
+    "sandbox": true,
+    "contextIsolation": true,
+    "nodeIntegration": false,
+    "webSecurity": true,
+    "renderer": {
+      "runtime": {
+        "sandboxed": true,
+        "contextIsolated": true
+      },
+      "process": "undefined",
+      "require": "undefined"
+    }
+  },
+  "privateProcessTreeCleanupVerified": true,
+  "packages": [
+    "gnome-shell 48.7-0+deb13u2",
+    "kwin-wayland 4:6.3.6-1",
+    "kwin-x11 4:6.3.6-1",
+    "libqt6qml6 6.8.2+dfsg-7",
+    "mutter 48.7-0+deb13u1"
+  ]
+}

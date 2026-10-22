@@ -6,9 +6,10 @@ import pathlib
 import re
 import shutil
 import stat
+from observer_startup import diagnostic as startup_diagnostic
 
 BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
-SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py','private.py','artifacts.py','gnome-extension.js','kwin-script.js','kwin-bus.py','decoy.py',
+SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py', 'observer_startup.py','private.py','artifacts.py','gnome-extension.js','kwin-script.js','kwin-bus.py','decoy.py',
     '../../src/main.ts','../../src/profile.ts','../../src/preload.ts','../../src/contract.ts','../../src/renderer/main.tsx','../../src/renderer/App.tsx','../../src/renderer/style.css','../../build.ts','../../resources/index.html',
     '../../../../package.json','../../../../bun.lock','../../../../apps/desktop/package.json')
 OUTPUTS=('extension.js','kwin-script.js','metadata.json')
@@ -78,14 +79,24 @@ def observation(value):
         result['diagnostics']={key:window_diagnostic(value['diagnostics'][key],result[key]) for key in ('launcher','decoy')}
     return result
 
+def hook_failure_reply(value):
+    object_keys(value,('request','hookFailure'))
+    failure=value['hookFailure'];object_keys(failure,('stage','outcome'))
+    if type(failure['stage']) is not str or failure['stage'] not in ('enumerate','launcher','decoy','activation','publish'): raise ValueError('PUBLIC_HOOK_FAILURE')
+    return {'request':integer(value['request'],1,1000),'hookFailure':{'stage':failure['stage'],'outcome':exact(failure['outcome'],'native-read-failed')}}
+
 def native_diagnostic(value):
-    object_keys(value,('phase','state'),('lastObservation',))
-    if value['phase'] not in DIAGNOSTIC_PHASES or value['state'] not in ('request-written','reply-rejected','parsed','predicate-met','predicate-unmet'): raise ValueError('PUBLIC_NATIVE_PROGRESS')
+    object_keys(value,('phase','state'),('lastObservation','hookFailure'))
+    if value['phase'] not in DIAGNOSTIC_PHASES or value['state'] not in ('request-written','reply-rejected','parsed','predicate-met','predicate-unmet','hook-failed'): raise ValueError('PUBLIC_NATIVE_PROGRESS')
     result={'phase':value['phase'],'state':value['state']}
     if 'lastObservation' in value:
         last=value['lastObservation'];object_keys(last,('phase','native'))
         if last['phase'] not in DIAGNOSTIC_PHASES: raise ValueError('PUBLIC_NATIVE_PROGRESS')
         result['lastObservation']={'phase':last['phase'],'native':observation(last['native'])}
+    if (value['state']=='hook-failed')!=('hookFailure' in value): raise ValueError('PUBLIC_HOOK_FAILURE')
+    if 'hookFailure' in value:
+        result['hookFailure']=hook_failure_reply(value['hookFailure'])
+        if 'lastObservation' in result and result['hookFailure']['request']<=result['lastObservation']['native']['request']: raise ValueError('PUBLIC_HOOK_REQUEST')
     return result
 
 def runtime(value,backend):
@@ -110,7 +121,7 @@ def shortcut(value,backend):
 
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup'))
     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
@@ -130,11 +141,16 @@ def public_result(value,backend):
     for flag in FLAGS:
         if flag in value: result[flag]=boolean(value[flag])
     if 'nativeDiagnostic' in value: result['nativeDiagnostic']=native_diagnostic(value['nativeDiagnostic'])
+    if 'observerStartup' in value:
+        if not backend.startswith('gnome'): raise ValueError('PUBLIC_OBSERVER_BACKEND')
+        result['observerStartup']=startup_diagnostic(value['observerStartup'])
     if 'runtime' in value: result['runtime']=runtime(value['runtime'],backend)
     if 'shortcut' in value: result['shortcut']=shortcut(value['shortcut'],backend)
     if 'activationOutcome' in value:
         if value['activationOutcome'] not in ACTIVATION: raise ValueError('PUBLIC_ACTIVATION_OUTCOME')
         result['activationOutcome']=value['activationOutcome']
+    if result.get('nativeDiagnostic',{}).get('state')=='hook-failed' and (backend not in ('gnome-wayland','gnome-x11') or value['status']=='passed-bounded-native-probe'):
+        raise ValueError('PUBLIC_HOOK_FAILURE_CANNOT_PASS')
     if value['status']=='passed-bounded-native-probe':
         mandatory=('closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','explicitUiQuitExited','hiddenCliQuitExited')
         if value['stage']!='complete' or any(result.get(key) is not True for key in mandatory) or not all(key in result for key in ('runtime','shortcut','activationOutcome','initialPlacementInsideWorkArea','ordinaryShowNativeFocused')):

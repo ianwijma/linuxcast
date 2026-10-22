@@ -1,0 +1,38 @@
+{
+  "sourceBaselineCommit": "a3db48da3e371f0544c98fe67916ca823d94f2e5",
+  "sourceDirty": true,
+  "sourceSigned": false,
+  "reviewedDiffSha256": "398c2679071404c723382a353889e97056f7e3b6049fe0aa1a120449c6bf62b8",
+  "reviewedDiffPaths": [
+    "spikes/launcher/tests/native-session/protocol.ts",
+    "spikes/launcher/tests/native-session/check.ts",
+    "spikes/launcher/tests/native-session/gnome-extension.js",
+    "spikes/launcher/tests/native-session/artifacts.py",
+    "spikes/launcher/tests/native-session/artifact-canary.py",
+    "spikes/launcher/tests/native-session/preparation.test.ts",
+    "spikes/launcher/tests/native-session/observation-fixtures.ts"
+  ],
+  "reviewedPatchedFileSha256": {
+    "spikes/launcher/tests/native-session/protocol.ts": "45691813063984107c8501dbfe11319b93510dabb9f13510fee91073c7ce27cf",
+    "spikes/launcher/tests/native-session/check.ts": "d55f6c6a35fbaf00bd38dc15f6fa37cda68f7adfb0851d4a4477d958fbea0cde",
+    "spikes/launcher/tests/native-session/gnome-extension.js": "012d15627acb2f9b613d0786973ea5f67b398a03238fd9eabefd9492f35a27df",
+    "spikes/launcher/tests/native-session/artifacts.py": "101cbcdb8e87eb600dd1795d0b77d8afe647d905c66d1e4dfccb43516d0e9ea1",
+    "spikes/launcher/tests/native-session/artifact-canary.py": "4b60260b63baacc75d41633d9dccc1f4e23da3e0db8a4bef25d4633ab2bbc4c2",
+    "spikes/launcher/tests/native-session/preparation.test.ts": "311cedd38d0e6b6ab1288544fa3768c1c6ce4eb27ba3dd71403e99475d841eef",
+    "spikes/launcher/tests/native-session/observation-fixtures.ts": "a3bd711ef73829b6db2b1920058902b3257fa2b2d912dafe1266fe2c365eb384"
+  },
+  "archiveSha256": "6b593cf26ee0e8aee6247549b5a76a846b5a9b1c07cf0ac2c6007bff1367c920",
+  "sourceArchiveAuthoritySha256": "36d25825c55e4df6d1d8abb02287ba595354da67198c8c974e2526b3e37f7878",
+  "sourceInputsVerified": 23,
+  "authorityVerifiedBeforeExecution": true,
+  "checkerSha256": "d55f6c6a35fbaf00bd38dc15f6fa37cda68f7adfb0851d4a4477d958fbea0cde",
+  "startedUtc": "2026-10-22T19:59:36.097802+00:00",
+  "finishedUtc": "2026-10-22T20:00:13.679932+00:00",
+  "exitCode": 3,
+  "physicalDesktopMatrixEstablished": false,
+  "sourceUnchangedDuringRun": true,
+  "frozenInstallationPackages": 651,
+  "inputMarker": "/run/linuxcast-input-spike-lab",
+  "inputMarkerAbsentBeforeExecution": true,
+  "rendererPixelsCaptured": false
+}

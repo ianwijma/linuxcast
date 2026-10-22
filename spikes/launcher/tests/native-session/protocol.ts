@@ -16,8 +16,10 @@ export const NATIVE_PHASES = ['decoy-native-ready', 'decoy-focused-before-ordina
   'ordinary-singleton-cli-show', 'wayland-singleton-toggle-hidden', 'wayland-singleton-reopened', 'ordinary-show-native-focus',
   'actual-x11-shortcut-native-focus', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
 export type NativePhase = typeof NATIVE_PHASES[number];
-const PROGRESS = ['request-written', 'reply-rejected', 'parsed', 'predicate-met', 'predicate-unmet'] as const;
-export type NativeDiagnostic = { phase: NativePhase; state: typeof PROGRESS[number]; lastObservation?: { phase: NativePhase; native: Observation } };
+export const HOOK_FAILURE_STAGES = ['enumerate', 'launcher', 'decoy', 'activation', 'publish'] as const;
+export type HookFailureReply = { request: number; hookFailure: { stage: typeof HOOK_FAILURE_STAGES[number]; outcome: 'native-read-failed' } };
+const PROGRESS = ['request-written', 'reply-rejected', 'parsed', 'predicate-met', 'predicate-unmet', 'hook-failed'] as const;
+export type NativeDiagnostic = { phase: NativePhase; state: typeof PROGRESS[number]; lastObservation?: { phase: NativePhase; native: Observation }; hookFailure?: HookFailureReply };
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('NATIVE_SCHEMA');
   return value as Record<string, unknown>;
@@ -51,6 +53,14 @@ export function parseObservation(value: unknown, request: number): Observation {
   }
   return result;
 }
+export function parseHookFailureReply(value: unknown, request: number): HookFailureReply {
+  const row = object(value); keys(row, ['request', 'hookFailure']);
+  if (!Number.isSafeInteger(request) || request < 1 || request > 1000 || row.request !== request) throw new Error('NATIVE_REQUEST');
+  const failure = object(row.hookFailure); keys(failure, ['stage', 'outcome']);
+  if (typeof failure.stage !== 'string' || !HOOK_FAILURE_STAGES.includes(failure.stage as HookFailureReply['hookFailure']['stage'])
+    || failure.outcome !== 'native-read-failed') throw new Error('NATIVE_HOOK_FAILURE');
+  return { request, hookFailure: { stage: failure.stage as HookFailureReply['hookFailure']['stage'], outcome: 'native-read-failed' } };
+}
 function diagnostic(value: unknown, native: NativeWindow): WindowDiagnostic {
   const row = object(value); keys(row, ['pidMatch', 'primaryIdentity', 'secondaryIdentity', 'geometry', 'workArea']);
   const identities = ['not-inspected', 'non-string', 'empty', 'mismatch', 'match'];
@@ -73,7 +83,7 @@ function diagnostic(value: unknown, native: NativeWindow): WindowDiagnostic {
     secondaryIdentity: row.secondaryIdentity as WindowDiagnostic['secondaryIdentity'], geometry: row.geometry as WindowDiagnostic['geometry'], workArea: row.workArea as WindowDiagnostic['workArea'] };
 }
 export function parseNativeDiagnostic(value: unknown): NativeDiagnostic {
-  const row = object(value); keys(row, ['phase', 'state'], ['lastObservation']);
+  const row = object(value); keys(row, ['phase', 'state'], ['lastObservation', 'hookFailure']);
   if (!NATIVE_PHASES.includes(row.phase as NativePhase) || !PROGRESS.includes(row.state as NativeDiagnostic['state'])) throw new Error('NATIVE_DIAGNOSTIC');
   const result: NativeDiagnostic = { phase: row.phase as NativePhase, state: row.state as NativeDiagnostic['state'] };
   if ('lastObservation' in row) {
@@ -81,22 +91,34 @@ export function parseNativeDiagnostic(value: unknown): NativeDiagnostic {
     if (!NATIVE_PHASES.includes(last.phase as NativePhase)) throw new Error('NATIVE_DIAGNOSTIC');
     result.lastObservation = { phase: last.phase as NativePhase, native: parseObservation(last.native, Number(object(last.native).request)) };
   }
+  if ((row.state === 'hook-failed') !== Object.hasOwn(row, 'hookFailure')) throw new Error('NATIVE_HOOK_FAILURE');
+  if ('hookFailure' in row) {
+    result.hookFailure = parseHookFailureReply(row.hookFailure, Number(object(row.hookFailure).request));
+    if (result.lastObservation && result.hookFailure.request <= result.lastObservation.native.request) throw new Error('NATIVE_REQUEST');
+  }
   return result;
 }
 /** Stores only reconstructed allowlisted data, never rejected input/error text. */
 export class NativeTrace {
   private current: NativeDiagnostic | undefined;
   begin(phase: NativePhase) { this.current = { phase, state: 'request-written', ...(this.current?.lastObservation ? { lastObservation: this.current.lastObservation } : {}) }; }
-  reject() { if (this.current) this.current.state = 'reply-rejected'; }
+  reject() { if (this.current) { this.current.state = 'reply-rejected'; delete this.current.hookFailure; } }
   reply(value: unknown, request: number): Observation | undefined {
     if (!this.current) throw new Error('NATIVE_REQUEST_REQUIRED');
     try {
+      if (Object.hasOwn(object(value), 'hookFailure')) {
+        const failure = parseHookFailureReply(value, request);
+        if (this.current.lastObservation && failure.request <= this.current.lastObservation.native.request) throw new Error('NATIVE_REQUEST');
+        this.current.hookFailure = failure;
+        this.current.state = 'hook-failed'; return undefined;
+      }
       const native = parseObservation(value, request);
+      delete this.current.hookFailure;
       this.current.lastObservation = { phase: this.current.phase, native };
       this.current.state = 'parsed'; return native;
     } catch { this.reject(); return undefined; }
   }
-  predicate(met: boolean) { if (this.current) this.current.state = met ? 'predicate-met' : 'predicate-unmet'; }
+  predicate(met: boolean) { if (this.current && this.current.state !== 'hook-failed') this.current.state = met ? 'predicate-met' : 'predicate-unmet'; }
   snapshot(): NativeDiagnostic | undefined { return this.current ? parseNativeDiagnostic(this.current) : undefined; }
 }
 export function requireNativeTarget(window: NativeWindow, backend: Backend) {
@@ -106,4 +128,41 @@ export function requireNativeTarget(window: NativeWindow, backend: Backend) {
 export function contained(window: NativeWindow): boolean {
   const r = window.geometry, a = window.workArea;
   return !!r && !!a && r.x >= a.x && r.y >= a.y && r.x + r.width <= a.x + a.width + 1 && r.y + r.height <= a.y + a.height + 1;
+}
+
+export const OBSERVER_CHECKPOINTS = ['MODULE_ENTERED', 'ENABLE_ENTERED', 'PRIVATE_CONTEXT_REJECTED', 'PRIVATE_CONTEXT_ACCEPTED', 'POLL_INSTALLED', 'FIRST_POLL_TICK', 'DISABLED',
+  'CONTEXT_NOT_OBSERVED', 'READ_FAILED', 'SIZE_REJECTED', 'DECODE_FAILED', 'JSON_REJECTED', 'SCHEMA_REJECTED', 'STALE_REQUEST', 'PREVALIDATION_FAILED'] as const;
+export const OBSERVER_EVENTS = ['REQUEST_VALIDATED', 'REPLY_PUBLISHED', 'HOOK_FAILURE_PUBLISHED'] as const;
+export type ObserverSnapshot = { checkpoints: typeof OBSERVER_CHECKPOINTS[number][];
+  requests: { event: typeof OBSERVER_EVENTS[number]; request: number }[];
+  extensionInfo: { status: 'INFO_UNAVAILABLE' | 'NOT_FOUND' } | { status: 'INFO_AVAILABLE'; state: number; enabled: boolean } };
+export type ObserverStartup = { latest: ObserverSnapshot; beforeChecker?: ObserverSnapshot };
+function observerSnapshot(value: unknown): ObserverSnapshot {
+  const row = object(value); keys(row, ['checkpoints', 'requests', 'extensionInfo']);
+  if (!Array.isArray(row.checkpoints) || row.checkpoints.length > OBSERVER_CHECKPOINTS.length
+    || row.checkpoints.some(v => typeof v !== 'string' || !OBSERVER_CHECKPOINTS.includes(v as typeof OBSERVER_CHECKPOINTS[number]))
+    || new Set(row.checkpoints).size !== row.checkpoints.length || !Array.isArray(row.requests) || row.requests.length > 16) throw new Error('OBSERVER_STARTUP_SCHEMA');
+  const requests = row.requests.map(value => {
+    const event = object(value); keys(event, ['event', 'request']);
+    if (typeof event.event !== 'string' || !OBSERVER_EVENTS.includes(event.event as typeof OBSERVER_EVENTS[number])
+      || !Number.isSafeInteger(event.request) || Number(event.request) < 1 || Number(event.request) > 1000) throw new Error('OBSERVER_REQUEST_SCHEMA');
+    return { event: event.event as typeof OBSERVER_EVENTS[number], request: Number(event.request) };
+  });
+  const extension = object(row.extensionInfo);
+  let extensionInfo: ObserverSnapshot['extensionInfo'];
+  if (extension.status === 'INFO_UNAVAILABLE' || extension.status === 'NOT_FOUND') {
+    keys(extension, ['status']); extensionInfo = { status: extension.status };
+  } else {
+    keys(extension, ['status', 'state', 'enabled']);
+    if (extension.status !== 'INFO_AVAILABLE' || !Number.isSafeInteger(extension.state) || ![1, 2, 3, 4, 5, 6, 7, 8, 99].includes(Number(extension.state))
+      || typeof extension.enabled !== 'boolean') throw new Error('OBSERVER_INFO_SCHEMA');
+    extensionInfo = { status: 'INFO_AVAILABLE', state: Number(extension.state), enabled: extension.enabled };
+  }
+  return { checkpoints: [...row.checkpoints] as ObserverSnapshot['checkpoints'], requests, extensionInfo };
+}
+export function parseObserverStartup(value: unknown): ObserverStartup {
+  const row = object(value); keys(row, ['latest'], ['beforeChecker']);
+  const result: ObserverStartup = { latest: observerSnapshot(row.latest) };
+  if ('beforeChecker' in row) result.beforeChecker = observerSnapshot(row.beforeChecker);
+  return result;
 }

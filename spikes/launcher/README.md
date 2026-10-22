@@ -61,7 +61,7 @@ The [native-session harness](tests/native-session/README.md) runs the actual lau
 | Required target                     | Current evidence                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
 | Debian 13 amd64, GNOME 48 Wayland   | Isolated software-compositor native probe passes; ordinary show remains unfocused and exposes the component requirement. Actual own-renderer dark/light pixels recorded; physical/session matrix and portal consent/effective binding remain outstanding. |
-| Debian 13 amd64, GNOME X11          | Latest13b diagnostic establishes initial native identity/geometry, then no matching parsed reply after Close; resident/native-hidden gate remains open. |
+| Debian 13 amd64, GNOME X11          | Prior13b established initial identity/geometry before missing a post-Close reply. Reviewed unsigned2111 startup run retains module/enable/local-context/poll markers, but no validated request or matching initial reply; typed info unavailable. Earlier398c failure remains preserved; cause and resident/native-hidden gate remain open. |
 | Debian 13 amd64, Plasma 6.3 Wayland | Signed7c decoy-only rerun passes bounded native identity/backend/lifecycle and ordinary-show focus; controlled placement, portal consent and physical/full-session gates remain pending. Earlier identity failures are preserved. |
 | Debian 13 amd64, KDE X11            | Latest13b diagnostic finds two launcher-PID candidates and refuses identity/geometry inspection; exact-target selection remains open. |
 

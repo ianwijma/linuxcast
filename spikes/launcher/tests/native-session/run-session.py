@@ -17,6 +17,7 @@ import time
 from private import private_root, private_environment, target_guard
 from supervision import Supervisor, Cancelled
 from artifacts import public_manifest, fallback_result, publish
+from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
@@ -69,29 +70,45 @@ def inner(backend,root):
     else:
         args=['--virtual','--socket',env['WAYLAND_DISPLAY'],'--width','1280','--height','900','--no-lockscreen','--no-kactivities'] if wayland else ['--replace']
     with open(os.devnull,'w') as log:
-        compositor=subprocess.Popen([executable,*args],env=env,stdout=log,stderr=log,start_new_session=True)
-        owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
-        deadline=time.monotonic()+45
-        while time.monotonic()<deadline:
-            if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
-            if has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists()): break
-            time.sleep(0.2)
-        else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
-        if family=='kwin':
-            subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
-            deadline=time.monotonic()+5
-            while time.monotonic()<deadline and not has_owner(BUS,env): time.sleep(0.1)
-            if not has_owner(BUS,env): return unavailable('PRIVATE_OBSERVER_BUS_REQUIRED')
-            loaded=bounded(['gdbus','call','--session','--dest',owner,'--object-path','/Scripting','--method','org.kde.kwin.Scripting.loadScript',str(HERE/'dist/kwin-script.js'),'linuxcast-s001-observer'],env)
-            match=re.fullmatch(r'\((?:int32 )?([0-9]+),?\)\s*',loaded.stdout)
-            if loaded.returncode or not match: return unavailable('NATIVE_OBSERVER_LOAD_FAILED')
-            started=bounded(['gdbus','call','--session','--dest',owner,'--object-path','/Scripting/Script'+match.group(1),'--method','org.kde.kwin.Script.run'],env)
-            if started.returncode: return unavailable('NATIVE_OBSERVER_START_FAILED')
-        node=env.get('LINUXCAST_S001_NODE')
-        if not node: return unavailable('PINNED_NODE_REQUIRED')
-        driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
-        try: return driver.wait(timeout=180)
-        except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
+        compositor=subprocess.Popen([executable,*args],env=env,stdout=subprocess.PIPE if family=='gnome' else log,
+            stderr=subprocess.STDOUT if family=='gnome' else log,start_new_session=True,bufsize=0)
+        monitor=ShellDrain(compositor.stdout) if family=='gnome' else None
+        before_checker=None
+        try:
+            owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
+            deadline=time.monotonic()+45
+            while time.monotonic()<deadline:
+                if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
+                if has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists()): break
+                time.sleep(0.2)
+            else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+            if monitor:
+                monitor.set_info(query_once(env,deadline))
+                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+            if family=='kwin':
+                subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                deadline=time.monotonic()+5
+                while time.monotonic()<deadline and not has_owner(BUS,env): time.sleep(0.1)
+                if not has_owner(BUS,env): return unavailable('PRIVATE_OBSERVER_BUS_REQUIRED')
+                loaded=bounded(['gdbus','call','--session','--dest',owner,'--object-path','/Scripting','--method','org.kde.kwin.Scripting.loadScript',str(HERE/'dist/kwin-script.js'),'linuxcast-s001-observer'],env)
+                match=re.fullmatch(r'\((?:int32 )?([0-9]+),?\)\s*',loaded.stdout)
+                if loaded.returncode or not match: return unavailable('NATIVE_OBSERVER_LOAD_FAILED')
+                started=bounded(['gdbus','call','--session','--dest',owner,'--object-path','/Scripting/Script'+match.group(1),'--method','org.kde.kwin.Script.run'],env)
+                if started.returncode: return unavailable('NATIVE_OBSERVER_START_FAILED')
+            node=env.get('LINUXCAST_S001_NODE')
+            if not node: return unavailable('PINNED_NODE_REQUIRED')
+            if monitor:
+                before_checker=monitor.snapshot()
+                (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
+            driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+            try: return driver.wait(timeout=180)
+            except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
+        finally:
+            if monitor:
+                monitor.close()
+                value={'latest':monitor.snapshot()}
+                if before_checker is not None: value['beforeChecker']=before_checker
+                (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic(value)))
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -144,6 +161,11 @@ def main():
             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid(): raise ValueError('PRIVATE_RESULT_FILE_REQUIRED')
             result=json.loads(result_path.read_text())
         else: result=fallback_result(arguments.backend)
+        startup=root/'observer-startup.json'
+        if arguments.backend.startswith('gnome') and result.get('status')!='passed-bounded-native-probe' and startup.exists():
+            metadata=startup.lstat()
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>16384: raise ValueError('OBSERVER_STARTUP_FILE_REQUIRED')
+            result['observerStartup']=startup_diagnostic(json.loads(startup.read_text()))
         packages=bounded(['dpkg-query','-W','-f=${Package} ${Version}\n','gnome-shell','mutter','kwin-wayland','kwin-x11','libqt6qml6'],env)
         destination=HERE.parents[1]/'evidence/native-session'/arguments.backend
         manifest=verify_build(HERE/'dist')

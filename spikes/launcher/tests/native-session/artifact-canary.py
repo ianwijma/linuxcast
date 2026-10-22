@@ -38,6 +38,25 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         native={'request':1,'launcher':launcher,'decoy':window,'decoyActivationIssued':False,'diagnostics':{'launcher':launcher_probe,'decoy':probe}}
         value['nativeDiagnostic']={'phase':'initial-native-launch','state':'predicate-unmet','lastObservation':{'phase':'initial-native-launch','native':native}}
         return value
+    def hook_report():
+        value=diagnostic_report();value['stage']='resident-close'
+        value['nativeDiagnostic'].update(phase='after-close-native-hidden',state='hook-failed',hookFailure={'request':2,'hookFailure':{'stage':'launcher','outcome':'native-read-failed'}})
+        return value
+    if case=='valid-hook-failed':
+        report=hook_report()
+        status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
+        assert status==3 and state=='incomplete'
+        saved=json.loads((destination/'report.json').read_text())
+        assert saved['nativeDiagnostic']['lastObservation']['native']['request']==1
+        assert saved['nativeDiagnostic']['hookFailure']['request']==2
+        print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
+    startup={'latest':{'checkpoints':['MODULE_ENTERED','PRIVATE_CONTEXT_REJECTED'],'requests':[],
+        'extensionInfo':{'status':'INFO_AVAILABLE','state':1,'enabled':True}}}
+    if case=='valid-startup':
+        report['observerStartup']=startup
+        status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
+        assert status==3 and state=='unavailable'
+        print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
     if case in ('valid-diagnostic','valid-zero-geometry'):
         report=diagnostic_report(case=='valid-zero-geometry')
         status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
@@ -78,6 +97,31 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         elif case=='diagnostic-inconsistent': native['diagnostics']['launcher']['pidMatch']='single'
         else:
             report=complete();report['observations'][0]['native']['launcher']['geometry']=None
+    elif case in ('hook-extra','hook-nested-private','hook-stage-private','hook-outcome-private','hook-stale','hook-missing','hook-wrong-state','hook-forged-success','hook-kwin'):
+        report=hook_report();trace=report['nativeDiagnostic'];failure=trace['hookFailure']
+        if case=='hook-extra': failure['private']='synthetic-private-canary'
+        elif case=='hook-nested-private': failure['hookFailure']['private']='synthetic-private-canary'
+        elif case=='hook-stage-private': failure['hookFailure']['stage']='synthetic-private-canary'
+        elif case=='hook-outcome-private': failure['hookFailure']['outcome']='synthetic-private-canary'
+        elif case=='hook-stale': failure['request']=1
+        elif case=='hook-missing': del trace['hookFailure']
+        elif case=='hook-wrong-state': trace['state']='parsed'
+        elif case=='hook-forged-success': report=complete();report['nativeDiagnostic']=trace
+        else:
+            from artifacts import public_result
+            report['backend']='kwin-wayland'
+            try: public_result(report,'kwin-wayland')
+            except ValueError: pass
+            else: raise AssertionError('KWIN_HOOK_FAILURE_ACCEPTED')
+            print(json.dumps({'case':case,'rejectedBeforePublication':True,'publishedFiles':0}));sys.exit(0)
+    elif case in ('startup-extra','startup-nested-private','startup-unknown-marker','startup-state-type','startup-request-private','startup-request-bound'):
+        report['observerStartup']=copy.deepcopy(startup);saved=report['observerStartup']
+        if case=='startup-extra': saved['private']='synthetic-private-canary'
+        elif case=='startup-nested-private': saved['latest']['extensionInfo']['error']='synthetic-private-canary'
+        elif case=='startup-unknown-marker': saved['latest']['checkpoints'].append('synthetic-private-canary')
+        elif case=='startup-state-type': saved['latest']['extensionInfo']['state']='1'
+        elif case=='startup-request-private': saved['latest']['requests']=[{'event':'REQUEST_VALIDATED','request':1,'private':'synthetic-private-canary'}]
+        else:saved['latest']['requests']=[{'event':'REQUEST_VALIDATED','request':1}]*17
     elif case=='missing-success-observations':
         report.update(status='passed-bounded-native-probe',stage='complete',runtime=runtime,shortcut={'state':'temporarily-unavailable','effectiveBindingExposed':False,'portalServicePresent':False,'consentOrEffectiveBindingProven':False},
             closeRetainedResidentProcess=True,decoyActivationUsedForChallengeSetup=True,singletonShowRetainedPid=True,explicitUiQuitExited=True,hiddenCliQuitExited=True,
