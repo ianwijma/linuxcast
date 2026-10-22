@@ -17,6 +17,8 @@ from supervision import Supervisor, Cancelled
 import private_context as _context
 from debugger_filter import parse_report as parse_debugger_report
 from post_stop import QUIET_SECONDS, observe_post_stop
+from client_resize import control_progress, parse_adapter as parse_resize_adapter, evaluate as evaluate_client_resize
+import clipboard_scenario
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
@@ -48,7 +50,7 @@ def read_result(path):
     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
     return value
 
-def canary_progress(root):
+def canary_progress(root,client_resize=False):
     file=root/'private-canary.log'
     if not file.exists(): return None
     with file.open('rb') as stream:
@@ -56,6 +58,9 @@ def canary_progress(root):
     for line in reversed(content.splitlines()):
         try: value=json.loads(line)
         except ValueError: continue
+        if client_resize:
+            if control_progress(value) is not None: return value
+            continue
         if not isinstance(value,dict) or set(value)!= {'ownConfigureEvents'}: continue
         entries=value['ownConfigureEvents']
         if not isinstance(entries,list) or not 1<=len(entries)<=8: continue
@@ -66,7 +71,7 @@ def canary_progress(root):
             return value
     return None
 
-def native_progress(root):
+def native_progress(root,client_resize=False):
     # Only own exact static stage labels escape the private compositor log.
     stages={'SCRIPT_ENTERED','CONTEXT_CALLBACK','OWN_WINDOW_FOUND','NATIVE_ADAPTER_READY','LOOP_START','OWN_WINDOW_DEADLINE','SCRIPT_EXCEPTION'}
     file=root/'private-compositor.log'
@@ -92,11 +97,16 @@ def native_progress(root):
         debugger=parse_debugger_report(candidate)
         if debugger is not None: break
     return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
-            'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root),'debugger':debugger}
+            'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root,client_resize),'debugger':debugger}
 
-def inner(backend,root,restart=False,debugger=False,read_only_control=False):
+def inner(backend,root,restart=False,debugger=False,read_only_control=False,client_resize_control=False,clipboard_only=False):
+    scenario='own-client-resize-control' if client_resize_control else 'read-only-control' if read_only_control else None
     def unavailable(reason,progress=None):
-        return report_unavailable(reason,progress,'read-only-control' if read_only_control else None)
+        if clipboard_only:
+            print(json.dumps(clipboard_scenario.unavailable(reason))); return 3
+        return report_unavailable(reason,progress,scenario)
+    def progress():
+        return native_progress(root,client_resize_control)
     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
     for key in ('DISPLAY','XAUTHORITY'):
@@ -109,6 +119,7 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
     env['LINUXCAST_S002_PRIVATE_GUEST']='1'
     env['LINUXCAST_S002_RESULT_DIR']=str(root)
     if read_only_control: env['LINUXCAST_S002_READ_ONLY_CONTROL']='1'
+    if client_resize_control: env['LINUXCAST_S002_OWN_CLIENT_RESIZE_CONTROL']='1'
     socket='linuxcast-s002-wayland'
     if wayland: env['WAYLAND_DISPLAY']=socket
     if backend.startswith('gnome'):
@@ -120,6 +131,7 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
         args=['--virtual','--socket',socket,'--width','1280','--height','720','--no-lockscreen','--no-global-shortcuts','--no-kactivities'] if wayland else ['--replace']
     if not executable: return unavailable('GUEST_COMPOSITOR_PACKAGE_REQUIRED')
     children=[]
+    resize_ends=[]
     def interrupted(_signal,_frame):
         raise InterruptedError()
     signal.signal(signal.SIGTERM,interrupted)
@@ -146,12 +158,26 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
         deadline=time.monotonic()+15
         bus_name='org.gnome.Shell' if backend.startswith('gnome') else 'org.kde.KWin'
         while time.monotonic()<deadline:
-            if compositor.poll() is not None: return unavailable('NATIVE_COMPOSITOR_START_FAILED',native_progress(root) if debugger else None)
+            if compositor.poll() is not None: return unavailable('NATIVE_COMPOSITOR_START_FAILED',progress() if debugger else None)
             owner=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',bus_name],env)
             if 'true' in owner.stdout and (not wayland or (pathlib.Path(env['XDG_RUNTIME_DIR'])/socket).exists()): break
             time.sleep(0.1)
         else: return unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
-        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True)
+        if clipboard_only:
+            report=clipboard_scenario.collect(env,HERE,compositor)
+            report.update(backend=backend,kernel=os.uname().release,sourceManifest=json.loads((HERE/'manifest.json').read_text()),
+                          rendering='software-requested; no GPU passthrough; actual renderer must be recorded separately')
+            print(json.dumps(report))
+            return 0 if report['state']=='passed' else 3
+        if client_resize_control:
+            # Created AFTER the compositor. CLOEXEC/default close_fds prevents
+            # either end reaching any other child; fixed stdin maps only the
+            # read end to GTK and the write end to Gio. No caller FD is read.
+            resize_ends=list(os.pipe2(os.O_CLOEXEC|os.O_NONBLOCK))
+        canary_args=['/usr/bin/python3',str(HERE/'canary.py')]
+        if client_resize_control: canary_args.append('--own-client-resize-control')
+        canary=subprocess.Popen(canary_args,env=env,stdin=resize_ends[0] if client_resize_control else None,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True,close_fds=True)
+        if client_resize_control: os.close(resize_ends.pop(0))
         children.append(canary)
         if backend.startswith('kwin'):
             env['LINUXCAST_S002_CANARY_PID']=str(canary.pid)
@@ -164,7 +190,8 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
                 if not result: return unavailable('NATIVE_RESTART_RESULT_REQUIRED')
                 print(json.dumps(result))
                 return 0 if driver.returncode==0 and result.get('state')=='passed' else 3
-            helper=subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+            helper=subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdin=resize_ends[0] if client_resize_control else None,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True,close_fds=True)
+            if client_resize_control: os.close(resize_ends.pop(0))
             children.append(helper)
             helper_deadline=time.monotonic()+5
             while time.monotonic()<helper_deadline:
@@ -184,14 +211,16 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
         result=None
         while time.monotonic()<deadline:
             if canary.poll() is not None:
-                progress=native_progress(root) if backend.startswith('kwin') else {}
-                progress['canaryExitCode']=canary.returncode
-                progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
-                return unavailable('OWN_NATIVE_CANARY_FAILED',progress)
+                failure_progress=progress() if backend.startswith('kwin') else {}
+                failure_progress['canaryExitCode']=canary.returncode
+                failure_progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
+                return unavailable('OWN_NATIVE_CANARY_FAILED',failure_progress)
             result=read_result(result_path)
             if result: break
             time.sleep(0.1)
-        if not result: return unavailable('NATIVE_ADAPTER_PROBE_DEADLINE',native_progress(root) if backend.startswith('kwin') else None)
+        if not result: return unavailable('NATIVE_ADAPTER_PROBE_DEADLINE',progress() if backend.startswith('kwin') else None)
+        if client_resize_control and parse_resize_adapter(result) is None:
+            return unavailable('OWN_CLIENT_RESIZE_RESULT_SCHEMA_REJECTED',progress())
         quiet=None
         if backend=='kwin-wayland':
             if result.get('pollingStopped') is True:
@@ -200,7 +229,7 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
                 quiet={'seconds':QUIET_SECONDS,'completed':False,'allOwnProcessesAlive':False,
                        'controlTrafficStable':False,'reason':'POST_STOP_REPORT_REQUIRED'}
         clipboard=None
-        if backend=='kwin-wayland' and not read_only_control and quiet is not None and quiet['completed']:
+        if backend=='kwin-wayland' and not read_only_control and not client_resize_control and quiet is not None and quiet['completed']:
             native=bounded([env.get('LINUXCAST_S002_NODE','/usr/bin/node'),str(HERE/'clipboard-client.mjs')],env,timeout=10)
             clipboard=read_result(root/'clipboard-result.json')
             if not clipboard: clipboard={'state':'unavailable','reason':'NATIVE_CLIPBOARD_CLIENT_REQUIRED'}
@@ -217,11 +246,11 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
         if quiet is not None and not quiet['completed']:
             report['state']='unavailable'
             report['reason']='POST_STOP_QUIET_FAILED'
-            progress=native_progress(root)
-            progress['canaryExitCode']=canary.poll()
-            progress['privateHelperExitCode']=helper.poll()
-            progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
-            report['nativeProgress']=progress
+            failure_progress=progress()
+            failure_progress['canaryExitCode']=canary.poll()
+            failure_progress['privateHelperExitCode']=helper.poll()
+            failure_progress['debuggerWrapperExitCode' if debugger else 'compositorExitCode']=compositor.poll()
+            report['nativeProgress']=failure_progress
         if clipboard and clipboard.get('state')!='passed': report['state']='unavailable'
         if read_only_control:
             complete=(result.get('state')=='diagnostic' and result.get('diagnosticStatus')=='READ_ONLY_CONTROL_COMPLETE'
@@ -231,13 +260,25 @@ def inner(backend,root,restart=False,debugger=False,read_only_control=False):
                           nativePlacementAttempted=result.get('nativePlacementAttempted'),actualRestartTested=False,
                           placementAcceptanceEstablished=False,clipboardAcceptanceEstablished=False,
                           clipboard={'state':'not-exercised','reason':'READ_ONLY_DIAGNOSTIC_CONTROL'})
+        if client_resize_control:
+            own=canary_progress(root,True)
+            complete,checks=evaluate_client_resize(result,own)
+            complete=complete and quiet is not None and quiet['completed']
+            report.update(state='diagnostic',diagnosticStatus='OWN_CLIENT_RESIZE_CONTROL_COMPLETE' if complete else 'OWN_CLIENT_RESIZE_CONTROL_FAILED',
+                          diagnosticScenario='own-client-resize-control',evidenceKind='actual-isolated-own-client-resize-diagnostic',
+                          nativePlacementAttempted=result['nativePlacementAttempted'],requestedPlacement=result['requested'],actualRestartTested=False,
+                          placementAcceptanceEstablished=False,clipboardAcceptanceEstablished=False,
+                          ownClient=own,clientResizeChecks=checks,
+                          clipboard={'state':'not-exercised','reason':'OWN_CLIENT_RESIZE_DIAGNOSTIC_CONTROL'})
         (root/'report.json').write_text(json.dumps(report))
         print(json.dumps(report))
         if read_only_control: return 4 if report['diagnosticStatus']=='READ_ONLY_CONTROL_COMPLETE' else 3
+        if client_resize_control: return 4 if report['diagnosticStatus']=='OWN_CLIENT_RESIZE_CONTROL_COMPLETE' else 3
         return 0 if report['state']=='passed' else 3
     except (OSError,ValueError,subprocess.TimeoutExpired):
         return unavailable('PRIVATE_GUEST_NATIVE_HARNESS_FAILED')
     finally:
+        for descriptor in resize_ends: os.close(descriptor)
         for child in reversed(children): terminate(child)
         rawlog.close()
         canarylog.close()
@@ -250,11 +291,17 @@ def main():
     parser.add_argument('--restart-scenario',action='store_true')
     parser.add_argument('--debugger-scenario',action='store_true')
     parser.add_argument('--read-only-control',action='store_true')
+    parser.add_argument('--own-client-resize-control',action='store_true')
+    parser.add_argument('--clipboard-only',action='store_true')
     arguments=parser.parse_args()
     if not arguments.private_guest or not _context.guest_allowed(pathlib.Path('/etc/os-release').read_text(),os.getuid(),pathlib.Path('/run/linuxcast-input-spike-lab').exists()):
         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
+    if arguments.clipboard_only and (arguments.backend!='kwin-wayland' or arguments.restart_scenario or arguments.debugger_scenario or arguments.read_only_control or arguments.own_client_resize_control):
+        return report_unavailable('CLIPBOARD_ONLY_REQUIRES_ONLY_KWIN_WAYLAND')
     if arguments.read_only_control and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
         return report_unavailable('READ_ONLY_CONTROL_REQUIRES_KWIN_WAYLAND_WITHOUT_RESTART')
+    if arguments.own_client_resize_control and (arguments.backend!='kwin-wayland' or arguments.restart_scenario or arguments.read_only_control):
+        return report_unavailable('OWN_CLIENT_RESIZE_REQUIRES_ONLY_KWIN_WAYLAND_WITHOUT_RESTART')
     if arguments.debugger_scenario and (arguments.backend!='kwin-wayland' or arguments.restart_scenario):
         return report_unavailable('DEBUGGER_ONLY_KWIN_WAYLAND_SUCCESS_SCENARIO')
     if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
@@ -262,7 +309,7 @@ def main():
     if arguments.inner:
         try: root=_context.private_context(str(arguments.inner),arguments.backend)
         except (OSError,ValueError,RuntimeError): return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
-        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario,arguments.read_only_control)
+        return inner(arguments.backend,root,arguments.restart_scenario,arguments.debugger_scenario,arguments.read_only_control,arguments.own_client_resize_control,arguments.clipboard_only)
     root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-',dir='/tmp'))
     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
     for name in _context.DIRECTORIES.values(): (root/name).mkdir(mode=0o700)
@@ -278,6 +325,8 @@ def main():
     if arguments.restart_scenario: command.append('--restart-scenario')
     if arguments.debugger_scenario: command.append('--debugger-scenario')
     if arguments.read_only_control: command.append('--read-only-control')
+    if arguments.own_client_resize_control: command.append('--own-client-resize-control')
+    if arguments.clipboard_only: command.append('--clipboard-only')
     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
         command=['xvfb-run','-a','-f',str(root/'xauthority'),'-s','-screen 0 1280x720x24 -nolisten tcp',*command]
     try:

@@ -9,6 +9,7 @@ import gi
 
 gi.require_version('Gio','2.0')
 from gi.repository import Gio, GLib
+from client_resize import Writer, AckTrigger
 
 ROOT = pathlib.Path(os.environ.get('LINUXCAST_S002_RESULT_DIR',''))
 if os.environ.get('LINUXCAST_S002_PRIVATE_GUEST') != '1' or not str(ROOT).startswith('/tmp/linuxcast-s002-'):
@@ -20,8 +21,13 @@ XML = '<node><interface name="'+BUS+'">'+''.join('<method name="'+name+'"><arg t
 
 def main():
     loop = GLib.MainLoop()
+    resize_control = os.environ.get('LINUXCAST_S002_OWN_CLIENT_RESIZE_CONTROL') == '1'
+    # In this mode fd0 is only the runner's anonymous write end. Node receives
+    # a fresh stdin pipe below, never this descriptor; no FD number is input.
+    writer = Writer() if resize_control else None
+    trigger = AckTrigger(writer) if writer else None
     node_path = os.environ.get('LINUXCAST_S002_NODE','/usr/bin/node')
-    child = subprocess.Popen([node_path,str(pathlib.Path(__file__).with_name('queue-helper.mjs'))],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,bufsize=1)
+    child = subprocess.Popen([node_path,str(pathlib.Path(__file__).with_name('queue-helper.mjs'))],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,bufsize=1,close_fds=True)
     connection = Gio.bus_get_sync(Gio.BusType.SESSION,None)
     waiting = {}
     serial = 0
@@ -42,7 +48,7 @@ def main():
             if not isinstance(body,dict): raise ValueError()
             counts[name]+=1; progress()
             serial += 1
-            waiting[serial] = (invocation,name)
+            waiting[serial] = (invocation,name,body)
             child.stdin.write(json.dumps({'id':serial,'peer':sender,'method':name,'body':body})+'\n')
             child.stdin.flush()
         except Exception:
@@ -52,9 +58,12 @@ def main():
         if not line or len(line)>65536: loop.quit(); return False
         try:
             frame=json.loads(line)
-            invocation,name=waiting.pop(frame['id'])
+            invocation,name,body=waiting.pop(frame['id'])
             replies[name]+=1; progress()
             reply(invocation,frame['reply'])
+            # The invocation was authenticated against the actual KWin owner
+            # before entering waiting. Trigger only AFTER its Ack response.
+            if trigger is not None: trigger.after_reply(name,body,frame['reply'])
             if name=='CanaryObservation':
                 (ROOT/'kwin-result.json').write_text(json.dumps(frame['reply']))
         except Exception: loop.quit(); return False
@@ -65,6 +74,7 @@ def main():
     timeout=GLib.timeout_add(20000,lambda: (loop.quit(),False)[1])
     try: loop.run()
     finally:
+        if writer is not None: writer.close()
         GLib.source_remove(watch); GLib.source_remove(timeout)
         Gio.bus_unown_name(owner); connection.unregister_object(registration)
         child.terminate()

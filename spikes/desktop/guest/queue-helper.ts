@@ -9,6 +9,8 @@ const root = process.env.LINUXCAST_S002_RESULT_DIR ?? '';
 if (process.env.LINUXCAST_S002_PRIVATE_GUEST !== '1' || !root.startsWith('/tmp/linuxcast-s002-') || !Number.isSafeInteger(pid) || pid <= 0) process.exit(3);
 const instance = newCompanionInstance();
 const readOnlyControl = process.env.LINUXCAST_S002_READ_ONLY_CONTROL === '1';
+const clientResizeControl = process.env.LINUXCAST_S002_OWN_CLIENT_RESIZE_CONTROL === '1';
+if (readOnlyControl && clientResizeControl) process.exit(3);
 let peer = '';
 let stage = 0;
 let outcomes: string[] = [];
@@ -43,7 +45,7 @@ async function request(encoded: string) {
       outcomes.push(String(value.outcome));
       stage++;
       answer(id,{kind:'ack'});
-      if (stage === 1) { if (readOnlyControl) geometry(); else placement(); }
+      if (stage === 1) { if (readOnlyControl || clientResizeControl) geometry(); else placement(); }
       else if (stage === 2) setTimeout(geometry,250);
     } else if (frame.method === 'CanaryObservation' && keys === 'action,nativePlacementAttempted,observations,protocolVersion,reason,requested' && frame.peer === peer) {
       if (typeof value.action !== 'string' || value.action.length > 256 || typeof value.reason !== 'string' || !['COMPANION_RESTARTED','COMPANION_DBUS_TIMEOUT','COMPANION_PROTOCOL_FAILURE'].includes(value.reason)
@@ -52,6 +54,17 @@ async function request(encoded: string) {
       const requested = value.requested === null ? null : parseRect(value.requested);
       const changed = observations.length === 2 && JSON.stringify(observations[0]) !== JSON.stringify(observations[1]);
       const applied = requested !== null && JSON.stringify(requested) === JSON.stringify(observations[1]);
+      if (clientResizeControl) {
+        const sizeChanged = observations.length === 3 && (observations[0]!.width !== observations[2]!.width || observations[0]!.height !== observations[2]!.height);
+        const ready = stage === 3 && terminalReplySent && outcomes.every(outcome => outcome === 'ok') && sizeChanged
+          && value.nativePlacementAttempted === false && requested === null && value.reason === 'COMPANION_RESTARTED';
+        answer(id,{kind:'diagnostic',state:'diagnostic',diagnosticStatus:ready ? 'OWN_CLIENT_RESIZE_GEOMETRY_READY' : 'OWN_CLIENT_RESIZE_GEOMETRY_FAILED',
+          kindEvidence:'own-client-resize-not-placement-or-clipboard-acceptance',nativePlacementAttempted:value.nativePlacementAttempted,
+          placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,nativeGeometryChanged:sizeChanged,
+          pollingStopped:terminalReplySent,observations,requested,transportAckCount:stage,outcomes,
+          terminalReason:value.reason,normalClipboardTouched:false});
+        return;
+      }
       if (readOnlyControl) {
         const stable = observations.length === 3 && observations.every(rect => JSON.stringify(rect) === JSON.stringify(observations[0]));
         const complete = stage === 3 && terminalReplySent && outcomes.every(outcome => outcome === 'ok') && stable

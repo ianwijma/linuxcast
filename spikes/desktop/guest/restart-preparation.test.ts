@@ -239,8 +239,8 @@ print('fixed-symbol-state-privacy-passed')
 });
 
 
-async function exerciseQueueFixture(control:boolean) {
-  const helper=startProcess('queue-helper.mjs',control ? {LINUXCAST_S002_READ_ONLY_CONTROL:'1'} : {});
+async function exerciseQueueFixture(control:boolean,clientResize=false) {
+  const helper=startProcess('queue-helper.mjs',clientResize ? {LINUXCAST_S002_OWN_CLIENT_RESIZE_CONTROL:'1'} : control ? {LINUXCAST_S002_READ_ONLY_CONTROL:'1'} : {});
   try {
     const context=await helper.call('CanaryContext',{});
     const handle=context.handle as Handle;
@@ -275,6 +275,25 @@ test('read-only queue control retains three command/ack slots and cannot report 
       nativePlacementAttempted:false,placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,
       nativeGeometryStable:true,pollingStopped:true,transportAckCount:3,outcomes:['ok','ok','ok']});
   } finally {await helper.close();}
+});
+test('own-client resize queue is geometry-only and requires changed geometry plus an explicit stop',async()=>{
+  const {helper,handle,operations}=await exerciseQueueFixture(true,true);
+  try {
+    expect(operations).toEqual(['geometry','geometry','geometry']);
+    const body={...fixtureObservation(true),observations:[fixtureInitial,fixtureInitial,{...fixtureInitial,width:400,height:240}]};
+    expect(await helper.call('CanaryObservation',body)).toMatchObject({diagnosticStatus:'OWN_CLIENT_RESIZE_GEOMETRY_FAILED',pollingStopped:false});
+    await helper.call('NextCommand',{generation:handle.generation});
+    expect(await helper.call('CanaryObservation',body)).toMatchObject({kind:'diagnostic',state:'diagnostic',
+      diagnosticStatus:'OWN_CLIENT_RESIZE_GEOMETRY_READY',nativePlacementAttempted:false,
+      placementAcceptanceEstablished:false,clipboardAcceptanceEstablished:false,nativeGeometryChanged:true});
+    expect(await helper.call('CanaryObservation',{...body,nativePlacementAttempted:true})).toMatchObject({diagnosticStatus:'OWN_CLIENT_RESIZE_GEOMETRY_FAILED'});
+    expect(await helper.call('CanaryObservation',fixtureObservation(true))).toMatchObject({diagnosticStatus:'OWN_CLIENT_RESIZE_GEOMETRY_FAILED'});
+  } finally {await helper.close();}
+});
+test('own-client resize pipe, callbacks and strict report requirements have no display effects',()=>{
+  const result=execFileSync('/usr/bin/python3',[new URL('./client_resize_fixture.py',import.meta.url).pathname],
+    {encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('own-window-single-resize-fixture-passed');
 });
 test('ordinary queue fixture retains exact placement and fails a wrong observed target',async()=>{
   const {helper,handle,operations}=await exerciseQueueFixture(false);
@@ -347,4 +366,24 @@ for backend,extra in [('gnome-wayland',[]),('gnome-x11',[]),('kwin-x11',[]),('kw
 print('bounded-read-only-flag-guard-passed')
 `,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
   expect(result.trim().endsWith('bounded-read-only-flag-guard-passed')).toBe(true);
+});
+test('own-client resize flags reject other backends, restart and mixed control modes before native calls',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import pathlib,runpy,sys
+from unittest.mock import patch
+sys.path.insert(0,sys.argv[1])
+module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))
+main=module['main'];context=module['_context']
+for backend,extra in [('gnome-wayland',[]),('gnome-x11',[]),('kwin-x11',[]),('kwin-wayland',['--restart-scenario']),('kwin-wayland',['--read-only-control'])]:
+    with patch.object(context,'guest_allowed',return_value=True),patch.object(sys,'argv',['run-session.py',backend,'--private-guest','--own-client-resize-control',*extra]),patch('subprocess.Popen',side_effect=AssertionError('UNEXPECTED_DISPLAY_CALL')):
+        assert main()==3
+print('own-client-resize-flag-guard-passed')
+`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim().endsWith('own-client-resize-flag-guard-passed')).toBe(true);
+});
+
+test('clipboard-only keeps strict protocol/client gates and starts no window or command queue',()=>{
+  const result=execFileSync('/usr/bin/python3',[new URL('./clipboard_fixture.py',import.meta.url).pathname],
+    {encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('clipboard-only-fixed-scenario-passed');
 });

@@ -1,0 +1,32 @@
+{
+  "task": "S0-02",
+  "sourceBaselineCommit": "3f31c83936e074888daf2023092eaf8fec2a6b85",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "incrementSha256": "d13b8266acedab7d2aac5ec9b420fc5ac6aa00bdf8e892a367a20da94045c957",
+  "combinedPatchSha256": "4e475192fddf4fdd9c063be41b204d99d40d6e9bbae6e0a628e7dc7eb31d6ad0",
+  "manifestSha256": "6bb0b94154a91c753403dc1de812d5927011e37eea7c2b0e41b6ff90fa19fc55",
+  "runtimeInputs": 27,
+  "outputs": 21,
+  "independentSourceReview": "CLEAN; independent no-display fixture passes",
+  "platform": "Pop!_OS22.04 GNOME42.9 X11, Node24.22.1/Bun1.4.4",
+  "command": "bun run test:integration -- S0-02",
+  "passed": 99,
+  "failed": 0,
+  "skipped": 0,
+  "seconds": 3.52,
+  "composition": {
+    "transport": 63,
+    "preparation": 34,
+    "actualOwnWindowPrivateSelectionAndBus": 2
+  },
+  "otherChecks": [
+    "typecheck",
+    "affected ESLint",
+    "guest Python syntax",
+    "build/manifest validation",
+    "plan validation"
+  ],
+  "nativeClipboardOnlyExecuted": false,
+  "physicalDesktopMatrixEstablished": false
+}

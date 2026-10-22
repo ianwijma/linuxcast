@@ -1,0 +1,13 @@
+# Actual isolated KDE clipboard transport
+
+Exactly one clipboard-only run on22October2026,2026-10-22T20:47:45.616953+00:00–2026-10-22T20:47:49.415914+00:00, passes exit0. Source is signed baseline3f31c839 plus the explicitly unsigned reviewed ten-file patch4e475192 (five-file incrementd13b8266). Manifest6bb0b941 verifies27 runtime inputs/21 outputs before and after execution. The packaged clipboard client, bounded pipe reader and fixed ownership-event script remain unchanged from3f31. Preparation99/99 checks pass on this exact source; independent source review is CLEAN.
+
+The [installed guest baseline](guest-installed.json) records wl-clipboard2.2.1-2; this run did not separately re-query its package version.
+
+The guarded private Debian13.7/kernel6.12.113+deb13-amd64/KWin6.3.6 Wayland compositor supplies positively observed zwlr_data_control_manager_v1 version2 binding and four native ownership events. The fixed synthetic payload matches. Denial before native read, unsupported MIME skip, cancellation and oversize rejection all pass; nativeClientFailure=false. The single client exits0 and the compositor is still alive at that checkpoint. This is not a measured stability interval or permanent health claim.
+
+This separate scenario starts no GTK window, command queue or KWin script; placement/focus/restart remain unexercised. No geometry-control completion is reused as clipboard success. Only the new private compositor clipboard contains the synthetic text; no host clipboard/display/settings/input are used. Raw protocol debug remains transient and is discarded. The strict output contains fixed enums, public booleans/counts, package versions and source hashes, never clipboard bytes, private app content or protocol lines.
+
+This supplies actual KDE packaged-client clipboard transport feasibility alongside the separately recorded GNOME private Meta.Selection API and KWin live geometry/restart evidence. It is not implementation or acceptance of the production data-control adapter, arbitrary-owner GNOME bridge, ordinary KWin placement, all X11 paths or the full physical/release matrix. The unresolved KWin placement SIGSEGV remains an explicit F0/P1-03/P1-05 finding; complete1.0 scope is preserved.
+
+`kwin-wayland-clipboard-only.json` preserves the exact source/platform/provenance and safe result; `clipboard-only-reviewed.patch.gz` preserves the combined source. `guest-release-clipboard-only.json` at20:47:50UTC confirms native/Xvfb/Electron/node/GDB0, DBus2 baseline, private roots/input marker absent and owned staging removed. No retry or source/renderer/timer change occurred during execution. Final independent artifact/acceptance review precedes task integration.
