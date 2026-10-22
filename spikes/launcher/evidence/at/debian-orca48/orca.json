@@ -1,0 +1,45 @@
+{
+  "status": "passed-generated-presentation",
+  "orcaVersion": "48.1",
+  "startupCompleted": true,
+  "anchors": [
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "delivered": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "delivered": true
+    }
+  ],
+  "presentations": [
+    {
+      "label": "Search commands",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Hide launcher",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Actions Ctrl K",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Record shortcut",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Cancel shortcut change",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    }
+  ],
+  "limitation": "Actual Orca/private Speech Dispatcher generated presentation only; no audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof."
+}

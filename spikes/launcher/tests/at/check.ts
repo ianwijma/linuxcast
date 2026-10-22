@@ -39,12 +39,14 @@ let orcaExited = false;
 let speechFailed = false;
 let stage = 'build';
 const snapshots: { label: string; snapshot: NativeSnapshot }[] = [];
+let lastNativeAttempt: { label: string; snapshot: NativeSnapshot } | undefined;
 const presentations: { label: string; generatedAfterNativeFocus: boolean; deliveredToSpeechDispatcher: boolean }[] = [];
+const anchors: { nativeFocused: boolean; generated: boolean; delivered: boolean }[] = [];
 const debugPath = join(profile, 'orca-debug.log');
 const log = () => { try { return readFileSync(debugPath, 'utf8'); } catch { return ''; } };
 const hasLabel = (text: string, marker: string, label: string) => text.split('\n').some(line => line.includes(marker) && line.includes(label));
 const startupCompleted = () => log().includes('ORCA: Startup complete') || log().includes('ORCA: Starting Atspi main event loop');
-const orcaVersion = /[0-9]+\.[0-9]+(?:\.[0-9]+)?/.exec(spawnSync('/usr/bin/orca', ['--version'], { env, encoding: 'utf8', timeout: 5000 }).stdout ?? '')?.[0] ?? 'unavailable';
+const orcaVersion = /[0-9]+\.[0-9]+(?:\.[0-9]+)?/.exec(spawnSync('/usr/bin/orca', ['--version'], { env, encoding: 'utf8', timeout: 20_000 }).stdout ?? '')?.[0] ?? 'unavailable';
 
 try {
   const main = await buildLauncher();
@@ -140,10 +142,19 @@ try {
   const settleDismissAnchor = async () => {
     stage = 'anchor:Dismiss launcher';
     const offset = log().length;
+    const anchor = { nativeFocused: false, generated: false, delivered: false };
+    anchors.push(anchor);
     await page.getByRole('button', { name: 'Dismiss launcher', exact: true }).focus();
     // Process a distinct anchor first so a delayed initial search utterance
     // cannot satisfy the subsequent per-focus presentation assertion.
-    await expect.poll(() => hasLabel(log().slice(offset), 'SPEECH OUTPUT:', 'Dismiss launcher'), { timeout: 10_000 }).toBe(true);
+    await expect.poll(async () => {
+      const native = await inspect();
+      anchor.nativeFocused = native.controls?.some(control => control.label === 'Dismiss launcher' && control.kind === 'button' && control.focused) ?? false;
+      const fresh = log().slice(offset);
+      anchor.generated = hasLabel(fresh, 'SPEECH OUTPUT:', 'Dismiss launcher');
+      anchor.delivered = hasLabel(fresh, 'SPEECH DISPATCHER: Speaking', 'Dismiss launcher');
+      return !orcaExited && anchor.nativeFocused && anchor.generated;
+    }, { timeout: 30_000 }).toBe(true);
   };
   const focusCheck = async (label: string, role: string, target: Locator, key: string, screenshot?: string) => {
     stage = `focus:${label}`;
@@ -154,6 +165,7 @@ try {
     let snapshot: NativeSnapshot | undefined;
     await expect.poll(async () => {
       snapshot = await inspect();
+      lastNativeAttempt = { label, snapshot };
       return (snapshot.event_sequence ?? 0) > (before.event_sequence ?? 0)
         && snapshot.focus_events?.at(-1) === label
         && snapshot.controls?.some(control => control.label === label && control.kind === role && control.focused);
@@ -182,22 +194,24 @@ try {
   await expect(page.getByRole('heading', { name: 'Session shortcut', exact: true })).toBeVisible();
   await page.evaluate(() => window.linuxcast.setAppearance('light'));
   await settleDismissAnchor();
-  await focusCheck('Record shortcut', 'button', page.getByRole('button', { name: 'Record shortcut', exact: true }), 'Tab', 'light-shortcut.png');
+  await focusCheck('Record shortcut', 'toggle-button', page.getByRole('button', { name: 'Record shortcut', exact: true }), 'Tab', 'light-shortcut.png');
   await focusCheck('Cancel shortcut change', 'button', page.getByRole('button', { name: 'Cancel shortcut change', exact: true }), 'Tab');
   stage = 'complete';
   expect(presentations).toHaveLength(5);
   expect(orcaExited).toBe(false);
   writeFileSync(join(evidence, 'native-at.json'), JSON.stringify({ status: 'passed-native-focus', snapshots }, null, 2) + '\n');
   writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'passed-generated-presentation', orcaVersion, startupCompleted: startupCompleted(),
-    presentations, limitation: 'Actual Orca/private Speech Dispatcher generated presentation only; no audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof.' }, null, 2) + '\n');
+    anchors, presentations, limitation: 'Actual Orca/private Speech Dispatcher generated presentation only; no audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof.' }, null, 2) + '\n');
   writeFileSync(join(evidence, 'report.json'), JSON.stringify({ status: 'passed', stage, nativeFocus: 5, generatedPresentation: 5,
     boundary: 'Actual launcher on private Xvfb/session/AT buses; synthetic app-only observation; actual renderer sandbox; no host display hooks/settings or audible QA.' }, null, 2) + '\n');
   console.log('Launcher actual Electron/native AT/Orca presentation passed5/5. No audible or compositor QA claimed.');
 } catch {
   // Operational stages/allowlisted booleans only. Never persist raw Orca debug,
   // unfiltered accessible text, application screenshots or exception payloads.
-  writeFileSync(join(evidence, 'native-at.json'), JSON.stringify({ status: 'incomplete', stage, snapshots }, null, 2) + '\n');
-  writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'incomplete', stage, orcaVersion, startupCompleted: startupCompleted(), presentations }, null, 2) + '\n');
+  writeFileSync(join(evidence, 'native-at.json'), JSON.stringify({ status: 'incomplete', stage, snapshots, lastNativeAttempt }, null, 2) + '\n');
+  writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'incomplete', stage, orcaVersion, startupCompleted: startupCompleted(), anchors, presentations,
+    anyKnownGenerated: ['Dismiss launcher', 'Search commands', 'Hide launcher', 'Actions Ctrl K', 'Record shortcut', 'Cancel shortcut change'].some(label => hasLabel(log(), 'SPEECH OUTPUT:', label)),
+    anyKnownDelivered: ['Dismiss launcher', 'Search commands', 'Hide launcher', 'Actions Ctrl K', 'Record shortcut', 'Cancel shortcut change'].some(label => hasLabel(log(), 'SPEECH DISPATCHER: Speaking', label)) }, null, 2) + '\n');
   writeFileSync(join(evidence, 'report.json'), JSON.stringify({ status: 'incomplete', stage, limitation: 'Required assertions did not all pass. No acceptance success or audible/compositor QA inferred.' }, null, 2) + '\n');
   console.log(`Launcher AT incomplete at ${stage}; no acceptance success inferred.`);
   process.exitCode = 3;

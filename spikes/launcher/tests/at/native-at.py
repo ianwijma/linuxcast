@@ -65,7 +65,7 @@ def inspect():
                 raise RuntimeError("bounded-tree-exceeded")
             if obj.name in expected:
                 found.append({"label": obj.name, "role": obj.getRoleName(),
-                              "kind": "entry" if obj.getRole() == pyatspi.ROLE_ENTRY else "button" if obj.getRole() == pyatspi.ROLE_PUSH_BUTTON else "other",
+                              "kind": "entry" if obj.getRole() == pyatspi.ROLE_ENTRY else "button" if obj.getRole() == pyatspi.ROLE_PUSH_BUTTON else "toggle-button" if obj.getRole() == pyatspi.ROLE_TOGGLE_BUTTON else "other",
                               "focused": obj.getState().contains(pyatspi.STATE_FOCUSED)})
             for child in obj:
                 walk(child, depth + 1)

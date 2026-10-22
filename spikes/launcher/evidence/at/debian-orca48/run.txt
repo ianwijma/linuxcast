@@ -1,0 +1,9 @@
+Fresh isolated launcher source directory in reserved disposable Debian13 VM.
+Pinned Node24.22.1 / Bun1.4.4, disk-backed private temporary/cache directories.
+bun install --frozen-lockfile: exit0,651packages installed; no lockfile changes.
+bun run setup:electron: exit0, pinned Electron45.0.0.
+node spikes/launcher/tests/at/xvfb-orca.ts
+Launcher actual Electron/native AT/Orca presentation passed5/5. No audible or compositor QA claimed.
+Launcher AT exit:0
+After exit: no synthetic-user Electron/Orca/Xvfb/python/node/AT registry/Speech Dispatcher processes remain; private temporary directory empty. Preexisting system bus unchanged. Input lab marker absent. VM reservation released.
+Local final source checks: strict typecheck, lint, Python AST parse, planning validation and diff integrity passed. No actual host-display rerun performed.
