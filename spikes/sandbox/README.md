@@ -9,7 +9,7 @@ This is a fixed synthetic feasibility fixture for [S0-04](../../docs/implementat
 - A small C program emits classic BPF using the installed Linux UAPI constants, not a handwritten syscall-number table. It checks the amd64 architecture/x32 ABI and denies direct sockets, namespace re-entry, mounting, ptrace/process-memory access, io_uring setup and other privileged kernel interfaces. `clone3` returns ENOSYS so libc can use the inspected `clone` flags; new namespace flags remain denied. The filter is defense in depth alongside namespaces, and has not received a production security audit. Node also disables native addons and SIGUSR1 inspector startup.
 - `systemd-run --user --scope` requests 256 MiB memory, no swap, 64 tasks and one core of CPU quota. **A successful systemd command is insufficient.** The parent reads `memory.max`, `pids.max` and `cpu.max` from the actual scope. bubblewrap blocks on a separate parent-owned descriptor until these values are verified; Node cannot start the fixture while a required controller is absent. No reduced profile or plain-Node fallback exists.
 - Parent-owned stdin/stdout carry 4-byte big-endian framed UTF-8 JSON. Frames are bounded at 1 MiB; invalid UTF-8/JSON/envelopes, stale sessions, caller-supplied identity and unknown methods fail closed. The parent binds its own session/principal and offers exactly one public allowed fixture operation and one denied operation. Raw diagnostics are never persisted; accumulated stderr is capped at 1 MiB. The prototype additionally bounds incoming frames per invocation. It implements no remote network, credentials, real files or system effects through this broker.
-- Deadlines are at most 30 seconds. Cancellation signals the entire scope, escalates after a one-second grace period, kills any remaining launcher group, and checks kernel cgroup population. Detached descendant, memory/task/CPU pressure and malformed-output fixtures are implemented. They remain unexecuted on this host because the mandatory resource profile is unavailable.
+- Deadlines are at most 30 seconds. Cancellation signals the entire scope, escalates after a one-second grace period, kills any remaining launcher group, and checks kernel cgroup population. Detached descendant, memory/task/CPU pressure and malformed-output fixtures are implemented. They cannot execute on the current Pop!_OS host, but the complete22-check suite passes on the isolated Debian13 guest described below.
 
 ## Actual host result
 
@@ -18,6 +18,12 @@ User-authorized host test, 23 October 2026 (Australia/Sydney): **Pop!_OS 22.04 L
 The actual [host probe](evidence/host-probe.json) exits **3** with `CPU_CONTROLLER_UNAVAILABLE`, verified scope cleanup and no fixture startup. It does not report simulated broker or direct-access success. The installed vendor `user@.service` sets `Delegate=pids memory`; the current user's manager and parent slice expose only `memory pids` to their children. Consequently `CPUQuota=100%` is accepted by systemd without a `cpu.max` file appearing in the child scope. Silently accepting that result would leave CPU containment unenforced.
 
 The host filesystem shows `cpu` at the root hierarchy, so this is a delegation-policy gap, not evidence that the kernel lacks the CPU controller. See [controller evidence](evidence/controllers.txt). No policy, service, user manager or session was changed.
+
+## Actual Debian13 result
+
+A disposable Debian13.7 amd64 guest now passes **22/22 security checks**, including the real allowed broker, denied direct file/sibling/database/network/display/bus/environment access, malformed/flooded output, cancellation of a detached descendant, wall deadline, actual memory OOM enforcement, task-limit pressure and CPU throttling. The independent probe reports20true boundary checks and verified cleanup. Kernel controls read back `memory.max=268435456`, `pids.max=64` and `cpu.max=100000 100000` before fixture execution.
+
+See [Debian probe](evidence/debian-probe.json), [complete suite](evidence/security-debian.log), [exact tested source hashes](evidence/debian-source-sha256.txt) and [runner/provisioning record](vm/README.md). QEMU TCG runs in a bounded unprivileged container with no host devices/cgroups/session mounts; Debian's own default user manager supplies CPU delegation. This did not change the user's host policy. It does not establish desktop/session, physical-input or performance release gates.
 
 ## Checks and reproduction
 
@@ -30,17 +36,17 @@ node spikes/sandbox/probe.ts
 bun run test:security -- S0-04
 ```
 
-The coordinator must add these exact owned files to the security mapping: `spikes/sandbox/protocol.test.ts`, `spikes/sandbox/supervisor.test.ts`, `spikes/sandbox/host.security.test.ts`. This lane does not edit that shared manifest.
+The coordinator registered these exact owned files in the security mapping: `spikes/sandbox/protocol.test.ts`, `spikes/sandbox/supervisor.test.ts`, `spikes/sandbox/host.security.test.ts`. This lane does not edit that shared manifest.
 
-Pure framing/principal and missing-backend fixtures pass **5 checks**. A targeted host fixture separately covers a deterministic namespace-startup failure and missing bubblewrap. The namespace fixture is an explicit supervisor stand-in; it does not claim to disable the host kernel's namespaces. It returns the real bubblewrap error shape before any package execution and verifies that no fallback emits fixture protocol. Filtered tests are not represented as a passing full security suite. On this host the complete security suite must remain nonzero because its real allowed-broker/adversarial/resource scenarios cannot execute under the required profile.
+Pure framing/principal and missing-backend fixtures pass **5 checks**. A targeted host fixture separately covers a deterministic namespace-startup failure and missing bubblewrap. The namespace fixture is an explicit supervisor stand-in; it does not claim to disable the host kernel's namespaces. It returns the real bubblewrap error shape before any package execution and verifies that no fallback emits fixture protocol. Filtered tests are not represented as a passing full security suite. On the Pop!_OS host the complete security suite remains nonzero because the mandatory profile is unavailable; the separate Debian run executes every check successfully.
 
 Actual required named-command result: `bun run test:security -- S0-04` exits **1**, with **7 passed and 15 failed** out of 22 checks. All 15 real-profile cases report `CPU_CONTROLLER_UNAVAILABLE` and verified cleanup before fixture startup; none establishes successful adversarial containment. The full unsuppressed result is retained in [security-suite.log](evidence/security-suite.log).
 
-After delegation is available, rerun the complete named security suite and retain actual results for all direct file/sibling/database/network/display/D-Bus/environment attempts, allowed and denied broker calls, malformed/framed output, actual cancellation/descendant cleanup and memory/tasks/CPU pressure. Do not mark S0-04-AC01 passed based on source inspection or pure fixtures. The committed hostile fixture cases are executable checks, not current success evidence.
+After delegation is available, rerun the complete named security suite and retain actual results for all direct file/sibling/database/network/display/D-Bus/environment attempts, allowed and denied broker calls, malformed/framed output, actual cancellation/descendant cleanup and memory/tasks/CPU pressure. Do not mark S0-04-AC01 passed based on source inspection or pure fixtures. The Debian probe and complete suite provide the actual execution evidence; the host failure remains a separate supported unavailable state.
 
 ## Proposed administrative remedy — declined, not applied
 
-The user explicitly chose to leave system policy unchanged. No override, manager reload or session restart was applied. This proposal is retained only as reviewed context; it is not authorization to apply it. An isolated Debian13 VM is being investigated for the missing execution evidence.
+The user explicitly chose to leave system policy unchanged. No override, manager reload or session restart was applied. This proposal is retained only as reviewed context; it is not authorization to apply it. An isolated Debian13 VM supplied the missing execution evidence without changing this host.
 
 There is no user-scope-only workaround: a manager cannot delegate a CPU controller that it did not receive. The narrowly scoped proposed override is for the current UID **1000**, not every user's manager. An administrator should review existing overrides first; if a different machine already delegates more controllers, preserve them when adding `cpu`.
 
@@ -69,7 +75,7 @@ Primary references: [bubblewrap v0.6.1](https://github.com/containers/bubblewrap
 
 | Criterion | Current evidence / gap |
 | --- | --- |
-| S0-04-AC01 | **Outstanding**: real host profile fails closed before fixture execution because CPU delegation is missing. The intended allowed-broker/direct-denial and hostile resource checks are implemented but not passed. |
+| S0-04-AC01 | Debian13 probe passes all20boundary checks; complete22-check suite proves broker/direct denial and hostile resource handling. Pop!_OS host remains unavailable without CPU delegation. |
 | S0-04-AC02 | Missing-backend fixtures and deterministic namespace-startup denial exercise unavailable results, no fixture startup and no direct-Node fallback; actual host CPU-controller failure demonstrates the same fail-closed policy. Independent review/criterion recording is coordinator-owned. |
 | S0-04-UI | Conditional N/A proposed: no user-facing product view or behavior is introduced. CLI capability diagnostics are engineering evidence only. |
 | S0-04-PRIVACY | Only public synthetic file/database/socket/environment strings, dependency/runtime hashes and operational controller/version metadata. No actual credentials, user files, browser profile, keyboard data, screenshots or raw stderr are included. |

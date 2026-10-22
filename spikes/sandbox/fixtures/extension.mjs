@@ -120,15 +120,21 @@ if (process.argv[2] === 'child-idle') {
       const retained = [];
       function allocate() { retained.push(Buffer.alloc(8 * 1024 * 1024, 1)); setImmediate(allocate); }
       allocate();
-    } else if (mode === 'threads') {
-      const workers = [];
-      let denied = false;
-      try {
-        for (let index = 0; index < 100; index++) workers.push(new Worker('setInterval(() => {}, 1000)', { eval: true }));
-      } catch (error) { denied = ['ERR_WORKER_INIT_FAILED', 'EAGAIN'].includes(error.code); }
-      await call('fixture.report', { threadCreationDenied: denied, workers: workers.length });
-      for (const worker of workers) await worker.terminate();
-      process.exit(denied ? 0 : 1);
+    } else if (mode === 'tasks') {
+      const pressure = spawn('/test-fixtures/task-pressure', [], { stdio: ['ignore', 'pipe', 'ignore'] });
+      let text = '';
+      pressure.stdout.on('data', data => {
+        text += data.toString('utf8');
+        if (text.length > 4096) process.exit(3);
+      });
+      const code = await new Promise(resolve => {
+        pressure.once('error', () => resolve(3));
+        pressure.once('close', resolve);
+      });
+      if (code !== 0) process.exit(3);
+      const report = JSON.parse(text);
+      await call('fixture.report', report);
+      process.exit(report.taskCreationDenied === true ? 0 : 1);
     } else if (mode === 'cpu') {
       for (let index = 0; index < 3; index++) new Worker('while (true) {}', { eval: true });
       while (true) { /* bounded by independent CPU quota and command deadline */ }

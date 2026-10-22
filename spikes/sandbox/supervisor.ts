@@ -10,7 +10,7 @@ import { Decoder, envelope, frame, brokerReply, MAX_DIAGNOSTICS, MAX_REQUESTS, P
 const own = dirname(fileURLToPath(import.meta.url));
 const NODE = '/tmp/linuxcast-node24/node';
 export const NODE_SHA256 = 'e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb';
-export const MODES = ['boundaries', 'idle', 'descendants', 'oversized', 'bad-json', 'truncated', 'stderr-flood', 'frame-flood', 'stale-session', 'unknown-method', 'spoof-principal', 'allocate', 'threads', 'cpu', 'crash'] as const;
+export const MODES = ['boundaries', 'idle', 'descendants', 'oversized', 'bad-json', 'truncated', 'stderr-flood', 'frame-flood', 'stale-session', 'unknown-method', 'spoof-principal', 'allocate', 'tasks', 'cpu', 'crash'] as const;
 export type Mode = typeof MODES[number];
 export type Result = {
   status: 'completed' | 'unavailable' | 'failed' | 'cancelled';
@@ -44,7 +44,7 @@ function tool(command: string, args: string[]) {
   return spawnSync(command, args, { env: cleanEnvironment(), encoding: 'utf8', timeout: 5000, maxBuffer: 1024 * 1024 });
 }
 
-function prepare(directory: string): { args: string[]; filterFd: number } {
+function prepare(directory: string, mode: Mode): { args: string[]; filterFd: number } {
   if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('AMD64_LINUX_REQUIRED');
   const controllers = readFileSync('/sys/fs/cgroup/cgroup.controllers', 'utf8').split(/\s+/);
   if (!['memory', 'pids', 'cpu'].every(value => controllers.includes(value))) throw new Error('CGROUP_V2_REQUIRED');
@@ -68,6 +68,15 @@ function prepare(directory: string): { args: string[]; filterFd: number } {
   }
   const compiled = tool('/usr/bin/gcc', ['-std=c11', '-Wall', '-Wextra', '-Werror', '-O2', join(own, 'seccomp.c'), '-o', join(directory, 'policy')]);
   if (compiled.status !== 0) throw new Error('SECCOMP_COMPILER_UNAVAILABLE');
+  const pressureBindings: string[] = [];
+  if (mode === 'tasks') {
+    // A low-RSS, fixed test helper isolates TasksMax from V8 heap pressure.
+    // It is not included in the synthetic extension package or normal modes.
+    const pressure = join(directory, 'task-pressure');
+    const built = tool('/usr/bin/gcc', ['-std=c11', '-D_POSIX_C_SOURCE=200809L', '-Wall', '-Wextra', '-Werror', '-O2', join(own, 'task-pressure.c'), '-o', pressure]);
+    if (built.status !== 0) throw new Error('PRESSURE_FIXTURE_COMPILER_UNAVAILABLE');
+    pressureBindings.push('--dir', '/test-fixtures', '--ro-bind', pressure, '/test-fixtures/task-pressure');
+  }
   const emitted = spawnSync(join(directory, 'policy'), [], { timeout: 5000, maxBuffer: 65536, env: cleanEnvironment() });
   if (emitted.status !== 0 || !emitted.stdout.length || emitted.stdout.length % 8) throw new Error('SECCOMP_POLICY_UNAVAILABLE');
   writeFileSync(join(directory, 'policy.bpf'), emitted.stdout, { mode: 0o600 });
@@ -80,7 +89,7 @@ function prepare(directory: string): { args: string[]; filterFd: number } {
     '--dir', '/runtime', '--dir', '/runtime/lib', '--dir', '/lib64',
     '--ro-bind', join(runtime, 'node'), '/runtime/node', ...bindings,
     '--symlink', '/runtime/lib/ld-linux-x86-64.so.2', '/lib64/ld-linux-x86-64.so.2',
-    '--ro-bind', join(directory, 'package'), '/package',
+    '--ro-bind', join(directory, 'package'), '/package', ...pressureBindings,
     '--bind', join(directory, 'data'), '/data', '--tmpfs', '/tmp',
     '--dir', '/home', '--dir', '/home/sandbox', '--proc', '/proc', '--dev', '/dev',
     '--setenv', 'PATH', '/runtime', '--setenv', 'HOME', '/home/sandbox',
@@ -137,7 +146,7 @@ export async function runFixture(options: Options): Promise<Result> {
   }
   const directory = mkdtempSync(join(tmpdir(), 'linuxcast-sandbox-'));
   let prepared: ReturnType<typeof prepare>;
-  try { prepared = prepare(directory); }
+  try { prepared = prepare(directory, options.mode); }
   catch (error) {
     rmSync(directory, { recursive: true, force: true });
     return { status: 'unavailable', code: error instanceof Error ? error.message : 'SETUP_UNAVAILABLE', cleanupVerified: true, diagnosticsBytes: 0 };

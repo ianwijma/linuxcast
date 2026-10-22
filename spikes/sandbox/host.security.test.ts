@@ -6,6 +6,8 @@ import { join } from 'node:path';
 import { runFixture } from './supervisor.ts';
 import type { Mode } from './supervisor.ts';
 
+// Outer harness budget includes pinned-runtime staging/hash/compilation under software VM emulation.
+// Sandbox wall deadlines and kernel resource limits below remain unchanged.
 let directory: string;
 let connections = 0;
 const tcp = createServer(socket => { connections++; socket.destroy(); });
@@ -41,14 +43,14 @@ test('real broker works while actual direct host access is denied', async () => 
   expect(connections).toBe(0);
   expect(result.controls?.memoryMax).toBe('268435456');
   expect(result.controls?.tasksMax).toBe('64');
-}, 10000);
+}, 30000);
 
 test.each<Mode>(['oversized', 'bad-json', 'truncated', 'stderr-flood', 'frame-flood', 'stale-session', 'unknown-method', 'spoof-principal', 'crash'])('host survives and cleans up hostile %s fixture', async mode => {
   const result = await runFixture({ mode });
   expect(result.status, JSON.stringify(result)).toBe('failed');
   expect(result.cleanupVerified).toBe(true);
   expect(result.code).not.toBe('NO_REPORT');
-}, 10000);
+}, 30000);
 
 test('missing bubblewrap reports unavailable without executing fixture code', async () => {
   let ready = false;
@@ -58,7 +60,7 @@ test('missing bubblewrap reports unavailable without executing fixture code', as
   expect(result.fixtureStarted).toBeUndefined();
   expect(ready).toBe(false);
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
 test('namespace setup failure reports unavailable and never executes Node', async () => {
   const fake = join(directory, 'namespace-denied');
@@ -72,7 +74,7 @@ test('namespace setup failure reports unavailable and never executes Node', asyn
   expect(result.report).toBeUndefined();
   expect(result.fixtureStarted).toBeUndefined();
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
 test('cancellation kills a real detached descendant and verifies empty cgroup', async () => {
   const controller = new AbortController();
@@ -81,14 +83,14 @@ test('cancellation kills a real detached descendant and verifies empty cgroup', 
   expect(result.status, JSON.stringify(result)).toBe('cancelled');
   expect(result.report?.detachedDescendantStarted).toBe(true);
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
 test('wall deadline is independent of a noncooperative runtime', async () => {
   const result = await runFixture({ mode: 'idle', deadlineMs: 200 });
   expect(result.status, JSON.stringify(result)).toBe('failed');
   expect(result.code).toBe('DEADLINE');
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
 test('memory pressure is contained by the kernel memory controller', async () => {
   const result = await runFixture({ mode: 'allocate', deadlineMs: 5000 });
@@ -97,20 +99,20 @@ test('memory pressure is contained by the kernel memory controller', async () =>
   expect(result.controls?.memoryMax).toBe('268435456');
   expect(result.controls?.memoryEvents).toMatch(/oom_kill [1-9]/);
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
-test('thread pressure is bounded by the kernel task controller', async () => {
-  const result = await runFixture({ mode: 'threads', deadlineMs: 5000 });
+test('task pressure is bounded by the kernel task controller', async () => {
+  const result = await runFixture({ mode: 'tasks', deadlineMs: 5000 });
   expect(['completed', 'failed'], JSON.stringify(result)).toContain(result.status);
-  if (result.status === 'completed') expect(result.report?.threadCreationDenied).toBe(true);
+  if (result.status === 'completed') expect(result.report?.taskCreationDenied).toBe(true);
   else expect(result.code).toMatch(/^CHILD_EXIT_/);
   expect(result.controls?.pidsEvents).toMatch(/max [1-9]/);
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
 
 test('CPU quota throttles parallel worker load before independent deadline', async () => {
   const result = await runFixture({ mode: 'cpu', deadlineMs: 1200 });
   expect(result.code, JSON.stringify(result)).toBe('DEADLINE');
   expect(result.controls?.cpuStat).toMatch(/nr_throttled [1-9]/);
   expect(result.cleanupVerified).toBe(true);
-}, 10000);
+}, 30000);
