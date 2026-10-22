@@ -56,6 +56,8 @@ Screenshots, all from the synthetic Electron app: [dark](evidence/x11-dark-ready
 
 ## Target matrix and remaining gates
 
+An [offline native-session harness](tests/native-session/README.md) is prepared for the actual launcher on isolated Debian GNOME48/KWin6.3 Wayland/X11. Its six guard/schema/backend/cleanup preparation checks pass without starting any compositor. Exact native identity/backend, ordinary show/focus/placement outcomes and resident/explicit-Quit paths still require independently reviewed target execution after a coordinator VM reservation; the table below remains unchanged.
+
 | Required target                     | Current evidence                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
 | Debian 13 amd64, GNOME 48 Wayland   | Not run; component/activation and portal consent/effective-binding evidence required. |
