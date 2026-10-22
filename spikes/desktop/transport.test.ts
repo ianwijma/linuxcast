@@ -2,6 +2,10 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { buildGuestHarness } from './guest/build.ts';
 import { parseCommand, parseHandle, parsePollResult } from './protocol.ts';
 import { ClipboardTransfer, CommandQueue, Companion, MIME_LIMITS, clampRect } from './model.ts';
 import type { Backend, NativeWindow, Source } from './model.ts';
@@ -376,4 +380,27 @@ test('fresh helper processes generate distinct instance epochs without caller-pr
   expect(first.id).toBe(restarted.id);
   expect(first.generation).toBe(restarted.generation);
   expect(first.instance).not.toBe(restarted.instance);
+});
+
+
+test('guest harness builds real adapter bundles with source hashes without starting a compositor', async () => {
+  const destination = mkdtempSync(join(tmpdir(),'linuxcast-s002-build-'));
+  try {
+    await buildGuestHarness(destination);
+    const manifest = JSON.parse(readFileSync(join(destination,'manifest.json'),'utf8'));
+    expect(manifest.kind).toBe('task-owned-real-adapter-guest-harness');
+    expect(manifest.sourceSha256['../adapters.ts']).toMatch(/^[0-9a-f]{64}$/u);
+    const bundle = readFileSync(join(destination,'desktop-api.js'),'utf8');
+    expect(bundle).not.toContain('node:');
+    const metadata = JSON.parse(readFileSync(join(destination,'metadata.json'),'utf8'));
+    expect(metadata['shell-version']).toEqual(['48']);
+    expect(metadata.uuid).toBe('s002-native@linuxcast.invalid');
+  } finally { rmSync(destination,{recursive:true,force:true}); }
+});
+test('guest session harness refuses startup without an explicit disposable-guest request', () => {
+  for (const args of [[], ['--inner','/tmp']]) {
+    const result = spawnSync('/usr/bin/python3',[fileURLToPath(new URL('./guest/run-session.py',import.meta.url)),'gnome-wayland',...args],{encoding:'utf8',timeout:5000,maxBuffer:4096});
+    expect(result.status).toBe(3);
+    expect(JSON.parse(result.stdout)).toEqual({state:'unavailable',reason:'EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED',physicalDesktopMatrixEstablished:false});
+  }
 });

@@ -52,7 +52,7 @@ node spikes/desktop/probe.ts --synthetic-canary
 dbus-run-session -- python3 spikes/desktop/native/transport-wire.py
 ```
 
-The coordinator-owned integration mapping includes `spikes/desktop/transport.test.ts` and `spikes/desktop/native.integration.test.ts`. The first has 60 pure/API-shaped checks, including the independent review regressions for strict command parsing, same-session fresh-instance alias rejection, fresh-process epochs and a Node-free adapter bundle; the latter has two actual host/private-bus canary checks. The required named command passes all **62 checks**, with no skipped/todo checks; its real output is in [integration-host.log](evidence/integration-host.log). This is fixture/host evidence, not a passing GNOME48/Plasma6.3 companion gate. Lint and typecheck are no-write validation.
+The coordinator-owned integration mapping includes `spikes/desktop/transport.test.ts` and `spikes/desktop/native.integration.test.ts`. The first has 62 pure/API-shaped/build-guard checks, including the independent review regressions for strict command parsing, same-session fresh-instance alias rejection, fresh-process epochs and a Node-free adapter bundle; the latter has two actual host/private-bus canary checks. The required named command passes all **64 checks**, with no skipped/todo checks; its real output is in [integration-host.log](evidence/integration-host.log). This is fixture/host evidence, not a passing GNOME48/Plasma6.3 companion gate. Lint and typecheck are no-write validation.
 
 `native/transport-wire.py` is deliberately a small fixed private-bus fixture rather than a second production queue implementation. Its messages contain only synthetic command metadata and it never controls a desktop window. The full queue expiry, stale-peer, permission, restart and no-replay semantics are exercised against the TypeScript prototype. Production D-Bus sender validation, packaged component authentication, automatic recovery of an already-enabled component, native file/blob handles and the full protocol remain F0-01/downstream work.
 
@@ -78,3 +78,30 @@ The source inspection is API evidence; no upstream implementation code, private 
 | S0-02-PRIVACY | Only public fixture text, own-window rectangles, private selection MIME names, versions/API-presence/controller metadata and command IDs are retained. No user clipboard, private window title, screenshot, browser data or credential is collected. |
 
 F0-01 should freeze component/session/owner generations separately, typed unavailable and MIME/size outcomes, opaque window/blob handles, fixed commands and acknowledgements with explicit uncertainty, one outstanding KWin poll, expiry/no-replay and a recovery path that handles missing callbacks. GNOME bounded reads and KWin's older negotiated `zwlr_data_control_manager_v1` v2 clipboard backend are distinct; this spike does not treat XWayland or a clipboard portal grant as universal history/control authority. Real companions remain opt-in and must be enabled/tested on their supported session before downstream features claim them.
+
+
+## Prepared Debian guest harness (not yet executed)
+
+`guest/` prepares the next actual compositor/API experiment. At this checkpoint the VM is reserved for S0-03, so no desktop packages, sessions or guest harness files have been installed/run for this experiment. Local bundle, Python syntax, TypeScript/lint and startup-refusal checks are preparation evidence only. They do not close any missing GNOME/KWin acceptance gate.
+
+The read-only package query found Debian13.7 candidates GNOME Shell48.7, Mutter48.7, GJS1.82.3 and KWin6.3.6; no compositor was installed. Once the coordinator releases the guest, the minimal proposed package set is `gnome-shell mutter gjs kwin-wayland kwin-x11 wl-clipboard libgl1-mesa-dri libegl-mesa0 mesa-utils xauth`; use `--no-install-recommends` and inspect the actual package transaction first. GTK3/PyGObject, Xvfb and private D-Bus support are already available. The pinned Node24 executable is a development harness runtime, not a new production dependency or packaged-client requirement.
+
+Build locally with `node spikes/desktop/guest/build.ts`, transfer its ignored `guest/dist/` output to the released disposable guest, and run there only:
+
+```sh
+python3 run-session.py gnome-wayland --private-guest
+python3 run-session.py gnome-wayland-nested --private-guest
+python3 run-session.py gnome-x11 --private-guest
+LINUXCAST_S002_NODE=/path/to/pinned/node python3 run-session.py kwin-wayland --private-guest
+LINUXCAST_S002_NODE=/path/to/pinned/node python3 run-session.py kwin-x11 --private-guest
+```
+
+The nested GNOME variant is explicit, with its own Xvfb parent, not a silent switch to XWayland. GTK clients select the actual native Wayland backend. Each run discards inherited display/bus/Xauthority addresses and creates a fresh private HOME/config/cache/runtime plus private session bus. Compositor logs remain private and are deleted; only bounded public result JSON and source hashes leave the run. Missing prerequisites or compositor startup return unavailable/exit3, never fixture success. Session child process groups are terminated on normal completion or a bounded deadline. The runner does not install packages, enable host extensions, alter a real user's settings or select a host display.
+
+The GNOME extension imports the current real `gnomeWindow` and `gnomeSelectionSource` adapters. It finds only the synthetic GTK app ID, requests and observes actual native geometry, and uses a distinct native `Meta.Selection` manager for public owner signals, MIME enumeration, capped transfer, oversize detection and actual Gio cancellation. It deliberately does not obtain `global.display.get_selection()` or touch normal CLIPBOARD. This can prove the native Meta API under the actual compositor; it does not by itself prove the production bridge from arbitrary Wayland clipboard owners.
+
+The KWin script imports current `kwinWindow`/`kwinLoop`, native `workspace` objects, native QTimer relative time and outbound `callDBus`. A fixed private Gio parent verifies each sender against the actual `org.kde.KWin` unique owner and forwards only bounded fixed methods to the current Node `CommandQueue`. Observed geometry must match the requested target and every transport acknowledgement must succeed. The final explicit reconnect reply terminates polling before the observation report. Actual missing/restarted-helper scenarios still need execution and further recovery evidence; completion of the success scenario must not be relabelled a full crash/restart test.
+
+On the fresh KWin Wayland display only, packaged wl-clipboard supplies a bounded cancellable native source to current `ClipboardTransfer`. A fixed watch callback emits public comparisons/counts only; the harness retains only a boolean for a verified `zwlr_data_control_manager_v1` version2 binding. No popup/other-protocol result can satisfy that assertion. This is packaged-client transport evidence, not implementation of the future production C/Rust data-control adapter. The guest clipboard contains only the harness's public synthetic selection and is destroyed with the private compositor. X11 uses a fresh private named GTK selection, never normal CLIPBOARD.
+
+Native software-rendered/nested compositor outcomes will be reported separately from complete GNOME/Plasma user sessions, physical GPU/input/display behavior, multimonitor/fractional-scale and the full release matrix. Those gates remain open until executed and independently reviewed.
