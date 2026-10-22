@@ -359,7 +359,7 @@
     {
       "id": "S0-04",
       "title": "Prove extension sandbox boundaries",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -431,14 +431,14 @@
         "bun run test:security -- S0-04"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-04-sandbox",
       "limitations": []
     },
     {
       "id": "S0-05",
       "title": "Prove streaming provider and approval lifecycle",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -511,14 +511,14 @@
         "bun run test:contracts -- S0-05"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_05_provider",
+      "branch": "codex/s0-05-provider",
       "limitations": []
     },
     {
       "id": "S0-06",
       "title": "Prove visual workflow and declarative view integration",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -591,8 +591,8 @@
         "bun run test:ui -- S0-06"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_06_workflow_ui",
+      "branch": "codex/s0-06-workflow-ui",
       "limitations": []
     },
     {
