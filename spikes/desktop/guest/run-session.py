@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from supervision import Supervisor, Cancelled
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
@@ -40,7 +41,7 @@ def read_result(path):
     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
     return value
 
-def inner(backend,root):
+def inner(backend,root,restart=False):
     env=dict(os.environ)
     wayland='wayland' in backend
     env['XDG_SESSION_TYPE']='wayland' if wayland else 'x11'
@@ -83,6 +84,15 @@ def inner(backend,root):
         children.append(canary)
         if backend.startswith('kwin'):
             env['LINUXCAST_S002_CANARY_PID']=str(canary.pid)
+            if restart:
+                driver=subprocess.Popen(['/usr/bin/python3',str(HERE/'restart-driver.py')],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
+                children.append(driver)
+                try: driver.communicate(timeout=20)
+                except subprocess.TimeoutExpired: return report_unavailable('NATIVE_RESTART_SCENARIO_DEADLINE')
+                result=read_result(root/'restart-result.json')
+                if not result: return report_unavailable('NATIVE_RESTART_RESULT_REQUIRED')
+                print(json.dumps(result))
+                return 0 if driver.returncode==0 and result.get('state')=='passed' else 3
             helper=subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             children.append(helper)
             time.sleep(0.5)
@@ -131,9 +141,12 @@ def main():
     parser.add_argument('backend',choices=BACKENDS)
     parser.add_argument('--private-guest',action='store_true')
     parser.add_argument('--inner',type=pathlib.Path)
+    parser.add_argument('--restart-scenario',action='store_true')
     arguments=parser.parse_args()
     if not arguments.private_guest or 'VERSION_ID="13"' not in pathlib.Path('/etc/os-release').read_text():
         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
+    if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
+        return report_unavailable('KWIN_RESTART_BACKEND_REQUIRED')
     if arguments.inner:
         root=arguments.inner.resolve()
         if root.parent!=pathlib.Path(tempfile.gettempdir()).resolve() or not root.name.startswith('linuxcast-s002-') or root!=arguments.inner:
@@ -141,7 +154,7 @@ def main():
         stat=root.stat()
         if stat.st_uid!=os.getuid() or stat.st_mode & 0o077 or os.environ.get('LINUXCAST_S002_PRIVATE_GUEST')!='1' or os.environ.get('HOME')!=str(root/'home') or os.environ.get('XDG_RUNTIME_DIR')!=str(root/'runtime'):
             return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
-        return inner(arguments.backend,root)
+        return inner(arguments.backend,root,arguments.restart_scenario)
     root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-'))
     env=dict(os.environ)
     env['LINUXCAST_S002_PRIVATE_GUEST']='1'
@@ -155,20 +168,23 @@ def main():
     for filename in ('metadata.json','extension.js','desktop-api.js'):
         if (HERE/filename).exists(): shutil.copyfile(HERE/filename,extension/filename)
     command=['dbus-run-session','--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
+    if arguments.restart_scenario: command.append('--restart-scenario')
     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
         command=['xvfb-run','-a','-s','-screen 0 1280x720x24 -nolisten tcp',*command]
-    child=None
     try:
-        child=subprocess.Popen(command,env=env,start_new_session=True)
-        try: return child.wait(timeout=60)
-        except subprocess.TimeoutExpired:
-            os.killpg(child.pid,signal.SIGTERM)
-            try: child.wait(timeout=10)
+        # This outer owner adopts and tears down all detached descendants too.
+        # Cleanup signals the tree concurrently; it never hard-kills an inner
+        # supervisor merely because its serial per-child cleanup needs >2s.
+        with Supervisor():
+            child=subprocess.Popen(command,env=env,start_new_session=True)
+            try: return child.wait(timeout=60)
             except subprocess.TimeoutExpired:
-                os.killpg(child.pid,signal.SIGKILL); child.wait()
-            return report_unavailable('PRIVATE_GUEST_SESSION_DEADLINE')
+                return report_unavailable('PRIVATE_GUEST_SESSION_DEADLINE')
+    except Cancelled:
+        return report_unavailable('PRIVATE_GUEST_SESSION_CANCELLED')
+    except OSError:
+        return report_unavailable('PRIVATE_GUEST_SUPERVISION_UNAVAILABLE')
     finally:
-        if child: terminate(child)
         shutil.rmtree(root)
 
 if __name__=='__main__': sys.exit(main())

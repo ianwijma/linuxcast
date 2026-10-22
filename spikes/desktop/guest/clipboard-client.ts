@@ -4,6 +4,7 @@ import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { ClipboardTransfer } from '../model.ts';
 import type { Source } from '../model.ts';
+import {readNativePipe} from './native-pipe.ts';
 
 const root = process.env.LINUXCAST_S002_RESULT_DIR ?? '';
 if (process.env.LINUXCAST_S002_PRIVATE_GUEST !== '1' || !root.startsWith('/tmp/linuxcast-s002-') || process.env.GDK_BACKEND !== 'wayland'
@@ -13,29 +14,13 @@ let bindingV2 = false;
 function terminate(child: ReturnType<typeof spawn>) {
   try { if (child.pid) process.kill(-child.pid,'SIGKILL'); } catch { /* already gone */ }
 }
-const source: Source = {read: (_mime,maximum,signal) => new Promise((resolve,reject) => {
-  const child = spawn('/usr/bin/wl-paste',['--no-newline','--type','text/plain'],{env:{...process.env,WAYLAND_DEBUG:'1'},stdio:['ignore','pipe','pipe'],detached:true});
-  let bytes = Buffer.alloc(0), debug = '', ended = false;
-  const finish = (error?: string) => {
-    if (ended) return;
-    ended = true; signal.removeEventListener('abort',abort); clearTimeout(deadline); terminate(child);
-    if (error) reject(new Error(error)); else resolve(bytes);
-  };
-  const abort = () => finish('CANCELLED');
-  const deadline = setTimeout(() => finish('NATIVE_CLIPBOARD_DEADLINE'),1000);
-  signal.addEventListener('abort',abort,{once:true});
-  if (signal.aborted) { abort(); return; }
-  child.stdout!.on('data',(chunk: Buffer) => {
-    bytes = Buffer.concat([bytes,chunk.subarray(0,maximum-bytes.length)]);
-    if (bytes.length === maximum) finish();
+const source: Source = {read: (_mime,maximum,signal) => {
+  let debug='';
+  return readNativePipe('/usr/bin/wl-paste',['--no-newline','--type','text/plain'],{...process.env,WAYLAND_DEBUG:'1'},maximum,signal,chunk=>{
+    debug=(debug+chunk.toString('utf8')).slice(-8192);
+    if (/wl_registry[^\n]*\.bind\([^\n]*"zwlr_data_control_manager_v1"[^\n]*,\s*2\s*,/u.test(debug)) bindingV2=true;
   });
-  child.stderr!.on('data',(chunk: Buffer) => {
-    debug = (debug+chunk.toString('utf8')).slice(-8192);
-    if (/wl_registry[^\n]*\.bind\([^\n]*"zwlr_data_control_manager_v1"[^\n]*,\s*2\s*,/u.test(debug)) bindingV2 = true;
-  });
-  child.once('error',() => finish('NATIVE_CLIPBOARD_UNAVAILABLE'));
-  child.once('exit',code => finish(code===0 ? undefined : 'NATIVE_CLIPBOARD_UNAVAILABLE'));
-})};
+}};
 let owner: ReturnType<typeof spawn> | undefined;
 let ownerEvents = 0;
 let nativeClientFailure = false;
