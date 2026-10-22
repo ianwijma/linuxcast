@@ -1,0 +1,50 @@
+{
+  "kind": "source-only-classifier-symbol-state-preparation",
+  "parentCommit": "f3493147376aeda840fa54b2f840d3830a5ca952",
+  "sourceDirty": true,
+  "reviewFileSet": [
+    "spikes/desktop/guest/debugger_filter.py",
+    "spikes/desktop/guest/restart-preparation.test.ts",
+    "spikes/desktop/guest/README.md",
+    "spikes/desktop/guest/diagnostic-next.md"
+  ],
+  "reviewDiffSha256": "771318ea54fe529f920dc8eff23a134aeef3967d09331221a20424a1b17f2b61",
+  "manifestSha256": "c1b77e4f9a3df33de5d2212a0046de36810c5526609e8c8510ab68b1027b9f50",
+  "checkedSourceInputs": 25,
+  "checkedBuiltOutputs": 19,
+  "sourceSha256": {
+    "spikes/desktop/guest/debugger_filter.py": "e4e3e5814223fa9dd4ce8db093d44514270c0d319aec27870aa4c4980fdf7f43",
+    "spikes/desktop/guest/restart-preparation.test.ts": "7844f0bac3415fc031d87c9667cde686e42f8127c7678566759121d6f402296f",
+    "spikes/desktop/guest/README.md": "4ea4ffebfbe25d5f5d715330b1702dff9a0795c3e2033a502e6b534925d508cf",
+    "spikes/desktop/guest/diagnostic-next.md": "a9f6a2992c94d9a872e3fdd5c52e55862489901b0f443b412e91b748caab266c"
+  },
+  "preparation": {
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "hostLocalStart": "2026-10-23T06:22:44+11:00",
+    "startUtc": "2026-10-22T19:22:44Z",
+    "command": "LINUXCAST_TEST_FILES=[spikes/desktop/guest/restart-preparation.test.ts] pinned Node24.22.1 Vitest4.1.12 run with scripts/test-runner/vitest.config.ts",
+    "platform": "Authorized Pop!_OS22.04 host; no GUI/guest call. Private synthetic process/socket fixtures only.",
+    "priorRestrictedAttempt": {
+      "passed": 3,
+      "failed": 27,
+      "reason": "Fixture child process spawn denied by sandbox (EPERM); rerun with authorized process permissions passed."
+    }
+  },
+  "checks": {
+    "typecheckExit": 0,
+    "lintExit": 0,
+    "buildExit": 0,
+    "pythonSourceCompileExit": 0,
+    "pythonFilesCompiledWithoutExecution": 12,
+    "planValidationExit": 0,
+    "diffCheckExit": 0
+  },
+  "nativeExecution": false,
+  "compositorBehaviorChanged": false,
+  "symbolDownloads": false,
+  "hostDisplayUsed": false,
+  "guestAccessed": false,
+  "interpretation": "Fixed helper families are hypotheses, not observed fault identities. ABSENT and UNCLASSIFIED were indistinguishable in prior artifacts; historical reports retain their source/schema. No functional acceptance established."
+}

@@ -191,7 +191,7 @@ for prefix, category in [('QPainter::','QT_PAINTER'),('QRasterPaintEngine::','QT
     assert module['function_category'](prefix+'privateMethod(private arguments)')==category
 
 parse=module['parse_report']
-valid={'signal':'SIGSEGV','frames':[{'module':'KWIN','function':'KWIN_MOVE_RESIZE'}],'inspectionFailed':False}
+valid={'signal':'SIGSEGV','frames':[{'module':'KWIN','function':'KWIN_MOVE_RESIZE','symbolState':'CLASSIFIED'}],'inspectionFailed':False}
 assert parse(valid)==valid
 for value in [dict(valid,raw='private'),dict(valid,signal='private signal'),dict(valid,inspectionFailed=0),
               dict(valid,frames=valid['frames']*17),
@@ -202,6 +202,40 @@ for value in [dict(valid,raw='private'),dict(valid,signal='private signal'),dict
 print('bounded-debugger-filter-passed')
 `,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
   expect(result.trim()).toBe('bounded-debugger-filter-passed');
+});
+
+test('debugger distinguishes absent symbols from unclassified names without exporting them',()=>{
+  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
+import json,pathlib,runpy,sys
+module=runpy.run_path(str(pathlib.Path(sys.argv[1])/'debugger_filter.py'))
+frame=module['frame_category']
+parse=module['parse_report']
+private='PrivateSymbolCanary_0x1234(/private/arguments)'
+path='/private/library/libQt6Gui.so.6'
+frames=[frame(path,None),frame(path,''),frame(path,private)]
+assert frames[:2]==[{'module':'QT_GUI','function':'UNKNOWN','symbolState':'ABSENT'}]*2
+assert frames[2]=={'module':'QT_GUI','function':'UNKNOWN','symbolState':'UNCLASSIFIED'}
+for prefix, category in [('qt_blend_','QT_IMAGE_BLEND'),('qt_scale_image_','QT_IMAGE_SCALE'),
+                         ('qt_transform_image_','QT_IMAGE_TRANSFORM'),('fetchTransformed','QT_TEXTURE_FETCH')]:
+    actual=frame(path,prefix+private)
+    assert actual=={'module':'QT_GUI','function':category,'symbolState':'CLASSIFIED'}
+    frames.append(actual)
+valid={'signal':'SIGSEGV','frames':frames,'inspectionFailed':False}
+assert parse(valid)==valid
+encoded=json.dumps(valid)
+assert private not in encoded and '/private/' not in encoded and '0x1234' not in encoded
+for bad in [dict(frames[0],symbolState=private),dict(frames[0],symbolState='UNKNOWN'),
+            dict(frames[0],symbolState=True),dict(frames[0],symbolState=None),
+            dict(frames[0],symbolState=[]),dict(frames[0],symbolState='CLASSIFIED'),
+            dict(frames[-1],symbolState='ABSENT'),dict(frames[-1],symbolState='UNCLASSIFIED'),
+            dict(frames[-1],function=private),dict(frames[0],symbol=private),
+            {'module':'QT_GUI','function':'UNKNOWN'}]:
+    assert parse(dict(valid,frames=[bad])) is None
+assert parse(dict(valid,frames=frames[:1]*16)) is not None
+assert parse(dict(valid,frames=frames[:1]*17)) is None
+print('fixed-symbol-state-privacy-passed')
+`,new URL('.',import.meta.url).pathname],{encoding:'utf8',timeout:5000,maxBuffer:16384});
+  expect(result.trim()).toBe('fixed-symbol-state-privacy-passed');
 });
 
 
