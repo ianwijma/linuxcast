@@ -111,12 +111,15 @@ if (!ownsInstance) {
       publish();
       return;
     }
-    // One normal show request. Native Wayland focus/position is never force-looped.
+    // One normal request. X11 uses the documented restore/show/focus path;
+    // Wayland and unknown sessions retain Show without explicit focus/restore.
     if (rendererFailed) {
       window.webContents.reload();
       rendererFailed = false;
     }
+    if (hint === "x11" && window.isMinimized()) window.restore();
     window.show();
+    if (hint === "x11") window.focus();
     publish();
   };
   const registerShortcut = (requested: string): Shortcut => {
