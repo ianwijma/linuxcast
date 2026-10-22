@@ -1,0 +1,11 @@
+2026-10-22 UTC; final Debian13 isolated Xvfb run
+Frozen Bun install: exit0
+Explicit Electron setup: exit0
+Electron UI checks passed; native AT passed; Orca presentation passed. No audible QA claimed.
+Harness exit:0
+Native role/focus assertions:3/3
+Actual Orca presentation after native focus:3/3
+Chromium renderer sandbox:true; contextIsolation:true; renderer Node:absent
+Post-run process cleanup: no Electron, Orca, Speech Dispatcher, AT registry or Xvfb test processes remain
+Executed electron-check.ts SHA256:a5940859228e7e0c6d9c5b33128623af194bcc86e467fb417542837086af3f96
+No host desktop/compositor/Wayland or audible/tactile QA claim.

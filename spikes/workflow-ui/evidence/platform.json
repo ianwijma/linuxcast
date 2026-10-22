@@ -1,0 +1,18 @@
+{
+  "scope": "headless browser renderer only",
+  "platform": "linux",
+  "architecture": "x64",
+  "kernel": "7.1.1-76070101-generic",
+  "node": "v24.22.1",
+  "chromium": "156.0.8078.4",
+  "viewport": {
+    "width": 1440,
+    "height": 1100
+  },
+  "distro": "PRETTY_NAME=\"Pop!_OS 22.04 LTS\"",
+  "limitations": [
+    "No installed Electron validation",
+    "No Debian desktop/session integration",
+    "No real screen reader evidence"
+  ]
+}
