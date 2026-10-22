@@ -1,0 +1,701 @@
+diff --git a/spikes/launcher/tests/native-session/artifact-canary.py b/spikes/launcher/tests/native-session/artifact-canary.py
+index c77b600..31f4266 100644
+--- a/spikes/launcher/tests/native-session/artifact-canary.py
++++ b/spikes/launcher/tests/native-session/artifact-canary.py
+@@ -42,6 +42,18 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
+         value=diagnostic_report();value['stage']='resident-close'
+         value['nativeDiagnostic'].update(phase='after-close-native-hidden',state='hook-failed',hookFailure={'request':2,'hookFailure':{'stage':'launcher','outcome':'native-read-failed'}})
+         return value
++    consumer={'request':2,'pollCount':3,'outcomes':{'missing':2,'other-serial':1,'matching':0,'parse-rejected':0,'poll-error':0},
++              'pollsCapped':False,'elapsedMs':100,'elapsedCapped':False}
++    if case in ('valid-consumer','valid-consumer-zero','valid-consumer-capped'):
++        report['consumerRead']=copy.deepcopy(consumer)
++        if case=='valid-consumer-zero':
++            report['consumerRead'].update(pollCount=0,outcomes={name:0 for name in consumer['outcomes']})
++        if case=='valid-consumer-capped':
++            report['consumerRead'].update(pollCount=255,outcomes={name:255 if name=='missing' else 0 for name in consumer['outcomes']},pollsCapped=True,elapsedMs=180000,elapsedCapped=True)
++        status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
++        assert status==3 and state=='unavailable'
++        assert json.loads((destination/'report.json').read_text())['consumerRead']==report['consumerRead']
++        print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
+     if case=='valid-hook-failed':
+         report=hook_report()
+         status,state=publish(root,destination,report,manifest,'gnome-wayland',3,'')
+@@ -72,7 +84,27 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
+         assert status==3 and state=='unavailable'
+         assert json.loads((destination/'report.json').read_text())['physicalDesktopMatrixEstablished'] is False
+         print(json.dumps({'case':case,'strictFixtureAccepted':True}));sys.exit(0)
+-    if case=='unknown-top-level': report['private']='synthetic-private-canary'
++    if case.startswith('consumer-'):
++        report['consumerRead']=copy.deepcopy(consumer);saved=report['consumerRead']
++        if case=='consumer-private':saved['private']='synthetic-private-canary'
++        elif case=='consumer-outcome-private':saved['outcomes']['private']='synthetic-private-canary'
++        elif case=='consumer-request-bool':saved['request']=True
++        elif case=='consumer-count-bool':saved['pollCount']=True
++        elif case=='consumer-count-over':saved['pollCount']=256
++        elif case=='consumer-count-negative':saved['pollCount']=-1
++        elif case=='consumer-count-fraction':saved['pollCount']=1.5
++        elif case=='consumer-count-nan':saved['pollCount']=float('nan')
++        elif case=='consumer-sum':saved['outcomes']['missing']=1
++        elif case=='consumer-poll-cap':saved['pollsCapped']=True
++        elif case=='consumer-flag-type':saved['pollsCapped']=1
++        elif case=='consumer-outcome-type':saved['outcomes']['missing']='synthetic-private-canary'
++        elif case=='consumer-outcome-bool':saved['outcomes']['missing']=True
++        elif case=='consumer-elapsed-cap':saved['elapsedCapped']=True
++        elif case=='consumer-elapsed-nan':saved['elapsedMs']=float('nan')
++        elif case=='consumer-elapsed-inf':saved['elapsedMs']=float('inf')
++        elif case=='consumer-elapsed-over':saved['elapsedMs']=180001
++        else:raise ValueError('UNKNOWN_CONSUMER_CASE')
++    elif case=='unknown-top-level': report['private']='synthetic-private-canary'
+     elif case=='nested-private-canary':
+         report['runtime']=copy.deepcopy(runtime);report['runtime']['renderer']['runtime']['private']='synthetic-private-canary'
+     elif case=='forged-physical': report['physicalDesktopMatrixEstablished']=True
+diff --git a/spikes/launcher/tests/native-session/artifacts.py b/spikes/launcher/tests/native-session/artifacts.py
+index 42ff7a9..bdf5a89 100644
+--- a/spikes/launcher/tests/native-session/artifacts.py
++++ b/spikes/launcher/tests/native-session/artifacts.py
+@@ -99,6 +99,18 @@ def native_diagnostic(value):
+         if 'lastObservation' in result and result['hookFailure']['request']<=result['lastObservation']['native']['request']: raise ValueError('PUBLIC_HOOK_REQUEST')
+     return result
+ 
++
++def consumer_read(value):
++    names=('missing','other-serial','matching','parse-rejected','poll-error')
++    object_keys(value,('request','pollCount','outcomes','pollsCapped','elapsedMs','elapsedCapped'))
++    request=integer(value['request'],1,1000);count=integer(value['pollCount'],0,255)
++    object_keys(value['outcomes'],names)
++    outcomes={name:integer(value['outcomes'][name],0,255) for name in names}
++    polls_capped=boolean(value['pollsCapped']);elapsed=integer(value['elapsedMs'],0,180000);elapsed_capped=boolean(value['elapsedCapped'])
++    if sum(outcomes.values())!=count or polls_capped and count!=255 or elapsed_capped and elapsed!=180000:
++        raise ValueError('PUBLIC_CONSUMER_RELATION')
++    return {'request':request,'pollCount':count,'outcomes':outcomes,'pollsCapped':polls_capped,'elapsedMs':elapsed,'elapsedCapped':elapsed_capped}
++
+ def runtime(value,backend):
+     object_keys(value,('electron','chrome','ozone','noSandbox','sandbox','contextIsolation','nodeIntegration','webSecurity','renderer'))
+     renderer=value['renderer'];object_keys(renderer,('runtime','process','require'))
+@@ -121,7 +133,7 @@ def shortcut(value,backend):
+ 
+ def public_result(value,backend):
+     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
+-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup'))
++    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead'))
+     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
+     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
+     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
+@@ -141,6 +153,7 @@ def public_result(value,backend):
+     for flag in FLAGS:
+         if flag in value: result[flag]=boolean(value[flag])
+     if 'nativeDiagnostic' in value: result['nativeDiagnostic']=native_diagnostic(value['nativeDiagnostic'])
++    if 'consumerRead' in value: result['consumerRead']=consumer_read(value['consumerRead'])
+     if 'observerStartup' in value:
+         if not backend.startswith('gnome'): raise ValueError('PUBLIC_OBSERVER_BACKEND')
+         result['observerStartup']=startup_diagnostic(value['observerStartup'])
+diff --git a/spikes/launcher/tests/native-session/check.ts b/spikes/launcher/tests/native-session/check.ts
+index 5f2cb20..731c56e 100644
+--- a/spikes/launcher/tests/native-session/check.ts
++++ b/spikes/launcher/tests/native-session/check.ts
+@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
+ import { buildLauncher } from '../../build.ts';
+ import { APP_ID, APP_URL } from '../../src/contract.ts';
+ import type { LauncherState } from '../../src/contract.ts';
+-import { BACKENDS, contained, NativeTrace, requireNativeTarget } from './protocol.ts';
++import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget } from './protocol.ts';
+ import type { Backend, NativePhase, Observation } from './protocol.ts';
+ 
+ const backend = process.argv[2] as Backend;
+@@ -40,6 +40,7 @@ let stage = 'build';
+ let request = 0;
+ let pid = 0;
+ const nativeTrace = new NativeTrace();
++const consumerTrace = new ConsumerTrace(() => process.hrtime.bigint());
+ class NativeHookFailed extends Error { constructor() { super('NATIVE_HOOK_FAILURE'); } }
+ const decoy = spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
+ decoy.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
+@@ -49,20 +50,27 @@ const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePha
+   writeFileSync(join(root, 'context-next.json'), JSON.stringify({ request: serial, pid, decoyPid: decoy.pid, operation }), { mode: 0o600 });
+   renameSync(join(root, 'context-next.json'), join(root, 'context.json'));
+   nativeTrace.begin(phase);
++  consumerTrace.begin(serial);
+   let observation: Observation | undefined;
+   let hookFailed = false;
+-  await expect.poll(() => {
+-    const path = join(root, 'observation.json');
+-    if (!existsSync(path)) return false;
+-    if (lstatSync(path).size > 8192) { nativeTrace.reject(); return false; }
+-    try {
+-      const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
+-      if (value.request !== serial) return false;
+-      observation = nativeTrace.reply(value, serial);
+-      hookFailed = nativeTrace.snapshot()?.state === 'hook-failed';
+-      return !!observation || hookFailed;
+-    } catch { nativeTrace.reject(); return false; }
+-  }, { timeout: 8000 }).toBe(true);
++  try {
++    await expect.poll(() => {
++      const path = join(root, 'observation.json');
++      if (!existsSync(path)) { consumerTrace.record('missing'); return false; }
++      let size: number;
++      try { size = lstatSync(path).size; }
++      catch (error) { consumerTrace.record('poll-error'); throw error; }
++      if (size > 8192) { consumerTrace.record('parse-rejected'); nativeTrace.reject(); return false; }
++      try {
++        const value = JSON.parse(readFileSync(path, 'utf8')) as { request?: number };
++        if (value.request !== serial) { consumerTrace.record('other-serial'); return false; }
++        observation = nativeTrace.reply(value, serial);
++        hookFailed = nativeTrace.snapshot()?.state === 'hook-failed';
++        consumerTrace.record(observation || hookFailed ? 'matching' : 'parse-rejected');
++        return !!observation || hookFailed;
++      } catch { consumerTrace.record('parse-rejected'); nativeTrace.reject(); return false; }
++    }, { timeout: 8000 }).toBe(true);
++  } finally { consumerTrace.finish(); }
+   if (hookFailed) throw new NativeHookFailed();
+   return observation!;
+ };
+@@ -239,5 +247,7 @@ finally {
+   report.stage = stage;
+   const diagnostic = nativeTrace.snapshot();
+   if (diagnostic) report.nativeDiagnostic = diagnostic;
++  const consumer = consumerTrace.snapshot();
++  if (consumer) report.consumerRead = consumer;
+   writeFileSync(join(root, 'result.json'), JSON.stringify(report), { mode: 0o600 });
+ }
+diff --git a/spikes/launcher/tests/native-session/observer_startup.py b/spikes/launcher/tests/native-session/observer_startup.py
+index 4284cec..5c901a0 100644
+--- a/spikes/launcher/tests/native-session/observer_startup.py
++++ b/spikes/launcher/tests/native-session/observer_startup.py
+@@ -39,10 +39,38 @@ def snapshot(value):
+     return {'checkpoints':list(checkpoints),'requests':safe,'extensionInfo':info(value['extensionInfo'])}
+ 
+ 
++def lifecycle_sample(value):
++    if type(value) is not dict or set(value)!= {'compositor','drain'}: raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
++    process=value['compositor'];drain=value['drain']
++    if type(process) is not dict or set(process)!= {'state','exitCode'}: raise ValueError('OBSERVER_PROCESS_SCHEMA')
++    code=process['exitCode']
++    if process['state']=='running':
++        if code is not None: raise ValueError('OBSERVER_PROCESS_SCHEMA')
++    elif process['state']=='exited':
++        if type(code) is not int or not -64<=code<=255: raise ValueError('OBSERVER_PROCESS_SCHEMA')
++    else: raise ValueError('OBSERVER_PROCESS_SCHEMA')
++    if type(drain) is not dict or set(drain)!= {'eofObserved','readerAlive','stopRequested'} or any(type(v) is not bool for v in drain.values()):
++        raise ValueError('OBSERVER_DRAIN_SCHEMA')
++    return {'compositor':{'state':process['state'],'exitCode':code},'drain':{key:drain[key] for key in ('eofObserved','readerAlive','stopRequested')}}
++
++
++def lifecycle(value):
++    if type(value) is not dict or 'finally' not in value or not set(value)<= {'beforeChecker','afterChecker','finally'}:
++        raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
++    return {key:lifecycle_sample(value[key]) for key in ('beforeChecker','afterChecker','finally') if key in value}
++
++
++def runtime_sample(process,drain):
++    # Only this own Popen is sampled. No process enumeration, wait or signal.
++    code=process.poll()
++    return lifecycle_sample({'compositor':{'state':'running' if code is None else 'exited','exitCode':code},'drain':drain.health()})
++
++
+ def diagnostic(value):
+-    if type(value) is not dict or 'latest' not in value or not set(value)<= {'beforeChecker','latest'}: raise ValueError('OBSERVER_STARTUP_SCHEMA')
++    if type(value) is not dict or 'latest' not in value or not set(value)<= {'beforeChecker','latest','lifecycle'}: raise ValueError('OBSERVER_STARTUP_SCHEMA')
+     result={'latest':snapshot(value['latest'])}
+     if 'beforeChecker' in value: result['beforeChecker']=snapshot(value['beforeChecker'])
++    if 'lifecycle' in value: result['lifecycle']=lifecycle(value['lifecycle'])
+     return result
+ 
+ 
+@@ -83,6 +111,7 @@ class FixedOutput:
+ class ShellDrain(FixedOutput):
+     def __init__(self,stream):
+         super().__init__();self.stream=stream;self.stop_event=threading.Event()
++        self.eof_observed=False
+         os.set_blocking(stream.fileno(),False)
+         self.shutdown_deadline=0.0
+         self.thread=threading.Thread(target=self._drain,daemon=True);self.thread.start()
+@@ -97,7 +126,9 @@ class ShellDrain(FixedOutput):
+                     continue
+                 try: data=os.read(self.stream.fileno(),4096)
+                 except BlockingIOError: continue
+-                if not data: return
++                if not data:
++                    with self.lock: self.eof_observed=True
++                    return
+                 self.feed(data)
+         except (OSError,ValueError): pass
+ 
+@@ -106,6 +137,12 @@ class ShellDrain(FixedOutput):
+         self.stop_event.set();self.thread.join(timeout=0.2);self.stream.close()
+         with self.lock: self.line.clear();self.discard=False
+ 
++    def health(self):
++        # Independent observed facts: EOF does not imply process exit, and a
++        # live reader can outlast an exited parent whose child holds the pipe.
++        with self.lock:
++            return {'eofObserved':self.eof_observed,'readerAlive':self.thread.is_alive(),'stopRequested':self.stop_event.is_set()}
++
+ 
+ def extract_info(reply):
+     # Never unpack/copy metadata, paths or error strings from the vardict.
+diff --git a/spikes/launcher/tests/native-session/preparation.test.ts b/spikes/launcher/tests/native-session/preparation.test.ts
+index ef7df0f..55a0a5a 100644
+--- a/spikes/launcher/tests/native-session/preparation.test.ts
++++ b/spikes/launcher/tests/native-session/preparation.test.ts
+@@ -5,9 +5,11 @@ import { tmpdir } from 'node:os';
+ import { dirname, join } from 'node:path';
+ import { createHash } from 'node:crypto';
+ import { fileURLToPath } from 'node:url';
++import { stripTypeScriptTypes } from 'node:module';
++import { runInNewContext } from 'node:vm';
+ import { buildNativeSession } from './build.ts';
+-import { NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+-import type { NativeWindow } from './protocol.ts';
++import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
++import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
+ import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
+ const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
+ const native = (): NativeWindow => ({ count: 1, identityMatches: true, nativeBackend: 'wayland', focused: false, hidden: false,
+@@ -37,6 +39,139 @@ test('public observation parsing rejects stale replies, arbitrary content and un
+   expect(() => parseObservation({ ...row, launcher: { ...native(), count: 0 } }, 7)).toThrow('NATIVE_IDENTITY_SCHEMA');
+ });
+ 
++// Execute the production observe function, type-only stripped, with synthetic
++// file operations and a deterministic poll scheduler. No guard, GUI or real
++// observation files are evaluated by this fixture.
++async function consumerFixture(options: { exists?: boolean; raw?: string; size?: number; callbacks?: number;
++  metadataError?: Error; readError?: Error; elapsedNs?: bigint } = {}) {
++  const text = readFileSync(source('check.ts'), 'utf8');
++  const begin = text.indexOf('const observe = async'), end = text.indexOf('const observed = async', begin);
++  expect(begin).toBeGreaterThanOrEqual(0); expect(end).toBeGreaterThan(begin);
++  const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureObserve = observe;`);
++  const fs = { write: 0, rename: 0, exists: 0, stat: 0, read: 0 };
++  const nativeTrace = new NativeTrace();
++  let clock = 9_000_000_000n;
++  const consumerTrace = new ConsumerTrace(() => clock);
++  const raw = options.raw ?? '{}', timeout = new Error('SYNTHETIC_POLL_DEADLINE');
++  class SyntheticHookFailed extends Error {}
++  const context = {
++    request: 1, pid: 101, decoy: { pid: 202 }, root: '/synthetic', join,
++    nativeTrace, consumerTrace, NativeHookFailed: SyntheticHookFailed,
++    writeFileSync: (path: string, body: string, mode: { mode: number }) => {
++      fs.write++; expect(path).toBe('/synthetic/context-next.json');
++      expect(JSON.parse(body)).toEqual({ request: 2, pid: 101, decoyPid: 202, operation: 'observe' });
++      expect(mode.mode).toBe(0o600);
++    },
++    renameSync: (from: string, to: string) => { fs.rename++; expect(from).toBe('/synthetic/context-next.json'); expect(to).toBe('/synthetic/context.json'); },
++    existsSync: (path: string) => { fs.exists++; expect(path).toBe('/synthetic/observation.json'); return options.exists !== false; },
++    lstatSync: (path: string) => { fs.stat++; expect(path).toBe('/synthetic/observation.json'); if (options.metadataError) throw options.metadataError; return { size: options.size ?? raw.length }; },
++    readFileSync: (path: string, encoding: string) => { fs.read++; expect(path).toBe('/synthetic/observation.json'); expect(encoding).toBe('utf8'); if (options.readError) throw options.readError; return raw; },
++    expect: { poll: (callback: () => boolean, config: { timeout: number }) => {
++      expect(config.timeout).toBe(8000);
++      return { toBe: async (expected: boolean) => {
++        expect(expected).toBe(true);
++        try {
++          for (let index = 0; index < (options.callbacks ?? 1); index++) if (callback()) return;
++          throw timeout;
++        } finally { clock += options.elapsedNs ?? 25_000_000n; }
++      } };
++    } },
++    fixtureObserve: undefined as undefined | ((operation: 'observe', phase: 'after-close-native-hidden') => Promise<Observation>),
++  };
++  runInNewContext(program, context, { timeout: 1000 });
++  let returned: Observation | undefined, error: unknown;
++  try { returned = await context.fixtureObserve!('observe', 'after-close-native-hidden'); } catch (value) { error = value; }
++  return { fs, returned, error, timeout, hookFailed: error instanceof SyntheticHookFailed,
++    native: nativeTrace.snapshot(), consumer: consumerTrace.snapshot()! };
++}
++
++const consumerCases: { name: string; options: Parameters<typeof consumerFixture>[0]; outcome: ConsumerOutcome; state: string; stat: number; read: number }[] = [
++  { name: 'missing-file', options: { exists: false }, outcome: 'missing', state: 'request-written', stat: 0, read: 0 },
++  { name: 'old-serial', options: { raw: '{"request":1}' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
++  { name: 'missing-serial', options: { raw: '{}' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
++  { name: 'scalar-json', options: { raw: '17' }, outcome: 'other-serial', state: 'request-written', stat: 1, read: 1 },
++  { name: 'null-json', options: { raw: 'null' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
++  { name: 'malformed-json', options: { raw: '{synthetic-private-canary' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
++  { name: 'matching-invalid-schema', options: { raw: '{"request":2,"private":"synthetic-private-canary"}' }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
++  { name: 'oversize', options: { size: 8193 }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 0 },
++  { name: 'read-error', options: { readError: new Error('synthetic-private-canary') }, outcome: 'parse-rejected', state: 'reply-rejected', stat: 1, read: 1 },
++];
++for (const row of consumerCases) test(`actual consumer callback ${row.name} preserves file operations and native trace`, async () => {
++  const value = await consumerFixture(row.options);
++  expect(value.error).toBe(value.timeout); expect(value.returned).toBeUndefined();
++  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: row.stat, read: row.read });
++  expect(value.native?.state).toBe(row.state);
++  expect(value.consumer).toEqual({ request: 2, pollCount: 1, outcomes: Object.fromEntries(CONSUMER_OUTCOMES.map(name => [name, name === row.outcome ? 1 : 0])),
++    pollsCapped: false, elapsedMs: 25, elapsedCapped: false });
++  expect(JSON.stringify({ consumer: value.consumer, native: value.native })).not.toContain('synthetic-private-canary');
++});
++
++test('actual consumer metadata error rethrows the identical exception without reading or rejecting the old trace', async () => {
++  const metadataError = new Error('synthetic-private-canary');
++  const value = await consumerFixture({ metadataError });
++  expect(value.error).toBe(metadataError);
++  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: 1, read: 0 });
++  expect(value.consumer.outcomes['poll-error']).toBe(1); expect(value.consumer.elapsedMs).toBe(25);
++  expect(value.native?.state).toBe('request-written');
++  expect(JSON.stringify(value.consumer)).not.toContain('synthetic-private-canary');
++});
++
++test('actual consumer distinguishes parsed native observation from terminal typed hook failure without retrying', async () => {
++  const observation = { request: 2, launcher: native(), decoy: native(), decoyActivationIssued: false };
++  const parsed = await consumerFixture({ raw: JSON.stringify(observation), callbacks: 5 });
++  expect(parsed.error).toBeUndefined(); expect(parsed.returned).toEqual(observation); expect(parsed.native?.state).toBe('parsed');
++  const failed = await consumerFixture({ raw: JSON.stringify({ request: 2, hookFailure: { stage: 'launcher', outcome: 'native-read-failed' } }), callbacks: 5 });
++  expect(failed.hookFailed).toBe(true); expect(failed.returned).toBeUndefined(); expect(failed.native?.state).toBe('hook-failed');
++  for (const value of [parsed, failed]) {
++    expect(value.consumer.pollCount).toBe(1); expect(value.consumer.outcomes.matching).toBe(1);
++    expect(value.fs).toEqual({ write: 1, rename: 1, exists: 1, stat: 1, read: 1 });
++  }
++});
++
++test('actual consumer exports zero callbacks when the scheduler never invokes it and finishes elapsed on timeout', async () => {
++  const value = await consumerFixture({ callbacks: 0, elapsedNs: 8_000_000_000n });
++  expect(value.error).toBe(value.timeout); expect(value.consumer.pollCount).toBe(0); expect(value.consumer.elapsedMs).toBe(8000);
++  expect(Object.values(value.consumer.outcomes)).toEqual([0, 0, 0, 0, 0]);
++  expect(value.native?.state).toBe('request-written');
++  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 0, stat: 0, read: 0 });
++});
++
++test('actual consumer saturation bounds the exported counts without adding or suppressing existing file operations', async () => {
++  const value = await consumerFixture({ callbacks: 300, raw: '{"request":1}' });
++  expect(value.error).toBe(value.timeout); expect(value.consumer.pollCount).toBe(255); expect(value.consumer.pollsCapped).toBe(true);
++  expect(value.consumer.outcomes['other-serial']).toBe(255); expect(Object.values(value.consumer.outcomes).reduce((a, b) => a + b, 0)).toBe(255);
++  expect(value.fs).toEqual({ write: 1, rename: 1, exists: 300, stat: 300, read: 300 });
++  expect(value.native?.state).toBe('request-written');
++});
++
++test('consumer keeps only the last own request and exports bounded own elapsed time without absolute clock values', () => {
++  let clock = 99_000_000_000_000n;
++  const trace = new ConsumerTrace(() => clock);
++  expect(trace.snapshot()).toBeUndefined();
++  trace.begin(1); trace.record('missing'); clock += 1_234_567n; trace.finish();
++  expect(trace.snapshot()?.elapsedMs).toBe(1);
++  trace.begin(2); expect(trace.snapshot()?.pollCount).toBe(0);
++  for (let i = 0; i < 255; i++) trace.record('matching');
++  clock += 180_000_000_000n; trace.finish();
++  expect(trace.snapshot()?.pollsCapped).toBe(false); expect(trace.snapshot()?.elapsedCapped).toBe(false);
++  trace.record('missing'); clock += 1n; trace.finish();
++  expect(trace.snapshot()).toEqual({ request: 2, pollCount: 255, outcomes: { missing: 0, 'other-serial': 0, matching: 255, 'parse-rejected': 0, 'poll-error': 0 }, pollsCapped: true, elapsedMs: 180000, elapsedCapped: true });
++  expect(JSON.stringify(trace.snapshot())).not.toContain('99000000000000');
++});
++
++test('consumer parsers reject private, wrong-typed, unbounded and inconsistent fields', () => {
++  const base = { request: 2, pollCount: 1, outcomes: { missing: 1, 'other-serial': 0, matching: 0, 'parse-rejected': 0, 'poll-error': 0 }, pollsCapped: false, elapsedMs: 1, elapsedCapped: false };
++  expect(parseConsumerRead(base)).toEqual(base);
++  const invalid = [{ ...base, private: 'synthetic-private-canary' }, { ...base, outcomes: { ...base.outcomes, private: 'synthetic-private-canary' } },
++    ...[true, 0, -1, 1001, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(request => ({ ...base, request })),
++    ...[true, -1, 256, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(pollCount => ({ ...base, pollCount })),
++    ...[true, -1, 256, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(missing => ({ ...base, outcomes: { ...base.outcomes, missing } })),
++    ...[true, -1, 180001, 1.5, NaN, Infinity, 'synthetic-private-canary'].map(elapsedMs => ({ ...base, elapsedMs })),
++    { ...base, outcomes: { ...base.outcomes, matching: 1 } }, { ...base, pollsCapped: true }, { ...base, elapsedCapped: true },
++    { ...base, pollsCapped: 1 }, { ...base, elapsedCapped: 1 }];
++  for (const value of invalid) expect(() => parseConsumerRead(value)).toThrow();
++});
++
+ for (const family of ['gnome', 'kwin'] as const) {
+   test(`${family} hook never reads identity/geometry outside the exact launched PID`, () => {
+     const foreign = syntheticWindow(303, 'synthetic-private-canary'); foreign.forbidMetadata = true;
+@@ -211,7 +346,9 @@ for (const scenario of ['valid', 'real-private-bus', 'platform-denied', 'externa
+   if (scenario === 'real-private-bus') expect(value.wrapperPwdValidated).toBe(true);
+ });
+ 
+-for (const scenario of ['valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
++for (const scenario of ['valid-consumer', 'valid-consumer-zero', 'valid-consumer-capped', 'consumer-private', 'consumer-outcome-private', 'consumer-request-bool',
++  'consumer-count-bool', 'consumer-count-over', 'consumer-count-negative', 'consumer-count-fraction', 'consumer-count-nan', 'consumer-sum', 'consumer-poll-cap', 'consumer-flag-type',
++  'consumer-outcome-type', 'consumer-outcome-bool', 'consumer-elapsed-cap', 'consumer-elapsed-nan', 'consumer-elapsed-inf', 'consumer-elapsed-over', 'valid-incomplete', 'valid-complete', 'unknown-top-level', 'nested-private-canary', 'forged-physical', 'unknown-stage', 'invalid-runtime',
+   'manifest-extra', 'manifest-source-extra', 'manifest-hash-private', 'native-extra', 'missing-success-observations', 'forged-native-backend',
+   'valid-diagnostic', 'valid-zero-geometry', 'valid-startup', 'startup-extra', 'startup-nested-private', 'startup-unknown-marker', 'startup-state-type', 'startup-request-private', 'startup-request-bound', 'valid-hook-failed', 'hook-extra', 'hook-nested-private', 'hook-stage-private', 'hook-outcome-private', 'hook-stale', 'hook-missing', 'hook-wrong-state', 'hook-forged-success', 'hook-kwin', 'diagnostic-extra', 'diagnostic-last-private', 'diagnostic-state-private', 'diagnostic-role-private', 'diagnostic-inconsistent', 'forged-success-not-ready']) test(`strict artifact boundary ${scenario}`, () => {
+   const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+@@ -238,7 +375,7 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
+   }
+ }, 6000);
+ 
+-for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
++for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+   const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+   expect(result.status, result.stderr).toBe(0);
+   expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);
+@@ -274,6 +411,32 @@ test('typed startup artifacts reject private fields, overbounds and unsupported
+   }
+ });
+ 
++test('typed lifecycle records distinguish own process state from independent pipe health', () => {
++  const latest = { checkpoints: [], requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } };
++  const running = { compositor: { state: 'running', exitCode: null }, drain: { eofObserved: true, readerAlive: false, stopRequested: false } };
++  for (const exitCode of [0, 255, -15, -64]) {
++    const exited = { compositor: { state: 'exited', exitCode }, drain: { eofObserved: false, readerAlive: true, stopRequested: false } };
++    const value = { latest, lifecycle: { beforeChecker: running, afterChecker: exited, finally: exited } };
++    expect(parseObserverStartup(value)).toEqual(value);
++  }
++  expect(parseObserverStartup({ latest })).toEqual({ latest });
++});
++
++test('typed lifecycle rejects inconsistent state, missing final sample and nested private values', () => {
++  const latest = { checkpoints: [], requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } };
++  const sample = { compositor: { state: 'exited', exitCode: 0 }, drain: { eofObserved: true, readerAlive: false, stopRequested: true } };
++  for (const lifecycle of [{}, { finally: sample, private: 'synthetic-private-canary' },
++    { finally: { ...sample, private: 'synthetic-private-canary' } },
++    { finally: { ...sample, compositor: { ...sample.compositor, error: 'synthetic-private-canary' } } },
++    { finally: { ...sample, compositor: { state: 'crashed', exitCode: -11 } } },
++    { finally: { ...sample, compositor: { state: 'running', exitCode: 0 } } },
++    { finally: { ...sample, drain: { ...sample.drain, private: 'synthetic-private-canary' } } },
++    { finally: { ...sample, drain: { ...sample.drain, readerAlive: 'synthetic-private-canary' } } },
++    ...[null, true, false, NaN, Infinity, -65, 256, 1.5, 'synthetic-private-canary'].map(exitCode => ({ finally: { ...sample, compositor: { state: 'exited', exitCode } } }))]) {
++    expect(() => parseObserverStartup({ latest, lifecycle })).toThrow();
++  }
++});
++
+ const prevalidationCases: { name: string; marker: string; options: NonNullable<Parameters<typeof hookFixture>[2]>; reads: number; queries: number }[] = [
+   { name: 'missing', marker: 'CONTEXT_NOT_OBSERVED', options: { contextMissing: true }, reads: 0, queries: 1 },
+   { name: 'unqueryable', marker: 'CONTEXT_NOT_OBSERVED', options: { contextFailure: 'query' }, reads: 0, queries: 1 },
+diff --git a/spikes/launcher/tests/native-session/protocol.ts b/spikes/launcher/tests/native-session/protocol.ts
+index 8db56c1..b121ceb 100644
+--- a/spikes/launcher/tests/native-session/protocol.ts
++++ b/spikes/launcher/tests/native-session/protocol.ts
+@@ -121,6 +121,56 @@ export class NativeTrace {
+   predicate(met: boolean) { if (this.current && this.current.state !== 'hook-failed') this.current.state = met ? 'predicate-met' : 'predicate-unmet'; }
+   snapshot(): NativeDiagnostic | undefined { return this.current ? parseNativeDiagnostic(this.current) : undefined; }
+ }
++
++export const CONSUMER_OUTCOMES = ['missing', 'other-serial', 'matching', 'parse-rejected', 'poll-error'] as const;
++export type ConsumerOutcome = typeof CONSUMER_OUTCOMES[number];
++export type ConsumerRead = { request: number; pollCount: number; outcomes: Record<ConsumerOutcome, number>;
++  pollsCapped: boolean; elapsedMs: number; elapsedCapped: boolean };
++export function parseConsumerRead(value: unknown): ConsumerRead {
++  const row = object(value); keys(row, ['request', 'pollCount', 'outcomes', 'pollsCapped', 'elapsedMs', 'elapsedCapped']);
++  if (!Number.isSafeInteger(row.request) || Number(row.request) < 1 || Number(row.request) > 1000
++    || !Number.isSafeInteger(row.pollCount) || Number(row.pollCount) < 0 || Number(row.pollCount) > 255
++    || typeof row.pollsCapped !== 'boolean' || typeof row.elapsedCapped !== 'boolean'
++    || !Number.isSafeInteger(row.elapsedMs) || Number(row.elapsedMs) < 0 || Number(row.elapsedMs) > 180_000) throw new Error('CONSUMER_SCHEMA');
++  const counts = object(row.outcomes); keys(counts, [...CONSUMER_OUTCOMES]);
++  const outcomes = {} as ConsumerRead['outcomes'];
++  for (const name of CONSUMER_OUTCOMES) {
++    if (!Number.isSafeInteger(counts[name]) || Number(counts[name]) < 0 || Number(counts[name]) > 255) throw new Error('CONSUMER_COUNT');
++    outcomes[name] = Number(counts[name]);
++  }
++  if (Object.values(outcomes).reduce((sum, count) => sum + count, 0) !== row.pollCount
++    || row.pollsCapped && row.pollCount !== 255 || row.elapsedCapped && row.elapsedMs !== 180_000) throw new Error('CONSUMER_RELATION');
++  return { request: Number(row.request), pollCount: Number(row.pollCount), outcomes, pollsCapped: row.pollsCapped,
++    elapsedMs: Number(row.elapsedMs), elapsedCapped: row.elapsedCapped };
++}
++/** Only the last own request survives; clocks stay private and are never correlated. */
++export class ConsumerTrace {
++  private current: ConsumerRead | undefined;
++  private started = 0n;
++  private readonly now: () => bigint;
++  constructor(now: () => bigint) { this.now = now; }
++  begin(request: number) {
++    this.current = parseConsumerRead({ request, pollCount: 0, outcomes: Object.fromEntries(CONSUMER_OUTCOMES.map(name => [name, 0])),
++      pollsCapped: false, elapsedMs: 0, elapsedCapped: false });
++    this.started = this.now();
++    if (typeof this.started !== 'bigint') throw new Error('CONSUMER_CLOCK');
++  }
++  record(outcome: ConsumerOutcome) {
++    if (!this.current || !CONSUMER_OUTCOMES.includes(outcome)) throw new Error('CONSUMER_REQUEST');
++    // Saturate all counts together: the sum always equals recorded callbacks.
++    if (this.current.pollCount === 255) { this.current.pollsCapped = true; return; }
++    this.current.pollCount++; this.current.outcomes[outcome]++;
++  }
++  finish() {
++    if (!this.current) throw new Error('CONSUMER_REQUEST');
++    const finished = this.now();
++    if (typeof finished !== 'bigint' || finished < this.started) throw new Error('CONSUMER_CLOCK');
++    const delta = finished - this.started, limit = 180_000_000_000n;
++    this.current.elapsedCapped = delta > limit;
++    this.current.elapsedMs = Number((delta > limit ? limit : delta) / 1_000_000n);
++  }
++  snapshot(): ConsumerRead | undefined { return this.current ? parseConsumerRead(this.current) : undefined; }
++}
+ export function requireNativeTarget(window: NativeWindow, backend: Backend) {
+   if (window.count !== 1 || !window.identityMatches || !window.geometry || !window.workArea) throw new Error('OWN_NATIVE_IDENTITY_REQUIRED');
+   if (window.nativeBackend !== (backend.endsWith('wayland') ? 'wayland' : 'x11')) throw new Error('NATIVE_BACKEND_MISMATCH');
+@@ -136,7 +186,24 @@ export const OBSERVER_EVENTS = ['REQUEST_VALIDATED', 'REPLY_PUBLISHED', 'HOOK_FA
+ export type ObserverSnapshot = { checkpoints: typeof OBSERVER_CHECKPOINTS[number][];
+   requests: { event: typeof OBSERVER_EVENTS[number]; request: number }[];
+   extensionInfo: { status: 'INFO_UNAVAILABLE' | 'NOT_FOUND' } | { status: 'INFO_AVAILABLE'; state: number; enabled: boolean } };
+-export type ObserverStartup = { latest: ObserverSnapshot; beforeChecker?: ObserverSnapshot };
++export type ObserverLifecycleSample = {
++  compositor: { state: 'running'; exitCode: null } | { state: 'exited'; exitCode: number };
++  drain: { eofObserved: boolean; readerAlive: boolean; stopRequested: boolean };
++};
++export type ObserverLifecycle = { beforeChecker?: ObserverLifecycleSample; afterChecker?: ObserverLifecycleSample; finally: ObserverLifecycleSample };
++export type ObserverStartup = { latest: ObserverSnapshot; beforeChecker?: ObserverSnapshot; lifecycle?: ObserverLifecycle };
++function observerLifecycleSample(value: unknown): ObserverLifecycleSample {
++  const row = object(value); keys(row, ['compositor', 'drain']);
++  const process = object(row.compositor); keys(process, ['state', 'exitCode']);
++  let compositor: ObserverLifecycleSample['compositor'];
++  if (process.state === 'running' && process.exitCode === null) compositor = { state: 'running', exitCode: null };
++  else if (process.state === 'exited' && Number.isSafeInteger(process.exitCode) && Number(process.exitCode) >= -64 && Number(process.exitCode) <= 255) {
++    compositor = { state: 'exited', exitCode: Number(process.exitCode) };
++  } else throw new Error('OBSERVER_PROCESS_SCHEMA');
++  const drain = object(row.drain); keys(drain, ['eofObserved', 'readerAlive', 'stopRequested']);
++  if (typeof drain.eofObserved !== 'boolean' || typeof drain.readerAlive !== 'boolean' || typeof drain.stopRequested !== 'boolean') throw new Error('OBSERVER_DRAIN_SCHEMA');
++  return { compositor, drain: { eofObserved: drain.eofObserved, readerAlive: drain.readerAlive, stopRequested: drain.stopRequested } };
++}
+ function observerSnapshot(value: unknown): ObserverSnapshot {
+   const row = object(value); keys(row, ['checkpoints', 'requests', 'extensionInfo']);
+   if (!Array.isArray(row.checkpoints) || row.checkpoints.length > OBSERVER_CHECKPOINTS.length
+@@ -161,8 +228,14 @@ function observerSnapshot(value: unknown): ObserverSnapshot {
+   return { checkpoints: [...row.checkpoints] as ObserverSnapshot['checkpoints'], requests, extensionInfo };
+ }
+ export function parseObserverStartup(value: unknown): ObserverStartup {
+-  const row = object(value); keys(row, ['latest'], ['beforeChecker']);
++  const row = object(value); keys(row, ['latest'], ['beforeChecker', 'lifecycle']);
+   const result: ObserverStartup = { latest: observerSnapshot(row.latest) };
+   if ('beforeChecker' in row) result.beforeChecker = observerSnapshot(row.beforeChecker);
++  if ('lifecycle' in row) {
++    const states = object(row.lifecycle); keys(states, ['finally'], ['beforeChecker', 'afterChecker']);
++    result.lifecycle = { finally: observerLifecycleSample(states.finally) };
++    if ('beforeChecker' in states) result.lifecycle.beforeChecker = observerLifecycleSample(states.beforeChecker);
++    if ('afterChecker' in states) result.lifecycle.afterChecker = observerLifecycleSample(states.afterChecker);
++  }
+   return result;
+ }
+diff --git a/spikes/launcher/tests/native-session/run-session.py b/spikes/launcher/tests/native-session/run-session.py
+index a4cb7b1..61485b2 100644
+--- a/spikes/launcher/tests/native-session/run-session.py
++++ b/spikes/launcher/tests/native-session/run-session.py
+@@ -17,7 +17,7 @@ import time
+ from private import private_root, private_environment, target_guard
+ from supervision import Supervisor, Cancelled
+ from artifacts import public_manifest, fallback_result, publish
+-from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic
++from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample
+ 
+ HERE=pathlib.Path(__file__).resolve().parent
+ BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
+@@ -74,6 +74,7 @@ def inner(backend,root):
+             stderr=subprocess.STDOUT if family=='gnome' else log,start_new_session=True,bufsize=0)
+         monitor=ShellDrain(compositor.stdout) if family=='gnome' else None
+         before_checker=None
++        lifecycle={}
+         try:
+             owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
+             deadline=time.monotonic()+45
+@@ -98,16 +99,21 @@ def inner(backend,root):
+             node=env.get('LINUXCAST_S001_NODE')
+             if not node: return unavailable('PINNED_NODE_REQUIRED')
+             if monitor:
++                lifecycle['beforeChecker']=runtime_sample(compositor,monitor)
+                 before_checker=monitor.snapshot()
+                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
+             driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+             try: return driver.wait(timeout=180)
+             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
++            finally:
++                if monitor: lifecycle['afterChecker']=runtime_sample(compositor,monitor)
+         finally:
+             if monitor:
+                 monitor.close()
++                lifecycle['finally']=runtime_sample(compositor,monitor)
+                 value={'latest':monitor.snapshot()}
+                 if before_checker is not None: value['beforeChecker']=before_checker
++                value['lifecycle']=lifecycle
+                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic(value)))
+ 
+ def main():
+diff --git a/spikes/launcher/tests/native-session/startup-fixture.py b/spikes/launcher/tests/native-session/startup-fixture.py
+index 944da11..228a3c0 100644
+--- a/spikes/launcher/tests/native-session/startup-fixture.py
++++ b/spikes/launcher/tests/native-session/startup-fixture.py
+@@ -11,6 +11,7 @@ import types
+ from unittest.mock import patch
+ import observer_startup as startup
+ import private
++from supervision import Supervisor
+ 
+ case=sys.argv[1]
+ 
+@@ -73,6 +74,64 @@ elif case=='schema':
+         try:startup.diagnostic(value)
+         except ValueError:pass
+         else:raise AssertionError('PRIVATE_STARTUP_ACCEPTED')
++elif case=='lifecycle-schema':
++    drain={'eofObserved':False,'readerAlive':True,'stopRequested':False}
++    running={'compositor':{'state':'running','exitCode':None},'drain':drain}
++    exited={'compositor':{'state':'exited','exitCode':-15},'drain':{'eofObserved':True,'readerAlive':False,'stopRequested':True}}
++    base={'latest':{'checkpoints':[],'requests':[],'extensionInfo':{'status':'INFO_UNAVAILABLE'}},
++          'lifecycle':{'beforeChecker':running,'afterChecker':exited,'finally':exited}}
++    assert startup.diagnostic(base)==base
++    for code in (0,255,-64):
++        value=copy.deepcopy(base);value['lifecycle']['finally']['compositor']['exitCode']=code
++        assert startup.diagnostic(value)==value
++    for mutate in (lambda v:v['lifecycle'].update(private='synthetic-private-canary'),
++                   lambda v:v['lifecycle'].pop('finally'),
++                   lambda v:v['lifecycle']['finally'].update(private='synthetic-private-canary'),
++                   lambda v:v['lifecycle']['finally']['compositor'].update(error='synthetic-private-canary'),
++                   lambda v:v['lifecycle']['finally']['compositor'].update(state='crashed'),
++                   lambda v:v['lifecycle']['beforeChecker']['compositor'].update(exitCode=0),
++                   lambda v:v['lifecycle']['finally']['drain'].update(readerAlive='synthetic-private-canary'),
++                   lambda v:v['lifecycle']['finally']['drain'].update(private='synthetic-private-canary')):
++        value=copy.deepcopy(base);mutate(value)
++        try:startup.diagnostic(value)
++        except ValueError:pass
++        else:raise AssertionError('PRIVATE_LIFECYCLE_ACCEPTED')
++    for code in (None,True,False,float('nan'),float('inf'),-65,256,1.5,'synthetic-private-canary'):
++        value=copy.deepcopy(base);value['lifecycle']['finally']['compositor']['exitCode']=code
++        try:startup.diagnostic(value)
++        except ValueError:pass
++        else:raise AssertionError('INVALID_EXIT_CODE_ACCEPTED')
++elif case=='lifecycle-eof-running':
++    # A process may close stdout while it remains alive. No display/bus is used.
++    drain=None;process=None
++    try:
++        with Supervisor(grace=0.1):
++            process=subprocess.Popen(['/usr/bin/python3','-c','import os,sys; os.close(1); os.close(2); sys.stdin.buffer.read(1)'],
++                                     stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,bufsize=0,start_new_session=True)
++            drain=startup.ShellDrain(process.stdout);drain.thread.join(timeout=2)
++            value=startup.runtime_sample(process,drain)
++            assert value=={'compositor':{'state':'running','exitCode':None},'drain':{'eofObserved':True,'readerAlive':False,'stopRequested':False}}
++            process.stdin.write(b'x');process.stdin.close();assert process.wait(timeout=2)==0
++    finally:
++        if drain:drain.close()
++        if process:process.poll()
++    assert Supervisor.descendants()=={} and drain.health()['stopRequested'] is True
++elif case=='lifecycle-exited-pipe-held':
++    # The own process can exit while its detached child retains the output pipe.
++    # The existing supervisor must remove that child before the fixture returns.
++    drain=None;process=None
++    try:
++        with Supervisor(grace=0.1):
++            held='import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)'
++            code='import subprocess,sys; subprocess.Popen([sys.executable,"-c",'+repr(held)+'],start_new_session=True); sys.exit(7)'
++            process=subprocess.Popen(['/usr/bin/python3','-c',code],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,bufsize=0,start_new_session=True)
++            drain=startup.ShellDrain(process.stdout);assert process.wait(timeout=2)==7
++            value=startup.runtime_sample(process,drain)
++            assert value=={'compositor':{'state':'exited','exitCode':7},'drain':{'eofObserved':False,'readerAlive':True,'stopRequested':False}}
++    finally:
++        if drain:drain.close()
++        if process:process.poll()
++    assert Supervisor.descendants()=={} and not drain.thread.is_alive()
+ elif case=='query-deadline':
+     calls=[];now=[10.0];env={'public-private-env':'fixed'}
+     def run(command,**kwargs):
+@@ -119,8 +178,9 @@ elif case in ('runner-order','runner-deadline'):
+     with tempfile.TemporaryDirectory(prefix='linuxcast-s001-matrix-startup-') as temporary:
+         root=pathlib.Path(temporary)
+         class Monitor(startup.FixedOutput):
+-            def __init__(self,_stream):super().__init__();self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
+-            def close(self):events.append('drain-close')
++            def __init__(self,_stream):super().__init__();self.closed=False;self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
++            def close(self):self.closed=True;events.append('drain-close')
++            def health(self):return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
+         class Child:
+             stdout=None
+             def poll(self):return None
+@@ -138,11 +198,16 @@ elif case in ('runner-order','runner-deadline'):
+             assert runner.inner('gnome-x11',root)==3
+         if case=='runner-deadline':
+             assert events==['shell','owner','one-info','drain-close']
+-            assert 'beforeChecker' not in startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
++            value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
++            assert 'beforeChecker' not in value and set(value['lifecycle'])=={'finally'}
+             print('startup-'+case+'-passed');sys.exit(0)
+         assert events==['shell','owner','one-info','checker','driver-wait','drain-close']
+         value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
+         assert value['beforeChecker']['extensionInfo']=={'status':'NOT_FOUND'}
++        assert set(value['lifecycle'])=={'beforeChecker','afterChecker','finally'}
++        assert value['lifecycle']['beforeChecker']['drain']['stopRequested'] is False
++        assert value['lifecycle']['afterChecker']['drain']['stopRequested'] is False
++        assert value['lifecycle']['finally']['drain']['stopRequested'] is True
+ 
+ else:raise ValueError('UNKNOWN_STARTUP_FIXTURE')
+ print('startup-'+case+'-passed')

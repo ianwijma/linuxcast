@@ -1,0 +1,36 @@
+{
+  "kind": "S0-01-unsigned-consumer-collector-draft",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "sourceSnapshot": {
+    "path": "/tmp/linuxcast-s001-consumer-immutable",
+    "sourceArchiveSha256": "7bae027914e1ce33ddb0ed384e48b7924f6e4b0579ae051916bcba7541e971fd",
+    "authoritySha256": "85fc6343bdc6888e00cfa5182a1f8ca78d515cbeb5b73fbac933a82b92565e92",
+    "buildManifestSha256": "6cb4791f7ca07ddf034585dca2778bc3d1067b17e511c9fe8f103dc061d74422",
+    "immutableIndexSha256": "5963436eef3d5843c02eabd287249e3294311dccd4484081415841e89ab6df84"
+  },
+  "reviewedSource": {
+    "signedBaseline": "d8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab",
+    "combinedIncrementSha256": "efdbc5d72bdc0169484fe5ca55b45c8a0bf08ff64c8d5d24e0c19260d8b54103",
+    "consumerIncrementSha256": "5ddf091419ba927790d785879b9e3185a29a3d90eb32b7a56469ac2ca0507bf6",
+    "consumerManifestSha256": "4f84be42701e6200622c49df226ce326080a222cefd63e1eca2f1bdfd3b5d167"
+  },
+  "checks": {
+    "collector": 29,
+    "orchestration": 23,
+    "pythonAst": "passed",
+    "archiveBaselineComparison": "455regular/66directories/exact8overlays"
+  },
+  "filesSha256": {
+    "README.md": "9d72aefc4e491b951132c43b3386357aec76a76593fe014e43fdf7ee8399faf2",
+    "archive-path-index.json": "27b06d19fc67cf9be4aa7ee9854d281f581b4ce3de147b802c080d6ea48dd8d1",
+    "collect.py": "b9791ee62da4d27d5070360f69f1925cb01892eb8b94a49b8571cb0f47eb6aa1",
+    "collector.diff": "420dd7b51aedfa3fd3a8a0c018e8bd2266882b5402624a707787de3c52e0b828",
+    "guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "host.py": "1b47ba5c639b45c7fc1a655fa99efa097cb097a9e30266bb82ff5d0328f1cb0a",
+    "test_collect.py": "3e46f281ca70c84c9a1f451bd9c285fd720d4de9a35b70cdb0bbc905b7526874",
+    "test_orchestration.py": "a5a170cd48bce95bf0b299abcdf49da67d7912779a277697cda1be80bb88504b"
+  }
+}
