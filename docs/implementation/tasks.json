@@ -350,6 +350,12 @@
               "outcome": "Eleven native non-device checks and final real security suite2/2 pass. Review verifies no raw event/content path in public protocol, bounded fixed-code diagnostics, disabled core/libevdev logs and seeded error/path privacy regression. Committed artifacts contain public synthetic identities, fixed labels, booleans, numeric timing and tool metadata; no host keyboard/private content captured.",
               "platform": "Disposable Debian13.7 amd64, generic kernel6.12.113+deb13-amd64, libevdev1.13.4, systemd257.13, Node24.22.1/Bun1.4.4; synthetic devices only.",
               "reference": "spikes/input/evidence/{nondevice-tests.log,source-sha256.txt,binary-sha256.txt,kernel-debian.json,security-debian.log,guest-cleanup.json}; independently reviewed source26688de and README8e0c2bb."
+            },
+            {
+              "command": "cargo test --locked -p linuxcast-input-spike; linuxcast-input-spike-context-probe --observe-own-session; independent source/schema/artifact review",
+              "outcome": "Separate no-input monitor16-check run passes including14 private sd-bus cases; real host invocation completes20 fixed-schema always-denied observations. No private session/object/owner identifiers cross the bridge, logging overrides are cleared and only exact fixed denial enums/booleans/numeric timing appear. Root review corrected broad property subscriptions and unexpected trailing reply fields before execution. Probe denies before bus access on this actual own-PID context.",
+              "platform": "Pinned Debian13 libsystemd257.13 build/private fixtures; actual read-only Pop!_OS22.04 host/systemd249.11/libc2.35 own-process observation, with no input or session mutation.",
+              "reference": "spikes/input/evidence/context-{source-sha256.txt,binary-sha256.txt,binary-inspection.log,nondevice-tests.log,clippy.log,host.json}; source e944347 and READMEa8636a3; actual binary32f2637486b0d4ac4a54445eda14c9ba92166e8d83979b61d71ed7a7a34bee2d."
             }
           ]
         }
@@ -362,7 +368,8 @@
         "Final source26688de, diagnostic83f4a12, kernel identity2071354 and recovery5cfdbff independently reviewed by coordinator and separate source reviewer. Eleven non-device Rust checks (eight unit/three subprocess), strict clippy/fmt and TS checks pass. Source and binary hashes in spikes/input/evidence match the executed guest artifacts.",
         "Actual isolated Debian13.7, generic6.12.113+deb13-amd64/libevdev1.13.4/systemd257.13: final bun run test:security -- S0-03 passes2/2 without skips, including14 manufactured evdev/uinput scenarios and actual unchanged mandatory extension sandbox socket denial. Ordinary UID1000 can connect to the same0600 socket; sandbox cannot. See spikes/input/evidence/security-debian.log and kernel-debian.json.",
         "Worker/supervisor SIGKILL recovery121/116ms; watchdog SIGKILL issued501ms after last heartbeat, kernel removal/regrab127ms later; lease disarm requested1ms after expiry, kernel cleanup101ms later; emergency78ms. No automatic rearm. Dormant completed-input regression requires fresh-input positive control. Earlier failed startup/mixed timing reports remain unchanged.",
-        "After execution, all source hashes verified; no input spike processes or manufactured devices remain and root lab enabling marker removed before VM release. See spikes/input/evidence/guest-cleanup.json. No host system policy, physical input device or desktop settings changed."
+        "After execution, all source hashes verified; no input spike processes or manufactured devices remain and root lab enabling marker removed before VM release. See spikes/input/evidence/guest-cleanup.json. No host system policy, physical input device or desktop settings changed.",
+        "Separate monitor-only context probe e944347, READMEa8636a3, independently reviewed by coordinator:16 Rust checks pass, including14 private sd-bus transport cases. No input symbols/control path; always canArm=false. Actual host read-only invocation matches binary32f2637486b0d4ac4a54445eda14c9ba92166e8d83979b61d71ed7a7a34bee2d and emits20 fixed denial reports because own-PID login session cannot be bound; it denies before any system-bus query. Host systemd249.11/libc2.35 explicitly differ from Debian257. No live lock/session eligibility is inferred. See spikes/input/evidence/context-{source-sha256.txt,binary-sha256.txt,binary-inspection.log,nondevice-tests.log,clippy.log,host.json}."
       ],
       "owner": "review_f1_01",
       "branch": "codex/s0-03-input",

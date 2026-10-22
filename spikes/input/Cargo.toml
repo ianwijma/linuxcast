@@ -25,3 +25,7 @@ path = "src/bin/worker.rs"
 [[bin]]
 name = "linuxcast-input-spike-synthetic-lab"
 path = "src/bin/synthetic-lab.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-context-probe"
+path = "src/bin/context-probe.rs"
