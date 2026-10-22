@@ -279,7 +279,7 @@
     {
       "id": "S0-03",
       "title": "Prove native input failure recovery",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -352,14 +352,14 @@
         "bun run test:security -- S0-03"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-03-input",
       "limitations": []
     },
     {
       "id": "S0-04",
       "title": "Prove extension sandbox boundaries",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -452,7 +452,8 @@
         "bun run test:security -- S0-04"
       ],
       "evidence": [
-        "PR #9 source independently reviewed by coordinator; reviewer review_f1_01 reviewed coordinator changes. Removed-cgroup ENODEV race fixed; low-RSS task helper report-field finding fixed with stronger completed-result assertions. Final Debian suite22/22 and probe20/20 pass, actual namespace denial/cleanup verified. Final review, current-head CI and integration pending."
+        "Integrated PR #9 https://github.com/ianwijma/linuxcast/pull/9 into develop8baac2e5a94e49182003619d311d96f5dfa91d29. Coordinator independently reviewed implementation and executed actual Debian13 suite22/22/probe20/20/namespace-denial; review_f1_01 independently reviewed coordinator changes and evidence at31618cf, with no remaining findings after ENODEV and pressure-report fixes.",
+        "Current-head GitHub validate passed for31618cf: https://github.com/ianwijma/linuxcast/actions/runs/39809772686/job/119932564597. No requested reviewers/bots/comments were present. Exact source hashes and VM/host limitations are retained in spike evidence; no host policy change occurred."
       ],
       "owner": "review_f1_01",
       "branch": "codex/s0-04-sandbox",
