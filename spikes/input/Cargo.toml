@@ -38,3 +38,16 @@ path = "src/bin/peer-probe.rs"
 name = "peer-observer-private"
 path = "tests/peer-observer-private.rs"
 harness = false
+
+[[bin]]
+name = "linuxcast-input-spike-denial-probe"
+path = "src/bin/denial-probe.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-denial-helper"
+path = "src/bin/denial-helper.rs"
+
+[[test]]
+name = "denial-private"
+path = "tests/denial-private.rs"
+harness = false
