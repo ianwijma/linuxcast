@@ -121,7 +121,7 @@
     {
       "id": "S0-01",
       "title": "Prove launcher activation and desktop identity",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -193,8 +193,8 @@
         "bun run test:integration -- S0-01"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_06_workflow_ui",
+      "branch": "codex/s0-01-launcher",
       "limitations": []
     },
     {
@@ -438,7 +438,7 @@
     {
       "id": "S0-05",
       "title": "Prove streaming provider and approval lifecycle",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -532,7 +532,8 @@
         "bun run test:contracts -- S0-05"
       ],
       "evidence": [
-        "Implementation d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7 independently reviewed by coordinator against S0-05 and normative references. Two findings (hanging tool deadline, malformed OAuth expiry) addressed and independently rerun: lint/typecheck,63 contract checks and26 OAuth security checks pass. Integration/PR CI pending."
+        "Integrated PR #7 https://github.com/ianwijma/linuxcast/pull/7 into develop c9a9b9566b510e93bd7082f306473207cc62aece. Source d5a36ac independently reviewed by coordinator; metadata 033c6f47 independently reviewed by s0_05_provider. Hanging-tool deadline and malformed OAuth expiry findings fixed and verified.",
+        "Lint/typecheck pass;63 contract checks and26 OAuth security checks pass with actual local HTTP transport failure/cancellation fixtures. Current-head GitHub validate passed for 033c6f47: https://github.com/ianwijma/linuxcast/actions/runs/39802346250/job/119906184636. No requested GitHub reviewers or review bot were present. Platform and remaining live-account/durability limits are recorded per criterion and in spikes/ai/evidence.md."
       ],
       "owner": "s0_05_provider",
       "branch": "codex/s0-05-provider",
