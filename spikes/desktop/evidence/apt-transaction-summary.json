@@ -1,0 +1,45 @@
+{
+  "selectedPackages": 342,
+  "metadataRows": 342,
+  "downloadBytes": 149510796,
+  "installedKiB": 624419,
+  "policyRcExists": false,
+  "policyRcExecutable": false,
+  "serviceStates": {
+    "accounts-daemon.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    },
+    "colord.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    },
+    "polkit.service": {
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "UnitFileState": "static"
+    },
+    "pipewire.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    },
+    "pipewire-pulse.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    },
+    "gdm.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    },
+    "sddm.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "UnitFileState": ""
+    }
+  }
+}

@@ -34,7 +34,10 @@ export default class NativeCanary extends Extension {
                 .filter(window => window.get_gtk_application_id() === appId);
             if (windows.length === 1) {
                 this._poll = 0;
-                this._probe(windows[0]).catch(() => this._finish('failed','NATIVE_PROBE_FAILED'));
+                this._probe(windows[0]).catch(error => {
+                    this._result.errorKind = error instanceof TypeError ? 'TYPE_ERROR' : error instanceof RangeError ? 'RANGE_ERROR' : 'NATIVE_OR_PROBE_ERROR';
+                    this._finish('failed','NATIVE_PROBE_FAILED');
+                });
                 return GLib.SOURCE_REMOVE;
             }
             if (--remaining <= 0) { this._poll = 0; this._finish('unavailable','OWN_CANARY_WINDOW_REQUIRED'); return GLib.SOURCE_REMOVE; }
@@ -42,14 +45,23 @@ export default class NativeCanary extends Extension {
         });
     }
     async _probe(window) {
+        this._result.stage = 'WINDOW_ADAPTER';
+        this._result.windowApiPresent = ['get_frame_rect','get_work_area_current_monitor','move_resize_frame','is_fullscreen','get_maximized','connect','disconnect']
+            .every(name => typeof window[name] === 'function');
+        this._result.nativeWaylandClient = window.get_client_type() === Meta.WindowClientType.WAYLAND;
+        if (GLib.getenv('GDK_BACKEND') === 'wayland' && !this._result.nativeWaylandClient) throw new Error('NATIVE_WAYLAND_CLIENT_REQUIRED');
         this._native = gnomeWindow(window);
+        this._result.stage = 'INITIAL_GEOMETRY';
         const before = parseRect(this._native.geometry());
+        this._result.stage = 'WORK_AREA';
         const area = parseRect(this._native.workArea());
+        this._result.stage = 'WINDOW_STATE';
         if (this._native.state() !== 'normal') throw new Error('OWN_WINDOW_NOT_NORMAL');
         this._result.initialGeometry = before;
         this._result.workArea = area;
         const target = {x:before.x === area.x+32 ? area.x+64 : area.x+32,y:area.y+32,width:Math.min(400,area.width-64),height:Math.min(240,area.height-64)};
         this._result.requested = target;
+        this._result.stage = 'NATIVE_PLACEMENT';
         this._native.place(target);
         await this._delay(300);
         this._result.finalGeometry = parseRect(this._native.geometry());
@@ -57,6 +69,7 @@ export default class NativeCanary extends Extension {
         this._result.targetApplied = Object.keys(target).every(key => Math.abs(target[key]-this._result.finalGeometry[key]) <= 1);
         // A distinct native manager is deliberately NOT global.display.get_selection().
         // Real Meta owner signals/transfers are exercised without normal CLIPBOARD.
+        this._result.stage = 'PRIVATE_SELECTION_SETUP';
         this._selection = Meta.Selection.new(global.display);
         this._ownerSignal = this._selection.connect('owner-changed',() => { this._result.ownerEvents++; });
         const type = Meta.SelectionType.SELECTION_CLIPBOARD;
@@ -68,6 +81,7 @@ export default class NativeCanary extends Extension {
         const reader = gnomeSelectionSource(this._selection,type,
             () => Gio.MemoryOutputStream.new_resizable(),() => new Gio.Cancellable());
         this._cancel = new Cancellation();
+        this._result.stage = 'PRIVATE_SELECTION_TRANSFER';
         const content = await reader.read('text/plain',4097,this._cancel);
         this._result.publicPayloadMatches = content.length === bytes.length && content.every((byte,index) => byte === bytes[index]);
         const oversize = Meta.SelectionSourceMemory.new('text/plain',new GLib.Bytes(new Uint8Array(8192).fill(65)));
