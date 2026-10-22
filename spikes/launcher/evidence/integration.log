@@ -1,0 +1,22 @@
+$ node scripts/test-runner/run.ts integration "S0-01"
+
+ RUN  v4.1.12 /tmp/linuxcast-s0-01
+
+ ✓ spikes/launcher/tests/launcher.integration.test.ts (10 tests) 9753ms
+     ✓ starts with strict sandbox identity and effective shortcut  451ms
+     ✓ S0-01-AC02 retains the resident singleton on close and reopens through CLI before explicit Quit exits  563ms
+     ✓ validates native WM_CLASS and regains GNOME X11 focus through the registered shortcut from a synthetic decoy  1000ms
+     ✓ reports a real shortcut conflict preserves the existing key and recovers after release  1355ms
+     ✓ denies foreign renderer frames unknown protocol fields navigation popups network and sensitive permissions  539ms
+     ✓ supports keyboard navigation layered Escape action focus and explicit shortcut recorder cancellation  1062ms
+     ✓ renders dark/light empty capabilities and action states with zero automated AA violations and no external requests  2644ms
+     ✓ recovers a crashed renderer only on explicit reopening with sandbox settings intact  701ms
+     ✓ uses compact host rows content sizing and keyboard controls at 200% zoom with emulated high contrast and reduced motion  833ms
+     ✓ routes explicit --quit to the hidden singleton without showing another window  522ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  03:00:57
+   Duration  10.14s (transform 52ms, setup 0ms, import 299ms, tests 9.75s, environment 0ms)
+
+JSON report written to /tmp/linuxcast-test-report-Wwp0VO/results.json

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Linuxcast
+Comment=Launcher feasibility prototype
+Exec=linuxcast --toggle
+Icon=io.github.ianwijma.Linuxcast
+StartupWMClass=io.github.ianwijma.Linuxcast
+Terminal=false
+Categories=Utility;

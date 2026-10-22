@@ -1,0 +1,33 @@
+{
+  "scope": "real Pop!_OS GNOME X11 session only",
+  "kernel": "7.1.1-76070101-generic",
+  "distro": "Pop!_OS 22.04 LTS",
+  "desktop": "GNOME Shell 42.9",
+  "backend": "native X11 via Electron",
+  "packages": [
+    "at-spi2-core 2.44.0-3",
+    "orca 42.0-1ubuntu2",
+    "xdg-desktop-portal 1.14.4-1ubuntu2~22.04.2",
+    "xdg-desktop-portal-gnome 42.1-0ubuntu2"
+  ],
+  "version": "45.0.0",
+  "chrome": "156.0.8078.48",
+  "embeddedNode": "24.22.0",
+  "name": "Linuxcast",
+  "noSandboxFlag": false,
+  "unsafeSandboxArgument": false,
+  "focused": true,
+  "scaleFactor": 1,
+  "gpu": [
+    {
+      "vendorId": 4098,
+      "deviceId": 29772,
+      "active": true
+    }
+  ],
+  "limitations": [
+    "Debian13 GNOME48 Wayland untested",
+    "Debian13 GNOME X11 untested",
+    "Debian13 Plasma6.3 Wayland and X11 untested"
+  ]
+}

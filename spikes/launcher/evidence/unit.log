@@ -1,0 +1,13 @@
+$ node scripts/test-runner/run.ts unit "S0-01"
+
+ RUN  v4.1.12 /tmp/linuxcast-s0-01
+
+ ✓ spikes/launcher/tests/launcher.unit.test.ts (4 tests) 6ms
+ ✓ spikes/launcher/tests/launcher.ui-fixture.test.tsx (3 tests) 165ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  02:57:25
+   Duration  727ms (transform 69ms, setup 0ms, import 143ms, tests 171ms, environment 377ms)
+
+JSON report written to /tmp/linuxcast-test-report-8JTyce/results.json
