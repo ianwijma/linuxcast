@@ -1,0 +1,189 @@
+diff --git a/spikes/desktop/guest/canary.py b/spikes/desktop/guest/canary.py
+index b916160..2f2df04 100644
+--- a/spikes/desktop/guest/canary.py
++++ b/spikes/desktop/guest/canary.py
+@@ -1,11 +1,12 @@
+ #!/usr/bin/python3
+ """Persistent public GTK window; no clipboard, keyboard capture or host display."""
+ import os
++import json
+ import sys
+ import gi
+ 
+ gi.require_version('Gtk', '3.0')
+-from gi.repository import Gtk, Gio
++from gi.repository import Gtk, Gio, Gdk
+ 
+ if os.environ.get('LINUXCAST_S002_PRIVATE_GUEST') != '1':
+     sys.exit(3)
+@@ -16,6 +17,24 @@ def activate(application):
+     window = Gtk.ApplicationWindow(application=application, title='Linuxcast public native canary')
+     window.set_default_size(280, 160)
+     window.add(Gtk.Label(label='Public Linuxcast native API canary\nNo user clipboard or private window content'))
++    observations = []
++    def configured(_window, event):
++        # Only the first eight events of this synthetic window leave stdout.
++        # The runner keeps this private log transient and exports this schema.
++        if len(observations) >= 8: return False
++        client = tuple(window.get_size())
++        if any(not isinstance(value, int) or not 0 < value <= 16384 for value in (event.width, event.height, *client)):
++            return False
++        state = window.get_window().get_state()
++        observations.append({'width':event.width,'height':event.height,
++            'clientWidth':client[0],'clientHeight':client[1],
++            'maximized':bool(state & Gdk.WindowState.MAXIMIZED),
++            'fullscreen':bool(state & Gdk.WindowState.FULLSCREEN),
++            'iconified':bool(state & Gdk.WindowState.ICONIFIED),
++            'resizable':window.get_resizable()})
++        print(json.dumps({'ownConfigureEvents':observations}),flush=True)
++        return False
++    window.connect('configure-event', configured)
+     window.show_all()
+ 
+ app.connect('activate', activate)
+diff --git a/spikes/desktop/guest/restart-preparation.test.ts b/spikes/desktop/guest/restart-preparation.test.ts
+index 609dd2d..5fa2974 100644
+--- a/spikes/desktop/guest/restart-preparation.test.ts
++++ b/spikes/desktop/guest/restart-preparation.test.ts
+@@ -1,5 +1,5 @@
+ import {afterAll,beforeAll,expect,test} from 'vitest';
+-import {spawn} from 'node:child_process';
++import {spawn,execFileSync} from 'node:child_process';
+ import {createInterface} from 'node:readline';
+ import {mkdtempSync,readFileSync,rmSync,existsSync} from 'node:fs';
+ import {tmpdir} from 'node:os';
+@@ -143,3 +143,31 @@ print('bounded-platform-guard-passed')`;
+   const child=spawn('/usr/bin/python3',['-c',code],{env:{PATH:process.env.PATH},stdio:'ignore'});
+   expect(await new Promise<number|null>(resolve=>child.once('close',resolve))).toBe(0);
+ });
++
++test('native failure diagnostics export only bounded synthetic configure records',()=>{
++  const result=execFileSync('/usr/bin/python3',['-c',String.raw`
++import json, pathlib, runpy, sys, tempfile
++sys.path.insert(0,sys.argv[1])
++probe=runpy.run_path(str(pathlib.Path(sys.argv[1])/'run-session.py'))['canary_progress']
++entry=dict(width=280,height=160,clientWidth=280,clientHeight=160,maximized=False,fullscreen=False,iconified=False,resizable=True)
++with tempfile.TemporaryDirectory(dir=sys.argv[2]) as directory:
++    root=pathlib.Path(directory)
++    file=root/'private-canary.log'
++    assert probe(root) is None
++    valid={'ownConfigureEvents':[entry]}
++    file.write_text('unstructured private diagnostic must never escape\n'+json.dumps(valid)+'\n')
++    assert probe(root)==valid
++    invalid=[{'ownConfigureEvents':[dict(entry,caption='private')]},
++             {'ownConfigureEvents':[dict(entry,width=True)]},
++             {'ownConfigureEvents':[dict(entry,clientHeight=16385)]},
++             {'ownConfigureEvents':[entry]*9},
++             {'ownConfigureEvents':[entry],'error':'private'}]
++    for value in invalid:
++        file.write_text(json.dumps(value)+'\n')
++        assert probe(root) is None
++    file.write_text('x'*20000+'\n'+json.dumps(valid)+'\n')
++    assert probe(root)==valid
++print('bounded-own-configure-schema-passed')
++`,new URL('.',import.meta.url).pathname,root],{encoding:'utf8',timeout:5000,maxBuffer:16384});
++  expect(result.trim()).toBe('bounded-own-configure-schema-passed');
++});
+diff --git a/spikes/desktop/guest/run-session.py b/spikes/desktop/guest/run-session.py
+index 0070c87..5c158b5 100644
+--- a/spikes/desktop/guest/run-session.py
++++ b/spikes/desktop/guest/run-session.py
+@@ -45,6 +45,24 @@ def read_result(path):
+     if not isinstance(value,dict): raise ValueError('RESULT_SCHEMA')
+     return value
+ 
++def canary_progress(root):
++    file=root/'private-canary.log'
++    if not file.exists(): return None
++    with file.open('rb') as stream:
++        stream.seek(max(0,file.stat().st_size-16384)); content=stream.read(16384).decode('utf8','replace')
++    for line in reversed(content.splitlines()):
++        try: value=json.loads(line)
++        except ValueError: continue
++        if not isinstance(value,dict) or set(value)!= {'ownConfigureEvents'}: continue
++        entries=value['ownConfigureEvents']
++        if not isinstance(entries,list) or not 1<=len(entries)<=8: continue
++        keys={'width','height','clientWidth','clientHeight','maximized','fullscreen','iconified','resizable'}
++        if all(isinstance(item,dict) and set(item)==keys
++               and all(type(item[key]) is int and 0<item[key]<=16384 for key in ('width','height','clientWidth','clientHeight'))
++               and all(type(item[key]) is bool for key in ('maximized','fullscreen','iconified','resizable')) for item in entries):
++            return value
++    return None
++
+ def native_progress(root):
+     # Only own exact static stage labels escape the private compositor log.
+     stages={'SCRIPT_ENTERED','CONTEXT_CALLBACK','OWN_WINDOW_FOUND','NATIVE_ADAPTER_READY','LOOP_START','OWN_WINDOW_DEADLINE','SCRIPT_EXCEPTION'}
+@@ -64,7 +82,7 @@ def native_progress(root):
+         if 0<number<=1000000 and number not in error_lines: error_lines.append(number)
+         if len(error_lines)>=8: break
+     return {'stages':observed,'scriptEvaluationErrorLogged':bool(error_lines),'publicBundleErrorLines':error_lines,
+-            'wire':read_result(root/'kwin-progress.json')}
++            'wire':read_result(root/'kwin-progress.json'),'ownClient':canary_progress(root)}
+ 
+ def inner(backend,root,restart=False):
+     env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+@@ -94,6 +112,7 @@ def inner(backend,root,restart=False):
+     signal.signal(signal.SIGTERM,interrupted)
+     signal.signal(signal.SIGINT,interrupted)
+     rawlog=(root/'private-compositor.log').open('w')
++    canarylog=(root/'private-canary.log').open('w')
+     try:
+         if backend.startswith('gnome'):
+             setting=bounded(['gsettings','set','org.gnome.shell','enabled-extensions',"['s002-native@linuxcast.invalid']"],env)
+@@ -108,7 +127,7 @@ def inner(backend,root,restart=False):
+             if 'true' in owner.stdout and (not wayland or (pathlib.Path(env['XDG_RUNTIME_DIR'])/socket).exists()): break
+             time.sleep(0.1)
+         else: return report_unavailable('NATIVE_COMPOSITOR_START_DEADLINE')
+-        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
++        canary=subprocess.Popen(['/usr/bin/python3',str(HERE/'canary.py')],env=env,stdout=canarylog,stderr=subprocess.DEVNULL,start_new_session=True)
+         children.append(canary)
+         if backend.startswith('kwin'):
+             env['LINUXCAST_S002_CANARY_PID']=str(canary.pid)
+@@ -172,6 +191,7 @@ def inner(backend,root,restart=False):
+     finally:
+         for child in reversed(children): terminate(child)
+         rawlog.close()
++        canarylog.close()
+ 
+ def main():
+     parser=argparse.ArgumentParser(description=__doc__)
+diff --git a/spikes/desktop/native/own-canary.py b/spikes/desktop/native/own-canary.py
+index 0703736..f6fcca5 100644
+--- a/spikes/desktop/native/own-canary.py
++++ b/spikes/desktop/native/own-canary.py
+@@ -27,7 +27,8 @@ def main():
+     clipboard = Gtk.Clipboard.get_for_display(display, atom)
+     result = {"state": "running", "backend": "GTK3/GDK-X11 own-window/private-selection",
+               "ownerEvents": 0, "clipboardTouched": False, "privateSelectionTextMatches": False,
+-              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None}
++              "privateSelectionReleased": False, "initialGeometry": None, "finalGeometry": None,
++              "configureEvents": [], "configureEventCount": 0, "invalidOwnConfigureObserved": False}
+     clipboard.connect("owner-change", lambda *_args: result.update(ownerEvents=result["ownerEvents"] + 1))
+     clipboard.set_text("public Linuxcast private-selection canary", -1)
+     owned = Gdk.selection_owner_get_for_display(display, atom)
+@@ -54,6 +55,25 @@ def main():
+         mapped_by_server = True
+         return False
+     window.connect("map-event", mapped)
++    def configured(_window, event):
++        result["configureEventCount"] = min(255, result["configureEventCount"] + 1)
++        client = tuple(window.get_size())
++        values = (event.width, event.height, *client)
++        if any(not isinstance(value, int) or not 0 < value <= 16384 for value in values):
++            result["invalidOwnConfigureObserved"] = True
++            return False
++        if len(result["configureEvents"]) < 8:
++            state = window.get_window().get_state()
++            result["configureEvents"].append({
++                "width": event.width, "height": event.height,
++                "clientWidth": client[0], "clientHeight": client[1],
++                "requestSent": result["initialGeometry"] is not None,
++                "maximized": bool(state & Gdk.WindowState.MAXIMIZED),
++                "fullscreen": bool(state & Gdk.WindowState.FULLSCREEN),
++                "iconified": bool(state & Gdk.WindowState.ICONIFIED),
++                "resizable": window.get_resizable()})
++        return False
++    window.connect("configure-event", configured)
+     window.show_all()
+ 
+     def rectangle():

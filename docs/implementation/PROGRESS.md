@@ -1,32 +1,35 @@
 # Coordinator checkpoint
 
-The complete local1.0 goal remains active. F1-01, S0-04 and S0-05 are integrated and accepted;94 tasks and the release gates remain outstanding. Never close the goal at an intermediate milestone.
+The complete agreed local 1.0 goal continues through R1-03: **5 tasks accepted, 92 remaining**. S0-01 and S0-03 remain in progress. F0-01 depends on their acceptance; no release scope has been reduced.
 
-## Integrated evidence
+## Integrated prerequisites
 
-- Acceptance tracking PR2 (`a7d8d18`) introduced389 stable criteria, required evidence and conditional N/A validation. Bun tooling contract PR3 (`4cf9504`) is approved.
-- F1-01 PR4 (`e3f9a769467a903d5d257c644d1afcd06d0afb50`), completion PR5 (`fa571e1`). Clean Debian13 Bun1.4.4/Node24.22.1 install, Electron45 load;20 JS checks,21 plan regressions; Rust1.95 native/Go-age1.2.1 interoperability, fmt/clippy. Evidence in bootstrap.md and scripts/test-runner/evidence. Independent review and current-head CI passed.
-- S0-05 PR7 (`c9a9b9566b510e93bd7082f306473207cc62aece`), completion PR8 (`5c2145a`). Independently reviewed source d5a36ac,63 contract/26 OAuth checks with real local HTTP interruption/cancel. Tool deadline and invalid OAuth expiry findings fixed. No paid inference, real OAuth/keyring or durable SQLite proof; owning production tasks remain outstanding.
-- S0-04 PR9 (`8baac2e5a94e49182003619d311d96f5dfa91d29`), reviewed head31618cf. Actual Debian13.7 kernel6.12.113/systemd257/bwrap0.12:20 real boundary checks,22/22 full security checks without skips, actual namespace-denial/no fixture/cleanup proof. Kernel256MiB/64tasks/onecore controls verified before exec. ENODEV cleanup and pressure report-field findings fixed and independently reviewed; exact source hashes match guest. CI https://github.com/ianwijma/linuxcast/actions/runs/39809772686/job/119932564597 passed; no requested GitHub reviewers/bots or review comments. Completion tracking PR10 integrated as1b01ebd24971322dc9b4563b84e315d88721b197 after independent review and current-head CI.
+- F1-01, S0-04, S0-05 and S0-06 are accepted.
+- S0-02 source PR14 and completion PR16 are integrated on develop (`fc0b6ee62cda1f783c4318147ea23ec3fc4683f5`). Its bounded native read/geometry/restart/clipboard evidence is accepted. Ordinary KWin placement still crashes; requested, acknowledged and observed outcomes and explicit recovery remain F0-01/P1-03/P1-05 requirements.
+- This S0-01 branch incorporates accepted develop changes and preserves both S0-01 and S0-02 integration suite routes.
 
-## Active work
+## S0-01 launcher
 
-- S0-01: `/tmp/linuxcast-s0-01`, `codex/s0-01-launcher`, source9fb4c0f plus independently reviewed root fixesb126d46. Root corrected nested profile ancestry and lost shortcut registration reporting; eight unit checks rerun independently, ten real-host checks pass. Remaining UI/build review continues. Eight unit/fixture and ten actual Electron45/GNOME42.9 X11 checks pass, including native shortcut/focus/identity/conflict/recovery, hardened IPC, resident hide/quit, keyboard/states and eight screenshots. Root owns uncommitted package/lock/inventory/maps. Debian four-session and actual screen-reader evidence remain outstanding. No user desktop settings or installation changed.
-- S0-02: `/tmp/linuxcast-s0-02`, `codex/s0-02-desktop`, reviewed fixes5500e48. Strict Node-free wire parser rejects malformed commands before effects/replay state; trusted random instance epochs prevent old handles aliasing new windows.62 mapped checks (60 pure/API fixtures plus real private Gio DBus and own GTK/X11 window/private selection) pass; global CLIPBOARD untouched. Agent s0_06_workflow_ui is preparing actual GNOME48/KWin6.3 guest compositor harness. No graphical guest mutation until S003 kernel test reservation releases. Target-native proof remains pending.
-- S0-03: `/tmp/linuxcast-s0-03`, `codex/s0-03-input`, source5fb6aba by review_f1_01. Nine actual non-device/protocol/SCM_RIGHTS/subprocess checks, strict clippy/fmt and TS checks pass. Coordinator manifests pin libc0.2.191/serde1.0.229/serde_json1.0.154;154-package inventory and fresh audit (zero known vulnerabilities, retained basic-toml warning) generated, shared commit pending. Concrete manufactured-device harness awaits root and independent s0_05_provider review BEFORE execution. VM reserved next for synthetic-only input; no host policy/device/service changes. Live logind/physical keyboard/compositor recovery remains separate.
-- S0-06: `/tmp/linuxcast-s0-06`, `codex/s0-06-workflow-ui`, final AT evidence455c84b and accepted develop merged. Root independently reviewed final source/harness and target screenshots.13/13 UI checks, strict typecheck/lint and plan validation pass on final integrated baseline. Actual sandboxed Electron45 keyboard/axe/zoom/media checks pass; target Debian13 Orca48.1/AT-SPI/SpeechDispatcher generated presentation3/3 after native Xvfb focus, native roles/focus3/3, exit0. Exact executed source hash retained. HostOrca42 failure unchanged. All four bounded-spike criteria have evidence; status stays in-progress until PR CI/review/integration. No audible/compositor/Wayland/release claim.
+Draft [PR15](https://github.com/ianwijma/linuxcast/pull/15), worktree `/tmp/linuxcast-s0-01`, branch `codex/s0-01-launcher`.
 
-## Disposable test environment
+Reviewed Wayland focus-or-component-requirement and privacy evidence is recorded per criterion. Native X11 lifecycle, remaining UI/accessibility and full desktop/release checks remain pending. GNOME and KWin private Wayland paths pass their bounded probes; this does not establish the physical session matrix or portal consent.
 
-- User authorized testing on this Pop!_OS22.04/GNOME42.9 X11 host (DISPLAY=:1, seat0,session2); actual input/uinput exist outside the restricted tool sandbox. The sandbox's hidden devices/session-bus denial do not establish host absence. Host CPU delegation is missing; user explicitly declined an override. No override, daemon reload, session restart, input policy/group/permissions or host service change occurred.
-- Root built/booted Debian13.7 official cloud image20261017-2634, publisher SHA512 verified, inside QEMU10.0.13 TCG. Container `linuxcast-s0-04-vm`:UID1000,cap-dropALL,no-new-privileges,2CPU/4GiB/512pids, no published ports or host devices/cgroups/session mounts. Guest2vCPU/2GiB/16GiB overlay. Default guest user manager already delegates cpu/memory/pids. S0-04 vm/README.md records exact configuration and limitations.
-- Lab `/tmp/linuxcast-vm-lab`; SSH only inside container loopback2222 using disposable test key. Never commit keys, seed/cloud-init, host keys, disk or serial logs. Container runs under a3600s lifetime and overlay can resume. Access: docker exec to SSH with lab key/known_hosts, guest userdebian. No host sudo/policy needed. Guest sudo is disposable-test-only.
-- Installed guest accessibility packages Orca48.1,AT-SPI2.56.2,Xvfb21.1.16,SpeechDispatcher0.12 and Electron dependencies. S006 final source runs from `/home/debian/linuxcast-workflow-ui` with disk-backed private temp/cache because guest /tmp is987MiB tmpfs. All UI/Orca processes cleaned; agent released VM. Guest next reserved for independently reviewed S003 manufactured input only; never run a graphical session concurrently with its session guard.
-- Host focus tests must serialize. Launcher final reservation is released; provider is using only private Xvfb. Never let parallel real host windows invalidate focus evidence.
+Signed source `03df170788c2cd2358b15e93cf65dde51919db0c` adds bounded observer lifecycle and consumer diagnostics. The consumer's eleven polls in the latest X11 attempt all found the reply file missing; no native observation or screenshot was produced. Other X11 attempts reached initial identity but failed after Close. All first outcomes, source authority and verified cleanup remain under `spikes/launcher/evidence/native-session/gnome-x11-{prevalidation,short-layout,lifecycle,consumer}`. Earlier unsigned execution remains explicitly unsigned even after matching source blobs were signed.
 
-## Remaining obligations
+Readiness correction `e0fea79b96877a881ca398a55376cd98e3d8e58e` requires the own observer's context/poll/first-tick markers inside the original 45-second startup deadline. It retains the single diagnostic query, native acceptance checks and other deadlines. Coordinator and independent review pass, as do 178 configured preparation tests and strict TypeScript. One earlier TypeScript process exited 139; the author rerun and independent coordinator run passed without an inferred cause. This correction has not yet run in a native compositor.
 
-- Bun audit18 advisories in build-only dependency families are unsuppressed. RustSec audit at640bf5a found no known vulnerabilities but retains basic-toml maintenance warning; refresh for new dependencies/release.
-- Application build CI is not wired; existing GitHub CI checks plan/acceptance tooling. Current CLI lacks workflow write scope. Native ABI, .deb lifecycle and package/release artifacts remain owning tasks.
-- Debian GNOME48/KDE6.3 Wayland/X11, physical input/recovery, screen reader and full release gates remain outstanding. QEMU headless kernel evidence and Xvfb UI evidence never substitute for the native desktop matrix. GNOME48.7/KWin6.3.6 packages are available in the guest repository for future dedicated desktop setup.
-- Preserve older uncommitted pnpm prototype `/home/ian/.codex/worktrees/f1-01-bootstrap/linuxcast`; never overwrite. R1-01/R1-02/R1-03 remain planned.
+Evidence packaging correction `25bc2c5` preserves nine reviewed source files byte-for-byte in a deterministic archive, preventing their copied TypeScript names from entering compiler inputs. Original source, actual artifacts and initial evidence index remain reproducible. No compiler configuration changed.
+
+## S0-03 input
+
+Draft [PR13](https://github.com/ianwijma/linuxcast/pull/13), worktree `/tmp/linuxcast-s0-03`, branch `codex/s0-03-input`.
+
+Root-to-user negative-observation source and startup readbacks pass independent source and offline checks; actual root helper execution is still unverified. Historical manufactured native regression passed its fourteen cases, while its outer cleanup gate remains explicitly incomplete. A separate verified resource release did not change that outcome.
+
+Collector preparation failed before any file transfer because it assumed root-owned staging inside a container running as UID1000. The guest stage was removed; one owned empty container stage remains for separately reviewed recovery. The first failure and frozen collector are preserved. Ownership correction and an exact generated-guard regression are required before another preparation. No helper installation or native input execution occurred in that attempt.
+
+Physical held-key/grab/modifier recovery and real graphical locked/inactive enforcement remain mandatory. No service is enabled, physical keyboard stream opened, or host system policy changed.
+
+## Validation and next work
+
+After integrating accepted develop: planning validation, 21 planning regression tests and strict TypeScript pass. Both integration route mappings are retained. Obtain current-head CI and independent integration review, then continue the bounded native readiness and input ownership/recovery checks. Do not merge either draft as a completed task until its applicable acceptance evidence passes.

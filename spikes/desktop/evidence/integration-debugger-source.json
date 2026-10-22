@@ -1,0 +1,32 @@
+{
+  "kind": "recorded-host-mapped-S0-02-command-output",
+  "command": "bun run test:integration -- S0-02",
+  "outcome": "passed",
+  "passed": 89,
+  "failed": 0,
+  "skippedOrTodo": 0,
+  "startedLocal": "2026-10-23 05:32:11 Australia/Sydney",
+  "startedUtc": "2026-10-22T18:32:11Z",
+  "durationSeconds": 2.15,
+  "evidenceSource": "Recorded command stdout; test runner automatically removed its temporary JSON report",
+  "host": "Pop!_OS22.04 GNOME42.9 X11 amd64",
+  "nodeVersion": "24.22.1",
+  "bunVersion": "1.4.4",
+  "parentCommit": "ee564d10d40178ef6835ef664b2c401e9dfa09ba",
+  "sourceDirty": true,
+  "reviewedDiffSha256": "7a98106207cd4c51a172c41533ae8d31652b8e4caf744a58b3e8f1a49bbcf311",
+  "sourcePatch": "debugger-source.patch",
+  "scope": {
+    "transportFixtures": 63,
+    "processAndPrivacyPreparation": 24,
+    "actualHostOwnWindowPrivateSelectionAndPrivateGioBus": 2
+  },
+  "targetCompositorAcceptanceEstablished": false,
+  "checksAlsoPassed": [
+    "typecheck",
+    "lint",
+    "guestBuild",
+    "PythonSyntax",
+    "validate_plan"
+  ]
+}

@@ -19,6 +19,13 @@ class PlanningFixture(unittest.TestCase):
         for path in ROOT.glob("*.md"):
             shutil.copy(path,self.root/path.name)
         shutil.copy(ROOT/"LICENSE",self.root/"LICENSE")
+        # Architecture findings link to real spike evidence documents. Keep
+        # those link targets in the isolated fixture without copying build
+        # trees, dependencies, screenshots or native binaries.
+        for path in ROOT.glob("spikes/*/evidence/*.md"):
+            target = self.root / path.relative_to(ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(path, target)
         # The live registry acquires real evidence as implementation proceeds.
         # Negative tests must construct their own pending baseline rather than
         # inheriting (or erasing) the coordinator's real completion claims.

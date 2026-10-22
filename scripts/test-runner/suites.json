@@ -25,6 +25,11 @@
     "S0-01": [
       "spikes/launcher/tests/launcher.integration.test.ts",
       "spikes/launcher/tests/native-session/preparation.test.ts"
+    ],
+    "S0-02": [
+      "spikes/desktop/transport.test.ts",
+      "spikes/desktop/native.integration.test.ts",
+      "spikes/desktop/guest/restart-preparation.test.ts"
     ]
   },
   "security": {
