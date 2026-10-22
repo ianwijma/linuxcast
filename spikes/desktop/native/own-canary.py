@@ -48,19 +48,25 @@ def main():
     window.set_skip_taskbar_hint(True)
     window.set_default_size(280, 120)
     window.add(Gtk.Label(label="Public integration canary\nNo user clipboard or window content is read"))
+    mapped_by_server = False
+    def mapped(*_args):
+        nonlocal mapped_by_server
+        mapped_by_server = True
+        return False
+    window.connect("map-event", mapped)
     window.show_all()
 
     def rectangle():
         rect = window.get_window().get_frame_extents()
         return {"x": rect.x, "y": rect.y, "width": rect.width, "height": rect.height}
 
-    def resize():
-        result["initialGeometry"] = rectangle()
-        window.resize(360, 180)
-        return False
-
+    requested = (360, 180)
+    started = GLib.get_monotonic_time()
     def finish():
         result["finalGeometry"] = rectangle()
+        result["mappedByServer"] = mapped_by_server
+        result["requestedClientSize"] = {"width": requested[0], "height": requested[1]}
+        result["clientSizeApplied"] = tuple(window.get_size()) == requested
         # Never clear a newer owner, even for this private test selection.
         if Gdk.selection_owner_get_for_display(display, atom) == owned:
             clipboard.clear()
@@ -69,13 +75,27 @@ def main():
             result["preservedNewerOwner"] = True
         before, after = result["initialGeometry"], result["finalGeometry"]
         result["liveGeometryChanged"] = bool(before and after and (before["width"], before["height"]) != (after["width"], after["height"]))
-        result["state"] = "passed" if result["liveGeometryChanged"] and result["privateSelectionTextMatches"] else "failed"
+        result["state"] = "passed" if result["liveGeometryChanged"] and result["clientSizeApplied"] and result["privateSelectionTextMatches"] else "failed"
         window.destroy()
         Gtk.main_quit()
         return False
 
-    GLib.timeout_add(300, resize)
-    GLib.timeout_add(1000, finish)
+    def observe():
+        if result["initialGeometry"] is None and mapped_by_server:
+            result["initialGeometry"] = rectangle()
+            # Exactly one client resize request after actual X11 MapNotify.
+            window.resize(*requested)
+        elif result["initialGeometry"] is not None:
+            current = rectangle()
+            before = result["initialGeometry"]
+            changed = (current["width"], current["height"]) != (before["width"], before["height"])
+            if changed and tuple(window.get_size()) == requested and result["privateSelectionTextMatches"]:
+                return finish()
+        if GLib.get_monotonic_time() - started >= 3500000:
+            return finish()
+        return True
+
+    GLib.timeout_add(100, observe)
     try:
         Gtk.main()
     finally:

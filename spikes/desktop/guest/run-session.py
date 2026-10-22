@@ -140,7 +140,10 @@ def inner(backend,root,restart=False):
         deadline=time.monotonic()+25
         result=None
         while time.monotonic()<deadline:
-            if canary.poll() is not None: return report_unavailable('OWN_NATIVE_CANARY_FAILED')
+            if canary.poll() is not None:
+                progress=native_progress(root) if backend.startswith('kwin') else {}
+                progress.update(canaryExitCode=canary.returncode,compositorExitCode=compositor.poll())
+                return report_unavailable('OWN_NATIVE_CANARY_FAILED',progress)
             result=read_result(result_path)
             if result: break
             time.sleep(0.1)
