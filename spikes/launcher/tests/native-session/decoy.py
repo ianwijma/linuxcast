@@ -3,8 +3,10 @@ import os
 import sys
 import gi
 gi.require_version('Gtk','3.0')
-from gi.repository import Gio, Gtk
+from gi.repository import Gio, GLib
 if os.environ.get('LINUXCAST_S001_PRIVATE_MATRIX')!='1': sys.exit(3)
+GLib.set_prgname('io.github.ianwijma.Linuxcast.S001Decoy')
+from gi.repository import Gtk
 app=Gtk.Application(application_id='io.github.ianwijma.Linuxcast.S001Decoy',flags=Gio.ApplicationFlags.NON_UNIQUE)
 def activate(application):
     window=Gtk.ApplicationWindow(application=application,title='Linuxcast public focus decoy')
