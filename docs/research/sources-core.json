@@ -1,0 +1,474 @@
+[
+  {
+    "id": "core-ray-quickstart",
+    "title": "Raycast quickstart",
+    "url": "https://manual.raycast.com/quickstart",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-search-bar",
+    "title": "Search bar",
+    "url": "https://manual.raycast.com/search-bar",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-action-panel",
+    "title": "Action panel",
+    "url": "https://manual.raycast.com/action-panel",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-file-search",
+    "title": "File search",
+    "url": "https://manual.raycast.com/file-search",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-snippets",
+    "title": "Snippets",
+    "url": "https://manual.raycast.com/snippets",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-quicklinks",
+    "title": "Quicklinks",
+    "url": "https://manual.raycast.com/quicklinks",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-clipboard-history",
+    "title": "Clipboard history",
+    "url": "https://manual.raycast.com/clipboard-history",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-calculator",
+    "title": "Calculator",
+    "url": "https://manual.raycast.com/calculator",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-calendar",
+    "title": "Calendar",
+    "url": "https://manual.raycast.com/calendar",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-notes",
+    "title": "Notes",
+    "url": "https://manual.raycast.com/notes",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-focus",
+    "title": "Focus",
+    "url": "https://manual.raycast.com/focus",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-screenshots",
+    "title": "Screenshots",
+    "url": "https://manual.raycast.com/screenshots",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-translate",
+    "title": "Translate",
+    "url": "https://manual.raycast.com/translate",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-emoji-symbols",
+    "title": "Emoji and symbols",
+    "url": "https://manual.raycast.com/emoji-symbols",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-navigation",
+    "title": "Navigation",
+    "url": "https://manual.raycast.com/navigation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-system-commands",
+    "title": "System commands",
+    "url": "https://manual.raycast.com/system-commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-hyper-key",
+    "title": "Hyper key",
+    "url": "https://manual.raycast.com/hyper-key",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-auto-quit",
+    "title": "Auto quit",
+    "url": "https://manual.raycast.com/auto-quit",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-games",
+    "title": "Games",
+    "url": "https://manual.raycast.com/games",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-themes",
+    "title": "Themes",
+    "url": "https://manual.raycast.com/themes",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-dynamic-placeholders",
+    "title": "Dynamic placeholders",
+    "url": "https://manual.raycast.com/dynamic-placeholders",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-settings",
+    "title": "Settings",
+    "url": "https://manual.raycast.com/settings",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-quick-ai",
+    "title": "Quick AI",
+    "url": "https://manual.raycast.com/ai/quick-ai",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-ai-chat",
+    "title": "AI Chat",
+    "url": "https://manual.raycast.com/ai/ai-chat",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-dictation",
+    "title": "Dictation",
+    "url": "https://manual.raycast.com/ai/dictation",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-screen-awareness",
+    "title": "Screen awareness",
+    "url": "https://manual.raycast.com/ai/screen-awareness",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-ai-commands",
+    "title": "AI commands",
+    "url": "https://manual.raycast.com/ai/ai-commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-ai-extensions",
+    "title": "AI extensions",
+    "url": "https://manual.raycast.com/ai/ai-extensions",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-automations",
+    "title": "Automations",
+    "url": "https://manual.raycast.com/ai/automations",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-agents",
+    "title": "Agents",
+    "url": "https://manual.raycast.com/ai/agents",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-model-context-protocol",
+    "title": "MCP",
+    "url": "https://manual.raycast.com/ai/model-context-protocol",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-skills",
+    "title": "Skills",
+    "url": "https://manual.raycast.com/ai/skills",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-projects",
+    "title": "Projects",
+    "url": "https://manual.raycast.com/ai/projects",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-personalization",
+    "title": "Personalization",
+    "url": "https://manual.raycast.com/ai/personalization",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-local-models",
+    "title": "Local models",
+    "url": "https://manual.raycast.com/ai/local-models",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ai-custom-providers",
+    "title": "Custom providers",
+    "url": "https://manual.raycast.com/ai/custom-providers",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-web",
+    "title": "Raycast website",
+    "url": "https://www.raycast.com/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-store",
+    "title": "Raycast Store",
+    "url": "https://www.raycast.com/store",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-browser",
+    "title": "Raycast browser extension",
+    "url": "https://www.raycast.com/browser-extension",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-sdk",
+    "title": "Raycast SDK",
+    "url": "https://developers.raycast.com/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-script",
+    "title": "Raycast scripts",
+    "url": "https://github.com/raycast/script-commands",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-v2",
+    "title": "Raycast v2",
+    "url": "https://manual.raycast.com/new-in-v2",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-default-results",
+    "title": "Default results",
+    "url": "https://www.alfredapp.com/help/features/default-results/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-file-search",
+    "title": "File search",
+    "url": "https://www.alfredapp.com/help/features/file-search/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-universal-actions",
+    "title": "Universal actions",
+    "url": "https://www.alfredapp.com/help/features/universal-actions/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-web-search",
+    "title": "Web search",
+    "url": "https://www.alfredapp.com/help/features/web-search/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-bookmarks",
+    "title": "Bookmarks",
+    "url": "https://www.alfredapp.com/help/features/bookmarks/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-dictionary",
+    "title": "Dictionary",
+    "url": "https://www.alfredapp.com/help/features/dictionary/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-contacts",
+    "title": "Contacts",
+    "url": "https://www.alfredapp.com/help/features/contacts/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-1password",
+    "title": "1Password integration",
+    "url": "https://www.alfredapp.com/help/features/1password/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-terminal",
+    "title": "Terminal",
+    "url": "https://www.alfredapp.com/help/features/terminal/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-previews",
+    "title": "Previews",
+    "url": "https://www.alfredapp.com/help/features/previews/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-large-type",
+    "title": "Large type",
+    "url": "https://www.alfredapp.com/help/features/large-type/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-workflows",
+    "title": "Alfred workflows",
+    "url": "https://www.alfredapp.com/workflows/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-gallery",
+    "title": "Alfred Gallery",
+    "url": "https://alfred.app/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-v6",
+    "title": "Alfred 6 preview",
+    "url": "https://www.alfredapp.com/v6/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-alf-remote",
+    "title": "Alfred Remote",
+    "url": "https://www.alfredapp.com/remote/",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-1password",
+    "title": "1Password CLI Linux integration",
+    "url": "https://www.1password.dev/cli/get-started",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Research baseline; implementation acceptance remains unverified."
+  },
+  {
+    "id": "core-ray-import-export",
+    "title": "Raycast import/export and scheduled backups",
+    "url": "https://manual.raycast.com/import-export",
+    "accessed": "2026-10-22",
+    "kind": "official-documentation",
+    "notes": "Encrypted portable exports and scheduled backups are documented; Linuxcast uses a native format."
+  }
+]

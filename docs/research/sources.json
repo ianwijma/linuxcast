@@ -1,0 +1,2239 @@
+{
+  "schemaVersion": 1,
+  "snapshot": "2026-10-22",
+  "method": "Official documentation/source research and limited website/client-image visual inspection; no proprietary native runtime execution. Subsystem fragments preserve ownership; multiple records may cite the same URL in different contexts.",
+  "sources": [
+    {
+      "id": "ray-home",
+      "url": "https://www.raycast.com/",
+      "title": "Raycast \u2014 Your shortcut to everything",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Marketing/product and ecosystem entry points; read as web content, not native runtime evidence."
+    },
+    {
+      "id": "ray-quickstart",
+      "url": "https://manual.raycast.com/quickstart",
+      "title": "Raycast Manual \u2014 Quickstart",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current manual navigation and baseline client entry points; source-derived."
+    },
+    {
+      "id": "ray-new-v2",
+      "url": "https://manual.raycast.com/new-in-v2",
+      "title": "Raycast Manual \u2014 New in Raycast v2",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current v2 baseline, renamed Agents/Projects and revised UI/features; do not substitute historical beta pages."
+    },
+    {
+      "id": "ray-search",
+      "url": "https://manual.raycast.com/search-bar",
+      "title": "Raycast Manual \u2014 Search Bar",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Root search, ranking, arguments, contacts, compact mode, favorites and context actions; mixed OS content."
+    },
+    {
+      "id": "ray-actions",
+      "url": "https://manual.raycast.com/action-panel",
+      "title": "Raycast Manual \u2014 Action Panel",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Context actions and keyboard interaction; no runtime timing measurement."
+    },
+    {
+      "id": "ray-hotkeys",
+      "url": "https://manual.raycast.com/command-aliases-and-hotkeys",
+      "title": "Raycast Manual \u2014 Command Aliases & Hotkeys",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Side-specific and modifier gestures, conflict handling and layout semantics; native Linux feasibility separately specified."
+    },
+    {
+      "id": "ray-settings",
+      "url": "https://manual.raycast.com/settings",
+      "title": "Raycast Manual \u2014 Settings",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Settings/search, launcher/input/network configuration; macOS/Windows-specific options distinguished."
+    },
+    {
+      "id": "ray-import-export",
+      "url": "https://manual.raycast.com/import-export",
+      "title": "Raycast Manual \u2014 Import & Export",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Configuration backup and selective restoration; Linuxcast explicitly uses native formats only."
+    },
+    {
+      "id": "ray-snippets",
+      "url": "https://manual.raycast.com/snippets",
+      "title": "Raycast Manual \u2014 Snippets",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Text/rich snippets, keyword expansion and management; no source-format compatibility promised."
+    },
+    {
+      "id": "ray-quicklinks",
+      "url": "https://manual.raycast.com/quicklinks",
+      "title": "Raycast Manual \u2014 Quicklinks",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Links, templates, context creation, tags and actions."
+    },
+    {
+      "id": "ray-clipboard",
+      "url": "https://manual.raycast.com/clipboard-history",
+      "title": "Raycast Manual \u2014 Clipboard History",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "MIME families, OCR/QR, search/actions and retention."
+    },
+    {
+      "id": "ray-notes",
+      "url": "https://manual.raycast.com/notes",
+      "title": "Raycast Manual \u2014 Notes",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Separate note UI and editing/search family; native client not executed."
+    },
+    {
+      "id": "ray-focus",
+      "url": "https://manual.raycast.com/focus",
+      "title": "Raycast Manual \u2014 Focus",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local focus sessions and app/site restrictions; Linux adapters need independent verification."
+    },
+    {
+      "id": "ray-files",
+      "url": "https://manual.raycast.com/file-search",
+      "title": "Raycast Manual \u2014 File Search",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Indexing, root/dedicated search, filters and ignore rules."
+    },
+    {
+      "id": "ray-applications",
+      "url": "https://manual.raycast.com/applications",
+      "title": "Raycast Manual \u2014 Applications",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Launch and app actions; each OS-specific action is not universal."
+    },
+    {
+      "id": "ray-extensions",
+      "url": "https://manual.raycast.com/extensions",
+      "title": "Raycast Manual \u2014 Extensions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Discovery, installation/configuration/update/development lifecycle; not exhaustive inspection of Store packages."
+    },
+    {
+      "id": "ray-translate",
+      "url": "https://manual.raycast.com/translate",
+      "title": "Raycast Manual \u2014 Translate",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Language-pair and selected-text interactions; Linuxcast global-model policy is a deliberate product decision."
+    },
+    {
+      "id": "ray-emoji",
+      "url": "https://manual.raycast.com/emoji-symbols",
+      "title": "Raycast Manual \u2014 Emoji & Symbols",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local Unicode search/grid, history and optional AI assistance."
+    },
+    {
+      "id": "ray-calendar",
+      "url": "https://manual.raycast.com/calendar",
+      "title": "Raycast Manual \u2014 Calendar",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Schedule and meeting actions, macOS personal-data services; external transcription is separate."
+    },
+    {
+      "id": "ray-calculator",
+      "url": "https://manual.raycast.com/calculator",
+      "title": "Raycast Manual \u2014 Calculator",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Arithmetic/unit/date/currency/color families; no calculator implementation reverse engineering."
+    },
+    {
+      "id": "ray-screenshots",
+      "url": "https://manual.raycast.com/screenshots",
+      "title": "Raycast Manual \u2014 Screenshots",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Media index and OCR/filter/paste behavior; acquisition and indexing are distinct."
+    },
+    {
+      "id": "ray-windows",
+      "url": "https://manual.raycast.com/window-management",
+      "title": "Raycast Manual \u2014 Window Management",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Positions/layouts/displays/workspaces; Linux compositor capability work remains required."
+    },
+    {
+      "id": "ray-navigation",
+      "url": "https://manual.raycast.com/navigation",
+      "title": "Raycast Manual \u2014 Navigation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Application menu/window search and accessibility dependencies."
+    },
+    {
+      "id": "ray-hyper",
+      "url": "https://manual.raycast.com/hyper-key",
+      "title": "Raycast Manual \u2014 Hyper Key",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Modifier remapping and tap/device behavior; Linux privileged-input design is independent."
+    },
+    {
+      "id": "ray-placeholders",
+      "url": "https://manual.raycast.com/dynamic-placeholders",
+      "title": "Raycast Manual \u2014 Dynamic Placeholders",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Shared dynamic content families and transformations; native Linuxcast grammar required."
+    },
+    {
+      "id": "ray-system",
+      "url": "https://manual.raycast.com/system-commands",
+      "title": "Raycast Manual \u2014 System Commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Session/audio/display/files/app actions with platform distinctions."
+    },
+    {
+      "id": "ray-scripts",
+      "url": "https://manual.raycast.com/script-commands",
+      "title": "Raycast Manual \u2014 Script Commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Script discovery/metadata/invocation and working directory; no format importer."
+    },
+    {
+      "id": "ray-themes",
+      "url": "https://manual.raycast.com/themes",
+      "title": "Raycast Manual \u2014 Themes",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local theme editor and sharing; sources are reference behavior, not copied assets."
+    },
+    {
+      "id": "ray-autoquit",
+      "url": "https://manual.raycast.com/auto-quit",
+      "title": "Raycast Manual \u2014 Auto Quit",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Per-app inactivity behavior and playback/recording/focus exclusions."
+    },
+    {
+      "id": "ray-run",
+      "url": "https://manual.raycast.com/run",
+      "title": "Raycast Manual \u2014 Run",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Windows-oriented commands/path/URI/history feature; Linux equivalents specified separately."
+    },
+    {
+      "id": "ray-games",
+      "url": "https://manual.raycast.com/games",
+      "title": "Raycast Manual \u2014 Games",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Windows-oriented game discovery and foreground hotkey suppression; no blanket Linux launcher compatibility."
+    },
+    {
+      "id": "ray-ai-index",
+      "url": "https://manual.raycast.com/ai",
+      "title": "Raycast Manual \u2014 AI",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "AI feature-family index for current manual."
+    },
+    {
+      "id": "ray-quick-ai",
+      "url": "https://manual.raycast.com/ai/quick-ai",
+      "title": "Raycast Manual \u2014 Quick AI",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Root entry, followups, attachments and full-chat handoff."
+    },
+    {
+      "id": "ray-ai-chat",
+      "url": "https://manual.raycast.com/ai/ai-chat",
+      "title": "Raycast Manual \u2014 AI Chat",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Persistent conversation lifecycle, queue/steer, history and context management; native runtime not tested."
+    },
+    {
+      "id": "ray-dictation",
+      "url": "https://manual.raycast.com/ai/dictation",
+      "title": "Raycast Manual \u2014 Dictation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Recording/styles/history/vocabulary/device and output behavior; some contextual submission features experimental."
+    },
+    {
+      "id": "ray-screen-awareness",
+      "url": "https://manual.raycast.com/ai/screen-awareness",
+      "title": "Raycast Manual \u2014 Screen Awareness",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Independent context sources and capture inspection; permissions are OS-dependent."
+    },
+    {
+      "id": "ray-ai-commands",
+      "url": "https://manual.raycast.com/ai/ai-commands",
+      "title": "Raycast Manual \u2014 AI Commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Prompt CRUD, context/output modes and Quick Fix billing distinction."
+    },
+    {
+      "id": "ray-ai-extensions",
+      "url": "https://manual.raycast.com/ai/ai-extensions",
+      "title": "Raycast Manual \u2014 AI Extensions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Tools, discovery and permission modes; app-specific tool inventory is not a transferable entitlement."
+    },
+    {
+      "id": "ray-automations",
+      "url": "https://manual.raycast.com/ai/automations",
+      "title": "Raycast Manual \u2014 Automations",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local recurring work, coalescing and conversation state; Linuxcast deletion policy intentionally explicit."
+    },
+    {
+      "id": "ray-agents",
+      "url": "https://manual.raycast.com/ai/agents",
+      "title": "Raycast Manual \u2014 Agents",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current name for Presets and reusable agent configuration; Linuxcast omits per-agent model override."
+    },
+    {
+      "id": "ray-mcp",
+      "url": "https://manual.raycast.com/ai/model-context-protocol",
+      "title": "Raycast Manual \u2014 Model Context Protocol",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Stdio/HTTP/OAuth and server lifecycle; no actual server connected during research."
+    },
+    {
+      "id": "ray-skills",
+      "url": "https://manual.raycast.com/ai/skills",
+      "title": "Raycast Manual \u2014 Skills",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Metadata indexing, on-demand loading, directories and limitations."
+    },
+    {
+      "id": "ray-projects",
+      "url": "https://manual.raycast.com/ai/projects",
+      "title": "Raycast Manual \u2014 Projects",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current grouping/instructions/directory/memory features; formerly folders."
+    },
+    {
+      "id": "ray-personalization",
+      "url": "https://manual.raycast.com/ai/personalization",
+      "title": "Raycast Manual \u2014 Personalization",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Profile, global/project memory and controls; Linuxcast opt-in defaults are design decisions."
+    },
+    {
+      "id": "ray-credits",
+      "url": "https://manual.raycast.com/ai/ai-credits",
+      "title": "Raycast Manual \u2014 AI Credits",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Usage/credit service; no price or fixed quota copied into implementation requirements."
+    },
+    {
+      "id": "ray-local-models",
+      "url": "https://manual.raycast.com/ai/local-models",
+      "title": "Raycast Manual \u2014 Local Models",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Ollama lifecycle and feature limitations; local response does not imply all product processing is local."
+    },
+    {
+      "id": "ray-extension-models",
+      "url": "https://manual.raycast.com/ai/extension-models",
+      "title": "Raycast Manual \u2014 Extension Models",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Provider-extension catalog and setup/caching behavior."
+    },
+    {
+      "id": "ray-provide-models",
+      "url": "https://developers.raycast.com/ai/provide-ai-models",
+      "title": "Raycast Developers \u2014 Provide AI Models",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Model discovery/streaming contract and capability declarations; Linuxcast creates an independent API."
+    },
+    {
+      "id": "ray-custom-providers",
+      "url": "https://manual.raycast.com/ai/custom-providers",
+      "title": "Raycast Manual \u2014 Custom Providers",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Direct compatible endpoints, config watching and tool services; do not copy plaintext-secret storage."
+    },
+    {
+      "id": "ray-byok",
+      "url": "https://manual.raycast.com/ai/bring-your-own-key",
+      "title": "Raycast Manual \u2014 Bring Your Own Key",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Provider-specific routing/catalog/billing behavior; Raycast hosted services distinct."
+    },
+    {
+      "id": "ray-subscriptions",
+      "url": "https://manual.raycast.com/ai/bring-your-own-subscription",
+      "title": "Raycast Manual \u2014 Bring Your Own Subscription",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Raycast original CLI integrations; not evidence of permission transferable to Linuxcast."
+    },
+    {
+      "id": "ray-privacy",
+      "url": "https://manual.raycast.com/ai/raycast-ai-privacy-security",
+      "title": "Raycast Manual \u2014 AI Privacy & Security",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Feature-specific context/storage/processing and service boundaries; source policy not a Linuxcast guarantee."
+    },
+    {
+      "id": "ray-browser",
+      "url": "https://www.raycast.com/browser-extension",
+      "title": "Raycast \u2014 Browser Extension",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Browser page context and supported browser marketing; no extension installed or traffic tested."
+    },
+    {
+      "id": "ray-store",
+      "url": "https://www.raycast.com/store",
+      "title": "Raycast Store",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Discovery and extension ecosystem web surface; dynamic catalog not exhaustively enumerated."
+    },
+    {
+      "id": "ray-store-linear",
+      "url": "https://www.raycast.com/linear/linear",
+      "title": "Raycast Store \u2014 Linear",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Representative extension-detail surface; no integration account or commands exercised."
+    },
+    {
+      "id": "ray-account",
+      "url": "https://manual.raycast.com/account-management",
+      "title": "Raycast Manual \u2014 Account Management",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Identity/profile/organization and creator-account functionality."
+    },
+    {
+      "id": "ray-billing",
+      "url": "https://manual.raycast.com/billing",
+      "title": "Raycast Manual \u2014 Billing",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Billing/account lifecycle; prices intentionally not fixed in plan."
+    },
+    {
+      "id": "ray-cloud",
+      "url": "https://manual.raycast.com/cloud-sync",
+      "title": "Raycast Manual \u2014 Cloud Sync",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current beta label, category/device/exclusion controls; encryption claims do not establish E2EE."
+    },
+    {
+      "id": "ray-team-sharing",
+      "url": "https://manual.raycast.com/teams/shared-features",
+      "title": "Raycast Manual \u2014 Shared Features",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Shared content and private extensions; shared Skills marked coming soon."
+    },
+    {
+      "id": "ray-team-roles",
+      "url": "https://manual.raycast.com/teams/roles-and-permissions",
+      "title": "Raycast Manual \u2014 Roles & Permissions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Organization role distinctions; cloud/teams deferred."
+    },
+    {
+      "id": "ray-enterprise",
+      "url": "https://manual.raycast.com/enterprise",
+      "title": "Raycast Manual \u2014 Enterprise",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "SSO/provisioning/device/data/provider policy families; current platform limitations require release-time review."
+    },
+    {
+      "id": "ray-teams-v1",
+      "url": "https://manual.raycast.com/v1/getting-started-with-teams",
+      "title": "Raycast Manual v1 \u2014 Getting Started with Teams",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Historical redirect encountered; retained as version warning, not current feature authority."
+    },
+    {
+      "id": "ai-openrouter-quickstart",
+      "url": "https://openrouter.ai/docs/quickstart",
+      "title": "OpenRouter \u2014 Quickstart",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Required direct API and catalog integration; models and terms remain live."
+    },
+    {
+      "id": "ai-openrouter-auth",
+      "url": "https://openrouter.ai/docs/api_reference/authentication",
+      "title": "OpenRouter \u2014 Authentication",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "API-key ownership and bearer authentication."
+    },
+    {
+      "id": "ai-openrouter-routing",
+      "url": "https://openrouter.ai/docs/guides/routing/provider-selection",
+      "title": "OpenRouter \u2014 Provider Selection",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Upstream routing is distinct from Linuxcast global model selection."
+    },
+    {
+      "id": "ai-openai-text",
+      "url": "https://developers.openai.com/api/docs/guides/text",
+      "title": "OpenAI API \u2014 Text generation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official Responses integration overview; API reference fetch separately exceeded tool content size."
+    },
+    {
+      "id": "ai-openai-responses",
+      "url": "https://platform.openai.com/docs/api-reference/responses",
+      "title": "OpenAI API \u2014 Responses reference",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Fetch attempted but content-size limit prevented full extraction; supplementary reference, not sole evidence."
+    },
+    {
+      "id": "ai-siwc-quickstart",
+      "url": "https://developers.openai.com/siwc/quickstart",
+      "title": "OpenAI \u2014 Sign in with ChatGPT quickstart",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official plan-backed integration; open-source eligibility is not automatic account entitlement."
+    },
+    {
+      "id": "ai-siwc-signin",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/sign-in",
+      "title": "OpenAI \u2014 SIWC registration and sign-in",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Dynamic bootstrap/issued client ID, stable host identifier, loopback PKCE, identity versus inference scopes."
+    },
+    {
+      "id": "ai-siwc-sessions",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions",
+      "title": "OpenAI \u2014 SIWC profiles and sessions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Secure session persistence, refresh serialization and revocation."
+    },
+    {
+      "id": "ai-siwc-models",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference",
+      "title": "OpenAI \u2014 SIWC models and inference",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Public account catalog and Responses, explicit history, streaming and terminal status."
+    },
+    {
+      "id": "ai-siwc-limitations",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations",
+      "title": "OpenAI \u2014 SIWC preview limitations",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Dedicated supported-field/tool profile; cannot assume all API capabilities."
+    },
+    {
+      "id": "ai-siwc-errors",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery",
+      "title": "OpenAI \u2014 SIWC errors and recovery",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Eligibility/quota/unavailability separation and transparent recovery."
+    },
+    {
+      "id": "ai-siwc-codex",
+      "url": "https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server",
+      "title": "OpenAI \u2014 SIWC with Codex app-server",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official public Responses provider config, child-only credential and restart/resume lifecycle."
+    },
+    {
+      "id": "ai-codex-platform",
+      "url": "https://developers.openai.com/blog/codex-as-a-platform",
+      "title": "OpenAI \u2014 Codex as a platform",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "CLI/SDK/app-server role distinction; official product source."
+    },
+    {
+      "id": "ai-codex-app-server",
+      "url": "https://learn.chatgpt.com/docs/app-server",
+      "title": "OpenAI \u2014 Codex app-server",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Current destination reached from developers.openai.com/codex/app-server; stdio lifecycle/schema must be version pinned."
+    },
+    {
+      "id": "ai-claude-sdk",
+      "url": "https://code.claude.com/docs/en/agent-sdk/overview",
+      "title": "Anthropic \u2014 Agent SDK overview",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "SDK capabilities and prohibition on third-party claude.ai login absent approval; distinguish unmodified CLI path."
+    },
+    {
+      "id": "ai-claude-sdk-start",
+      "url": "https://code.claude.com/docs/en/agent-sdk/quickstart",
+      "title": "Anthropic \u2014 Agent SDK quickstart",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "API/cloud auth and native binary packaging; no consumer-token extraction."
+    },
+    {
+      "id": "ai-claude-legal",
+      "url": "https://code.claude.com/docs/en/legal-and-compliance",
+      "title": "Anthropic \u2014 Legal and compliance",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Unmodified Claude Code product integration conditions and end-user auth/billing; release-time terms review required."
+    },
+    {
+      "id": "ai-copilot-auth",
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/auth/authenticate",
+      "title": "GitHub \u2014 Copilot SDK authentication",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official CLI/user/OAuth routes and credential support; explicitly selected identity."
+    },
+    {
+      "id": "ai-copilot-byok",
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/auth/byok",
+      "title": "GitHub \u2014 Copilot SDK BYOK",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Provider-key route distinct from Copilot subscription entitlement."
+    },
+    {
+      "id": "ai-copilot-setup",
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/setup",
+      "title": "GitHub \u2014 Copilot SDK setup",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "SDK/CLI dependency and runtime setup."
+    },
+    {
+      "id": "ai-gemini-faq",
+      "url": "https://geminicli.com/docs/resources/faq/",
+      "title": "Google \u2014 Gemini CLI FAQ",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Third-party OAuth harvesting/piggyback restrictions; headless interface is not blanket authorization."
+    },
+    {
+      "id": "ai-gemini-quota",
+      "url": "https://geminicli.com/docs/resources/quota-and-pricing/",
+      "title": "Google \u2014 Gemini CLI quota and pricing",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "CLI free/paid quota distinctions; not transferable API entitlement."
+    },
+    {
+      "id": "ai-gemini-headless",
+      "url": "https://geminicli.com/docs/cli/headless/",
+      "title": "Google \u2014 Gemini CLI headless mode",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Structured execution/output capabilities; auth/terms remain separate."
+    },
+    {
+      "id": "ai-gemini-auth",
+      "url": "https://geminicli.com/docs/get-started/authentication/",
+      "title": "Google \u2014 Gemini CLI authentication",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "CLI sign-in, API-key and supported cloud routes."
+    },
+    {
+      "id": "ai-gemini-api",
+      "url": "https://ai.google.dev/gemini-api/docs/api-key",
+      "title": "Google \u2014 Gemini API keys",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Direct Gemini API credential route; account/subscription login not equivalent."
+    },
+    {
+      "id": "ai-ollama",
+      "url": "https://docs.ollama.com/api/openai-compatibility",
+      "title": "Ollama \u2014 OpenAI compatibility",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local compatible subset and distinct remote/cloud endpoints; capabilities require testing."
+    },
+    {
+      "id": "ai-groq",
+      "url": "https://console.groq.com/docs/openai",
+      "title": "Groq \u2014 OpenAI compatibility",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Compatible-provider preset source; no assumption of complete API parity."
+    },
+    {
+      "id": "ai-together",
+      "url": "https://docs.together.ai/docs/inference/openai-compatibility",
+      "title": "Together AI \u2014 OpenAI compatibility",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Compatible-provider preset source; separate key/billing."
+    },
+    {
+      "id": "ai-deepseek",
+      "url": "https://api-docs.deepseek.com/",
+      "title": "DeepSeek \u2014 API documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Compatible endpoint/provider source; model IDs are live data."
+    },
+    {
+      "id": "ai-mistral",
+      "url": "https://docs.mistral.ai/studio",
+      "title": "Mistral \u2014 Studio documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Additional direct provider option; do not infer consumer subscription API access."
+    },
+    {
+      "id": "ai-electron-secrets",
+      "url": "https://www.electronjs.org/docs/latest/api/safe-storage",
+      "title": "Electron \u2014 safeStorage",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Linux backend security and insecure basic_text fallback; pin API behavior to shipped Electron version."
+    },
+    {
+      "id": "alf-home",
+      "url": "https://www.alfredapp.com/",
+      "title": "Alfred homepage",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Homepage advertised Alfred 5.8.1 build 2349 and separately promoted Alfred 6 preview; dated observation, not an installed-runtime check."
+    },
+    {
+      "id": "alf-preview",
+      "url": "https://www.alfredapp.com/v6/",
+      "title": "Alfred 6 preview",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Preview-only evidence: native UI toolkit, optional BYOK AI, refreshed preferences and other announced improvements; not a stable SDK contract."
+    },
+    {
+      "id": "alf-workflows-site",
+      "url": "https://www.alfredapp.com/workflows/",
+      "title": "Alfred Workflows product page",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Visual workflows, Gallery and community distribution."
+    },
+    {
+      "id": "alf-features",
+      "url": "https://www.alfredapp.com/help/features/",
+      "title": "Alfred feature documentation index",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Index of stable documented core client features."
+    },
+    {
+      "id": "alf-default-results",
+      "url": "https://www.alfredapp.com/help/features/default-results/",
+      "title": "Default Results",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Search types/scopes/fallbacks and application matching."
+    },
+    {
+      "id": "alf-file-search",
+      "url": "https://www.alfredapp.com/help/features/file-search/",
+      "title": "File Search",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Filename/content search, browsing, file buffer, sorting and recent documents."
+    },
+    {
+      "id": "alf-universal-actions",
+      "url": "https://www.alfredapp.com/help/features/universal-actions/",
+      "title": "Universal Actions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Typed actions over selected files, URLs and text, including workflow contributions."
+    },
+    {
+      "id": "alf-web-search",
+      "url": "https://www.alfredapp.com/help/features/web-search/",
+      "title": "Web Search",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Built-in/custom searches, URL encoding, discovery and optional URL history."
+    },
+    {
+      "id": "alf-bookmarks",
+      "url": "https://www.alfredapp.com/help/features/bookmarks/",
+      "title": "Browser Bookmarks",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Safari/Chrome bookmarks and source/default browser behavior; Mac-specific support does not establish Linux capability."
+    },
+    {
+      "id": "alf-clipboard",
+      "url": "https://www.alfredapp.com/help/features/clipboard/",
+      "title": "Clipboard History",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Types, opt-in history, retention, merging, snippet creation, excluded apps and concealed-data behavior."
+    },
+    {
+      "id": "alf-snippets",
+      "url": "https://www.alfredapp.com/help/features/snippets/",
+      "title": "Snippets and Text Expansion",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Plain/rich text, collections, affixes, search and expansion; secure-field claim is specific to Alfred/macOS."
+    },
+    {
+      "id": "alf-snippet-expansion",
+      "url": "https://www.alfredapp.com/help/features/snippets/auto-expansion/",
+      "title": "Setting Up Text Auto-Expansion",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Enablement, keyword suggestions and secure-text-field behavior as documented for macOS."
+    },
+    {
+      "id": "alf-snippet-advanced",
+      "url": "https://www.alfredapp.com/help/features/snippets/advanced/",
+      "title": "Advanced Snippet Expansion Preferences",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "App exclusions, matching within strings, key-event timing and clipboard restore controls."
+    },
+    {
+      "id": "alf-placeholders",
+      "url": "https://www.alfredapp.com/help/workflows/advanced/placeholders/",
+      "title": "Dynamic Placeholders",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Dynamic data/date/time/clipboard formatting and placeholders; Linuxcast uses native parsing rules."
+    },
+    {
+      "id": "alf-calculator",
+      "url": "https://www.alfredapp.com/help/features/calculator/",
+      "title": "Calculator",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Inline/chained arithmetic, advanced functions, locale formatting."
+    },
+    {
+      "id": "alf-dictionary",
+      "url": "https://www.alfredapp.com/help/features/dictionary/",
+      "title": "Dictionary",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Definition/spelling/dictionary choice and Dictionary.app thesaurus integration."
+    },
+    {
+      "id": "alf-contacts",
+      "url": "https://www.alfredapp.com/help/features/contacts/",
+      "title": "Contacts and Email",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Search, inline cards, contact-field actions and supported email composition adapters."
+    },
+    {
+      "id": "alf-music",
+      "url": "https://www.alfredapp.com/help/features/itunes/",
+      "title": "Music Mini Player",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Music.app library, playback, ratings, random albums, artwork and indexing."
+    },
+    {
+      "id": "alf-passwords",
+      "url": "https://www.alfredapp.com/help/features/1password/",
+      "title": "1Password Integration",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Distinguishes legacy bookmark integration and 1Password 8 workflow; legacy support is not password extraction."
+    },
+    {
+      "id": "alf-system",
+      "url": "https://www.alfredapp.com/help/features/system/",
+      "title": "System Commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Power/session, apps, trash, volume and eject behavior."
+    },
+    {
+      "id": "alf-terminal",
+      "url": "https://www.alfredapp.com/help/features/terminal/",
+      "title": "Terminal and Shell",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Explicit terminal mode and customizable terminal integration."
+    },
+    {
+      "id": "alf-previews",
+      "url": "https://www.alfredapp.com/help/features/previews/",
+      "title": "Previews and QuickLook",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Inline and larger file previews; native Linuxcast preview is independent."
+    },
+    {
+      "id": "alf-large-type",
+      "url": "https://www.alfredapp.com/help/features/large-type/",
+      "title": "Large Type",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Oversized text display and appearance."
+    },
+    {
+      "id": "alf-appearance",
+      "url": "https://www.alfredapp.com/help/appearance/",
+      "title": "Appearance and Theming",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Theme editing, import/export, dimensions, colors, fonts and display placement."
+    },
+    {
+      "id": "alf-advanced",
+      "url": "https://www.alfredapp.com/help/advanced/",
+      "title": "Advanced Preferences",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Query history, input source, modifiers, indexing maintenance and syncing references."
+    },
+    {
+      "id": "alf-sync",
+      "url": "https://www.alfredapp.com/help/advanced/sync/",
+      "title": "Syncing Your Alfred Settings Between Macs",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Preferences syncing/backup and machine-specific settings; Linuxcast cloud sync deferred."
+    },
+    {
+      "id": "alf-usage",
+      "url": "https://www.alfredapp.com/help/usage/",
+      "title": "Usage",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Feature totals and recent usage graph."
+    },
+    {
+      "id": "alf-remote",
+      "url": "https://www.alfredapp.com/remote/",
+      "title": "Alfred Remote",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Separate iOS companion/local-network product, outside initial Debian client platform scope."
+    },
+    {
+      "id": "alf-gallery",
+      "url": "https://alfred.app/",
+      "title": "Alfred Gallery",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official workflow discovery and categories; open-ended third-party catalogue not fully ported by capability support."
+    },
+    {
+      "id": "alf-workflow-overview",
+      "url": "https://www.alfredapp.com/help/workflows/",
+      "title": "Workflows Help",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Seven object categories, editor, install/export and advanced topic index."
+    },
+    {
+      "id": "alf-triggers",
+      "url": "https://www.alfredapp.com/help/workflows/triggers/",
+      "title": "Workflow Triggers",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "All documented trigger object types."
+    },
+    {
+      "id": "alf-inputs",
+      "url": "https://www.alfredapp.com/help/workflows/inputs/",
+      "title": "Workflow Inputs",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Keyword, file/running-app/dictionary/list/script filter input categories."
+    },
+    {
+      "id": "alf-actions",
+      "url": "https://www.alfredapp.com/help/workflows/actions/",
+      "title": "Workflow Actions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "File/app/URL/terminal/script actions and moved automation categories."
+    },
+    {
+      "id": "alf-automations",
+      "url": "https://www.alfredapp.com/help/workflows/automations/",
+      "title": "Automation Objects",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Automation task, Shortcuts, system and music objects."
+    },
+    {
+      "id": "alf-automation-task",
+      "url": "https://www.alfredapp.com/help/workflows/automations/automation-task/",
+      "title": "Automation Tasks",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "No-code task chaining, task installation/update and configuration state."
+    },
+    {
+      "id": "alf-automation-list",
+      "url": "https://www.alfredapp.com/help/workflows/automations/automation-task/list/",
+      "title": "Automation Tasks List",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Dated operation-family inventory, including platform-specific Apple/browser tasks; not an immutable API."
+    },
+    {
+      "id": "alf-ui",
+      "url": "https://www.alfredapp.com/help/workflows/user-interface/",
+      "title": "Workflow User Interface",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Stable documented Grid, Image, Text and PDF View objects."
+    },
+    {
+      "id": "alf-utilities",
+      "url": "https://www.alfredapp.com/help/workflows/utilities/",
+      "title": "Workflow Utilities",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Arguments/variables, branching, data transforms, delay, JSON configuration and debug object categories."
+    },
+    {
+      "id": "alf-outputs",
+      "url": "https://www.alfredapp.com/help/workflows/outputs/",
+      "title": "Workflow Outputs",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Notifications, large type, clipboard, files, audio, speech, keys and external calls."
+    },
+    {
+      "id": "alf-script-filter",
+      "url": "https://www.alfredapp.com/help/workflows/inputs/script-filter/",
+      "title": "Script Filter Input",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Argument modes, debounce/queue/cancel behavior, trim settings and host filtering."
+    },
+    {
+      "id": "alf-script-filter-json",
+      "url": "https://www.alfredapp.com/help/workflows/inputs/script-filter/json/",
+      "title": "Script Filter JSON Format",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Result identities, arguments, actions, modifiers, metadata, variables, caching and reruns; not Linuxcast's schema."
+    },
+    {
+      "id": "alf-run-script",
+      "url": "https://www.alfredapp.com/help/workflows/actions/run-script/",
+      "title": "Run Script Action",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Argv recommendation, external interpreters and sequential/concurrent execution."
+    },
+    {
+      "id": "alf-variables",
+      "url": "https://www.alfredapp.com/help/workflows/advanced/variables/",
+      "title": "Using Variables in Workflows",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Dynamic/static workflow variables and script environment distinction."
+    },
+    {
+      "id": "alf-script-environment",
+      "url": "https://www.alfredapp.com/help/workflows/script-environment-variables/",
+      "title": "Workflow Script Environment Variables",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Workflow data/cache/environment values provided to scripts."
+    },
+    {
+      "id": "alf-alternative-actions",
+      "url": "https://www.alfredapp.com/help/workflows/advanced/alternative-actions/",
+      "title": "Using Alternative Actions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Modifier routes and retaining launcher window between inputs."
+    },
+    {
+      "id": "alf-sharing",
+      "url": "https://www.alfredapp.com/help/workflows/advanced/sharing-workflows/",
+      "title": "Exporting and Sharing Workflows",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Bundle identity, version/about/configuration, notes and .alfredworkflow export; archive internals unverified."
+    },
+    {
+      "id": "alf-snippet-trigger",
+      "url": "https://www.alfredapp.com/help/workflows/triggers/snippet/",
+      "title": "Snippet Trigger",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Prefix/suffix, app scoping, precedence and stripping automatic bindings on import."
+    },
+    {
+      "id": "sdk-raycast-api",
+      "url": "https://developers.raycast.com/api-reference",
+      "title": "Raycast Extension API Reference",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Capability comparison only: native Linuxcast ViewModel/SDK is independently specified."
+    },
+    {
+      "id": "sdk-raycast-manifest",
+      "url": "https://developers.raycast.com/information/manifest",
+      "title": "Raycast Extension Manifest",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Reference command/preferences/tool/background/AI contribution surfaces; no manifest compatibility."
+    },
+    {
+      "id": "sdk-react-flow",
+      "url": "https://reactflow.dev/learn",
+      "title": "React Flow Quick Start",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Official controlled node/edge UI documentation; canvas library does not define workflow execution semantics."
+    },
+    {
+      "id": "sdk-bubblewrap",
+      "url": "https://github.com/containers/bubblewrap",
+      "title": "Bubblewrap upstream source and README",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Namespace/mount sandbox building block; caller must define policy and avoid dangerous host sockets."
+    },
+    {
+      "id": "sdk-wayland-text",
+      "url": "https://cgit.freedesktop.org/wayland/wayland-protocols/tree/unstable/text-input/text-input-unstable-v3.xml",
+      "title": "Wayland text-input protocol source",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Primary protocol source distinguishes preedit/commit, focus state and sensitive/password hints; availability is not universal."
+    },
+    {
+      "id": "sdk-wayland-data",
+      "url": "https://wayland.freedesktop.org/docs/html/apa.html#protocol-spec-wl_data_source",
+      "title": "Wayland data-transfer protocol",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Clipboard transfer/ownership is asynchronous; data-source send is not confirmation of insertion into intended field."
+    },
+    {
+      "id": "sdk-xkb-compose",
+      "url": "https://xkbcommon.org/doc/current/group__compose.html",
+      "title": "libxkbcommon Compose and dead-keys",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Compose states and cancellation/locale behavior; raw key reconstruction does not establish universal IME committed text."
+    },
+    {
+      "id": "core-ray-quickstart",
+      "title": "Raycast quickstart",
+      "url": "https://manual.raycast.com/quickstart",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-search-bar",
+      "title": "Search bar",
+      "url": "https://manual.raycast.com/search-bar",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-action-panel",
+      "title": "Action panel",
+      "url": "https://manual.raycast.com/action-panel",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-file-search",
+      "title": "File search",
+      "url": "https://manual.raycast.com/file-search",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-snippets",
+      "title": "Snippets",
+      "url": "https://manual.raycast.com/snippets",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-quicklinks",
+      "title": "Quicklinks",
+      "url": "https://manual.raycast.com/quicklinks",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-clipboard-history",
+      "title": "Clipboard history",
+      "url": "https://manual.raycast.com/clipboard-history",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-calculator",
+      "title": "Calculator",
+      "url": "https://manual.raycast.com/calculator",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-calendar",
+      "title": "Calendar",
+      "url": "https://manual.raycast.com/calendar",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-notes",
+      "title": "Notes",
+      "url": "https://manual.raycast.com/notes",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-focus",
+      "title": "Focus",
+      "url": "https://manual.raycast.com/focus",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-screenshots",
+      "title": "Screenshots",
+      "url": "https://manual.raycast.com/screenshots",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-translate",
+      "title": "Translate",
+      "url": "https://manual.raycast.com/translate",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-emoji-symbols",
+      "title": "Emoji and symbols",
+      "url": "https://manual.raycast.com/emoji-symbols",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-navigation",
+      "title": "Navigation",
+      "url": "https://manual.raycast.com/navigation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-system-commands",
+      "title": "System commands",
+      "url": "https://manual.raycast.com/system-commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-hyper-key",
+      "title": "Hyper key",
+      "url": "https://manual.raycast.com/hyper-key",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-auto-quit",
+      "title": "Auto quit",
+      "url": "https://manual.raycast.com/auto-quit",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-games",
+      "title": "Games",
+      "url": "https://manual.raycast.com/games",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-themes",
+      "title": "Themes",
+      "url": "https://manual.raycast.com/themes",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-dynamic-placeholders",
+      "title": "Dynamic placeholders",
+      "url": "https://manual.raycast.com/dynamic-placeholders",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-settings",
+      "title": "Settings",
+      "url": "https://manual.raycast.com/settings",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-quick-ai",
+      "title": "Quick AI",
+      "url": "https://manual.raycast.com/ai/quick-ai",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-ai-chat",
+      "title": "AI Chat",
+      "url": "https://manual.raycast.com/ai/ai-chat",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-dictation",
+      "title": "Dictation",
+      "url": "https://manual.raycast.com/ai/dictation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-screen-awareness",
+      "title": "Screen awareness",
+      "url": "https://manual.raycast.com/ai/screen-awareness",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-ai-commands",
+      "title": "AI commands",
+      "url": "https://manual.raycast.com/ai/ai-commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-ai-extensions",
+      "title": "AI extensions",
+      "url": "https://manual.raycast.com/ai/ai-extensions",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-automations",
+      "title": "Automations",
+      "url": "https://manual.raycast.com/ai/automations",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-agents",
+      "title": "Agents",
+      "url": "https://manual.raycast.com/ai/agents",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-model-context-protocol",
+      "title": "MCP",
+      "url": "https://manual.raycast.com/ai/model-context-protocol",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-skills",
+      "title": "Skills",
+      "url": "https://manual.raycast.com/ai/skills",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-projects",
+      "title": "Projects",
+      "url": "https://manual.raycast.com/ai/projects",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-personalization",
+      "title": "Personalization",
+      "url": "https://manual.raycast.com/ai/personalization",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-local-models",
+      "title": "Local models",
+      "url": "https://manual.raycast.com/ai/local-models",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ai-custom-providers",
+      "title": "Custom providers",
+      "url": "https://manual.raycast.com/ai/custom-providers",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-web",
+      "title": "Raycast website",
+      "url": "https://www.raycast.com/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-store",
+      "title": "Raycast Store",
+      "url": "https://www.raycast.com/store",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-browser",
+      "title": "Raycast browser extension",
+      "url": "https://www.raycast.com/browser-extension",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-sdk",
+      "title": "Raycast SDK",
+      "url": "https://developers.raycast.com/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-script",
+      "title": "Raycast scripts",
+      "url": "https://github.com/raycast/script-commands",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-v2",
+      "title": "Raycast v2",
+      "url": "https://manual.raycast.com/new-in-v2",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-default-results",
+      "title": "Default results",
+      "url": "https://www.alfredapp.com/help/features/default-results/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-file-search",
+      "title": "File search",
+      "url": "https://www.alfredapp.com/help/features/file-search/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-universal-actions",
+      "title": "Universal actions",
+      "url": "https://www.alfredapp.com/help/features/universal-actions/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-web-search",
+      "title": "Web search",
+      "url": "https://www.alfredapp.com/help/features/web-search/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-bookmarks",
+      "title": "Bookmarks",
+      "url": "https://www.alfredapp.com/help/features/bookmarks/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-dictionary",
+      "title": "Dictionary",
+      "url": "https://www.alfredapp.com/help/features/dictionary/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-contacts",
+      "title": "Contacts",
+      "url": "https://www.alfredapp.com/help/features/contacts/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-1password",
+      "title": "1Password integration",
+      "url": "https://www.alfredapp.com/help/features/1password/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-terminal",
+      "title": "Terminal",
+      "url": "https://www.alfredapp.com/help/features/terminal/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-previews",
+      "title": "Previews",
+      "url": "https://www.alfredapp.com/help/features/previews/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-large-type",
+      "title": "Large type",
+      "url": "https://www.alfredapp.com/help/features/large-type/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-workflows",
+      "title": "Alfred workflows",
+      "url": "https://www.alfredapp.com/workflows/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-gallery",
+      "title": "Alfred Gallery",
+      "url": "https://alfred.app/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-v6",
+      "title": "Alfred 6 preview",
+      "url": "https://www.alfredapp.com/v6/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-alf-remote",
+      "title": "Alfred Remote",
+      "url": "https://www.alfredapp.com/remote/",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-1password",
+      "title": "1Password CLI Linux integration",
+      "url": "https://www.1password.dev/cli/get-started",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research baseline; implementation acceptance remains unverified."
+    },
+    {
+      "id": "core-ray-import-export",
+      "title": "Raycast import/export and scheduled backups",
+      "url": "https://manual.raycast.com/import-export",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Encrypted portable exports and scheduled backups are documented; Linuxcast uses a native format."
+    },
+    {
+      "id": "lin-debian-13-announcement",
+      "url": "https://www.debian.org/News/2025/20250809",
+      "title": "Debian 13 trixie released",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Distribution baseline: GNOME 48 and KDE Plasma 6.3. This does not prove Linuxcast integration works."
+    },
+    {
+      "id": "lin-debian-trixie",
+      "url": "https://www.debian.org/releases/trixie/",
+      "title": "Debian trixie release information",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Supported distribution baseline and release documentation."
+    },
+    {
+      "id": "lin-package-portal-gnome",
+      "url": "https://packages.debian.org/trixie/xdg-desktop-portal-gnome",
+      "title": "Debian trixie xdg-desktop-portal-gnome package",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Observed version 48.0-2 used to bound GNOME portal API assumptions; security updates remain supported."
+    },
+    {
+      "id": "lin-package-portal-kde",
+      "url": "https://packages.debian.org/trixie/xdg-desktop-portal-kde",
+      "title": "Debian trixie xdg-desktop-portal-kde package",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Observed version 6.3.5-1 used to bound Plasma portal API assumptions."
+    },
+    {
+      "id": "lin-package-kwin",
+      "url": "https://packages.debian.org/trixie/kwin-wayland",
+      "title": "Debian trixie kwin-wayland package",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Observed version 4:6.3.6-1; inspect versioned KWin source rather than assuming newest Wayland protocols."
+    },
+    {
+      "id": "lin-package-libei",
+      "url": "https://packages.debian.org/trixie/libei1",
+      "title": "Debian trixie libei1 package",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Observed version 1.3.901-1 informs portal input-emulation build/test baseline."
+    },
+    {
+      "id": "lin-package-bubblewrap",
+      "url": "https://packages.debian.org/trixie/bubblewrap",
+      "title": "Debian trixie bubblewrap package",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Observed version 0.12.0-1~deb13u1; runtime namespace/resource profile still needs validation."
+    },
+    {
+      "id": "arch-electron-releases",
+      "url": "https://releases.electronjs.org/?channel=stable",
+      "title": "Electron stable releases",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Research snapshot identifies Electron 45.0.0 release on 2026-10-20; selected initial baseline, not an indefinite version pin."
+    },
+    {
+      "id": "arch-electron-policy",
+      "url": "https://www.electronjs.org/docs/latest/tutorial/electron-timelines",
+      "title": "Electron versioning and release timelines",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Latest three stable major versions are supported; plan requires ongoing supported-major/security updates."
+    },
+    {
+      "id": "lin-electron-global-shortcut",
+      "url": "https://www.electronjs.org/docs/latest/api/global-shortcut/",
+      "title": "Electron globalShortcut API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Portal shortcut support and registration behavior; desktop identity and runtime failure/conflicts require validation."
+    },
+    {
+      "id": "arch-electron-security",
+      "url": "https://www.electronjs.org/docs/latest/tutorial/security/",
+      "title": "Electron security checklist",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Context isolation, sandboxing, IPC sender validation, navigation and external-content controls."
+    },
+    {
+      "id": "arch-electron-sandbox",
+      "url": "https://www.electronjs.org/docs/latest/tutorial/sandbox",
+      "title": "Electron process sandboxing",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Renderer sandbox boundary; not a substitute for the separate untrusted Node extension sandbox."
+    },
+    {
+      "id": "arch-electron-browser-window",
+      "url": "https://github.com/electron/electron/blob/main/docs/api/browser-window.md",
+      "title": "Electron BrowserWindow API source documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Wayland limitations on ordinary client positioning, focus and related window control; companion capabilities require testing."
+    },
+    {
+      "id": "arch-electron-safe-storage",
+      "url": "https://github.com/electron/electron/blob/main/docs/api/safe-storage.md",
+      "title": "Electron safeStorage API source documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Linux backend selection and basic_text fallback; persistent secrets must require an OS-backed backend."
+    },
+    {
+      "id": "arch-electron-utility-process",
+      "url": "https://github.com/electron/electron/blob/main/docs/api/utility-process.md",
+      "title": "Electron utilityProcess API source documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Trusted background process mechanism for storage and workflow execution; not the untrusted plugin boundary."
+    },
+    {
+      "id": "arch-electron-rebuild",
+      "url": "https://github.com/electron/rebuild",
+      "title": "Electron rebuild",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Rebuild trusted native SQLite addon for the exact packaged Electron ABI."
+    },
+    {
+      "id": "arch-electron-updater",
+      "url": "https://www.electronjs.org/docs/latest/api/auto-updater/",
+      "title": "Electron autoUpdater API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "No built-in Linux auto-updating support; initial releases use normal Debian package installation."
+    },
+    {
+      "id": "arch-forge-deb",
+      "url": "https://www.electronforge.io/config/makers/deb",
+      "title": "Electron Forge Debian maker",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Selected .deb packaging mechanism; native/system integration files and disabled service require package tests."
+    },
+    {
+      "id": "arch-forge-vite",
+      "url": "https://www.electronforge.io/config/plugins/vite",
+      "title": "Electron Forge Vite plugin",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Plugin documented as experimental; plan selects explicit Vite/esbuild build before Forge packaging."
+    },
+    {
+      "id": "arch-react-flow",
+      "url": "https://reactflow.dev/learn",
+      "title": "React Flow documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Visual graph editing foundation; graph execution semantics and accessibility of custom nodes remain Linuxcast responsibilities."
+    },
+    {
+      "id": "arch-playwright-electron",
+      "url": "https://playwright.dev/docs/api/class-electronapplication",
+      "title": "Playwright ElectronApplication API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Electron UI/process test support; does not replace real compositor/input-device validation."
+    },
+    {
+      "id": "arch-sqlite-fts5",
+      "url": "https://www.sqlite.org/fts5.html",
+      "title": "SQLite FTS5 extension",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local full-text candidate retrieval; ranking and source-content preservation are application design decisions."
+    },
+    {
+      "id": "arch-node-permissions",
+      "url": "https://github.com/nodejs/node/blob/main/doc/api/permissions.md",
+      "title": "Node.js permission-model documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Defense-in-depth permission controls; not treated as the untrusted extension security boundary."
+    },
+    {
+      "id": "arch-bubblewrap",
+      "url": "https://github.com/containers/bubblewrap",
+      "title": "Bubblewrap source and documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Namespace/mount sandbox construction primitives; Linuxcast must define policy and fail closed if required isolation cannot be applied."
+    },
+    {
+      "id": "lin-gnome-48-developers",
+      "url": "https://release.gnome.org/48/developers/",
+      "title": "GNOME 48 developer release notes",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "GNOME 48 global-shortcut portal support and desktop generation context."
+    },
+    {
+      "id": "lin-portal-global-shortcuts",
+      "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.GlobalShortcuts.html",
+      "title": "XDG GlobalShortcuts portal",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Session-based global shortcut registration/permission protocol."
+    },
+    {
+      "id": "lin-portal-clipboard",
+      "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Clipboard.html",
+      "title": "XDG Clipboard portal",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Clipboard support extends RemoteDesktop/InputCapture sessions; not a universal clipboard-history permission API."
+    },
+    {
+      "id": "lin-portal-remote-desktop",
+      "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.RemoteDesktop.html",
+      "title": "XDG RemoteDesktop portal",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Consented remote-input sessions and input-emulation path; grant/revocation behavior must be tested."
+    },
+    {
+      "id": "lin-portal-screenshot",
+      "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Screenshot.html",
+      "title": "XDG Screenshot portal",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "User-mediated screenshot capture API."
+    },
+    {
+      "id": "lin-portal-screencast",
+      "url": "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.ScreenCast.html",
+      "title": "XDG ScreenCast portal",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "User-mediated capture/session protocol for supported capture features."
+    },
+    {
+      "id": "lin-libei",
+      "url": "https://libinput.pages.freedesktop.org/libei/",
+      "title": "libei documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Input-emulation client/server mechanism used with compatible desktop permissions; not arbitrary Wayland access."
+    },
+    {
+      "id": "lin-desktop-entry",
+      "url": "https://xdg.pages.freedesktop.org/xdg-specs/desktop-entry/latest-single/",
+      "title": "Desktop Entry specification",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Application metadata, visibility, actions and launch semantics; Exec is not passed to a shell."
+    },
+    {
+      "id": "lin-gio-launch",
+      "url": "https://gnome.pages.gitlab.gnome.org/gtk/gio/method.AppInfo.launch.html",
+      "title": "GIO AppInfo launch",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Platform application launch adapter selected over hand-built shell execution."
+    },
+    {
+      "id": "lin-xdg-basedir",
+      "url": "https://specifications.freedesktop.org/basedir/0.8/",
+      "title": "XDG Base Directory specification",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Config/data/cache/state/runtime placement, honoring environment values and specified fallbacks."
+    },
+    {
+      "id": "lin-xdg-autostart",
+      "url": "https://specifications.freedesktop.org/autostart/latest/",
+      "title": "Desktop Application Autostart specification",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Explicit per-user startup preference; unrelated to enabling privileged capture."
+    },
+    {
+      "id": "lin-ewmh",
+      "url": "https://specifications.freedesktop.org/wm/latest-single/",
+      "title": "Extended Window Manager Hints specification",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "X11 window control/interoperability; not a native Wayland control API."
+    },
+    {
+      "id": "lin-logind",
+      "url": "https://freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html",
+      "title": "org.freedesktop.login1 D-Bus API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Session/seat state and device-controller semantics; Linuxcast must not force takeover of the compositor's session controller."
+    },
+    {
+      "id": "lin-mpris",
+      "url": "https://wiki.freedesktop.org/www/Specifications/mpris-spec/",
+      "title": "MPRIS specification",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Desktop media player control protocol."
+    },
+    {
+      "id": "lin-systemd-exec",
+      "url": "https://www.freedesktop.org/software/systemd/man/257/systemd.exec.html",
+      "title": "systemd 257 execution environment controls",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Debian-compatible service hardening; exact input-device/capability interactions require runtime tests."
+    },
+    {
+      "id": "lin-systemd-resources",
+      "url": "https://www.freedesktop.org/software/systemd/man/257/systemd.resource-control.html",
+      "title": "systemd 257 resource control",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Cgroup resource and device policy primitives; required limits are selected product policy."
+    },
+    {
+      "id": "lin-polkit",
+      "url": "https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html",
+      "title": "Polkit documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Authorization for narrowly scoped input-service administration."
+    },
+    {
+      "id": "lin-pkexec",
+      "url": "https://www.freedesktop.org/software/polkit/docs/latest/pkexec.1.html",
+      "title": "pkexec documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Administrative execution context/caller identity; fixed helper actions only, never general root commands."
+    },
+    {
+      "id": "lin-kernel-uinput",
+      "url": "https://kernel.org/doc/html/latest/input/uinput.html",
+      "title": "Linux kernel uinput documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Userspace virtual input device mechanism; device lifetime and recovery require actual tests."
+    },
+    {
+      "id": "lin-libevdev",
+      "url": "https://www.freedesktop.org/software/libevdev/doc/latest/",
+      "title": "libevdev documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Selected evdev event/forwarding library for dedicated input worker."
+    },
+    {
+      "id": "lin-libevdev-sync",
+      "url": "https://www.freedesktop.org/software/libevdev/doc/latest/syn_dropped.html",
+      "title": "libevdev SYN_DROPPED handling",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Resynchronize device state after dropped events, clear typed-trigger inference and avoid reconstructing committed text."
+    },
+    {
+      "id": "lin-libevdev-init",
+      "url": "https://www.freedesktop.org/software/libevdev/doc/latest/group__init.html",
+      "title": "libevdev initialization and device lifetime",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "File descriptor and grab lifecycle; supervisor must not retain duplicate grab-owning descriptors after handoff."
+    },
+    {
+      "id": "lin-libevdev-uinput",
+      "url": "https://www.freedesktop.org/software/libevdev/doc/latest/group__uinput.html",
+      "title": "libevdev uinput devices",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Virtual device creation/destruction and identity behavior."
+    },
+    {
+      "id": "lin-xkbcommon",
+      "url": "https://xkbcommon.org/doc/current/index.html",
+      "title": "libxkbcommon documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Keyboard map/state processing; not proof of committed application text or protected-field status."
+    },
+    {
+      "id": "lin-xkbcommon-compose",
+      "url": "https://xkbcommon.org/doc/current/group__compose.html",
+      "title": "libxkbcommon compose API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Compose-state support and limitations relevant to raw-key snippet matching."
+    },
+    {
+      "id": "lin-espanso-linux",
+      "url": "https://espanso.org/docs/install/linux/",
+      "title": "Espanso Linux installation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Related text-expander platform constraints; evidence for investigation, not an implementation dependency or parity claim."
+    },
+    {
+      "id": "lin-gnome-extension-development",
+      "url": "https://gjs.guide/extensions/development/creating.html",
+      "title": "GNOME Shell extension development",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Bundled companion structure and explicit Shell-version compatibility."
+    },
+    {
+      "id": "lin-kwin-data-control",
+      "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/wayland/datacontroldevicemanager_v1.cpp",
+      "title": "KWin 6.3.6 data-control implementation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Versioned source confirms zwlr_data_control_manager_v1 baseline rather than assuming newer ext-data-control."
+    },
+    {
+      "id": "lin-kwin-workspace",
+      "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/scripting/workspace_wrapper.h",
+      "title": "KWin 6.3.6 scripting workspace API",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Window enumeration, active window and work-area API basis for fixed script operations."
+    },
+    {
+      "id": "lin-kwin-window",
+      "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/window.h",
+      "title": "KWin 6.3.6 window API",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Geometry/maximization API basis; compositor-specific behavior remains an integration test gate."
+    },
+    {
+      "id": "lin-kwin-scripting",
+      "url": "https://github.com/KDE/kwin/blob/v6.3.6/src/scripting/scripting.cpp",
+      "title": "KWin 6.3.6 scripting implementation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Outbound asynchronous callDBus mechanism; helper-owned bounded NextCommand transport is proposed, not already tested."
+    },
+    {
+      "id": "lin-mutter-selection",
+      "url": "https://github.com/GNOME/mutter/blob/48.0/src/core/meta-selection.c",
+      "title": "Mutter 48 selection implementation",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Clipboard selection ownership notifications used by optional GNOME companion."
+    },
+    {
+      "id": "lin-shell-clipboard",
+      "url": "https://github.com/GNOME/gnome-shell/blob/48.0/src/st/st-clipboard.h",
+      "title": "GNOME Shell 48 StClipboard API",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Clipboard MIME/content access in Shell companion; transfer races and limits require implementation."
+    },
+    {
+      "id": "lin-mutter-display",
+      "url": "https://github.com/GNOME/mutter/blob/48.0/src/meta/display.h",
+      "title": "Mutter 48 display API",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Window/focus API basis for companion integration."
+    },
+    {
+      "id": "lin-keyd",
+      "url": "https://github.com/rvaiya/keyd",
+      "title": "keyd keyboard remapping daemon",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Existing evdev/uinput remapping pattern; no claim that Linuxcast inherits its implementation or security properties."
+    },
+    {
+      "id": "lin-kanata-linux",
+      "url": "https://github.com/jtroo/kanata/blob/main/docs/setup-linux.md",
+      "title": "Kanata Linux setup",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Existing Linux remapper device-access/setup patterns; Linuxcast instead uses a fixed opt-in supervisor with no broad input-group grant."
+    },
+    {
+      "id": "arch-sqlite-backup",
+      "url": "https://www.sqlite.org/backup.html",
+      "title": "SQLite Online Backup API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Consistent snapshot backup of a live database; plan rejects copying a database file while ignoring WAL state."
+    },
+    {
+      "id": "arch-sqlite-wal",
+      "url": "https://www.sqlite.org/wal.html",
+      "title": "SQLite Write-Ahead Logging",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Local-filesystem requirement, WAL lifetime/checkpointing and documented WAL-reset fix in SQLite 3.51.3; packaged runtime version must be checked."
+    },
+    {
+      "id": "arch-sqlite-synchronous",
+      "url": "https://www.sqlite.org/pragma.html#pragma_synchronous",
+      "title": "SQLite synchronous pragma",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Durability modes; FULL is the selected initial content/checkpoint policy, subject to explicit measured review."
+    },
+    {
+      "id": "arch-rage",
+      "url": "https://github.com/str4d/rage",
+      "title": "rage: Rust implementation of age",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Maintained Rust age implementation, standard passphrase encryption and interoperable library/CLI format; selected for portable backups."
+    },
+    {
+      "id": "arch-age-crate",
+      "url": "https://docs.rs/age/latest/age/",
+      "title": "age Rust crate API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Passphrase/streaming APIs and interoperability. Inspected 0.12.1 documentation explicitly calls pre-1.0 APIs beta; exact version/toolchain and security review are required at bootstrap."
+    },
+    {
+      "id": "arch-age-scrypt-recipient",
+      "url": "https://docs.rs/age/latest/age/scrypt/struct.Recipient.html",
+      "title": "age scrypt Recipient API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Public work-factor control for standard age passphrase encryption; plan selects factor 18 as a resource/security default."
+    },
+    {
+      "id": "arch-age-scrypt-identity",
+      "url": "https://docs.rs/age/latest/age/scrypt/struct.Identity.html",
+      "title": "age scrypt Identity API",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Maximum accepted work-factor control and denial-of-service considerations for untrusted encrypted files; plan selects maximum 20."
+    },
+    {
+      "id": "arch-rust-regex",
+      "url": "https://github.com/rust-lang/regex",
+      "title": "Rust regex crate",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Finite-automata regular-expression implementation; selected with pattern/input bounds and no backtracking-engine fallback."
+    },
+    {
+      "id": "arch-sharp",
+      "url": "https://sharp.pixelplumbing.com/",
+      "title": "Sharp image processing documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Selected Sharp/libvips image-transform family; exact version/native ABI, license and parser-security gates remain implementation work."
+    },
+    {
+      "id": "arch-pdf-lib",
+      "url": "https://pdf-lib.js.org/",
+      "title": "pdf-lib documentation",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Pure-JavaScript PDF creation/modification and split/merge basis; selected for contained assembly jobs."
+    },
+    {
+      "id": "arch-pdfjs",
+      "url": "https://mozilla.github.io/pdf.js/",
+      "title": "Mozilla PDF.js",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "PDF parsing/rendering foundation; Linuxcast must disable document scripts/eval/external access and validate isolation."
+    },
+    {
+      "id": "arch-libreoffice-headless",
+      "url": "https://help.libreoffice.org/latest/en-US/text/shared/guide/start_parameters.html",
+      "title": "LibreOffice startup parameters",
+      "accessed": "2026-10-22",
+      "kind": "official-documentation",
+      "notes": "Headless conversion and writable profile requirements; optional installed-tool adapter uses a disposable sandbox profile and must test the detected Debian version."
+    },
+    {
+      "id": "arch-speech-dispatcher",
+      "url": "https://github.com/brailcom/speechd",
+      "title": "Speech Dispatcher",
+      "accessed": "2026-10-22",
+      "kind": "official-source",
+      "notes": "Local speech synthesis service/library; selected optional installed-service adapter with unavailable state when absent."
+    }
+  ]
+}
