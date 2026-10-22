@@ -1,0 +1,13 @@
+{
+  "task": "S0-01",
+  "backend": "kwin-wayland",
+  "sourceInputEquivalentSignedCommit": "3c747cca0dbf8c6eebe7752dce37839f021436ac",
+  "checkerSha256": "3528f160390707e7dc7e48251e4bbe0cdb1d655a234c8a7501e30214bc7df593",
+  "exactExecutedSourceManifest": "source-manifest.json",
+  "all23SourceInputHashesMatchSignedCommit": true,
+  "command": "python3 spikes/launcher/tests/native-session/run-session.py kwin-wayland --private-guest",
+  "exitCode": 3,
+  "status": "incomplete",
+  "sourceChangedDuringExecution": false,
+  "physicalDesktopMatrixEstablished": false
+}

@@ -61,9 +61,9 @@ The [native-session harness](tests/native-session/README.md) runs the actual lau
 | Required target                     | Current evidence                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
 | Debian 13 amd64, GNOME 48 Wayland   | Isolated software-compositor native probe passes; ordinary show remains unfocused and exposes the component requirement. Actual own-renderer dark/light pixels recorded; physical/session matrix and portal consent/effective binding remain outstanding. |
-| Debian 13 amd64, GNOME X11          | Not run; current Pop!_OS/GNOME 42 X11 result cannot close it.                         |
-| Debian 13 amd64, Plasma 6.3 Wayland | Not run; component/activation and portal evidence required.                           |
-| Debian 13 amd64, KDE X11            | Not run.                                                                              |
+| Debian 13 amd64, GNOME X11          | Incomplete at initial native-identity condition; strict actual Electron/X11 sandbox passes, no successful native predicate persisted. |
+| Debian 13 amd64, Plasma 6.3 Wayland | Incomplete at decoy challenge: launcher native Wayland identity/geometry/resident close pass, fixed decoy fails identity gate. |
+| Debian 13 amd64, KDE X11            | Incomplete at initial native-identity condition; strict actual Electron/X11 sandbox passes, no successful native predicate persisted. |
 
 No companion, portal, input service, keyboard device, GNOME setting, autostart entry or user shortcut preference is installed/enabled/changed. The test shortcut grabs last only for the disposable application processes. No claim covers multimonitor/fractional scale, suspend/lock/logout, packaging installation or production command routing. The coordinator must keep missing checks outstanding and obtain independent review before integration.
 
