@@ -5,7 +5,7 @@
     {
       "id": "F1-01",
       "title": "Bootstrap workspace and scoped test runners",
-      "status": "in-progress",
+      "status": "done",
       "phase": "implementation",
       "lane": "F1",
       "dependsOn": [],
@@ -105,7 +105,10 @@
         "bun run test:unit -- F1-01"
       ],
       "evidence": [
-        "F1-01 build acceptance recorded in docs/implementation/bootstrap.md; integration and independent review pending."
+        "Integrated implementation PR https://github.com/ianwijma/linuxcast/pull/4; develop commit e3f9a769467a903d5d257c644d1afcd06d0afb50. Its tree exactly matches independently reviewed head 1646497ffbb95f12b430218831a05d9c65bb06e9.",
+        "Current-head GitHub validate check passed: https://github.com/ianwijma/linuxcast/actions/runs/39798244044/job/119891232957. No requested reviewers, GitHub reviews, review threads, review-bot checks or repository merge protections were present.",
+        "Independent review_f1_01 reviewed the final tree and closed its age interoperability/security finding; independently verified 20 JS tests, 21 Python regressions, two native tests, reference Go-age interoperability, Rust audit, clippy and rustfmt.",
+        "Build/runtime platform and all criterion outcomes: docs/implementation/bootstrap.md; scripts/test-runner/evidence/F1-01-debian.log; scripts/test-runner/evidence/F1-01-rust.log; dependency inventories and audit JSON. These establish bootstrap acceptance only, not desktop or release completion."
       ],
       "owner": "coordinator",
       "branch": "codex/f1-01-bun",
