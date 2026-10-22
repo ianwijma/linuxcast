@@ -11,8 +11,7 @@
       "dependsOn": [],
       "ownedPaths": [
         "package.json",
-        "pnpm-workspace.yaml",
-        "pnpm-lock.yaml",
+        "bun.lock",
         "tsconfig.base.json",
         "apps/desktop/package.json",
         "scripts/test-runner/"
@@ -37,7 +36,7 @@
         "Task-scoped tests and recorded acceptance evidence"
       ],
       "steps": [
-        "Create pnpm workspace with locked compatible Electron/React/TS/Tailwind toolchain and Rust workspace.",
+        "Create Bun workspace using root package.json workspaces and committed bun.lock; pin the Bun version and compatible Electron/React/TS/Tailwind toolchain alongside the Rust workspace.",
         "Wire the stable no-write lint/typecheck and task-scoped test commands; document exact prerequisites and compiler choice."
       ],
       "acceptance": [
@@ -45,8 +44,8 @@
         "Unknown task selector fails; omitted selector runs the suite; no placeholder success scripts."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- F1-01"
+        "bun run typecheck",
+        "bun run test:unit -- F1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -93,8 +92,8 @@
         "Closing the launcher retains resident process; explicit Quit exits."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- S0-01"
+        "bun run typecheck",
+        "bun run test:integration -- S0-01"
       ],
       "evidence": [],
       "owner": null,
@@ -141,8 +140,8 @@
         "Missing/restarted companion and unsupported formats produce actionable states."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- S0-02"
+        "bun run typecheck",
+        "bun run test:integration -- S0-02"
       ],
       "evidence": [],
       "owner": null,
@@ -190,8 +189,8 @@
         "Locked/inactive/TTY sessions never arm; plugin processes cannot access control socket."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- S0-03"
+        "bun run typecheck",
+        "bun run test:security -- S0-03"
       ],
       "evidence": [],
       "owner": null,
@@ -238,8 +237,8 @@
         "Missing user namespaces or bubblewrap gives unavailable capability."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- S0-04"
+        "bun run typecheck",
+        "bun run test:security -- S0-04"
       ],
       "evidence": [],
       "owner": null,
@@ -287,8 +286,8 @@
         "A denied tool never executes and reconnect does not duplicate it."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- S0-05"
+        "bun run typecheck",
+        "bun run test:contracts -- S0-05"
       ],
       "evidence": [],
       "owner": null,
@@ -336,8 +335,8 @@
         "Unsupported ViewModel fields and invalid edge types are rejected."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- S0-06"
+        "bun run typecheck",
+        "bun run test:ui -- S0-06"
       ],
       "evidence": [],
       "owner": null,
@@ -392,8 +391,8 @@
         "TS and Rust accept/reject the same cross-language fixtures."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- F0-01"
+        "bun run typecheck",
+        "bun run test:contracts -- F0-01"
       ],
       "evidence": [],
       "owner": null,
@@ -441,8 +440,8 @@
         "Second invocation toggles existing launcher and malformed deep links are rejected."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F1-02"
+        "bun run typecheck",
+        "bun run test:security -- F1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -490,8 +489,8 @@
         "Packaged SQLite runtime reports version >=3.51.3 (WAL-reset fix); backups use SQLite backup API rather than copying an active DB without WAL."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- F2-01"
+        "bun run typecheck",
+        "bun run test:integration -- F2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -539,8 +538,8 @@
         "Clear/export/delete controls operate on intended categories only."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F2-02"
+        "bun run typecheck",
+        "bun run test:security -- F2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -588,8 +587,8 @@
         "Revocation cancels pending sensitive operations and shows remediation."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F3-01"
+        "bun run typecheck",
+        "bun run test:security -- F3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -637,8 +636,8 @@
         "Keyboard focus, labels and text scaling remain usable."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-01"
+        "bun run typecheck",
+        "bun run test:ui -- D1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -687,8 +686,8 @@
         "Async results preserve selection; keyboard-only actions/forms work."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-02"
+        "bun run typecheck",
+        "bun run test:ui -- D1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -738,8 +737,8 @@
         "Pending approvals survive navigation and cannot submit twice."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-03"
+        "bun run typecheck",
+        "bun run test:ui -- D1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -787,8 +786,8 @@
         "Install/upgrade/remove do not silently enable keyboard capture."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- F1-03"
+        "bun run typecheck",
+        "bun run test:integration -- F1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -837,8 +836,8 @@
         "Empty query/disabled command/ranking reset and cancellation fixtures pass."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L1-01"
+        "bun run typecheck",
+        "bun run test:unit -- L1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -886,8 +885,8 @@
         "Applications with spaces/arguments and unavailable executables report accurately."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L1-02"
+        "bun run typecheck",
+        "bun run test:integration -- L1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -938,8 +937,8 @@
         "External deep links cannot execute arbitrary shell actions."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L1-03"
+        "bun run typecheck",
+        "bun run test:integration -- L1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -988,8 +987,8 @@
         "Permission failures and excluded mounts never stall the whole index."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-01"
+        "bun run typecheck",
+        "bun run test:integration -- L2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1039,8 +1038,8 @@
         "Corrupt/large files and cancelled extraction do not hang the host."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-02"
+        "bun run typecheck",
+        "bun run test:integration -- L2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1091,8 +1090,8 @@
         "Preview/index cache deletion cannot delete source files."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-03"
+        "bun run typecheck",
+        "bun run test:integration -- L2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1140,8 +1139,8 @@
         "DST/unit/colour fixtures pass and stale/offline rates are labelled."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-04"
+        "bun run typecheck",
+        "bun run test:unit -- L2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -1191,8 +1190,8 @@
         "Recursive/missing/unsupported cursor placeholders produce explicit errors."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-05"
+        "bun run typecheck",
+        "bun run test:unit -- L2-05"
       ],
       "evidence": [],
       "owner": null,
@@ -1241,8 +1240,8 @@
         "Unicode/combining-character results copy correctly and unsupported paste explains fallback."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- L2-06"
+        "bun run typecheck",
+        "bun run test:ui -- L2-06"
       ],
       "evidence": [],
       "owner": null,
@@ -1290,8 +1289,8 @@
         "linuxcast --toggle remains an available recovery command."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-01"
+        "bun run typecheck",
+        "bun run test:integration -- P1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1341,8 +1340,8 @@
         "Shell restart clears transactions and resumes only after fresh validation."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-02"
+        "bun run typecheck",
+        "bun run test:integration -- P1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1392,8 +1391,8 @@
         "Restart/missing protocol and stale acknowledgements fail safely."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-03"
+        "bun run typecheck",
+        "bun run test:integration -- P1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1440,8 +1439,8 @@
         "Mixed XWayland session cannot report native Wayland operations as available."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-04"
+        "bun run typecheck",
+        "bun run test:integration -- P1-04"
       ],
       "evidence": [],
       "owner": null,
@@ -1490,8 +1489,8 @@
         "Applying a layout skips missing identities instead of moving unrelated apps."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-05"
+        "bun run typecheck",
+        "bun run test:integration -- P1-05"
       ],
       "evidence": [],
       "owner": null,
@@ -1542,8 +1541,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-01",
-        "pnpm test:integration -- P2-01"
+        "bun run test:security -- P2-01",
+        "bun run test:integration -- P2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1590,8 +1589,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-02",
-        "pnpm test:integration -- P2-02"
+        "bun run test:security -- P2-02",
+        "bun run test:integration -- P2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1643,8 +1642,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-03",
-        "pnpm test:integration -- P2-03"
+        "bun run test:security -- P2-03",
+        "bun run test:integration -- P2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1694,8 +1693,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-04",
-        "pnpm test:integration -- P2-04"
+        "bun run test:security -- P2-04",
+        "bun run test:integration -- P2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -1747,8 +1746,8 @@
         "Paused/excluded/sensitive-known events do not enter history."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-01"
+        "bun run typecheck",
+        "bun run test:integration -- P3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1799,8 +1798,8 @@
         "Concurrent user copies cannot be overwritten by restoration."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-02"
+        "bun run typecheck",
+        "bun run test:integration -- P3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1851,8 +1850,8 @@
         "Long-running workflow output falls back to explicit copy when target token expires."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-03"
+        "bun run typecheck",
+        "bun run test:integration -- P3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1901,8 +1900,8 @@
         "Missing sandbox disables execution; denied calls cannot be spoofed by payload IDs."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-01"
+        "bun run typecheck",
+        "bun run test:security -- E1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1947,11 +1946,11 @@
       ],
       "acceptance": [
         "ANSI/oversized output is sanitized and cancellation terminates process tree.",
-        "No npm postinstall/native-addon download or shell interpolation fallback."
+        "No package lifecycle scripts, native-addon downloads or shell interpolation fallback."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-02"
+        "bun run typecheck",
+        "bun run test:security -- E1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2002,8 +2001,8 @@
         "An update cannot silently broaden grants or destroy user settings."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-03"
+        "bun run typecheck",
+        "bun run test:security -- E1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2052,8 +2051,8 @@
         "Password integration never persists secret values or harvests another app credential."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- E1-04"
+        "bun run typecheck",
+        "bun run test:integration -- E1-04"
       ],
       "evidence": [],
       "owner": null,
@@ -2100,8 +2099,8 @@
         "One branch cannot mutate another branch or live configuration."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- W1-01"
+        "bun run typecheck",
+        "bun run test:contracts -- W1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2148,8 +2147,8 @@
         "Cancel and nested failure stop intended jobs without duplicate external effects."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W1-02"
+        "bun run typecheck",
+        "bun run test:unit -- W1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2196,8 +2195,8 @@
         "Secret values and oversized output do not leak into durable logs."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W1-03"
+        "bun run typecheck",
+        "bun run test:integration -- W1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2243,8 +2242,8 @@
         "Layout edits never alter execution semantics and undo restores graph state."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-01"
+        "bun run typecheck",
+        "bun run test:ui -- W2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2290,8 +2289,8 @@
         "Reusable-group edits preserve stable IDs and clear package defaults versus local overrides."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-02"
+        "bun run typecheck",
+        "bun run test:ui -- W2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2337,8 +2336,8 @@
         "Large output remains inspectable via bounded previews, not frozen rendering."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-03"
+        "bun run typecheck",
+        "bun run test:ui -- W2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2385,8 +2384,8 @@
         "External input validates types and app-scope/hotkey rules apply."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- W3-01"
+        "bun run typecheck",
+        "bun run test:contracts -- W3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2432,8 +2431,8 @@
         "Expression parsing cannot execute arbitrary host JavaScript."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W3-02"
+        "bun run typecheck",
+        "bun run test:unit -- W3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2482,8 +2481,8 @@
         "Script/HTTP/file changes cannot evade scoped grants or replay after uncertain crash."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W3-03"
+        "bun run typecheck",
+        "bun run test:security -- W3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2531,8 +2530,8 @@
         "Missing model capability fails before sending unsupported payload."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W3-04"
+        "bun run typecheck",
+        "bun run test:integration -- W3-04"
       ],
       "evidence": [],
       "owner": null,
@@ -2593,8 +2592,8 @@
         "Export contains no secrets/history and imported typed triggers remain disabled."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W3-05"
+        "bun run typecheck",
+        "bun run test:integration -- W3-05"
       ],
       "evidence": [],
       "owner": null,
@@ -2643,8 +2642,8 @@
         "Settings changes do not alter active run; failed stream is not success."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- A1-01"
+        "bun run typecheck",
+        "bun run test:contracts -- A1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2691,8 +2690,8 @@
         "No retry after visible output or provider switch without explicit action."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- A1-02"
+        "bun run typecheck",
+        "bun run test:contracts -- A1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2738,8 +2737,8 @@
         "Local mode never falls back to hosted inference; endpoint grants restrict credential destination."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A1-03"
+        "bun run typecheck",
+        "bun run test:integration -- A1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2788,8 +2787,8 @@
         "No enabled replacement/handoff control before the corresponding integration capability is available; copy remains usable."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A2-01"
+        "bun run typecheck",
+        "bun run test:ui -- A2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2836,8 +2835,8 @@
         "Editing old turns branches correctly and compaction preserves referenced context."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-02"
+        "bun run typecheck",
+        "bun run test:integration -- A2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2883,8 +2882,8 @@
         "Repeated submit/notification handling cannot duplicate a turn."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A2-03"
+        "bun run typecheck",
+        "bun run test:ui -- A2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2935,8 +2934,8 @@
         "Focus/layout changes prevent late text replacement; copy fallback remains available."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-04"
+        "bun run typecheck",
+        "bun run test:integration -- A2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -2986,8 +2985,8 @@
         "Token expiry/server restart/approval navigation cannot execute an effect twice."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- A3-01"
+        "bun run typecheck",
+        "bun run test:security -- A3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3035,8 +3034,8 @@
         "Skill files cannot enable tools, expand filesystem scope or override permission policy."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- A3-02"
+        "bun run typecheck",
+        "bun run test:security -- A3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3084,8 +3083,8 @@
         "Reset removes only intended scope and sensitive exports are explicit."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-03"
+        "bun run typecheck",
+        "bun run test:integration -- A3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3133,8 +3132,8 @@
         "Refresh/restart preserves explicit session identity and cannot replay completed tools."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-04"
+        "bun run typecheck",
+        "bun run test:integration -- A3-04"
       ],
       "evidence": [],
       "owner": null,
@@ -3181,8 +3180,8 @@
         "Harness grants remain bounded, cancellation works and unavailable binaries have clear setup instructions."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-05"
+        "bun run typecheck",
+        "bun run test:integration -- A3-05"
       ],
       "evidence": [],
       "owner": null,
@@ -3231,8 +3230,8 @@
         "Uncertain side effect pauses for review and approval waits survive restart."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A4-01"
+        "bun run typecheck",
+        "bun run test:integration -- A4-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3279,8 +3278,8 @@
         "Busy/detached targets and explicit app Quit are clearly represented."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A4-02"
+        "bun run typecheck",
+        "bun run test:ui -- A4-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3328,8 +3327,8 @@
         "Multiple profiles/stale active tabs cannot attach the wrong page."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- B1-01"
+        "bun run typecheck",
+        "bun run test:integration -- B1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3377,8 +3376,8 @@
         "Unsupported browsers have clear missing-component state rather than false blocking."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- B1-02"
+        "bun run typecheck",
+        "bun run test:integration -- B1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3426,8 +3425,8 @@
         "Markdown round trip preserves text/tasks and declares unsupported styling."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- U1-01"
+        "bun run typecheck",
+        "bun run test:ui -- U1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3477,8 +3476,8 @@
         "Recurrence exceptions, timezone changes and expired credentials have fixtures."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U1-02"
+        "bun run typecheck",
+        "bun run test:integration -- U1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3528,8 +3527,8 @@
         "DST/reminder/repeated occurrence and offline-source views are correct."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U1-03"
+        "bun run typecheck",
+        "bun run test:integration -- U1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3578,8 +3577,8 @@
         "Selected media player and per-app audio actions target the intended resource."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-01"
+        "bun run typecheck",
+        "bun run test:integration -- U2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3630,8 +3629,8 @@
         "Focus end/crash restores rules; autoquit excludes system/session processes."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-02"
+        "bun run typecheck",
+        "bun run test:integration -- U2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3679,8 +3678,8 @@
         "Focus/exit/helper restart restores shortcut state exactly once."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-03"
+        "bun run typecheck",
+        "bun run test:integration -- U2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3730,8 +3729,8 @@
         "Default export excludes secrets/content histories and redacts diagnostics."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- U2-04"
+        "bun run typecheck",
+        "bun run test:ui -- U2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -3782,8 +3781,8 @@
         "Cache retention does not delete source media; permanent deletion is explicit."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M1-01"
+        "bun run typecheck",
+        "bun run test:integration -- M1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3834,8 +3833,8 @@
         "Missing language/download failure is actionable and no media leaks to providers."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M1-02"
+        "bun run typecheck",
+        "bun run test:integration -- M1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3884,8 +3883,8 @@
         "Offline model/audio-device changes and permission revocation recover visibly."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M2-01"
+        "bun run typecheck",
+        "bun run test:integration -- M2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3937,8 +3936,8 @@
         "Focus change/cancel prevents paste; audio/text never enters keyboard-service logs."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M2-02"
+        "bun run typecheck",
+        "bun run test:integration -- M2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4008,8 +4007,8 @@
         "All v1 feature tasks have actual acceptance evidence."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- R1-01"
+        "bun run typecheck",
+        "bun run test:integration -- R1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -4057,8 +4056,8 @@
         "Mockups are not substituted for application screenshots and failed budgets remain visible."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- R1-02"
+        "bun run typecheck",
+        "bun run test:ui -- R1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4108,8 +4107,8 @@
         "No secrets/private content enter artifacts; all critical acceptance gates pass."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- R1-03"
+        "bun run typecheck",
+        "bun run test:integration -- R1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4159,8 +4158,8 @@
         "Changed target or unsupported selection replacement returns copy/preview without late typing."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-05"
+        "bun run typecheck",
+        "bun run test:integration -- A2-05"
       ],
       "evidence": [],
       "owner": null,
@@ -4207,8 +4206,8 @@
         "Cancelled/error/unrecognized AI suggestions never replace valid local results."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-07"
+        "bun run typecheck",
+        "bun run test:unit -- L2-07"
       ],
       "evidence": [],
       "owner": null,
@@ -4257,8 +4256,8 @@
         "Contribution removal leaves unavailable selected-profile state; origin changes require new consent."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-05"
+        "bun run typecheck",
+        "bun run test:security -- E1-05"
       ],
       "evidence": [],
       "owner": null,
@@ -4307,8 +4306,8 @@
         "Locked/missing keyring skips scheduled backup visibly; credentials/grants are never exported."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F2-03"
+        "bun run typecheck",
+        "bun run test:security -- F2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4357,8 +4356,8 @@
         "Denied advanced operation cannot be rerouted as generic script execution."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- B1-03"
+        "bun run typecheck",
+        "bun run test:security -- B1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4404,8 +4403,8 @@
         "Untrusted expressions cannot invoke arbitrary code."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W4-01"
+        "bun run typecheck",
+        "bun run test:unit -- W4-01"
       ],
       "evidence": [],
       "owner": null,
@@ -4452,8 +4451,8 @@
         "Changed sync plan invalidates confirmation and no normal copy becomes destructive mirroring."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-02"
+        "bun run typecheck",
+        "bun run test:security -- W4-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4500,8 +4499,8 @@
         "Geometry/alpha/orientation fixtures preserve documented semantics."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-03"
+        "bun run typecheck",
+        "bun run test:integration -- W4-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4549,8 +4548,8 @@
         "Page ordering/ranges and output files match fixtures; cancellation stops worker."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-04"
+        "bun run typecheck",
+        "bun run test:integration -- W4-04"
       ],
       "evidence": [],
       "owner": null,
@@ -4603,8 +4602,8 @@
         "No task obtains broader authority than the corresponding direct command."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-05"
+        "bun run typecheck",
+        "bun run test:integration -- W4-05"
       ],
       "evidence": [],
       "owner": null,
@@ -4651,8 +4650,8 @@
         "Navigation/profile changes invalidate pending target and cancelled tasks stop."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-06"
+        "bun run typecheck",
+        "bun run test:security -- W4-06"
       ],
       "evidence": [],
       "owner": null,
@@ -4698,8 +4697,8 @@
         "No path from a script becomes a filesystem grant and hook execution policy is explicit."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-07"
+        "bun run typecheck",
+        "bun run test:security -- W4-07"
       ],
       "evidence": [],
       "owner": null,
@@ -4745,8 +4744,8 @@
         "Malicious macros/external links cannot run/fetch; timeout kills conversion process tree."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-08"
+        "bun run typecheck",
+        "bun run test:security -- W4-08"
       ],
       "evidence": [],
       "owner": null,
@@ -4794,8 +4793,8 @@
         "Library/rating operations are unavailable when provider supports transport only."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-09"
+        "bun run typecheck",
+        "bun run test:integration -- W4-09"
       ],
       "evidence": [],
       "owner": null,
@@ -4845,8 +4844,8 @@
         "Sleeping/restarting/updating/removing a package cannot replay missed effects or broaden grants."
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- E1-06"
+        "bun run typecheck",
+        "bun run test:integration -- E1-06"
       ],
       "evidence": [],
       "owner": null,
