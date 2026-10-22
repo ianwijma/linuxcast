@@ -121,7 +121,7 @@
     {
       "id": "S0-01",
       "title": "Prove launcher activation and desktop identity",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -193,14 +193,14 @@
         "bun run test:integration -- S0-01"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_06_workflow_ui",
+      "branch": "codex/s0-01-launcher",
       "limitations": []
     },
     {
       "id": "S0-02",
       "title": "Prove compositor and clipboard transport",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -272,14 +272,14 @@
         "bun run test:integration -- S0-02"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-02-desktop",
       "limitations": []
     },
     {
       "id": "S0-03",
       "title": "Prove native input failure recovery",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -352,14 +352,14 @@
         "bun run test:security -- S0-03"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-03-input",
       "limitations": []
     },
     {
       "id": "S0-04",
       "title": "Prove extension sandbox boundaries",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -396,49 +396,77 @@
         {
           "id": "S0-04-AC01",
           "text": "An allowed broker fixture works while direct host access fails.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian probe passes20boundary checks; named security suite passes22/22 with no skips. Broker allow/deny, direct host-resource denial, strict framing, detached descendant cleanup and actual memory/pids/CPU pressure are verified. Final task helper must report completed/taskCreationDenied with bounded child count plus kernel pids.events max>0.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         },
         {
           "id": "S0-04-AC02",
           "text": "Missing user namespaces or bubblewrap gives unavailable capability.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Actual Debian kernel namespace denial returns NAMESPACES_UNAVAILABLE with no fixture execution and verified cleanup; guest limit restored. Missing-backend fixtures return unavailable without direct-Node fallback. Pop!_OS host CPU delegation gap separately fails closed; user declined host policy change and none occurred.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         },
         {
           "id": "S0-04-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Fixed engineering CLI/fixture prototype only; no product renderer or user-facing application UI introduced.",
           "evidence": []
         },
         {
           "id": "S0-04-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
+              "outcome": "Source and evidence review finds public synthetic file/socket/database/environment canaries and operational metadata only. No user files, input, clipboard, credentials, raw stderr, VM keys or private disk/seed data committed.",
+              "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:security -- S0-04"
       ],
-      "evidence": [],
+      "evidence": [
+        "Integrated PR #9 https://github.com/ianwijma/linuxcast/pull/9 into develop8baac2e5a94e49182003619d311d96f5dfa91d29. Coordinator independently reviewed implementation and executed actual Debian13 suite22/22/probe20/20/namespace-denial; review_f1_01 independently reviewed coordinator changes and evidence at31618cf, with no remaining findings after ENODEV and pressure-report fixes.",
+        "Current-head GitHub validate passed for31618cf: https://github.com/ianwijma/linuxcast/actions/runs/39809772686/job/119932564597. No requested reviewers/bots/comments were present. Exact source hashes and VM/host limitations are retained in spike evidence; no host policy change occurred."
+      ],
       "owner": "review_f1_01",
       "branch": "codex/s0-04-sandbox",
-      "limitations": []
+      "limitations": [
+        "Pop!_OS22.04 host user manager lacks CPU delegation, so mandatory profile remains unavailable there. User declined host administrator policy changes; none were applied.",
+        "Debian VM proves kernel/systemd sandbox behavior, not GNOME/KDE desktop, Wayland, physical input, performance or whole-release gates.",
+        "Spike uses development tool paths, a staged pinned runtime and test-only C emitters/pressure helper; production native helper/SDK/package validation, policy audit, permission revocation integration and release packaging remain owning-task work."
+      ]
     },
     {
       "id": "S0-05",
       "title": "Prove streaming provider and approval lifecycle",
-      "status": "in-progress",
+      "status": "done",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -532,7 +560,8 @@
         "bun run test:contracts -- S0-05"
       ],
       "evidence": [
-        "Implementation d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7 independently reviewed by coordinator against S0-05 and normative references. Two findings (hanging tool deadline, malformed OAuth expiry) addressed and independently rerun: lint/typecheck,63 contract checks and26 OAuth security checks pass. Integration/PR CI pending."
+        "Integrated PR #7 https://github.com/ianwijma/linuxcast/pull/7 into develop c9a9b9566b510e93bd7082f306473207cc62aece. Source d5a36ac independently reviewed by coordinator; metadata 033c6f47 independently reviewed by s0_05_provider. Hanging-tool deadline and malformed OAuth expiry findings fixed and verified.",
+        "Lint/typecheck pass;63 contract checks and26 OAuth security checks pass with actual local HTTP transport failure/cancellation fixtures. Current-head GitHub validate passed for 033c6f47: https://github.com/ianwijma/linuxcast/actions/runs/39802346250/job/119906184636. No requested GitHub reviewers or review bot were present. Platform and remaining live-account/durability limits are recorded per criterion and in spikes/ai/evidence.md."
       ],
       "owner": "s0_05_provider",
       "branch": "codex/s0-05-provider",

@@ -1,0 +1,67 @@
+S0-04 read-only controller evidence, 23 October 2026 (Australia/Sydney). No service/policy changes.
+$ /usr/bin/bwrap --version
+bubblewrap 0.6.1
+exit 0
+
+$ /usr/bin/systemd-run --version
+systemd 249 (249.11-0ubuntu3.20pop0~1778766019~22.04~5586583)
++PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY -P11KIT -QRENCODE +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified
+exit 0
+
+$ /usr/bin/systemctl show user@1000.service --property=Delegate --property=DelegateControllers
+Delegate=yes
+DelegateControllers=memory pids
+exit 0
+
+$ /usr/bin/systemctl cat user@.service
+# /lib/systemd/system/user@.service
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=User Manager for UID %i
+Documentation=man:user@.service(5)
+After=systemd-user-sessions.service user-runtime-dir@%i.service dbus.service
+Requires=user-runtime-dir@%i.service
+IgnoreOnIsolate=yes
+
+[Service]
+User=%i
+PAMName=systemd-user
+Type=notify
+ExecStart=/lib/systemd/systemd --user
+Slice=user-%i.slice
+KillMode=mixed
+Delegate=pids memory
+TasksMax=infinity
+TimeoutStopSec=120s
+KeyringMode=inherit
+
+# /usr/lib/systemd/system/user@.service.d/timeout.conf
+# Avoid long hangs during shutdown if user services fail/hang due to X.org
+# going away too early
+[Service]
+TimeoutStopSec=5
+exit 0
+
+$ /usr/bin/cat /sys/fs/cgroup/cgroup.controllers /sys/fs/cgroup/cgroup.subtree_control
+cpuset cpu io memory hugetlb pids rdma misc dmem
+cpuset cpu io memory hugetlb pids rdma misc dmem
+exit 0
+
+$ /usr/bin/cat /sys/fs/cgroup/user.slice/cgroup.controllers /sys/fs/cgroup/user.slice/cgroup.subtree_control
+cpuset cpu io memory hugetlb pids rdma misc dmem
+memory pids
+exit 0
+
+$ /usr/bin/cat /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/cgroup.controllers /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/cgroup.subtree_control
+memory pids
+memory pids
+exit 0
+
