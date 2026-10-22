@@ -333,18 +333,25 @@
         {
           "id": "S0-03-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "This engineering-only spike introduces no product UI, service installation or input enablement flow; product onboarding and accessibility remain owning-task gates.",
           "evidence": []
         },
         {
           "id": "S0-03-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "cargo test --locked -p linuxcast-input-spike; bun run test:security -- S0-03; independent source/evidence review",
+              "outcome": "Eleven native non-device checks and final real security suite2/2 pass. Review verifies no raw event/content path in public protocol, bounded fixed-code diagnostics, disabled core/libevdev logs and seeded error/path privacy regression. Committed artifacts contain public synthetic identities, fixed labels, booleans, numeric timing and tool metadata; no host keyboard/private content captured.",
+              "platform": "Disposable Debian13.7 amd64, generic kernel6.12.113+deb13-amd64, libevdev1.13.4, systemd257.13, Node24.22.1/Bun1.4.4; synthetic devices only.",
+              "reference": "spikes/input/evidence/{nondevice-tests.log,source-sha256.txt,binary-sha256.txt,kernel-debian.json,security-debian.log,guest-cleanup.json}; independently reviewed source26688de and README8e0c2bb."
+            }
+          ]
         }
       ],
       "validation": [
@@ -352,14 +359,16 @@
         "bun run test:security -- S0-03"
       ],
       "evidence": [
-        "Source5fb6aba and coordinator manifests30a39d8, plugin-socket routef3908e1. Independent source review found stale pre-arm queued input, extra watchdog grace and ambiguous wrong-peer test; fixes5cfdbff independently re-reviewed clean. Diagnostic83f4a12 and explicit pre-CREATE kernel UI_SET_PHYS2071354 independently reviewed by coordinator. Ten non-device Rust checks, strict clippy/fmt and TS source checks pass.",
-        "Actual disposable Debian13 generic6.12.113+deb13-amd64/libevdev1.13.4: first named gate failed before kernel scenarios and socket runtime was unavailable after guest reboot. Exact pinned runtime restored; actual plugin socket route passes1/1, and again in complete named gate. Second gate executes all14 manufactured scenarios but correctly fails eventual watchdog recovery620ms against575ms bound. Standalone capture records133/128/628/1102/127ms for worker/supervisor/watchdog/lease/emergency cleanup; all semantic booleans true. This is not accepted completion. See spikes/input/evidence/{kernel-initial-unavailable.log,kernel-watchdog-timing-failure.log,kernel-premeasurement-correction.json,plugin-socket-debian.log}."
+        "Final source26688de, diagnostic83f4a12, kernel identity2071354 and recovery5cfdbff independently reviewed by coordinator and separate source reviewer. Eleven non-device Rust checks (eight unit/three subprocess), strict clippy/fmt and TS checks pass. Source and binary hashes in spikes/input/evidence match the executed guest artifacts.",
+        "Actual isolated Debian13.7, generic6.12.113+deb13-amd64/libevdev1.13.4/systemd257.13: final bun run test:security -- S0-03 passes2/2 without skips, including14 manufactured evdev/uinput scenarios and actual unchanged mandatory extension sandbox socket denial. Ordinary UID1000 can connect to the same0600 socket; sandbox cannot. See spikes/input/evidence/security-debian.log and kernel-debian.json.",
+        "Worker/supervisor SIGKILL recovery121/116ms; watchdog SIGKILL issued501ms after last heartbeat, kernel removal/regrab127ms later; lease disarm requested1ms after expiry, kernel cleanup101ms later; emergency78ms. No automatic rearm. Dormant completed-input regression requires fresh-input positive control. Earlier failed startup/mixed timing reports remain unchanged.",
+        "After execution, all source hashes verified; no input spike processes or manufactured devices remain and root lab enabling marker removed before VM release. See spikes/input/evidence/guest-cleanup.json. No host system policy, physical input device or desktop settings changed."
       ],
       "owner": "review_f1_01",
       "branch": "codex/s0-03-input",
       "limitations": [
-        "Actual watchdog signal-issuance time must be measured separately from eventual kernel virtual-device teardown. The measured approximately128ms cleanup tail is an observation; its kernel cause is not established. Preserve500ms watchdog and1s lease, record separate bounded cleanup evidence and rerun final scoped security gate before acceptance.",
-        "All device experiments use newly manufactured evdev/uinput sources in a disposable VM. No host input devices, service, administrator policy or user desktop settings changed. Live logind transitions, physical laptop/USB/Bluetooth, compositor modifier recovery and full release gate remain unverified."
+        "All input devices are newly manufactured inside a disposable VM. Held physical laptop/USB/Bluetooth keys, real compositor modifier recovery and complete privileged-input security/release gate remain unverified; synthetic recovery is not physical desktop proof.",
+        "Locked/inactive/TTY/remote/stale denial uses a root-owned trusted-context fixture coupled to actual kernel no-grab checks. No live logind/companion adapter or transition-race acceptance is claimed. AC02 remains pending; coordinator also retains AC01 pending physical/compositor proof required by normative input recovery gates."
       ]
     },
     {

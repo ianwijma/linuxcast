@@ -1,0 +1,152 @@
+{
+  "exitCode": 0,
+  "report": {
+    "task": "S0-03",
+    "physicalHardwareProof": false,
+    "status": "PASSED",
+    "results": [
+      {
+        "scenario": "worker-sigkill",
+        "syntheticModifiersObserved": true,
+        "otherClientRegrabbed": true,
+        "virtualDeviceRemoved": true,
+        "noAutomaticRearm": true,
+        "recoveryMs": 121,
+        "observedMs": 2072664,
+        "mechanismDeadlineMs": 250,
+        "observerToleranceMs": 75,
+        "kernelTeardownBudgetMs": 0,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "supervisor-sigkill",
+        "syntheticModifiersObserved": true,
+        "otherClientRegrabbed": true,
+        "virtualDeviceRemoved": true,
+        "noAutomaticRearm": true,
+        "recoveryMs": 116,
+        "observedMs": 2073552,
+        "mechanismDeadlineMs": 250,
+        "observerToleranceMs": 75,
+        "kernelTeardownBudgetMs": 0,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "worker-watchdog",
+        "syntheticModifiersObserved": true,
+        "otherClientRegrabbed": true,
+        "virtualDeviceRemoved": true,
+        "noAutomaticRearm": true,
+        "recoveryMs": 627,
+        "observedMs": 2075364,
+        "mechanismDeadlineMs": 500,
+        "observerToleranceMs": 75,
+        "kernelTeardownBudgetMs": 250,
+        "watchdogKill": {
+          "lastHeartbeatMs": 2074736,
+          "detectedMs": 2075237,
+          "killIssuedMs": 2075237
+        },
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "app-lease",
+        "syntheticModifiersObserved": true,
+        "otherClientRegrabbed": true,
+        "virtualDeviceRemoved": true,
+        "noAutomaticRearm": true,
+        "recoveryMs": 1093,
+        "observedMs": 2077232,
+        "mechanismDeadlineMs": 1000,
+        "observerToleranceMs": 75,
+        "kernelTeardownBudgetMs": 250,
+        "watchdogKill": null,
+        "leaseDisarm": {
+          "leaseUntilMs": 2077130,
+          "requestedMs": 2077131
+        }
+      },
+      {
+        "scenario": "emergency",
+        "syntheticModifiersObserved": true,
+        "otherClientRegrabbed": true,
+        "virtualDeviceRemoved": true,
+        "noAutomaticRearm": true,
+        "recoveryMs": 78,
+        "observedMs": 2078032,
+        "mechanismDeadlineMs": 100,
+        "observerToleranceMs": 75,
+        "kernelTeardownBudgetMs": 0,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "locked",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "unknown-lock",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "inactive",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "tty",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "remote",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "stale-context",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "stale-generation",
+        "armDenied": true,
+        "otherClientCanGrab": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "peer-credentials-and-context-revoke",
+        "wrongUidDenied": true,
+        "rootPeerPassedDAC": true,
+        "rootPeerUidDeniedBeforeAuthorizedClient": true,
+        "contextRevocationDisarms": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      },
+      {
+        "scenario": "prearm-completed-input-backlog",
+        "preArmCompletedInputNotForwarded": true,
+        "freshPostArmInputObserved": true,
+        "watchdogKill": null,
+        "leaseDisarm": null
+      }
+    ]
+  }
+}
