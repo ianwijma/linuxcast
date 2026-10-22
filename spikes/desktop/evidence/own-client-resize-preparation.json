@@ -1,0 +1,39 @@
+{
+  "task": "S0-02",
+  "sourceBaselineCommit": "3f31c83936e074888daf2023092eaf8fec2a6b85",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "reviewedPatchSha256": "c9af4d351d0ff53b5c6c546e91b4dbc547d7aeb424ce99eab5da295860fc77e9",
+  "manifestSha256": "c07d2ac038a988623fa3ece8dfee2974fd06b258cb60acf2b1e32afe1289fcf4",
+  "platform": "Pop!_OS22.04 GNOME42.9 X11; Node24.22.1/Bun1.4.4",
+  "checks": [
+    {
+      "command": "vitest run --config scripts/test-runner/vitest.config.ts with only restart-preparation.test.ts",
+      "passed": 33,
+      "failed": 0,
+      "seconds": 3.5
+    },
+    {
+      "command": "bun run test:integration -- S0-02",
+      "passed": 98,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 3.46,
+      "composition": {
+        "transport": 63,
+        "preparation": 33,
+        "actualOwnWindowPrivateSelectionAndBus": 2
+      }
+    }
+  ],
+  "otherChecks": [
+    "typecheck passed",
+    "affected ESLint passed",
+    "guest Python syntax passed",
+    "26-input/20-output build manifest verified",
+    "plan validation passed",
+    "independent source and actual artifact review CLEAN"
+  ],
+  "physicalDesktopMatrixEstablished": false,
+  "functionalAcceptanceChanged": false
+}

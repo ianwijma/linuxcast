@@ -1,0 +1,35 @@
+{
+  "backend": "kwin-wayland",
+  "startedUtc": "2026-10-22T17:34:43.927614+00:00",
+  "exitCode": 3,
+  "results": [
+    {
+      "state": "unavailable",
+      "reason": "NATIVE_ADAPTER_PROBE_DEADLINE",
+      "physicalDesktopMatrixEstablished": false
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

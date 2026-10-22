@@ -1,0 +1,18 @@
+{
+  "releasedUtc": "2026-10-22T19:09:38.129645+00:00",
+  "stageRemoved": true,
+  "processCounts": {
+    "gnome-shell": 0,
+    "kwin_wayland": 0,
+    "kwin_x11": 0,
+    "Xvfb": 0,
+    "node": 0,
+    "dbus-daemon": 2,
+    "python3": 1,
+    "gdb": 0
+  },
+  "privateRunRootsAbsent": true,
+  "inputMarkerAbsent": true,
+  "guestPackagesPreserved": true,
+  "hostMutation": false
+}

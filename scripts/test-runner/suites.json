@@ -17,7 +17,13 @@
       "spikes/workflow-ui/tests/workflow-ui.test.ts"
     ]
   },
-  "integration": {},
+  "integration": {
+    "S0-02": [
+      "spikes/desktop/transport.test.ts",
+      "spikes/desktop/native.integration.test.ts",
+      "spikes/desktop/guest/restart-preparation.test.ts"
+    ]
+  },
   "security": {
     "S0-05": [
       "spikes/ai/oauth.contract.test.ts"

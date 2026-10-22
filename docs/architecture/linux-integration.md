@@ -54,6 +54,12 @@ KWin scripting provides outbound asynchronous `callDBus`; do not invent an incom
 
 Clipboard history uses the Wayland helper's negotiated `zwlr_data_control_manager_v1` v2 binding. Treat absence/revocation as unavailable, cap MIME sizes, cancel stale transfers and exclude Linuxcast-owned clipboard updates from recursive history capture. Protocol access does not guarantee that a clipboard source is safe to store or that the originating application can always be identified.
 
+### Feasibility finding carried into implementation
+
+S0-02 records an unresolved failure on isolated Debian 13.7, KWin 6.3.6 and the virtual software compositor: ordinary native placement reaches resize configure and then SIGSEGV. The [bounded comparison](../../spikes/desktop/evidence/native-control-comparison.md), [symbol-state result](../../spikes/desktop/evidence/symbol-state-result.md), [own-client resize control](../../spikes/desktop/evidence/own-client-resize-result.md) and [actual helper restart](../../spikes/desktop/evidence/native-restart-result.md) preserve distinct source hashes and outcomes. Successful geometry reads, client resize and helper recovery do not establish successful placement or identify the crash cause or actual renderer.
+
+F0-01 must preserve the distinction between a requested operation, its transport acknowledgement and an observed native postcondition. A compositor failure makes affected operations temporarily unavailable with an explicit recovery action; it must not become reported placement success or an automatic replay. P1-03 and P1-05 must resolve this finding and demonstrate the required placement behavior on supported targets before those features are accepted. The Debian 13/GNOME 48/Plasma 6.3 baseline, complete window-command scope and four-session release gate remain required. This finding does not authorize a renderer/platform substitution or a scope reduction.
+
 ## X11 integration
 
 Use Electron globalShortcut, XFixes selection notifications, XTest for bounded injection, and EWMH-compatible window enumeration/activation/geometry. Test against both supported desktops' X11 sessions. X11 is a less isolated display environment; Linuxcast's plugin sandbox must still prevent untrusted extensions from accessing its display socket or Xauthority. [Extended Window Manager Hints](https://specifications.freedesktop.org/wm/latest-single/).
