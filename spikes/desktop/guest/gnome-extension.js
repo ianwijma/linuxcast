@@ -32,9 +32,20 @@ export default class NativeCanary extends Extension {
             if (this._stopped) return GLib.SOURCE_REMOVE;
             const windows = global.get_window_actors().map(actor => actor.meta_window)
                 .filter(window => window.get_gtk_application_id() === appId);
+            let frameReady = false;
             if (windows.length === 1) {
+                const frame = windows[0].get_frame_rect();
+                this._result.ownFrameIsArray = Array.isArray(frame);
+                this._result.ownFrameFieldsNumeric = frame !== null && typeof frame === 'object' && ['x','y','width','height'].every(key => typeof frame[key] === 'number' && Number.isFinite(frame[key]));
+                this._result.ownFramePositive = this._result.ownFrameFieldsNumeric && frame.width > 0 && frame.height > 0;
+                // Delay known unallocated zero frames; an unexpected native
+                // shape must still reach strict validation and a failure report.
+                frameReady = !this._result.ownFrameFieldsNumeric || this._result.ownFramePositive;
+            }
+            if (windows.length === 1 && frameReady) {
                 this._poll = 0;
                 this._probe(windows[0]).catch(error => {
+                    if (['INVALID_GEOMETRY','INVALID_PROTOCOL_RECORD','INVALID_PROTOCOL_FIELDS'].includes(error?.message)) this._result.validationFailure = error.message;
                     this._result.errorKind = error instanceof TypeError ? 'TYPE_ERROR' : error instanceof RangeError ? 'RANGE_ERROR' : 'NATIVE_OR_PROBE_ERROR';
                     this._finish('failed','NATIVE_PROBE_FAILED');
                 });
@@ -52,7 +63,10 @@ export default class NativeCanary extends Extension {
         if (GLib.getenv('GDK_BACKEND') === 'wayland' && !this._result.nativeWaylandClient) throw new Error('NATIVE_WAYLAND_CLIENT_REQUIRED');
         this._native = gnomeWindow(window);
         this._result.stage = 'INITIAL_GEOMETRY';
-        const before = parseRect(this._native.geometry());
+        const initial = this._native.geometry();
+        this._result.adapterFrameFieldsNumeric = ['x','y','width','height'].every(key => typeof initial[key] === 'number' && Number.isFinite(initial[key]));
+        this._result.adapterFramePositive = initial.width > 0 && initial.height > 0;
+        const before = parseRect(initial);
         this._result.stage = 'WORK_AREA';
         const area = parseRect(this._native.workArea());
         this._result.stage = 'WINDOW_STATE';

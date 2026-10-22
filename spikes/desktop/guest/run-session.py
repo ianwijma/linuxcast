@@ -95,7 +95,13 @@ def inner(backend,root,restart=False):
                 return 0 if driver.returncode==0 and result.get('state')=='passed' else 3
             helper=subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             children.append(helper)
-            time.sleep(0.5)
+            helper_deadline=time.monotonic()+5
+            while time.monotonic()<helper_deadline:
+                if helper.poll() is not None: return report_unavailable('PRIVATE_COMPANION_START_FAILED')
+                present=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner','io.github.ianwijma.Linuxcast.Spike.Desktop1'],env)
+                if present.returncode==0 and 'true' in present.stdout: break
+                time.sleep(0.05)
+            else: return report_unavailable('PRIVATE_COMPANION_START_DEADLINE')
             loaded=bounded(['gdbus','call','--session','--dest','org.kde.KWin','--object-path','/Scripting','--method','org.kde.kwin.Scripting.loadScript',str(HERE/'kwin-script.js'),'linuxcast-s002-canary'],env)
             import re
             match=re.search(r'\((?:int32 )?([0-9]+),?\)',loaded.stdout)

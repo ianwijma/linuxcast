@@ -17,11 +17,10 @@ function timer(milliseconds,expired) {
 send('CanaryContext',{protocolVersion:1},encoded => {
     try {
         const context = JSON.parse(encoded);
-        if (!Number.isSafeInteger(context.pid) || context.pid <= 0 || context.pid > 4194304) return;
+        if (Object.keys(context).sort().join() !== 'handle,pid' || !Number.isSafeInteger(context.pid) || context.pid <= 0 || context.pid > 4194304) return;
         const handle = parseHandle(context.handle);
-        const windows = workspace.windowList().filter(window => window.pid === context.pid);
-        if (windows.length !== 1) return;
-        const native = kwinWindow(windows[0],workspace,KWin.MaximizeArea);
+        const run = window => {
+        const native = kwinWindow(window,workspace,KWin.MaximizeArea);
         const observations = [];
         let requested = null;
         const loop = kwinLoop(callDBus,timer,command => {
@@ -43,5 +42,15 @@ send('CanaryContext',{protocolVersion:1},encoded => {
             send('CanaryObservation',{protocolVersion:1,reason,action,observations,requested},() => native.dispose());
         });
         loop.start();
+        };
+        // The native GTK client may map after helper registration under TCG.
+        const ready = new QTimer(); ready.interval = 100; ready.singleShot = false;
+        let remaining = 40;
+        const find = () => {
+            const windows = workspace.windowList().filter(window => window.pid === context.pid);
+            if (windows.length === 1) { ready.stop(); run(windows[0]); }
+            else if (--remaining <= 0) ready.stop();
+        };
+        ready.timeout.connect(find); ready.start(); find();
     } catch { /* No content/exception body enters compositor diagnostics. */ }
 });
