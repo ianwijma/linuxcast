@@ -271,6 +271,22 @@ describe("S0-01 lifecycle, native activation and renderer boundaries", () => {
     ).toContain(`0x${identities.decoy.toString(16)}`);
     // Hide via singleton before triggering a real X11 global shortcut. No raw devices or private windows are inspected.
     expect(await cli("--toggle")).toBe(0);
+    await expect
+      .poll(async () =>
+        app!.evaluate(
+          ({ BrowserWindow }, id) =>
+            BrowserWindow.getAllWindows()
+              .find((w) => w.getNativeWindowHandle().readUInt32LE(0) === id)!
+              .isVisible(),
+          identities.primary,
+        ),
+      )
+      .toBe(false);
+    expect(
+      execFileSync("xprop", ["-root", "_NET_ACTIVE_WINDOW"], {
+        encoding: "utf8",
+      }).toLowerCase(),
+    ).toContain(`0x${identities.decoy.toString(16)}`);
     execFileSync("xdotool", ["key", "ctrl+alt+shift+F12"]);
     await expect
       .poll(async () =>

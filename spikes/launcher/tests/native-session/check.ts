@@ -2,9 +2,9 @@ import { _electron, expect } from '@playwright/test';
 import type { ElectronApplication } from '@playwright/test';
 import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { existsSync, lstatSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir, release } from 'node:os';
-import { basename, dirname, join } from 'node:path';
+import { existsSync, lstatSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { release } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
@@ -14,14 +14,19 @@ import type { Backend, Observation } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
 const root = process.env.LINUXCAST_S001_MATRIX_ROOT ?? '';
-if (!BACKENDS.includes(backend) || process.env.LINUXCAST_S001_PRIVATE_MATRIX !== '1'
-  || !existsSync(root) || realpathSync(root) !== root || dirname(root) !== realpathSync(tmpdir())
-  || !basename(root).startsWith('linuxcast-s001-matrix-') || lstatSync(root).uid !== process.getuid?.()
-  || (lstatSync(root).mode & 0o077) !== 0 || process.env.HOME !== join(root, 'home')
-  || process.env.XDG_RUNTIME_DIR !== join(root, 'runtime') || !process.env.DBUS_SESSION_BUS_ADDRESS?.startsWith(`unix:path=${root}/`)) throw new Error('PRIVATE_MATRIX_REQUIRED');
+// One reviewed guard covers Python and direct Node entry. This executes before
+// build, Electron/GTK launch, D-Bus calls, settings or compositor operations.
+if (!BACKENDS.includes(backend)) throw new Error('PRIVATE_MATRIX_REQUIRED');
+const contextKeys = new Set(['HOME', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_CACHE_HOME', 'XDG_RUNTIME_DIR', 'PATH', 'LANG', 'LC_ALL', 'TMPDIR', 'GSETTINGS_BACKEND',
+  'XDG_DATA_DIRS', 'XDG_CONFIG_DIRS', 'LINUXCAST_S001_PRIVATE_MATRIX', 'LINUXCAST_S001_MATRIX_ROOT', 'LINUXCAST_S001_NODE', 'LINUXCAST_S001_BACKEND',
+  'DBUS_SESSION_BUS_ADDRESS', 'DISPLAY', 'XAUTHORITY', 'WAYLAND_DISPLAY', 'XDG_SESSION_TYPE', 'GDK_BACKEND', 'LIBGL_ALWAYS_SOFTWARE', 'QT_QUICK_BACKEND', 'PWD']);
+// Unknown names are enough to reject the environment; their values may be
+// credentials and are never copied to the validator or a diagnostic artifact.
+const candidateEnv = Object.fromEntries(Object.entries(process.env).map(([key, value]) => [key, contextKeys.has(key) ? value : '']));
+const guard = spawnSync('/usr/bin/python3', ['-I', fileURLToPath(new URL('./private.py', import.meta.url)), '--driver', backend],
+  { env: { PATH: '/usr/bin:/bin', LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8' }, input: JSON.stringify(candidateEnv), encoding: 'utf8', timeout: 5000, maxBuffer: 65536 });
+if (guard.status !== 0 || guard.stdout.trim() !== 'PRIVATE_MATRIX_VERIFIED') throw new Error('PRIVATE_MATRIX_REQUIRED');
 const wayland = backend.endsWith('wayland');
-if (process.env.XDG_SESSION_TYPE !== (wayland ? 'wayland' : 'x11') || (wayland && (process.env.DISPLAY || process.env.WAYLAND_DISPLAY !== 'linuxcast-s001-wayland'))
-  || (!wayland && !/\/xvfb-run\.[^/]+\/Xauthority$/.test(process.env.XAUTHORITY ?? ''))) throw new Error('PRIVATE_NATIVE_SESSION_REQUIRED');
 const require = createRequire(new URL('../../../../apps/desktop/package.json', import.meta.url));
 const executable = require('electron') as string;
 const profile = join(root, 'linuxcast-launcher-native-session');
@@ -83,9 +88,24 @@ const state = async (): Promise<LauncherState> => {
   expect(reply.value.identity).toBe(APP_ID); expect(reply.value.session).toBe(wayland ? 'wayland' : 'x11');
   return reply.value;
 };
-const capture = async (name: string) => {
-  const png = await application!.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'));
-  writeFileSync(join(root, name), Buffer.from(png, 'base64'));
+const capture = async (name: string, appearance: 'dark' | 'light', view: 'search' | 'capabilities') => {
+  const page = await application!.firstWindow();
+  await expect(page.locator('main')).toHaveAttribute('data-theme', appearance, { timeout: 5000 });
+  if (view === 'search') await expect(page.getByRole('textbox', { name: 'Search commands', exact: true })).toBeVisible({ timeout: 5000 });
+  else {
+    await expect(page.getByRole('heading', { name: 'Launcher capabilities', exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('button', { name: 'Back to commands', exact: true })).toBeVisible({ timeout: 5000 });
+  }
+  // Renderer DOM acknowledgement precedes two actual animation frames. The
+  // Node-owned deadline remains bounded even when the renderer is backgrounded.
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('SCREENSHOT_PAINT_DEADLINE')), 5000);
+    void page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))))
+      .then(() => { clearTimeout(timer); resolve(); }, () => { clearTimeout(timer); reject(new Error('SCREENSHOT_PAINT_FAILED')); });
+  });
+  // Actual own-renderer/CDP pixels, not a compositor-wide screen capture.
+  const png = await page.screenshot({ type: 'png', timeout: 5000 });
+  writeFileSync(join(root, name), png);
 };
 const waitForExit = (app: ElectronApplication) => new Promise<void>((resolve, reject) => {
   const timer = setTimeout(() => reject(new Error('EXPLICIT_QUIT_DEADLINE')), 15_000);
@@ -126,8 +146,8 @@ try {
   requireNativeTarget(initial.launcher, backend);
   report.initialPlacementInsideWorkArea = contained(initial.launcher);
   if (!wayland) expect(contained(initial.launcher)).toBe(true);
-  await page.evaluate(() => window.linuxcast.setAppearance('dark'));
-  await capture('dark-launcher.png');
+  expect(await page.evaluate(() => window.linuxcast.setAppearance('dark'))).toMatchObject({ ok: true });
+  await capture('dark-launcher.png', 'dark', 'search');
   stage = 'resident-close';
   const original = application!.process();
   await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
@@ -170,13 +190,13 @@ try {
     report.activationOutcome = 'normal-show-and-shortcut-native-focus-observed';
   }
   stage = 'light-component-state';
-  await page.evaluate(() => window.linuxcast.setAppearance('light'));
+  expect(await page.evaluate(() => window.linuxcast.setAppearance('light'))).toMatchObject({ ok: true });
   await page.getByRole('button', { name: 'Launcher capabilities', exact: true }).click();
   if (wayland) {
     await expect(page.getByText('component required', { exact: true })).toHaveCount(2);
     for (const capability of current.capabilities) await expect(page.getByText(capability.remediation, { exact: true })).toBeVisible();
   }
-  await capture('light-capabilities.png');
+  await capture('light-capabilities.png', 'light', 'capabilities');
   await page.getByRole('button', { name: 'Back to commands', exact: true }).click();
   stage = 'explicit-ui-quit';
   const firstExit = waitForExit(application!);

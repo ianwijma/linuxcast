@@ -56,11 +56,11 @@ Screenshots, all from the synthetic Electron app: [dark](evidence/x11-dark-ready
 
 ## Target matrix and remaining gates
 
-An [offline native-session harness](tests/native-session/README.md) is prepared for the actual launcher on isolated Debian GNOME48/KWin6.3 Wayland/X11. Its six guard/schema/backend/cleanup preparation checks pass without starting any compositor. Exact native identity/backend, ordinary show/focus/placement outcomes and resident/explicit-Quit paths still require independently reviewed target execution after a coordinator VM reservation; the table below remains unchanged.
+The [native-session harness](tests/native-session/README.md) runs the actual launcher on isolated Debian GNOME48/KWin6.3 Wayland/X11 after independent review and a coordinator VM reservation. Its42 guard/schema/backend/provenance/cleanup preparation checks pass without starting a compositor. A bounded actual GNOME48 native Wayland run now passes identity/backend, strict sandbox, ordinary-show component requirement and resident/explicit-Quit assertions. Initial screenshot defects are preserved and visual evidence remains incomplete. Physical/session, portal-consent and broader release gates remain outstanding.
 
 | Required target                     | Current evidence                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
-| Debian 13 amd64, GNOME 48 Wayland   | Not run; component/activation and portal consent/effective-binding evidence required. |
+| Debian 13 amd64, GNOME 48 Wayland   | Isolated software-compositor native probe passes; ordinary show remains unfocused and exposes the component requirement. Affected-state pixels, physical/session matrix and portal consent/effective binding remain outstanding. |
 | Debian 13 amd64, GNOME X11          | Not run; current Pop!_OS/GNOME 42 X11 result cannot close it.                         |
 | Debian 13 amd64, Plasma 6.3 Wayland | Not run; component/activation and portal evidence required.                           |
 | Debian 13 amd64, KDE X11            | Not run.                                                                              |

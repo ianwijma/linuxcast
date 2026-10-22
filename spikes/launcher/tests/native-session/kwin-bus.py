@@ -3,7 +3,7 @@ import json
 import os
 import sys
 import gi
-from private import private_root, read_context
+from private import private_root, read_context, target_guard
 gi.require_version('Gio','2.0')
 from gi.repository import Gio, GLib
 
@@ -12,7 +12,8 @@ PATH='/io/github/ianwijma/Linuxcast/Spike/LauncherMatrix1'
 XML='<node><interface name="'+BUS+'">'+''.join('<method name="'+name+'"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>' for name in ('Context','Observation'))+'</interface></node>'
 
 def main():
-    root=private_root(os.environ.get('LINUXCAST_S001_MATRIX_ROOT',''))
+    target_guard()
+    root=private_root(os.environ.get('LINUXCAST_S001_MATRIX_ROOT',''),os.environ.get('LINUXCAST_S001_BACKEND'),driver=True)
     loop=GLib.MainLoop()
     connection=Gio.bus_get_sync(Gio.BusType.SESSION,None)
     def method(_connection,sender,_path,_interface,name,parameters,invocation):
