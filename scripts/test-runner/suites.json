@@ -17,6 +17,11 @@
   "security": {
     "S0-05": [
       "spikes/ai/oauth.contract.test.ts"
+    ],
+    "S0-04": [
+      "spikes/sandbox/protocol.test.ts",
+      "spikes/sandbox/supervisor.test.ts",
+      "spikes/sandbox/host.security.test.ts"
     ]
   },
   "perf": {}
