@@ -1,0 +1,67 @@
+{
+  "backend": "kwin-wayland",
+  "restart": false,
+  "startedUtc": "2026-10-22T17:47:08.202605+00:00",
+  "staging": {
+    "sourceCommit": "8030f6bad3d9266f0f3e34b215f06dd6bef4cf26",
+    "nodeVersion": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "manifestSha256": "563e712e92b4fe53c81516ca82cb225947492ec04dfae117e6d0034fa1abc6b7",
+    "guestExecution": false
+  },
+  "exitCode": 3,
+  "results": [
+    {
+      "state": "unavailable",
+      "reason": "NATIVE_ADAPTER_PROBE_DEADLINE",
+      "physicalDesktopMatrixEstablished": false,
+      "nativeProgress": {
+        "stages": [],
+        "scriptEvaluationErrorLogged": true,
+        "publicBundleErrorLines": [
+          61
+        ],
+        "wire": {
+          "authenticatedRequests": {
+            "CanaryContext": 0,
+            "Handshake": 0,
+            "NextCommand": 0,
+            "Ack": 0,
+            "CanaryObservation": 0
+          },
+          "replies": {
+            "CanaryContext": 0,
+            "Handshake": 0,
+            "NextCommand": 0,
+            "Ack": 0,
+            "CanaryObservation": 0
+          },
+          "nodeExited": false
+        }
+      }
+    }
+  ],
+  "noValidResult": false,
+  "cleanup": {
+    "processCountsBefore": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "processCountsAfter": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "node": 0,
+      "dbus-daemon": 2,
+      "python3": 1
+    },
+    "noNewPrivateRoots": true
+  },
+  "physicalDesktopMatrixEstablished": false
+}

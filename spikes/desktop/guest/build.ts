@@ -8,8 +8,8 @@ const source = dirname(fileURLToPath(import.meta.url));
 export async function buildGuestHarness(destination = join(source, 'dist')): Promise<string> {
   await mkdir(destination, {recursive:true});
   await build({entryPoints:[join(source,'desktop-api.ts')],outdir:destination,bundle:true,platform:'neutral',format:'esm',target:'es2022',logLevel:'silent'});
-  await build({entryPoints:[join(source,'kwin-script.js')],outfile:join(destination,'kwin-script.js'),bundle:true,platform:'neutral',format:'iife',target:'es2020',logLevel:'silent'});
-  await build({entryPoints:[join(source,'restart-script.js')],outfile:join(destination,'restart-script.js'),bundle:true,platform:'neutral',format:'iife',target:'es2020',logLevel:'silent'});
+  await build({entryPoints:[join(source,'kwin-script.js')],outfile:join(destination,'kwin-script.js'),bundle:true,platform:'neutral',format:'iife',target:'es2016',logLevel:'silent'});
+  await build({entryPoints:[join(source,'restart-script.js')],outfile:join(destination,'restart-script.js'),bundle:true,platform:'neutral',format:'iife',target:'es2016',logLevel:'silent'});
   await build({entryPoints:[join(source,'restart-helper.ts')],outfile:join(destination,'restart-helper.mjs'),bundle:true,platform:'node',format:'esm',target:'node24',logLevel:'silent'});
   await build({entryPoints:[join(source,'queue-helper.ts')],outfile:join(destination,'queue-helper.mjs'),bundle:true,platform:'node',format:'esm',target:'node24',logLevel:'silent'});
   await build({entryPoints:[join(source,'clipboard-client.ts')],outfile:join(destination,'clipboard-client.mjs'),bundle:true,platform:'node',format:'esm',target:'node24',logLevel:'silent'});
