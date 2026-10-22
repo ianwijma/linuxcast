@@ -238,6 +238,38 @@ test("S0-06-AC02 edge validator rejects incompatible types ports missing nodes d
   expect(removeNode(next, "trim").edges).toHaveLength(0);
   expect(graph.edges).toHaveLength(2);
 });
+test("source edge order stays unique after deleting an earlier connection", () => {
+  let graph = connect(structuredClone(graphFixture), "start", "copy", "second");
+  graph.edges = graph.edges.filter((edge) => !(edge.from.nodeId === "start" && edge.to.nodeId === "trim"));
+  graph.nodes.push({ ...structuredClone(graph.nodes[1]!), id: "extra" });
+  graph = connect(graph, "start", "extra", "third");
+  const orders = graph.edges.filter((edge) => edge.from.nodeId === "start").map((edge) => edge.order);
+  expect(orders).toEqual([1, 2]);
+  expect(new Set(orders).size).toBe(orders.length);
+});
+test("disabled Form actions cannot submit through Enter or native form submission", async ({ page }) => {
+  await open(page);
+  await page.evaluate(async () => { const path = "/tests/host-boundaries.tsx"; const helper = await import(path); helper.mountBlockedForm(); });
+  await expect(page.getByRole("button", { name: "Apply configuration" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Cancel changes" })).toBeDisabled();
+  await expect(page.getByText("Synthetic policy denial")).toHaveCount(2);
+  await page.getByLabel("Node label").focus();
+  await page.keyboard.press("Enter");
+  await page.locator("form").evaluate((form: HTMLFormElement) => form.requestSubmit());
+  await expect(page.locator("#boundary-fixture")).toHaveAttribute("data-submissions", "0");
+  await expect(page.locator("#boundary-fixture")).toHaveAttribute("data-cancellations", "0");
+});
+test("list arrow keys skip disabled rows in both directions and wrap", async ({ page }) => {
+  await open(page);
+  await page.evaluate(async () => { const path = "/tests/host-boundaries.tsx"; const helper = await import(path); helper.mountDisabledList(); });
+  await page.getByRole("button", { name: "First" }).focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("button", { name: "Last" })).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByRole("button", { name: "First" })).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByRole("button", { name: "Last" })).toBeFocused();
+});
 test("layout editing does not change execution graph and form cancel preserves values", async ({
   page,
 }) => {

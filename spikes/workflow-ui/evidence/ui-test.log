@@ -1,18 +1,21 @@
 $ node scripts/test-runner/run.ts ui "S0-06"
 
-Running 10 tests using 1 worker
+Running 13 tests using 1 worker
 
-(node:934924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:944129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ✓   1 spikes/workflow-ui/tests/workflow-ui.test.ts:98:1 › S0-06-AC01 keyboard adds configures connects and removes a node (585ms)
-  ✓   2 spikes/workflow-ui/tests/workflow-ui.test.ts:129:1 › S0-06-AC02 rejects unrecognized ViewModel fields versions identities and action revisions (62ms)
-  ✓   3 spikes/workflow-ui/tests/workflow-ui.test.ts:217:1 › S0-06-AC02 edge validator rejects incompatible types ports missing nodes duplicates and cycles (36ms)
-  ✓   4 spikes/workflow-ui/tests/workflow-ui.test.ts:241:1 › layout editing does not change execution graph and form cancel preserves values (455ms)
-  ✓   5 spikes/workflow-ui/tests/workflow-ui.test.ts:263:1 › drafts survive attempted navigation and controls retain focus after apply and cancel (414ms)
-  ✓   6 spikes/workflow-ui/tests/workflow-ui.test.ts:298:1 › invalid edge reason is visible and graph is unchanged (501ms)
-  ✓   7 spikes/workflow-ui/tests/workflow-ui.test.ts:319:1 › host list states are truthful and retry restores the fixture (866ms)
-  ✓   8 spikes/workflow-ui/tests/workflow-ui.test.ts:377:1 › dark and light host renderer pass WCAG AA automated accessibility (1.7s)
-  ✓   9 spikes/workflow-ui/tests/workflow-ui.test.ts:395:1 › S0-06-PRIVACY renderer makes no external requests and rejects private payloads without echo (263ms)
-  ✓  10 spikes/workflow-ui/tests/workflow-ui.test.ts:427:1 › structured editor works with reduced motion forced colors 200% text and long CJK RTL labels (545ms)
+  ✓   1 spikes/workflow-ui/tests/workflow-ui.test.ts:98:1 › S0-06-AC01 keyboard adds configures connects and removes a node (618ms)
+  ✓   2 spikes/workflow-ui/tests/workflow-ui.test.ts:129:1 › S0-06-AC02 rejects unrecognized ViewModel fields versions identities and action revisions (70ms)
+  ✓   3 spikes/workflow-ui/tests/workflow-ui.test.ts:217:1 › S0-06-AC02 edge validator rejects incompatible types ports missing nodes duplicates and cycles (44ms)
+  ✓   4 spikes/workflow-ui/tests/workflow-ui.test.ts:241:1 › source edge order stays unique after deleting an earlier connection (34ms)
+  ✓   5 spikes/workflow-ui/tests/workflow-ui.test.ts:250:1 › disabled Form actions cannot submit through Enter or native form submission (318ms)
+  ✓   6 spikes/workflow-ui/tests/workflow-ui.test.ts:262:1 › list arrow keys skip disabled rows in both directions and wrap (292ms)
+  ✓   7 spikes/workflow-ui/tests/workflow-ui.test.ts:273:1 › layout editing does not change execution graph and form cancel preserves values (493ms)
+  ✓   8 spikes/workflow-ui/tests/workflow-ui.test.ts:295:1 › drafts survive attempted navigation and controls retain focus after apply and cancel (447ms)
+  ✓   9 spikes/workflow-ui/tests/workflow-ui.test.ts:330:1 › invalid edge reason is visible and graph is unchanged (515ms)
+  ✓  10 spikes/workflow-ui/tests/workflow-ui.test.ts:351:1 › host list states are truthful and retry restores the fixture (854ms)
+  ✓  11 spikes/workflow-ui/tests/workflow-ui.test.ts:409:1 › dark and light host renderer pass WCAG AA automated accessibility (1.6s)
+  ✓  12 spikes/workflow-ui/tests/workflow-ui.test.ts:427:1 › S0-06-PRIVACY renderer makes no external requests and rejects private payloads without echo (236ms)
+  ✓  13 spikes/workflow-ui/tests/workflow-ui.test.ts:459:1 › structured editor works with reduced motion forced colors 200% text and long CJK RTL labels (506ms)
 
-  10 passed (6.3s)
+  13 passed (7.0s)

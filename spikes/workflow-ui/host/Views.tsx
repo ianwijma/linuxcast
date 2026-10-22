@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { FormView, ListView } from "../model.ts";
+import { acceptsAction, type FormView, type ListView } from "../model.ts";
 /** Host-owned feasibility primitives, shared by graph structure and fixture preview. */
 export function HostList({
   view,
@@ -54,16 +54,14 @@ export function HostList({
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                     e.preventDefault();
-                    buttons.current
-                      .get(
-                        rows[
-                          (index +
-                            (e.key === "ArrowDown" ? 1 : -1) +
-                            rows.length) %
-                            rows.length
-                        ]!.id,
-                      )
-                      ?.focus();
+                    const step = e.key === "ArrowDown" ? 1 : -1;
+                    for (let offset = 1; offset <= rows.length; offset++) {
+                      const candidate = rows[(index + step * offset + rows.length) % rows.length]!;
+                      if (!candidate.disabledReason) {
+                        buttons.current.get(candidate.id)?.focus();
+                        break;
+                      }
+                    }
                   }
                 }}
               >
@@ -102,12 +100,15 @@ export function HostForm({
   const [values, setValues] = useState(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const dirty = JSON.stringify(initial) !== JSON.stringify(values);
+  const submitAction = view.actions?.find((a) => a.id === view.submitActionId);
+  const cancelAction = view.actions?.find((a) => a.id === view.cancelActionId);
   return (
     <form
       aria-label={view.title}
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
+        if (!acceptsAction(view, view.revision, view.submitActionId)) return;
         const next = Object.fromEntries(
           view.fields.flatMap((field) => {
             const value = values[field.id] ?? "";
@@ -154,12 +155,15 @@ export function HostForm({
         {dirty ? "Unapplied changes" : "Configuration matches this session"}
       </p>
       <div className="button-row">
-        <button className="primary" type="submit">
-          {view.actions?.find((a) => a.id === view.submitActionId)?.title}
+        <button className="primary" type="submit" disabled={!acceptsAction(view, view.revision, view.submitActionId)} aria-describedby={submitAction?.disabledReason ? "submit-unavailable" : undefined}>
+          {submitAction?.title}
         </button>
         <button
           type="button"
+          disabled={!acceptsAction(view, view.revision, view.cancelActionId)}
+          aria-describedby={cancelAction?.disabledReason ? "cancel-unavailable" : undefined}
           onClick={() => {
+            if (!acceptsAction(view, view.revision, view.cancelActionId)) return;
             setValues(initial);
             setErrors({});
             onDirtyChange(false);
@@ -169,6 +173,8 @@ export function HostForm({
           Cancel changes
         </button>
       </div>
+      {submitAction?.disabledReason && <p id="submit-unavailable" className="notice warning">{submitAction.disabledReason}</p>}
+      {cancelAction?.disabledReason && <p id="cancel-unavailable" className="notice warning">{cancelAction.disabledReason}</p>}
     </form>
   );
 }

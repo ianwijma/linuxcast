@@ -286,7 +286,7 @@ export function connect(
         id,
         from: { nodeId: from, port: "out" },
         to: { nodeId: to, port: "in" },
-        order: graph.edges.filter((e) => e.from.nodeId === from).length,
+        order: Math.max(-1, ...graph.edges.filter((e) => e.from.nodeId === from && e.from.port === "out").map((e) => e.order)) + 1,
       },
     ],
   };
