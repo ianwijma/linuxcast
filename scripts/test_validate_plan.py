@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 
-class PlanningGateTests(unittest.TestCase):
+class PlanningFixture(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
         self.root=Path(self.tmp.name)
@@ -31,6 +31,7 @@ class PlanningGateTests(unittest.TestCase):
         data=json.loads(path.read_text());fn(data["tasks"])
         path.write_text(json.dumps(data))
 
+class PlanningGateTests(PlanningFixture):
     def test_valid_handoff(self):
         result=self.run_gate()
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
@@ -68,4 +69,6 @@ class PlanningGateTests(unittest.TestCase):
         self.assertNotEqual(result.returncode,0)
         self.assertIn("done without evidence",result.stdout)
 
-if __name__=="__main__":unittest.main()
+if __name__=="__main__":
+    # Keep the established CI entry point while including all planning regressions.
+    unittest.main(module=None, argv=[sys.argv[0], "discover", "-s", str(ROOT / "scripts"), "-p", "test_*.py"])
