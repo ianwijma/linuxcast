@@ -7,6 +7,10 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <dlfcn.h>
 
 #define LOGIN "org.freedesktop.login1"
 #define MANAGER "/org/freedesktop/login1"
@@ -27,7 +31,16 @@ struct lc_context {
     int invalidated;
     unsigned event_count;
     int flood;
+    int peer_mode;
+    int peer_socket;
+    int peer_pidfd;
+    pid_t peer_pid;
+    uint32_t peer_terminal;
+    int (*peer_session_fn)(int, char **);
+    int (*peer_uid_fn)(const char *, uid_t *);
 };
+static uint32_t peer_binding(struct lc_context *c);
+static void peer_terminal(struct lc_context *c, uint32_t status);
 static uint64_t now_us(void) {
     struct timespec t;
     if (clock_gettime(CLOCK_MONOTONIC, &t) < 0) return UINT64_MAX;
@@ -95,6 +108,10 @@ static int call(struct lc_context *c, const char *destination, const char *path,
                 const char *interface, const char *member, const char *argument,
                 const char *property, sd_bus_message **reply) {
     sd_bus_message *request = NULL;
+    if (c->peer_mode) {
+        uint32_t status = c->peer_terminal ? c->peer_terminal : peer_binding(c);
+        if (status != LC_CONTEXT_OK) { peer_terminal(c, status); return -ESTALE; }
+    }
     uint64_t left = remaining(c);
     if (!left) return -ETIMEDOUT;
     int r = sd_bus_message_new_method_call(c->bus, &request, destination, path, interface, member);
@@ -103,6 +120,14 @@ static int call(struct lc_context *c, const char *destination, const char *path,
     if (r >= 0 && property) r = sd_bus_message_append(request, "s", property);
     if (r >= 0) r = sd_bus_call(c->bus, request, left, NULL, reply);
     sd_bus_message_unref(request);
+    if (c->peer_mode) {
+        uint32_t status = peer_binding(c);
+        if (status != LC_CONTEXT_OK) {
+            peer_terminal(c, status);
+            *reply = sd_bus_message_unref(*reply);
+            return -ESTALE;
+        }
+    }
     return r;
 }
 static int property(struct lc_context *c, const char *name, const char *signature,
@@ -259,7 +284,7 @@ fail:
 }
 static void sample_bound(struct lc_context *c, struct lc_context_observation *out) {
     memset(out, 0, sizeof(*out));
-    c->deadline_us = now_us() + QUERY_BUDGET_US;
+    if (!c->peer_mode) c->deadline_us = now_us() + QUERY_BUDGET_US;
     out->started_ms = now_us() / 1000;
     c->invalidated = 0;
     c->event_count = 0;
@@ -321,5 +346,11 @@ void lc_context_close(struct lc_context *c) {
     if (!c) return;
     sd_bus_close(c->bus);
     sd_bus_unref(c->bus);
+    if (c->peer_mode) {
+        if (c->peer_socket >= 0) close(c->peer_socket);
+        if (c->peer_pidfd >= 0) close(c->peer_pidfd);
+    }
     free(c);
 }
+
+#include "peer-context.c"

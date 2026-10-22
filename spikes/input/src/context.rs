@@ -1,6 +1,8 @@
 //! Monitor-only observations. This module exposes no device or Arm operation.
 use serde::Serialize;
 use std::ffi::c_void;
+use std::os::fd::AsRawFd;
+use std::os::unix::net::UnixStream;
 
 #[repr(C)]
 #[derive(Default, Clone, Copy)]
@@ -14,6 +16,12 @@ struct NativeObservation {
 unsafe extern "C" {
     fn lc_context_open(out: *mut NativeObservation) -> *mut c_void;
     fn lc_context_sample(context: *mut c_void, out: *mut NativeObservation);
+    fn lc_context_open_peer(
+        socket: libc::c_int,
+        expected_uid: u32,
+        out: *mut NativeObservation,
+    ) -> *mut c_void;
+    fn lc_context_sample_peer(context: *mut c_void, out: *mut NativeObservation);
     fn lc_context_close(context: *mut c_void);
 }
 const PID_BOUND: u32 = 1;
@@ -40,6 +48,13 @@ pub enum Denial {
     QueryDeadline,
     MalformedObservation,
     MessageFlood,
+    PeerPidfdUnavailable,
+    PeerDead,
+    PeerDisconnected,
+    PeerBindingInvalid,
+    PeerSessionUnsupported,
+    PeerSessionChanged,
+    EnvironmentUntrusted,
     SnapshotStale,
     Inactive,
     Remote,
@@ -93,6 +108,13 @@ fn report(value: NativeObservation, now_ms: u64) -> Report {
         7 => denials.push(Denial::QueryDeadline),
         8 => denials.push(Denial::MalformedObservation),
         9 => denials.push(Denial::MessageFlood),
+        10 => denials.push(Denial::PeerPidfdUnavailable),
+        11 => denials.push(Denial::PeerDead),
+        12 => denials.push(Denial::PeerDisconnected),
+        13 => denials.push(Denial::PeerBindingInvalid),
+        14 => denials.push(Denial::PeerSessionUnsupported),
+        15 => denials.push(Denial::PeerSessionChanged),
+        16 => denials.push(Denial::EnvironmentUntrusted),
         _ => denials.push(Denial::MalformedObservation),
     }
     if !valid && value.status == 0 {
@@ -170,6 +192,46 @@ impl Monitor {
     }
 }
 impl Drop for Monitor {
+    fn drop(&mut self) {
+        unsafe { lc_context_close(self.native) };
+    }
+}
+
+/// Metadata-only peer observation. It consumes an already accepted AF_UNIX
+/// stream, owns its kernel-derived CLOEXEC peer pidfd and has no protocol/Arm,
+/// client-provided FD/principal, or arbitrary PID/session constructor.
+/// The expected UID MUST come from trusted server grant state, never a message.
+/// Dedicated engineering observer only: launch with an empty environment before
+/// library initialization and never mutate it. This API rejects any environment
+/// entry before symbol resolution/session/bus work; it does not clear globals.
+pub struct PeerMonitor {
+    native: *mut c_void,
+}
+impl PeerMonitor {
+    pub fn bind_connected(
+        stream: UnixStream,
+        trusted_expected_uid: u32,
+    ) -> std::result::Result<Self, Denial> {
+        let mut observation = NativeObservation::default();
+        let native = unsafe {
+            lc_context_open_peer(stream.as_raw_fd(), trusted_expected_uid, &mut observation)
+        };
+        // The native object retains only its own CLOEXEC metadata socket copy.
+        // Consuming this transport prevents an unrelated socket replacing it.
+        drop(stream);
+        if native.is_null() {
+            let mut denied = report(observation, crate::unix::monotonic_ms()).denials;
+            return Err(denied.remove(0));
+        }
+        Ok(Self { native })
+    }
+    pub fn observe(&mut self) -> Report {
+        let mut observation = NativeObservation::default();
+        unsafe { lc_context_sample_peer(self.native, &mut observation) };
+        report(observation, crate::unix::monotonic_ms())
+    }
+}
+impl Drop for PeerMonitor {
     fn drop(&mut self) {
         unsafe { lc_context_close(self.native) };
     }

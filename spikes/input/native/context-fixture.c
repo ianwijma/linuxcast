@@ -4,7 +4,8 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <stdio.h>
-struct fixture { int mode; unsigned calls; int bad; int signaled; };
+#include <signal.h>
+struct fixture { int mode; unsigned calls; int bad; int signaled; uid_t uid; pid_t expire_peer; int expire_pidfd; };
 static int answer(sd_bus_message *request, struct fixture *f, const char *type,
                   const char *text, uint32_t number) {
     sd_bus_message *reply = NULL;
@@ -46,6 +47,11 @@ static int handler(sd_bus_message *m, void *userdata, sd_bus_error *error) {
         const char *interface, *name;
         if (sd_bus_message_read(m, "ss", &interface, &name) <= 0 || strcmp(interface, SESSION)) { f->bad = 1; return 1; }
         ++f->calls;
+        if (f->expire_peer > 0) {
+            kill(f->expire_peer, SIGKILL); f->expire_peer = 0;
+            struct pollfd death = { .fd = f->expire_pidfd, .events = POLLIN };
+            if (poll(&death, 1, 100) <= 0) f->bad = 1;
+        }
         if (f->mode == 4) return 1; /* Real bounded unanswered method call. */
         if ((f->mode == 5 || f->mode == 10 || f->mode == 13) && !f->signaled) {
             sd_bus_message *signal = NULL;
@@ -81,7 +87,7 @@ static int handler(sd_bus_message *m, void *userdata, sd_bus_error *error) {
             if (r < 0) f->bad = 1;
             f->signaled = 1;
         }
-        if (strcmp(name, "User") == 0) return answer(m, f, "v(uo)", NULL, f->mode == 1 ? 1001 : 1000);
+        if (strcmp(name, "User") == 0) return answer(m, f, "v(uo)", NULL, f->mode == 1 ? 1001 : f->uid);
         if (strcmp(name, "Remote") == 0) return answer(m, f, "vb", NULL, f->mode == 7);
         if (strcmp(name, "Active") == 0) return answer(m, f, f->mode == 3 ? "vs" : "vb", "PrivateFixtureCanary", f->mode != 9);
         if (strcmp(name, "Type") == 0) return answer(m, f, "vs", f->mode == 8 ? "tty" : "wayland", 0);
@@ -102,7 +108,7 @@ static int one(int mode) {
         alarm(3);
         close(fd[0]);
         sd_bus *server = NULL;
-        struct fixture f = { .mode = mode };
+        struct fixture f = { .mode = mode, .uid = 1000 };
         sd_id128_t id = SD_ID128_MAKE(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
         if (sd_bus_new(&server) < 0 || sd_bus_set_fd(server, fd[1], fd[1]) < 0 ||
             sd_bus_set_server(server, 1, id) < 0 || sd_bus_add_filter(server, NULL, handler, &f) < 0 ||
@@ -151,6 +157,7 @@ static int one(int mode) {
     return observed.flags == (LC_PID_BOUND | LC_UID_MATCHED | LC_ACTIVE | LC_LOCAL |
         LC_GRAPHICAL | LC_USER_CLASS | LC_SEAT0 | LC_HINT_KNOWN | LC_OWNER_ROOT);
 }
+#ifndef LC_CONTEXT_FIXTURE_NO_MAIN
 int main(void) {
     clearenv();
     for (int mode = 0; mode <= 13; ++mode) {
@@ -159,3 +166,5 @@ int main(void) {
     puts("{\"privatePeerFixture\":true,\"casesPassed\":14,\"readMethodsOnly\":true}");
     return 0;
 }
+
+#endif

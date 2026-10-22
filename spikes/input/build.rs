@@ -93,6 +93,31 @@ fn main() {
         "cargo:rustc-env=LINUXCAST_CONTEXT_PRIVATE_FIXTURE={}",
         fixture.display()
     );
+    let peer_fixture = out.join("context-peer-fixture");
+    assert!(
+        Command::new("cc")
+            .args([
+                "-std=c11",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-D_GNU_SOURCE"
+            ])
+            .args(flags.split_whitespace())
+            .args(["native/peer-fixture.c", "-lsystemd", "-o"])
+            .arg(&peer_fixture)
+            .status()
+            .expect("C compiler required")
+            .success(),
+        "peer fixture compilation failed"
+    );
+    println!(
+        "cargo:rustc-env=LINUXCAST_CONTEXT_PEER_FIXTURE={}",
+        peer_fixture.display()
+    );
+    println!("cargo:rerun-if-changed=native/peer-context.c");
+    println!("cargo:rerun-if-changed=native/peer-fixture.c");
     println!("cargo:rustc-link-lib=systemd");
     println!("cargo:rerun-if-changed=native/context.c");
     println!("cargo:rerun-if-changed=native/context.h");
