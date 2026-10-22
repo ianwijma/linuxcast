@@ -24,7 +24,8 @@
       "spikes/sandbox/host.security.test.ts"
     ],
     "S0-03": [
-      "spikes/input/kernel.security.test.ts"
+      "spikes/input/kernel.security.test.ts",
+      "spikes/input/plugin-socket.security.test.ts"
     ]
   },
   "perf": {}
