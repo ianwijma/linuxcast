@@ -61,9 +61,9 @@ The [native-session harness](tests/native-session/README.md) runs the actual lau
 | Required target                     | Current evidence                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
 | Debian 13 amd64, GNOME 48 Wayland   | Isolated software-compositor native probe passes; ordinary show remains unfocused and exposes the component requirement. Actual own-renderer dark/light pixels recorded; physical/session matrix and portal consent/effective binding remain outstanding. |
-| Debian 13 amd64, GNOME X11          | Incomplete at initial native-identity condition; strict actual Electron/X11 sandbox passes, no successful native predicate persisted. |
-| Debian 13 amd64, Plasma 6.3 Wayland | Incomplete at decoy challenge: launcher native Wayland identity/geometry/resident close pass, fixed decoy fails identity gate. |
-| Debian 13 amd64, KDE X11            | Incomplete at initial native-identity condition; strict actual Electron/X11 sandbox passes, no successful native predicate persisted. |
+| Debian 13 amd64, GNOME X11          | Latest13b diagnostic establishes initial native identity/geometry, then no matching parsed reply after Close; resident/native-hidden gate remains open. |
+| Debian 13 amd64, Plasma 6.3 Wayland | Incomplete at decoy challenge: launcher native Wayland identity/geometry/resident close pass; parsed diagnostics reject both fixed decoy identity channels. |
+| Debian 13 amd64, KDE X11            | Latest13b diagnostic finds two launcher-PID candidates and refuses identity/geometry inspection; exact-target selection remains open. |
 
 No companion, portal, input service, keyboard device, GNOME setting, autostart entry or user shortcut preference is installed/enabled/changed. The test shortcut grabs last only for the disposable application processes. No claim covers multimonitor/fractional scale, suspend/lock/logout, packaging installation or production command routing. The coordinator must keep missing checks outstanding and obtain independent review before integration.
 
