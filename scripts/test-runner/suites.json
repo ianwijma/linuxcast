@@ -9,6 +9,12 @@
   "contracts": {},
   "ui": {},
   "integration": {},
-  "security": {},
+  "security": {
+    "S0-04": [
+      "spikes/sandbox/protocol.test.ts",
+      "spikes/sandbox/supervisor.test.ts",
+      "spikes/sandbox/host.security.test.ts"
+    ]
+  },
   "perf": {}
 }
