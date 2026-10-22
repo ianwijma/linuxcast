@@ -354,6 +354,17 @@ describe("S0-01 lifecycle, native activation and renderer boundaries", () => {
         expect(blockerState.value.shortcut.effective).toBe(
           "Ctrl+Alt+Shift+F11",
         );
+      // Simulate loss of this app's old backend registration, then try a key
+      // still held by the real second app. A stale key must not be advertised.
+      await app!.evaluate(({ globalShortcut }) => globalShortcut.unregisterAll());
+      const stale = await page.evaluate(() =>
+        window.linuxcast.setShortcut("Ctrl+Alt+Shift+F11"),
+      );
+      expect(stale.ok).toBe(true);
+      if (stale.ok) {
+        expect(stale.value.effective).toBeNull();
+        expect(stale.value.reason).not.toContain("remains active");
+      }
       await blocker.close();
       const recovered = await page.evaluate(() =>
         window.linuxcast.setShortcut("Ctrl+Alt+Shift+F11"),

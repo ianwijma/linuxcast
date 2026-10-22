@@ -121,4 +121,13 @@ describe("S0-01 strict launcher data boundaries", () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+  it("rejects nested profiles whose writable parent could replace the checked directory", () => {
+    const parent = mkdtempSync(join(tmpdir(), "linuxcast-launcher-parent-"));
+    try {
+      chmodSync(parent, 0o777);
+      expect(() => prepareProfile(join(parent, "private-child"))).toThrow("Invalid disposable");
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
 });

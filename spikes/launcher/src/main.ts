@@ -120,10 +120,13 @@ if (!ownsInstance) {
     publish();
   };
   const registerShortcut = (requested: string): Shortcut => {
-    const old = registeredBinding;
     finishRecording();
-    let registered =
-      old === requested && globalShortcut.isRegistered(requested);
+    let old: string | null = null;
+    try {
+      if (registeredBinding && globalShortcut.isRegistered(registeredBinding)) old = registeredBinding;
+    } catch { /* A lost backend registration must not be advertised as active. */ }
+    registeredBinding = old;
+    let registered = old === requested;
     try {
       if (!registered)
         registered =
