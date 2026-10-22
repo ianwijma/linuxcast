@@ -2,13 +2,13 @@ $ node scripts/test-runner/run.ts integration "S0-02"
 
  RUN  v4.1.12 /tmp/linuxcast-s0-02
 
- ✓ spikes/desktop/transport.test.ts (15 tests) 37ms
- ✓ spikes/desktop/native.integration.test.ts (2 tests) 1262ms
-   ✓ actual own GTK/X11 window and private selection canary, not companion proof  1111ms
+ ✓ spikes/desktop/transport.test.ts (60 tests) 198ms
+ ✓ spikes/desktop/native.integration.test.ts (2 tests) 1266ms
+   ✓ actual own GTK/X11 window and private selection canary, not companion proof  1112ms
 
  Test Files  2 passed (2)
-      Tests  17 passed (17)
-   Start at  02:53:03
-   Duration  1.39s (transform 73ms, setup 0ms, import 97ms, tests 1.30s, environment 0ms)
+      Tests  62 passed (62)
+   Start at  03:11:38
+   Duration  1.40s (transform 94ms, setup 0ms, import 126ms, tests 1.46s, environment 0ms)
 
-JSON report written to /tmp/linuxcast-test-report-HzNU7m/results.json
+JSON report written to /tmp/linuxcast-test-report-tmIl6u/results.json

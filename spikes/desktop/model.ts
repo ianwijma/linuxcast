@@ -1,19 +1,11 @@
 /** S0-02 private fixture vocabulary. These are proposals, not frozen contracts. */
 export type Backend = 'gnome48' | 'kwin6.3';
 export type State = { state: 'available' | 'component-required' | 'permission-required' | 'unsupported' | 'temporarily-unavailable'; reason: string; action: string; generation: number };
-export class DesktopError extends Error {
-  readonly action: string;
-  constructor(code: string, action = 'Refresh capabilities and retry with current context') { super(code); this.action = action; }
-}
-export type Rect = { x: number; y: number; width: number; height: number };
-export type Handle = { session: string; generation: number; id: string };
-
-export function validRect(value: Rect): void {
-  if (Object.keys(value).sort().join() !== 'height,width,x,y' || !Object.values(value).every(Number.isFinite)
-      || value.width <= 0 || value.height <= 0 || Object.values(value).some(number => Math.abs(number) > 1000000)) {
-    throw new DesktopError('INVALID_GEOMETRY');
-  }
-}
+import { DesktopError, parseHandle, parseCommandInput, validRect } from './protocol.ts';
+import type { Rect, Handle, Command, CommandInput, PollResult } from './protocol.ts';
+import { newCompanionInstance } from './helper-epoch.ts';
+export { DesktopError, validRect } from './protocol.ts';
+export type { Rect, Handle, Command, PollResult } from './protocol.ts';
 
 export function clampRect(rect: Rect, workArea: Rect): Rect {
   validRect(rect); validRect(workArea);
@@ -33,6 +25,7 @@ export interface NativeWindow {
 
 export class Companion {
   private nextId = 0;
+  private readonly instance = newCompanionInstance();
   private readonly windows = new Map<string, NativeWindow>();
   private identities = new WeakMap<NativeWindow, string>();
   status: State = { state: 'component-required', reason: 'COMPANION_MISSING', action: 'Explicitly enable the matching desktop companion', generation: 0 };
@@ -62,17 +55,18 @@ export class Companion {
     this.available();
     if (!window.alive()) throw new DesktopError('WINDOW_GONE');
     const existing = this.identities.get(window);
-    if (existing && this.windows.has(existing)) return { session: this.session, generation: this.status.generation, id: existing };
+    if (existing && this.windows.has(existing)) return { session: this.session, instance: this.instance, generation: this.status.generation, id: existing };
     if (this.windows.size >= 256) for (const [id, value] of this.windows) if (!value.alive()) this.windows.delete(id);
     if (this.windows.size >= 256) throw new DesktopError('WINDOW_REGISTRY_LIMIT', 'Refresh the bounded window registry before adding more handles');
     const id = `window-${++this.nextId}`;
     this.windows.set(id, window);
     this.identities.set(window, id);
-    return { session: this.session, generation: this.status.generation, id };
+    return { session: this.session, instance: this.instance, generation: this.status.generation, id };
   }
   private resolve(handle: Handle): NativeWindow {
     this.available();
-    if (Object.keys(handle).sort().join() !== 'generation,id,session' || handle.session !== this.session
+    try { handle = parseHandle(handle); } catch { throw new DesktopError('STALE_WINDOW_HANDLE'); }
+    if (handle.instance !== this.instance || handle.session !== this.session
         || handle.generation !== this.status.generation || !this.windows.has(handle.id)) throw new DesktopError('STALE_WINDOW_HANDLE');
     const value = this.windows.get(handle.id)!;
     if (!value.alive()) { this.windows.delete(handle.id); throw new DesktopError('WINDOW_GONE'); }
@@ -165,8 +159,6 @@ export class ClipboardTransfer {
   }
 }
 
-export type Command = { id: string; generation: number; operation: 'geometry' | 'place'; handle: Handle; rect?: Rect; expires: number };
-export type PollResult = { kind: 'command'; command: Command; expiresInMs: number } | { kind: 'empty' | 'reconnect'; reason: string };
 type Pending = { resolve(value: PollResult): void; timer: ReturnType<typeof setTimeout> };
 
 /** One authenticated script, one long-poll and one unacknowledged command. */
@@ -204,19 +196,13 @@ export class CommandQueue {
     this.peer = undefined;
     if (this.pending) { clearTimeout(this.pending.timer); this.pending.resolve({ kind: 'reconnect', reason }); this.pending = undefined; }
   }
-  enqueue(peer: string, generation: number, value: Omit<Command, 'id' | 'generation' | 'expires'>, lifetimeMs = 1000): string {
+  enqueue(peer: string, generation: number, value: CommandInput, lifetimeMs = 1000): string {
     this.identity(peer, generation);
-    if (!value || typeof value !== 'object' || !value.handle || typeof value.handle !== 'object'
-        || Object.keys(value.handle).sort().join() !== 'generation,id,session'
-        || typeof value.handle.session !== 'string' || value.handle.session.length > 128
-        || typeof value.handle.id !== 'string' || value.handle.id.length > 128) throw new DesktopError('INVALID_COMMAND');
-    if (!['geometry', 'place'].includes(value.operation) || Object.keys(value).some(key => !['operation', 'handle', 'rect'].includes(key))) throw new DesktopError('UNKNOWN_WINDOW_OPERATION');
-    if (value.handle.generation !== generation) throw new DesktopError('STALE_WINDOW_HANDLE');
-    if (value.operation === 'place') { if (!value.rect) throw new DesktopError('INVALID_GEOMETRY'); validRect(value.rect); }
-    else if ('rect' in value) throw new DesktopError('INVALID_COMMAND');
+    const input = parseCommandInput(value);
+    if (input.handle.generation !== generation) throw new DesktopError('STALE_WINDOW_HANDLE');
     if (this.queue.length >= 16) throw new DesktopError('COMMAND_QUEUE_FULL');
     if (!Number.isFinite(lifetimeMs) || lifetimeMs <= 0 || lifetimeMs > 5000) throw new DesktopError('COMMAND_DEADLINE');
-    const command: Command = { ...value, handle: { ...value.handle }, ...(value.rect ? { rect: { ...value.rect } } : {}), id: `${generation}-${++this.serial}`, generation, expires: this.now() + lifetimeMs };
+    const command: Command = { ...input, id: `${generation}-${++this.serial}`, generation, expires: this.now() + lifetimeMs };
     this.queue.push(command);
     this.dispatch();
     return command.id;

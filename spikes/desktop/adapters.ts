@@ -1,5 +1,6 @@
-import { DesktopError } from './model.ts';
-import type { Command, Source } from './model.ts';
+import { DesktopError, parseAck, parseHandshake, parsePollResult } from './protocol.ts';
+import type { Command } from './protocol.ts';
+import type { Source } from './model.ts';
 
 export type NativeBytes = { get_data(): Uint8Array };
 export type MemoryStream = { close(cancel: null): void; steal_as_bytes(): NativeBytes };
@@ -85,22 +86,18 @@ export function kwinLoop(callDBus: CallDBus, timer: TimerFactory,
     });
   };
   const poll = () => invoke('NextCommand', { protocolVersion: 1, generation }, (reply, elapsed) => {
-    if (reply.kind === 'reconnect') { stop('COMPANION_RESTARTED'); return; }
-    if (reply.kind === 'empty') { poll(); return; }
-    if (reply.kind !== 'command' || !reply.command || typeof reply.command !== 'object'
-        || typeof reply.expiresInMs !== 'number' || !Number.isFinite(reply.expiresInMs) || reply.expiresInMs > 5000) throw new DesktopError('INVALID_COMMAND');
-    const command = reply.command as Command;
-    if (command.generation !== generation || !/^[0-9]+-[0-9]+$/.test(command.id)
-        || !['geometry', 'place'].includes(command.operation) || !command.handle
-        || command.handle.generation !== generation) throw new DesktopError('STALE_COMMAND');
-    const [epoch, serial] = command.id.split('-').map(Number);
-    if (epoch !== generation || !Number.isSafeInteger(serial) || serial! <= lastSerial) throw new DesktopError('REPLAYED_COMMAND');
-    lastSerial = serial!;
+    const parsed = parsePollResult(reply, generation);
+    if (parsed.kind === 'reconnect') { stop('COMPANION_RESTARTED'); return; }
+    if (parsed.kind === 'empty') { poll(); return; }
+    const command = parsed.command;
+    const serial = Number(command.id.split('-')[1]);
+    if (serial <= lastSerial) throw new DesktopError('REPLAYED_COMMAND');
+    lastSerial = serial;
     // The whole request elapsed time bounds reply transit conservatively. A
     // QTimer remainingTime-backed elapsed value avoids wall-clock adjustments.
-    const outcome = elapsed >= reply.expiresInMs ? 'expired' : execute(command);
+    const outcome = elapsed >= parsed.expiresInMs ? 'expired' : execute(command);
     invoke('Ack', { protocolVersion: 1, generation, id: command.id, outcome }, ack => {
-      if (ack.kind !== 'ack') { stop('ACK_REJECTED'); return; }
+      parseAck(ack);
       poll();
     });
   });
@@ -109,8 +106,7 @@ export function kwinLoop(callDBus: CallDBus, timer: TimerFactory,
       if (started || closed) return;
       started = true;
       invoke('Handshake', { protocolVersion: 1, backend: 'kwin6.3' }, reply => {
-        if (reply.protocolVersion !== 1 || !Number.isSafeInteger(reply.generation) || Number(reply.generation) <= 0) throw new DesktopError('HANDSHAKE');
-        generation = Number(reply.generation);
+        generation = parseHandshake(reply).generation;
         poll();
       });
     },

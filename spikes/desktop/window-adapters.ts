@@ -1,4 +1,4 @@
-import { DesktopError } from './model.ts';
+import { DesktopError } from './protocol.ts';
 import type { NativeWindow, Rect } from './model.ts';
 
 /** Native APIs inspected at Mutter48.0 and KWin6.3.6. No title/caption reader is
