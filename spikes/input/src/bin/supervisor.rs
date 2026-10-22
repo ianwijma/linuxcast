@@ -339,6 +339,24 @@ fn run() -> Result<()> {
         std::thread::sleep(Duration::from_millis(2));
     };
     guard.disarm();
+    if reason == "WORKER_WATCHDOG" {
+        let detected_ms = unix::monotonic_ms();
+        // Record only after the actual successful SIGKILL syscall, before
+        // wait/reap or uinput's kernel teardown can add latency.
+        child.0.kill().map_err(|_| fail("WATCHDOG_KILL_FAILED"))?;
+        let kill_issued_ms = unix::monotonic_ms();
+        let _ = unix::send(
+            lab.as_raw_fd(),
+            &Internal::WatchdogKill {
+                timing: unix::WatchdogKill {
+                    last_heartbeat_ms: last_heartbeat,
+                    detected_ms,
+                    kill_issued_ms,
+                },
+            },
+            &[],
+        );
+    }
     let cooperative = matches!(
         reason,
         "EXPLICIT_DISARM"
@@ -350,7 +368,20 @@ fn run() -> Result<()> {
     // An expired500ms watchdog is already the last safety deadline: do not
     // add a grace period for a stopped/nonresponsive worker.
     if cooperative {
-        let _ = unix::send(control.as_raw_fd(), &Internal::Disarm, &[]);
+        let requested = unix::send(control.as_raw_fd(), &Internal::Disarm, &[]).is_ok();
+        let requested_ms = unix::monotonic_ms();
+        if reason == "LEASE_OR_CONTEXT_EXPIRED" && requested {
+            let _ = unix::send(
+                lab.as_raw_fd(),
+                &Internal::LeaseDisarm {
+                    timing: unix::LeaseDisarm {
+                        lease_until_ms: guard.lease_until,
+                        requested_ms,
+                    },
+                },
+                &[],
+            );
+        }
         let end = unix::monotonic_ms() + 100;
         while unix::monotonic_ms() < end {
             if child.0.try_wait()?.is_some() {

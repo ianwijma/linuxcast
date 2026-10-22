@@ -200,9 +200,28 @@ pub struct Boot {
     pub source_phys: String,
     pub socket_path: String,
 }
+#[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct WatchdogKill {
+    pub last_heartbeat_ms: u64,
+    pub detected_ms: u64,
+    pub kill_issued_ms: u64,
+}
+#[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LeaseDisarm {
+    pub lease_until_ms: u64,
+    pub requested_ms: u64,
+}
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum Internal {
+    WatchdogKill {
+        timing: WatchdogKill,
+    },
+    LeaseDisarm {
+        timing: LeaseDisarm,
+    },
     Context {
         context: crate::safety::Context,
     },

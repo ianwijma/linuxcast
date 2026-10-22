@@ -3,6 +3,22 @@ use serde::{Deserialize, Serialize};
 pub const APP_LEASE_MS: u64 = 1000;
 pub const WORKER_WATCHDOG_MS: u64 = 500;
 pub const CONTEXT_MAX_AGE_MS: u64 = 1000;
+#[derive(Debug, PartialEq, Eq)]
+pub enum RecoveryState {
+    Pending,
+    Recovered,
+    Expired,
+}
+pub fn recovery_state(elapsed: u64, limit: u64, recovered: bool) -> RecoveryState {
+    // Deadline wins even when an ioctl returns recovered after it elapsed.
+    if elapsed > limit {
+        RecoveryState::Expired
+    } else if recovered {
+        RecoveryState::Recovered
+    } else {
+        RecoveryState::Pending
+    }
+}
 
 /// Root-side trusted context fixture, not client-supplied session evidence.
 /// A production logind/desktop adapter is explicitly outside this spike.
@@ -97,6 +113,13 @@ impl Emergency {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn late_kernel_recovery_is_never_success() {
+        assert_eq!(recovery_state(575, 575, true), RecoveryState::Recovered);
+        assert_eq!(recovery_state(576, 575, true), RecoveryState::Expired);
+        assert_eq!(recovery_state(576, 575, false), RecoveryState::Expired);
+        assert_eq!(recovery_state(574, 575, false), RecoveryState::Pending);
+    }
     fn context() -> Context {
         Context {
             uid: 1000,

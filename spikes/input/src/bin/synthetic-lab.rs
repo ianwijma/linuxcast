@@ -5,7 +5,7 @@ use linuxcast_input_spike::{
     device::{self, Synthetic},
     fail,
     protocol::{self, Operation, Reply, Request},
-    safety::Context,
+    safety::{Context, RecoveryState},
     unix::{self, Boot, Internal},
 };
 use std::{
@@ -186,6 +186,44 @@ struct Case {
     client: Option<Client>,
     context: Context,
     path: String,
+    watchdog_kill: Option<unix::WatchdogKill>,
+    lease_disarm: Option<unix::LeaseDisarm>,
+}
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RecoveryObservation {
+    recovery_ms: u64,
+    observed_ms: u64,
+    grab_released: bool,
+    virtual_device_removed: bool,
+    within_limit: bool,
+    watchdog_kill: Option<unix::WatchdogKill>,
+    lease_disarm: Option<unix::LeaseDisarm>,
+}
+fn print_report(results: &[serde_json::Value], status: &'static str) -> Result<()> {
+    println!(
+        "{}",
+        serde_json::to_string_pretty(
+            &serde_json::json!({"task":"S0-03","backend":"Debian synthetic libevdev/uinput; no graphical session","physicalHardwareProof":false,"status":status,"results":results})
+        )?
+    );
+    Ok(())
+}
+fn failed_observation(
+    results: &mut Vec<serde_json::Value>,
+    scenario: &'static str,
+    observation: &RecoveryObservation,
+    code: &'static str,
+) -> Box<dyn std::error::Error + Send + Sync> {
+    if let Ok(mut value) = serde_json::to_value(observation) {
+        if let Some(object) = value.as_object_mut() {
+            object.insert("scenario".into(), scenario.into());
+            object.insert("status".into(), "FAILED".into());
+            object.insert("failureCode".into(), code.into());
+        }
+        results.push(value);
+    }
+    fail(code)
 }
 impl Case {
     fn start(index: u32, worker_uid: u32, worker_gid: u32, client_uid: u32) -> Result<Self> {
@@ -297,6 +335,8 @@ impl Case {
             client: None,
             context,
             path,
+            watchdog_kill: None,
+            lease_disarm: None,
         })
     }
     fn signal_worker(&self, signal: i32) -> Result<()> {
@@ -411,15 +451,55 @@ impl Case {
         }
         Ok(())
     }
-    fn recovered(&mut self, start: u64, limit: u64, keep_context: bool) -> Result<u64> {
+    fn collect_timing(&mut self) {
+        for _ in 0..32 {
+            match unix::receive::<Internal>(self.control.as_raw_fd(), 0) {
+                Ok(Some((Internal::WatchdogKill { timing }, _))) => {
+                    self.watchdog_kill = Some(timing)
+                }
+                Ok(Some((Internal::LeaseDisarm { timing }, _))) => self.lease_disarm = Some(timing),
+                Ok(Some(_)) => {}
+                Ok(None) | Err(_) => break,
+            }
+        }
+    }
+    fn recovered(
+        &mut self,
+        start: u64,
+        limit: u64,
+        keep_context: bool,
+    ) -> std::result::Result<RecoveryObservation, RecoveryObservation> {
         linuxcast_input_spike::diagnostics::stage("KERNEL_RECOVERY");
         let mut refreshed = start;
         loop {
-            if device::regrab(&self.probe) && device::removed(&self.output) {
-                return Ok(unix::monotonic_ms() - start);
-            }
-            if unix::monotonic_ms() - start > limit {
-                return Err(fail("KERNEL_RECOVERY_TIMEOUT"));
+            self.collect_timing();
+            let expired = unix::monotonic_ms().saturating_sub(start) > limit;
+            let grab_released = !expired && device::regrab(&self.probe);
+            let virtual_device_removed = !expired && device::removed(&self.output);
+            // Recheck AFTER the ioctls: a slow kernel call must not turn a
+            // recovery observed beyond its deadline into success.
+            let observed_ms = unix::monotonic_ms();
+            let elapsed = observed_ms.saturating_sub(start);
+            let state = linuxcast_input_spike::safety::recovery_state(
+                elapsed,
+                limit,
+                grab_released && virtual_device_removed,
+            );
+            if state != RecoveryState::Pending {
+                let observation = RecoveryObservation {
+                    recovery_ms: elapsed,
+                    observed_ms,
+                    grab_released,
+                    virtual_device_removed,
+                    within_limit: state == RecoveryState::Recovered,
+                    watchdog_kill: self.watchdog_kill.clone(),
+                    lease_disarm: self.lease_disarm.clone(),
+                };
+                return if state == RecoveryState::Recovered {
+                    Ok(observation)
+                } else {
+                    Err(observation)
+                };
             }
             if keep_context && unix::monotonic_ms().saturating_sub(refreshed) >= 100 {
                 let _ = self.refresh();
@@ -449,7 +529,7 @@ impl Drop for Case {
         }
     }
 }
-fn run() -> Result<()> {
+fn run(results: &mut Vec<serde_json::Value>) -> Result<()> {
     linuxcast_input_spike::diagnostics::stage("LAB_GUARD");
     check_lab()?;
     linuxcast_input_spike::diagnostics::stage("DEDICATED_ACCOUNT");
@@ -476,7 +556,6 @@ fn run() -> Result<()> {
         "/run/linuxcast-input-spike",
         fs::Permissions::from_mode(0o711),
     )?;
-    let mut results = Vec::new();
     for (index, name) in [
         "worker-sigkill",
         "supervisor-sigkill",
@@ -519,12 +598,53 @@ fn run() -> Result<()> {
             "emergency" => (100, 75),
             _ => (250, 75),
         };
-        let elapsed = case.recovered(trigger, deadline + tolerance, true)?;
+        let teardown_budget = if matches!(*name, "worker-watchdog" | "app-lease") {
+            250
+        } else {
+            0
+        };
+        let observation =
+            match case.recovered(trigger, deadline + tolerance + teardown_budget, true) {
+                Ok(value) => value,
+                Err(value) => {
+                    return Err(failed_observation(
+                        results,
+                        name,
+                        &value,
+                        "KERNEL_RECOVERY_TIMEOUT",
+                    ));
+                }
+            };
+        let action_valid = match *name {
+            "worker-watchdog" => observation.watchdog_kill.as_ref().is_some_and(|t| {
+                t.last_heartbeat_ms <= t.detected_ms
+                    && t.detected_ms - t.last_heartbeat_ms >= 500
+                    && t.detected_ms <= t.kill_issued_ms
+                    && t.kill_issued_ms - t.last_heartbeat_ms <= 500 + 75
+                    && observation.observed_ms >= t.kill_issued_ms
+                    && observation.observed_ms - t.kill_issued_ms <= 250
+            }),
+            "app-lease" => observation.lease_disarm.as_ref().is_some_and(|t| {
+                t.requested_ms >= t.lease_until_ms
+                    && t.requested_ms - t.lease_until_ms <= 75
+                    && observation.observed_ms >= t.requested_ms
+                    && observation.observed_ms - t.requested_ms <= 250
+            }),
+            _ => true,
+        };
+        if !action_valid {
+            return Err(failed_observation(
+                results,
+                name,
+                &observation,
+                "ACTION_OR_KERNEL_TEARDOWN_BOUND",
+            ));
+        }
         std::thread::sleep(Duration::from_millis(550));
         if !device::regrab(&case.probe) || !device::removed(&case.output) {
             return Err(fail("AUTOMATIC_REARM_DETECTED"));
         }
-        results.push(serde_json::json!({"scenario":name,"syntheticModifiersObserved":true,"otherClientRegrabbed":true,"virtualDeviceRemoved":true,"noAutomaticRearm":true,"recoveryMs":elapsed,"mechanismDeadlineMs":deadline,"observerToleranceMs":tolerance}));
+        results.push(serde_json::json!({"scenario":name,"syntheticModifiersObserved":true,"otherClientRegrabbed":true,"virtualDeviceRemoved":true,"noAutomaticRearm":true,"recoveryMs":observation.recovery_ms,"observedMs":observation.observed_ms,"watchdogKill":observation.watchdog_kill,"leaseDisarm":observation.lease_disarm,"mechanismDeadlineMs":deadline,"observerToleranceMs":tolerance,"kernelTeardownBudgetMs":teardown_budget}));
     }
     for (index, name) in [
         "locked",
@@ -589,7 +709,14 @@ fn run() -> Result<()> {
     case.context.unlocked = Some(false);
     let revoked = unix::monotonic_ms();
     case.refresh()?;
-    case.recovered(revoked, 175, false)?;
+    if let Err(value) = case.recovered(revoked, 175, false) {
+        return Err(failed_observation(
+            results,
+            "peer-credentials-and-context-revoke",
+            &value,
+            "KERNEL_RECOVERY_TIMEOUT",
+        ));
+    }
     results.push(serde_json::json!({"scenario":"peer-credentials-and-context-revoke","rootPeerPassedDAC":true,"rootPeerUidDeniedBeforeAuthorizedClient":true,"wrongUidDenied":true,"contextRevocationDisarms":true}));
     drop(case);
     // A stopped dormant worker guarantees that a completedF24 press/release
@@ -624,17 +751,19 @@ fn run() -> Result<()> {
         std::thread::sleep(Duration::from_millis(2));
     }
     results.push(serde_json::json!({"scenario":"prearm-completed-input-backlog","preArmCompletedInputNotForwarded":true,"freshPostArmInputObserved":true}));
-    println!(
-        "{}",
-        serde_json::to_string_pretty(
-            &serde_json::json!({"task":"S0-03","backend":"Debian synthetic libevdev/uinput; no graphical session","physicalHardwareProof":false,"results":results})
-        )?
-    );
     Ok(())
 }
 fn main() {
     linuxcast_input_spike::diagnostics::panic_policy("LAB");
-    if let Err(error) = run() {
+    let mut results = Vec::new();
+    let result = run(&mut results);
+    if (result.is_ok() || !results.is_empty())
+        && print_report(&results, if result.is_ok() { "PASSED" } else { "FAILED" }).is_err()
+    {
+        linuxcast_input_spike::diagnostics::emit("LAB", fail("REPORT_FAILED").as_ref());
+        std::process::exit(3);
+    }
+    if let Err(error) = result {
         linuxcast_input_spike::diagnostics::emit("LAB", error.as_ref());
         std::process::exit(3);
     }
