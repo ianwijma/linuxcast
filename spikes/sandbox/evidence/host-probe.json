@@ -1,0 +1,19 @@
+{
+  "task": "S0-04",
+  "platform": {
+    "os": "Pop!_OS 22.04 LTS",
+    "kernel": "7.1.1-76070101-generic",
+    "architecture": "x64",
+    "bwrap": "bubblewrap 0.6.1",
+    "systemd": "systemd 249 (249.11-0ubuntu3.20pop0~1778766019~22.04~5586583)",
+    "node": "24.22.1",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "userControllers": "memory pids"
+  },
+  "result": {
+    "status": "unavailable",
+    "code": "CPU_CONTROLLER_UNAVAILABLE",
+    "cleanupVerified": true,
+    "diagnosticsBytes": 0
+  }
+}
