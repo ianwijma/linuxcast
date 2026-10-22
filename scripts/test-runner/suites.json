@@ -7,7 +7,11 @@
     ]
   },
   "contracts": {},
-  "ui": {},
+  "ui": {
+    "S0-06": [
+      "spikes/workflow-ui/tests/workflow-ui.test.ts"
+    ]
+  },
   "integration": {},
   "security": {},
   "perf": {}
