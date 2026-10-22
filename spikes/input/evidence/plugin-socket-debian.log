@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /home/debian/linuxcast-input-source
+
+ ✓ spikes/input/plugin-socket.security.test.ts (1 test) 8030ms
+   ✓ mandatory extension sandbox cannot reach the input control socket hierarchy  8018ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:42:11
+   Duration  9.56s (transform 302ms, setup 0ms, import 419ms, tests 8.03s, environment 1ms)
+

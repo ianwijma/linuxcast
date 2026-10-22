@@ -351,10 +351,16 @@
         "bun run typecheck",
         "bun run test:security -- S0-03"
       ],
-      "evidence": [],
+      "evidence": [
+        "Source5fb6aba and coordinator manifests30a39d8, plugin-socket routef3908e1. Independent source review found stale pre-arm queued input, extra watchdog grace and ambiguous wrong-peer test; fixes5cfdbff independently re-reviewed clean. Diagnostic83f4a12 and explicit pre-CREATE kernel UI_SET_PHYS2071354 independently reviewed by coordinator. Ten non-device Rust checks, strict clippy/fmt and TS source checks pass.",
+        "Actual disposable Debian13 generic6.12.113+deb13-amd64/libevdev1.13.4: first named gate failed before kernel scenarios and socket runtime was unavailable after guest reboot. Exact pinned runtime restored; actual plugin socket route passes1/1, and again in complete named gate. Second gate executes all14 manufactured scenarios but correctly fails eventual watchdog recovery620ms against575ms bound. Standalone capture records133/128/628/1102/127ms for worker/supervisor/watchdog/lease/emergency cleanup; all semantic booleans true. This is not accepted completion. See spikes/input/evidence/{kernel-initial-unavailable.log,kernel-watchdog-timing-failure.log,kernel-premeasurement-correction.json,plugin-socket-debian.log}."
+      ],
       "owner": "review_f1_01",
       "branch": "codex/s0-03-input",
-      "limitations": []
+      "limitations": [
+        "Actual watchdog signal-issuance time must be measured separately from eventual kernel virtual-device teardown. The measured approximately128ms cleanup tail is an observation; its kernel cause is not established. Preserve500ms watchdog and1s lease, record separate bounded cleanup evidence and rerun final scoped security gate before acceptance.",
+        "All device experiments use newly manufactured evdev/uinput sources in a disposable VM. No host input devices, service, administrator policy or user desktop settings changed. Live logind transitions, physical laptop/USB/Bluetooth, compositor modifier recovery and full release gate remain unverified."
+      ]
     },
     {
       "id": "S0-04",
@@ -404,7 +410,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Actual Debian probe passes20boundary checks; named security suite passes22/22 with no skips. Broker allow/deny, direct host-resource denial, strict framing, detached descendant cleanup and actual memory/pids/CPU pressure are verified. Final task helper must report completed/taskCreationDenied with bounded child count plus kernel pids.events max>0.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
             }
           ]
         },
@@ -419,7 +425,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Actual Debian kernel namespace denial returns NAMESPACES_UNAVAILABLE with no fixture execution and verified cleanup; guest limit restored. Missing-backend fixtures return unavailable without direct-Node fallback. Pop!_OS host CPU delegation gap separately fails closed; user declined host policy change and none occurred.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
             }
           ]
         },
@@ -442,7 +448,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Source and evidence review finds public synthetic file/socket/database/environment canaries and operational metadata only. No user files, input, clipboard, credentials, raw stderr, VM keys or private disk/seed data committed.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
             }
           ]
         }
