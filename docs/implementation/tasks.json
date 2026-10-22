@@ -253,18 +253,25 @@
         {
           "id": "S0-02-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "This engineering-only spike adds disposable synthetic test windows and native API diagnostics; it adds no Linuxcast product UI or user interaction flow. Product keyboard/accessibility and capability UI remain their owning-task gates.",
           "evidence": []
         },
         {
           "id": "S0-02-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- S0-02 on recorded7a source; later vitest preparation checks on frozen937 source; independent source/schema/provenance/artifact review",
+              "outcome": "Recorded mapped89-check host suite passes on its exact7a source (63 transport,24 preparation,2 actual own-window/private-bus canaries). Later reviewed control-source29 no-GUI checks pass; these are separate runs, not an inferred94-check result. Private HOME/XDG/keyfile/bus guards precede native effects. Complete allowlisted schemas and fixed bounded debugger categories retain only own synthetic dimensions, booleans, counts, versions and hashes; no host clipboard/private windows/input streams/raw stacks/arguments/addresses/core/VM keys are published. Root and separate S0-01 reviewer verified signed520b677 source, both25-input/19-output manifests and strict exit3 placement failure versus diagnostic-only exit4.",
+              "platform": "Authorized Pop!_OS22.04/GNOME42.9 X11 own canaries; isolated Debian13.7 generic6.12.113+deb13-amd64 GNOME48.7/KWin6.3.6/GDB16.3 with software-rendering request, no host display/settings/clipboard/input access.",
+              "reference": "PR14; signed520b677699a7d85ff80aef0f8738799aee58ed61; spikes/desktop/evidence/native-control-comparison.md,kwin-wayland-{finer-placement-debugger,read-only-control-debugger}.json,read-only-control-preparation.json,guest-release-control.json; reviewed source937fe6889aff47dfa9e6802ec618151b66879de7bba8233eaedd2a0b76777882 and manifestdf140d19fdd94063767564eedde78925ed612983f6135f7552d0d8ac6c58a191."
+            }
+          ]
         }
       ],
       "validation": [
@@ -273,13 +280,17 @@
       ],
       "evidence": [
         "Independently reviewed source5500e48, GNOME positive-extent fixdcfc653 and restart/supervision/pipe-drain preparationb066f4a; coordinator exact suite routeae0238f. Pinned Node24.22.1/Bun1.4.4 on Pop!_OS22.04/GNOME42.9 X11: mapped integration suite71/71 passes on final prepared source, including63 adapter/transport checks,6 actual process preparation checks and2 private Gio/own GTK-X11 canaries. Strict typecheck/lint/build/Python checks pass. See spikes/desktop/guest/preparation-evidence.md.",
-        "Independent review found and verified fixes for helper instance reuse, malformed wire execution, outer cancellation leaving detached descendants, early exit before pipe drain, and subpixel GNOME extent flooring to zero. Actual harmless SIGTERM/SIGINT descendant tests and delayed pipe-drain/cap/cancel checks pass."
+        "Independent review found and verified fixes for helper instance reuse, malformed wire execution, outer cancellation leaving detached descendants, early exit before pipe drain, and subpixel GNOME extent flooring to zero. Actual harmless SIGTERM/SIGINT descendant tests and delayed pipe-drain/cap/cancel checks pass.",
+        "Guarded source95c329d independently reviewed; actual Debian13/GNOME48 Wayland Meta window placement and private Selection owner/MIME/cap/oversize/cancel/unsupported/release pass, exact23-source manifest14b80f06 verified. GNOME X11 primary Meta/Selection pass; secondary generic GTK own-client single-resize check fails and remains preserved. Host same canary passes315ms. See gnome-{wayland,x11}-guarded.json.",
+        "KWin6.3.6 ES2016 script lowering5656ef9 fixes actual QJSEngine object-spread rejection. Native own geometry/placement transport reaches two acknowledgements and actual client resize configure, then compositor SIGSEGV. Reviewed child-only debugger10c070c classifies bounded static modules/functions, no raw stack or core; failure remains unavailable.",
+        "Signed520b677 and both exact-source native artifacts independently reviewed by coordinator and separate launcher reviewer. Frozen937fe688/manifestdf140d19: ordinary placement fails exit3 with actual SIGSEGV/Next3/Ack2, one QT_PAINTER and later KWIN_WAYLAND_COMPOSITE frame; three earlier QtGui frames unclassified. Same-source read-only queue control completes diagnostic exit4 with three stable actual geometries/three acknowledgements, then5.0s exact wire stability/own child-handle liveness. No placement/clipboard/restart acceptance is inferred. All processes/private roots removed before VM release19:09:38UTC."
       ],
-      "owner": "review_f1_01",
+      "owner": "s0_06_workflow_ui",
       "branch": "codex/s0-02-desktop",
       "limitations": [
-        "Target GNOME48/KWin6.3 Wayland/X11 live API, clipboard and actual KWin helper-crash/reload scenarios are prepared but not executed. Native API-shaped fixtures and the host own GTK/X11/private D-Bus canaries do not establish target compositor acceptance.",
-        "No global host clipboard, private windows or physical keyboard content is captured. Private guest clipboard/window canaries and packaged protocol clients remain provisional feasibility mechanisms; no production companion, frozen contract or full physical desktop/release claim."
+        "KWin placement still crashes after actual resize configure; specific cause and actual compositor renderer are unproven. Read-only control survives only its recorded bound and cannot satisfy placement, clipboard, restart or full desktop acceptance.",
+        "GNOME X11 secondary GTK own-client single resize remains failed despite passing primary Meta adapter; KWin X11 complete native geometry/clipboard, KWin clipboard data-control, arbitrary external-owner GNOME bridge and actual companion crash/reload/watchdog/fresh-instance recovery remain outstanding. AC01/AC02 pending.",
+        "No global host clipboard/private windows/physical keyboard content is captured. All guest native tests use isolated virtual software-compositor/API contexts, not complete physical sessions or release matrix. No production companion/frozen contract acceptance."
       ]
     },
     {
