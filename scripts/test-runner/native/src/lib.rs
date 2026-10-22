@@ -30,4 +30,19 @@ mod tests {
             .unwrap();
         assert!(reader.read_to_end(&mut Vec::new()).is_err());
     }
+
+    #[test]
+    fn decrypts_public_fixture_from_reference_go_age_1_2_1() {
+        let encrypted = include_bytes!("../fixtures/reference-age.age");
+        let decryptor = age::Decryptor::new(encrypted.as_slice()).unwrap();
+        let identity = age::scrypt::Identity::new(age::secrecy::SecretString::from(
+            "synthetic bootstrap fixture only".to_owned(),
+        ));
+        let mut reader = decryptor
+            .decrypt(std::iter::once(&identity as &dyn age::Identity))
+            .unwrap();
+        let mut plain = Vec::new();
+        reader.read_to_end(&mut plain).unwrap();
+        assert_eq!(plain, b"public build fixture");
+    }
 }
