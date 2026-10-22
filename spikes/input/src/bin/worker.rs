@@ -11,6 +11,7 @@ use std::{
 };
 
 fn run() -> Result<()> {
+    linuxcast_input_spike::diagnostics::stage("WORKER_GUARD");
     if std::env::args().nth(1).as_deref() == Some("--policy-probe") {
         unix::no_core()?;
         if !device::empty_caps() {
@@ -32,15 +33,18 @@ fn run() -> Result<()> {
     }
     unix::no_core()?;
     device::silence();
+    linuxcast_input_spike::diagnostics::stage("WORKER_IDENTITY");
     if unsafe { libc::getuid() } == 0 || !device::empty_caps() {
         return Err(fail("WORKER_IDENTITY_UNSAFE"));
     }
     // FD3 is the fixed root-supervisor-owned internal socket, never a client path.
     let control = unsafe { OwnedFd::from_raw_fd(3) };
+    linuxcast_input_spike::diagnostics::stage("WORKER_CONTROL_PEER");
     let peer = unix::peer(control.as_raw_fd())?;
     if peer.uid != 0 {
         return Err(fail("WRONG_SUPERVISOR_UID"));
     }
+    linuxcast_input_spike::diagnostics::stage("WORKER_HANDOFF");
     let (boot, mut descriptors) = unix::wait_receive::<Boot>(control.as_raw_fd(), 2, 2000)?;
     if boot.parent != peer.pid as u32 || boot.worker_uid != unsafe { libc::getuid() } {
         return Err(fail("BOOT_IDENTITY_MISMATCH"));
@@ -48,12 +52,16 @@ fn run() -> Result<()> {
     unix::parent_death(boot.parent)?;
     let output = descriptors.pop().ok_or_else(|| fail("NO_UINPUT"))?;
     let input = descriptors.pop().ok_or_else(|| fail("NO_EVDEV"))?;
+    linuxcast_input_spike::diagnostics::stage("WORKER_VALIDATE_SOURCE");
     device::validate(&input, &boot.source_phys)?;
+    linuxcast_input_spike::diagnostics::stage("WORKER_DEVICE_PREPARE");
     let device = Device::new(input, output)?;
     let node = device.node()?;
     // All library initialization and sysfs discovery has finished. No future
     // program/file/socket creation is permitted, including in dormant state.
+    linuxcast_input_spike::diagnostics::stage("WORKER_POLICY");
     device::worker_policy()?;
+    linuxcast_input_spike::diagnostics::stage("WORKER_READY");
     unix::send(
         control.as_raw_fd(),
         &Internal::Ready {
@@ -67,6 +75,7 @@ fn run() -> Result<()> {
     let mut lease_until = 0;
     let mut heartbeat = 0;
     let mut emergency = Emergency::default();
+    linuxcast_input_spike::diagnostics::stage("WORKER_LOOP");
     let reason = loop {
         let now = unix::monotonic_ms();
         if now.saturating_sub(heartbeat) >= 100 {
@@ -171,8 +180,9 @@ fn run() -> Result<()> {
     Ok(())
 }
 fn main() {
-    if run().is_err() {
-        eprintln!("INPUT_WORKER_UNAVAILABLE");
+    linuxcast_input_spike::diagnostics::panic_policy("WORKER");
+    if let Err(error) = run() {
+        linuxcast_input_spike::diagnostics::emit("WORKER", error.as_ref());
         std::process::exit(3);
     }
 }

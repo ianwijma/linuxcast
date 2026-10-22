@@ -32,7 +32,10 @@ fn worker_cannot_be_started_as_an_arbitrary_executor() {
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     assert!(output.stdout.is_empty());
-    assert_eq!(output.stderr, b"INPUT_WORKER_UNAVAILABLE\n");
+    let error: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["component"], "WORKER");
+    assert_eq!(error["stage"], "WORKER_GUARD");
+    assert_eq!(error["code"], "INTERNAL_ONLY");
 }
 
 #[test]
@@ -43,5 +46,8 @@ fn lab_requires_explicit_reviewed_guest_invocation_before_device_access() {
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     assert!(output.stdout.is_empty());
-    assert_eq!(output.stderr, b"INPUT_LAB_UNAVAILABLE_OR_FAILED\n");
+    let error: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(error["component"], "LAB");
+    assert_eq!(error["stage"], "LAB_GUARD");
+    assert_eq!(error["code"], "REVIEWED_DISPOSABLE_GUEST_REQUIRED");
 }

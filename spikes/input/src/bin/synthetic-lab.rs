@@ -41,7 +41,7 @@ fn check_lab() -> Result<()> {
     }
     let os = fs::read_to_string("/etc/os-release")?;
     if !os.lines().any(|l| l == "ID=debian") || !os.lines().any(|l| l == "VERSION_ID=\"13\"") {
-        return Err(fail("DEBIAN13_GUEST_REQUIRED"));
+        return Err(fail("DEBIAN_GUEST_REQUIRED"));
     }
     // Refuse to manufacture a keyboard in any logged-in graphical session.
     if let Ok(entries) = fs::read_dir("/run/systemd/sessions") {
@@ -189,14 +189,17 @@ struct Case {
 }
 impl Case {
     fn start(index: u32, worker_uid: u32, worker_gid: u32, client_uid: u32) -> Result<Self> {
+        linuxcast_input_spike::diagnostics::stage("SOURCE_MANUFACTURE");
         let phys = format!("linuxcast-s0-03/manufactured-{}-{index}", unsafe {
             libc::getpid()
         });
         let source = Synthetic::new(device_open("/dev/uinput")?, &phys)?;
+        linuxcast_input_spike::diagnostics::stage("SOURCE_NODE_OPEN");
         let node = source.node()?;
         let input = device_open(&node)?;
         let probe = device_open(&node)?;
         let output_fd = device_open("/dev/uinput")?;
+        linuxcast_input_spike::diagnostics::stage("RUNTIME_DIRECTORY");
         let directory = format!("/run/linuxcast-input-spike/{}-{index}", unsafe {
             libc::getpid()
         });
@@ -214,7 +217,7 @@ impl Case {
             .env_clear()
             .stdin(Stdio::null())
             .stdout(Stdio::null())
-            .stderr(Stdio::null());
+            .stderr(Stdio::inherit());
         unsafe {
             command.pre_exec(move || {
                 if libc::dup2(child_fd, 3) < 0 || libc::fcntl(3, libc::F_SETFD, 0) < 0 {
@@ -223,6 +226,7 @@ impl Case {
                 Ok(())
             });
         }
+        linuxcast_input_spike::diagnostics::stage("SUPERVISOR_SPAWN");
         let mut supervisor = command.spawn()?;
         drop(child_control);
         let boot = Boot {
@@ -233,6 +237,7 @@ impl Case {
             source_phys: phys,
             socket_path: path.clone(),
         };
+        linuxcast_input_spike::diagnostics::stage("SUPERVISOR_HANDOFF");
         unix::send(
             control.as_raw_fd(),
             &boot,
@@ -240,6 +245,7 @@ impl Case {
         )?;
         drop(input);
         drop(output_fd);
+        linuxcast_input_spike::diagnostics::stage("SUPERVISOR_READY");
         let (ready, _) = match unix::wait_receive::<Internal>(control.as_raw_fd(), 0, 5000) {
             Ok(r) => r,
             Err(e) => {
@@ -260,6 +266,7 @@ impl Case {
             return Err(fail("WORKER_PIDFD_UNAVAILABLE"));
         }
         let worker_pidfd = unsafe { OwnedFd::from_raw_fd(fd as i32) };
+        linuxcast_input_spike::diagnostics::stage("VIRTUAL_NODE_OPEN");
         let output = device_open(&virtual_node)?;
         let context = Context {
             uid: client_uid,
@@ -358,6 +365,7 @@ impl Case {
         Ok(self.client.as_mut().expect("client initialized"))
     }
     fn begin_arm(&mut self) -> Result<()> {
+        linuxcast_input_spike::diagnostics::stage("CLIENT_HANDSHAKE_ARM");
         let r = self.client()?.request(Operation::Handshake, 1)?;
         if r.reason != "READY" {
             return Err(fail("LAB_HANDSHAKE_DENIED"));
@@ -369,6 +377,7 @@ impl Case {
         Ok(())
     }
     fn await_arm(&mut self) -> Result<()> {
+        linuxcast_input_spike::diagnostics::stage("CLIENT_ARM_ACK");
         let end = unix::monotonic_ms() + 500;
         loop {
             let r = self.client()?.request(Operation::Status, 1)?;
@@ -390,6 +399,7 @@ impl Case {
         self.await_arm()
     }
     fn hold_modifiers(&self) -> Result<()> {
+        linuxcast_input_spike::diagnostics::stage("SYNTHETIC_PASSTHROUGH");
         self.source.emit(29, 1)?;
         self.source.emit(42, 1)?;
         let end = unix::monotonic_ms() + 300;
@@ -402,6 +412,7 @@ impl Case {
         Ok(())
     }
     fn recovered(&mut self, start: u64, limit: u64, keep_context: bool) -> Result<u64> {
+        linuxcast_input_spike::diagnostics::stage("KERNEL_RECOVERY");
         let mut refreshed = start;
         loop {
             if device::regrab(&self.probe) && device::removed(&self.output) {
@@ -439,7 +450,9 @@ impl Drop for Case {
     }
 }
 fn run() -> Result<()> {
+    linuxcast_input_spike::diagnostics::stage("LAB_GUARD");
     check_lab()?;
+    linuxcast_input_spike::diagnostics::stage("DEDICATED_ACCOUNT");
     let passwd = fs::read_to_string("/etc/passwd")?;
     let record = passwd
         .lines()
@@ -620,8 +633,9 @@ fn run() -> Result<()> {
     Ok(())
 }
 fn main() {
-    if run().is_err() {
-        eprintln!("INPUT_LAB_UNAVAILABLE_OR_FAILED");
+    linuxcast_input_spike::diagnostics::panic_policy("LAB");
+    if let Err(error) = run() {
+        linuxcast_input_spike::diagnostics::emit("LAB", error.as_ref());
         std::process::exit(3);
     }
 }

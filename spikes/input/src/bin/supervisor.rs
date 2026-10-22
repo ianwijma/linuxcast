@@ -54,6 +54,7 @@ fn reply(stream: &mut UnixStream, generation: u64, state: &str, reason: &str) ->
     Ok(())
 }
 fn run() -> Result<()> {
+    linuxcast_input_spike::diagnostics::stage("SUPERVISOR_GUARD");
     if std::env::args().collect::<Vec<_>>()
         != [std::env::args().next().unwrap(), "--synthetic-lab".into()]
         || unsafe { libc::getuid() } != 0
@@ -68,6 +69,7 @@ fn run() -> Result<()> {
         return Err(fail("LAB_ROOT_PEER_REQUIRED"));
     }
     unix::parent_death(peer.pid as u32)?;
+    linuxcast_input_spike::diagnostics::stage("LAB_BOOTSTRAP");
     let (mut boot, descriptors) = unix::wait_receive::<Boot>(lab.as_raw_fd(), 2, 2000)?;
     if boot.worker_uid == 0
         || boot.worker_uid == boot.client_uid
@@ -81,6 +83,7 @@ fn run() -> Result<()> {
     {
         return Err(fail("LAB_BOOT_DENIED"));
     }
+    linuxcast_input_spike::diagnostics::stage("VALIDATE_SOURCE");
     device::validate(&descriptors[0], &boot.source_phys)?;
     let path = PathBuf::from(&boot.socket_path);
     let directory = path.parent().ok_or_else(|| fail("BAD_SOCKET_DIRECTORY"))?;
@@ -88,6 +91,7 @@ fn run() -> Result<()> {
     if !meta.is_dir() || meta.uid() != 0 || meta.mode() & 0o022 != 0 {
         return Err(fail("UNSAFE_RUNTIME_DIRECTORY"));
     }
+    linuxcast_input_spike::diagnostics::stage("CONTROL_BIND");
     let listener = UnixListener::bind(&path)?;
     let _cleanup = SocketCleanup(boot.socket_path.clone());
     fs::set_permissions(&path, fs::Permissions::from_mode(0o600))?;
@@ -96,11 +100,13 @@ fn run() -> Result<()> {
         return Err(fail("SOCKET_OWNER_FAILED"));
     }
     listener.set_nonblocking(true)?;
+    linuxcast_input_spike::diagnostics::stage("WORKER_BINARY");
     let executable = std::env::current_exe()?.with_file_name("linuxcast-input-spike-worker");
     let meta = fs::symlink_metadata(&executable)?;
     if !meta.is_file() || meta.uid() != 0 || meta.mode() & 0o022 != 0 {
         return Err(fail("WORKER_BINARY_NOT_ROOT_OWNED"));
     }
+    linuxcast_input_spike::diagnostics::stage("SUPERVISOR_CAPS");
     device::supervisor_caps()?;
     let (control, child_control) = unix::pair()?;
     let child_fd = child_control.as_raw_fd();
@@ -112,7 +118,7 @@ fn run() -> Result<()> {
         .env_clear()
         .stdin(Stdio::null())
         .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .stderr(Stdio::inherit());
     unsafe {
         command.pre_exec(move || {
             if libc::setgroups(0, std::ptr::null()) != 0
@@ -129,9 +135,11 @@ fn run() -> Result<()> {
             Ok(())
         });
     }
+    linuxcast_input_spike::diagnostics::stage("WORKER_SPAWN");
     let mut child = ChildGuard(command.spawn()?);
     drop(child_control);
     boot.parent = unsafe { libc::getpid() } as u32;
+    linuxcast_input_spike::diagnostics::stage("WORKER_HANDOFF");
     unix::send(
         control.as_raw_fd(),
         &boot,
@@ -142,6 +150,7 @@ fn run() -> Result<()> {
     )?;
     // Critical invariant: no supervisor recovery duplicate survives handoff.
     drop(descriptors);
+    linuxcast_input_spike::diagnostics::stage("WORKER_READY");
     let (ready, _) = unix::wait_receive::<Internal>(control.as_raw_fd(), 0, 3000)?;
     if !matches!(ready, Internal::Ready { .. }) {
         return Err(fail("WORKER_NOT_READY"));
@@ -154,6 +163,7 @@ fn run() -> Result<()> {
     let mut client: Option<Connection> = None;
     let mut armed = false;
     let mut arming = false;
+    linuxcast_input_spike::diagnostics::stage("SUPERVISOR_LOOP");
     let reason = loop {
         let now = unix::monotonic_ms();
         if child.0.try_wait()?.is_some() {
@@ -362,8 +372,9 @@ fn run() -> Result<()> {
     Ok(())
 }
 fn main() {
-    if run().is_err() {
-        eprintln!("INPUT_SUPERVISOR_UNAVAILABLE");
+    linuxcast_input_spike::diagnostics::panic_policy("SUPERVISOR");
+    if let Err(error) = run() {
+        linuxcast_input_spike::diagnostics::emit("SUPERVISOR", error.as_ref());
         std::process::exit(3);
     }
 }
