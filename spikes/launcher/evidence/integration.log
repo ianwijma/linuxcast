@@ -2,21 +2,21 @@ $ node scripts/test-runner/run.ts integration "S0-01"
 
  RUN  v4.1.12 /tmp/linuxcast-s0-01
 
- ✓ spikes/launcher/tests/launcher.integration.test.ts (10 tests) 9428ms
-     ✓ starts with strict sandbox identity and effective shortcut  443ms
-     ✓ S0-01-AC02 retains the resident singleton on close and reopens through CLI before explicit Quit exits  517ms
-     ✓ validates native WM_CLASS and regains GNOME X11 focus through the registered shortcut from a synthetic decoy  960ms
-     ✓ reports a real shortcut conflict preserves the existing key and recovers after release  1263ms
-     ✓ denies foreign renderer frames unknown protocol fields navigation popups network and sensitive permissions  501ms
-     ✓ supports keyboard navigation layered Escape action focus and explicit shortcut recorder cancellation  1050ms
-     ✓ renders dark/light empty capabilities and action states with zero automated AA violations and no external requests  2619ms
-     ✓ recovers a crashed renderer only on explicit reopening with sandbox settings intact  679ms
-     ✓ uses compact host rows content sizing and keyboard controls at 200% zoom with emulated high contrast and reduced motion  827ms
-     ✓ routes explicit --quit to the hidden singleton without showing another window  488ms
+ ✓ spikes/launcher/tests/launcher.integration.test.ts (10 tests) 9399ms
+     ✓ starts with strict sandbox identity and effective shortcut  450ms
+     ✓ S0-01-AC02 retains the resident singleton on close and reopens through CLI before explicit Quit exits  510ms
+     ✓ validates native WM_CLASS and regains GNOME X11 focus through the registered shortcut from a synthetic decoy  948ms
+     ✓ reports a real shortcut conflict preserves the existing key and recovers after release  1233ms
+     ✓ denies foreign renderer frames unknown protocol fields navigation popups network and sensitive permissions  517ms
+     ✓ supports keyboard navigation layered Escape action focus and explicit shortcut recorder cancellation  1057ms
+     ✓ renders dark/light empty capabilities and action states with zero automated AA violations and no external requests  2643ms
+     ✓ recovers a crashed renderer only on explicit reopening with sandbox settings intact  663ms
+     ✓ uses compact host rows content sizing and keyboard controls at 200% zoom with emulated high contrast and reduced motion  828ms
+     ✓ routes explicit --quit to the hidden singleton without showing another window  476ms
 
  Test Files  1 passed (1)
       Tests  10 passed (10)
-   Start at  03:16:54
-   Duration  9.81s (transform 51ms, setup 0ms, import 298ms, tests 9.43s, environment 0ms)
+   Start at  03:29:44
+   Duration  9.77s (transform 51ms, setup 0ms, import 292ms, tests 9.40s, environment 0ms)
 
-JSON report written to /tmp/linuxcast-test-report-qzShgB/results.json
+JSON report written to /tmp/linuxcast-test-report-9rw1lN/results.json

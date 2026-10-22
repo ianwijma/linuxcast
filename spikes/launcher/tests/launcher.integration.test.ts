@@ -356,7 +356,9 @@ describe("S0-01 lifecycle, native activation and renderer boundaries", () => {
         );
       // Simulate loss of this app's old backend registration, then try a key
       // still held by the real second app. A stale key must not be advertised.
-      await app!.evaluate(({ globalShortcut }) => globalShortcut.unregisterAll());
+      await app!.evaluate(({ globalShortcut }) =>
+        globalShortcut.unregisterAll(),
+      );
       const stale = await page.evaluate(() =>
         window.linuxcast.setShortcut("Ctrl+Alt+Shift+F11"),
       );
@@ -478,6 +480,17 @@ describe("S0-01 lifecycle, native activation and renderer boundaries", () => {
           .evaluate((el) => el === document.activeElement),
       )
       .toBe(true);
+    await page.keyboard.press("Control+k");
+    expect(
+      await page.getByRole("dialog", { name: "Launcher actions" }).count(),
+    ).toBe(0);
+    expect(
+      await page
+        .getByRole("button", { name: "Actions Ctrl K" })
+        .evaluate((el) => el === document.activeElement),
+    ).toBe(true);
+    await page.keyboard.press("Control+k");
+    await page.getByRole("dialog", { name: "Launcher actions" }).waitFor();
     await page.keyboard.press("Escape");
     expect(
       await page.getByRole("dialog", { name: "Launcher actions" }).count(),

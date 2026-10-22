@@ -175,7 +175,8 @@ export function App() {
         }
         if (event.ctrlKey && event.key.toLowerCase() === "k") {
           event.preventDefault();
-          setActions((value) => !value);
+          if (actions) closeActions();
+          else setActions(true);
         }
       }}
     >
@@ -358,7 +359,7 @@ export function App() {
               </p>
               <p className="muted">
                 Default request is {DEFAULT_SHORTCUT}. A reserved or denied key
-                leaves the current binding unchanged. You can also bind{" "}
+                preserves any still-active binding. You can also bind{" "}
                 <code>linuxcast --toggle</code> in desktop settings.
               </p>
               <button
