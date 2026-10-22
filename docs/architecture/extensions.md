@@ -10,7 +10,7 @@ The design system is authoritative: [DESIGN.md](../design/DESIGN.md). Read [work
 
 Raycast's official extension API covers command lifecycle, preferences, cache/storage, OAuth, clipboard, feedback, keyboard/system/window/browser operations, AI/tools, navigation and List/Grid/Detail/Form/action UI. Its manifest declares commands, view/no-view/menu-bar modes, arguments, preferences, intervals, tools and AI contributions. Those are useful capability targets; Linuxcast's schemas below are new contracts. [Raycast API reference](https://developers.raycast.com/api-reference) (sdk-raycast-api), [Raycast manifest](https://developers.raycast.com/information/manifest) (sdk-raycast-manifest).
 
-V1 supports local native-package install, developer tooling, package permissions/configuration, foreground/headless/background/tray contributions, native workflows, tool declarations and browser-companion mediation. It does not import Raycast packages, impersonate @raycast/api, install npm packages on an end user's machine or require a hosted marketplace. An online catalogue can be added later without changing package execution authority.
+V1 supports local native-package install, developer tooling, package permissions/configuration, foreground/headless/background/tray contributions, native workflows, tool declarations and browser-companion mediation. It does not import Raycast packages, impersonate @raycast/api, install JavaScript dependencies on an end user's machine or require a hosted marketplace. An online catalogue can be added later without changing package execution authority.
 
 ## 2. Process and trust boundary
 
@@ -277,7 +277,7 @@ The implementation must build and test a policy, not copy a demonstration comman
 - No direct host network. Broker RPC through the dedicated parent-owned pipes is the only network/desktop path. A network origin grant does not make a host network namespace available.
 - Resource enforcement through supervisor/cgroup mechanisms where supported plus process/output/time limits. Fail closed if the security-critical sandbox setup fails; surface specific diagnostics.
 - Seccomp policy must be compatible with the bundled runtime while denying unnecessary high-risk operations. Validate it on supported Debian kernels; no claim that disabling a JavaScript import is an OS security boundary.
-- Bundled JavaScript dependencies only. Reject .node addons and executable native payloads in extension packages. No npm postinstall, downloads or runtime dependency installation.
+- Bundled JavaScript dependencies only. Reject .node addons and executable native payloads in extension packages. No package lifecycle scripts, downloads or runtime dependency installation.
 - For workflow scripts, host-selected shell/Python executables and required libraries may be mounted explicitly. The interpreter remains sandboxed; a missing dependency gives setup instructions, not a hidden unsandboxed retry.
 
 The SDK loader can reject node:child_process and native-addon imports for clear errors, but assume hostile JavaScript can use any interface available in its process. Namespace/mount/network/broker restrictions and resource limits are the actual boundary. Filesystem access within an extension's own data directory is allowed by design.

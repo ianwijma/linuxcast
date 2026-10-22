@@ -52,7 +52,7 @@ Verify that required namespaces and resource controls can actually be created on
 
 ### Package installation
 
-Validate manifest/version, file count, total expanded size, per-file size and archive paths before installing to a staging directory, using the exact package limits in [extensions.md](extensions.md). Reject absolute paths, traversal, escaping symlinks, special files, native `.node` addons, package lifecycle hooks and remote executable imports. Bundled pure-JavaScript dependencies are allowed. Do not run `npm install` against an extension package on the user's machine.
+Validate manifest/version, file count, total expanded size, per-file size and archive paths before installing to a staging directory, using the exact package limits in [extensions.md](extensions.md). Reject absolute paths, traversal, escaping symlinks, special files, native `.node` addons, package lifecycle hooks and remote executable imports. Bundled pure-JavaScript dependencies are allowed. Do not run `bun install` or any other dependency installer against an extension package on the user's machine.
 
 Compute a content hash after validation and atomically move the package into its immutable version directory. Grants bind to installed extension identity, version and integrity record. A permission expansion, changed package identity or changed integrity requires a new grant; do not silently reuse the former package's permissions. Disable/removal stops the host before deleting its data, and deletion of user data is a separate explicit choice.
 

@@ -11,8 +11,7 @@
       "dependsOn": [],
       "ownedPaths": [
         "package.json",
-        "pnpm-workspace.yaml",
-        "pnpm-lock.yaml",
+        "bun.lock",
         "tsconfig.base.json",
         "apps/desktop/package.json",
         "scripts/test-runner/"
@@ -37,7 +36,7 @@
         "Task-scoped tests and recorded acceptance evidence"
       ],
       "steps": [
-        "Create pnpm workspace with locked compatible Electron/React/TS/Tailwind toolchain and Rust workspace.",
+        "Create Bun workspace using root package.json workspaces and committed bun.lock; pin the Bun version and compatible Electron/React/TS/Tailwind toolchain alongside the Rust workspace.",
         "Wire the stable no-write lint/typecheck and task-scoped test commands; document exact prerequisites and compiler choice."
       ],
       "acceptance": [
@@ -75,8 +74,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- F1-01"
+        "bun run typecheck",
+        "bun run test:unit -- F1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -154,8 +153,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- S0-01"
+        "bun run typecheck",
+        "bun run test:integration -- S0-01"
       ],
       "evidence": [],
       "owner": null,
@@ -233,8 +232,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- S0-02"
+        "bun run typecheck",
+        "bun run test:integration -- S0-02"
       ],
       "evidence": [],
       "owner": null,
@@ -313,8 +312,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- S0-03"
+        "bun run typecheck",
+        "bun run test:security -- S0-03"
       ],
       "evidence": [],
       "owner": null,
@@ -392,8 +391,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- S0-04"
+        "bun run typecheck",
+        "bun run test:security -- S0-04"
       ],
       "evidence": [],
       "owner": null,
@@ -472,8 +471,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- S0-05"
+        "bun run typecheck",
+        "bun run test:contracts -- S0-05"
       ],
       "evidence": [],
       "owner": null,
@@ -552,8 +551,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- S0-06"
+        "bun run typecheck",
+        "bun run test:ui -- S0-06"
       ],
       "evidence": [],
       "owner": null,
@@ -639,8 +638,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- F0-01"
+        "bun run typecheck",
+        "bun run test:contracts -- F0-01"
       ],
       "evidence": [],
       "owner": null,
@@ -719,8 +718,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F1-02"
+        "bun run typecheck",
+        "bun run test:security -- F1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -806,8 +805,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- F2-01"
+        "bun run typecheck",
+        "bun run test:integration -- F2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -886,8 +885,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F2-02"
+        "bun run typecheck",
+        "bun run test:security -- F2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -966,8 +965,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F3-01"
+        "bun run typecheck",
+        "bun run test:security -- F3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1046,8 +1045,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-01"
+        "bun run typecheck",
+        "bun run test:ui -- D1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1127,8 +1126,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-02"
+        "bun run typecheck",
+        "bun run test:ui -- D1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1209,8 +1208,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- D1-03"
+        "bun run typecheck",
+        "bun run test:ui -- D1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1289,8 +1288,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- F1-03"
+        "bun run typecheck",
+        "bun run test:integration -- F1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1370,8 +1369,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L1-01"
+        "bun run typecheck",
+        "bun run test:unit -- L1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1450,8 +1449,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L1-02"
+        "bun run typecheck",
+        "bun run test:integration -- L1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1533,8 +1532,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L1-03"
+        "bun run typecheck",
+        "bun run test:integration -- L1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1614,8 +1613,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-01"
+        "bun run typecheck",
+        "bun run test:integration -- L2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -1696,8 +1695,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-02"
+        "bun run typecheck",
+        "bun run test:integration -- L2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -1779,8 +1778,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- L2-03"
+        "bun run typecheck",
+        "bun run test:integration -- L2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -1859,8 +1858,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-04"
+        "bun run typecheck",
+        "bun run test:unit -- L2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -1941,8 +1940,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-05"
+        "bun run typecheck",
+        "bun run test:unit -- L2-05"
       ],
       "evidence": [],
       "owner": null,
@@ -2022,8 +2021,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- L2-06"
+        "bun run typecheck",
+        "bun run test:ui -- L2-06"
       ],
       "evidence": [],
       "owner": null,
@@ -2102,8 +2101,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-01"
+        "bun run typecheck",
+        "bun run test:integration -- P1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2184,8 +2183,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-02"
+        "bun run typecheck",
+        "bun run test:integration -- P1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2266,8 +2265,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-03"
+        "bun run typecheck",
+        "bun run test:integration -- P1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2345,8 +2344,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-04"
+        "bun run typecheck",
+        "bun run test:integration -- P1-04"
       ],
       "evidence": [],
       "owner": null,
@@ -2426,8 +2425,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P1-05"
+        "bun run typecheck",
+        "bun run test:integration -- P1-05"
       ],
       "evidence": [],
       "owner": null,
@@ -2509,8 +2508,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-01",
-        "pnpm test:integration -- P2-01"
+        "bun run test:security -- P2-01",
+        "bun run test:integration -- P2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2588,8 +2587,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-02",
-        "pnpm test:integration -- P2-02"
+        "bun run test:security -- P2-02",
+        "bun run test:integration -- P2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -2672,8 +2671,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-03",
-        "pnpm test:integration -- P2-03"
+        "bun run test:security -- P2-03",
+        "bun run test:integration -- P2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -2754,8 +2753,8 @@
       ],
       "validation": [
         "cargo test --workspace",
-        "pnpm test:security -- P2-04",
-        "pnpm test:integration -- P2-04"
+        "bun run test:security -- P2-04",
+        "bun run test:integration -- P2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -2838,8 +2837,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-01"
+        "bun run typecheck",
+        "bun run test:integration -- P3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -2921,8 +2920,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-02"
+        "bun run typecheck",
+        "bun run test:integration -- P3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3004,8 +3003,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- P3-03"
+        "bun run typecheck",
+        "bun run test:integration -- P3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3085,8 +3084,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-01"
+        "bun run typecheck",
+        "bun run test:security -- E1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3141,7 +3140,7 @@
         },
         {
           "id": "E1-02-AC02",
-          "text": "No npm postinstall/native-addon download or shell interpolation fallback.",
+          "text": "No package lifecycle scripts, native-addon downloads or shell interpolation fallback.",
           "status": "pending",
           "conditional": null,
           "justification": "",
@@ -3165,8 +3164,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-02"
+        "bun run typecheck",
+        "bun run test:security -- E1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3248,8 +3247,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-03"
+        "bun run typecheck",
+        "bun run test:security -- E1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3329,8 +3328,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- E1-04"
+        "bun run typecheck",
+        "bun run test:integration -- E1-04"
       ],
       "evidence": [],
       "owner": null,
@@ -3408,8 +3407,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- W1-01"
+        "bun run typecheck",
+        "bun run test:contracts -- W1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3487,8 +3486,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W1-02"
+        "bun run typecheck",
+        "bun run test:unit -- W1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3566,8 +3565,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W1-03"
+        "bun run typecheck",
+        "bun run test:integration -- W1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3644,8 +3643,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-01"
+        "bun run typecheck",
+        "bun run test:ui -- W2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3722,8 +3721,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-02"
+        "bun run typecheck",
+        "bun run test:ui -- W2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -3800,8 +3799,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- W2-03"
+        "bun run typecheck",
+        "bun run test:ui -- W2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -3879,8 +3878,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- W3-01"
+        "bun run typecheck",
+        "bun run test:contracts -- W3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -3957,8 +3956,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W3-02"
+        "bun run typecheck",
+        "bun run test:unit -- W3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4038,8 +4037,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W3-03"
+        "bun run typecheck",
+        "bun run test:security -- W3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4118,8 +4117,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W3-04"
+        "bun run typecheck",
+        "bun run test:integration -- W3-04"
       ],
       "evidence": [],
       "owner": null,
@@ -4211,8 +4210,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W3-05"
+        "bun run typecheck",
+        "bun run test:integration -- W3-05"
       ],
       "evidence": [],
       "owner": null,
@@ -4292,8 +4291,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- A1-01"
+        "bun run typecheck",
+        "bun run test:contracts -- A1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -4371,8 +4370,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:contracts -- A1-02"
+        "bun run typecheck",
+        "bun run test:contracts -- A1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4449,8 +4448,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A1-03"
+        "bun run typecheck",
+        "bun run test:integration -- A1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4530,8 +4529,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A2-01"
+        "bun run typecheck",
+        "bun run test:ui -- A2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -4609,8 +4608,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-02"
+        "bun run typecheck",
+        "bun run test:integration -- A2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -4687,8 +4686,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A2-03"
+        "bun run typecheck",
+        "bun run test:ui -- A2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -4770,8 +4769,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-04"
+        "bun run typecheck",
+        "bun run test:integration -- A2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -4852,8 +4851,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- A3-01"
+        "bun run typecheck",
+        "bun run test:security -- A3-01"
       ],
       "evidence": [],
       "owner": null,
@@ -4932,8 +4931,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- A3-02"
+        "bun run typecheck",
+        "bun run test:security -- A3-02"
       ],
       "evidence": [],
       "owner": null,
@@ -5012,8 +5011,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-03"
+        "bun run typecheck",
+        "bun run test:integration -- A3-03"
       ],
       "evidence": [],
       "owner": null,
@@ -5092,8 +5091,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-04"
+        "bun run typecheck",
+        "bun run test:integration -- A3-04"
       ],
       "evidence": [],
       "owner": null,
@@ -5171,8 +5170,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A3-05"
+        "bun run typecheck",
+        "bun run test:integration -- A3-05"
       ],
       "evidence": [],
       "owner": null,
@@ -5252,8 +5251,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A4-01"
+        "bun run typecheck",
+        "bun run test:integration -- A4-01"
       ],
       "evidence": [],
       "owner": null,
@@ -5331,8 +5330,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- A4-02"
+        "bun run typecheck",
+        "bun run test:ui -- A4-02"
       ],
       "evidence": [],
       "owner": null,
@@ -5411,8 +5410,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- B1-01"
+        "bun run typecheck",
+        "bun run test:integration -- B1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -5491,8 +5490,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- B1-02"
+        "bun run typecheck",
+        "bun run test:integration -- B1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -5571,8 +5570,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- U1-01"
+        "bun run typecheck",
+        "bun run test:ui -- U1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -5653,8 +5652,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U1-02"
+        "bun run typecheck",
+        "bun run test:integration -- U1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -5735,8 +5734,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U1-03"
+        "bun run typecheck",
+        "bun run test:integration -- U1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -5816,8 +5815,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-01"
+        "bun run typecheck",
+        "bun run test:integration -- U2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -5899,8 +5898,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-02"
+        "bun run typecheck",
+        "bun run test:integration -- U2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -5979,8 +5978,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- U2-03"
+        "bun run typecheck",
+        "bun run test:integration -- U2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -6061,8 +6060,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- U2-04"
+        "bun run typecheck",
+        "bun run test:ui -- U2-04"
       ],
       "evidence": [],
       "owner": null,
@@ -6144,8 +6143,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M1-01"
+        "bun run typecheck",
+        "bun run test:integration -- M1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -6227,8 +6226,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M1-02"
+        "bun run typecheck",
+        "bun run test:integration -- M1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -6308,8 +6307,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M2-01"
+        "bun run typecheck",
+        "bun run test:integration -- M2-01"
       ],
       "evidence": [],
       "owner": null,
@@ -6392,8 +6391,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- M2-02"
+        "bun run typecheck",
+        "bun run test:integration -- M2-02"
       ],
       "evidence": [],
       "owner": null,
@@ -6494,8 +6493,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- R1-01"
+        "bun run typecheck",
+        "bun run test:integration -- R1-01"
       ],
       "evidence": [],
       "owner": null,
@@ -6574,8 +6573,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:ui -- R1-02"
+        "bun run typecheck",
+        "bun run test:ui -- R1-02"
       ],
       "evidence": [],
       "owner": null,
@@ -6656,8 +6655,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- R1-03"
+        "bun run typecheck",
+        "bun run test:integration -- R1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -6738,8 +6737,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- A2-05"
+        "bun run typecheck",
+        "bun run test:integration -- A2-05"
       ],
       "evidence": [],
       "owner": null,
@@ -6817,8 +6816,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- L2-07"
+        "bun run typecheck",
+        "bun run test:unit -- L2-07"
       ],
       "evidence": [],
       "owner": null,
@@ -6898,8 +6897,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- E1-05"
+        "bun run typecheck",
+        "bun run test:security -- E1-05"
       ],
       "evidence": [],
       "owner": null,
@@ -6979,8 +6978,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- F2-03"
+        "bun run typecheck",
+        "bun run test:security -- F2-03"
       ],
       "evidence": [],
       "owner": null,
@@ -7060,8 +7059,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- B1-03"
+        "bun run typecheck",
+        "bun run test:security -- B1-03"
       ],
       "evidence": [],
       "owner": null,
@@ -7138,8 +7137,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:unit -- W4-01"
+        "bun run typecheck",
+        "bun run test:unit -- W4-01"
       ],
       "evidence": [],
       "owner": null,
@@ -7217,8 +7216,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-02"
+        "bun run typecheck",
+        "bun run test:security -- W4-02"
       ],
       "evidence": [],
       "owner": null,
@@ -7296,8 +7295,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-03"
+        "bun run typecheck",
+        "bun run test:integration -- W4-03"
       ],
       "evidence": [],
       "owner": null,
@@ -7376,8 +7375,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-04"
+        "bun run typecheck",
+        "bun run test:integration -- W4-04"
       ],
       "evidence": [],
       "owner": null,
@@ -7461,8 +7460,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-05"
+        "bun run typecheck",
+        "bun run test:integration -- W4-05"
       ],
       "evidence": [],
       "owner": null,
@@ -7540,8 +7539,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-06"
+        "bun run typecheck",
+        "bun run test:security -- W4-06"
       ],
       "evidence": [],
       "owner": null,
@@ -7618,8 +7617,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-07"
+        "bun run typecheck",
+        "bun run test:security -- W4-07"
       ],
       "evidence": [],
       "owner": null,
@@ -7696,8 +7695,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:security -- W4-08"
+        "bun run typecheck",
+        "bun run test:security -- W4-08"
       ],
       "evidence": [],
       "owner": null,
@@ -7776,8 +7775,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- W4-09"
+        "bun run typecheck",
+        "bun run test:integration -- W4-09"
       ],
       "evidence": [],
       "owner": null,
@@ -7858,8 +7857,8 @@
         }
       ],
       "validation": [
-        "pnpm typecheck",
-        "pnpm test:integration -- E1-06"
+        "bun run typecheck",
+        "bun run test:integration -- E1-06"
       ],
       "evidence": [],
       "owner": null,

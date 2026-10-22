@@ -58,7 +58,7 @@ Electron utility processes are trusted isolation for responsiveness and crash co
 
 ## Workspace and ownership
 
-Use a pnpm workspace with these ownership boundaries. The names are implementation targets, not directories already implemented.
+Use a Bun workspace declared in the root `package.json` with these ownership boundaries and a committed `bun.lock`. The names are implementation targets, not directories already implemented.
 
 | Directory | Responsibility | Allowed direct dependencies |
 | --- | --- | --- |

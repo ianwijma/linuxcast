@@ -8,15 +8,16 @@ This is a future acceptance contract. The repository presently runs documentatio
 |---|---|
 | `python3 scripts/validate_plan.py` | Existing: local documentation, IDs, graph, coverage, assets and token checks. |
 | `python3 scripts/plan_status.py` | Existing: task counts and dependency-ready work. |
-| `pnpm lint` / `pnpm typecheck` | Foundation introduces no-write lint and TypeScript validation. |
-| `pnpm test:unit -- TASK-ID` | Task-scoped unit tests; omitted ID runs all. Unknown IDs fail, never silently pass. |
-| `pnpm test:contracts -- TASK-ID` | Shared wire/schema/ViewModel/native fixture checks. |
-| `pnpm test:ui -- TASK-ID` | Renderer behaviour, accessibility and visual fixtures; not desktop-native proof. |
-| `pnpm test:integration -- TASK-ID` | Installed-client/desktop adapter integration suite. Reports unavailable desktop separately from pass. |
-| `pnpm test:security -- TASK-ID` | Sandbox, permission, IPC and adversarial fixtures. |
-| `pnpm test:perf` | Repeatable latency, process-memory and idle-CPU measurements. |
+| `bun install --frozen-lockfile` | Install from the committed `bun.lock` after bootstrap; CI uses the pinned Bun version. |
+| `bun run lint` / `bun run typecheck` | Foundation introduces no-write lint and TypeScript validation. |
+| `bun run test:unit -- TASK-ID` | Task-scoped unit tests; omitted ID runs all. Unknown IDs fail, never silently pass. |
+| `bun run test:contracts -- TASK-ID` | Shared wire/schema/ViewModel/native fixture checks. |
+| `bun run test:ui -- TASK-ID` | Renderer behaviour, accessibility and visual fixtures; not desktop-native proof. |
+| `bun run test:integration -- TASK-ID` | Installed-client/desktop adapter integration suite. Reports unavailable desktop separately from pass. |
+| `bun run test:security -- TASK-ID` | Sandbox, permission, IPC and adversarial fixtures. |
+| `bun run test:perf` | Repeatable latency, process-memory and idle-CPU measurements. |
 | `cargo test --workspace` | Rust workspace tests after native bootstrap. |
-| `pnpm package:deb` | Build the complete amd64 client package after packaging bootstrap. |
+| `bun run package:deb` | Build the complete amd64 client package after packaging bootstrap. |
 
 F1 foundation tasks create runners with these interfaces. Task cards name the future commands needed for their acceptance; these are not commands to run in the documentation-only snapshot. Bootstrap records prerequisites and runs every introduced command once. Tests must check behaviour and boundaries, not merely mirror implementation.
 

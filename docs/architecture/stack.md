@@ -12,7 +12,7 @@ Status: selected stack for implementation; not yet installed, built or tested. R
 | Rich notes editor | Tiptap 3 | Store versioned structured documents; sanitize imported/pasted content and provide accessible editing controls |
 | Visual workflow editor | `@xyflow/react` / React Flow 12 | Use typed custom nodes, accessible keyboard controls and a structured outline; graph semantics live outside the canvas |
 | Build | Vite 7 for renderer, esbuild for main/preload/utility entry points | Build explicitly before packaging; do not depend on the experimental Forge Vite plugin |
-| Workspace | pnpm 10 workspace, committed lockfile | Frozen installs in CI; package ownership follows overview.md |
+| Workspace | Bun workspace, committed `bun.lock` | `bun install --frozen-lockfile` in CI; package ownership follows overview.md |
 | Package generation | Electron Forge 7 with Debian maker | Initial artifact is one amd64 `.deb`; include native helpers and runtime assets as unpacked resources |
 | Local database | SQLite at least 3.51.3 through better-sqlite3, FTS5 | One trusted storage utility process owns the database; rebuild the native addon for pinned Electron and assert runtime SQLite version |
 | Portable backup encryption | Rust `age` crate from the rage project, standard age passphrase format | Pin a reviewed compatible version in bootstrap; no custom cipher/KDF; encrypted full backups and scheduled exports |
@@ -58,6 +58,10 @@ Support requires a functioning user desktop session, an available session bus an
 
 ## Runtime ownership
 
+Bun manages development dependencies and runs workspace scripts. Bootstrap pins the Bun version, declares `workspaces` in the root `package.json`, and commits `bun.lock`; local setup uses `bun install`, and CI uses `bun install --frozen-lockfile`. Review dependency lifecycle requirements for Electron and native build tools and explicitly allow only required packages through `trustedDependencies`. Validate native addon rebuilds and packaging with this install policy. [Bun workspaces](https://bun.sh/docs/pm/workspaces), [Bun installation and lifecycle scripts](https://bun.sh/docs/pm/cli/install).
+
+Use `bun run <script>` for the repository's named scripts, retaining their configured tools such as Vitest and Playwright. Node-based build tools retain their declared runtime; the packaged application continues to use Electron and the bundled Node runtime described below. [Bun script execution](https://bun.com/docs/runtime).
+
 Electron provides its own embedded Node version for trusted main and utility code. The separate Node 24 runtime exists to give extensions a stable, independently sandboxed execution environment. Do not load extension JavaScript into Electron main, a trusted utility process or a preload script.
 
 Only reviewed bundled SQLite/media adapters may use native Node addons. Build better-sqlite3 with the exact Electron headers/ABI using electron-rebuild; package Sharp/libvips for the separate bundled Node media worker and validate its runtime ABI independently. Verify both inside the packaged app. Extension packages are pure bundled JavaScript with no `.node` files, package-install scripts or runtime native compilation. [electron-rebuild](https://github.com/electron/rebuild).
@@ -78,7 +82,7 @@ Bootstrap/utility tasks pin exact compatible versions, record transitive license
 
 ## Build and package contents
 
-Build in a pinned Debian 13 amd64 environment. Keep Node, Rust, native libraries and model runner versions in a build manifest. CI must build from the lockfile and record source revisions and artifact hashes. Reproducibility is a target validated by repeated builds, not assumed from using a container.
+Build in a pinned Debian 13 amd64 environment. Keep Bun, Node, Rust, native libraries and model runner versions in a build manifest. CI must build from the lockfile and record source revisions and artifact hashes. Reproducibility is a target validated by repeated builds, not assumed from using a container.
 
 Proposed filesystem layout:
 
@@ -119,12 +123,12 @@ Foundation task F1-01 must expose these stable workspace commands. An optional a
 
 | Command | Scope meaning |
 | --- | --- |
-| `pnpm test:unit -- <TASK-ID>` | Domain and React component unit tests mapped to the task |
-| `pnpm test:contracts -- <TASK-ID>` | Shared protocol, schema and compatibility fixtures mapped to the task |
-| `pnpm test:ui -- <TASK-ID>` | Playwright Electron UI scenarios mapped to the task |
-| `pnpm test:integration -- <TASK-ID>` | Cross-process and native integration scenarios; declare required session/backend |
-| `pnpm test:security -- <TASK-ID>` | Permission, sandbox, IPC and adversarial fixtures mapped to the task |
-| `pnpm test:perf` | Complete reproducible performance suite with environment and percentile output |
+| `bun run test:unit -- <TASK-ID>` | Domain and React component unit tests mapped to the task |
+| `bun run test:contracts -- <TASK-ID>` | Shared protocol, schema and compatibility fixtures mapped to the task |
+| `bun run test:ui -- <TASK-ID>` | Playwright Electron UI scenarios mapped to the task |
+| `bun run test:integration -- <TASK-ID>` | Cross-process and native integration scenarios; declare required session/backend |
+| `bun run test:security -- <TASK-ID>` | Permission, sandbox, IPC and adversarial fixtures mapped to the task |
+| `bun run test:perf` | Complete reproducible performance suite with environment and percentile output |
 | `cargo test --workspace` | Native Rust unit and protocol tests |
 
 Native session/device tests must report prerequisites and fail the relevant release gate when prerequisites are missing. Do not report an unexecuted hardware/compositor test as passed. These are required future scripts; this documentation PR does not claim that they already exist.
