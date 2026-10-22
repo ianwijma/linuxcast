@@ -1,0 +1,71 @@
+13.7
+v24.22.1
+1.4.4
+bun install v1.4.4 (38afee6c8)
+
++ @eslint/js@9.39.5
++ @playwright/test@1.64.1
++ @tailwindcss/vite@4.3.3
++ @testing-library/dom@10.4.2
++ @testing-library/react@16.3.3
++ @types/node@24.19.2
++ @types/react@19.3.0
++ @types/react-dom@19.3.0
++ esbuild@0.28.2
++ eslint@9.39.5
++ jsdom@30.1.3
++ react@19.3.1
++ react-dom@19.3.1
++ tailwindcss@4.3.3
++ typescript@6.0.3
++ typescript-eslint@8.72.0
++ vite@7.3.7
++ vitest@4.1.12
+
+627 packages installed [5.03s]
+$ node scripts/test-runner/setup-electron.ts
+{"electron":"45.0.0","node":"24.22.0","chrome":"156.0.8078.48"}
+$ eslint . --max-warnings 0
+$ tsc --project tsconfig.base.json --noEmit
+$ node scripts/test-runner/run.ts unit "F1-01"
+
+ RUN  v4.1.12 /build
+
+ ✓ scripts/test-runner/reports.test.ts (1 test) 3ms
+ ✓ scripts/test-runner/toolchain.test.tsx (2 tests) 89ms
+ ✓ scripts/test-runner/selection.test.ts (17 tests) 4044ms
+   ✓ CLI executes only selected files, omission executes all, and tool failure propagates  1549ms
+   ✓ CLI refuses an unexecuted skip check as acceptance  467ms
+   ✓ CLI refuses an unexecuted todo check as acceptance  469ms
+   ✓ CLI refuses an unexecuted only check as acceptance  477ms
+   ✓ cancelling a running suite terminates its process group and returns interruption  448ms
+   ✓ public Bun script preserves empty selectors, rejects unknown IDs and runs omitted selectors  621ms
+
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Start at  14:35:05
+   Duration  4.21s (transform 122ms, setup 0ms, import 263ms, tests 4.14s, environment 0ms)
+
+JSON report written to /tmp/linuxcast-test-report-5EkSdA/results.json
+$ node scripts/test-runner/run.ts unit
+
+ RUN  v4.1.12 /build
+
+ ✓ scripts/test-runner/reports.test.ts (1 test) 3ms
+ ✓ scripts/test-runner/toolchain.test.tsx (2 tests) 89ms
+ ✓ scripts/test-runner/selection.test.ts (17 tests) 4028ms
+   ✓ CLI executes only selected files, omission executes all, and tool failure propagates  1553ms
+   ✓ CLI refuses an unexecuted skip check as acceptance  471ms
+   ✓ CLI refuses an unexecuted todo check as acceptance  478ms
+   ✓ CLI refuses an unexecuted only check as acceptance  469ms
+   ✓ cancelling a running suite terminates its process group and returns interruption  426ms
+   ✓ public Bun script preserves empty selectors, rejects unknown IDs and runs omitted selectors  620ms
+
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Start at  14:35:10
+   Duration  4.19s (transform 103ms, setup 0ms, import 228ms, tests 4.12s, environment 0ms)
+
+JSON report written to /tmp/linuxcast-test-report-tRCmuX/results.json
+$ node scripts/test-runner/run.ts unit ""
+Supply one task ID, or omit the selector to run the entire suite. An empty selector is invalid.

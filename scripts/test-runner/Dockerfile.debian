@@ -1,0 +1,11 @@
+# F1-01 build environment only. No graphical/session acceptance is implied.
+FROM node@sha256:016f604a11c4c725f0a4c62e29ff11adab153d297bf97046c9bf2ddb9f1011d3
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgtk-3-0 libnss3 libasound2t64 libgbm1 \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip -o /tmp/bun.zip \
+    && echo 'bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c  /tmp/bun.zip' | sha256sum -c - \
+    && unzip -q /tmp/bun.zip -d /tmp \
+    && mv /tmp/bun-linux-x64/bun /usr/local/bin/bun \
+    && rm -rf /tmp/bun.zip /tmp/bun-linux-x64
+WORKDIR /build
