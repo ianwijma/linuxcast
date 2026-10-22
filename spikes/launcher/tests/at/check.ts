@@ -138,6 +138,7 @@ try {
   const nativeKey = (key: string) => expect(spawnSync('xdotool', ['key', '--clearmodifiers', key], { env, timeout: 5000 }).status).toBe(0);
   expect(spawnSync('xdotool', ['windowfocus', '--sync', String(runtime.windowId)], { env, timeout: 5000 }).status).toBe(0);
   const settleDismissAnchor = async () => {
+    stage = 'anchor:Dismiss launcher';
     const offset = log().length;
     await page.getByRole('button', { name: 'Dismiss launcher', exact: true }).focus();
     // Process a distinct anchor first so a delayed initial search utterance
@@ -158,9 +159,14 @@ try {
         && snapshot.controls?.some(control => control.label === label && control.kind === role && control.focused);
     }, { timeout: 10_000 }).toBe(true);
     snapshots.push({ label, snapshot: snapshot! });
-    await expect.poll(() => !orcaExited && hasLabel(log().slice(offset), 'SPEECH OUTPUT:', label)
-      && hasLabel(log().slice(offset), 'SPEECH DISPATCHER: Speaking', label), { timeout: 10_000 }).toBe(true);
-    presentations.push({ label, generatedAfterNativeFocus: true, deliveredToSpeechDispatcher: true });
+    const presentation = { label, generatedAfterNativeFocus: false, deliveredToSpeechDispatcher: false };
+    presentations.push(presentation);
+    await expect.poll(() => {
+      const fresh = log().slice(offset);
+      presentation.generatedAfterNativeFocus = hasLabel(fresh, 'SPEECH OUTPUT:', label);
+      presentation.deliveredToSpeechDispatcher = hasLabel(fresh, 'SPEECH DISPATCHER: Speaking', label);
+      return !orcaExited && presentation.generatedAfterNativeFocus && presentation.deliveredToSpeechDispatcher;
+    }, { timeout: 10_000 }).toBe(true);
     if (screenshot) {
       const png = await application!.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'));
       writeFileSync(join(evidence, screenshot), Buffer.from(png, 'base64'));
