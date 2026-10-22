@@ -3,6 +3,7 @@ pub mod context;
 pub mod decision;
 pub mod device;
 pub mod diagnostics;
+pub mod peer_bootstrap;
 pub mod protocol;
 pub mod safety;
 pub mod unix;

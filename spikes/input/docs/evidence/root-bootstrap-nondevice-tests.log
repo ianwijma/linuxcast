@@ -1,0 +1,97 @@
+   Compiling linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s
+     Running unittests src/lib.rs (spikes/input/.target/debug/deps/linuxcast_input_spike-8a75de16431c276f)
+
+running 17 tests
+test context::tests::invalidation_timeout_unknown_flags_and_stale_sample_discard_all_eligibility ... ok
+test context::tests::live_context_types_have_distinct_fixed_denials_and_no_private_fields ... ok
+test context::tests::root_unlocked_hint_never_grants_without_authenticated_companion ... ok
+test decision::tests::live_negative_reason_is_consumed_and_never_overridden_by_eligible_fixture ... ok
+test decision::tests::running_live_state_vetoes_and_missing_stale_wrong_generation_fail_closed ... ok
+test decision::tests::synthetic_positive_lease_and_terminal_behavior_preserved ... ok
+test peer_bootstrap::tests::account_requires_exact_authorized_uid_and_nonroot_primary_group ... ok
+test diagnostics::tests::diagnostics_never_format_private_error_text_or_paths ... ok
+test peer_bootstrap::tests::creator_authentication_does_not_confuse_root_parent_and_child ... ok
+test safety::tests::chord_precedes_forwarding ... ok
+test safety::tests::late_kernel_recovery_is_never_success ... ok
+test safety::tests::lease_boundary_generation_and_no_rearm ... ok
+test protocol::tests::strict_fixed_frame_grammar ... ok
+test safety::tests::session_denials_are_closed ... ok
+test unix::tests::unexpected_ancillary_descriptors_are_closed ... ok
+test unix::tests::real_scm_rights_closes_sender_copy_and_authenticates_peer ... ok
+test decision::tests::actual_kernel_peer_private_bus_negative_reaches_shared_decision ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/context-probe.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_context_probe-418ec8be6ad7f51b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/denial-helper.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_denial_helper-81b3baf9c1ce5244)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/denial-probe.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_denial_probe-83bd8218579a77fc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/peer-probe.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_peer_probe-1d4d13a4739d427b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/supervisor.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_supervisor-10205d7b4004e3e7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/synthetic-lab.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_synthetic_lab-e2e9ff716b410406)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/worker.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_worker-88a7a00489ca8481)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/context-private.rs (spikes/input/.target/debug/deps/context_private-64a9b92f3e79d253)
+
+running 5 tests
+test rust_peer_api_consumes_transport_and_rejects_wrong_trusted_uid ... ok
+test context_probe_rejects_caller_selected_identity_or_bus_before_reading ... ok
+test peer_observer_rejects_every_environment_entry_before_binding ... ok
+test kernel_peer_lifetime_brackets_mock_session_queries ... ok
+test typed_context_bridge_against_private_peer_only ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/denial-private.rs (spikes/input/.target/debug/deps/denial_private-6f38ab5e1f845abd)
+{"privateNoQueryFixture":true,"helperCases":10,"invocationPrivacy":true,"parentDeathCleanup":true,"independentSevenSecondGuard":true,"blockedGuardSignalsRejected":true,"noWorkerArm":true,"liveQueries":0,"actualWrongRootParentRejected":true,"rootBootstrapSchemaAndRightsChecked":true,"nonrootSupervisorEntryDenied":true,"rootExecutionUnavailable":true,"actualRootDropProof":false}
+     Running tests/nondevice.rs (spikes/input/.target/debug/deps/nondevice-115d8bc578912639)
+
+running 3 tests
+test actual_unprivileged_post_initialization_syscall_policy ... ok
+test worker_cannot_be_started_as_an_arbitrary_executor ... ok
+test lab_requires_explicit_reviewed_guest_invocation_before_device_access ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/peer-observer-private.rs (spikes/input/.target/debug/deps/peer_observer_private-38b2e6f8549b4a55)
+{"privateNoQueryFixture":true,"normalCleanup":true,"queryFailureCleanup":true,"startupFailureCleanup":true,"cancellationCleanup":true,"deadlineCleanup":true,"retainedDescendantCleanup":true,"parentDeathCleanup":true,"fixedInvocationPrivacy":true,"independentSevenSecondDeadline":true,"liveQueries":0}
+   Doc-tests linuxcast_input_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

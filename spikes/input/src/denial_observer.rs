@@ -2,7 +2,9 @@
 use linuxcast_input_spike::{
     Result, context,
     decision::{DecisionState, Veto},
-    fail, unix,
+    fail,
+    peer_bootstrap::{self, ParentBinding, ParentKind, RootPeer},
+    unix,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -150,8 +152,8 @@ impl Tracker {
     }
 }
 impl Observer {
-    /// Ordinary-UID engineering driver only. No root-to-user launch adapter is
-    /// introduced: future supervisor integration requires separate review.
+    /// Ordinary-UID engineering driver. Root callers must use the separate
+    /// fixed-path, validated-principal start_root constructor.
     pub fn start(stream: &UnixStream, connection: u64) -> Result<Self> {
         let uid = unsafe { libc::getuid() };
         if uid == 0 || connection == 0 {
@@ -165,13 +167,40 @@ impl Observer {
         }
         Self::spawn(stream, connection, executable, "--internal-denial")
     }
+    /// Root-only engineering bootstrap. No caller-selected executable, group,
+    /// environment or principal; RootPeer already matched the authorized UID.
+    pub fn start_root(peer: &RootPeer, connection: u64) -> Result<Self> {
+        if !peer_bootstrap::root_identity() || connection == 0 {
+            return Err(fail("DENIAL_ROOT_AUTHORIZATION_REQUIRED"));
+        }
+        peer.check()?;
+        let result = Self::spawn_as(
+            peer.stream(),
+            connection,
+            peer_bootstrap::root_helper()?,
+            "--internal-root-denial",
+            Some((peer.uid(), peer.gid())),
+        )?;
+        peer.check()?;
+        Ok(result)
+    }
     fn spawn(
         stream: &UnixStream,
         connection: u64,
         executable: std::path::PathBuf,
         argument: &str,
     ) -> Result<Self> {
-        let uid = unsafe { libc::getuid() };
+        Self::spawn_as(stream, connection, executable, argument, None)
+    }
+    fn spawn_as(
+        stream: &UnixStream,
+        connection: u64,
+        executable: std::path::PathBuf,
+        argument: &str,
+        root_drop: Option<(u32, u32)>,
+    ) -> Result<Self> {
+        child_reaping_policy()?;
+        let uid = root_drop.map_or_else(|| unsafe { libc::getuid() }, |(uid, _)| uid);
         let (channel, child_channel) = unix::pair()?;
         let child_fd = child_channel.as_raw_fd();
         let parent = unsafe { libc::getpid() };
@@ -179,12 +208,15 @@ impl Observer {
         command
             .arg(argument)
             .env_clear()
+            .current_dir("/")
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::inherit());
         unsafe {
             command.pre_exec(move || {
-                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0
+                if let Some((uid, gid)) = root_drop {
+                    peer_bootstrap::drop_root_identity(uid, gid, parent)?;
+                } else if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0
                     || libc::getppid() != parent
                 {
                     return Err(std::io::Error::from_raw_os_error(libc::EPERM));
@@ -192,8 +224,18 @@ impl Observer {
                 if libc::dup2(child_fd, 3) < 0 || libc::fcntl(3, libc::F_SETFD, 0) < 0 {
                     return Err(std::io::Error::last_os_error());
                 }
-                // Remaining FDs are CLOEXEC at spawn; helper independently closes
-                // every descriptor >=4 before accepting its metadata descriptor.
+                // Keep Rust's exec-error pipe usable until exec; mark EVERY
+                // other descriptor for closure even if the caller forgot it.
+                if libc::syscall(
+                    libc::SYS_close_range,
+                    4u32,
+                    u32::MAX,
+                    libc::CLOSE_RANGE_CLOEXEC,
+                ) != 0
+                {
+                    return Err(std::io::Error::last_os_error());
+                }
+                // Helper independently closes >=4 before library/query work.
                 Ok(())
             });
         }
@@ -342,8 +384,46 @@ fn unprivileged_identity() -> bool {
             && gr == gs
     }
 }
+#[derive(Clone, Copy)]
+struct StartupReadbacks {
+    parent_death: i32,
+    dumpable: i32,
+    no_new_privileges: i32,
+    core_soft: libc::rlim_t,
+    core_hard: libc::rlim_t,
+}
+impl StartupReadbacks {
+    fn valid(self) -> bool {
+        self.parent_death == libc::SIGKILL
+            && self.dumpable == 0
+            && self.no_new_privileges == 1
+            && self.core_soft == 0
+            && self.core_hard == 0
+    }
+}
+fn helper_startup_readbacks() -> Result<()> {
+    let mut parent_death = 0;
+    let mut core: libc::rlimit = unsafe { std::mem::zeroed() };
+    if unsafe { libc::prctl(libc::PR_GET_PDEATHSIG, &mut parent_death, 0, 0, 0) } != 0
+        || unsafe { libc::getrlimit(libc::RLIMIT_CORE, &mut core) } != 0
+        || !(StartupReadbacks {
+            parent_death,
+            dumpable: unsafe { libc::prctl(libc::PR_GET_DUMPABLE, 0, 0, 0, 0) },
+            no_new_privileges: unsafe { libc::prctl(libc::PR_GET_NO_NEW_PRIVS, 0, 0, 0, 0) },
+            core_soft: core.rlim_cur,
+            core_hard: core.rlim_max,
+        })
+        .valid()
+    {
+        return Err(fail("DENIAL_HELPER_STARTUP_READBACK"));
+    }
+    Ok(())
+}
 pub fn helper() -> Result<()> {
-    run_helper(Backend::Live)
+    run_helper(Backend::Live, ParentKind::SameUid)
+}
+pub fn root_helper() -> Result<()> {
+    run_helper(Backend::Live, ParentKind::Root)
 }
 #[derive(Clone, Copy)]
 enum Backend {
@@ -351,70 +431,82 @@ enum Backend {
     #[cfg(test)]
     Fixture(Fixture),
 }
-fn run_helper(backend: Backend) -> Result<()> {
+fn run_helper(backend: Backend, kind: ParentKind) -> Result<()> {
     // Dedicated env_clear exec; rejection precedes library/symbol work.
-    if std::env::vars_os().next().is_some() || !unprivileged_identity() {
+    if std::env::vars_os().next().is_some()
+        || !unprivileged_identity()
+        || kind == ParentKind::Root
+            && (unsafe { libc::getgroups(0, std::ptr::null_mut()) } != 0
+                || unsafe { libc::getgid() } == 0)
+    {
         return Err(fail("DENIAL_HELPER_ENV_OR_UID"));
     }
+    guard_signal_mask()?;
+    install_deadline()?;
     unix::no_core()?;
-    let parent = unsafe { libc::getppid() };
-    unix::parent_death(parent as u32)?;
-    if !empty_caps() || unsafe { libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) } != 0 {
+    if !empty_caps()
+        || unsafe {
+            libc::prctl(
+                libc::PR_CAP_AMBIENT,
+                libc::PR_CAP_AMBIENT_CLEAR_ALL,
+                0,
+                0,
+                0,
+            )
+        } != 0
+        || unsafe { libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) } != 0
+    {
         return Err(fail("DENIAL_HELPER_PRIVILEGES"));
     }
     close_above_channel()?;
     unsafe {
         libc::alarm(6);
     }
-    // Creator credentials validate the expected parent, not this child's UID.
-    // Verify the borrowed descriptor before claiming OwnedFd ownership: a
-    // direct unsupported invocation may have no FD3 at all.
-    let creator = unix::peer(3)?;
-    let mut kind = 0i32;
-    let mut length = std::mem::size_of::<i32>() as libc::socklen_t;
-    if unsafe {
-        libc::getsockopt(
-            3,
-            libc::SOL_SOCKET,
-            libc::SO_TYPE,
-            (&mut kind as *mut i32).cast(),
-            &mut length,
-        )
-    } != 0
-        || length != 4
-        || kind != libc::SOCK_SEQPACKET
-    {
-        return Err(fail("DENIAL_BOOTSTRAP_CHANNEL"));
-    }
-    if creator.pid != parent
-        || creator.uid != unsafe { libc::getuid() }
-        || unsafe { libc::getppid() } != parent
-    {
-        return Err(fail("DENIAL_BOOTSTRAP_PARENT"));
-    }
+    // Parent credential/drop changes never turn creator credentials into a
+    // claim about the child. Stable kernel parent lifetime is checked too.
+    let parent = ParentBinding::bind(3, kind)?;
+    // A private Ready response from these exact bytes establishes successful
+    // self-readback, not external observation or a parent-death experiment.
+    helper_startup_readbacks()?;
     let channel = unsafe { OwnedFd::from_raw_fd(3) };
     let (boot, mut fds) = unix::wait_receive::<Bootstrap>(channel.as_raw_fd(), 1, 300)?;
+    parent.check(channel.as_raw_fd())?;
     if boot.version != 1 || boot.connection == 0 || boot.uid != unsafe { libc::getuid() } {
         return Err(fail("DENIAL_BOOTSTRAP_INVALID"));
     }
     let fd = fds.remove(0);
+    peer_bootstrap::socket_kind(fd.as_raw_fd(), libc::SOCK_STREAM)?;
     let stream = UnixStream::from(fd);
     unix::send(channel.as_raw_fd(), &Request { sequence: 0 }, &[])?;
     match backend {
-        Backend::Live => helper_queries(channel.as_raw_fd(), stream, boot.connection, boot.uid),
+        Backend::Live => helper_queries(
+            channel.as_raw_fd(),
+            stream,
+            boot.connection,
+            boot.uid,
+            &parent,
+        ),
         #[cfg(test)]
         Backend::Fixture(case) => {
             fixture_queries(channel.as_raw_fd(), stream, boot.connection, case)
         }
     }
 }
-fn helper_queries(channel: RawFd, stream: UnixStream, connection: u64, uid: u32) -> Result<()> {
+fn helper_queries(
+    channel: RawFd,
+    stream: UnixStream,
+    connection: u64,
+    uid: u32,
+    parent: &ParentBinding,
+) -> Result<()> {
     let mut last = 0u64;
     // Metadata binding is deferred until the first request. Startup never
     // runs the potentially250ms query work on the parent watchdog thread.
     let mut binding: Option<std::result::Result<context::PeerMonitor, context::Denial>> = None;
     loop {
+        parent.check(channel)?;
         let (request, _) = unix::wait_receive::<Request>(channel, 0, 1000)?;
+        parent.check(channel)?;
         if request.sequence
             != last
                 .checked_add(1)
@@ -442,6 +534,7 @@ fn helper_queries(channel: RawFd, stream: UnixStream, connection: u64, uid: u32)
                 veto: linuxcast_input_spike::decision::monitor_denial(reason),
             },
         };
+        parent.check(channel)?;
         unix::send(channel, &value, &[])?;
     }
 }
@@ -453,7 +546,45 @@ extern "C" fn cancelled(_: libc::c_int) {
 extern "C" fn deadline(_: libc::c_int) {
     unsafe { libc::_exit(124) }
 }
+fn guard_signal_mask() -> Result<()> {
+    let mut current: libc::sigset_t = unsafe { std::mem::zeroed() };
+    if unsafe { libc::pthread_sigmask(libc::SIG_BLOCK, std::ptr::null(), &mut current) } != 0
+        || [libc::SIGALRM, libc::SIGTERM, libc::SIGINT]
+            .iter()
+            .any(|signal| unsafe { libc::sigismember(&current, *signal) } != 0)
+    {
+        return Err(fail("DENIAL_GUARD_SIGNAL_MASK"));
+    }
+    Ok(())
+}
+fn child_reaping_policy() -> Result<()> {
+    let mut action: libc::sigaction = unsafe { std::mem::zeroed() };
+    if unsafe { libc::sigaction(libc::SIGCHLD, std::ptr::null(), &mut action) } != 0
+        || action.sa_sigaction != libc::SIG_DFL
+        || action.sa_flags & libc::SA_NOCLDWAIT != 0
+    {
+        return Err(fail("DENIAL_CHILD_REAPER_POLICY"));
+    }
+    // Dedicated single-threaded engineering processes only: there is no other
+    // waitpid consumer. A direct child cannot be reused until our own wait.
+    Ok(())
+}
+fn install_deadline() -> Result<()> {
+    let mut action: libc::sigaction = unsafe { std::mem::zeroed() };
+    action.sa_sigaction = deadline as *const () as usize;
+    unsafe {
+        libc::sigemptyset(&mut action.sa_mask);
+    }
+    if unsafe { libc::sigaction(libc::SIGALRM, &action, std::ptr::null_mut()) } != 0 {
+        return Err(fail("DENIAL_GUARD_FAILED"));
+    }
+    Ok(())
+}
 pub fn initialize() -> Result<()> {
+    // fork/exec preserves signal masks. Reject before NSS/bootstrap/queries,
+    // rather than claiming an inherited blocked alarm can enforce a deadline.
+    guard_signal_mask()?;
+    child_reaping_policy()?;
     unix::no_core()?;
     for (signal, handler) in [
         (libc::SIGALRM, deadline as extern "C" fn(libc::c_int)),
@@ -548,6 +679,7 @@ impl Drop for Connector {
     }
 }
 fn connect_private() -> Result<(PrivateSocket, UnixStream, Connector)> {
+    child_reaping_policy()?;
     let (private, listener) = PrivateSocket::create()?;
     let parent = unsafe { libc::getpid() };
     let pid = unsafe { libc::fork() };
@@ -711,6 +843,151 @@ pub fn driver() -> Result<()> {
     Ok(())
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RootBootstrap {
+    version: u8,
+    authorized_uid: u32,
+}
+impl RootBootstrap {
+    fn authorized_uid(&self) -> Result<u32> {
+        if self.version != 1 || self.authorized_uid == 0 || self.authorized_uid == u32::MAX {
+            return Err(fail("ROOT_DENIAL_AUTHORIZATION_INVALID"));
+        }
+        Ok(self.authorized_uid)
+    }
+}
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RootGateReport {
+    phase: &'static str,
+    evidence_veto: Veto,
+    decision_veto: Veto,
+    can_arm: bool,
+    worker_arm_emitted: bool,
+    device_bootstrap_reached: bool,
+}
+fn supported_root_negative(value: Veto) -> bool {
+    matches!(
+        value,
+        Veto::Remote
+            | Veto::Inactive
+            | Veto::NotGraphical
+            | Veto::NotSeatZero
+            | Veto::Locked
+            | Veto::CompanionUnavailable
+            | Veto::PeerDead
+            | Veto::PeerDisconnected
+    )
+}
+fn root_result_complete(decision: Veto, evidence: Veto) -> bool {
+    supported_root_negative(decision) && supported_root_negative(evidence)
+}
+fn deny_before_bootstrap(state: &mut DecisionState, now: u64) -> Result<Veto> {
+    // The real supervisor entry consumes the same Arm/Renew decision code as
+    // the manufactured route. No fixture, ready worker or input FD exists here.
+    let mut handshake = false;
+    let mut result = None;
+    for operation in [
+        linuxcast_input_spike::protocol::Operation::Arm,
+        linuxcast_input_spike::protocol::Operation::Renew,
+    ] {
+        let outcome = state.request(operation, 1, &mut handshake, None, false, now);
+        if outcome.effect != linuxcast_input_spike::decision::Effect::Disarm
+            || outcome.veto.is_none()
+            || state.is_armed()
+        {
+            return Err(fail("DENIAL_UNEXPECTED_WORKER_EFFECT"));
+        }
+        if result.is_some_and(|previous| Some(previous) != outcome.veto) {
+            return Err(fail("DENIAL_TERMINAL_REVIVAL"));
+        }
+        result = outcome.veto;
+    }
+    Ok(result.unwrap())
+}
+/// Fixed actual-supervisor engineering entry. FD3 belongs to the actual root
+/// parent and carries ONLY its authorization record and one accepted peer.
+/// This is not a polkit/service grant API and has no positive continuation.
+pub fn root_gate() -> Result<()> {
+    if !peer_bootstrap::root_identity() || std::env::vars_os().next().is_some() {
+        return Err(fail("ROOT_DENIAL_EMPTY_ENV_AND_ROOT_REQUIRED"));
+    }
+    initialize()?;
+    close_above_channel()?;
+    let parent = ParentBinding::bind(3, ParentKind::Root)?;
+    let channel = unsafe { OwnedFd::from_raw_fd(3) };
+    let (boot, mut descriptors) = unix::wait_receive::<RootBootstrap>(channel.as_raw_fd(), 1, 300)?;
+    parent.check(channel.as_raw_fd())?;
+    let peer = RootPeer::bind(
+        UnixStream::from(descriptors.remove(0)),
+        boot.authorized_uid()?,
+    )?;
+    parent.check(channel.as_raw_fd())?;
+    // Assigned here, never carried by a client or inherited authorization wire.
+    let connection_generation = 1;
+    let mut observer = Observer::start_root(&peer, connection_generation)?;
+    parent.check(channel.as_raw_fd())?;
+    let mut decision = DecisionState::live_denial(peer.uid(), connection_generation);
+    let started = Instant::now();
+    for index in 0..20 {
+        while started.elapsed() < Duration::from_millis(index * SAMPLE_MS) {
+            if CANCEL.load(std::sync::atomic::Ordering::SeqCst) {
+                return Err(fail("DENIAL_CANCELLED"));
+            }
+            parent.check(channel.as_raw_fd())?;
+            observer.poll(&mut decision, unix::monotonic_ms());
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        parent.check(channel.as_raw_fd())?;
+        // The root fixture has exactly one bootstrap operation. Reject any
+        // subsequent bytes/FDs rather than creating another authorization mode.
+        if unix::receive::<Request>(channel.as_raw_fd(), 0)?.is_some() {
+            return Err(fail("ROOT_DENIAL_UNEXPECTED_PARENT_PACKET"));
+        }
+        observer.poll(&mut decision, unix::monotonic_ms());
+        let now = unix::monotonic_ms();
+        // Preserve the fixed schedule. An attempt while still Pending latches
+        // that veto and MUST make this experiment incomplete, even if later
+        // evidence is valid. Never wait/retry or revive its decision.
+        let veto = if index == 0 {
+            decision.veto(now).unwrap_or(Veto::InvalidObservation)
+        } else {
+            deny_before_bootstrap(&mut decision, now)?
+        };
+        let row = RootGateReport {
+            phase: "ROOT_LIVE_DENIAL_PREBOOTSTRAP",
+            evidence_veto: observer.evidence(),
+            decision_veto: veto,
+            can_arm: false,
+            worker_arm_emitted: false,
+            device_bootstrap_reached: false,
+        };
+        let bytes = serde_json::to_vec(&row)?;
+        if bytes.len() > 512 {
+            return Err(fail("DENIAL_PUBLIC_BOUND"));
+        }
+        use std::io::Write;
+        std::io::stdout().write_all(&bytes)?;
+        std::io::stdout().write_all(b"\n")?;
+    }
+    if !observer.stop() {
+        return Err(fail("DENIAL_OWNED_CLEANUP"));
+    }
+    unsafe {
+        libc::alarm(0);
+    }
+    if !root_result_complete(
+        decision
+            .veto(unix::monotonic_ms())
+            .unwrap_or(Veto::InvalidObservation),
+        observer.evidence(),
+    ) {
+        return Err(fail("DENIAL_OBSERVATION_INCOMPLETE"));
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 #[derive(Clone, Copy, PartialEq)]
 enum Fixture {
@@ -862,7 +1139,7 @@ pub fn private_entry(args: &[String]) -> Result<()> {
             "unsupported" => Fixture::Unsupported,
             _ => return Err(fail("PRIVATE_CASE")),
         };
-        return run_helper(Backend::Fixture(case));
+        return run_helper(Backend::Fixture(case), ParentKind::SameUid);
     }
     if args == ["--private-abrupt"] || args == ["--private-deadline"] {
         initialize()?;
@@ -886,6 +1163,7 @@ pub fn private_entry(args: &[String]) -> Result<()> {
         return Err(fail("PRIVATE_CASE"));
     }
     tracker_cases();
+    root_boundary_cases()?;
     let (canary, _) = unix::pair()?;
     if unsafe { libc::dup2(canary.as_raw_fd(), 198) } != 198 {
         return Err(fail("PRIVATE_CANARY_DESCRIPTOR"));
@@ -989,11 +1267,274 @@ pub fn private_entry(args: &[String]) -> Result<()> {
         assert!(client.stop());
     }
     println!(
-        "{{\"privateNoQueryFixture\":true,\"helperCases\":10,\"boundedNonblockingPoll\":true,\"terminalVeto\":true,\"noWorkerArm\":true,\"liveQueries\":0}}"
+        "{{\"privateNoQueryFixture\":true,\"helperCases\":10,\"boundedNonblockingPoll\":true,\"terminalVeto\":true,\"noWorkerArm\":true,\"liveQueries\":0,\"actualWrongRootParentRejected\":true,\"rootBootstrapSchemaAndRightsChecked\":true,\"rootExecutionUnavailable\":true,\"actualRootDropProof\":false}}"
     );
     unsafe {
         libc::close(198);
     }
+    Ok(())
+}
+#[cfg(test)]
+fn root_boundary_cases() -> Result<()> {
+    // Deliberately unprivileged. This tests real transport denial, not a mock
+    // assertion that credential drop or the privileged entry ran successfully.
+    if unsafe { libc::getuid() } == 0 {
+        return Err(fail("PRIVATE_NONROOT_BOUNDARY_REQUIRED"));
+    }
+    let mut previous: libc::sigaction = unsafe { std::mem::zeroed() };
+    assert_eq!(
+        unsafe { libc::sigaction(libc::SIGCHLD, std::ptr::null(), &mut previous) },
+        0
+    );
+    for (handler, flags) in [(libc::SIG_IGN, 0), (libc::SIG_DFL, libc::SA_NOCLDWAIT)] {
+        let mut action: libc::sigaction = unsafe { std::mem::zeroed() };
+        action.sa_sigaction = handler;
+        action.sa_flags = flags;
+        unsafe {
+            libc::sigemptyset(&mut action.sa_mask);
+        }
+        assert_eq!(
+            unsafe { libc::sigaction(libc::SIGCHLD, &action, std::ptr::null_mut()) },
+            0
+        );
+        assert!(child_reaping_policy().is_err());
+    }
+    assert_eq!(
+        unsafe { libc::sigaction(libc::SIGCHLD, &previous, std::ptr::null_mut()) },
+        0
+    );
+    child_reaping_policy()?;
+    startup_readback_cases()?;
+    for (version, authorized_uid) in [(0, 1000), (1, 0), (1, u32::MAX)] {
+        assert!(
+            RootBootstrap {
+                version,
+                authorized_uid
+            }
+            .authorized_uid()
+            .is_err()
+        );
+    }
+    let boot = RootBootstrap {
+        version: 1,
+        authorized_uid: 1000,
+    };
+    for field in [
+        "pid",
+        "uid",
+        "epoch",
+        "connection",
+        "helper_path",
+        "environment",
+    ] {
+        let mut forged = serde_json::to_value(&boot)?;
+        forged[field] = serde_json::json!("PrivateBootstrapCanary");
+        assert!(serde_json::from_value::<RootBootstrap>(forged).is_err());
+    }
+    assert!(
+        serde_json::from_slice::<RootBootstrap>(b"{\"version\":1,\"authorized_uid\":1000}{}")
+            .is_err()
+    );
+    let (channel, receiver) = unix::pair()?;
+    let (stream, other) = UnixStream::pair()?;
+    // Wrong descriptor kind and extra SCM_RIGHTS cannot become a root peer.
+    assert!(peer_bootstrap::socket_kind(channel.as_raw_fd(), libc::SOCK_STREAM).is_err());
+    unix::send(
+        channel.as_raw_fd(),
+        &boot,
+        &[stream.as_raw_fd(), other.as_raw_fd()],
+    )?;
+    assert!(unix::receive::<RootBootstrap>(receiver.as_raw_fd(), 1).is_err());
+    let oversized = [b'X'; 2048];
+    assert_eq!(
+        unsafe {
+            libc::send(
+                channel.as_raw_fd(),
+                oversized.as_ptr().cast(),
+                oversized.len(),
+                libc::MSG_NOSIGNAL,
+            )
+        },
+        2048
+    );
+    assert!(unix::receive::<RootBootstrap>(receiver.as_raw_fd(), 1).is_err());
+    assert!(RootPeer::bind(stream, unsafe { libc::getuid() }).is_err());
+    // A real socketpair creator PID matches the actual child's parent. Only
+    // its nonroot UID makes this authentication fail; no PID/UID was claimed.
+    let (parent_end, child_end) = unix::pair()?;
+    let pid = unsafe { libc::fork() };
+    if pid < 0 {
+        return Err(fail("PRIVATE_PARENT_FORK_FAILED"));
+    }
+    if pid == 0 {
+        drop(parent_end);
+        let denied = ParentBinding::bind(child_end.as_raw_fd(), ParentKind::Root)
+            .err()
+            .is_some_and(|e| {
+                e.downcast_ref::<linuxcast_input_spike::diagnostics::CodeFailure>()
+                    .is_some_and(|e| e.code == "DENIAL_BOOTSTRAP_PARENT")
+            });
+        unsafe {
+            libc::_exit(if denied { 0 } else { 3 });
+        }
+    }
+    drop(child_end);
+    let end = Instant::now() + Duration::from_millis(300);
+    let mut status = 0;
+    loop {
+        if unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) } == pid {
+            break;
+        }
+        if Instant::now() >= end {
+            unsafe {
+                libc::kill(pid, libc::SIGKILL);
+                libc::waitpid(pid, &mut status, 0);
+            }
+            return Err(fail("PRIVATE_PARENT_CHILD_TIMEOUT"));
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    assert!(libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0);
+    // Same gate logic rejects live Arm/Renew and refuses an accidentally
+    // supplied synthetic policy rather than opening a positive continuation.
+    for cause in [
+        Veto::Remote,
+        Veto::Locked,
+        Veto::Inactive,
+        Veto::Unsupported,
+        Veto::PeerDead,
+    ] {
+        let now = unix::monotonic_ms();
+        let mut live = DecisionState::live_denial(1000, 1);
+        live.observation(1, cause, now);
+        assert_eq!(deny_before_bootstrap(&mut live, now)?, cause);
+        live.observation(1, Veto::CompanionUnavailable, now);
+        assert_eq!(deny_before_bootstrap(&mut live, now)?, cause);
+    }
+    assert!(
+        deny_before_bootstrap(
+            &mut DecisionState::synthetic_lab(1000),
+            unix::monotonic_ms()
+        )
+        .is_err()
+    );
+    // Valid late evidence arrives inside300ms but after the scheduled250ms
+    // attempt. It cannot convert the latched Pending decision into success.
+    let mut tracker = Tracker::new(1);
+    tracker.sequence = 1;
+    tracker.pending = Some(100);
+    tracker.earliest = Some(100);
+    let mut state = DecisionState::live_denial(1000, 1);
+    assert_eq!(deny_before_bootstrap(&mut state, 350)?, Veto::Pending);
+    tracker.ingest(
+        &mut state,
+        Sample {
+            version: 1,
+            connection: 1,
+            sequence: 1,
+            epoch: 1,
+            observed_ms: 351,
+            query_ms: 250,
+            veto: Veto::Remote,
+        },
+        351,
+    );
+    assert_eq!(tracker.evidence, Veto::Remote);
+    assert_eq!(state.veto(351), Some(Veto::Pending));
+    assert!(!root_result_complete(
+        state.veto(351).unwrap(),
+        tracker.evidence
+    ));
+    assert!(root_result_complete(Veto::Remote, Veto::PeerDead));
+    for unavailable in [
+        Veto::Pending,
+        Veto::Unsupported,
+        Veto::Timeout,
+        Veto::UnknownContext,
+        Veto::InvalidObservation,
+    ] {
+        assert!(!root_result_complete(unavailable, Veto::Remote));
+        assert!(!root_result_complete(Veto::Remote, unavailable));
+    }
+    Ok(())
+}
+#[cfg(test)]
+fn startup_readback_cases() -> Result<()> {
+    let expected = StartupReadbacks {
+        parent_death: libc::SIGKILL,
+        dumpable: 0,
+        no_new_privileges: 1,
+        core_soft: 0,
+        core_hard: 0,
+    };
+    assert!(expected.valid());
+    for bad in [
+        StartupReadbacks {
+            parent_death: 0,
+            ..expected
+        },
+        StartupReadbacks {
+            dumpable: 1,
+            ..expected
+        },
+        StartupReadbacks {
+            no_new_privileges: 0,
+            ..expected
+        },
+        StartupReadbacks {
+            core_soft: 1,
+            ..expected
+        },
+        StartupReadbacks {
+            core_hard: 1,
+            ..expected
+        },
+    ] {
+        assert!(!bad.valid());
+    }
+    // Irreversible NNP/core limits remain confined to our owned child. The
+    // dump/PDEATH mutations test the real read syscall path, not just a struct.
+    let pid = unsafe { libc::fork() };
+    if pid < 0 {
+        return Err(fail("PRIVATE_READBACK_FORK_FAILED"));
+    }
+    if pid == 0 {
+        let check = || -> Result<()> {
+            unix::no_core()?;
+            if unsafe { libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) } != 0 {
+                return Err(fail("PRIVATE_READBACK_SETUP"));
+            }
+            unix::parent_death(unsafe { libc::getppid() } as u32)?;
+            helper_startup_readbacks()?;
+            assert_eq!(
+                unsafe { libc::prctl(libc::PR_SET_PDEATHSIG, 0, 0, 0, 0) },
+                0
+            );
+            assert!(helper_startup_readbacks().is_err());
+            unix::parent_death(unsafe { libc::getppid() } as u32)?;
+            assert_eq!(unsafe { libc::prctl(libc::PR_SET_DUMPABLE, 1, 0, 0, 0) }, 0);
+            assert!(helper_startup_readbacks().is_err());
+            unix::no_core()?;
+            helper_startup_readbacks()
+        };
+        unsafe { libc::_exit(if check().is_ok() { 0 } else { 3 }) }
+    }
+    let end = Instant::now() + Duration::from_millis(300);
+    let mut status = 0;
+    loop {
+        if unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) } == pid {
+            break;
+        }
+        if Instant::now() >= end {
+            unsafe {
+                libc::kill(pid, libc::SIGKILL);
+                libc::waitpid(pid, &mut status, 0);
+            }
+            return Err(fail("PRIVATE_READBACK_CHILD_TIMEOUT"));
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    assert!(libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0);
     Ok(())
 }
 #[cfg(test)]

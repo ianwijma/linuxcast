@@ -4,6 +4,7 @@
 mod denial_observer;
 use std::io::{BufRead, BufReader};
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+use std::os::unix::process::CommandExt;
 use std::process::Command;
 use std::time::{Duration, Instant};
 fn abrupt(deadline: bool) {
@@ -81,6 +82,54 @@ fn main() {
     unsafe {
         libc::alarm(15);
     }
+    let mut command = Command::new(env!("CARGO_BIN_EXE_linuxcast-input-spike-denial-probe"));
+    command.arg("--PrivateCanary").env_clear();
+    unsafe {
+        command.pre_exec(|| {
+            if libc::signal(libc::SIGCHLD, libc::SIG_IGN) == libc::SIG_ERR {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(())
+        });
+    }
+    let output = command.output().unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    assert!(output.stdout.is_empty() && output.stderr.len() <= 384);
+    let report: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(report["code"], "DENIAL_CHILD_REAPER_POLICY");
+    // Exact public binaries reject inherited blocked guard signals before
+    // startup/query work. The existing unblocked7s case still tests the alarm.
+    for blocked in [libc::SIGALRM, libc::SIGTERM, libc::SIGINT] {
+        for (binary, argument) in [
+            (
+                env!("CARGO_BIN_EXE_linuxcast-input-spike-denial-probe"),
+                "--PrivateCanary",
+            ),
+            (
+                env!("CARGO_BIN_EXE_linuxcast-input-spike-denial-helper"),
+                "--internal-denial",
+            ),
+        ] {
+            let mut command = Command::new(binary);
+            command.arg(argument).env_clear();
+            unsafe {
+                command.pre_exec(move || {
+                    let mut mask: libc::sigset_t = std::mem::zeroed();
+                    libc::sigemptyset(&mut mask);
+                    libc::sigaddset(&mut mask, blocked);
+                    if libc::pthread_sigmask(libc::SIG_BLOCK, &mask, std::ptr::null_mut()) != 0 {
+                        return Err(std::io::Error::from_raw_os_error(libc::EINVAL));
+                    }
+                    Ok(())
+                });
+            }
+            let output = command.output().unwrap();
+            assert_eq!(output.status.code(), Some(3));
+            assert!(output.stdout.is_empty() && output.stderr.len() <= 384);
+            let report: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+            assert_eq!(report["code"], "DENIAL_GUARD_SIGNAL_MASK");
+        }
+    }
     for (binary, arg) in [
         (
             env!("CARGO_BIN_EXE_linuxcast-input-spike-denial-probe"),
@@ -144,12 +193,29 @@ fn main() {
     assert_eq!(report["helperCases"], 10);
     assert_eq!(report["noWorkerArm"], true);
     assert_eq!(report["liveQueries"], 0);
+    assert_eq!(report["actualWrongRootParentRejected"], true);
+    assert_eq!(report["rootBootstrapSchemaAndRightsChecked"], true);
+    assert_eq!(report["rootExecutionUnavailable"], true);
+    assert_eq!(report["actualRootDropProof"], false);
+    // Exercise the real supervisor's distinct entry as an ordinary user. It
+    // cannot fall back to synthetic bootstrap or start a worker without root.
+    let output = Command::new(env!("CARGO_BIN_EXE_linuxcast-input-spike-supervisor"))
+        .arg("--live-denial")
+        .env_clear()
+        .env("PRIVATE_CANARY", "PrivateRootEnvironmentCanary")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    assert!(output.stdout.is_empty() && output.stderr.len() <= 384);
+    let denied: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
+    assert_eq!(denied["code"], "ROOT_DENIAL_EMPTY_ENV_AND_ROOT_REQUIRED");
+    assert!(!String::from_utf8_lossy(&output.stderr).contains("PrivateRootEnvironmentCanary"));
     abrupt(false);
     abrupt(true);
     unsafe {
         libc::alarm(0);
     }
     println!(
-        "{{\"privateNoQueryFixture\":true,\"helperCases\":10,\"invocationPrivacy\":true,\"parentDeathCleanup\":true,\"independentSevenSecondGuard\":true,\"noWorkerArm\":true,\"liveQueries\":0}}"
+        "{{\"privateNoQueryFixture\":true,\"helperCases\":10,\"invocationPrivacy\":true,\"parentDeathCleanup\":true,\"independentSevenSecondGuard\":true,\"blockedGuardSignalsRejected\":true,\"noWorkerArm\":true,\"liveQueries\":0,\"actualWrongRootParentRejected\":true,\"rootBootstrapSchemaAndRightsChecked\":true,\"nonrootSupervisorEntryDenied\":true,\"rootExecutionUnavailable\":true,\"actualRootDropProof\":false}}"
     );
 }

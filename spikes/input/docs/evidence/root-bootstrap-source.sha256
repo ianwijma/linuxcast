@@ -1,0 +1,6 @@
+dbd600d52dce0b9b9598d5393881d6dfb253be60a802973abaa2c4a2ba27e20d  spikes/input/src/bin/denial-helper.rs
+cda8a57a24db2552ffa39398c415052a9c362282a0c90d933641a55ea1fa1b66  spikes/input/src/bin/supervisor.rs
+bd1544c672fc57a04ff03b43afead1faacb7db09e3db858cc826847e044dcbd3  spikes/input/src/denial_observer.rs
+e96d5a5a6d17877ebd6abffdcde7a6c2b1088592b07f256c684a278400e3a579  spikes/input/src/lib.rs
+2a29f7633cc402e267f617e3c9a6b1b543fbbc8a07f03fe5e41fe484dc86e0c6  spikes/input/src/peer_bootstrap.rs
+fdf333148ab4d4fb6ff5fbb3a19f62efb5421a00606afb11a45de5964efcbf21  spikes/input/tests/denial-private.rs

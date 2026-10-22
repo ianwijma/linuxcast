@@ -21,6 +21,9 @@ use std::{
     process::{Command, Stdio},
     time::Duration,
 };
+#[path = "../denial_observer.rs"]
+#[allow(dead_code)]
+mod denial_observer;
 
 struct ChildGuard(std::process::Child);
 impl Drop for ChildGuard {
@@ -57,6 +60,11 @@ fn reply(stream: &mut UnixStream, generation: u64, state: &str, reason: &str) ->
 }
 fn run() -> Result<()> {
     linuxcast_input_spike::diagnostics::stage("SUPERVISOR_GUARD");
+    // This branch terminates without reaching any synthetic/device/worker
+    // bootstrap below. It cannot fall back to the positive manufactured mode.
+    if std::env::args().skip(1).collect::<Vec<_>>() == ["--live-denial"] {
+        return denial_observer::root_gate();
+    }
     if std::env::args().collect::<Vec<_>>()
         != [std::env::args().next().unwrap(), "--synthetic-lab".into()]
         || unsafe { libc::getuid() } != 0
