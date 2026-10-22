@@ -6,13 +6,22 @@
       "scripts/test-runner/reports.test.ts"
     ]
   },
-  "contracts": {},
+  "contracts": {
+    "S0-05": [
+      "spikes/ai/provider.contract.test.ts",
+      "spikes/ai/oauth.contract.test.ts"
+    ]
+  },
   "ui": {
     "S0-06": [
       "spikes/workflow-ui/tests/workflow-ui.test.ts"
     ]
   },
   "integration": {},
-  "security": {},
+  "security": {
+    "S0-05": [
+      "spikes/ai/oauth.contract.test.ts"
+    ]
+  },
   "perf": {}
 }

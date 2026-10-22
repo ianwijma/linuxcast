@@ -359,7 +359,7 @@
     {
       "id": "S0-04",
       "title": "Prove extension sandbox boundaries",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -431,14 +431,14 @@
         "bun run test:security -- S0-04"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "review_f1_01",
+      "branch": "codex/s0-04-sandbox",
       "limitations": []
     },
     {
       "id": "S0-05",
       "title": "Prove streaming provider and approval lifecycle",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -476,49 +476,77 @@
         {
           "id": "S0-05-AC01",
           "text": "Partial output on transport failure is not committed as success.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:contracts -- S0-05",
+              "outcome": "63 executed checks pass, including actual local HTTP partial connection loss/cancellation, UTF-8/SSE boundaries and exclusive terminal states. Partial output is never committed on failure.",
+              "platform": "Pop!_OS22.04 x86_64 host; Node24.22.1, Bun1.4.4, TypeScript6.0.3, Vitest4.1.12; headless/local HTTP, no desktop/account claim.",
+              "reference": "spikes/ai/evidence.md; source d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7; independent coordinator review and rerun."
+            }
+          ]
         },
         {
           "id": "S0-05-AC02",
           "text": "A denied tool never executes and reconnect does not duplicate it.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:contracts -- S0-05",
+              "outcome": "63 executed checks pass; denied or invalid tools never execute, repeated/concurrent approvals and reconnect do not replay, failed journal intent prevents dispatch, and hanging effects settle interrupted at a recorded deadline.",
+              "platform": "Pop!_OS22.04 x86_64 host; Node24.22.1, Bun1.4.4, TypeScript6.0.3, Vitest4.1.12; headless/local HTTP, no desktop/account claim.",
+              "reference": "spikes/ai/evidence.md; source d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7; independent coordinator review and rerun."
+            }
+          ]
         },
         {
           "id": "S0-05-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Host-only feasibility code and developer opt-in CLI; no product renderer or user-facing application UI is introduced.",
           "evidence": []
         },
         {
           "id": "S0-05-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "Committed-fixture and diagnostic review; bun run test:security -- S0-05",
+              "outcome": "26 OAuth boundary checks pass; only public synthetic fixtures are committed, seeded private error details are classified safely, no real key/code/account/clipboard data or screenshot is recorded.",
+              "platform": "Pop!_OS22.04 x86_64 host; Node24.22.1, Bun1.4.4, TypeScript6.0.3, Vitest4.1.12; headless/local HTTP, no desktop/account claim.",
+              "reference": "spikes/ai/evidence.md; source d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7; independent coordinator review and rerun."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:contracts -- S0-05"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Implementation d5a36ac2d04e6fbbacaa128e2318a92c7834e2c7 independently reviewed by coordinator against S0-05 and normative references. Two findings (hanging tool deadline, malformed OAuth expiry) addressed and independently rerun: lint/typecheck,63 contract checks and26 OAuth security checks pass. Integration/PR CI pending."
+      ],
+      "owner": "s0_05_provider",
+      "branch": "codex/s0-05-provider",
+      "limitations": [
+        "Optional real OpenRouter inference was not run: no explicitly supplied live credential; smoke command exits3 by default without traffic.",
+        "OAuth is explicit registration feasibility with trusted listener/verifier seams; no real registration, token exchange, JWKS verification, refresh, keyring or account eligibility proof.",
+        "Fixture journal is in-memory test storage; no actual SQLite crash recovery, cross-process or exactly-once side-effect claim.",
+        "Host/local transport evidence does not close Debian desktop, real provider/account, product UI, packaging or release gates."
+      ]
     },
     {
       "id": "S0-06",
       "title": "Prove visual workflow and declarative view integration",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "feasibility",
       "lane": "S0",
       "dependsOn": [
@@ -591,8 +619,8 @@
         "bun run test:ui -- S0-06"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
+      "owner": "s0_06_workflow_ui",
+      "branch": "codex/s0-06-workflow-ui",
       "limitations": []
     },
     {
