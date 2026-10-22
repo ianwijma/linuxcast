@@ -5,7 +5,7 @@
     {
       "id": "F1-01",
       "title": "Bootstrap workspace and scoped test runners",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F1",
       "dependsOn": [],
@@ -14,7 +14,12 @@
         "bun.lock",
         "tsconfig.base.json",
         "apps/desktop/package.json",
-        "scripts/test-runner/"
+        "scripts/test-runner/",
+        "Cargo.toml",
+        "Cargo.lock",
+        "rust-toolchain.toml",
+        "eslint.config.mjs",
+        "docs/implementation/bootstrap.md"
       ],
       "featureIds": [
         "foundation"
@@ -43,44 +48,71 @@
         {
           "id": "F1-01-AC01",
           "text": "Clean install resolves on Debian13 amd64.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun install --frozen-lockfile; bun run setup:electron; ELECTRON_RUN_AS_NODE=1 electron runtime smoke",
+              "outcome": "Fresh source-only Debian container installed the frozen lockfile and loaded Electron 45.0.0 with its pinned checksum-verifying installer.",
+              "platform": "Debian 13.7 amd64 build container; Node 24.22.1, Bun 1.4.4; Rust 1.95.0 in separate pinned Debian image. No desktop session evidence.",
+              "reference": "docs/implementation/bootstrap.md and scripts/test-runner/evidence/F1-01-debian.log"
+            }
+          ]
         },
         {
           "id": "F1-01-AC02",
           "text": "Unknown task selector fails; omitted selector runs the suite; no placeholder success scripts.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- F1-01; bun run test:unit; public command outcome matrix",
+              "outcome": "20 checks pass in both scoped and complete suites; unknown and explicitly empty IDs exit 2; unavailable suites/package commands exit 3; failure/skip/todo/only and live process cancellation are covered.",
+              "platform": "Debian 13.7 amd64 build container; Node 24.22.1, Bun 1.4.4; Rust 1.95.0 in separate pinned Debian image. No desktop session evidence.",
+              "reference": "docs/implementation/bootstrap.md and scripts/test-runner/evidence/F1-01-debian.log"
+            }
+          ]
         },
         {
           "id": "F1-01-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Build tooling only; no user-facing application behavior or UI is introduced.",
           "evidence": []
         },
         {
           "id": "F1-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "Independent committed-fixture and inventory content inspection",
+              "outcome": "Only public synthetic fixture strings, dependency metadata and build logs are included; no real secrets, user content, screenshots or keyboard streams.",
+              "platform": "Debian 13.7 amd64 build container; Node 24.22.1, Bun 1.4.4; Rust 1.95.0 in separate pinned Debian image. No desktop session evidence.",
+              "reference": "docs/implementation/bootstrap.md and scripts/test-runner/evidence/F1-01-debian.log"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:unit -- F1-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "F1-01 build acceptance recorded in docs/implementation/bootstrap.md; integration and independent review pending."
+      ],
+      "owner": "coordinator",
+      "branch": "codex/f1-01-bun",
+      "limitations": [
+        "Build-only evidence; real desktop integration, native addon rebuilds, packaging and release gates remain in their owning tasks.",
+        "Bun audit exits 1 with 18 advisories across five transitive development dependency families; recorded for packaging/release review, not represented as a clean security audit.",
+        "Application CI is not introduced; current GitHub workflow validates documentation. CLI credential lacks workflow write scope."
+      ]
     },
     {
       "id": "S0-01",

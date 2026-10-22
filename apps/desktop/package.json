@@ -1,0 +1,13 @@
+{
+  "name": "@linuxcast/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "dependencies": { "react": "19.3.1", "react-dom": "19.3.1" },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-deb": "7.11.2"
+  }
+}

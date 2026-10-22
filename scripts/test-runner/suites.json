@@ -1,0 +1,14 @@
+{
+  "unit": {
+    "F1-01": [
+      "scripts/test-runner/selection.test.ts",
+      "scripts/test-runner/toolchain.test.tsx",
+      "scripts/test-runner/reports.test.ts"
+    ]
+  },
+  "contracts": {},
+  "ui": {},
+  "integration": {},
+  "security": {},
+  "perf": {}
+}
