@@ -23,7 +23,8 @@
   },
   "integration": {
     "S0-01": [
-      "spikes/launcher/tests/launcher.integration.test.ts"
+      "spikes/launcher/tests/launcher.integration.test.ts",
+      "spikes/launcher/tests/native-session/preparation.test.ts"
     ]
   },
   "security": {
