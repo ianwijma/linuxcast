@@ -14,6 +14,7 @@ import sys
 import tempfile
 import time
 from supervision import Supervisor, Cancelled
+import private_context as _context
 
 HERE=pathlib.Path(__file__).resolve().parent
 BACKENDS=('gnome-wayland','gnome-wayland-nested','gnome-x11','kwin-wayland','kwin-x11')
@@ -66,7 +67,10 @@ def native_progress(root):
             'wire':read_result(root/'kwin-progress.json')}
 
 def inner(backend,root,restart=False):
-    env=dict(os.environ)
+    env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+    env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
+    for key in ('DISPLAY','XAUTHORITY'):
+        if os.environ.get(key): env[key]=os.environ[key]
     wayland='wayland' in backend
     env['XDG_SESSION_TYPE']='wayland' if wayland else 'x11'
     env['GDK_BACKEND']='wayland' if wayland else 'x11'
@@ -173,34 +177,29 @@ def main():
     parser.add_argument('--inner',type=pathlib.Path)
     parser.add_argument('--restart-scenario',action='store_true')
     arguments=parser.parse_args()
-    if not arguments.private_guest or 'VERSION_ID="13"' not in pathlib.Path('/etc/os-release').read_text():
+    if not arguments.private_guest or not _context.guest_allowed(pathlib.Path('/etc/os-release').read_text(),os.getuid(),pathlib.Path('/run/linuxcast-input-spike-lab').exists()):
         return report_unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED')
     if arguments.restart_scenario and not arguments.backend.startswith('kwin'):
         return report_unavailable('KWIN_RESTART_BACKEND_REQUIRED')
     if arguments.inner:
-        root=arguments.inner.resolve()
-        if root.parent!=pathlib.Path(tempfile.gettempdir()).resolve() or not root.name.startswith('linuxcast-s002-') or root!=arguments.inner:
-            return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
-        stat=root.stat()
-        if stat.st_uid!=os.getuid() or stat.st_mode & 0o077 or os.environ.get('LINUXCAST_S002_PRIVATE_GUEST')!='1' or os.environ.get('HOME')!=str(root/'home') or os.environ.get('XDG_RUNTIME_DIR')!=str(root/'runtime'):
-            return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
+        try: root=_context.private_context(str(arguments.inner),arguments.backend)
+        except (OSError,ValueError,RuntimeError): return report_unavailable('PRIVATE_GUEST_CONTEXT_REQUIRED')
         return inner(arguments.backend,root,arguments.restart_scenario)
-    root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-'))
-    env=dict(os.environ)
-    env['LINUXCAST_S002_PRIVATE_GUEST']='1'
-    env['LINUXCAST_S002_RESULT_DIR']=str(root)
-    for name in ('DISPLAY','WAYLAND_DISPLAY','DBUS_SESSION_BUS_ADDRESS','DBUS_STARTER_ADDRESS','DBUS_STARTER_BUS_TYPE','XAUTHORITY'):
-        env.pop(name,None)
-    for key,child in [('HOME','home'),('XDG_CONFIG_HOME','config'),('XDG_DATA_HOME','data'),('XDG_CACHE_HOME','cache'),('XDG_RUNTIME_DIR','runtime')]:
-        target=root/child; target.mkdir(mode=0o700); env[key]=str(target)
+    root=pathlib.Path(tempfile.mkdtemp(prefix='linuxcast-s002-',dir='/tmp'))
+    env=_context.private_environment(root,os.environ.get('LINUXCAST_S002_NODE'))
+    for name in _context.DIRECTORIES.values(): (root/name).mkdir(mode=0o700)
+    services=root/'services'; services.mkdir(mode=0o700)
+    config=root/'bus.conf'
+    config.write_text('<busconfig><type>session</type><listen>unix:path='+str(root/'dbus-session')+'</listen><auth>EXTERNAL</auth><servicedir>'+str(services)+'</servicedir><policy context="default"><allow send_destination="*"/><allow receive_sender="*"/><allow own="*"/></policy></busconfig>')
+    config.chmod(0o600)
     extension=pathlib.Path(env['XDG_DATA_HOME'])/'gnome-shell/extensions/s002-native@linuxcast.invalid'
     extension.mkdir(parents=True,mode=0o700)
     for filename in ('metadata.json','extension.js','desktop-api.js'):
         if (HERE/filename).exists(): shutil.copyfile(HERE/filename,extension/filename)
-    command=['dbus-run-session','--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
+    command=['dbus-run-session','--config-file',str(config),'--','/usr/bin/python3',str(pathlib.Path(__file__).resolve()),arguments.backend,'--private-guest','--inner',str(root)]
     if arguments.restart_scenario: command.append('--restart-scenario')
     if arguments.backend.endswith('x11') or arguments.backend=='gnome-wayland-nested':
-        command=['xvfb-run','-a','-s','-screen 0 1280x720x24 -nolisten tcp',*command]
+        command=['xvfb-run','-a','-f',str(root/'xauthority'),'-s','-screen 0 1280x720x24 -nolisten tcp',*command]
     try:
         # This outer owner adopts and tears down all detached descendants too.
         # Cleanup signals the tree concurrently; it never hard-kills an inner

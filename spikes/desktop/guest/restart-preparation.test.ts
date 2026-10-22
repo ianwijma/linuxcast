@@ -118,3 +118,28 @@ test('native pipe cap and cancellation remain immediate when a trusted child kee
   cancellation.abort();
   await expect(pending).rejects.toThrow('CANCELLED');
 });
+
+for(const guard of ['valid','real-private-bus','external-home','external-config','external-data','external-cache','external-runtime','dconf','fallback-bus','abstract-bus','outside-bus','backend-override','symlink-config','shared-config','inherited-display']) {
+  test(`private inner entry guard ${guard} is checked before settings or native calls`,async()=>{
+    const child=spawn('/usr/bin/python3',[new URL('./guard-canary.py',import.meta.url).pathname,guard],{env:{PATH:process.env.PATH},stdio:['ignore','pipe','ignore']});
+    let output='';child.stdout.on('data',(chunk:Buffer)=>{output+=chunk.toString();});
+    const status=await new Promise<number|null>(resolve=>child.once('close',resolve));
+    expect(status).toBe(0);
+    const report=JSON.parse(output.trim().split('\n').at(-1)!);
+    expect(report.nativeCalls).toBe(0);
+    expect(report[['valid','real-private-bus'].includes(guard)?'validPrivateContext':'rejectedBeforeNative']).toBe(true);
+  });
+}
+
+test('guest eligibility rejects root, non-Debian13 and an active input marker',async()=>{
+  const code=`import sys;sys.path.insert(0,${JSON.stringify(new URL('.',import.meta.url).pathname)});from private_context import guest_allowed
+release='ID=debian\\nVERSION_ID="13"\\n'
+assert guest_allowed(release,1000,False)
+assert not guest_allowed(release,0,False)
+assert not guest_allowed(release,1000,True)
+assert not guest_allowed('ID=ubuntu\\nVERSION_ID="13"\\n',1000,False)
+assert not guest_allowed('ID=debian\\nVERSION_ID="12"\\n',1000,False)
+print('bounded-platform-guard-passed')`;
+  const child=spawn('/usr/bin/python3',['-c',code],{env:{PATH:process.env.PATH},stdio:'ignore'});
+  expect(await new Promise<number|null>(resolve=>child.once('close',resolve))).toBe(0);
+});
