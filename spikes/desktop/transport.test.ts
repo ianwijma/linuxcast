@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { buildGuestHarness } from './guest/build.ts';
 import { parseCommand, parseHandle, parsePollResult } from './protocol.ts';
 import { ClipboardTransfer, CommandQueue, Companion, MIME_LIMITS, clampRect } from './model.ts';
-import type { Backend, NativeWindow, Source } from './model.ts';
+import type { Backend, NativeWindow, Source, Rect } from './model.ts';
 import { gnomeSelectionSource, kwinLoop, BUS } from './adapters.ts';
 import type { CallDBus } from './adapters.ts';
 import { gnomeWindow, kwinWindow } from './window-adapters.ts';
@@ -403,4 +403,18 @@ test('guest session harness refuses startup without an explicit disposable-guest
     expect(result.status).toBe(3);
     expect(JSON.parse(result.stdout)).toEqual({state:'unavailable',reason:'EXPLICIT_DISPOSABLE_DEBIAN13_GUEST_REQUIRED',physicalDesktopMatrixEstablished:false});
   }
+});
+
+test('direct GNOME placement never passes nonpositive integer extents to Mutter',()=>{
+  const calls:Rect[]=[];
+  const rect={x:0,y:0,width:100,height:100};
+  const native=gnomeWindow({get_frame_rect:()=>rect,get_work_area_current_monitor:()=>rect,
+    move_resize_frame:(_user,x,y,width,height)=>{expect(width).toBeGreaterThan(0);expect(height).toBeGreaterThan(0);calls.push({x,y,width,height});},
+    is_fullscreen:()=>false,get_maximized:()=>0,connect:()=>1,disconnect:()=>{}});
+  native.place({x:1.2,y:-1.2,width:0.1,height:0.9});
+  expect(calls).toEqual([{x:1,y:-1,width:1,height:1}]);
+  expect(()=>native.place({x:0,y:0,width:0,height:1})).toThrow('INVALID_GEOMETRY');
+  expect(()=>native.place({x:0,y:0,width:NaN,height:1})).toThrow('INVALID_GEOMETRY');
+  expect(calls).toHaveLength(1);
+  native.dispose();
 });

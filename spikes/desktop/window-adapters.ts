@@ -1,4 +1,4 @@
-import { DesktopError } from './protocol.ts';
+import { DesktopError, parseRect } from './protocol.ts';
 import type { NativeWindow, Rect } from './model.ts';
 
 /** Native APIs inspected at Mutter48.0 and KWin6.3.6. No title/caption reader is
@@ -21,7 +21,12 @@ export function gnomeWindow(window: MetaWindow): NativeWindow & { dispose(): voi
   return {
     geometry: () => rectangle(window.get_frame_rect()),
     workArea: () => rectangle(window.get_work_area_current_monitor()),
-    place: rect => window.move_resize_frame(true, Math.round(rect.x), Math.round(rect.y), Math.floor(rect.width), Math.floor(rect.height)),
+    place: rect => {
+      const value = parseRect(rect);
+      // Mutter takes integer extents; a valid subpixel rectangle still needs
+      // at least one native pixel. KWin retains its own fractional geometry.
+      window.move_resize_frame(true, Math.round(value.x), Math.round(value.y), Math.max(1, Math.floor(value.width)), Math.max(1, Math.floor(value.height)));
+    },
     alive: () => alive,
     state: () => window.is_fullscreen() ? 'fullscreen' : window.get_maximized() ? 'maximized' : 'normal',
     dispose: () => { if (alive) window.disconnect(unmanaged); alive = false; },
