@@ -1,7 +1,7 @@
 {
   "scope": "F1-01 development dependencies, not the packaged 1.0 SBOM. Missing platform or non-registry manifest metadata has null licenses; re-inventory shipped contents at R1-03.",
   "lockfileSha256": {
-    "bun.lock": "d7703d349de6f73499a661fc04df3881af28b40f06d8a0d2f78e59c2c38baa92",
+    "bun.lock": "febc15205991b1c44280529ba2615ab816156c3839211cd5754c6fcddf01350e",
     "Cargo.lock": "b101850ee36039784f244bf6269faa20299d315889e1542c2ee401a64a671350",
     "rust-toolchain.toml": "24ef3b9d3edbd850aa386cb0a98e10450b0030991a4537cb359f54d49dbbb33a"
   },
@@ -19,6 +19,13 @@
       "integrity": "sha512-A6f1nKy99I6tyoK82U6kBHvQQZmdHmTmPzJYPY/0eaOW0r8/qPmEOwjGHs+hL/vCgOwQTupu4LT1XtXNUuDruA==",
       "manifestMetadataPresent": true,
       "license": "MIT"
+    },
+    {
+      "key": "@axe-core/playwright",
+      "resolved": "@axe-core/playwright@4.14.0",
+      "integrity": "sha512-SGUhG5PIHd2eMdpgBF2PyQLOhX+qyDR2PT4cmoS4Qk2ak+jX/rrSvst9l0PGv5WTHolKpUMvVmoHpr4cZgf1RQ==",
+      "manifestMetadataPresent": true,
+      "license": "MPL-2.0"
     },
     {
       "key": "@babel/code-frame",
@@ -204,8 +211,8 @@
     },
     {
       "key": "@electron/get",
-      "resolved": "@electron/get@3.1.0",
-      "integrity": "sha512-F+nKc0xW+kVbBRhFzaMgPy3KwmuNTYX1fx6+FxxoSnNgwYX6LD7AKBTWkU0MQ6IBoe7dz069CNkR673sPAgkCQ==",
+      "resolved": "@electron/get@5.1.0",
+      "integrity": "sha512-3kSBtG8ObcTVfXanm5vVJ6UnBLEVmVsRk1M+vGqCuMBV+XLCbJYuWQful+yIy0GQDsSlK0kHEriEHn7SPk4EnA==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -509,6 +516,20 @@
       "integrity": "sha512-IcpW84uEn3N7ETtNZMlxKhfl6Pec8rUNGOTBtWbK1FKhJxIFAptZyVrvVRVBimAJxJCgc3PxepxkdWWG4DVzfA==",
       "manifestMetadataPresent": true,
       "license": "MIT"
+    },
+    {
+      "key": "@fontsource/inter",
+      "resolved": "@fontsource/inter@5.3.0",
+      "integrity": "sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==",
+      "manifestMetadataPresent": true,
+      "license": "OFL-1.1"
+    },
+    {
+      "key": "@fontsource/jetbrains-mono",
+      "resolved": "@fontsource/jetbrains-mono@5.3.0",
+      "integrity": "sha512-fqDfB5I9f1p1TV486aUgB9t8zP84P0O1FtQR5Ol9vjwPy+S+EIGlVYm1cvj2W5shcZMTg2nZFdVMoH5wFu8a1A==",
+      "manifestMetadataPresent": true,
+      "license": "OFL-1.1"
     },
     {
       "key": "@gar/promisify",
@@ -1561,6 +1582,13 @@
       "license": "MIT"
     },
     {
+      "key": "axe-core",
+      "resolved": "axe-core@4.14.0",
+      "integrity": "sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==",
+      "manifestMetadataPresent": true,
+      "license": "MPL-2.0"
+    },
+    {
       "key": "balanced-match",
       "resolved": "balanced-match@1.0.2",
       "integrity": "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
@@ -2024,8 +2052,8 @@
     },
     {
       "key": "env-paths",
-      "resolved": "env-paths@2.2.1",
-      "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
+      "resolved": "env-paths@3.0.0",
+      "integrity": "sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -4361,6 +4389,20 @@
       "license": "MIT"
     },
     {
+      "key": "@electron-forge/cli/@electron/get",
+      "resolved": "@electron/get@3.1.0",
+      "integrity": "sha512-F+nKc0xW+kVbBRhFzaMgPy3KwmuNTYX1fx6+FxxoSnNgwYX6LD7AKBTWkU0MQ6IBoe7dz069CNkR673sPAgkCQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get",
+      "resolved": "@electron/get@3.1.0",
+      "integrity": "sha512-F+nKc0xW+kVbBRhFzaMgPy3KwmuNTYX1fx6+FxxoSnNgwYX6LD7AKBTWkU0MQ6IBoe7dz069CNkR673sPAgkCQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "@electron-forge/template-webpack-typescript/typescript",
       "resolved": "typescript@5.4.5",
       "integrity": "sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==",
@@ -4375,18 +4417,18 @@
       "license": "MIT"
     },
     {
-      "key": "@electron/get/fs-extra",
-      "resolved": "fs-extra@8.1.0",
-      "integrity": "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==",
+      "key": "@electron/get/undici",
+      "resolved": "undici@7.30.1",
+      "integrity": "sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
     {
-      "key": "@electron/get/semver",
-      "resolved": "semver@6.3.1",
-      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+      "key": "@electron/node-gyp/env-paths",
+      "resolved": "env-paths@2.2.1",
+      "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
       "manifestMetadataPresent": true,
-      "license": "ISC"
+      "license": "MIT"
     },
     {
       "key": "@electron/node-gyp/glob",
@@ -4399,6 +4441,13 @@
       "key": "@electron/notarize/fs-extra",
       "resolved": "fs-extra@9.1.0",
       "integrity": "sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron/packager/@electron/get",
+      "resolved": "@electron/get@3.1.0",
+      "integrity": "sha512-F+nKc0xW+kVbBRhFzaMgPy3KwmuNTYX1fx6+FxxoSnNgwYX6LD7AKBTWkU0MQ6IBoe7dz069CNkR673sPAgkCQ==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -4683,13 +4732,6 @@
       "license": "MIT"
     },
     {
-      "key": "electron/@electron/get",
-      "resolved": "@electron/get@5.1.0",
-      "integrity": "sha512-3kSBtG8ObcTVfXanm5vVJ6UnBLEVmVsRk1M+vGqCuMBV+XLCbJYuWQful+yIy0GQDsSlK0kHEriEHn7SPk4EnA==",
-      "manifestMetadataPresent": true,
-      "license": "MIT"
-    },
-    {
       "key": "electron-installer-common/@malept/cross-spawn-promise",
       "resolved": "@malept/cross-spawn-promise@1.1.1",
       "integrity": "sha512-RTBGWL5FWQcg9orDOCcp4LvItNzUPcyEU9bwaeJX0rJ1IQxzucC48Y0/sQLp/g6t99IQgAlGIaesJS+gTn7tVQ==",
@@ -4970,23 +5012,72 @@
       "license": "ISC"
     },
     {
-      "key": "@electron/get/fs-extra/jsonfile",
-      "resolved": "jsonfile@4.0.0",
-      "integrity": "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==",
+      "key": "@electron-forge/cli/@electron/get/env-paths",
+      "resolved": "env-paths@2.2.1",
+      "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
     {
-      "key": "@electron/get/fs-extra/universalify",
-      "resolved": "universalify@0.1.2",
-      "integrity": "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==",
+      "key": "@electron-forge/cli/@electron/get/fs-extra",
+      "resolved": "fs-extra@8.1.0",
+      "integrity": "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==",
       "manifestMetadataPresent": true,
       "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/cli/@electron/get/semver",
+      "resolved": "semver@6.3.1",
+      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+      "manifestMetadataPresent": true,
+      "license": "ISC"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get/env-paths",
+      "resolved": "env-paths@2.2.1",
+      "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get/fs-extra",
+      "resolved": "fs-extra@8.1.0",
+      "integrity": "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get/semver",
+      "resolved": "semver@6.3.1",
+      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+      "manifestMetadataPresent": true,
+      "license": "ISC"
     },
     {
       "key": "@electron/node-gyp/glob/minimatch",
       "resolved": "minimatch@5.1.9",
       "integrity": "sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==",
+      "manifestMetadataPresent": true,
+      "license": "ISC"
+    },
+    {
+      "key": "@electron/packager/@electron/get/env-paths",
+      "resolved": "env-paths@2.2.1",
+      "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron/packager/@electron/get/fs-extra",
+      "resolved": "fs-extra@8.1.0",
+      "integrity": "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron/packager/@electron/get/semver",
+      "resolved": "semver@6.3.1",
+      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
       "manifestMetadataPresent": true,
       "license": "ISC"
     },
@@ -5071,20 +5162,6 @@
       "key": "cliui/wrap-ansi/ansi-styles",
       "resolved": "ansi-styles@4.3.0",
       "integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
-      "manifestMetadataPresent": true,
-      "license": "MIT"
-    },
-    {
-      "key": "electron/@electron/get/env-paths",
-      "resolved": "env-paths@3.0.0",
-      "integrity": "sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A==",
-      "manifestMetadataPresent": true,
-      "license": "MIT"
-    },
-    {
-      "key": "electron/@electron/get/undici",
-      "resolved": "undici@7.30.1",
-      "integrity": "sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -5187,9 +5264,51 @@
       "license": "MIT"
     },
     {
+      "key": "@electron-forge/cli/@electron/get/fs-extra/jsonfile",
+      "resolved": "jsonfile@4.0.0",
+      "integrity": "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/cli/@electron/get/fs-extra/universalify",
+      "resolved": "universalify@0.1.2",
+      "integrity": "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get/fs-extra/jsonfile",
+      "resolved": "jsonfile@4.0.0",
+      "integrity": "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron-forge/core/@electron/get/fs-extra/universalify",
+      "resolved": "universalify@0.1.2",
+      "integrity": "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "@electron/node-gyp/glob/minimatch/brace-expansion",
       "resolved": "brace-expansion@2.1.7",
       "integrity": "sha512-uZbew1NqdmPDTMJ8ah1y+b+9QEJrfkXFk3RcTQw3X0jW/xRUvFKsg1CfQdSYGdTbXZWExtU3J3ccxtnfw1Fi0g==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron/packager/@electron/get/fs-extra/jsonfile",
+      "resolved": "jsonfile@4.0.0",
+      "integrity": "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@electron/packager/@electron/get/fs-extra/universalify",
+      "resolved": "universalify@0.1.2",
+      "integrity": "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },

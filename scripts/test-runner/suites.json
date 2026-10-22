@@ -4,6 +4,10 @@
       "scripts/test-runner/selection.test.ts",
       "scripts/test-runner/toolchain.test.tsx",
       "scripts/test-runner/reports.test.ts"
+    ],
+    "S0-01": [
+      "spikes/launcher/tests/launcher.unit.test.ts",
+      "spikes/launcher/tests/launcher.ui-fixture.test.tsx"
     ]
   },
   "contracts": {
@@ -13,7 +17,11 @@
     ]
   },
   "ui": {},
-  "integration": {},
+  "integration": {
+    "S0-01": [
+      "spikes/launcher/tests/launcher.integration.test.ts"
+    ]
+  },
   "security": {
     "S0-05": [
       "spikes/ai/oauth.contract.test.ts"
