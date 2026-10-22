@@ -14,3 +14,5 @@ The complete local 1.0 goal remains active; no application task has completed in
 
 - Bun 1.3.9 was rejected after the public command dropped an empty selector; the pin is now 1.4.4, verified by the public-script regression. The Debian build image is local ID `6188a7225ee2`; exact source/verification recipe is in `scripts/test-runner/Dockerfile.debian`.
 - Review evidence: `docs/implementation/bootstrap.md`, development/Rust inventories, recorded audit (18 advisories; not clean), and `scripts/test-runner/evidence/F1-01-debian.log`. Native tests/rustfmt/clippy also pass.
+
+- First criterion passes exposed Python fixture dependence on real F1-01 status. The coordinator now normalizes only temporary test registries to a pending baseline and regenerates fixture cards; all 21 Python regressions pass with the real acceptance evidence retained. Independent review is active in `/tmp/linuxcast-f1-01-review`, branch `codex/f1-01-review`.

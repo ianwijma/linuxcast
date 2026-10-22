@@ -19,7 +19,8 @@
         "Cargo.lock",
         "rust-toolchain.toml",
         "eslint.config.mjs",
-        "docs/implementation/bootstrap.md"
+        "docs/implementation/bootstrap.md",
+        "scripts/test_validate_plan.py"
       ],
       "featureIds": [
         "foundation"
@@ -91,7 +92,7 @@
           "justification": "",
           "evidence": [
             {
-              "command": "Independent committed-fixture and inventory content inspection",
+              "command": "Committed-fixture and inventory content inspection",
               "outcome": "Only public synthetic fixture strings, dependency metadata and build logs are included; no real secrets, user content, screenshots or keyboard streams.",
               "platform": "Debian 13.7 amd64 build container; Node 24.22.1, Bun 1.4.4; Rust 1.95.0 in separate pinned Debian image. No desktop session evidence.",
               "reference": "docs/implementation/bootstrap.md and scripts/test-runner/evidence/F1-01-debian.log"

@@ -87,3 +87,5 @@ The [recorded Bun audit](../../scripts/test-runner/dependency-audit.json) exits 
 No application CI, native-addon ABI rebuild, .deb, real GNOME/KDE Wayland/X11 integration, screen-reader check or physical keyboard recovery is established by this bootstrap. Existing GitHub CI validates documentation/acceptance tooling; application checks above were run separately in the target build environment. Adding a build workflow requires a GitHub credential with workflow write scope; the current CLI credential has repo/read:org/gist scopes only.
 
 The coordinator expanded F1-01 ownership to include its required Rust workspace files, lint configuration and this evidence document. That corrects an ownership omission in a card whose existing implementation step already required the Rust workspace; it does not change its requirements or dependencies.
+
+The Python planning regressions construct a fresh pending registry inside their temporary fixture. Their negative claims must remain independent of real task evidence: the first recorded passes exposed a prior fixture assumption that F1-01 would remain pending forever. Production criterion data is never reset by those tests.

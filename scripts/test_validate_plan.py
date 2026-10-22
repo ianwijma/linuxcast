@@ -19,6 +19,19 @@ class PlanningFixture(unittest.TestCase):
         for path in ROOT.glob("*.md"):
             shutil.copy(path,self.root/path.name)
         shutil.copy(ROOT/"LICENSE",self.root/"LICENSE")
+        # The live registry acquires real evidence as implementation proceeds.
+        # Negative tests must construct their own pending baseline rather than
+        # inheriting (or erasing) the coordinator's real completion claims.
+        path = self.root / "docs/implementation/tasks.json"
+        data = json.loads(path.read_text())
+        for task in data["tasks"]:
+            task.update(status="planned", evidence=[], limitations=[], owner=None, branch=None)
+            for criterion in task["acceptance"]:
+                criterion.update(status="pending", evidence=[], justification="")
+        path.write_text(json.dumps(data))
+        from render_tasks import render_files
+        for name, content in render_files(data).items():
+            (self.root / name).write_text(content)
 
     def tearDown(self):
         self.tmp.cleanup()
