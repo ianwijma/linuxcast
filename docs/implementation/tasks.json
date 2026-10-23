@@ -192,10 +192,18 @@
         "bun run typecheck",
         "bun run test:integration -- S0-01"
       ],
-      "evidence": [],
+      "evidence": [
+        "Unmerged implementation: draft PR https://github.com/ianwijma/linuxcast/pull/15 at signed source commit https://github.com/ianwijma/linuxcast/commit/5d8848cf685778ab03d1ada31f02ef7975f2e4c8. Source and partial native observations support feasibility work only; all acceptance criteria remain pending.",
+        "Published evidence in that PR includes GNOME 48 and Plasma 6.3 private Wayland capability/lifecycle probes and affected dark/light states. A separate Debian 13.7 / GNOME 48.7 X11 lifecycle-only diagnostic completes two selected launches, resident Close, UI Quit, hidden CLI Quit, native absence and dark/light captures, with verified cleanup. Its final result is intentionally incomplete/exit 3; focus and shortcut are skipped, and unsigned-at-execution provenance is preserved.",
+        "Current published head validation: 31 new fixed-control runner Python checks, 29 retained Node control checks, strict TypeScript/lint/syntax/planning checks, coordinator and independent source review. The restricted independent Node run preserves 28 passes and one subprocess EPERM. Planning CI https://github.com/ianwijma/linuxcast/actions/runs/39892048391 succeeds. These checks do not establish native acceptance."
+      ],
       "owner": "s0_06_workflow_ui",
       "branch": "codex/s0-01-launcher",
-      "limitations": []
+      "limitations": [
+        "Required Debian 13 GNOME 48 / Plasma 6.3 Wayland and X11 acceptance remains incomplete. Ubuntu-based GNOME host testing is authorized supplementary evidence and does not waive the target matrix.",
+        "The full GNOME X11 activation attempt fails strict focus: Show leaves the decoy focused. Its first incomplete outcome remains unchanged; shortcut and remaining UI paths are not established by the separate lifecycle-only diagnostic.",
+        "The published exact-target KWin X11 observer/control runner still needs actual auxiliary positive and substituted-binding negative controls, verified native cleanup and the remaining lifecycle, focus/shortcut, design and accessibility gates. No merge or task completion is authorized by source checks alone."
+      ]
     },
     {
       "id": "S0-02",
@@ -399,10 +407,18 @@
         "bun run typecheck",
         "bun run test:security -- S0-03"
       ],
-      "evidence": [],
+      "evidence": [
+        "Unmerged implementation: draft PR https://github.com/ianwijma/linuxcast/pull/13 at signed source commit https://github.com/ianwijma/linuxcast/commit/7e933c57979424fdd51f03b541c8acad75efe331. All acceptance criteria remain pending; source review and selected denial evidence do not establish physical recovery.",
+        "Published Debian 13.7 / kernel 6.12.113 / libsystemd 257.13 device-free root denial observation: actual credential drop, peer/lifetime checks and 20 fixed rows (initial Pending, then 19 Remote vetoes), with all arming/bootstrap flags false. Native exit 0 in 4802.294 ms, bounded cleanup and exact owned-source release are independently reviewed. Helper Ready is a self-readback, not an external parent-death or dumpability trial. Earlier manufactured recovery evidence retains its FAILED_UNRESOLVED outer collection gate.",
+        "Published source validation: 25 Rust checks, 10 private helper cases, 9 wrapper cases and strict clippy/formatting/TypeScript checks; the separate selection-proposal module has 19 synthetic checks. No real metadata query ran for that published selection increment. Coordinator and independent review pass; planning CI https://github.com/ianwijma/linuxcast/actions/runs/39886948557 succeeds. Private later diagnostics are not promoted into published acceptance evidence."
+      ],
       "owner": "review_f1_01",
       "branch": "codex/s0-03-input",
-      "limitations": []
+      "limitations": [
+        "Physical held-key worker/supervisor/app crash recovery, modifier release and emergency recovery remain unverified. A connected keyboard does not establish selected-device consent or capture authority; the optional input service remains disabled and stopped.",
+        "Actual locked/inactive graphical enforcement, authenticated live companion/session eligibility, device-owning integration and the current manufactured regression remain outstanding. Remote/TTY denials and mocked replies do not prove these positive graphical or physical gates.",
+        "The supplementary Ubuntu-based host has GNOME 42 / systemd 249, outside the Debian 13 GNOME 48 / Plasma 6.3 target; the existing peer adapter requires a newer systemd symbol and no compatible positive companion path is established. Host administrator policy remains unchanged. Metadata selection proposals can only deny capture and do not implement kernel authentication or a grant."
+      ]
     },
     {
       "id": "S0-04",
