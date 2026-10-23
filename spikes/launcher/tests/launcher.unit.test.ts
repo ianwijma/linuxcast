@@ -98,6 +98,8 @@ describe("S0-01 strict launcher data boundaries", () => {
       "temporarily-unavailable",
     );
     expect(capabilities("x11", true)[0]?.state).toBe("available");
+    expect(capabilities("x11", false, true)[0]?.state).toBe("component-required");
+    expect(capabilities("x11", false, true)[0]?.remediation).toContain("none is connected");
     expect(
       capabilities("unknown", true).every(
         (c) => c.state === "temporarily-unavailable",
@@ -145,12 +147,17 @@ function commandFixture(options: { hint?: LauncherState["session"]; visible?: bo
   const commandStart = text.indexOf("  const applyCommand ="), commandEnd = text.indexOf("  const registerShortcut =", commandStart);
   expect(snapshotStart).toBeGreaterThanOrEqual(0); expect(snapshotEnd).toBeGreaterThan(snapshotStart);
   expect(commandStart).toBeGreaterThan(snapshotEnd); expect(commandEnd).toBeGreaterThan(commandStart);
-  const program = stripTypeScriptTypes(`${text.slice(snapshotStart, snapshotEnd)}\n${text.slice(commandStart, commandEnd)}\n globalThis.fixtureCommand = applyCommand; globalThis.fixtureSnapshot = snapshot;`);
+  const listenerStart = text.indexOf('      window.on("focus",');
+  const listenerEnd = text.indexOf('      window.webContents.on("render-process-gone"', listenerStart);
+  expect(listenerStart).toBeGreaterThan(commandEnd); expect(listenerEnd).toBeGreaterThan(listenerStart);
+  const program = stripTypeScriptTypes(`${text.slice(snapshotStart, snapshotEnd)}\n${text.slice(commandStart, commandEnd)}\nif (window) { ${text.slice(listenerStart, listenerEnd)} }\n globalThis.fixtureCommand = applyCommand; globalThis.fixtureSnapshot = snapshot;`);
   const effects: string[] = [], published: LauncherState[] = [];
   let visible = options.visible ?? false, minimized = options.minimized ?? false, focused = false;
   let minimizeQueries = 0;
   const hint = options.hint ?? "x11";
+  const listeners = new Map<string, () => void>();
   const window = {
+    on: (name: string, listener: () => void) => listeners.set(name, listener),
     isDestroyed: () => options.destroyed ?? false,
     isVisible: () => visible,
     isFocused: () => focused,
@@ -167,7 +174,8 @@ function commandFixture(options: { hint?: LauncherState["session"]; visible?: bo
   const context = {
     window: options.absent ? null : window, hint, APP_ID, capabilities,
     quitting: false, launcherReady: options.ready ?? true, rendererFailed: options.rendererFailed ?? false,
-    pendingCommand: "show" as Command, recording: false,
+    pendingCommand: "show" as Command, recording: false, activationPending: false,
+    finishRecording: () => undefined,
     shortcut: { requested: "Ctrl+Space", effective: null, state: "temporarily-unavailable", reason: "Synthetic fixture" },
     nativeTheme: { shouldUseDarkColors: true },
     app: { quit: () => effects.push("quit") },
@@ -177,10 +185,12 @@ function commandFixture(options: { hint?: LauncherState["session"]; visible?: bo
   };
   runInNewContext(program, context, { timeout: 1000 });
   return { run: (request: Command) => context.fixtureCommand!(request), effects, published, context,
-    minimizeQueries: () => minimizeQueries };
+    minimizeQueries: () => minimizeQueries,
+    observeFocus: (value: boolean) => { focused = value; listeners.get(value ? "focus" : "blur")!(); },
+    observeHide: () => { visible = false; focused = false; listeners.get("hide")!(); } };
 }
 
-describe("S0-01 normal X11 command focus candidate, native success unexecuted", () => {
+describe("S0-01 ordinary X11 requests and observed activation fallback", () => {
   for (const row of [
     { name: "hidden Show", request: "show", visible: false, minimized: false },
     { name: "hidden toggle", request: "toggle", visible: false, minimized: false },
@@ -221,10 +231,35 @@ describe("S0-01 normal X11 command focus candidate, native success unexecuted", 
     const refused = commandFixture(); refused.run("show");
     expect(refused.effects).toEqual(["show", "focus", "publish"]);
     expect(refused.published[0]?.focused).toBe(false);
-    expect(refused.published[0]?.capabilities[0]?.state).toBe("temporarily-unavailable");
+    expect(refused.published[0]?.capabilities[0]?.state).toBe("component-required");
     const accepted = commandFixture({ focusAccepted: true }); accepted.run("show");
     expect(accepted.published[0]?.focused).toBe(true);
     expect(accepted.published[0]?.capabilities[0]?.state).toBe("available");
+  });
+
+  it("clears the current request on observed focus, so later blur does not claim an activation failure", () => {
+    const fixture = commandFixture(); fixture.run("show");
+    expect(fixture.context.activationPending).toBe(true);
+    fixture.observeFocus(true);
+    expect(fixture.context.activationPending).toBe(false);
+    expect(fixture.published.at(-1)?.capabilities[0]?.state).toBe("available");
+    fixture.observeFocus(false);
+    expect(fixture.published.at(-1)?.capabilities[0]?.state).toBe("temporarily-unavailable");
+    fixture.run("show");
+    expect(fixture.published.at(-1)?.capabilities[0]?.state).toBe("component-required");
+    fixture.observeHide();
+    expect(fixture.context.activationPending).toBe(false);
+    expect(fixture.published.at(-1)?.visible).toBe(false);
+  });
+
+  it("repeated Show while already focused needs no new focus event and later blur remains ordinary", () => {
+    const fixture = commandFixture({ focusAccepted: true });
+    fixture.run("show");
+    fixture.run("show");
+    expect(fixture.context.activationPending).toBe(false);
+    expect(fixture.published.at(-1)?.focused).toBe(true);
+    fixture.observeFocus(false);
+    expect(fixture.published.at(-1)?.capabilities[0]?.state).toBe("temporarily-unavailable");
   });
 
   it("actual quit bypasses readiness and invalid-window paths without show/focus or publication", () => {

@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { App } from "../src/renderer/App.tsx";
 import { waylandComponentFixture } from "../fixtures.ts";
 import type { LauncherAPI, LauncherState, Reply } from "../src/contract.ts";
-afterEach(cleanup);
+import { capabilities } from "../src/contract.ts";
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 function fixtureApi(getState: LauncherAPI["getState"]): LauncherAPI {
   return {
     getState,
@@ -49,6 +50,7 @@ it("shows loading while a synthetic host fixture is pending then exposes Wayland
       view.getByRole("button", { name: "Launcher capabilities" }),
     ).toBeTruthy(),
   );
+  expect(view.queryByRole("region", { name: "Unconfirmed activation" })).toBeNull();
   fireEvent.click(view.getByRole("button", { name: "Launcher capabilities" }));
   expect(view.getAllByText("component required")).toHaveLength(2);
   expect(
@@ -116,4 +118,37 @@ it("survives an absent preload bridge and keeps unavailable operations disabled"
       "Launcher state is unavailable",
     ),
   );
+});
+
+it("offers keyboard-accessible help for an unconfirmed request, then removes the notice on focus without treating later blur as failure", async () => {
+  vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+  const pending: LauncherState = {
+    ...waylandComponentFixture,
+    session: "x11",
+    capabilities: capabilities("x11", false, true),
+  };
+  const api = fixtureApi(async () => ({ ok: true, value: pending }));
+  let publish!: (next: LauncherState) => void;
+  api.onState = (listener) => { publish = listener; return () => undefined; };
+  window.linuxcast = api;
+  const view = render(<App />);
+  const notice = await view.findByRole("region", { name: "Unconfirmed activation" });
+  expect(within(notice).getByRole("status").textContent).toContain("desktop app switcher");
+  const help = within(notice).getByRole("button", { name: "View activation help" });
+  help.focus();
+  fireEvent.click(help); // Native button Enter/Space activation follows this handler.
+  await waitFor(() => expect(document.activeElement).toBe(view.getByRole("heading", { name: "Launcher capabilities" })));
+  expect(view.getByText(/none is connected in this prototype/)).toBeTruthy();
+  const details = view.getByRole("region", { name: "Launcher capability details" });
+  expect(details.tabIndex).toBe(0);
+  details.focus();
+  expect(document.activeElement).toBe(details);
+  fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
+  await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
+  act(() => publish({ ...pending, focused: true, capabilities: capabilities("x11", true, false) }));
+  expect(view.queryByRole("region", { name: "Unconfirmed activation" })).toBeNull();
+  act(() => publish({ ...pending, capabilities: capabilities("x11", false, false) }));
+  expect(view.queryByRole("region", { name: "Unconfirmed activation" })).toBeNull();
+  expect(api.setShortcut).not.toHaveBeenCalled();
+  expect(api.beginShortcutRecording).not.toHaveBeenCalled();
 });

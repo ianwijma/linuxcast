@@ -137,6 +137,7 @@ export function sessionHint(
 export function capabilities(
   session: SessionKind,
   focused: boolean,
+  activationPending = false,
 ): Capability[] {
   if (session === "wayland")
     return [
@@ -162,14 +163,20 @@ export function capabilities(
     return [
       {
         id: "launcher.activate",
-        state: focused ? "available" : "temporarily-unavailable",
+        state: focused
+          ? "available"
+          : activationPending ? "component-required" : "temporarily-unavailable",
         backend: "electron-x11",
         reason: focused
           ? "The window manager reported the launcher focused."
-          : "Focus has not been observed for this activation.",
+          : activationPending
+            ? "Linuxcast opened, but focus is unconfirmed for this request."
+            : "Linuxcast is not currently focused.",
         remediation: focused
           ? ""
-          : "Activate Linuxcast from the desktop or retry --show. No repeated force-focus is used.",
+          : activationPending
+            ? "Select Linuxcast using the desktop app switcher or click its window to type. A validated GNOME/KWin activation companion is required for automatic focus; none is connected in this prototype."
+            : "Select Linuxcast using the desktop app switcher or click its window.",
       },
       {
         id: "launcher.position",

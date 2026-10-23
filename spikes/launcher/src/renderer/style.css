@@ -39,7 +39,9 @@ button:disabled {
   color: var(--muted);
 }
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+h1:focus-visible,
+.content:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
@@ -121,6 +123,9 @@ button kbd {
   min-height: 0;
   overflow: auto;
   padding: var(--space-12) var(--space-16);
+}
+.content:focus-visible {
+  outline-offset: -2px;
 }
 .group-caption {
   margin: var(--space-4) 0 var(--space-8);

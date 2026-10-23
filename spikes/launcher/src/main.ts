@@ -69,6 +69,7 @@ if (!ownsInstance) {
   let registeredBinding: string | null = null;
   let launcherReady = false;
   let rendererFailed = false;
+  let activationPending = false;
   let pendingCommand: Command = command;
   let shortcut: Shortcut = {
     requested: DEFAULT_SHORTCUT,
@@ -76,17 +77,20 @@ if (!ownsInstance) {
     state: "temporarily-unavailable",
     reason: "Shortcut registration is pending.",
   };
-  const snapshot = (): LauncherState => ({
+  const snapshot = (): LauncherState => {
+    const focused = window?.isFocused() ?? false;
+    return {
     protocolVersion: 1,
     identity: APP_ID,
     session: hint,
     shortcut,
-    capabilities: capabilities(hint, window?.isFocused() ?? false),
+    capabilities: capabilities(hint, focused, activationPending),
     visible: window?.isVisible() ?? false,
-    focused: window?.isFocused() ?? false,
+    focused,
     appearance: nativeTheme.shouldUseDarkColors ? "dark" : "light",
     recording,
-  });
+    };
+  };
   const publish = () => {
     if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
       window.webContents.send("launcher:state", snapshot());
@@ -107,6 +111,7 @@ if (!ownsInstance) {
     }
     if (!window || window.isDestroyed()) return;
     if (request === "toggle" && window.isVisible()) {
+      activationPending = false;
       window.hide();
       publish();
       return;
@@ -117,9 +122,14 @@ if (!ownsInstance) {
       window.webContents.reload();
       rendererFailed = false;
     }
+    activationPending = hint === "x11";
     if (hint === "x11" && window.isMinimized()) window.restore();
     window.show();
-    if (hint === "x11") window.focus();
+    if (hint === "x11") {
+      window.focus();
+      // An already-focused window need not emit another focus event for Show.
+      if (window.isFocused()) activationPending = false;
+    }
     publish();
   };
   const registerShortcut = (requested: string): Shortcut => {
@@ -402,13 +412,17 @@ if (!ownsInstance) {
           publish();
         }
       });
-      window.on("focus", publish);
+      window.on("focus", () => {
+        activationPending = false;
+        publish();
+      });
       window.on("blur", () => {
         finishRecording();
         publish();
       });
       window.on("show", publish);
       window.on("hide", () => {
+        activationPending = false;
         finishRecording();
         publish();
       });

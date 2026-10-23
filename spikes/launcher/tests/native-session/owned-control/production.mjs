@@ -10,7 +10,7 @@ import { stripTypeScriptTypes } from 'node:module';
 import { runInNewContext } from 'node:vm';
 import { spawn } from 'node:child_process';
 import { endianness } from 'node:os';
-export const AUTHORITY = 'fd99384e780cd84de6424fc937c85f9de00617248d319af1f1825c8e70e6a947';
+export const AUTHORITY = '4e762cad080a9dbb04bf37f0ed5e53aefedc6c410b930638af7c5a56f86e6bda';
 export const SOURCE_REVIEW = 'c9a706cb39de47c7fb4f94f77b0c3e854f5f958b8e73f7e50ef7e9b9e5ec6d79';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const sourceHash = path => {

@@ -18,6 +18,7 @@ export function App() {
   const queryRef = useRef<HTMLInputElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
   const firstAction = useRef<HTMLButtonElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const rowRefs = useRef(new Map<string, HTMLButtonElement>());
   const load = useCallback(async () => {
     setFailure("");
@@ -45,6 +46,9 @@ export function App() {
   useEffect(() => {
     if (actions) firstAction.current?.focus();
   }, [actions]);
+  useEffect(() => {
+    if (view !== "search") headingRef.current?.focus();
+  }, [view]);
   useEffect(() => {
     const inner = contentRef.current;
     if (!inner || state?.session !== "x11") return;
@@ -151,6 +155,9 @@ export function App() {
     (state?.shortcut.state === "permission-required"
       ? "Managed by desktop"
       : "No active shortcut");
+  const activation = state?.capabilities.find(
+    (capability) => capability.id === "launcher.activate",
+  );
   return (
     <main
       data-theme={state?.appearance ?? "dark"}
@@ -216,7 +223,7 @@ export function App() {
             >
               ←
             </button>
-            <h1>
+            <h1 ref={headingRef} tabIndex={-1}>
               {view === "capabilities"
                 ? "Launcher capabilities"
                 : "Session shortcut"}
@@ -232,7 +239,12 @@ export function App() {
           Esc
         </button>
       </header>
-      <div className="content">
+      <div
+        className="content"
+        tabIndex={view === "search" ? undefined : 0}
+        role={view === "search" ? undefined : "region"}
+        aria-label={view === "capabilities" ? "Launcher capability details" : view === "shortcut" ? "Shortcut details" : undefined}
+      >
         <div ref={contentRef}>
           {!state && !failure && (
             <p role="status" className="notice">
@@ -250,6 +262,14 @@ export function App() {
               <p className="group-caption">
                 Launcher feasibility · local commands
               </p>
+              {state.session === "x11" && state.visible && !state.focused && activation?.state === "component-required" && (
+                <section className="notice warning" aria-label="Unconfirmed activation">
+                  <p role="status">Focus is unconfirmed. Select Linuxcast in the desktop app switcher or click this window to type.</p>
+                  <button onClick={() => setView("capabilities")}>
+                    View activation help
+                  </button>
+                </section>
+              )}
               {filtered.length ? (
                 <ul className="results" aria-label="Launcher commands">
                   {filtered.map((row, index) => (
