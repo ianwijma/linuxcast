@@ -67,6 +67,46 @@ observe an OS postcondition, manage sessions or guarantee exactly one terminal
 delivery. Those runtime responsibilities remain outstanding, and no caller may
 submit its own trusted registry, principal or successful native observation.
 
+## Ordinary AI selection and stream events
+
+`src/ai.ts` defines every ordinary AI purpose, the single provider/model/revision
+selection, explicit model capabilities and versioned stream event shapes.
+`snapshotAiSelection` copies and freezes the selected values for a run; later
+settings changes cannot mutate that snapshot. Unknown override/fallback/endpoint/
+credential fields are rejected. Unknown model limits remain null, capabilities
+have no implicit defaults, and unavailable usage cannot contain invented counts.
+
+Stream variants cover start, text/reasoning/status deltas, tool argument fragments,
+complete structured tool requests, usage, sources and distinct terminal completed/
+cancelled/failed outcomes. Partial argument text cannot masquerade as a complete
+tool object or request execution. `parseAiEvent` validates complete arguments
+against the broker-owned per-run offered-tool registry and returns its parsed
+output. Tool permissions and approval remain runtime obligations; neither the
+schema nor the registry grants execution. Reasoning display is limited to intentionally returned provider data.
+Source URLs allow credential-free HTTP(S) data only and never open themselves.
+
+These are TS utility-process contracts, not native-helper messages, so they do
+not expose provider details to Rust input helpers. Synthetic framed tests cover
+their shapes. Producer authentication, per-run selection enforcement, ordered
+event delivery, exactly-one persisted terminal, tool approvals, actual provider
+traffic and harness/storage records remain to implement.
+
+
+`src/ai-request.ts` defines versioned normalized messages, opaque attachment and
+context references, structured output schema envelopes and bounded request
+limits. Tool arguments/results are structured JSON; reasoning parts explicitly
+identify intentionally returned provider data. Context references describe their
+source and a local-only or preview-required transmission policy. A reference or
+policy field does not grant access or authorize transmission.
+
+`createBrokerAiRequest` keeps submitted content separate from broker-owned run
+identity, origin and global selection. It rejects caller-supplied routing or
+authority fields, copies message content and JSON arguments, and freezes the run
+selection snapshot. The caller must supply authenticated broker context; parsing
+cannot establish that authority. Runtime ownership checks, reference resolution,
+consent, model compatibility, tool grants, budget enforcement and JSON Schema
+semantic validation still precede sending. No provider traffic occurs here.
+
 Dependency pins and licences were checked against the installed package/crate
 metadata. `bun.lock` and `Cargo.lock` retain registry integrity checksums. Zod has
 no runtime dependencies; Serde was already present in the workspace lockfile.
@@ -89,7 +129,7 @@ It fails if Cargo cannot execute or either language disagrees with the fixtures.
 Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets -- -D warnings`.
 
 Still to implement in F0-01: command and declarative view contracts, workflow and
-provider contracts, extension envelopes, response/event/subscription lifecycle,
+provider catalog/status/harness/storage contracts, extension envelopes, response/event/subscription lifecycle,
 trusted effect contexts and runtime enforcement of native outcome/recovery
 contracts. The overview's native request `id` and the
 extension transport's `requestId`/`sessionId` envelopes are separate contracts;
