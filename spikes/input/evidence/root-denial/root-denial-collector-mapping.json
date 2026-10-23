@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "EXACT_GENERIC_SOURCE_SNAPSHOTS",
+  "snapshots": [
+    {
+      "prefix": "3c91a2aa",
+      "manifestSha256": "3c91a2aa6dfca78c2926849e95adf5f96b2a5a7390491078f5ac2d9a0efa8e30",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    },
+    {
+      "prefix": "ecb78882",
+      "manifestSha256": "ecb78882aec0ca5fa3d7a8d37fd7f3029990f1162f9bf71f9dc39764d3465ed2",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    },
+    {
+      "prefix": "ca658956",
+      "manifestSha256": "ca6589561f2a9c526e121b1252b08f7660c01553ae1d6797d52d74e700bf81f9",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    }
+  ],
+  "archiveMetadataIsSynthetic": true,
+  "recordedRuntimePathsOrPrivateJournalContentsIncluded": false,
+  "nativeSourceCommit": "c50c1876c322788e438591a7ae20a262d91d5b7c",
+  "nativeSourceManifestSha256": "22cd0d8c5992f0585b82a78ee1aa04fdae9cb275eb52bb0b86a300533c281b2b",
+  "supervisorUsedSha256": "4fd4609ab5acfd5131c403fe0b9dd9a8460bf35f698798d1025ef401401fba00",
+  "helperUsedSha256": "b80cc6a4c5577040ee679a9c657d6e6db04c8b4478cbb46ab70d6d2d883d1bc9",
+  "rebuildingOtherPathsDoesNotClaimExactDebugBinaryBytes": true
+}
