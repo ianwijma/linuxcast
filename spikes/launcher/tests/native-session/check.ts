@@ -42,6 +42,7 @@ const report: Record<string, unknown> = { task: 'S0-01', backend, status: 'runni
   launcherCompanionActivationOrPlacementUsed: false, observations };
 if (ownedRoute) report.ownedTargetObserver = { ...OWNED_X11_KIND, bindingObserved: false };
 let application: ElectronApplication | undefined;
+let applicationChild: ReturnType<ElectronApplication['process']> | undefined;
 let stage = 'build';
 let request = 0;
 let pid = 0;
@@ -137,7 +138,7 @@ class OwnedChannel {
   }
 }
 let ownedPage: Page | undefined, ownedGeneration = 0;
-let ownedBinding: { pid: number; xid: number; handle: string; generation: number; nonce: string; app: ElectronApplication } | undefined;
+let ownedBinding: { pid: number; xid: number; handle: string; generation: number; nonce: string; app: ElectronApplication; child: ReturnType<ElectronApplication['process']> } | undefined;
 let ownedChannel: OwnedChannel | undefined;
 const observeOwned = async (serial: number, phase: NativePhase): Promise<Observation> => {
   const deadline = performance.now() + 8000;
@@ -148,14 +149,14 @@ const observeOwned = async (serial: number, phase: NativePhase): Promise<Observa
     if (!retired) {
       const snapshot = await captureOwnedWindow(application, ownedPage, deadline);
       if (!ownedBinding) {
-        ownedBinding = { ...snapshot, generation: ownedGeneration, nonce: randomBytes(32).toString('hex'), app: application };
+        ownedBinding = { ...snapshot, generation: ownedGeneration, nonce: randomBytes(32).toString('hex'), app: application, child: application.process() };
         ownedChannel = new OwnedChannel();
         expect(await ownedChannel.send({ command: 'bind', pid: snapshot.pid, xid: snapshot.xid, generation: ownedGeneration, nonce: ownedBinding.nonce }, deadline)).toEqual({ bound: true });
       }
       if (ownedBinding.app !== application || snapshot.pid !== ownedBinding.pid || snapshot.handle !== ownedBinding.handle || snapshot.xid !== ownedBinding.xid) throw new OwnedX11Failed('binding');
       pid = snapshot.pid; report.runtime = snapshot.runtime;
     } else {
-      if (!ownedBinding || ownedBinding.app !== application || application.process().exitCode !== 0 || application.process().signalCode !== null) throw new OwnedX11Failed('lifetime');
+      if (!ownedBinding || ownedBinding.app !== application || ownedBinding.child.exitCode !== 0 || ownedBinding.child.signalCode !== null) throw new OwnedX11Failed('lifetime');
       expect(await ownedChannel!.send({ command: 'retire', exitCode: 0, generation: ownedGeneration, nonce: ownedBinding.nonce }, deadline)).toEqual({ retired: true });
     }
     if (!ownedBinding || !ownedChannel) throw new OwnedX11Failed('binding');
@@ -272,6 +273,7 @@ try {
   const launch = async () => {
     application = await _electron.launch({ executablePath: executable, chromiumSandbox: true,
       args: [`--ozone-platform=${wayland ? 'wayland' : 'x11'}`, main], env, timeout: 60_000 });
+    applicationChild = application.process();
     const page = await application.firstWindow();
     await page.waitForURL(APP_URL, { timeout: 60_000 });
     await expect(page.getByRole('textbox', { name: 'Search commands', exact: true })).toBeVisible({ timeout: 60_000 });
@@ -412,7 +414,7 @@ try {
 finally {
   decoy?.kill('SIGTERM');
   ownedChannel?.abort();
-  if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; });
+  if (application && applicationChild?.exitCode === null) await application.close().catch(() => { applicationChild?.kill('SIGKILL'); report.status = 'cleanup-incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; });
   // The outer process-local supervisor independently reaps every descendant.
   rmSync(profile, { recursive: true, force: true });
   report.stage = stage;

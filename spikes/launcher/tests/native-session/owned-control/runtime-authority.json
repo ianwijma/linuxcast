@@ -2,7 +2,7 @@
   "kind": "S0-01-private-native-compositor-probe",
   "sourceSha256": {
     "build.ts": "f06d10b58db7eed24be23ee9bafd3f7c3b3803c9c070444de41b49f65b4a9824",
-    "check.ts": "c8aec03c224d6a49024fb1f74b966ed4e29b25e4b7f45a7fb721b1e8cd8d7791",
+    "check.ts": "66f796aec41f8bee749e6e17cdbb9cfd0b4959bb27005943b1b0d59765b727d1",
     "protocol.ts": "cbe8e90192821182758b2f3212bdf0e5db8e5439db374fc2cd31f5e9ff07287f",
     "run-session.py": "596e4daf195951ea95c21e0eed717cc436aacf3a088fe20f8705fbcf977431f4",
     "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",

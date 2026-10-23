@@ -759,3 +759,55 @@ for (const [label, parts] of [['oversize', ['x'.repeat(8193)]], ['extra-line', [
 test('expired private channel budget does not wait for or accept a later reply', async () => {
   const value = await ownedChannelFixture([], true); expect(value.error).toBeDefined(); expect(value.child.killed).toBe(true);
 });
+
+for (const outcome of ['zero', 'nonzero', 'signal', 'running'] as const) test(`retired primary uses retained child after dispatcher disposal: ${outcome}`, async () => {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('const observeOwned = async'), end = text.indexOf('const observe = async', begin);
+  const calls: string[] = [];
+  const child = { exitCode: outcome === 'running' ? null : outcome === 'nonzero' ? 1 : 0, signalCode: outcome === 'signal' ? 'SIGTERM' : null };
+  const app = { process: () => { throw new Error('DISPOSED_DISPATCHER'); } };
+  const empty: NativeWindow = { count: 0, identityMatches: false, nativeBackend: 'unsupported', focused: false, hidden: true, geometry: null, workArea: null };
+  const failed = class extends Error { readonly kind: string; constructor(kind: string) { super('OWNED_FAILED'); this.kind = kind; } };
+  const trace = new NativeTrace();
+  const context = { expect, performance, nativeTrace: trace, application: app, ownedPage: {},
+    ownedBinding: { app, child, pid: 101, xid: 123, handle: '7b000000', generation: 1, nonce: 'a'.repeat(64) },
+    ownedChannel: {
+      send: async (packet: { command: string; exitCode?: number }) => {
+        calls.push(packet.command);
+        if (packet.command === 'retire') { expect(packet.exitCode).toBe(0); return { retired: true }; }
+        expect(packet.command).toBe('observe'); return { request: 1, launcher: empty, decoy: empty, decoyActivationIssued: false };
+      },
+      close: async () => { calls.push('close'); }, abort: () => { calls.push('abort'); },
+    },
+    captureOwnedWindow: () => { throw new Error('RETIRED_CAPTURE_FORBIDDEN'); },
+    OwnedX11Failed: failed, report: {}, pid: 0, parseObservation, OWNED_X11_KIND, ownedGeneration: 1,
+  };
+  runInNewContext(stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.retiredSample = observeOwned;`), context);
+  const run = (context as unknown as { retiredSample: (serial: number, phase: string) => Promise<unknown> }).retiredSample;
+  if (outcome === 'zero') {
+    await expect(run(1, 'after-ui-quit-native-window-absent')).resolves.toMatchObject({ launcher: { count: 0 } });
+    expect(calls).toEqual(['retire', 'observe', 'close']); expect(trace.snapshot()?.state).toBe('parsed');
+  } else {
+    await expect(run(1, 'after-ui-quit-native-window-absent')).rejects.toMatchObject({ kind: 'lifetime' });
+    expect(calls).toEqual(['abort']); expect(trace.snapshot()?.lastObservation).toBeUndefined();
+  }
+});
+
+for (const outcome of ['already-exited', 'live-close', 'close-rejected'] as const) test(`final cleanup uses retained child after dispatcher disposal: ${outcome}`, async () => {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.lastIndexOf('\nfinally {') + '\nfinally {'.length;
+  const body = text.slice(begin, text.lastIndexOf('}'));
+  const calls: string[] = [];
+  const child = { exitCode: outcome === 'already-exited' ? 0 : null, kill: (signal: string) => { expect(signal).toBe('SIGKILL'); calls.push('kill'); } };
+  const app = { process: () => { throw new Error('DISPOSED_DISPATCHER'); }, close: async () => { calls.push('close'); if (outcome === 'close-rejected') throw new Error('DISPOSED_DISPATCHER'); } };
+  const context = { application: app, applicationChild: child, decoy: undefined, ownedChannel: { abort: () => { calls.push('abort'); } },
+    report: {} as Record<string, unknown>, probeMode: 'lifecycle-only', process: { exitCode: 3 }, profile: '/synthetic/profile', root: '/synthetic', stage: 'explicit-ui-quit',
+    nativeTrace: { snapshot: () => undefined }, consumerTrace: { snapshot: () => undefined },
+    rmSync: () => { calls.push('remove-profile'); }, writeFileSync: () => { calls.push('write-report'); }, join,
+  };
+  runInNewContext(stripTypeScriptTypes(`globalThis.cleanup = async () => {${body}};`), context);
+  await (context as unknown as { cleanup: () => Promise<void> }).cleanup();
+  expect(calls).toEqual(['abort', ...(outcome === 'already-exited' ? [] : ['close']), ...(outcome === 'close-rejected' ? ['kill'] : []), 'remove-profile', 'write-report']);
+  expect(context.report.stage).toBe('explicit-ui-quit');
+  if (outcome === 'close-rejected') expect(context.report).toMatchObject({ status: 'cleanup-incomplete', diagnosticOutcome: 'failed' });
+});
