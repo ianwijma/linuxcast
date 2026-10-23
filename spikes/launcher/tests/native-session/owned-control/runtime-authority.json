@@ -19,7 +19,7 @@
     "../../src/preload.ts": "6012cadd85da0474bb33929657e5378b77732c64d39b5ee5ea52b820f7f64f42",
     "../../src/contract.ts": "6122155d29331d90631bc2744d6fe738a7c2ee3a69e473d84b9519abf1d225cd",
     "../../src/renderer/main.tsx": "0385cd6d02866433dca8685b674ae7ae086cc84e2f2bdc3a4dd399013e40e29d",
-    "../../src/renderer/App.tsx": "b3e9df15e8856120a013523f72c8fa2810a461c85c1e98cf640adcf582985b1c",
+    "../../src/renderer/App.tsx": "64d643150b92a217140bd4994819cf15ba9e339a2e678a6a38733c502aceb91e",
     "../../src/renderer/style.css": "b7c8b77911e7477af2fc5b98a9176859396d51ce443658cda9c140fe3336afe2",
     "../../build.ts": "618e6ccbbfa543d1e47473ba2f3730a79d708721812d62128ad25679c4a44b1b",
     "../../resources/index.html": "4993bd2c7eee945524c699ff1bdb07e36a72ee9ab1817632999f37acbbfd9e7f",

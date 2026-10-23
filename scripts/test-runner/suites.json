@@ -7,7 +7,8 @@
     ],
     "S0-01": [
       "spikes/launcher/tests/launcher.unit.test.ts",
-      "spikes/launcher/tests/launcher.ui-fixture.test.tsx"
+      "spikes/launcher/tests/launcher.ui-fixture.test.tsx",
+      "spikes/launcher/tests/at/profile-environment.test.ts"
     ]
   },
   "contracts": {

@@ -9,7 +9,7 @@ import stat
 KIND='S0-01-private-owned-X11-auxiliary-control'
 MODE='exact-owned-target-control'
 BACKEND='kwin-x11'
-AUTHORITY='78c4534fffdd58d93d2b105414689a29707c0faa8050a4787efa1d486c29604b'
+AUTHORITY='010aff02b7b8ead3488949720515fa484415ebfb6476c1ab3360cafbb50c901b'
 NODE_SHA256='e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb'
 RUNTIME_SOURCES=('control.mjs','core.mjs','production.mjs','pair.py','session.py','public.py')
 STEPS=('primary-bound','auxiliary-created','two-native-targets','primary-selected','swapped-rejected','quit-confirmed')

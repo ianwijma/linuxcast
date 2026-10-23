@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { LauncherState } from "../contract.ts";
 import { DEFAULT_SHORTCUT, normalizeShortcut } from "../contract.ts";
 type View = "search" | "capabilities" | "shortcut";
@@ -15,6 +15,8 @@ export function App() {
     "Feasibility commands only. Search stays on this device.",
   );
   const contentRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const searchScrollRef = useRef(0);
   const queryRef = useRef<HTMLInputElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
   const firstAction = useRef<HTMLButtonElement>(null);
@@ -46,7 +48,8 @@ export function App() {
   useEffect(() => {
     if (actions) firstAction.current?.focus();
   }, [actions]);
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = view === "search" ? searchScrollRef.current : 0;
     if (view !== "search") headingRef.current?.focus();
   }, [view]);
   useEffect(() => {
@@ -122,10 +125,14 @@ export function App() {
     setActions(false);
     actionRef.current?.focus();
   }
+  function enterView(next: Exclude<View, "search">) {
+    if (view === "search") searchScrollRef.current = scrollRef.current?.scrollTop ?? 0;
+    setView(next);
+  }
   async function invoke(id: string) {
     if (!state || !window.linuxcast) return;
     if (id === "capabilities" || id === "shortcut") {
-      setView(id);
+      enterView(id);
       setFeedback("");
       return;
     }
@@ -240,6 +247,7 @@ export function App() {
         </button>
       </header>
       <div
+        ref={scrollRef}
         className="content"
         tabIndex={view === "search" ? undefined : 0}
         role={view === "search" ? undefined : "region"}
@@ -265,7 +273,7 @@ export function App() {
               {state.session === "x11" && state.visible && !state.focused && activation?.state === "component-required" && (
                 <section className="notice warning" aria-label="Unconfirmed activation">
                   <p role="status">Focus is unconfirmed. Select Linuxcast in the desktop app switcher or click this window to type.</p>
-                  <button onClick={() => setView("capabilities")}>
+                  <button onClick={() => enterView("capabilities")}>
                     View activation help
                   </button>
                 </section>
@@ -329,7 +337,7 @@ export function App() {
                 <strong>{shortcutLabel}</strong>
                 <p>{state.shortcut.reason}</p>
                 {state.shortcut.state !== "available" && (
-                  <button onClick={() => setView("shortcut")}>
+                  <button onClick={() => enterView("shortcut")}>
                     Choose a shortcut
                   </button>
                 )}

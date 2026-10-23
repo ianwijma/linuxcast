@@ -152,3 +152,32 @@ it("offers keyboard-accessible help for an unconfirmed request, then removes the
   expect(api.setShortcut).not.toHaveBeenCalled();
   expect(api.beginShortcutRecording).not.toHaveBeenCalled();
 });
+
+for (const entry of ["row", "notice"] as const) for (const exit of ["Escape", "Back"] as const) {
+  it(`restores a pre-scrolled search/query/selection after ${entry} child entry and ${exit}`, async () => {
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    const pending: LauncherState = { ...waylandComponentFixture, session: "x11", capabilities: capabilities("x11", false, true) };
+    window.linuxcast = fixtureApi(async () => ({ ok: true, value: pending }));
+    const view = render(<App />);
+    const search = await view.findByRole("textbox", { name: "Search commands" });
+    fireEvent.change(search, { target: { value: "shortcut" } });
+    const row = view.getByRole("button", { name: "Change session shortcut" });
+    act(() => row.focus());
+    const scroll = view.container.querySelector<HTMLDivElement>(".content")!;
+    for (let cycle = 0; cycle < 2; cycle++) {
+      scroll.scrollTop = 115;
+      fireEvent.click(entry === "row" ? view.getByRole("button", { name: "Change session shortcut" }) : view.getByRole("button", { name: "View activation help" }));
+      const heading = view.getByRole("heading", { name: entry === "row" ? "Session shortcut" : "Launcher capabilities" });
+      await waitFor(() => expect(document.activeElement).toBe(heading));
+      expect(scroll.scrollTop).toBe(0);
+      scroll.scrollTop = 500;
+      if (exit === "Back") fireEvent.click(view.getByRole("button", { name: "Back to commands" }));
+      else fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
+      await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
+      expect(scroll.scrollTop).toBe(115);
+      expect((view.getByRole("textbox", { name: "Search commands" }) as HTMLInputElement).value).toBe("shortcut");
+      expect(view.getByRole("button", { name: "Change session shortcut" }).getAttribute("aria-pressed")).toBe("true");
+    }
+    expect(window.linuxcast.beginShortcutRecording).not.toHaveBeenCalled();
+  });
+}
