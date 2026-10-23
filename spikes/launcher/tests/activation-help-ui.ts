@@ -24,6 +24,7 @@ let application: Awaited<ReturnType<typeof electron.launch>> | null = null;
 const views: string[] = [];
 const axe: { mode: string; appearance: string; view: string; violations: string[] }[] = [];
 const displayModes: { mode: string; zoomFactor: number; forcedColors: boolean; reducedMotion: boolean }[] = [];
+const navigation: { mode: string; appearance: string; parentBeforeFocus: number; parentAtEntry: number | null; childAtEntry: number | null; searchFocusedAfterEscape: boolean | null; parentAfterEscape: number | null }[] = [];
 let sandboxed = false;
 let runtimeVersions: Record<string, string> = {};
 let stage = "build";
@@ -115,7 +116,9 @@ try {
     const notice = page.getByRole("region", { name: "Unconfirmed activation" });
     await expect(notice).toBeVisible();
     await expect(notice).toContainText("desktop app switcher");
-    expect(await page.locator(".content").evaluate(element => element.scrollTop)).toBe(0);
+    const entry = { mode, appearance, parentBeforeFocus: await page.locator(".content").evaluate(element => element.scrollTop), parentAtEntry: null as number | null, childAtEntry: null as number | null, searchFocusedAfterEscape: null as boolean | null, parentAfterEscape: null as number | null };
+    navigation.push(entry);
+    if (navigation.length === 1) expect(entry.parentBeforeFocus).toBe(0);
     stage = "notice-horizontal-overflow";
     expect(await page.locator("main").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     await capture(`${mode}-${appearance}-unconfirmed.png`);
@@ -124,12 +127,14 @@ try {
     stage = "help-heading-focus";
     const help = notice.getByRole("button", { name: "View activation help" });
     await help.focus();
+    entry.parentAtEntry = await page.locator(".content").evaluate(element => element.scrollTop);
     await page.keyboard.press("Enter");
     await expect(page.getByRole("heading", { name: "Launcher capabilities" })).toBeFocused();
     await expect(page.getByText(/none is connected in this prototype/)).toBeVisible();
     stage = "help-details-focus";
     const details = page.getByRole("region", { name: "Launcher capability details" });
-    expect(await details.evaluate(element => element.scrollTop)).toBe(0);
+    entry.childAtEntry = await details.evaluate(element => element.scrollTop);
+    expect(entry.childAtEntry).toBe(0);
     await details.focus();
     await expect(details).toBeFocused();
     stage = "help-horizontal-overflow";
@@ -154,8 +159,11 @@ try {
     await expect.poll(() => details.evaluate((element) => element.scrollHeight <= element.clientHeight || element.scrollTop > 0), { timeout: 2000 }).toBe(true);
     stage = "escape-search";
     await page.keyboard.press("Escape");
+    entry.searchFocusedAfterEscape = await page.getByRole("textbox", { name: "Search commands" }).evaluate(element => element === document.activeElement);
     await expect(page.getByRole("textbox", { name: "Search commands" })).toBeFocused();
-    expect(await page.locator(".content").evaluate(element => element.scrollTop)).toBe(0);
+    entry.searchFocusedAfterEscape = true;
+    entry.parentAfterEscape = await page.locator(".content").evaluate(element => element.scrollTop);
+    expect(entry.parentAfterEscape).toBe(entry.parentAtEntry);
     stage = "focus-recovery";
     await publish({ ...pending, focused: true, capabilities: capabilities("x11", true, false) });
     await expect(notice).toHaveCount(0);
@@ -173,7 +181,7 @@ try {
   writeFileSync(join(evidence, "ui-check.json"), JSON.stringify({
     task: "S0-01", status: "incomplete", stage, sourceSha256: before,
     sourceSigned: false, sourceDirty: true, sourceCommit: null,
-    views, axe, displayModes, actualGnomeFocusEstablished: false,
+    views, axe, displayModes, navigation, actualGnomeFocusEstablished: false,
     physicalDesktopMatrixEstablished: false, acceptanceClosure: false,
   }, null, 2) + "\n");
   throw new Error("S001_AFFECTED_UI_INCOMPLETE");
@@ -189,7 +197,7 @@ try {
 writeFileSync(join(evidence, "ui-check.json"), JSON.stringify({
   task: "S0-01", status: "passed", evidenceKind: "real-sandboxed-electron-ui-with-synthetic-focus-states",
   runtimeVersions, sourceSha256: before, sourceSigned: false, sourceDirty: true, sourceCommit: null, display: "private-Xvfb-X11-no-window-manager", sandboxed,
-  views, axe, displayModes, parentSearchScrollRestoredAndChildOpenedAtTop: true, keyboardHelpAndEscapeReturn: true, syntheticFocusRecoveryAndLaterBlur: true,
+  views, axe, displayModes, navigation, parentSearchScrollRestoredAndChildOpenedAtTop: true, keyboardHelpAndEscapeReturn: true, syntheticFocusRecoveryAndLaterBlur: true,
   actualGnomeFocusEstablished: false, physicalDesktopMatrixEstablished: false,
   companionActivationUsed: false, hostDisplaySettingsClipboardInputUsed: false,
   acceptanceClosure: false, ownApplicationClosed: true, ownProfilesRemoved: true,

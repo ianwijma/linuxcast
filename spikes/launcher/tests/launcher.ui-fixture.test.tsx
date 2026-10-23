@@ -181,3 +181,24 @@ for (const entry of ["row", "notice"] as const) for (const exit of ["Escape", "B
     expect(window.linuxcast.beginShortcutRecording).not.toHaveBeenCalled();
   });
 }
+
+it("restores the parent offset at activation after focusing help scrolls its parent", async () => {
+  vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+  const pending: LauncherState = { ...waylandComponentFixture, session: "x11", capabilities: capabilities("x11", false, true) };
+  window.linuxcast = fixtureApi(async () => ({ ok: true, value: pending }));
+  const view = render(<App />);
+  const help = await view.findByRole("button", { name: "View activation help" });
+  const scroll = view.container.querySelector<HTMLDivElement>(".content")!;
+  expect(scroll.scrollTop).toBe(0);
+  // jsdom has no layout: model the browser's focus-scroll effect at that exact event.
+  help.addEventListener("focus", () => { scroll.scrollTop = 73; });
+  act(() => help.focus());
+  expect(scroll.scrollTop).toBe(73);
+  fireEvent.click(help);
+  await waitFor(() => expect(document.activeElement).toBe(view.getByRole("heading", { name: "Launcher capabilities" })));
+  expect(scroll.scrollTop).toBe(0);
+  scroll.scrollTop = 500;
+  fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
+  await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
+  expect(scroll.scrollTop).toBe(73);
+});
