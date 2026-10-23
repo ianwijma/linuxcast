@@ -1,0 +1,41 @@
+{
+  "scope": "source-only; no native or guest execution",
+  "sourceBaselineCommit": "67b186b1b0cae64f7f65d1547dc7440d6f573f7c",
+  "platform": "Pop!_OS 22.04 amd64; Python 3.10.12; Node 24.22.1",
+  "checks": [
+    {
+      "name": "new Python runner/public fixtures",
+      "passed": 31,
+      "failed": 0
+    },
+    {
+      "name": "retained Node control fixtures",
+      "passed": 29,
+      "failed": 0,
+      "limitation": "Initial restricted run:28 passed/1 subprocess EPERM; identical permitted rerun:29 passed."
+    },
+    {
+      "name": "MJS ESLint",
+      "exitCode": 0
+    },
+    {
+      "name": "Python AST:3 new sources",
+      "exitCode": 0
+    },
+    {
+      "name": "plan validator",
+      "exitCode": 0
+    },
+    {
+      "name": "strict root TypeScript",
+      "exitCode": 0
+    },
+    {
+      "name": "four retained MJS syntax checks",
+      "exitCode": 0
+    }
+  ],
+  "nativeControlExecuted": false,
+  "fullAcceptanceEstablished": false,
+  "sharedFilesChanged": false
+}
