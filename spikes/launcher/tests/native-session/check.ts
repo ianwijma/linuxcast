@@ -1,16 +1,17 @@
 import { _electron, expect } from '@playwright/test';
-import type { ElectronApplication } from '@playwright/test';
+import type { ElectronApplication, Page } from '@playwright/test';
 import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { existsSync, lstatSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { release } from 'node:os';
+import { randomBytes } from 'node:crypto';
+import { release, endianness } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, parseProbeMode, LIFECYCLE_SKIPPED } from './protocol.ts';
-import type { Backend, NativePhase, Observation } from './protocol.ts';
+import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, parseProbeMode, LIFECYCLE_SKIPPED, OWNED_X11_KIND, OWNED_X11_FAILURES, parseOwnedX11Handle, parseObservation } from './protocol.ts';
+import type { Backend, NativePhase, Observation, OwnedX11Failure } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
 const probeMode = parseProbeMode(process.argv[3], backend);
@@ -29,6 +30,7 @@ const guard = spawnSync('/usr/bin/python3', ['-I', fileURLToPath(new URL('./priv
   { env: { PATH: '/usr/bin:/bin', LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8' }, input: JSON.stringify(candidateEnv), encoding: 'utf8', timeout: 5000, maxBuffer: 65536 });
 if (guard.status !== 0 || guard.stdout.trim() !== 'PRIVATE_MATRIX_VERIFIED') throw new Error('PRIVATE_MATRIX_REQUIRED');
 const wayland = backend.endsWith('wayland');
+const ownedRoute = backend === 'kwin-x11' && probeMode === 'lifecycle-only';
 const require = createRequire(new URL('../../../../apps/desktop/package.json', import.meta.url));
 const executable = require('electron') as string;
 const profile = join(root, 'linuxcast-launcher-native-session');
@@ -38,6 +40,7 @@ const report: Record<string, unknown> = { task: 'S0-01', backend, status: 'runni
   probeMode, ...(probeMode === 'lifecycle-only' ? { skippedChecks: [...LIFECYCLE_SKIPPED], diagnosticOutcome: 'failed' } : {}),
   evidenceKind: 'actual-isolated-software-compositor-launcher', kernel: release(), hostDisplayClipboardInputOrSettingsUsed: false,
   launcherCompanionActivationOrPlacementUsed: false, observations };
+if (ownedRoute) report.ownedTargetObserver = { ...OWNED_X11_KIND, bindingObserved: false };
 let application: ElectronApplication | undefined;
 let stage = 'build';
 let request = 0;
@@ -45,11 +48,137 @@ let pid = 0;
 const nativeTrace = new NativeTrace();
 const consumerTrace = new ConsumerTrace(() => process.hrtime.bigint());
 class NativeHookFailed extends Error { constructor() { super('NATIVE_HOOK_FAILURE'); } }
-const decoy = spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
-decoy.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
+const decoy = ownedRoute ? undefined : spawn('/usr/bin/python3', [fileURLToPath(new URL('./decoy.py', import.meta.url))], { env: process.env, stdio: 'ignore' });
+decoy?.on('error', () => { /* A missing fixed decoy cannot pass native observations. */ });
+// This private route is never selected by full/GNOME/Wayland probes.
+class OwnedX11Failed extends Error {
+  readonly kind: OwnedX11Failure;
+  constructor(kind: OwnedX11Failure) { super('OWNED_X11_FAILED'); this.kind = kind; }
+}
+const ownedBudget = async <T>(operation: () => Promise<T>, deadline: number): Promise<T> => {
+  const remaining = deadline - performance.now();
+  if (remaining <= 0) throw new OwnedX11Failed('deadline');
+  let timer: ReturnType<typeof setTimeout>;
+  try { return await Promise.race([operation(), new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new OwnedX11Failed('deadline')), remaining); })]); }
+  finally { clearTimeout(timer!); }
+};
+const captureOwnedWindow = async (app: ElectronApplication, page: Page, deadline: number) => {
+  const child = app.process();
+  if (!child.pid || child.exitCode !== null || child.signalCode !== null || page.url() !== APP_URL) throw new OwnedX11Failed('binding');
+  const browserWindow = await ownedBudget(() => app.browserWindow(page), deadline);
+  try {
+    const native = await ownedBudget(() => browserWindow.evaluate(win => {
+      if (win.isDestroyed() || win.webContents.isDestroyed()) throw new Error('OWN_WINDOW_REQUIRED');
+      const preferences = (win.webContents as unknown as { getLastWebPreferences(): { sandbox: boolean; contextIsolation: boolean; nodeIntegration: boolean; webSecurity: boolean } }).getLastWebPreferences();
+      return { handle: win.getNativeWindowHandle().toString('hex'), url: win.webContents.getURL(), sandbox: preferences.sandbox,
+        contextIsolation: preferences.contextIsolation, nodeIntegration: preferences.nodeIntegration, webSecurity: preferences.webSecurity };
+    }), deadline);
+    const main = await ownedBudget(() => app.evaluate(({ app }) => ({ pid: process.pid, electron: process.versions.electron, chrome: process.versions.chrome,
+      platform: process.platform, arch: process.arch, ozone: app.commandLine.getSwitchValue('ozone-platform'), noSandbox: app.commandLine.hasSwitch('no-sandbox') })), deadline);
+    const renderer = await ownedBudget(() => page.evaluate(async () => {
+      const state = await window.linuxcast.getState();
+      if (!state.ok || state.value.identity !== 'io.github.ianwijma.Linuxcast' || state.value.session !== 'x11') throw new Error('OWN_PAGE_STATE_REQUIRED');
+      return { runtime: window.linuxcast.runtime, process: typeof (window as unknown as Record<string, unknown>).process,
+        require: typeof (window as unknown as Record<string, unknown>).require };
+    }), deadline);
+    expect(main).toMatchObject({ pid: child.pid, electron: '45.0.0', ozone: 'x11', noSandbox: false });
+    expect(native).toMatchObject({ url: APP_URL, sandbox: true, contextIsolation: true, nodeIntegration: false, webSecurity: true });
+    expect(renderer).toEqual({ runtime: { sandboxed: true, contextIsolated: true }, process: 'undefined', require: 'undefined' });
+    if (child.exitCode !== null || child.signalCode !== null) throw new OwnedX11Failed('lifetime');
+    const xid = parseOwnedX11Handle(native.handle, main.platform, main.arch, endianness());
+    return { pid: child.pid, xid, handle: native.handle, runtime: { electron: main.electron, chrome: main.chrome, ozone: main.ozone,
+      noSandbox: main.noSandbox, sandbox: native.sandbox, contextIsolation: native.contextIsolation, nodeIntegration: native.nodeIntegration, webSecurity: native.webSecurity, renderer } };
+  } finally { void browserWindow.dispose().catch(() => {}); }
+};
+class OwnedChannel {
+  private child = spawn('/usr/bin/python3', [fileURLToPath(new URL('./owned-x11.py', import.meta.url)), '--kwin-x11-lifecycle-only'], { env: process.env, stdio: ['pipe', 'pipe', 'ignore'] });
+  private buffer = Buffer.alloc(0);
+  private pending: { resolve: (value: unknown) => void; reject: (error: OwnedX11Failed) => void } | undefined;
+  private terminal: OwnedX11Failed | undefined;
+  private exited: Promise<number | null>;
+  constructor() {
+    this.exited = new Promise(resolve => this.child.once('close', code => { resolve(code); this.fail('lifetime'); }));
+    this.child.once('error', () => this.fail('native-query'));
+    this.child.stdin!.on('error', () => this.fail('protocol'));
+    this.child.stdout!.on('error', () => this.fail('native-query'));
+    this.child.stdout!.on('data', (part: Buffer) => {
+      if (this.terminal) return;
+      this.buffer = Buffer.concat([this.buffer, part]);
+      if (this.buffer.length > 8192) { this.fail('overflow'); return; }
+      const newline = this.buffer.indexOf(10);
+      if (newline < 0) return;
+      if (!this.pending || newline !== this.buffer.length - 1) { this.fail('protocol'); return; }
+      const pending = this.pending; this.pending = undefined;
+      try {
+        const value = JSON.parse(this.buffer.subarray(0, newline).toString('utf8')) as Record<string, unknown>; this.buffer = Buffer.alloc(0);
+        if (value && typeof value === 'object' && Object.hasOwn(value, 'failure')) {
+          if (Object.keys(value).length !== 1 || !OWNED_X11_FAILURES.includes(value.failure as OwnedX11Failure)) throw new Error('OWNED_FAILURE_SCHEMA');
+          const error = new OwnedX11Failed(value.failure as OwnedX11Failure); pending.reject(error); this.fail(error.kind);
+        } else pending.resolve(value);
+      } catch { pending.reject(new OwnedX11Failed('protocol')); this.fail('protocol'); }
+    });
+  }
+  private fail(kind: OwnedX11Failure) { this.terminal ??= new OwnedX11Failed(kind); this.pending?.reject(this.terminal); this.pending = undefined; this.abort(); }
+  abort() { if (this.child.exitCode === null && this.child.signalCode === null) this.child.kill('SIGKILL'); }
+  async send(value: unknown, deadline: number) {
+    if (this.terminal) throw this.terminal;
+    if (this.pending) throw new OwnedX11Failed('protocol');
+    const encoded = JSON.stringify(value) + '\n';
+    if (Buffer.byteLength(encoded) > 4096) throw new OwnedX11Failed('overflow');
+    try {
+      return await ownedBudget(() => new Promise<unknown>((resolve, reject) => {
+        this.pending = { resolve, reject }; this.child.stdin!.write(encoded, error => { if (error) this.fail('protocol'); });
+      }), deadline);
+    } catch (error) { this.fail(error instanceof OwnedX11Failed ? error.kind : 'protocol'); throw error; }
+  }
+  async close(generation: number, nonce: string, deadline: number) {
+    expect(await this.send({ command: 'close', generation, nonce }, deadline)).toEqual({ closed: true });
+    expect(await ownedBudget(() => this.exited, deadline)).toBe(0);
+  }
+}
+let ownedPage: Page | undefined, ownedGeneration = 0;
+let ownedBinding: { pid: number; xid: number; handle: string; generation: number; nonce: string; app: ElectronApplication } | undefined;
+let ownedChannel: OwnedChannel | undefined;
+const observeOwned = async (serial: number, phase: NativePhase): Promise<Observation> => {
+  const deadline = performance.now() + 8000;
+  nativeTrace.begin(phase);
+  try {
+    if (!application || !ownedPage) throw new OwnedX11Failed('binding');
+    const retired = phase === 'after-ui-quit-native-window-absent' || phase === 'after-hidden-cli-quit-native-window-absent';
+    if (!retired) {
+      const snapshot = await captureOwnedWindow(application, ownedPage, deadline);
+      if (!ownedBinding) {
+        ownedBinding = { ...snapshot, generation: ownedGeneration, nonce: randomBytes(32).toString('hex'), app: application };
+        ownedChannel = new OwnedChannel();
+        expect(await ownedChannel.send({ command: 'bind', pid: snapshot.pid, xid: snapshot.xid, generation: ownedGeneration, nonce: ownedBinding.nonce }, deadline)).toEqual({ bound: true });
+      }
+      if (ownedBinding.app !== application || snapshot.pid !== ownedBinding.pid || snapshot.handle !== ownedBinding.handle || snapshot.xid !== ownedBinding.xid) throw new OwnedX11Failed('binding');
+      pid = snapshot.pid; report.runtime = snapshot.runtime;
+    } else {
+      if (!ownedBinding || ownedBinding.app !== application || application.process().exitCode !== 0 || application.process().signalCode !== null) throw new OwnedX11Failed('lifetime');
+      expect(await ownedChannel!.send({ command: 'retire', exitCode: 0, generation: ownedGeneration, nonce: ownedBinding.nonce }, deadline)).toEqual({ retired: true });
+    }
+    if (!ownedBinding || !ownedChannel) throw new OwnedX11Failed('binding');
+    const value = await ownedChannel.send({ command: 'observe', request: serial, generation: ownedGeneration, nonce: ownedBinding.nonce }, deadline);
+    const result = parseObservation(value, serial);
+    if (!retired) {
+      const after = await captureOwnedWindow(application, ownedPage, deadline);
+      if (after.pid !== ownedBinding.pid || after.xid !== ownedBinding.xid || after.handle !== ownedBinding.handle) throw new OwnedX11Failed('binding');
+      report.ownedTargetObserver = { ...OWNED_X11_KIND, bindingObserved: true };
+    } else {
+      await ownedChannel.close(ownedGeneration, ownedBinding.nonce, deadline); ownedChannel = undefined; ownedBinding = undefined;
+    }
+    if (!nativeTrace.reply(result, serial)) throw new OwnedX11Failed('protocol');
+    return result;
+  } catch (error) {
+    const failure = error instanceof OwnedX11Failed ? error.kind : 'binding';
+    report.ownedTargetFailure = failure; ownedChannel?.abort(); throw new OwnedX11Failed(failure);
+  }
+};
 const observe = async (operation: 'observe' | 'activate-decoy', phase: NativePhase): Promise<Observation> => {
   const serial = ++request;
-  if (!Number.isSafeInteger(pid) || !decoy.pid) throw new Error('OWN_PIDS_REQUIRED');
+  if (ownedRoute) { if (operation !== 'observe') throw new OwnedX11Failed('binding'); return observeOwned(serial, phase); }
+  if (!Number.isSafeInteger(pid) || !decoy?.pid) throw new Error('OWN_PIDS_REQUIRED');
   writeFileSync(join(root, 'context-next.json'), JSON.stringify({ request: serial, pid, decoyPid: decoy.pid, operation }), { mode: 0o600 });
   renameSync(join(root, 'context-next.json'), join(root, 'context.json'));
   nativeTrace.begin(phase);
@@ -147,6 +276,10 @@ try {
     await page.waitForURL(APP_URL, { timeout: 60_000 });
     await expect(page.getByRole('textbox', { name: 'Search commands', exact: true })).toBeVisible({ timeout: 60_000 });
     await page.evaluate(() => document.fonts.ready);
+    if (ownedRoute) {
+      if (ownedChannel || ownedBinding || ++ownedGeneration > 2) throw new OwnedX11Failed('binding');
+      ownedPage = page; return page;
+    }
     const runtime = await application.evaluate(({ app, BrowserWindow }) => {
       const window = BrowserWindow.getAllWindows()[0]!;
       const preferences = (window.webContents as unknown as { getLastWebPreferences(): { sandbox: boolean; contextIsolation: boolean; nodeIntegration: boolean; webSecurity: boolean } }).getLastWebPreferences();
@@ -277,7 +410,8 @@ try {
   }
 } catch { report.status = 'incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; }
 finally {
-  decoy.kill('SIGTERM');
+  decoy?.kill('SIGTERM');
+  ownedChannel?.abort();
   if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; });
   // The outer process-local supervisor independently reaps every descendant.
   rmSync(profile, { recursive: true, force: true });

@@ -6,9 +6,10 @@ import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { stripTypeScriptTypes } from 'node:module';
+import { EventEmitter } from 'node:events';
 import { runInNewContext } from 'node:vm';
 import { buildNativeSession } from './build.ts';
-import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, parseOwnedX11Handle, parseOwnedX11Provenance, OWNED_X11_FAILURES, OWNED_X11_KIND, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
 import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
@@ -55,7 +56,7 @@ async function consumerFixture(options: { exists?: boolean; raw?: string; size?:
   const raw = options.raw ?? '{}', timeout = new Error('SYNTHETIC_POLL_DEADLINE');
   class SyntheticHookFailed extends Error {}
   const context = {
-    request: 1, pid: 101, decoy: { pid: 202 }, root: '/synthetic', join,
+    ownedRoute: false, request: 1, pid: 101, decoy: { pid: 202 }, root: '/synthetic', join,
     nativeTrace, consumerTrace, NativeHookFailed: SyntheticHookFailed,
     writeFileSync: (path: string, body: string, mode: { mode: number }) => {
       fs.write++; expect(path).toBe('/synthetic/context-next.json');
@@ -615,4 +616,146 @@ for (const failure of ['fresh-identity-mismatch', 'fresh-backend-mismatch', 'clo
   const fixture = await lifecycleBranchFixture(failure);
   expect(fixture.caught).toBeDefined(); expect(fixture.report).not.toHaveProperty('lifecycleProof');
   expect(fixture.report).not.toHaveProperty('hiddenCliQuitExited'); expect(fixture.events).not.toContain('cli-quit');
+});
+
+
+for (const scenario of ['two-owned-candidates', 'foreign-pid', 'class-mismatch', 'class-suffix', 'class-no-nul', 'class-extra-nul', 'class-private', 'class-nonbytes',
+  'swapped-request', 'stale-generation', 'wrong-nonce', 'request-replay', 'extra-private', 'second-bind', 'boolean-generation', 'owner-dead', 'destroy-reuse',
+  'identity-event', 'identity-restored', 'unmanaged', 'during-geometry-death', 'during-geometry-swap', 'bad-window-pid', 'bad-window-class', 'bad-window-watch',
+  'bad-window-geometry', 'retired-absent', 'retired-reused', 'retired-stale-list', 'retired-live', 'retired-exit-bool', 'retired-identity-event', 'property-wrong-type',
+  'property-wrong-format', 'property-oversize', 'property-short', 'property-tail', 'property-null', 'property-highbits', 'property-bool-count', 'property-long-stride',
+  'lease-open-first', 'lease-race-replaced', 'lease-ancestry-failed', 'lease-initial-dead', 'lease-open-failed', 'property-free-on-reject', 'event-destroy', 'event-foreign', 'event-identity', 'event-input', 'event-overflow', 'geometry-valid', 'geometry-hidden', 'geometry-extents', 'geometry-desktop-count', 'geometry-desktop-index', 'geometry-viewport',
+  'geometry-workarea', 'geometry-active-highbits', 'geometry-foreign-root', 'geometry-override', 'geometry-map-state', 'geometry-bad-window', 'mask-and-abi', 'guard-before-library', 'pipe-eof', 'pipe-overflow', 'pipe-private-json', 'pipe-duplicate']) test(`passive owned X11 synthetic ${scenario}`, () => {
+  const child = spawnSync('/usr/bin/python3', [source('owned-x11-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000, env: { PATH: '/usr/bin:/bin', PYTHONDONTWRITEBYTECODE: '1' } });
+  expect(child.status, child.stderr).toBe(0); expect(child.stdout.trim()).toBe(`owned-${scenario}-passed`);
+});
+
+test('owned Linux handle ABI checks every byte and rejects high/protocol bits without truncation', () => {
+  const hex = (value: bigint) => { const bytes = Buffer.alloc(8); bytes.writeBigUInt64LE(value); return bytes.toString('hex'); };
+  for (const value of [1n, 123n, 0x1fffffffn]) expect(parseOwnedX11Handle(hex(value), 'linux', 'x64', 'LE')).toBe(Number(value));
+  for (const value of ['', '00'.repeat(4), '00'.repeat(7), '00'.repeat(9), hex(0n), hex(0x20000000n), hex(0x100000001n), hex(0xffffffffffffffffn), 'synthetic-private']) {
+    expect(() => parseOwnedX11Handle(value, 'linux', 'x64', 'LE')).toThrow();
+  }
+  for (const [platform, arch, endian] of [['darwin', 'x64', 'LE'], ['linux', 'arm64', 'LE'], ['linux', 'x64', 'BE']]) expect(() => parseOwnedX11Handle(hex(123n), platform, arch, endian)).toThrow();
+});
+test('owned public scope is exact target and never exports private IDs or arbitrary failure data', () => {
+  const value = { ...OWNED_X11_KIND, bindingObserved: false };
+  expect(parseOwnedX11Provenance(value)).toEqual(value);
+  for (const changed of [{ ...value, xid: 123 }, { ...value, pid: 101 }, { ...value, generation: 1 }, { ...value, nonce: 'synthetic-private' },
+    { ...value, bindingObserved: 1 }, { ...value, countScope: 'all-pid-windows' }, { ...value, geometryKind: 'client-assumed-frame' }]) expect(() => parseOwnedX11Provenance(changed)).toThrow();
+});
+
+function ownedProductionHelpers() {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('class OwnedX11Failed'), end = text.indexOf('let ownedPage:', begin);
+  const code = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureCapture = captureOwnedWindow; globalThis.fixtureBudget = ownedBudget; globalThis.fixtureChannel = OwnedChannel;`)
+    .replaceAll('import.meta.url', JSON.stringify(new URL('check.ts', import.meta.url).href));
+  return code;
+}
+async function ownedCaptureFixture(change?: 'destroyed' | 'url' | 'pid' | 'renderer' | 'preferences' | 'highbits' | 'dead' | 'expired' | 'identity' | 'session' | 'state-denied') {
+  const calls: string[] = [], deadline = performance.now() + (change === 'expired' ? -1 : 1000);
+  const bytes = Buffer.alloc(8); bytes.writeBigUInt64LE(change === 'highbits' ? 0x10000007bn : 123n);
+  const child = { pid: 101, exitCode: change === 'dead' ? 0 : null, signalCode: null };
+  const page = { url: () => 'linuxcast://launcher/index.html', evaluate: async (callback: () => unknown) => { calls.push('renderer'); return callback(); } };
+  const window = { isDestroyed: () => change === 'destroyed', getNativeWindowHandle: () => { calls.push('handle'); return bytes; },
+    webContents: { isDestroyed: () => false, getURL: () => change === 'url' ? 'private-canary://denied' : page.url(),
+      getLastWebPreferences: () => ({ sandbox: change !== 'preferences', contextIsolation: true, nodeIntegration: false, webSecurity: true }) } };
+  const handle = { evaluate: async (callback: (win: typeof window) => unknown) => { calls.push('window'); return callback(window); }, dispose: async () => { calls.push('dispose'); } };
+  const app = { process: () => child, browserWindow: async (requested: typeof page) => { expect(requested).toBe(page); calls.push('page-association'); return handle; },
+    evaluate: async () => ({ pid: change === 'pid' ? 999 : 101, electron: '45.0.0', chrome: '156.0.8078.48', platform: 'linux', arch: 'x64', ozone: 'x11', noSandbox: false }) };
+  const context = { expect, Buffer, setTimeout, clearTimeout, performance, parseOwnedX11Handle, endianness: () => 'LE', OWNED_X11_FAILURES,
+    APP_URL: page.url(), window: { linuxcast: { runtime: { sandboxed: change !== 'renderer', contextIsolated: true }, getState: async () => ({ ok: change !== 'state-denied',
+      value: { identity: change === 'identity' ? 'synthetic-private-canary' : 'io.github.ianwijma.Linuxcast', session: change === 'session' ? 'wayland' : 'x11' } }) } },
+    spawn: () => { throw new Error('NO_CHANNEL_IN_CAPTURE'); }, fileURLToPath, URL, process: { env: {} } };
+  runInNewContext(ownedProductionHelpers(), context);
+  let result: unknown, error: unknown;
+  try { result = await (context as unknown as { fixtureCapture: (app: unknown, page: unknown, deadline: number) => Promise<unknown> }).fixtureCapture(app, page, deadline); }
+  catch (caught) { error = caught; }
+  return { result, error, calls };
+}
+test('actual production capture uses only the validated page-associated BrowserWindow', async () => {
+  const value = await ownedCaptureFixture(); expect(value.error).toBeUndefined();
+  expect(value.result).toMatchObject({ pid: 101, xid: 123, handle: '7b00000000000000', runtime: { sandbox: true, nodeIntegration: false } });
+  expect(value.calls).toEqual(['page-association', 'window', 'handle', 'renderer', 'dispose']);
+});
+for (const change of ['destroyed', 'url', 'pid', 'renderer', 'preferences', 'highbits', 'dead', 'expired', 'identity', 'session', 'state-denied'] as const) test(`actual page capture rejects ${change} before native observer work`, async () => {
+  const value = await ownedCaptureFixture(change); expect(value.error).toBeDefined(); expect(value.result).toBeUndefined();
+  if (change === 'dead' || change === 'expired') expect(value.calls).toEqual([]);
+});
+
+async function ownedSampleFixture(swap: 'none' | 'before' | 'after' | 'private' = 'none') {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('const observeOwned = async'), end = text.indexOf('const observe = async', begin);
+  const failed = class extends Error { readonly kind: string; constructor(kind: string) { super('OWNED_FAILED'); this.kind = kind; } };
+  const app = { process: () => ({ pid: 101, exitCode: null, signalCode: null }) };
+  const own = { ...native(), nativeBackend: 'x11' as const }, empty: NativeWindow = { count: 0, identityMatches: false, nativeBackend: 'unsupported', focused: false, hidden: true, geometry: null, workArea: null };
+  let captures = 0, sends = 0, aborts = 0;
+  const report: Record<string, unknown> = {}, trace = new NativeTrace();
+  const context = { performance, nativeTrace: trace, application: app, ownedPage: {}, ownedGeneration: 1,
+    ownedBinding: { app, pid: 101, xid: 123, handle: '7b00000000000000', generation: 1, nonce: 'a'.repeat(64) },
+    ownedChannel: { send: async () => { sends++; return { request: 1, launcher: own, decoy: empty, decoyActivationIssued: false, ...(swap === 'private' ? { private: 'synthetic-private-canary' } : {}) }; }, abort: () => { aborts++; } },
+    captureOwnedWindow: async () => { captures++; const changed = swap === 'before' && captures === 1 || swap === 'after' && captures === 2;
+      return { pid: 101, xid: changed ? 124 : 123, handle: changed ? '7c00000000000000' : '7b00000000000000', runtime: { sandbox: true } }; },
+    OwnedX11Failed: failed, report, pid: 0, parseObservation, OWNED_X11_KIND,
+  };
+  const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureSample = observeOwned;`);runInNewContext(program, context);
+  let error: unknown;
+  try { await (context as unknown as { fixtureSample: (serial: number, phase: string) => Promise<unknown> }).fixtureSample(1, 'initial-native-launch'); } catch (caught) { error = caught; }
+  return { sends, aborts, report, trace: trace.snapshot(), error };
+}
+test('actual immutable primary binding rejects an auxiliary XID before helper/geometry calls', async () => {
+  const value = await ownedSampleFixture('before'); expect(value.error).toBeDefined(); expect(value.sends).toBe(0); expect(value.aborts).toBe(1);
+  expect(value.trace).toEqual({ phase: 'initial-native-launch', state: 'request-written' }); expect(JSON.stringify(value.report)).not.toContain('7c0000');
+});
+test('post-query page swap cannot publish sampled geometry as accepted evidence', async () => {
+  const value = await ownedSampleFixture('after'); expect(value.error).toBeDefined(); expect(value.sends).toBe(1);
+  expect(value.trace).toEqual({ phase: 'initial-native-launch', state: 'request-written' });
+});
+test('private helper fields cannot reach trace or public report', async () => {
+  const value = await ownedSampleFixture('private'); expect(value.error).toBeDefined(); expect(value.trace?.lastObservation).toBeUndefined();
+  expect(JSON.stringify(value.report)).not.toContain('synthetic-private');
+});
+test('exact target sample accepts its known primary alongside other same-PID windows without a PID fallback', async () => {
+  const value = await ownedSampleFixture(); expect(value.error).toBeUndefined(); expect(value.sends).toBe(1);
+  expect(value.trace?.state).toBe('parsed'); expect(value.report.ownedTargetObserver).toEqual({ ...OWNED_X11_KIND, bindingObserved: true });
+});
+
+for (const scenario of ['valid-owned-complete', 'owned-complete-unbound', 'owned-complete-failure', 'owned-complete-decoy', 'owned-complete-missing-phase', 'valid-owned-failed', 'valid-owned-failure', 'owned-extra', 'owned-private', 'owned-pid-count', 'owned-kind', 'owned-bound-bool',
+  'owned-no-provenance', 'owned-failure-private', 'owned-failure-unknown', 'owned-wrong-route', 'owned-full-route']) test(`public exact-target provenance ${scenario}`, () => {
+  const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+  expect(child.status, child.stderr).toBe(0); const result = JSON.parse(child.stdout);
+  if (scenario.startsWith('valid-')) expect(result.strictFixtureAccepted).toBe(true);
+  else expect(result).toMatchObject({ rejectedBeforePublication: true, publishedFiles: 0 });
+});
+
+async function ownedChannelFixture(parts: string[], expired = false) {
+  class Child extends EventEmitter {
+    exitCode: number | null = null; signalCode: string | null = null;
+    stdout = new EventEmitter(); stdin = new EventEmitter() as EventEmitter & { write: (value: string, done: (error?: Error) => void) => void };
+    killed = false;
+    constructor() { super(); this.stdin.write = (value, done) => { expect(JSON.parse(value)).toEqual({ command: 'synthetic' }); done();
+      queueMicrotask(() => { for (const part of parts) this.stdout.emit('data', Buffer.from(part)); }); }; }
+    kill() { this.killed = true; this.signalCode = 'SIGKILL'; queueMicrotask(() => this.emit('close', null)); return true; }
+  }
+  const child = new Child(); let spawns = 0;
+  const context = { expect, Buffer, setTimeout, clearTimeout, performance, parseOwnedX11Handle, OWNED_X11_FAILURES, APP_URL: 'linuxcast://launcher/index.html',
+    endianness: () => 'LE', process: { env: { PATH: '/usr/bin:/bin' } }, URL, fileURLToPath,
+    spawn: (executable: string, arguments_: string[], options: { stdio: string[] }) => {
+      spawns++; expect(executable).toBe('/usr/bin/python3'); expect(arguments_).toEqual([source('owned-x11.py'), '--kwin-x11-lifecycle-only']); expect(options.stdio).toEqual(['pipe', 'pipe', 'ignore']); return child;
+    } };
+  runInNewContext(ownedProductionHelpers(), context);
+  const channel = new (context as unknown as { fixtureChannel: new () => { send: (packet: unknown, deadline: number) => Promise<unknown>; abort: () => void } }).fixtureChannel();
+  let value: unknown, error: unknown;
+  try { value = await channel.send({ command: 'synthetic' }, performance.now() + (expired ? -1 : 50)); } catch (caught) { error = caught; }
+  channel.abort(); return { value, error, child, spawns };
+}
+test('actual private channel handles split bounded JSON and has no shell or inherited stderr log', async () => {
+  const value = await ownedChannelFixture(['{"bound":', 'true}\n']); expect(value.error).toBeUndefined(); expect(value.value).toEqual({ bound: true }); expect(value.spawns).toBe(1);
+});
+for (const [label, parts] of [['oversize', ['x'.repeat(8193)]], ['extra-line', ['{}\n{}\n']], ['malformed', ['{private\n']],
+  ['private-failure', ['{"failure":{"private":"canary"}}\n']], ['unknown-failure', ['{"failure":"private-canary"}\n']], ['native-failure', ['{"failure":"identity"}\n']]] as const) test(`private channel ${label} is terminal and bounded`, async () => {
+  const value = await ownedChannelFixture([...parts]); expect(value.error).toBeDefined(); expect(value.value).toBeUndefined(); expect(value.child.killed).toBe(true);
+});
+test('expired private channel budget does not wait for or accept a later reply', async () => {
+  const value = await ownedChannelFixture([], true); expect(value.error).toBeDefined(); expect(value.child.killed).toBe(true);
 });

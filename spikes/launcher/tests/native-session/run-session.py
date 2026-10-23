@@ -97,7 +97,7 @@ def inner(backend,root,probe_mode='full'):
                 # polled; no new bus queries or separate wait window are added.
                 time.sleep(0.2)
             else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
-            if family=='kwin':
+            if family=='kwin' and not (backend=='kwin-x11' and probe_mode=='lifecycle-only'):
                 subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
                 deadline=time.monotonic()+5
                 while time.monotonic()<deadline and not has_owner(BUS,env): time.sleep(0.1)

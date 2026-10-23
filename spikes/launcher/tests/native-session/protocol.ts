@@ -266,3 +266,20 @@ export function parseLifecycleDiagnostic(value: unknown, backend: Backend): Life
   if (result.diagnosticOutcome === 'complete' && !result.lifecycleProof) throw new Error('LIFECYCLE_PROOF_REQUIRED');
   return result;
 }
+
+export const OWNED_X11_FAILURES = ['binding', 'abi', 'identity', 'lifetime', 'native-query', 'overflow', 'guard', 'protocol', 'deadline'] as const;
+export type OwnedX11Failure = typeof OWNED_X11_FAILURES[number];
+export const OWNED_X11_KIND = { kind: 'private-x11-ewmh-exact-owned-target', targetScope: 'page-associated-browser-window',
+  countScope: 'exact-target', geometryKind: 'ewmh-frame', decoy: 'not-created' } as const;
+export function parseOwnedX11Provenance(value: unknown) {
+  const row = object(value); keys(row, [...Object.keys(OWNED_X11_KIND), 'bindingObserved']);
+  for (const [key, expected] of Object.entries(OWNED_X11_KIND)) if (row[key] !== expected) throw new Error('OWNED_X11_SCHEMA');
+  if (typeof row.bindingObserved !== 'boolean') throw new Error('OWNED_X11_SCHEMA');
+  return { ...OWNED_X11_KIND, bindingObserved: row.bindingObserved };
+}
+export function parseOwnedX11Handle(value: unknown, platform: unknown, architecture: unknown, endian: unknown): number {
+  if (platform !== 'linux' || architecture !== 'x64' || endian !== 'LE' || typeof value !== 'string' || !/^[0-9a-f]{16}$/.test(value)) throw new Error('OWNED_X11_ABI');
+  const raw = Buffer.from(value, 'hex').readBigUInt64LE();
+  if (raw < 1n || raw > 0x1fffffffn) throw new Error('OWNED_X11_ABI');
+  return Number(raw);
+}

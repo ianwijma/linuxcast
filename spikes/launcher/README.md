@@ -132,3 +132,90 @@ passed (21 launcher unit, three UI fixtures, 233 native preparation), plus stric
 TypeScript, ESLint, Python AST, plan validation and whitespace checks. Platform:
 Pop!_OS22.04 amd64/Bun1.4.4. Private Unix socket fixtures required local sandbox
 permission; no compositor, Electron UI or guest was run for this increment.
+
+
+### KWin X11 lifecycle exact-target observer — source only
+
+Only `kwin-x11` with `--probe-mode lifecycle-only` selects this new passive
+observer. Full probes, GNOME and Wayland keep their existing observer paths and
+strict focus/identity predicates. This candidate is native **UNEXECUTED**. It
+makes no acceptance or desktop capability claim; selected lifecycle completion
+still means `incomplete`, exit3, with ordinary Show focus and global shortcut
+explicitly skipped.
+
+The driver obtains the BrowserWindow associated with its validated Playwright
+page rather than selecting a window by PID or list position. Pinned Electron45
+[BaseWindow ABI documentation](https://raw.githubusercontent.com/electron/electron/v45.0.0/docs/api/base-window.md)
+and [native implementation](https://raw.githubusercontent.com/electron/electron/v45.0.0/shell/browser/api/electron_api_base_window.cc)
+identify the Linux handle as an unsigned long; the amd64 little-endian eight
+bytes are checked in full against the X11 protocol XID range, without truncation.
+The private binding combines this XID with the supervised Electron process,
+launch generation, random channel nonce, exact app ID and explicit X11 backend.
+These private fields never appear in public reports. Page association is checked
+again around each sample; a changed handle is terminal, not a new binding.
+
+A fixed Python helper validates the disposable Debian/user/private-display
+context before loading the fixed system Xlib. It checks an own-process ancestry
+chain and pidfd, exact `_NET_WM_PID`, then the two exact `WM_CLASS` strings before
+reading only the bound window's frame properties. It uses typed, bounded Xlib
+properties: format32 values use C-long storage on LP64; frame extents, current
+desktop, viewport, work area and active-window comparison have explicit type,
+length and numeric bounds. A foreign PID prevents its class/geometry reads.
+There is no foreign-window class/title/content query, activation, clipboard
+access, root event subscription, keyboard mask or input synthesis. The fixed
+root EWMH client list is used only to establish membership/absence of the bound
+target; other entries' metadata are never inspected.
+
+Only own-window property/structure notifications are selected. Identity mutation,
+destruction while live, process death, BadWindow, malformed properties or channel
+errors terminate the diagnostic; no replacement window or reused XID is adopted.
+After actual supervised exit0, the old target must be BadWindow and absent from
+the EWMH list before native absence is reported. Two same-PID windows therefore
+can coexist while the primary target's public count remains one. Reports label
+that count `exact-target`, with observer kind `private-x11-ewmh-exact-owned-target`,
+frame geometry `ewmh-frame`, and decoy `not-created`; the count is never a claim
+that the process owns only one native window.
+
+All helper capture, private-channel and native queries share the original
+8-second observation budget; the existing predicate/startup/checker/outer bounds,
+two-launch lifecycle branch, source guards and descendant supervisor remain in
+force. No dependencies, application behavior, activation retries or independent
+wait window are added. Canonical renderer tokens and Shell/navigation,
+Accessibility and Review gate design requirements remain applicable.
+
+Synthetic fixtures execute the production capture/channel/observation functions,
+ctypes property/geometry/event decoder and immutable target state. They cover two
+own-PID candidates, page swaps, foreign metadata traps, class mismatches,
+full-width/high-bit ABI rejection, process/event lifetime changes, BadWindow,
+retired/reused targets, property lengths/types, bounded pipe framing, strict
+public provenance and private-field rejection. They are source preparation,
+not Xlib/compositor evidence. A later independently reviewed native control must
+create one fixed synthetic auxiliary BrowserWindow in the same Electron process,
+prove the page-bound primary remains selected, and prove a deliberately swapped
+binding is rejected. That control and the actual KWin6.3.6 X11 two-launch
+lifecycle run require separate source/authority review before execution. Full
+focus/shortcut, target accessibility, physical desktop and complete S0-01 gates
+remain pending.
+
+
+Local source verification for this increment: configured Node24.22.1/Vitest4.1.12
+passed365/365 checks (21 launcher unit, three UI fixtures, 341 native preparation)
+in12.46s. Strict TypeScript, affected-source ESLint, five Python AST checks,
+planning validation and the source-only native build pass on Pop!_OS22.04 amd64
+with Bun1.4.4. The rebuilt manifest declares25 runtime inputs plus canonical
+tokens and the fixed desktop entry. The initial preparation run had one fixture
+dispatch failure (315 passed/one failed); correcting that fixture and adding the
+remaining property/publication cases produced the final pass. No desktop,
+Electron UI, display, guest or physical-device check ran for this increment.
+
+
+Independent review then found a numeric-PID reuse gap in the new source-only
+helper: ancestry was checked before opening the retained pidfd. The follow-up
+opens that handle first, requires it alive before and after the bounded UID/ancestry
+walk, and closes it on every validation failure. A replacement process encountered
+through numeric `/proc` paths cannot revive the retained original handle. Five
+additional fixtures execute production `ProcessLease` through `Target.bind`,
+including replacement during ancestry, and require denial before any native
+window PID/class/geometry query. Affected preparation346/346 pass in12.99s;
+strict TypeScript, affected lint and Python AST checks pass. The prior365-check
+snapshot remains immutable and native efficacy remains UNEXECUTED.

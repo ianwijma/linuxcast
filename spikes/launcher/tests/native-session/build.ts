@@ -6,7 +6,7 @@ import { transform } from 'esbuild';
 const source = dirname(fileURLToPath(import.meta.url));
 // Bounded current application/build inputs. Frozen install is the dependency
 // authority; package/lock fingerprints are included, not installed modules.
-const sources = ['build.ts', 'check.ts', 'protocol.ts', 'run-session.py', 'supervision.py', 'observer_startup.py', 'private.py', 'artifacts.py', 'gnome-extension.js', 'kwin-script.js', 'kwin-bus.py', 'decoy.py',
+const sources = ['build.ts', 'check.ts', 'protocol.ts', 'run-session.py', 'supervision.py', 'observer_startup.py', 'private.py', 'artifacts.py', 'gnome-extension.js', 'kwin-script.js', 'kwin-bus.py', 'decoy.py', 'owned-x11.py',
   '../../src/main.ts', '../../src/profile.ts', '../../src/preload.ts', '../../src/contract.ts', '../../src/renderer/main.tsx', '../../src/renderer/App.tsx', '../../src/renderer/style.css', '../../build.ts', '../../resources/index.html',
   '../../../../package.json', '../../../../bun.lock', '../../../../apps/desktop/package.json'];
 export async function buildNativeSession(destination = join(source, 'dist'), sourceDirectory = source) {

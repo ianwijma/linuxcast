@@ -44,6 +44,44 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         return value
     consumer={'request':2,'pollCount':3,'outcomes':{'missing':2,'other-serial':1,'matching':0,'parse-rejected':0,'poll-error':0},
               'pollsCapped':False,'elapsedMs':100,'elapsedCapped':False}
+    if case.startswith('owned-') or case.startswith('valid-owned-'):
+        from artifacts import OWNED_X11_KIND
+        report=fallback_result('kwin-x11','lifecycle-only');backend='kwin-x11'
+        if case in ('valid-owned-complete','owned-complete-unbound','owned-complete-failure','owned-complete-decoy','owned-complete-missing-phase'):
+            from artifacts import LIFECYCLE_PHASES
+            own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':429},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
+            empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}
+            report.update(stage='complete',diagnosticOutcome='complete',initialPlacementInsideWorkArea=True,closeRetainedResidentProcess=True,explicitUiQuitExited=True,hiddenCliQuitExited=True,
+                lifecycleProof={'launches':2,'darkSearchCaptured':True,'lightCapabilitiesCaptured':True,'uiQuitExitCode':0,'hiddenCliQuitExitCode':0,'closeProcessAlive':True},runtime=copy.deepcopy(runtime))
+            report['runtime']['ozone']='x11';report['ownedTargetObserver']['bindingObserved']=True
+            for index,phase in enumerate(LIFECYCLE_PHASES):
+                report['observations'].append({'phase':phase,'native':{'request':index+1,'launcher':copy.deepcopy(own if phase in ('initial-native-launch','fresh-lifecycle-native-launch') else empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}})
+            for name in ('dark-launcher.png','light-capabilities.png'):(root/name).write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic fixture')
+            if case=='owned-complete-unbound':report['ownedTargetObserver']['bindingObserved']=False
+            elif case=='owned-complete-failure':report['ownedTargetFailure']='lifetime'
+            elif case=='owned-complete-decoy':report['observations'][0]['native']['decoy']=copy.deepcopy(own)
+            elif case=='owned-complete-missing-phase':report['observations'].pop()
+        elif case=='valid-owned-failed':pass
+        elif case=='owned-extra':report['ownedTargetObserver']['xid']=123
+        elif case=='owned-private':report['ownedTargetObserver']['private']='synthetic-private-canary'
+        elif case=='owned-pid-count':report['ownedTargetObserver']['countScope']='all-pid-windows'
+        elif case=='owned-kind':report['ownedTargetObserver']['kind']='synthetic-private-canary'
+        elif case=='owned-bound-bool':report['ownedTargetObserver']['bindingObserved']=1
+        elif case=='owned-no-provenance':del report['ownedTargetObserver']
+        elif case=='owned-failure-private':report['ownedTargetFailure']={'private':'synthetic-private-canary'}
+        elif case=='owned-failure-unknown':report['ownedTargetFailure']='synthetic-private-canary'
+        elif case=='owned-wrong-route':backend='gnome-x11';report['backend']=backend
+        elif case=='owned-full-route':report['probeMode']='full'
+        elif case=='valid-owned-failure':report['ownedTargetFailure']='identity'
+        else:raise ValueError('UNKNOWN_OWNED_FIXTURE')
+        if case.startswith('valid-'):
+            status,state=publish(root,destination,report,manifest,backend,3,'')
+            assert status==3 and state=='incomplete'
+            print(json.dumps({'strictFixtureAccepted':True}));sys.exit(0)
+        try:publish(root,destination,report,manifest,backend,3,'')
+        except ValueError:pass
+        else:raise AssertionError('INVALID_OWNED_SCOPE_PUBLISHED')
+        assert not destination.exists();print(json.dumps({'rejectedBeforePublication':True,'publishedFiles':0}));sys.exit(0)
     if case.startswith(('lifecycle-','valid-lifecycle-')) or case=='full-lifecycle-phase':
         from artifacts import LIFECYCLE_PHASES,LIFECYCLE_SKIPPED
         backend='gnome-x11';report=fallback_result(backend,'lifecycle-only')

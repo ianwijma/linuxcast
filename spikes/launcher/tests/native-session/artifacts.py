@@ -9,7 +9,7 @@ import stat
 from observer_startup import diagnostic as startup_diagnostic
 
 BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
-SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py', 'observer_startup.py','private.py','artifacts.py','gnome-extension.js','kwin-script.js','kwin-bus.py','decoy.py',
+SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py', 'observer_startup.py','private.py','artifacts.py','gnome-extension.js','kwin-script.js','kwin-bus.py','decoy.py','owned-x11.py',
     '../../src/main.ts','../../src/profile.ts','../../src/preload.ts','../../src/contract.ts','../../src/renderer/main.tsx','../../src/renderer/App.tsx','../../src/renderer/style.css','../../build.ts','../../resources/index.html',
     '../../../../package.json','../../../../bun.lock','../../../../apps/desktop/package.json')
 OUTPUTS=('extension.js','kwin-script.js','metadata.json')
@@ -131,6 +131,13 @@ def shortcut(value,backend):
     return {'state':value['state'],'effectiveBindingExposed':exact(value['effectiveBindingExposed'],False),
         'portalServicePresent':boolean(value['portalServicePresent']),'consentOrEffectiveBindingProven':exact(value['consentOrEffectiveBindingProven'],False)}
 
+OWNED_X11_KIND={'kind':'private-x11-ewmh-exact-owned-target','targetScope':'page-associated-browser-window','countScope':'exact-target','geometryKind':'ewmh-frame','decoy':'not-created'}
+OWNED_X11_FAILURES=('binding','abi','identity','lifetime','native-query','overflow','guard','protocol','deadline')
+def owned_x11_provenance(value):
+    object_keys(value,(*OWNED_X11_KIND,'bindingObserved'))
+    for key,expected in OWNED_X11_KIND.items():exact(value[key],expected)
+    return {**OWNED_X11_KIND,'bindingObserved':boolean(value['bindingObserved'])}
+
 LIFECYCLE_SKIPPED=['ordinary-show-native-focus','actual-x11-global-shortcut']
 LIFECYCLE_PHASES=('initial-native-launch','after-ui-quit-native-window-absent','fresh-lifecycle-native-launch','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
 
@@ -166,6 +173,9 @@ def lifecycle_diagnostic(value,backend):
         proof=value['lifecycleProof'];object_keys(proof,('launches','darkSearchCaptured','lightCapabilitiesCaptured','uiQuitExitCode','hiddenCliQuitExitCode','closeProcessAlive'))
         for key,expected in (('launches',2),('darkSearchCaptured',True),('lightCapabilitiesCaptured',True),('uiQuitExitCode',0),('hiddenCliQuitExitCode',0),('closeProcessAlive',True)):
             exact(proof[key],expected)
+    if backend=='kwin-x11':
+        if any(row['native']['decoy']!={'count':0,'identityMatches':False,'focused':False,'hidden':True,'geometry':None,'workArea':None,'nativeBackend':'unsupported'} for row in rows): raise ValueError('PUBLIC_OWNED_DECOY_FORBIDDEN')
+        if value['diagnosticOutcome']=='complete' and (not value['ownedTargetObserver']['bindingObserved'] or 'ownedTargetFailure' in value): raise ValueError('PUBLIC_OWNED_TARGET_PROOF')
     if value['diagnosticOutcome']=='complete':
         if value['status']!='incomplete' or value['stage']!='complete' or phases!=list(LIFECYCLE_PHASES) or 'runtime' not in value or 'lifecycleProof' not in value or any(value.get(flag) is not True for flag in ('closeRetainedResidentProcess','explicitUiQuitExited','hiddenCliQuitExited','initialPlacementInsideWorkArea')):
             raise ValueError('PUBLIC_LIFECYCLE_PROOF_REQUIRED')
@@ -174,9 +184,11 @@ def lifecycle_diagnostic(value,backend):
 
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof','ownedTargetObserver','ownedTargetFailure'))
     mode=value.get('probeMode','full')
     if type(mode) is not str or mode not in ('full','lifecycle-only'): raise ValueError('PUBLIC_PROBE_MODE')
+    owned=backend=='kwin-x11' and mode=='lifecycle-only'
+    if not owned and any(key in value for key in ('ownedTargetObserver','ownedTargetFailure')): raise ValueError('PUBLIC_OWNED_TARGET_ROUTE')
     if mode=='full' and any(key in value for key in ('skippedChecks','diagnosticOutcome','lifecycleProof')): raise ValueError('PUBLIC_FULL_MODE_REQUIRED')
     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
@@ -185,6 +197,12 @@ def public_result(value,backend):
         'evidenceKind':exact(value['evidenceKind'],'actual-isolated-software-compositor-launcher'),'kernel':value['kernel'],
         'hostDisplayClipboardInputOrSettingsUsed':exact(value['hostDisplayClipboardInputOrSettingsUsed'],False),
         'launcherCompanionActivationOrPlacementUsed':exact(value['launcherCompanionActivationOrPlacementUsed'],False),'stage':value['stage']}
+    if owned:
+        if 'ownedTargetObserver' not in value: raise ValueError('PUBLIC_OWNED_TARGET_REQUIRED')
+        result['ownedTargetObserver']=owned_x11_provenance(value['ownedTargetObserver'])
+        if 'ownedTargetFailure' in value:
+            if type(value['ownedTargetFailure']) is not str or value['ownedTargetFailure'] not in OWNED_X11_FAILURES: raise ValueError('PUBLIC_OWNED_TARGET_FAILURE')
+            result['ownedTargetFailure']=value['ownedTargetFailure']
     rows=value['observations']
     if type(rows) is not list or len(rows)>32: raise ValueError('PUBLIC_OBSERVATION_BOUND')
     result['observations']=[];last=0
@@ -257,7 +275,8 @@ def fallback_result(backend,probe_mode='full'):
         'evidenceKind':'actual-isolated-software-compositor-launcher','kernel':os.uname().release,
         'hostDisplayClipboardInputOrSettingsUsed':False,'launcherCompanionActivationOrPlacementUsed':False,'observations':[],'stage':'private-session'}
     if probe_mode=='lifecycle-only': result.update(probeMode=probe_mode,status='incomplete',skippedChecks=list(LIFECYCLE_SKIPPED),diagnosticOutcome='failed')
-    elif probe_mode!='full': raise ValueError('PUBLIC_PROBE_MODE')
+    if backend=='kwin-x11' and probe_mode=='lifecycle-only': result['ownedTargetObserver']={**OWNED_X11_KIND,'bindingObserved':False}
+    elif probe_mode!='full' and probe_mode!='lifecycle-only': raise ValueError('PUBLIC_PROBE_MODE')
     return result
 
 def publish(root,destination,value,manifest,backend,status,packages):
