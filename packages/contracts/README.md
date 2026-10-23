@@ -1,7 +1,8 @@
 # Shared contracts (provisional F0-01 preparation)
 
 This increment implements the shared capability, handshake, request and failure
-schemas plus bounded UTF-8 framing. It is production boundary code with synthetic
+schemas plus bounded UTF-8 framing and native operation progress/failure contracts.
+It is production boundary code with synthetic
 fixtures, not evidence of a running desktop adapter. S0-01 and S0-03 are not yet
 accepted; do not integrate or call the contracts frozen until those prerequisites
 and the rest of F0-01 are complete.
@@ -41,6 +42,31 @@ them. Failure detail maps likewise preserve their keys. Native JSON parsing uses
 Serde JSON's `float_roundtrip` feature; boundary fixtures verify decoded generation
 and deadline values as well as acceptance near the safe-integer limit.
 
+## Native operation results
+
+`src/native.ts` distinguishes a request, a transport acknowledgement and an
+observed native postcondition. Requested/acknowledged progress is explicitly
+nonterminal and cannot carry an observation. Observed progress is terminal and
+must validate against the broker-owned operation/capability/postcondition registry.
+The synthetic placement fixture requires its explicit `placed` postcondition;
+a geometry-only reply or a mismatched requested result fails that contract.
+These fixtures do not prove actual placement or compositor recovery.
+
+`compositorUnavailable` constructs a fixed safe error and a matching generation/
+capability snapshot: temporarily unavailable, an explicit recovery action, unknown
+effect outcome and no automatic replay. Its schema rejects successful capability
+states, automatic-retry hints, missing recovery actions or mismatched snapshots.
+Explicit recovery and a fresh handshake/generation are runtime obligations.
+Cancellation may also leave an unknown effect; it cannot claim an effect was
+undone. A `not-applied` failure must be justified by the trusted producer, such as
+cancellation before dispatch.
+
+The Serde mirror and shared fixtures cover these distinctions. The parsers
+validate messages; they do not authenticate their source, enforce event ordering,
+observe an OS postcondition, manage sessions or guarantee exactly one terminal
+delivery. Those runtime responsibilities remain outstanding, and no caller may
+submit its own trusted registry, principal or successful native observation.
+
 Dependency pins and licences were checked against the installed package/crate
 metadata. `bun.lock` and `Cargo.lock` retain registry integrity checksums. Zod has
 no runtime dependencies; Serde was already present in the workspace lockfile.
@@ -64,8 +90,8 @@ Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets --
 
 Still to implement in F0-01: command and declarative view contracts, workflow and
 provider contracts, extension envelopes, response/event/subscription lifecycle,
-trusted effect contexts, requested/acknowledged/observed native outcomes and
-explicit compositor-failure recovery. The overview's native request `id` and the
+trusted effect contexts and runtime enforcement of native outcome/recovery
+contracts. The overview's native request `id` and the
 extension transport's `requestId`/`sessionId` envelopes are separate contracts;
 this increment implements the former. No runtime dispatch, permissions, native
 effect, credentials, UI or automatic reconnection is implemented here.

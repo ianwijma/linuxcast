@@ -3,11 +3,14 @@ import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import * as z from 'zod';
 import { capabilityStatusSchema, ContractError, encodeFrame, FrameDecoder, handshakeSchema,
-  MAX_ENVELOPE_BYTES, parseContract, parseJson, parseRequest, rpcFailureSchema } from '../src/index.ts';
+  MAX_ENVELOPE_BYTES, parseContract, parseJson, parseRequest, rpcFailureSchema,
+  compositorUnavailable, parseNativeOperationEvent } from '../src/index.ts';
 
 const fixtures = JSON.parse(readFileSync(new URL('../fixtures/protocol.json', import.meta.url), 'utf8')) as
   Array<{ id: string; kind: string; json: string; valid: boolean; expected?: Record<string, unknown> }>;
 const methods = new Map([['ping', z.strictObject({})]]);
+const operations = new Map([['native.place', { capabilityId: 'launcher.position',
+  observation: z.strictObject({ postcondition: z.literal('placed'), matchesRequested: z.literal(true) }) }]]);
 
 describe('shared native wire fixtures', () => {
   it('dispatches the registered schema output, including stripping, defaults and transforms', () => {
@@ -27,6 +30,7 @@ describe('shared native wire fixtures', () => {
           case 'handshake': return parseContract(handshakeSchema, value);
           case 'failure': return parseContract(rpcFailureSchema, value);
           case 'request': return parseRequest(value, methods);
+          case 'nativeEvent': return parseNativeOperationEvent(value, operations);
           default: throw new Error('Unrecognized fixture kind.');
         }
       };
@@ -57,6 +61,20 @@ describe('shared native wire fixtures', () => {
     expect(result.error, result.error?.message).toBeUndefined();
     expect(result.status, result.stdout + result.stderr).toBe(0);
   }, 65_000);
+});
+
+it('frames a safe compositor failure with an explicit action and no success/replay claim', () => {
+  const event = compositorUnavailable({ protocolVersion: 1, invocationId: 'fixture',
+    operation: 'native.place', capabilityId: 'launcher.position', generation: 3 }, 'kwin', 'reload-desktop-component');
+  const decoder = new FrameDecoder(); let received: unknown;
+  decoder.push(encodeFrame(event), value => { received = parseNativeOperationEvent(value, operations); });
+  decoder.finish();
+  expect(received).toMatchObject({ progress: { stage: 'compositor-unavailable', terminal: true,
+    effectOutcome: 'unknown', autoReplay: false,
+    capability: { state: 'temporarily-unavailable', remediationAction: 'reload-desktop-component' },
+    failure: { code: 'capability-unavailable', retryable: false } } });
+  expect(() => compositorUnavailable({ protocolVersion: 1, invocationId: 'fixture',
+    operation: 'native.place', capabilityId: 'launcher.position', generation: 3 }, 'kwin', '')).toThrow(ContractError);
 });
 
 describe('bounded UTF-8 framing', () => {

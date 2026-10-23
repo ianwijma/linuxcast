@@ -6,6 +6,10 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 use std::io::Read;
 mod json;
+mod native;
+pub use native::{
+    EffectOutcome, NativeOperationEvent, NativeProgress, parse_native_operation_event,
+};
 
 pub const MAX_ENVELOPE_BYTES: usize = 1024 * 1024;
 pub const MAX_JSON_DEPTH: usize = 64;

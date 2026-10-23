@@ -1,5 +1,6 @@
 use linuxcast_protocol::{
-    CapabilityStatus, Handshake, MAX_ENVELOPE_BYTES, RpcFailure, parse, parse_request, read_frame,
+    CapabilityStatus, Handshake, MAX_ENVELOPE_BYTES, RpcFailure, parse,
+    parse_native_operation_event, parse_request, read_frame,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -34,6 +35,23 @@ fn shared_typescript_fixtures() {
             "request" => parse_request(f.json.as_bytes(), |method, params| {
                 method == "ping" && params.as_object().is_some_and(|p| p.is_empty())
             })
+            .map(|v| serde_json::to_value(v).unwrap()),
+            "nativeEvent" => parse_native_operation_event(
+                f.json.as_bytes(),
+                |operation, capability, observation| {
+                    operation == "native.place"
+                        && capability == "launcher.position"
+                        && observation.is_none_or(|o| {
+                            o.as_object().is_some_and(|o| {
+                                o.len() == 2
+                                    && o.get("postcondition").and_then(Value::as_str)
+                                        == Some("placed")
+                                    && o.get("matchesRequested").and_then(Value::as_bool)
+                                        == Some(true)
+                            })
+                        })
+                },
+            )
             .map(|v| serde_json::to_value(v).unwrap()),
             _ => panic!("unknown fixture kind"),
         };
