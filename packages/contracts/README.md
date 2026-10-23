@@ -129,6 +129,23 @@ itself. The concrete image/PDF preview shape uses a typed `source` reference,
 keeping asset/file alternatives unambiguous; no remote executable URL is accepted.
 The fixtures prove parsing only, not visual or accessibility acceptance.
 
+
+## Command declarations
+
+`src/commands.ts` defines stable `namespace:local-name` command IDs, aliases,
+source metadata, versioned argument schema envelopes, required capabilities,
+permission requirements and broker registry references for visibility/handlers.
+`parseCommandDescriptor` rejects unknown capability, permission, predicate and
+handler references and validates each permission scope with its registered
+schema. It returns normalized scopes rather than the original unchecked data.
+
+Registration must be owned by the authenticated broker. Source metadata is not
+a principal; requirements are not grants, declared handlers are not executable
+code, and parsing never dispatches an action. The host must resolve identity,
+compile/validate argument schemas, bind reviewed handlers/predicates, classify
+effects and apply current grants and user intent before invocation. The schema
+validator is not an extension installation or command runtime.
+
 Dependency pins and licences were checked against the installed package/crate
 metadata. `bun.lock` and `Cargo.lock` retain registry integrity checksums. Zod has
 no runtime dependencies; Serde was already present in the workspace lockfile.
@@ -150,7 +167,7 @@ linuxcast-protocol`; install the locked Rust dependencies before an offline run.
 It fails if Cargo cannot execute or either language disagrees with the fixtures.
 Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets -- -D warnings`.
 
-Still to implement in F0-01: command contracts, workflow and
+Still to implement in F0-01: workflow and
 provider catalog/status/harness/storage contracts, extension envelopes, response/event/subscription lifecycle,
 trusted effect contexts and runtime enforcement of native outcome/recovery
 contracts. The overview's native request `id` and the
