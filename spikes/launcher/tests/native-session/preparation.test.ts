@@ -631,12 +631,12 @@ for (const scenario of ['two-owned-candidates', 'foreign-pid', 'class-mismatch',
 });
 
 test('owned Linux handle ABI checks every byte and rejects high/protocol bits without truncation', () => {
-  const hex = (value: bigint) => { const bytes = Buffer.alloc(8); bytes.writeBigUInt64LE(value); return bytes.toString('hex'); };
-  for (const value of [1n, 123n, 0x1fffffffn]) expect(parseOwnedX11Handle(hex(value), 'linux', 'x64', 'LE')).toBe(Number(value));
-  for (const value of ['', '00'.repeat(4), '00'.repeat(7), '00'.repeat(9), hex(0n), hex(0x20000000n), hex(0x100000001n), hex(0xffffffffffffffffn), 'synthetic-private']) {
+  const hex = (value: number) => { const bytes = Buffer.alloc(4); bytes.writeUInt32LE(value); return bytes.toString('hex'); };
+  for (const value of [1, 123, 0x1fffffff]) expect(parseOwnedX11Handle(hex(value), 'linux', 'x64', 'LE')).toBe(value);
+  for (const value of ['', '00'.repeat(3), '00'.repeat(5), '7b00000000000000', hex(0), hex(0x20000000), hex(0xffffffff), 'synthetic-private']) {
     expect(() => parseOwnedX11Handle(value, 'linux', 'x64', 'LE')).toThrow();
   }
-  for (const [platform, arch, endian] of [['darwin', 'x64', 'LE'], ['linux', 'arm64', 'LE'], ['linux', 'x64', 'BE']]) expect(() => parseOwnedX11Handle(hex(123n), platform, arch, endian)).toThrow();
+  for (const [platform, arch, endian] of [['darwin', 'x64', 'LE'], ['linux', 'arm64', 'LE'], ['linux', 'x64', 'BE']]) expect(() => parseOwnedX11Handle(hex(123), platform, arch, endian)).toThrow();
 });
 test('owned public scope is exact target and never exports private IDs or arbitrary failure data', () => {
   const value = { ...OWNED_X11_KIND, bindingObserved: false };
@@ -652,9 +652,9 @@ function ownedProductionHelpers() {
     .replaceAll('import.meta.url', JSON.stringify(new URL('check.ts', import.meta.url).href));
   return code;
 }
-async function ownedCaptureFixture(change?: 'destroyed' | 'url' | 'pid' | 'renderer' | 'preferences' | 'highbits' | 'dead' | 'expired' | 'identity' | 'session' | 'state-denied') {
+async function ownedCaptureFixture(change?: 'destroyed' | 'url' | 'pid' | 'renderer' | 'preferences' | 'highbits' | 'width' | 'dead' | 'expired' | 'identity' | 'session' | 'state-denied') {
   const calls: string[] = [], deadline = performance.now() + (change === 'expired' ? -1 : 1000);
-  const bytes = Buffer.alloc(8); bytes.writeBigUInt64LE(change === 'highbits' ? 0x10000007bn : 123n);
+  const bytes = Buffer.alloc(change === 'width' ? 8 : 4); bytes.writeUInt32LE(change === 'highbits' ? 0x2000007b : 123);
   const child = { pid: 101, exitCode: change === 'dead' ? 0 : null, signalCode: null };
   const page = { url: () => 'linuxcast://launcher/index.html', evaluate: async (callback: () => unknown) => { calls.push('renderer'); return callback(); } };
   const window = { isDestroyed: () => change === 'destroyed', getNativeWindowHandle: () => { calls.push('handle'); return bytes; },
@@ -675,10 +675,10 @@ async function ownedCaptureFixture(change?: 'destroyed' | 'url' | 'pid' | 'rende
 }
 test('actual production capture uses only the validated page-associated BrowserWindow', async () => {
   const value = await ownedCaptureFixture(); expect(value.error).toBeUndefined();
-  expect(value.result).toMatchObject({ pid: 101, xid: 123, handle: '7b00000000000000', runtime: { sandbox: true, nodeIntegration: false } });
+  expect(value.result).toMatchObject({ pid: 101, xid: 123, handle: '7b000000', runtime: { sandbox: true, nodeIntegration: false } });
   expect(value.calls).toEqual(['page-association', 'window', 'handle', 'renderer', 'dispose']);
 });
-for (const change of ['destroyed', 'url', 'pid', 'renderer', 'preferences', 'highbits', 'dead', 'expired', 'identity', 'session', 'state-denied'] as const) test(`actual page capture rejects ${change} before native observer work`, async () => {
+for (const change of ['destroyed', 'url', 'pid', 'renderer', 'preferences', 'highbits', 'width', 'dead', 'expired', 'identity', 'session', 'state-denied'] as const) test(`actual page capture rejects ${change} before native observer work`, async () => {
   const value = await ownedCaptureFixture(change); expect(value.error).toBeDefined(); expect(value.result).toBeUndefined();
   if (change === 'dead' || change === 'expired') expect(value.calls).toEqual([]);
 });
@@ -692,10 +692,10 @@ async function ownedSampleFixture(swap: 'none' | 'before' | 'after' | 'private' 
   let captures = 0, sends = 0, aborts = 0;
   const report: Record<string, unknown> = {}, trace = new NativeTrace();
   const context = { performance, nativeTrace: trace, application: app, ownedPage: {}, ownedGeneration: 1,
-    ownedBinding: { app, pid: 101, xid: 123, handle: '7b00000000000000', generation: 1, nonce: 'a'.repeat(64) },
+    ownedBinding: { app, pid: 101, xid: 123, handle: '7b000000', generation: 1, nonce: 'a'.repeat(64) },
     ownedChannel: { send: async () => { sends++; return { request: 1, launcher: own, decoy: empty, decoyActivationIssued: false, ...(swap === 'private' ? { private: 'synthetic-private-canary' } : {}) }; }, abort: () => { aborts++; } },
     captureOwnedWindow: async () => { captures++; const changed = swap === 'before' && captures === 1 || swap === 'after' && captures === 2;
-      return { pid: 101, xid: changed ? 124 : 123, handle: changed ? '7c00000000000000' : '7b00000000000000', runtime: { sandbox: true } }; },
+      return { pid: 101, xid: changed ? 124 : 123, handle: changed ? '7c000000' : '7b000000', runtime: { sandbox: true } }; },
     OwnedX11Failed: failed, report, pid: 0, parseObservation, OWNED_X11_KIND,
   };
   const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureSample = observeOwned;`);runInNewContext(program, context);

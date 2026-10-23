@@ -14,7 +14,7 @@ const same = (a, b) => a?.pid === b?.pid && a?.xid === b?.xid && a?.handle === b
 const identity = value => {
   const { pid, xid, handle } = value;
   if (!Number.isSafeInteger(pid) || pid<2 || pid>4194304 || !Number.isSafeInteger(xid) || xid<1 || xid>0x1fffffff ||
-    typeof handle!=='string' || !/^[0-9a-f]{16}$/.test(handle) || Buffer.from(handle,'hex').readBigUInt64LE()!==BigInt(xid)) throw new Error('CONTROL_IDENTITY');
+    typeof handle!=='string' || !/^[0-9a-f]{8}$/.test(handle) || Buffer.from(handle,'hex').readUInt32LE()!==xid) throw new Error('CONTROL_IDENTITY');
   return Object.freeze({pid,xid,handle});
 };
 export function pairProof(value) {

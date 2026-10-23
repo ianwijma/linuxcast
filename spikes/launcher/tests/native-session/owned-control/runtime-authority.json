@@ -3,7 +3,7 @@
   "sourceSha256": {
     "build.ts": "f06d10b58db7eed24be23ee9bafd3f7c3b3803c9c070444de41b49f65b4a9824",
     "check.ts": "c8aec03c224d6a49024fb1f74b966ed4e29b25e4b7f45a7fb721b1e8cd8d7791",
-    "protocol.ts": "11e3b69004b2dba574568a47bc8d0f69e64e1aad43e6b3ae347ac1761a5184c4",
+    "protocol.ts": "cbe8e90192821182758b2f3212bdf0e5db8e5439db374fc2cd31f5e9ff07287f",
     "run-session.py": "596e4daf195951ea95c21e0eed717cc436aacf3a088fe20f8705fbcf977431f4",
     "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
     "observer_startup.py": "e45715c19b77a21df95d46d3cb2eb3588b55aff9c4ecfe5a3265df432a62966f",

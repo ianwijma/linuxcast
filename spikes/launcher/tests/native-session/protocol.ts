@@ -278,8 +278,8 @@ export function parseOwnedX11Provenance(value: unknown) {
   return { ...OWNED_X11_KIND, bindingObserved: row.bindingObserved };
 }
 export function parseOwnedX11Handle(value: unknown, platform: unknown, architecture: unknown, endian: unknown): number {
-  if (platform !== 'linux' || architecture !== 'x64' || endian !== 'LE' || typeof value !== 'string' || !/^[0-9a-f]{16}$/.test(value)) throw new Error('OWNED_X11_ABI');
-  const raw = Buffer.from(value, 'hex').readBigUInt64LE();
-  if (raw < 1n || raw > 0x1fffffffn) throw new Error('OWNED_X11_ABI');
-  return Number(raw);
+  if (platform !== 'linux' || architecture !== 'x64' || endian !== 'LE' || typeof value !== 'string' || !/^[0-9a-f]{8}$/.test(value)) throw new Error('OWNED_X11_ABI');
+  const raw = Buffer.from(value, 'hex').readUInt32LE();
+  if (raw < 1 || raw > 0x1fffffff) throw new Error('OWNED_X11_ABI');
+  return raw;
 }

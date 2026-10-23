@@ -14,7 +14,7 @@ import { verifySources, loadProduction } from './production.mjs';
 import { validateContext } from './control.mjs';
 const sourceRoot=process.argv[2];
 if (!sourceRoot) throw new Error('FIXTURE_SOURCE_ROOT');
-const handle=xid=>{const buffer=Buffer.alloc(8);buffer.writeBigUInt64LE(BigInt(xid));return buffer.toString('hex');};
+const handle=xid=>{const buffer=Buffer.alloc(4);buffer.writeUInt32LE(xid);return buffer.toString('hex');};
 const primary={pid:101,xid:123,handle:handle(123)},aux={pid:101,xid:124,handle:handle(124)};
 const negative={rejected:true,helperCommands:0,newReplies:0,traceState:'request-written',originalBindingPreserved:true};
 const pair={sameProcess:true,twoManagedTargets:true,distinctResources:true};
@@ -36,10 +36,10 @@ for(const phase of ['capture','auxiliary','pair','positive','negative','quit','c
   assert(!JSON.stringify(result).includes('synthetic-private'));
   const index=events.indexOf(phase);if(phase!=='cleanup')assert.deepEqual(events.slice(index+1),['cleanup']);
 });
-for(const change of ['same-xid','other-pid','highbits','invalid-handle','primary-swapped'])test(`invalid ${change} cannot reach native pair metadata`,async()=>{
+for(const change of ['same-xid','other-pid','highbits','invalid-handle','wide-handle','zero-handle','primary-swapped'])test(`invalid ${change} cannot reach native pair metadata`,async()=>{
   const {io,events}=ioFixture();
   if(change==='primary-swapped'){let count=0;io.capturePrimary=async()=>{events.push('capture');return ++count===1?primary:aux;};}
-  else io.createAuxiliary=async()=>{events.push('auxiliary');return {...aux,...({'same-xid':primary,'other-pid':{pid:999},highbits:{xid:1<<30},'invalid-handle':{handle:'synthetic-private-canary'}}[change])};};
+  else io.createAuxiliary=async()=>{events.push('auxiliary');return {...aux,...({'same-xid':primary,'other-pid':{pid:999},highbits:{xid:1<<30},'invalid-handle':{handle:'synthetic-private-canary'},'wide-handle':{handle:'7b00000000000000'},'zero-handle':{xid:0,handle:'00000000'}}[change])};};
   const result=await runControl(io);assert.equal(result.diagnosticOutcome,'failed');assert(!events.includes('pair'));assert(!events.includes('positive'));
 });
 for(const field of ['helperCommands','newReplies','rejected','originalBindingPreserved','traceState'])test(`negative proof rejects forged ${field}`,()=>{
