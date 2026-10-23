@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, parseProbeMode, LIFECYCLE_SKIPPED, OWNED_X11_KIND, OWNED_X11_FAILURES, parseOwnedX11Handle, parseObservation } from './protocol.ts';
+import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities, parseProbeMode, LIFECYCLE_SKIPPED, OWNED_X11_KIND, OWNED_X11_FAILURES, parseOwnedX11Handle, parseObservation } from './protocol.ts';
 import type { Backend, NativePhase, Observation, OwnedX11Failure } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
@@ -315,8 +315,9 @@ try {
     report.explicitUiQuitExited = true;
     application = undefined;
     stage = 'fresh-launch-hidden-cli-quit'; await launch();
-    const fresh = await observed('fresh-lifecycle-native-launch', value => value.launcher.count === 1 && (!value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
-    requireNativeTarget(fresh.launcher, backend); expect(contained(fresh.launcher)).toBe(true);
+    const fresh = await observed('fresh-lifecycle-native-launch', value => value.launcher.count === 1 && (ownedRoute || !value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
+    if (ownedRoute) requireOwnedLifecycleTarget(fresh.launcher);
+    else { requireNativeTarget(fresh.launcher, backend); expect(contained(fresh.launcher)).toBe(true); }
     const second = application!.process();
     await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
     await expect.poll(async () => (await state()).visible).toBe(false);
@@ -334,10 +335,13 @@ try {
   stage = 'first-launch';
   let page = await launch();
   stage = 'native-initial-identity';
-  const initial = await observed('initial-native-launch', value => value.launcher.count === 1 && (!value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
-  requireNativeTarget(initial.launcher, backend);
-  report.initialPlacementInsideWorkArea = contained(initial.launcher);
-  if (!wayland) expect(contained(initial.launcher)).toBe(true);
+  const initial = await observed('initial-native-launch', value => value.launcher.count === 1 && (ownedRoute || !value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
+  if (ownedRoute) requireOwnedLifecycleTarget(initial.launcher);
+  else {
+    requireNativeTarget(initial.launcher, backend);
+    report.initialPlacementInsideWorkArea = contained(initial.launcher);
+    if (!wayland) expect(contained(initial.launcher)).toBe(true);
+  }
   expect(await page.evaluate(() => window.linuxcast.setAppearance('dark'))).toMatchObject({ ok: true });
   await capture('dark-launcher.png', 'dark', 'search');
   if (probeMode === 'lifecycle-only') { await lifecycleOnly(page); }
@@ -422,5 +426,9 @@ finally {
   if (diagnostic) report.nativeDiagnostic = diagnostic;
   const consumer = consumerTrace.snapshot();
   if (consumer) report.consumerRead = consumer;
+  if (ownedRoute) {
+    const geometryCapabilities = ownedGeometryCapabilities(observations.map(row => row.native.launcher));
+    if (geometryCapabilities) report.ownedTargetObserver = { ...(report.ownedTargetObserver as Record<string, unknown>), geometryCapabilities };
+  }
   writeFileSync(join(root, 'result.json'), JSON.stringify(report), { mode: 0o600 });
 }

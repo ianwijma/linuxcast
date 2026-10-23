@@ -47,7 +47,8 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
     if case.startswith('owned-') or case.startswith('valid-owned-'):
         from artifacts import OWNED_X11_KIND
         report=fallback_result('kwin-x11','lifecycle-only');backend='kwin-x11'
-        if case in ('valid-owned-complete','owned-complete-unbound','owned-complete-failure','owned-complete-decoy','owned-complete-missing-phase'):
+        cap_case=case.startswith('owned-cap-') or case.startswith('valid-owned-cap-')
+        if case in ('valid-owned-complete','owned-complete-unbound','owned-complete-failure','owned-complete-decoy','owned-complete-missing-phase') or cap_case:
             from artifacts import LIFECYCLE_PHASES
             own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':429},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
             empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}
@@ -57,6 +58,35 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
             for index,phase in enumerate(LIFECYCLE_PHASES):
                 report['observations'].append({'phase':phase,'native':{'request':index+1,'launcher':copy.deepcopy(own if phase in ('initial-native-launch','fresh-lifecycle-native-launch') else empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}})
             for name in ('dark-launcher.png','light-capabilities.png'):(root/name).write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic fixture')
+            if cap_case:
+                del report['initialPlacementInsideWorkArea']
+                capabilities={'frame':'unavailable','workArea':'unavailable'}
+                report['ownedTargetObserver']['geometryCapabilities']=capabilities
+                for row in report['observations']:
+                    window=row['native']['launcher']
+                    if window['identityMatches']:
+                        window['geometry']=None;window['workArea']=None
+                if case in ('valid-owned-cap-frame','valid-owned-cap-available','owned-cap-lie-unavailable'):
+                    capabilities['frame']='available'
+                    for row in report['observations']:
+                        if row['native']['launcher']['identityMatches']:row['native']['launcher']['geometry']=copy.deepcopy(own['geometry'])
+                if case in ('valid-owned-cap-workarea','valid-owned-cap-available','owned-cap-lie-unavailable'):
+                    capabilities['workArea']='available'
+                    for row in report['observations']:
+                        if row['native']['launcher']['identityMatches']:row['native']['launcher']['workArea']=copy.deepcopy(own['workArea'])
+                if case=='owned-cap-no-metadata':del report['ownedTargetObserver']['geometryCapabilities']
+                elif case=='owned-cap-lie-available':capabilities['frame']='available'
+                elif case=='owned-cap-lie-unavailable':capabilities['frame']='unavailable'
+                elif case=='owned-cap-private':capabilities['private']='synthetic-private-canary'
+                elif case=='owned-cap-type':capabilities['frame']=True
+                elif case=='owned-cap-placement':report['initialPlacementInsideWorkArea']=True
+                elif case=='owned-cap-unbound':report['ownedTargetObserver']['bindingObserved']=False
+                elif case=='owned-cap-wrong-route':backend='gnome-x11';report['backend']=backend
+                elif case=='owned-cap-full':report['probeMode']='full'
+                elif case=='owned-cap-hidden-initial':report['observations'][0]['native']['launcher']['hidden']=True
+                elif case=='owned-cap-visible-close':report['observations'][3]['native']['launcher']=copy.deepcopy(report['observations'][0]['native']['launcher'])
+                elif case=='owned-cap-live-quit':report['observations'][1]['native']['launcher']=copy.deepcopy(report['observations'][0]['native']['launcher'])
+                elif case=='owned-cap-zero-rect':report['observations'][0]['native']['launcher']['geometry']={'x':0,'y':0,'width':0,'height':0}
             if case=='owned-complete-unbound':report['ownedTargetObserver']['bindingObserved']=False
             elif case=='owned-complete-failure':report['ownedTargetFailure']='lifetime'
             elif case=='owned-complete-decoy':report['observations'][0]['native']['decoy']=copy.deepcopy(own)

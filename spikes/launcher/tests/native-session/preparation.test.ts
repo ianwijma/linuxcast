@@ -9,7 +9,7 @@ import { stripTypeScriptTypes } from 'node:module';
 import { EventEmitter } from 'node:events';
 import { runInNewContext } from 'node:vm';
 import { buildNativeSession } from './build.ts';
-import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, parseOwnedX11Handle, parseOwnedX11Provenance, OWNED_X11_FAILURES, OWNED_X11_KIND, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, parseOwnedX11Handle, parseOwnedX11Provenance, OWNED_X11_FAILURES, OWNED_X11_KIND, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities } from './protocol.ts';
 import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
@@ -492,7 +492,7 @@ test('prevalidation categories are capped at eight literals per enable, with no 
 
 // Run the exact diagnostic branch without importing Electron, touching the
 // filesystem or driving a desktop. Every effect is recorded; failures propagate.
-async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidden' | false = false) {
+async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidden' | false = false, ownedUnavailable = false) {
   const text = readFileSync(source('check.ts'), 'utf8');
   const begin = text.indexOf('  const lifecycleOnly = async');
   const end = text.indexOf("  stage = 'first-launch';", begin);
@@ -501,6 +501,7 @@ async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidd
   const events: string[] = [], failure = new Error('SYNTHETIC_PRIVATE_FAILURE');
   const effect = (name: string) => { events.push(name); if (name === failAt) throw failure; };
   const report: Record<string, unknown> = {}, own = { ...native(), nativeBackend: 'x11' as const };
+  if (ownedUnavailable) { own.geometry = null; own.workArea = null; }
   const empty: NativeWindow = { count: 0, identityMatches: false, nativeBackend: 'unsupported', focused: false, hidden: true, geometry: null, workArea: null };
   const child: { exitCode: number | null } = { exitCode: null };
   let count = 1, hidden = false;
@@ -512,8 +513,10 @@ async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidd
     } }),
   };
   const app = { process: () => child, evaluate: async () => { effect('close'); hidden = true; } };
-  const context = { stage: 'native-initial-identity', application: app as typeof app | undefined, pid: 101, main: '/fixed/main.cjs', backend: 'gnome-x11', report,
-    expect, requireNativeTarget, contained: () => true,
+  const context = { stage: 'native-initial-identity', application: app as typeof app | undefined, pid: 101, main: '/fixed/main.cjs', backend: ownedUnavailable ? 'kwin-x11' : 'gnome-x11', report,
+    expect, ownedRoute: ownedUnavailable, requireOwnedLifecycleTarget,
+    requireNativeTarget: ownedUnavailable ? () => { throw new Error('PLACEMENT_ASSERTION_FORBIDDEN'); } : requireNativeTarget,
+    contained: () => { if (ownedUnavailable) throw new Error('PLACEMENT_ASSERTION_FORBIDDEN'); return true; },
     process: { exitCode: undefined as number | undefined, kill: (pid: number, signal: number) => { expect([pid, signal]).toEqual([101, 0]); effect('process-live'); return true; } },
     capture: async (name: string, appearance: string, view: string) => { expect([name, appearance, view]).toEqual(['light-capabilities.png', 'light', 'capabilities']); effect('capture-light'); },
     waitForExit: async () => { effect('wait-exit'); },
@@ -619,12 +622,12 @@ for (const failure of ['fresh-identity-mismatch', 'fresh-backend-mismatch', 'clo
 });
 
 
-for (const scenario of ['two-owned-candidates', 'foreign-pid', 'class-mismatch', 'class-suffix', 'class-no-nul', 'class-extra-nul', 'class-private', 'class-nonbytes',
+for (const scenario of ['two-owned-candidates', 'two-owned-missing-frame', 'two-owned-missing-workarea', 'two-owned-missing-both', 'foreign-pid', 'class-mismatch', 'class-suffix', 'class-no-nul', 'class-extra-nul', 'class-private', 'class-nonbytes',
   'swapped-request', 'stale-generation', 'wrong-nonce', 'request-replay', 'extra-private', 'second-bind', 'boolean-generation', 'owner-dead', 'destroy-reuse',
   'identity-event', 'identity-restored', 'unmanaged', 'during-geometry-death', 'during-geometry-swap', 'bad-window-pid', 'bad-window-class', 'bad-window-watch',
   'bad-window-geometry', 'retired-absent', 'retired-reused', 'retired-stale-list', 'retired-live', 'retired-exit-bool', 'retired-identity-event', 'property-wrong-type',
   'property-wrong-format', 'property-oversize', 'property-short', 'property-tail', 'property-null', 'property-highbits', 'property-bool-count', 'property-long-stride',
-  'lease-open-first', 'lease-race-replaced', 'lease-ancestry-failed', 'lease-initial-dead', 'lease-open-failed', 'property-free-on-reject', 'event-destroy', 'event-foreign', 'event-identity', 'event-input', 'event-overflow', 'geometry-valid', 'geometry-hidden', 'geometry-extents', 'geometry-desktop-count', 'geometry-desktop-index', 'geometry-viewport',
+  'lease-open-first', 'lease-race-replaced', 'lease-ancestry-failed', 'lease-initial-dead', 'lease-open-failed', 'property-free-on-reject', 'optional-absent', 'optional-atom-absent', 'optional-wrong-type', 'optional-wrong-format', 'optional-short', 'optional-nonzero-count', 'optional-tail', 'optional-pointer', 'atoms-optional-absent', 'atoms-identity-absent', 'event-destroy', 'event-foreign', 'event-identity', 'event-input', 'event-overflow', 'geometry-valid', 'geometry-hidden', 'geometry-extents', 'geometry-desktop-count', 'geometry-desktop-index', 'geometry-viewport', 'geometry-missing-frame', 'geometry-missing-workarea', 'geometry-missing-both', 'geometry-missing-strict', 'geometry-missing-both-zero-client',
   'geometry-workarea', 'geometry-active-highbits', 'geometry-foreign-root', 'geometry-override', 'geometry-map-state', 'geometry-bad-window', 'mask-and-abi', 'guard-before-library', 'pipe-eof', 'pipe-overflow', 'pipe-private-json', 'pipe-duplicate']) test(`passive owned X11 synthetic ${scenario}`, () => {
   const child = spawnSync('/usr/bin/python3', [source('owned-x11-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000, env: { PATH: '/usr/bin:/bin', PYTHONDONTWRITEBYTECODE: '1' } });
   expect(child.status, child.stderr).toBe(0); expect(child.stdout.trim()).toBe(`owned-${scenario}-passed`);
@@ -801,7 +804,7 @@ for (const outcome of ['already-exited', 'live-close', 'close-rejected'] as cons
   const child = { exitCode: outcome === 'already-exited' ? 0 : null, kill: (signal: string) => { expect(signal).toBe('SIGKILL'); calls.push('kill'); } };
   const app = { process: () => { throw new Error('DISPOSED_DISPATCHER'); }, close: async () => { calls.push('close'); if (outcome === 'close-rejected') throw new Error('DISPOSED_DISPATCHER'); } };
   const context = { application: app, applicationChild: child, decoy: undefined, ownedChannel: { abort: () => { calls.push('abort'); } },
-    report: {} as Record<string, unknown>, probeMode: 'lifecycle-only', process: { exitCode: 3 }, profile: '/synthetic/profile', root: '/synthetic', stage: 'explicit-ui-quit',
+    report: {} as Record<string, unknown>, ownedRoute: false, probeMode: 'lifecycle-only', process: { exitCode: 3 }, profile: '/synthetic/profile', root: '/synthetic', stage: 'explicit-ui-quit',
     nativeTrace: { snapshot: () => undefined }, consumerTrace: { snapshot: () => undefined },
     rmSync: () => { calls.push('remove-profile'); }, writeFileSync: () => { calls.push('write-report'); }, join,
   };
@@ -810,4 +813,52 @@ for (const outcome of ['already-exited', 'live-close', 'close-rejected'] as cons
   expect(calls).toEqual(['abort', ...(outcome === 'already-exited' ? [] : ['close']), ...(outcome === 'close-rejected' ? ['kill'] : []), 'remove-profile', 'write-report']);
   expect(context.report.stage).toBe('explicit-ui-quit');
   if (outcome === 'close-rejected') expect(context.report).toMatchObject({ status: 'cleanup-incomplete', diagnosticOutcome: 'failed' });
+});
+
+test('owned lifecycle branch completes residency and Quit with unavailable rectangles and no placement assertion', async () => {
+  const fixture = await lifecycleBranchFixture(undefined, false, true);
+  expect(fixture.caught).toBeUndefined(); expect(fixture.count).toBe(2);
+  expect(fixture.report).toMatchObject({ closeRetainedResidentProcess: true, explicitUiQuitExited: true, hiddenCliQuitExited: true, diagnosticOutcome: 'complete', status: 'incomplete' });
+  expect(fixture.context.process.exitCode).toBe(3); expect(fixture.report).not.toHaveProperty('initialPlacementInsideWorkArea');
+});
+for (const failure of ['fresh-identity-mismatch', 'fresh-backend-mismatch', 'close-still-visible']) test(`owned geometry unavailability cannot bypass ${failure}`, async () => {
+  const fixture = await lifecycleBranchFixture(failure, false, true);
+  expect(fixture.caught).toBeDefined(); expect(fixture.report).not.toHaveProperty('lifecycleProof');
+  expect(fixture.report).not.toHaveProperty('hiddenCliQuitExited'); expect(fixture.events).not.toContain('cli-quit');
+});
+test('only the scoped owned lifecycle gate accepts missing geometry; full placement gate stays strict', () => {
+  const own = { ...native(), nativeBackend: 'x11' as const, geometry: null, workArea: null };
+  requireOwnedLifecycleTarget(own);
+  expect(() => requireNativeTarget(own, 'kwin-x11')).toThrow('OWN_NATIVE_IDENTITY_REQUIRED');
+  for (const value of [{ ...own, count: 0 }, { ...own, count: 2 }, { ...own, identityMatches: false }, { ...own, hidden: true }, { ...own, nativeBackend: 'wayland' as const }]) {
+    expect(() => requireOwnedLifecycleTarget(value)).toThrow();
+  }
+});
+test('geometry capability summary reflects only recorded known X11 observations without inventing rectangles', () => {
+  const own = { ...native(), nativeBackend: 'x11' as const };
+  const unavailable = { ...own, geometry: null, workArea: null };
+  expect(ownedGeometryCapabilities([])).toBeUndefined();
+  expect(ownedGeometryCapabilities([{ ...unavailable, identityMatches: false }])).toBeUndefined();
+  expect(ownedGeometryCapabilities([own])).toEqual({ frame: 'available', workArea: 'available' });
+  expect(ownedGeometryCapabilities([own, unavailable])).toEqual({ frame: 'unavailable', workArea: 'unavailable' });
+  expect(ownedGeometryCapabilities([{ ...own, geometry: null }])).toEqual({ frame: 'unavailable', workArea: 'available' });
+  expect(ownedGeometryCapabilities([{ ...own, workArea: null }])).toEqual({ frame: 'available', workArea: 'unavailable' });
+});
+test('owned capability metadata is fixed and rejects coercion, private fields and unbound claims', () => {
+  const value = { ...OWNED_X11_KIND, bindingObserved: true, geometryCapabilities: { frame: 'unavailable', workArea: 'available' } };
+  expect(parseOwnedX11Provenance(value)).toEqual(value);
+  const trap = { toString: () => { throw new Error('PRIVATE_COERCION_FORBIDDEN'); } };
+  for (const geometryCapabilities of [null, {}, { ...value.geometryCapabilities, private: 'synthetic-private-canary' },
+    { frame: trap, workArea: 'available' }, { frame: true, workArea: 'available' }, { frame: 'missing', workArea: 'available' }]) {
+    expect(() => parseOwnedX11Provenance({ ...value, geometryCapabilities })).toThrow();
+  }
+  expect(() => parseOwnedX11Provenance({ ...value, bindingObserved: false })).toThrow();
+});
+for (const scenario of ['valid-owned-cap-complete', 'valid-owned-cap-frame', 'valid-owned-cap-workarea', 'valid-owned-cap-available',
+  'owned-cap-no-metadata', 'owned-cap-lie-available', 'owned-cap-lie-unavailable', 'owned-cap-private', 'owned-cap-type', 'owned-cap-placement',
+  'owned-cap-unbound', 'owned-cap-wrong-route', 'owned-cap-full', 'owned-cap-hidden-initial', 'owned-cap-visible-close', 'owned-cap-live-quit', 'owned-cap-zero-rect']) test(`public lifecycle capability ${scenario}`, () => {
+  const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+  expect(child.status, child.stderr).toBe(0); const result = JSON.parse(child.stdout);
+  if (scenario.startsWith('valid-')) expect(result.strictFixtureAccepted).toBe(true);
+  else expect(result).toMatchObject({ rejectedBeforePublication: true, publishedFiles: 0 });
 });

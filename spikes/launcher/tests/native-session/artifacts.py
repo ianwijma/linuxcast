@@ -134,9 +134,15 @@ def shortcut(value,backend):
 OWNED_X11_KIND={'kind':'private-x11-ewmh-exact-owned-target','targetScope':'page-associated-browser-window','countScope':'exact-target','geometryKind':'ewmh-frame','decoy':'not-created'}
 OWNED_X11_FAILURES=('binding','abi','identity','lifetime','native-query','overflow','guard','protocol','deadline')
 def owned_x11_provenance(value):
-    object_keys(value,(*OWNED_X11_KIND,'bindingObserved'))
+    object_keys(value,(*OWNED_X11_KIND,'bindingObserved'),('geometryCapabilities',))
     for key,expected in OWNED_X11_KIND.items():exact(value[key],expected)
-    return {**OWNED_X11_KIND,'bindingObserved':boolean(value['bindingObserved'])}
+    result={**OWNED_X11_KIND,'bindingObserved':boolean(value['bindingObserved'])}
+    if 'geometryCapabilities' in value:
+        capabilities=value['geometryCapabilities'];object_keys(capabilities,('frame','workArea'))
+        if not result['bindingObserved'] or any(type(capabilities[key]) is not str or capabilities[key] not in ('available','unavailable') for key in ('frame','workArea')):
+            raise ValueError('PUBLIC_GEOMETRY_CAPABILITIES')
+        result['geometryCapabilities']={key:capabilities[key] for key in ('frame','workArea')}
+    return result
 
 LIFECYCLE_SKIPPED=['ordinary-show-native-focus','actual-x11-global-shortcut']
 LIFECYCLE_PHASES=('initial-native-launch','after-ui-quit-native-window-absent','fresh-lifecycle-native-launch','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
@@ -150,6 +156,12 @@ def lifecycle_diagnostic(value,backend):
     if value['stage'] not in ('build','first-launch','native-initial-identity','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session'): raise ValueError('PUBLIC_LIFECYCLE_STAGE')
     rows=value['observations'];phases=[row['phase'] for row in rows]
     if phases!=list(LIFECYCLE_PHASES[:len(phases)]): raise ValueError('PUBLIC_LIFECYCLE_PHASE_SEQUENCE')
+    capabilities=value.get('ownedTargetObserver',{}).get('geometryCapabilities')
+    if capabilities is not None:
+        own=[row['native']['launcher'] for row in rows if row['native']['launcher']['count']==1 and row['native']['launcher']['identityMatches'] and row['native']['launcher']['nativeBackend']=='x11']
+        expected={key:'unavailable' if any(window[field] is None for window in own) else 'available' for key,field in (('frame','geometry'),('workArea','workArea'))}
+        if backend!='kwin-x11' or not own or capabilities!=expected or 'initialPlacementInsideWorkArea' in value:
+            raise ValueError('PUBLIC_GEOMETRY_CAPABILITIES_RELATION')
     for row in rows:
         phase=row['phase'];native=row['native'];window=native['launcher']
         if native['decoyActivationIssued']: raise ValueError('PUBLIC_LIFECYCLE_ACTIVATION_FORBIDDEN')
@@ -157,10 +169,14 @@ def lifecycle_diagnostic(value,backend):
         # only a completed diagnostic may claim the strict phase proofs.
         if value['diagnosticOutcome']!='complete': continue
         if phase in ('initial-native-launch','fresh-lifecycle-native-launch'):
-            if window['count']!=1 or not window['identityMatches'] or window['nativeBackend']!='x11' or window['geometry'] is None or window['workArea'] is None:
+            if window['count']!=1 or not window['identityMatches'] or window['nativeBackend']!='x11' or capabilities is not None and window['hidden']:
                 raise ValueError('PUBLIC_LIFECYCLE_IDENTITY')
-            frame=window['geometry'];area=window['workArea']
-            if frame['x']<area['x'] or frame['y']<area['y'] or frame['x']+frame['width']>area['x']+area['width']+1 or frame['y']+frame['height']>area['y']+area['height']+1: raise ValueError('PUBLIC_LIFECYCLE_PLACEMENT')
+            # Historical/other routes retain their strict placement evidence.
+            # The explicit owned lifecycle capability variant claims only AC02.
+            if capabilities is None:
+                frame=window['geometry'];area=window['workArea']
+                if frame is None or area is None:raise ValueError('PUBLIC_LIFECYCLE_IDENTITY')
+                if frame['x']<area['x'] or frame['y']<area['y'] or frame['x']+frame['width']>area['x']+area['width']+1 or frame['y']+frame['height']>area['y']+area['height']+1: raise ValueError('PUBLIC_LIFECYCLE_PLACEMENT')
         elif phase=='fresh-resident-native-hidden':
             if not (window['count']==0 or window['hidden']): raise ValueError('PUBLIC_LIFECYCLE_HIDDEN')
         elif window['count']!=0: raise ValueError('PUBLIC_LIFECYCLE_QUIT')
@@ -177,7 +193,8 @@ def lifecycle_diagnostic(value,backend):
         if any(row['native']['decoy']!={'count':0,'identityMatches':False,'focused':False,'hidden':True,'geometry':None,'workArea':None,'nativeBackend':'unsupported'} for row in rows): raise ValueError('PUBLIC_OWNED_DECOY_FORBIDDEN')
         if value['diagnosticOutcome']=='complete' and (not value['ownedTargetObserver']['bindingObserved'] or 'ownedTargetFailure' in value): raise ValueError('PUBLIC_OWNED_TARGET_PROOF')
     if value['diagnosticOutcome']=='complete':
-        if value['status']!='incomplete' or value['stage']!='complete' or phases!=list(LIFECYCLE_PHASES) or 'runtime' not in value or 'lifecycleProof' not in value or any(value.get(flag) is not True for flag in ('closeRetainedResidentProcess','explicitUiQuitExited','hiddenCliQuitExited','initialPlacementInsideWorkArea')):
+        flags=('closeRetainedResidentProcess','explicitUiQuitExited','hiddenCliQuitExited')+(() if capabilities is not None else ('initialPlacementInsideWorkArea',))
+        if value['status']!='incomplete' or value['stage']!='complete' or phases!=list(LIFECYCLE_PHASES) or 'runtime' not in value or 'lifecycleProof' not in value or any(value.get(flag) is not True for flag in flags):
             raise ValueError('PUBLIC_LIFECYCLE_PROOF_REQUIRED')
         if trace and (trace['state']!='predicate-met' or trace['phase']!=LIFECYCLE_PHASES[-1]): raise ValueError('PUBLIC_LIFECYCLE_TRACE')
     return {key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value}

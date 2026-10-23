@@ -37,11 +37,14 @@ class Native:
     def events(self,xid):
         self.calls.append(('events',xid));result=self.queued;self.queued=[];return result
     def clients(self):self.calls.append(('clients',0));return self.members
-    def geometry(self,xid):
+    def geometry(self,xid,allow_unavailable=False):
         self.calls.append(('geometry',xid))
         if self.fail=='geometry':raise o.MissingWindow()
         if self.after_geometry:self.after_geometry()
-        return {'x':32,'y':32,'width':720,'height':429},{'x':0,'y':0,'width':1280,'height':900},False,False
+        if NAME.startswith('two-owned-missing-'):assert allow_unavailable
+        frame=None if NAME in ('two-owned-missing-frame','two-owned-missing-both') else {'x':32,'y':32,'width':720,'height':429}
+        area=None if NAME in ('two-owned-missing-workarea','two-owned-missing-both') else {'x':0,'y':0,'width':1280,'height':900}
+        return frame,area,False,False
     def close(self):self.calls.append(('closed',0))
 def fixture(bind=BIND):
     native=Native();lease=Lease();target=o.Target(native,lambda pid:lease)
@@ -53,10 +56,12 @@ def rejects(call):
     raise AssertionError('SYNTHETIC_REJECTION_REQUIRED')
 def no_geometry(native):assert not any(name=='geometry' for name,_ in native.calls)
 
-if NAME=='two-owned-candidates':
+if NAME in ('two-owned-candidates','two-owned-missing-frame','two-owned-missing-workarea','two-owned-missing-both'):
     x,lease,target=fixture();reply=target.command(dict(OBS));assert reply['launcher']['count']==1 and reply['launcher']['identityMatches']
     assert all(xid==123 for name,xid in x.calls if name in ('pid','class','geometry','watch','events'))
     assert reply['decoy']==o.empty() and not reply['decoyActivationIssued'];target.close();assert lease.closed
+    assert (reply['launcher']['geometry'] is None)==(NAME in ('two-owned-missing-frame','two-owned-missing-both'))
+    assert (reply['launcher']['workArea'] is None)==(NAME in ('two-owned-missing-workarea','two-owned-missing-both'))
 elif NAME=='foreign-pid':
     x,lease,target=fixture(None);rejects(lambda:target.bind({**BIND,'xid':125}));no_geometry(x);assert ('class',125) not in x.calls
 elif NAME in ('class-mismatch','class-suffix','class-no-nul','class-extra-nul','class-private','class-nonbytes'):
@@ -128,6 +133,40 @@ elif NAME.startswith('lease-'):
             else:assert calls[-1]==('close',88) and calls.count(('close',88))==1
             if NAME=='lease-initial-dead':assert 'ancestry' not in calls
             if NAME=='lease-race-replaced':assert calls==['open','poll-register','poll','ancestry','poll-register','poll',('close',88)]
+elif NAME.startswith('optional-'):
+    x=object.__new__(o.Xlib);x.display=1;x.error=None;x.atoms={'_NET_FRAME_EXTENTS':0 if NAME=='optional-atom-absent' else 1,'CARDINAL':2};calls=[]
+    storage=(C.c_ulong*4)(1,2,3,4)
+    class DLL:
+        def XGetWindowProperty(self,_d,_w,_p,_off,_len,_del,_req,actual,fmt,count,tail,data):
+            calls.append('read');kind=NAME.removeprefix('optional-')
+            C.cast(actual,C.POINTER(C.c_ulong))[0]=2 if kind in ('short','wrong-format') else 3 if kind=='wrong-type' else 0
+            C.cast(fmt,C.POINTER(C.c_int))[0]=8 if kind=='wrong-format' else 32 if kind in ('short','wrong-type') else 0
+            C.cast(count,C.POINTER(C.c_ulong))[0]=3 if kind=='short' else 4 if kind in ('wrong-format','wrong-type') else 1 if kind=='nonzero-count' else 0
+            C.cast(tail,C.POINTER(C.c_ulong))[0]=4 if kind=='tail' else 0
+            C.cast(data,C.POINTER(C.c_void_p))[0]=C.cast(storage,C.c_void_p).value if kind in ('pointer','short','wrong-format','wrong-type') else None
+            return 0
+        def XSync(self,*_):return 0
+        def XFree(self,_):calls.append('free')
+    x.lib=DLL()
+    query=lambda optional:x.property(123,'_NET_FRAME_EXTENTS','CARDINAL',32,4,4,optional=optional)
+    if NAME in ('optional-absent','optional-atom-absent'):
+        assert query(True) is None;rejects(lambda:query(False))
+        if NAME=='optional-atom-absent':assert calls==[]
+    else:rejects(lambda:query(True))
+    if NAME in ('optional-pointer','optional-short','optional-wrong-format','optional-wrong-type'):assert calls.count('free')==1
+elif NAME in ('atoms-optional-absent','atoms-identity-absent'):
+    missing=('_NET_FRAME_EXTENTS','_NET_WORKAREA') if NAME=='atoms-optional-absent' else ('_NET_WM_PID',)
+    class Function:
+        def __init__(self,call=lambda *_:1):self.call=call
+        def __call__(self,*args):return self.call(*args)
+    class DLL:
+        def __init__(self):self.functions={}
+        def __getattr__(self,name):
+            if name not in self.functions:self.functions[name]=Function((lambda _display,atom,_only:0 if atom.decode() in missing else 1) if name=='XInternAtom' else lambda *_:1)
+            return self.functions[name]
+    with patch.object(o.C,'CDLL',return_value=DLL()),patch.dict(o.os.environ,{'DISPLAY':':99'}):
+        if NAME=='atoms-optional-absent':x=o.Xlib();assert x.atoms['_NET_FRAME_EXTENTS']==x.atoms['_NET_WORKAREA']==0;x.close()
+        else:rejects(o.Xlib)
 elif NAME.startswith('property-') and NAME!='property-free-on-reject':
     expected=6;actual=6;fmt=32;remaining=0;count=4;maximum=4;exact=4
     longs=(C.c_ulong*4)(1,2,3,4);pointer=C.cast(longs,C.c_void_p)
@@ -177,6 +216,9 @@ elif NAME.startswith('geometry-'):
     elif mutation=='viewport':values['_NET_DESKTOP_VIEWPORT']=[1,0]
     elif mutation=='workarea':values['_NET_WORKAREA']=[0,0,0,900]
     elif mutation=='active-highbits':values['_NET_ACTIVE_WINDOW']=[1<<40]
+    if mutation.startswith('missing-'):
+        if mutation in ('missing-frame','missing-both','missing-strict','missing-both-zero-client'):values['_NET_FRAME_EXTENTS']=None
+        if mutation in ('missing-workarea','missing-both','missing-strict','missing-both-zero-client'):values['_NET_WORKAREA']=None
     class DLL:
         def XGetWindowAttributes(self,_display,window,pointer):
             assert window==123;calls.append('attributes');a=C.cast(pointer,C.POINTER(o.Attributes)).contents
@@ -185,19 +227,30 @@ elif NAME.startswith('geometry-'):
             if mutation=='override':a.override_redirect=1
             if mutation=='map-state':a.map_state=3
             if mutation=='bad-window':raise o.MissingWindow()
+            if mutation=='missing-both-zero-client':a.width=0
             return 1
         def XTranslateCoordinates(self,_display,window,root,_x,_y,xp,yp,child):
             assert window==123 and root==10;calls.append('translate');C.cast(xp,C.POINTER(C.c_int))[0]=36;C.cast(yp,C.POINTER(C.c_int))[0]=56;return 1
         def XSync(self,*_):return 0
-    def property_(window,name,type_,fmt,maximum,exact):
+    def property_(window,name,type_,fmt,maximum,exact,optional=False):
         calls.append(name);assert window==(123 if name=='_NET_FRAME_EXTENTS' else 10)
         assert fmt==32 and type_==('WINDOW' if name=='_NET_ACTIVE_WINDOW' else 'CARDINAL')
-        result=values[name];assert len(result)==exact and len(result)<=maximum;return result
+        result=values[name]
+        if result is None:
+            if optional:return None
+            raise o.Rejected('identity')
+        assert len(result)==exact and len(result)<=maximum;return result
     x.lib=DLL();x.property=property_
     if mutation in ('valid','hidden'):
         frame,area,hidden,focused=x.geometry(123)
         assert frame=={'x':32,'y':32,'width':720,'height':429} and area=={'x':0,'y':0,'width':1280,'height':900}
         assert hidden==(mutation=='hidden') and focused
+    elif mutation in ('missing-frame','missing-workarea','missing-both'):
+        frame,area,hidden,focused=x.geometry(123,allow_unavailable=True)
+        assert (frame is None)==(mutation in ('missing-frame','missing-both')) and (area is None)==(mutation in ('missing-workarea','missing-both'))
+        assert not hidden and focused
+        rejects(lambda:x.geometry(123))
+    elif mutation=='missing-both-zero-client':rejects(lambda:x.geometry(123,allow_unavailable=True));assert calls==['attributes']
     else:rejects(lambda:x.geometry(123))
     if mutation in ('foreign-root','override','map-state','bad-window'):assert calls==['attributes']
 elif NAME=='mask-and-abi':

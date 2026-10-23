@@ -73,16 +73,21 @@ class Xlib:
         self.root=int(self.lib.XDefaultRootWindow(self.display));self.fd=self.lib.XConnectionNumber(self.display)
         names=('CARDINAL','WINDOW','STRING','WM_CLASS','_NET_WM_PID','_NET_CLIENT_LIST','_NET_FRAME_EXTENTS','_NET_NUMBER_OF_DESKTOPS','_NET_CURRENT_DESKTOP','_NET_WORKAREA','_NET_DESKTOP_VIEWPORT','_NET_ACTIVE_WINDOW')
         self.atoms={name:int(self.lib.XInternAtom(self.display,name.encode(),1)) for name in names}
-        require(all(self.atoms.values()),'native-query')
+        # These two optional geometry capabilities may be absent on a bare
+        # private KWin session. Identity/lifetime properties remain mandatory.
+        require(all(self.atoms[name] for name in names if name not in ('_NET_FRAME_EXTENTS','_NET_WORKAREA')),'native-query')
     def checked(self,call):
         self.error=None;result=call();self.lib.XSync(self.display,0)
         if self.error==3:raise MissingWindow()
         require(self.error is None,'native-query');return result
-    def property(self,window,name,type_,fmt,maximum,exact=None):
+    def property(self,window,name,type_,fmt,maximum,exact=None,optional=False):
+        if optional and not self.atoms[name]:return None
+        require(bool(self.atoms[name]),'native-query')
         actual=C.c_ulong();format_=C.c_int();count=C.c_ulong();remaining=C.c_ulong();data=C.c_void_p()
         try:
             result=self.checked(lambda:self.lib.XGetWindowProperty(self.display,window,self.atoms[name],0,maximum if fmt==32 else (maximum+3)//4,0,self.atoms[type_],C.byref(actual),C.byref(format_),C.byref(count),C.byref(remaining),C.byref(data)))
             require(result==0,'native-query')
+            if optional and actual.value==0 and format_.value==0 and count.value==0 and remaining.value==0 and not data:return None
             return decode_property(actual.value,format_.value,count.value,remaining.value,data,self.atoms[type_],fmt,maximum,exact)
         finally:
             if data:self.lib.XFree(data)
@@ -102,19 +107,26 @@ class Xlib:
     def pid(self,window):return self.property(window,'_NET_WM_PID','CARDINAL',32,1,1)[0]
     def class_(self,window):return self.property(window,'WM_CLASS','STRING',8,256)
     def clients(self):return self.property(self.root,'_NET_CLIENT_LIST','WINDOW',32,128)
-    def geometry(self,window):
+    def geometry(self,window,allow_unavailable=False):
         attributes=Attributes();require(self.checked(lambda:self.lib.XGetWindowAttributes(self.display,window,C.byref(attributes)))!=0,'native-query')
         require(attributes.root==self.root and attributes.class_==1 and attributes.override_redirect==0 and attributes.border_width==0 and attributes.map_state in (0,1,2),'native-query')
-        left,right,top,bottom=self.property(window,'_NET_FRAME_EXTENTS','CARDINAL',32,4,4)
-        require(all(number<=65536 for number in (left,right,top,bottom)),'native-query')
+        require(0<attributes.width<=65536 and 0<attributes.height<=65536,'native-query')
+        extents=self.property(window,'_NET_FRAME_EXTENTS','CARDINAL',32,4,4,optional=allow_unavailable)
+        if extents is not None:require(all(number<=65536 for number in extents),'native-query')
         x=C.c_int();y=C.c_int();child=C.c_ulong()
         require(self.checked(lambda:self.lib.XTranslateCoordinates(self.display,window,self.root,0,0,C.byref(x),C.byref(y),C.byref(child)))!=0,'native-query')
-        frame={'x':x.value-left,'y':y.value-top,'width':attributes.width+left+right,'height':attributes.height+top+bottom}
+        require(abs(x.value)<=65536 and abs(y.value)<=65536,'native-query')
+        frame=None
+        if extents is not None:
+            left,right,top,bottom=extents
+            frame={'x':x.value-left,'y':y.value-top,'width':attributes.width+left+right,'height':attributes.height+top+bottom}
         desktops=self.property(self.root,'_NET_NUMBER_OF_DESKTOPS','CARDINAL',32,1,1)[0];require(1<=desktops<=64,'native-query')
         current=self.property(self.root,'_NET_CURRENT_DESKTOP','CARDINAL',32,1,1)[0];require(current<desktops,'native-query')
         viewport=self.property(self.root,'_NET_DESKTOP_VIEWPORT','CARDINAL',32,128,2*desktops);require(viewport[2*current:2*current+2]==[0,0],'native-query')
-        areas=self.property(self.root,'_NET_WORKAREA','CARDINAL',32,256,4*desktops);area=dict(zip(('x','y','width','height'),areas[4*current:4*current+4]))
+        areas=self.property(self.root,'_NET_WORKAREA','CARDINAL',32,256,4*desktops,optional=allow_unavailable)
+        area=None if areas is None else dict(zip(('x','y','width','height'),areas[4*current:4*current+4]))
         for rectangle in (frame,area):
+            if rectangle is None:continue
             require(all(type(v) is int and abs(v)<=65536 for v in rectangle.values()) and rectangle['width']>0 and rectangle['height']>0,'native-query')
         active=self.property(self.root,'_NET_ACTIVE_WINDOW','WINDOW',32,1,1)[0];require(0<=active<=0x1fffffff,'native-query')
         return frame,area,attributes.map_state!=2,active==window
@@ -185,7 +197,7 @@ class Target:
         else:
             require(not self.invalid,'lifetime');self.identity()
             require(self.managed or self.xid in self.x.clients(),'native-query')
-            frame,area,hidden,focused=self.x.geometry(self.xid)
+            frame,area,hidden,focused=self.x.geometry(self.xid,allow_unavailable=True)
             require(self.managed or not hidden,'native-query');self.managed=True
             self.events();require(not self.invalid,'lifetime');self.identity()
             launcher={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':focused,'hidden':hidden,'geometry':frame,'workArea':area}

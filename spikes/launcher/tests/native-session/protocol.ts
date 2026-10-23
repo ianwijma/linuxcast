@@ -175,6 +175,18 @@ export function requireNativeTarget(window: NativeWindow, backend: Backend) {
   if (window.count !== 1 || !window.identityMatches || !window.geometry || !window.workArea) throw new Error('OWN_NATIVE_IDENTITY_REQUIRED');
   if (window.nativeBackend !== (backend.endsWith('wayland') ? 'wayland' : 'x11')) throw new Error('NATIVE_BACKEND_MISMATCH');
 }
+/** AC02's private exact-owned lifecycle route makes no placement claim. */
+export function requireOwnedLifecycleTarget(window: NativeWindow) {
+  if (window.count !== 1 || !window.identityMatches || window.hidden) throw new Error('OWN_NATIVE_IDENTITY_REQUIRED');
+  if (window.nativeBackend !== 'x11') throw new Error('NATIVE_BACKEND_MISMATCH');
+}
+export type GeometryCapabilities = { frame: 'available' | 'unavailable'; workArea: 'available' | 'unavailable' };
+export function ownedGeometryCapabilities(windows: NativeWindow[]): GeometryCapabilities | undefined {
+  const own = windows.filter(window => window.count === 1 && window.identityMatches && window.nativeBackend === 'x11');
+  if (!own.length) return undefined;
+  return { frame: own.some(window => window.geometry === null) ? 'unavailable' : 'available',
+    workArea: own.some(window => window.workArea === null) ? 'unavailable' : 'available' };
+}
 export function contained(window: NativeWindow): boolean {
   const r = window.geometry, a = window.workArea;
   return !!r && !!a && r.x >= a.x && r.y >= a.y && r.x + r.width <= a.x + a.width + 1 && r.y + r.height <= a.y + a.height + 1;
@@ -272,10 +284,17 @@ export type OwnedX11Failure = typeof OWNED_X11_FAILURES[number];
 export const OWNED_X11_KIND = { kind: 'private-x11-ewmh-exact-owned-target', targetScope: 'page-associated-browser-window',
   countScope: 'exact-target', geometryKind: 'ewmh-frame', decoy: 'not-created' } as const;
 export function parseOwnedX11Provenance(value: unknown) {
-  const row = object(value); keys(row, [...Object.keys(OWNED_X11_KIND), 'bindingObserved']);
+  const row = object(value); keys(row, [...Object.keys(OWNED_X11_KIND), 'bindingObserved'], ['geometryCapabilities']);
   for (const [key, expected] of Object.entries(OWNED_X11_KIND)) if (row[key] !== expected) throw new Error('OWNED_X11_SCHEMA');
   if (typeof row.bindingObserved !== 'boolean') throw new Error('OWNED_X11_SCHEMA');
-  return { ...OWNED_X11_KIND, bindingObserved: row.bindingObserved };
+  let geometryCapabilities: GeometryCapabilities | undefined;
+  if ('geometryCapabilities' in row) {
+    const capabilities = object(row.geometryCapabilities); keys(capabilities, ['frame', 'workArea']);
+    if (!row.bindingObserved || typeof capabilities.frame !== 'string' || !['available', 'unavailable'].includes(capabilities.frame)
+      || typeof capabilities.workArea !== 'string' || !['available', 'unavailable'].includes(capabilities.workArea)) throw new Error('OWNED_X11_SCHEMA');
+    geometryCapabilities = { frame: capabilities.frame as GeometryCapabilities['frame'], workArea: capabilities.workArea as GeometryCapabilities['workArea'] };
+  }
+  return { ...OWNED_X11_KIND, bindingObserved: row.bindingObserved, ...(geometryCapabilities ? { geometryCapabilities } : {}) };
 }
 export function parseOwnedX11Handle(value: unknown, platform: unknown, architecture: unknown, endian: unknown): number {
   if (platform !== 'linux' || architecture !== 'x64' || endian !== 'LE' || typeof value !== 'string' || !/^[0-9a-f]{8}$/.test(value)) throw new Error('OWNED_X11_ABI');

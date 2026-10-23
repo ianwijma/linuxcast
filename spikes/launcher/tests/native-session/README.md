@@ -59,3 +59,37 @@ Primary source/API evidence (reviewed22 October2026 UTC): [Mutter48 window APIs]
 A separately reviewed decoy-only correction sets the fixed expected program name before importing GTK or constructing the application. GTK3.24.49 [creates the Wayland xdg app_id from g_get_prgname](https://github.com/GNOME/gtk/blob/3.24.49/gdk/wayland/gdkwindow-wayland.c#L2053-L2059); its later [GTK application metadata](https://github.com/GNOME/gtk/blob/3.24.49/gdk/wayland/gdkwindow-wayland.c#L4966-L5013) is a separate channel. The existing exact-ID observers are unchanged. Python syntax/diff checks and all58 offline preparation checks pass (3.15s); no native rerun has yet established whether this resolves the observed KWin decoy mismatch. Earlier failure evidence remains intact.
 
 The exact signed7c decoy-only snapshot then ran once on actual isolated KWin6.3.6 Wayland, exit0: exact native identities/backend, resident/singleton/quit behavior and ordinary-show focus pass. Placement remains component-required, and portal consent/effective binding is unproven. All23 input hashes and both correct dark/light CDP images were independently reviewed. See [the separate result](../../evidence/native-session/kwin-wayland-decoy-identity/README.md); previous identity failures remain unchanged. The immutable archive excluded later GNOME work, and the guest was released clean after source/cache removal. This establishes no physical/full-session acceptance.
+
+## Lifecycle-only unavailable geometry
+
+The `kwin-x11 --probe-mode lifecycle-only` diagnostic tests S0-01 AC02: resident
+Close, explicit UI Quit and hidden CLI Quit. Its exact page-associated primary,
+PID/class checks, managed membership, pidfd lifetime, generation/nonce, event
+race checks, hidden state, successful exit and native absence remain required.
+This mode does not test focus, shortcut or placement and always returns
+`incomplete`/exit3, including when its selected lifecycle checks complete.
+
+A bare private KWin session can omit `_NET_FRAME_EXTENTS` and `_NET_WORKAREA`.
+Only genuinely absent properties become `null` rectangles in this route. Wrong
+types, formats, lengths, trailing bytes, native errors, invalid client dimensions
+and identity/lifetime failures remain terminal. No zero extents, screen-sized
+work area or client-to-frame substitution is invented. Strict geometry callers
+still reject missing properties; the full native/focus/placement probes and
+GNOME/Wayland observation paths retain their original requirements.
+
+`ownedTargetObserver.geometryCapabilities` reports `frame` and `workArea` as
+`available` or `unavailable`, derived from the recorded known-X11 phase
+observations. Each capability is unavailable if any such recorded rectangle is
+null. The publisher checks this relation, binds it to the exact-owned lifecycle
+route and rejects placement claims in this variant. Non-null geometry remains
+an EWMH frame; the existing `geometryKind` describes that source rather than
+claiming that a rectangle was available. Historical reports without capability
+metadata retain their original strict geometry and placement validation.
+
+Synthetic tests exercise the actual typed property/geometry methods, target
+state machine, lifecycle branch and publication boundary. They do not establish
+native lifecycle acceptance. Independent source review and42 changed checks pass, alongside396 total
+preparation checks and31 runner/32 control fixtures. An actual target run is
+still required; full session, accessibility and release gates
+remain outstanding. Applicable design sections are Shell/navigation,
+Accessibility and Review gate; no product UI or canonical tokens change here.
