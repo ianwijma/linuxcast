@@ -31,3 +31,10 @@ it.each([
 ])('rejects invalid declarations and unknown broker references %#', value => {
   expect(() => parseCommandDescriptor(value, registry)).toThrow(ContractError);
 });
+
+it('preserves registered scalar, array and scopeless permission requirements', () => {
+  const permissions = new Map<string, z.ZodType>([['synthetic.scalar', z.literal('synthetic')],
+    ['synthetic.array', z.array(z.string()).min(1)], ['synthetic.none', z.undefined()]]);
+  const requirements = [{ id: 'synthetic.scalar', scope: 'synthetic' }, { id: 'synthetic.array', scope: ['synthetic'] }, { id: 'synthetic.none' }];
+  expect(parseCommandDescriptor({ ...command, permissionRequirements: requirements }, { ...registry, permissions }).permissionRequirements).toEqual(requirements);
+});

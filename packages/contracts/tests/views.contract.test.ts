@@ -18,7 +18,7 @@ it.each([
   form,
   { ...base, kind: 'text', text: 'Synthetic', editable: true, actions, submitActionId: action.id },
   { ...base, kind: 'image', source: asset, description: 'Synthetic image' },
-  { ...base, kind: 'pdf', source: { kind: 'file', fileRef: { id: 'synthetic-grant' } } },
+  { ...base, kind: 'pdf', source: { kind: 'file', fileRef: { kind: 'file', grantId: 'synthetic-grant', entryId: 'synthetic-entry', displayName: 'Synthetic' } } },
 ])('round-trips declarative $kind snapshots through bounded framing', value => {
   const expected = parseContract(viewModelSchema, value); let actual: unknown;
   const decoder = new FrameDecoder(); decoder.push(encodeFrame(value), decoded => { actual = parseContract(viewModelSchema, decoded); }); decoder.finish();
@@ -34,7 +34,7 @@ it.each([
   { ...list, selectedId: 'absent' },
   { ...list, sections: [{ id: 'a', items: [item, item] }] },
   { ...list, sections: [{ id: 'a', items: [] }, { id: 'a', items: [] }] },
-  { ...list, sections: [{ id: 'a', items: [{ ...item, icon: { kind: 'file', fileRef: { id: 'fixture', path: '/synthetic-only' } } }] }] },
+  { ...list, sections: [{ id: 'a', items: [{ ...item, icon: { kind: 'file', fileRef: { kind: 'file', grantId: 'synthetic-grant', entryId: 'synthetic-entry', displayName: 'Synthetic', path: '/synthetic-only' } } }] }] },
   { ...list, sections: [{ id: 'a', items: [{ ...item, actions: [{ ...action, handler: 'synthetic-only' }] }] }] },
   { ...base, kind: 'image', source: { kind: 'asset', url: 'https://synthetic.invalid/picture' }, description: 'Synthetic' },
   { ...base, kind: 'pdf', source: { kind: 'file', fileRef: { path: '/synthetic-only' } } },
@@ -64,6 +64,15 @@ it('bounds UTF-8 field bytes while preserving the exact limit', () => {
 it('accepts secret fields only without a published value and file fields only by opaque reference', () => {
   expect(() => parseContract(viewModelSchema, { ...form, fields: [
     { id: 'secret', title: 'Secret', required: true, kind: 'secret' },
-    { id: 'file', title: 'File', required: true, kind: 'file', value: { id: 'synthetic-file-reference' } },
+    { id: 'file', title: 'File', required: true, kind: 'file', value: { kind: 'file', grantId: 'synthetic-grant', entryId: 'synthetic-entry', displayName: 'Synthetic' } },
   ] })).not.toThrow();
+});
+
+it('keeps application picker references distinct from file grants', () => {
+  const field = { id: 'application', title: 'Application', required: true, kind: 'application',
+    value: { kind: 'application', id: 'synthetic.desktop', displayName: 'Synthetic' } };
+  expect(() => parseContract(viewModelSchema, { ...form, fields: [field] })).not.toThrow();
+  expect(() => parseContract(viewModelSchema, { ...form, fields: [{ ...field,
+    value: { kind: 'file', grantId: 'synthetic-grant', entryId: 'synthetic-entry', displayName: 'Synthetic' },
+  }] })).toThrow(ContractError);
 });

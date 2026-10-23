@@ -5,13 +5,12 @@ import { ContractError, parseContract } from './protocol.ts';
 
 const id = z.string().min(1);
 const uniqueIds = z.array(id).refine(values => new Set(values).size === values.length);
-const jsonObject = jsonValueSchema.refine(value => value !== null && typeof value === 'object' && !Array.isArray(value));
 /** A registry ID uses namespace:local-name. It does not authenticate its source. */
 export const commandDescriptorSchema = z.strictObject({
   protocolVersion: z.literal(1), id: z.string().regex(/^[^\s:]+:[^\s:]+$/u), title: id,
   aliases: z.array(z.string()), source: z.strictObject({ kind: z.enum(['builtin', 'extension', 'workflow']), id }),
   argumentSchema: versionedJsonSchemaSchema, requiredCapabilities: uniqueIds,
-  permissionRequirements: z.array(z.strictObject({ id, scope: jsonObject })),
+  permissionRequirements: z.array(z.strictObject({ id, scope: jsonValueSchema.optional() })),
   visibilityPredicateId: id, actionHandlerId: id,
 }).refine(value => new Set(value.permissionRequirements.map(permission => permission.id)).size === value.permissionRequirements.length);
 export type CommandDescriptor = z.infer<typeof commandDescriptorSchema>;
@@ -34,6 +33,6 @@ export function parseCommandDescriptor(value: unknown, registry: CommandContract
     const schema = registry.permissions.get(permission.id);
     if (!schema) throw new ContractError('Unknown command permission.');
     const scope = parseContract(schema, permission.scope);
-    return { id: permission.id, scope: parseContract(jsonObject, scope) };
+    return scope === undefined ? { id: permission.id } : { id: permission.id, scope: parseContract(jsonValueSchema, scope) };
   }) };
 }

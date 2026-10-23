@@ -1,12 +1,11 @@
 import * as z from 'zod';
+import { uiTextSchema as text } from './scalars.ts';
+import { fileReferenceSchema, applicationReferenceSchema } from './resources.ts';
+export { fileReferenceSchema } from './resources.ts';
 
-const encoder = new TextEncoder();
-/** Per-field UTF-8 limit from the declarative extension protocol. */
-const text = z.string().refine(value => encoder.encode(value).byteLength <= 64 * 1024);
 const id = text.min(1);
 const revision = z.number().int().nonnegative();
 /** IDs are resolved by the broker against the authenticated session's grants. */
-export const fileReferenceSchema = z.strictObject({ id });
 export const assetReferenceSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('asset'), assetId: id }),
   z.strictObject({ kind: z.literal('file'), fileRef: fileReferenceSchema }),
@@ -46,7 +45,7 @@ export const formFieldSchema = z.discriminatedUnion('kind', [
     options: z.array(z.strictObject({ label: text, value: text })).min(1) }),
   z.strictObject({ ...field, kind: z.literal('file'), value: fileReferenceSchema.nullable() }),
   z.strictObject({ ...field, kind: z.literal('directory'), value: fileReferenceSchema.nullable() }),
-  z.strictObject({ ...field, kind: z.literal('application'), value: fileReferenceSchema.nullable() }),
+  z.strictObject({ ...field, kind: z.literal('application'), value: applicationReferenceSchema.nullable() }),
 ]).superRefine((value, context) => {
   if (value.kind === 'enum' && (new Set(value.options.map(option => option.value)).size !== value.options.length ||
     (value.value !== null && !value.options.some(option => option.value === value.value)))) {

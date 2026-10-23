@@ -146,6 +146,45 @@ compile/validate argument schemas, bind reviewed handlers/predicates, classify
 effects and apply current grants and user intent before invocation. The schema
 validator is not an extension installation or command runtime.
 
+
+## Extension transport
+
+`src/extensions.ts` defines versioned request, mutually exclusive terminal
+response and subscription-event envelopes, plus the five declarative view event
+variants. Requests validate against broker-owned session and method registries;
+replies bind request/session/method and validate completed results using the
+registered result schema. Event payloads bind to an existing subscription's
+request/session/method and schema. Parsed defaults/normalization are preserved.
+Cancellation is distinct from success and cannot request automatic retry.
+
+These are Node extension-host contracts, not messages consumed by Rust native
+helpers. Claimed session/package identity cannot authenticate a principal or
+grant access. The connection owner must track outstanding invocations, accept
+one terminal, enforce deadlines/default policy and sequence rules, cancel
+subscriptions/close handles/expire leases on disconnect and require a fresh
+handshake on reconnect. View events require current view/revision/item/form
+validation before effects. Parser fixtures do not prove that runtime enforcement
+or an actual sandboxed extension host is implemented.
+
+
+## Shared settings and resource references
+
+`src/settings.ts` defines all eight setting kinds and permission requests shared
+by native extensions and workflows. Defaults must match their types, bounds and
+listed enum options; secret and file/directory/application defaults are rejected.
+Text length bounds count Unicode code points. Pattern strings remain data for a
+bounded host validator, not executable validators supplied by a package.
+`parsePermissionRequest` uses the host's permission-specific scope schema and
+returns normalized scope data. It never creates a grant.
+
+`src/resources.ts` follows the normative workflow `FileRef` shape: explicit file
+kind, opaque grant/entry IDs, display name and optional presentation-only path.
+Application references have their own explicit kind. Declarative views reuse
+these references. This corrects the earlier provisional id-only file reference
+before freeze; there are no integrated version1 consumers to migrate. Actual
+file resolution, race checks, grant ownership and application lookup remain
+broker obligations; display paths do not authorize access.
+
 Dependency pins and licences were checked against the installed package/crate
 metadata. `bun.lock` and `Cargo.lock` retain registry integrity checksums. Zod has
 no runtime dependencies; Serde was already present in the workspace lockfile.
@@ -168,11 +207,13 @@ It fails if Cargo cannot execute or either language disagrees with the fixtures.
 Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets -- -D warnings`.
 
 Still to implement in F0-01: workflow and
-provider catalog/status/harness/storage contracts, extension envelopes, response/event/subscription lifecycle,
-trusted effect contexts and runtime enforcement of native outcome/recovery
-contracts. The overview's native request `id` and the
+provider catalog/status/harness/storage contracts, extension manifests and
+remaining lifecycle contracts, and trusted effect contexts. Runtime enforcement
+of these contracts belongs to the consuming brokers, hosts and adapters; this
+freeze defines the schemas, compatibility fixtures and required obligations,
+not running OS/provider effects. The overview's native request `id` and the
 extension transport's `requestId`/`sessionId` envelopes are separate contracts;
-this increment implements the former. No runtime dispatch, permissions, native
+both have distinct versioned schemas in this package. No runtime dispatch, permissions, native
 effect, credentials, UI or automatic reconnection is implemented here.
 
 The coordinator owns contract changes and shared dependency files. A schema change

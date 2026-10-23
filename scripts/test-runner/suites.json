@@ -12,7 +12,9 @@
       "packages/contracts/tests/ai.contract.test.ts",
       "packages/contracts/tests/ai-request.contract.test.ts",
       "packages/contracts/tests/views.contract.test.ts",
-      "packages/contracts/tests/commands.contract.test.ts"
+      "packages/contracts/tests/commands.contract.test.ts",
+      "packages/contracts/tests/extensions.contract.test.ts",
+      "packages/contracts/tests/settings.contract.test.ts"
     ],
     "S0-05": [
       "spikes/ai/provider.contract.test.ts",
