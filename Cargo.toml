@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["scripts/test-runner/native"]
+members = ["scripts/test-runner/native", "native/protocol"]
 
 [workspace.package]
 edition = "2024"

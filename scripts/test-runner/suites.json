@@ -7,6 +7,9 @@
     ]
   },
   "contracts": {
+    "F0-01": [
+      "packages/contracts/tests/protocol.contract.test.ts"
+    ],
     "S0-05": [
       "spikes/ai/provider.contract.test.ts",
       "spikes/ai/oauth.contract.test.ts"
