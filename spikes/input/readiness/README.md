@@ -2,15 +2,22 @@
 
 This engineering module creates **selection proposals, never capture readiness or
 consent**. It has no CLI, device-open/grab/uinput/worker/Arm operation, input stream,
-service installer, permission change, or positive eligibility path. No actual
-udev metadata, keyboard, session, companion or bus has been queried for this
-increment. AC01/AC02 remain pending. Existing manufactured-device guards and
+service installer, permission change, or positive eligibility path. Separate reviewed private metadata observations have completed while the source
+was unsigned; aggregate values/rows/private evidence are not published here.
+Their four capture/consent/device/worker flags remain false and the authenticated
+companion is unavailable. They establish neither complete/error-free hardware
+inspection, device absence nor capture eligibility. See GUARDIAN.md for the
+source/unit provenance and still-pending acceptance gates. AC01/AC02 remain pending. Existing manufactured-device guards and
 native sources are unchanged.
 
 `UdevMetadata.scan()` lazily loads only the fixed amd64 system libudev. It uses
 input/keyboard enumeration and fixed device properties/sysfs attributes, requires
-initialized devices with the current `seat` tag, and closes all owned libudev
-references. It never opens the returned devnode. C strings, device counts and
+positively initialized devices with the current `seat` tag, and closes all
+owned libudev references. Public exact zero from either check excludes only that
+device: it may represent an ordinary false or a collapsed internal error, so it
+is not an error-free classification. Explicit negative/unexpected values
+invalidate the snapshot. Counts cover positively qualified metadata only, never
+all hardware, complete discovery, absence of keyboards or capture readiness. It never opens the returned devnode. C strings, device counts and
 elapsed scan observations are capped. Importing either module has no metadata
 effect. Fixed launch environment: `LC_ALL=C.UTF-8`, `LANG=C.UTF-8`,
 `PATH=/usr/bin:/bin`, and **no other entries**, checked before loading libraries.
@@ -22,7 +29,11 @@ paths, pointer/touch/tablet/game-controller/switch or mixed metadata, unknown
 transport/identity, wrong seats and missing keyboard/emergency-chord capability
 bits. Eligible transport categories are USB, Bluetooth and i8042 only. Missing
 ID_SEAT maps to seat0 following logind's default, **not** evidence of an active
-authorized session. Duplicate syspath/devnode/device numbers invalidate the scan.
+authorized session. Duplicate enumerated paths invalidate the adapter, including skipped entries;
+duplicate returned syspath/devnode/device numbers invalidate the catalog before
+other pure filters. All128 inspected entries, including non-event and zero-check
+entries, count toward the adapter bound; skipped devices still unref and advance
+exactly once, without downstream metadata reads.
 The private fingerprint includes the exact current node/path/number and metadata;
 reconnect/replacement is not automatically approved.
 
@@ -31,11 +42,12 @@ server-owned connection generation, monotonic expiry and an `alive()` callback.
 The parent must already retain and authenticate the accepted kernel peer/pidfd and
 transport, derive the UID from it, and ensure `alive()` checks that retained
 lifetime. This module does not implement that adapter, accept a claimed PID/UID,
-or prove actual kernel authentication. This is an ordinary trusted in-process
-engineering API, not a generic IPC endpoint. Dependency/source/clock injection is
+or prove actual kernel authentication. The dedicated guardian supplies a
+separately reviewed kernel-bound parent; that does not make this standalone seam
+a generic IPC endpoint. Dependency/source/clock injection is
 for the trusted parent and fixtures only. No caller-selected source/library/path
-exists on a wire. Actual use awaits separate review of the dedicated parent
-wrapper and its authentic kernel binding.
+exists on a wire. Every actual invocation still requires its separately reviewed source authority
+and bounded wrapper; standalone metadata proposals do not grant capture.
 
 The catalog's random secret and enumeration generation yield ephemeral opaque
 tokens. The only untrusted proposal fields are token and generation; extra
@@ -60,10 +72,11 @@ the original exception payload.
 
 The adapter's elapsed checks are fail-closed observations after fixed libudev
 calls, **not an independent preemption guarantee** for a stalled library/kernel.
-A future reviewed dedicated process must establish no-core/minimal environment,
-fixed source/library authority, an independent overall deadline and own-child
-cleanup before any actual metadata invocation. It must not enable capture. There
-is no wrapper or actual-use authorization in this patch.
+The dedicated guardian source and its previous independently reviewed outcomes
+are documented in GUARDIAN.md. Every new source authority requires independent
+review and a separately authorized bounded invocation; this v4 source change
+authorizes no actual metadata use or capture. Its1s adapter/2s query/5s total
+guardian/8s outer/2s cleanup bounds stay unchanged.
 
 Run local fixtures with `python3 -B -m unittest -v test_readiness` from this
 directory. The tests exercise the production filters/catalog, fixed ctypes
@@ -76,8 +89,9 @@ fixed libudev metadata functions. Fixtures retain public synthetic names only.
 
 The initial17 local tests passed, then coordinator review found the Python locale
 startup mismatch; the exact minimal environment and actual startup regression
-correct it. No failed live operation was retried. Final checks/results accompany
-the frozen handoff; no hardware/native or physical acceptance is inferred.
+correct it. Those checks are synthetic startup/metadata fixtures. Historical
+source and first outcomes remain preserved; no hardware/native or physical
+acceptance is inferred.
 
 Actual platform compatibility remains unproved here. Previously observed host
 Pop!_OS22.04/GNOME42/systemd249 differs from Debian13/GNOME48/Plasma6.3. The current
@@ -96,3 +110,22 @@ the coordinator.
 Primary API references: [systemd257 libudev device source](https://raw.githubusercontent.com/systemd/systemd/v257/src/libudev/libudev-device.c),
 [libudev enumeration](https://www.freedesktop.org/software/systemd/man/257/udev_enumerate_scan_devices.html),
 [logind seat default](https://raw.githubusercontent.com/systemd/systemd/v257/src/login/logind-core.c).
+
+## V4 qualification and preserved execution history
+
+The original signed7e version of this README, adapter and test_readiness.py is
+preserved byte-for-byte in private source history, with their literal commit/hash
+provenance recorded. These THREE files are new unsigned deltas; only
+readiness.py and checks.json remain byte-identical signed7e files. Historical
+checks and real/fake results remain unchanged; later signing cannot rewrite
+then-unsigned execution provenance. The old initialized0 test expectation is
+explicitly superseded by the reviewed per-device rule; its private/scan/string
+error assertions remain, with a positive zero-exclusion/cleanup assertion added.
+The standard unfiltered suites plus new test_per_device.py cover this behavior;
+no replacement test runner/subclass or silent exclusion is used.
+
+The underlying libudev249/257 implementations can collapse internal current-tag
+errors to0; initialized can likewise expose0 with errno. This module adds no
+errno query/API or tag filter to force diagnosis. Any zero result omits that
+device, while each remaining candidate must pass every original positive guard.
+This is conservative candidacy, not global inspection success.

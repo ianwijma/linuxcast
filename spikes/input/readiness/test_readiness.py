@@ -233,12 +233,18 @@ class UdevChecks(unittest.TestCase):
         self.assertEqual(self.calls, ["device-unref", "enumeration-unref", "context-unref"])
 
     def test_udev_failures_and_bounded_strings_never_echo_private(self):
-        for options in ({"private": True}, {"scan_error": True}, {"initialized": False}):
+        for options in ({"private": True}, {"scan_error": True}):
             factory = self.fake(**options)
             with patch.dict(os.environ, U.ENVIRONMENT, clear=True), patch.object(U.C, "CDLL", side_effect=factory):
                 with self.assertRaisesRegex(R.Unavailable, "^READINESS_METADATA_UNAVAILABLE$"):
                     U.UdevMetadata().scan()
             self.assertEqual(self.calls[-2:], ["enumeration-unref", "context-unref"])
+        # v4: public zero is not positively qualified (possibly a collapsed
+        # error), so only that device is excluded. This is not absence proof.
+        factory = self.fake(initialized=False)
+        with patch.dict(os.environ, U.ENVIRONMENT, clear=True), patch.object(U.C, "CDLL", side_effect=factory):
+            self.assertEqual(U.UdevMetadata().scan(), ())
+        self.assertEqual(self.calls, ["device-unref", "enumeration-unref", "context-unref"])
 
     def test_environment_rejected_before_loading_library(self):
         for env in ({}, {**U.ENVIRONMENT, "PRIVATE_LOG_ADDRESS": "PRIVATE_CANARY"},
