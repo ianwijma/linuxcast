@@ -1622,3 +1622,12 @@ fn tracker_cases() {
     t.ingest(&mut s, replacement, 110);
     assert_eq!(s.veto(110), Some(Veto::InvalidObservation));
 }
+
+// Root-only own-process test; excluded from every production binary.
+#[cfg(test)]
+#[path = "../tests/support/root-parent-death.rs"]
+mod root_parent_death;
+#[cfg(test)]
+pub fn private_root_parent_death() -> Result<()> {
+    root_parent_death::run()
+}

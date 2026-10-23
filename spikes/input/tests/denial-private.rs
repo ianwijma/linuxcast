@@ -71,6 +71,16 @@ fn main() {
         0
     );
     let args: Vec<_> = std::env::args().skip(1).collect();
+    if args == ["--private-root-parent-death"] {
+        unsafe {
+            libc::alarm(10);
+        }
+        denial_observer::private_root_parent_death().unwrap();
+        unsafe {
+            libc::alarm(0);
+        }
+        return;
+    }
     if args == ["--private-suite"] {
         denial_observer::private_entry(&[]).unwrap();
         return;
