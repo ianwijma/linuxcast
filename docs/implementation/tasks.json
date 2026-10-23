@@ -1,6 +1,5 @@
 {
   "schemaVersion": 2,
-  "defaultImplementer": "GPT 6.1 Sol, high reasoning effort",
   "tasks": [
     {
       "id": "F1-01",
