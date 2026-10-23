@@ -192,10 +192,18 @@
         "bun run typecheck",
         "bun run test:integration -- S0-01"
       ],
-      "evidence": [],
+      "evidence": [
+        "Unmerged implementation: draft PR https://github.com/ianwijma/linuxcast/pull/15 at signed source commit https://github.com/ianwijma/linuxcast/commit/5d8848cf685778ab03d1ada31f02ef7975f2e4c8. Source and partial native observations support feasibility work only; all acceptance criteria remain pending.",
+        "Published evidence in that PR includes GNOME 48 and Plasma 6.3 private Wayland capability/lifecycle probes and affected dark/light states. A separate Debian 13.7 / GNOME 48.7 X11 lifecycle-only diagnostic completes two selected launches, resident Close, UI Quit, hidden CLI Quit, native absence and dark/light captures, with verified cleanup. Its final result is intentionally incomplete/exit 3; focus and shortcut are skipped, and unsigned-at-execution provenance is preserved.",
+        "Current published head validation: 31 new fixed-control runner Python checks, 29 retained Node control checks, strict TypeScript/lint/syntax/planning checks, coordinator and independent source review. The restricted independent Node run preserves 28 passes and one subprocess EPERM. Planning CI https://github.com/ianwijma/linuxcast/actions/runs/39892048391 succeeds. These checks do not establish native acceptance."
+      ],
       "owner": "s0_06_workflow_ui",
       "branch": "codex/s0-01-launcher",
-      "limitations": []
+      "limitations": [
+        "Required Debian 13 GNOME 48 / Plasma 6.3 Wayland and X11 acceptance remains incomplete. Ubuntu-based GNOME host testing is authorized supplementary evidence and does not waive the target matrix.",
+        "The full GNOME X11 activation attempt fails strict focus: Show leaves the decoy focused. Its first incomplete outcome remains unchanged; shortcut and remaining UI paths are not established by the separate lifecycle-only diagnostic.",
+        "The published exact-target KWin X11 observer/control runner still needs actual auxiliary positive and substituted-binding negative controls, verified native cleanup and the remaining lifecycle, focus/shortcut, design and accessibility gates. No merge or task completion is authorized by source checks alone."
+      ]
     },
     {
       "id": "S0-02",
@@ -518,7 +526,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Actual Debian probe passes20boundary checks; named security suite passes22/22 with no skips. Broker allow/deny, direct host-resource denial, strict framing, detached descendant cleanup and actual memory/pids/CPU pressure are verified. Final task helper must report completed/taskCreationDenied with bounded child count plus kernel pids.events max>0.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
             }
           ]
         },
@@ -533,7 +541,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Actual Debian kernel namespace denial returns NAMESPACES_UNAVAILABLE with no fixture execution and verified cleanup; guest limit restored. Missing-backend fixtures return unavailable without direct-Node fallback. Pop!_OS host CPU delegation gap separately fails closed; user declined host policy change and none occurred.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
             }
           ]
         },
@@ -556,7 +564,7 @@
               "command": "bun run test:security -- S0-04; node spikes/sandbox/probe.ts; independent source/evidence review",
               "outcome": "Source and evidence review finds public synthetic file/socket/database/environment canaries and operational metadata only. No user files, input, clipboard, credentials, raw stderr, VM keys or private disk/seed data committed.",
               "platform": "Debian13.7 amd64 software VM, kernel6.12.113+deb13-cloud-amd64, systemd257.13, bubblewrap0.12.0, Node24.22.1/Bun1.4.4. Headless kernel/user-manager sandbox evidence, not desktop/input matrix proof.",
-              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source31618cf and completion metadata independently reviewed; PR10 integrated1b01ebd."
+              "reference": "spikes/sandbox/evidence/{security-debian.log,debian-probe.json,debian-namespace-denial.json,debian-source-sha256.txt}; spikes/sandbox/vm/README.md; PR #9; final source/metadata review pending."
             }
           ]
         }
