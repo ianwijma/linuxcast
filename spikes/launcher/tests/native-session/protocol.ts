@@ -14,7 +14,7 @@ export type Observation = { request: number; launcher: NativeWindow; decoy: Nati
   diagnostics?: { launcher: WindowDiagnostic; decoy: WindowDiagnostic } };
 export const NATIVE_PHASES = ['decoy-native-ready', 'decoy-focused-before-ordinary-show', 'initial-native-launch', 'after-close-native-hidden',
   'ordinary-singleton-cli-show', 'wayland-singleton-toggle-hidden', 'wayland-singleton-reopened', 'ordinary-show-native-focus',
-  'actual-x11-shortcut-native-focus', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
+  'actual-x11-shortcut-native-focus', 'fresh-lifecycle-native-launch', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
 export type NativePhase = typeof NATIVE_PHASES[number];
 export const HOOK_FAILURE_STAGES = ['enumerate', 'launcher', 'decoy', 'activation', 'publish'] as const;
 export type HookFailureReply = { request: number; hookFailure: { stage: typeof HOOK_FAILURE_STAGES[number]; outcome: 'native-read-failed' } };
@@ -237,5 +237,32 @@ export function parseObserverStartup(value: unknown): ObserverStartup {
     if ('beforeChecker' in states) result.lifecycle.beforeChecker = observerLifecycleSample(states.beforeChecker);
     if ('afterChecker' in states) result.lifecycle.afterChecker = observerLifecycleSample(states.afterChecker);
   }
+  return result;
+}
+
+/** Diagnostic selection is independent of native focus acceptance. */
+export type ProbeMode = 'full' | 'lifecycle-only';
+export const LIFECYCLE_SKIPPED = ['ordinary-show-native-focus', 'actual-x11-global-shortcut'] as const;
+export function parseProbeMode(value: unknown, backend: Backend): ProbeMode {
+  if (value === undefined || value === 'full') return 'full';
+  if (value === 'lifecycle-only' && backend.endsWith('x11')) return value;
+  throw new Error('PROBE_MODE_REQUIRED');
+}
+export type LifecycleDiagnostic = { probeMode: 'lifecycle-only'; skippedChecks: typeof LIFECYCLE_SKIPPED[number][];
+  diagnosticOutcome: 'complete' | 'failed'; lifecycleProof?: { launches: 2; darkSearchCaptured: true; lightCapabilitiesCaptured: true;
+    uiQuitExitCode: 0; hiddenCliQuitExitCode: 0; closeProcessAlive: true } };
+export function parseLifecycleDiagnostic(value: unknown, backend: Backend): LifecycleDiagnostic {
+  const row = object(value); keys(row, ['probeMode', 'skippedChecks', 'diagnosticOutcome'], ['lifecycleProof']);
+  if (parseProbeMode(row.probeMode, backend) !== 'lifecycle-only' || !Array.isArray(row.skippedChecks)
+    || row.skippedChecks.length !== LIFECYCLE_SKIPPED.length || row.skippedChecks.some((v, i) => v !== LIFECYCLE_SKIPPED[i])
+    || typeof row.diagnosticOutcome !== 'string' || !['complete', 'failed'].includes(row.diagnosticOutcome)) throw new Error('LIFECYCLE_SCHEMA');
+  const result: LifecycleDiagnostic = { probeMode: 'lifecycle-only', skippedChecks: [...LIFECYCLE_SKIPPED], diagnosticOutcome: row.diagnosticOutcome as 'complete' | 'failed' };
+  if ('lifecycleProof' in row) {
+    const proof = object(row.lifecycleProof); keys(proof, ['launches', 'darkSearchCaptured', 'lightCapabilitiesCaptured', 'uiQuitExitCode', 'hiddenCliQuitExitCode', 'closeProcessAlive']);
+    if (proof.launches !== 2 || proof.darkSearchCaptured !== true || proof.lightCapabilitiesCaptured !== true
+      || proof.uiQuitExitCode !== 0 || proof.hiddenCliQuitExitCode !== 0 || proof.closeProcessAlive !== true) throw new Error('LIFECYCLE_PROOF');
+    result.lifecycleProof = { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true };
+  }
+  if (result.diagnosticOutcome === 'complete' && !result.lifecycleProof) throw new Error('LIFECYCLE_PROOF_REQUIRED');
   return result;
 }

@@ -9,10 +9,12 @@ import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget } from './protocol.ts';
+import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, parseProbeMode, LIFECYCLE_SKIPPED } from './protocol.ts';
 import type { Backend, NativePhase, Observation } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
+const probeMode = parseProbeMode(process.argv[3], backend);
+if (process.argv.length > 4) throw new Error('PROBE_MODE_REQUIRED');
 const root = process.env.LINUXCAST_S001_MATRIX_ROOT ?? '';
 // One reviewed guard covers Python and direct Node entry. This executes before
 // build, Electron/GTK launch, D-Bus calls, settings or compositor operations.
@@ -33,6 +35,7 @@ const profile = join(root, 'linuxcast-launcher-native-session');
 const env = { ...process.env, TMPDIR: root, LINUXCAST_LAUNCHER_PROFILE: profile, LINUXCAST_LAUNCHER_SHORTCUT: 'Ctrl+Alt+Shift+F12' } as Record<string, string>;
 const observations: { phase: string; native: Observation }[] = [];
 const report: Record<string, unknown> = { task: 'S0-01', backend, status: 'running', physicalDesktopMatrixEstablished: false,
+  probeMode, ...(probeMode === 'lifecycle-only' ? { skippedChecks: [...LIFECYCLE_SKIPPED], diagnosticOutcome: 'failed' } : {}),
   evidenceKind: 'actual-isolated-software-compositor-launcher', kernel: release(), hostDisplayClipboardInputOrSettingsUsed: false,
   launcherCompanionActivationOrPlacementUsed: false, observations };
 let application: ElectronApplication | undefined;
@@ -162,6 +165,37 @@ try {
       sandbox: runtime.sandbox, contextIsolation: runtime.contextIsolation, nodeIntegration: runtime.nodeIntegration, webSecurity: runtime.webSecurity, renderer };
     return page;
   };
+  const lifecycleOnly = async (page: Awaited<ReturnType<typeof launch>>) => {
+    stage = 'light-component-state';
+    expect(await page.evaluate(() => window.linuxcast.setAppearance('light'))).toMatchObject({ ok: true });
+    await page.getByRole('button', { name: 'Launcher capabilities', exact: true }).click();
+    await capture('light-capabilities.png', 'light', 'capabilities');
+    await page.getByRole('button', { name: 'Back to commands', exact: true }).click();
+    stage = 'explicit-ui-quit';
+    const first = application!.process();
+    const firstExit = waitForExit(application!);
+    await Promise.all([page.getByRole('button', { name: 'Quit Linuxcast', exact: true }).click(), firstExit]);
+    expect(first.exitCode).toBe(0);
+    await observed('after-ui-quit-native-window-absent', value => value.launcher.count === 0);
+    report.explicitUiQuitExited = true;
+    application = undefined;
+    stage = 'fresh-launch-hidden-cli-quit'; await launch();
+    const fresh = await observed('fresh-lifecycle-native-launch', value => value.launcher.count === 1 && (!value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
+    requireNativeTarget(fresh.launcher, backend); expect(contained(fresh.launcher)).toBe(true);
+    const second = application!.process();
+    await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
+    await expect.poll(async () => (await state()).visible).toBe(false);
+    await observed('fresh-resident-native-hidden', value => value.launcher.count === 0 || value.launcher.hidden);
+    expect(second.exitCode).toBeNull(); expect(process.kill(pid, 0)).toBe(true);
+    report.closeRetainedResidentProcess = true;
+    const secondExit = waitForExit(application!);
+    await Promise.all([cli(main, '--quit'), secondExit]); expect(second.exitCode).toBe(0);
+    await observed('after-hidden-cli-quit-native-window-absent', value => value.launcher.count === 0);
+    application = undefined; report.hiddenCliQuitExited = true;
+    report.lifecycleProof = { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true,
+      uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true };
+    stage = 'complete'; report.diagnosticOutcome = 'complete'; report.status = 'incomplete'; process.exitCode = 3;
+  };
   stage = 'first-launch';
   let page = await launch();
   stage = 'native-initial-identity';
@@ -171,6 +205,8 @@ try {
   if (!wayland) expect(contained(initial.launcher)).toBe(true);
   expect(await page.evaluate(() => window.linuxcast.setAppearance('dark'))).toMatchObject({ ok: true });
   await capture('dark-launcher.png', 'dark', 'search');
+  if (probeMode === 'lifecycle-only') { await lifecycleOnly(page); }
+  else {
   stage = 'resident-close';
   const original = application!.process();
   await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
@@ -238,10 +274,11 @@ try {
   await observed('after-hidden-cli-quit-native-window-absent', value => value.launcher.count === 0);
   application = undefined; report.hiddenCliQuitExited = true;
   stage = 'complete'; report.status = 'passed-bounded-native-probe';
-} catch { report.status = 'incomplete'; process.exitCode = 3; }
+  }
+} catch { report.status = 'incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; }
 finally {
   decoy.kill('SIGTERM');
-  if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; process.exitCode = 3; });
+  if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; });
   // The outer process-local supervisor independently reaps every descendant.
   rmSync(profile, { recursive: true, force: true });
   report.stage = stage;

@@ -90,3 +90,45 @@ Primary pinned Electron45 documentation shows conditional restore and explicit f
 Deterministic tests execute type-only-stripped exact production `applyCommand` and state-snapshot functions with synthetic window spies/traps. They cover hidden/visible/minimized commands, conditional restore→Show→focus order, exactly one call per request, hide/quit/unready/destroyed/null boundaries, one-time reload recovery, no Wayland/unknown explicit activation, and published focus/capability remaining unavailable when focus is refused. These tests are not Electron/compositor evidence. Actual reviewed GNOME/KDE X11 focus/lifecycle, global shortcut and explicit Quit checks plus affected-state/accessibility review remain required under a separately authorized native run.
 
 Source-only verification: configured Node24.22.1/Vitest launcher unit21/21, UI fixtures3/3 and native preparation178/178 pass together202/202 (6.18s) on Pop!_OS22.04 amd64. Strict TypeScript, affected-source lint, planning validator and diff checks pass. No actual host/guest Electron, GNOME/KWin, screenshot or screen-reader run exercised this candidate; those results remain UNEXECUTED.
+
+### Separate X11 lifecycle diagnostic (source only)
+
+The full native probe still requires ordinary Show focus and actual global
+shortcut focus on X11; its predicates and first failed outcomes are unchanged.
+The signed explicit-focus candidate852f3ab did not establish a fix in its one
+reviewed GNOME48.7 X11 run. Exact failed evidence and source scope are preserved
+in `evidence/native-session/gnome-x11-explicit-focus/`.
+
+The explicit `run-session.py <x11-backend> --private-guest --probe-mode lifecycle-only`
+mode is a separate diagnostic. It verifies initial native identity/backend,
+sandbox/context isolation/no renderer Node, dark search and light capabilities,
+UI Quit with exit0 and native absence, then one fresh launch with the same
+strict identity/backend gates, resident Close with a live process and native
+hidden window, and hidden CLI Quit with exit0/native absence. The first launch
+and fresh launch share the existing launcher implementation; no application
+behaviour changes are made by this increment.
+
+The mode performs no ordinary Show, decoy activation or global chord, and carries
+exact skipped checks `ordinary-show-native-focus` and
+`actual-x11-global-shortcut`. It never claims activation or shortcut success.
+Even when these selected lifecycle checks complete, its status is `incomplete`
+and exit code3, with `diagnosticOutcome=complete` and bounded phase proofs;
+a failed selected phase is terminal and records `diagnosticOutcome=failed`.
+Unknown observer, identity, render, process, cancellation or cleanup failures
+cannot be caught as an ordinary focus failure and continued. The full default
+mode and historical reports without a mode remain full probes. Wayland is
+rejected for this diagnostic and its full probe is unchanged.
+
+All original startup45/checker180/outer240-second budgets, native8/12-second
+observation bounds, private guards, source authority and descendant cleanup
+remain in force. A later collector must explicitly pin this diagnostic mode;
+no collector snapshot or native run for it has been prepared or authorized.
+Source-only synthetic branch/schema fixtures do not establish Debian lifecycle,
+shortcut, target-session accessibility, portal, physical or complete UI proof.
+Relevant design sections remain Shell/navigation, Accessibility and Review gate.
+
+Local source verification: configured Node24.22.1/Vitest4.1.12 checks257/257
+passed (21 launcher unit, three UI fixtures, 233 native preparation), plus strict
+TypeScript, ESLint, Python AST, plan validation and whitespace checks. Platform:
+Pop!_OS22.04 amd64/Bun1.4.4. Private Unix socket fixtures required local sandbox
+permission; no compositor, Electron UI or guest was run for this increment.

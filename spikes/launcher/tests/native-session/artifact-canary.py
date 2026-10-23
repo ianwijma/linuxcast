@@ -44,6 +44,63 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         return value
     consumer={'request':2,'pollCount':3,'outcomes':{'missing':2,'other-serial':1,'matching':0,'parse-rejected':0,'poll-error':0},
               'pollsCapped':False,'elapsedMs':100,'elapsedCapped':False}
+    if case.startswith(('lifecycle-','valid-lifecycle-')) or case=='full-lifecycle-phase':
+        from artifacts import LIFECYCLE_PHASES,LIFECYCLE_SKIPPED
+        backend='gnome-x11';report=fallback_result(backend,'lifecycle-only')
+        own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':560},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
+        empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}
+        report.update(stage='complete',diagnosticOutcome='complete',initialPlacementInsideWorkArea=True,closeRetainedResidentProcess=True,explicitUiQuitExited=True,hiddenCliQuitExited=True,
+            lifecycleProof={'launches':2,'darkSearchCaptured':True,'lightCapabilitiesCaptured':True,'uiQuitExitCode':0,'hiddenCliQuitExitCode':0,'closeProcessAlive':True},runtime=copy.deepcopy(runtime))
+        report['runtime']['ozone']='x11'
+        for index,phase in enumerate(LIFECYCLE_PHASES):
+            report['observations'].append({'phase':phase,'native':{'request':index+1,'launcher':copy.deepcopy(own if phase in ('initial-native-launch','fresh-lifecycle-native-launch') else empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}})
+        for name in ('dark-launcher.png','light-capabilities.png'): (root/name).write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic fixture')
+        if case in ('valid-lifecycle-failed','valid-lifecycle-identity-failed'):
+            report=fallback_result(backend,'lifecycle-only')
+            if case=='valid-lifecycle-identity-failed':
+                report['stage']='native-initial-identity'
+                report['observations']=[{'phase':'initial-native-launch','native':{'request':1,'launcher':copy.deepcopy(empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}}]
+                report['observations'][0]['native']['launcher']['count']=1
+        elif case=='lifecycle-passed':report['status']='passed-bounded-native-probe'
+        elif case=='lifecycle-missing-mode':del report['probeMode']
+        elif case=='lifecycle-wayland':backend='gnome-wayland';report['backend']=backend;report['runtime']['ozone']='wayland'
+        elif case=='lifecycle-unknown-mode':report['probeMode']='synthetic-private-canary'
+        elif case=='lifecycle-extra':report['private']='synthetic-private-canary'
+        elif case=='lifecycle-private-proof':report['lifecycleProof']['private']='synthetic-private-canary'
+        elif case=='lifecycle-no-proof':del report['lifecycleProof']
+        elif case=='lifecycle-exit-bool':report['lifecycleProof']['uiQuitExitCode']=False
+        elif case=='lifecycle-exit-nonzero':report['lifecycleProof']['hiddenCliQuitExitCode']=7
+        elif case=='lifecycle-no-runtime':del report['runtime']
+        elif case=='lifecycle-no-screenshot':(root/'light-capabilities.png').unlink()
+        elif case=='lifecycle-missing-observation':report['observations'].pop()
+        elif case=='lifecycle-phase-reorder':report['observations'][0]['phase']=LIFECYCLE_PHASES[1]
+        elif case=='lifecycle-cross-phase':report['observations'][1]['phase']='ordinary-singleton-cli-show'
+        elif case=='lifecycle-forged-identity':report['observations'][0]['native']['launcher']=copy.deepcopy(empty)
+        elif case=='lifecycle-outside-workarea':report['observations'][0]['native']['launcher']['geometry']['x']=-500
+        elif case=='lifecycle-visible-close':report['observations'][3]['native']['launcher']=copy.deepcopy(own)
+        elif case=='lifecycle-nonabsent-quit':report['observations'][1]['native']['launcher']=copy.deepcopy(own)
+        elif case=='lifecycle-trace-cross-phase':report['nativeDiagnostic']={'phase':'ordinary-show-native-focus','state':'predicate-unmet'}
+        elif case=='lifecycle-trace-hook':report['nativeDiagnostic']={'phase':LIFECYCLE_PHASES[-1],'state':'hook-failed','hookFailure':{'request':6,'hookFailure':{'stage':'launcher','outcome':'native-read-failed'}}}
+        elif case=='lifecycle-activation-issued':report['observations'][0]['native']['decoyActivationIssued']=True
+        elif case=='lifecycle-focus-claim':report['ordinaryShowNativeFocused']=True
+        elif case=='lifecycle-shortcut-claim':report['shortcut']={'state':'available','nativeXTestActivationObserved':True,'effective':'Ctrl+Alt+Shift+F12'}
+        elif case=='lifecycle-activation-claim':report['activationOutcome']='normal-show-and-shortcut-native-focus-observed'
+        elif case=='lifecycle-skips-reordered':report['skippedChecks'].reverse()
+        elif case=='lifecycle-skips-extra':report['skippedChecks'].append('synthetic-private-canary')
+        elif case=='lifecycle-outcome-private':report['diagnosticOutcome']='synthetic-private-canary'
+        elif case=='full-lifecycle-phase':
+            report=complete();backend='gnome-wayland';report['observations'][0]['phase']='fresh-lifecycle-native-launch'
+        elif case!='valid-lifecycle-complete':raise ValueError('UNKNOWN_LIFECYCLE_FIXTURE')
+        if case.startswith('valid-'):
+            status,state=publish(root,destination,report,manifest,backend,3,'')
+            saved=json.loads((destination/'report.json').read_text())
+            assert status==3 and state=='incomplete' and saved['probeMode']=='lifecycle-only'
+            assert saved['diagnosticOutcome']==('complete' if case=='valid-lifecycle-complete' else 'failed')
+            print(json.dumps({'strictFixtureAccepted':True}));sys.exit(0)
+        try:publish(root,destination,report,manifest,backend,3,'')
+        except ValueError:pass
+        else:raise AssertionError('INVALID_LIFECYCLE_ARTIFACT_PUBLISHED')
+        assert not destination.exists();print(json.dumps({'rejectedBeforePublication':True,'publishedFiles':0}));sys.exit(0)
     if case in ('valid-consumer','valid-consumer-zero','valid-consumer-capped'):
         report['consumerRead']=copy.deepcopy(consumer)
         if case=='valid-consumer-zero':

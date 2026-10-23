@@ -14,7 +14,7 @@ SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py', 
     '../../../../package.json','../../../../bun.lock','../../../../apps/desktop/package.json')
 OUTPUTS=('extension.js','kwin-script.js','metadata.json')
 STAGES=('build','first-launch','native-initial-identity','resident-close','decoy-challenge','ordinary-cli-show','actual-x11-global-shortcut','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session')
-PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
+PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','fresh-lifecycle-native-launch','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
 DIAGNOSTIC_PHASES=(*PHASES,'decoy-activation-request')
 FLAGS=('initialPlacementInsideWorkArea','closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','explicitUiQuitExited','hiddenCliQuitExited')
 ACTIVATION=('normal-show-focused-component-placement-still-required','actionable-component-required','normal-show-and-shortcut-native-focus-observed')
@@ -131,9 +131,53 @@ def shortcut(value,backend):
     return {'state':value['state'],'effectiveBindingExposed':exact(value['effectiveBindingExposed'],False),
         'portalServicePresent':boolean(value['portalServicePresent']),'consentOrEffectiveBindingProven':exact(value['consentOrEffectiveBindingProven'],False)}
 
+LIFECYCLE_SKIPPED=['ordinary-show-native-focus','actual-x11-global-shortcut']
+LIFECYCLE_PHASES=('initial-native-launch','after-ui-quit-native-window-absent','fresh-lifecycle-native-launch','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
+
+def lifecycle_diagnostic(value,backend):
+    if not backend.endswith('x11') or value['status'] not in ('incomplete','cleanup-incomplete'): raise ValueError('PUBLIC_LIFECYCLE_MODE')
+    exact(value['probeMode'],'lifecycle-only');exact(value['skippedChecks'],LIFECYCLE_SKIPPED)
+    if value['diagnosticOutcome'] not in ('complete','failed'): raise ValueError('PUBLIC_LIFECYCLE_OUTCOME')
+    forbidden=('decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','activationOutcome','shortcut')
+    if any(key in value for key in forbidden): raise ValueError('PUBLIC_LIFECYCLE_ACTIVATION_FORBIDDEN')
+    if value['stage'] not in ('build','first-launch','native-initial-identity','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session'): raise ValueError('PUBLIC_LIFECYCLE_STAGE')
+    rows=value['observations'];phases=[row['phase'] for row in rows]
+    if phases!=list(LIFECYCLE_PHASES[:len(phases)]): raise ValueError('PUBLIC_LIFECYCLE_PHASE_SEQUENCE')
+    for row in rows:
+        phase=row['phase'];native=row['native'];window=native['launcher']
+        if native['decoyActivationIssued']: raise ValueError('PUBLIC_LIFECYCLE_ACTIVATION_FORBIDDEN')
+        # Failed identity/predicate observations remain safe failure evidence;
+        # only a completed diagnostic may claim the strict phase proofs.
+        if value['diagnosticOutcome']!='complete': continue
+        if phase in ('initial-native-launch','fresh-lifecycle-native-launch'):
+            if window['count']!=1 or not window['identityMatches'] or window['nativeBackend']!='x11' or window['geometry'] is None or window['workArea'] is None:
+                raise ValueError('PUBLIC_LIFECYCLE_IDENTITY')
+            frame=window['geometry'];area=window['workArea']
+            if frame['x']<area['x'] or frame['y']<area['y'] or frame['x']+frame['width']>area['x']+area['width']+1 or frame['y']+frame['height']>area['y']+area['height']+1: raise ValueError('PUBLIC_LIFECYCLE_PLACEMENT')
+        elif phase=='fresh-resident-native-hidden':
+            if not (window['count']==0 or window['hidden']): raise ValueError('PUBLIC_LIFECYCLE_HIDDEN')
+        elif window['count']!=0: raise ValueError('PUBLIC_LIFECYCLE_QUIT')
+    trace=value.get('nativeDiagnostic')
+    if trace:
+        if trace['phase'] not in LIFECYCLE_PHASES: raise ValueError('PUBLIC_LIFECYCLE_TRACE')
+        last=trace.get('lastObservation')
+        if last and (last['phase'] not in LIFECYCLE_PHASES or last['native']['decoyActivationIssued']): raise ValueError('PUBLIC_LIFECYCLE_TRACE')
+    if 'lifecycleProof' in value:
+        proof=value['lifecycleProof'];object_keys(proof,('launches','darkSearchCaptured','lightCapabilitiesCaptured','uiQuitExitCode','hiddenCliQuitExitCode','closeProcessAlive'))
+        for key,expected in (('launches',2),('darkSearchCaptured',True),('lightCapabilitiesCaptured',True),('uiQuitExitCode',0),('hiddenCliQuitExitCode',0),('closeProcessAlive',True)):
+            exact(proof[key],expected)
+    if value['diagnosticOutcome']=='complete':
+        if value['status']!='incomplete' or value['stage']!='complete' or phases!=list(LIFECYCLE_PHASES) or 'runtime' not in value or 'lifecycleProof' not in value or any(value.get(flag) is not True for flag in ('closeRetainedResidentProcess','explicitUiQuitExited','hiddenCliQuitExited','initialPlacementInsideWorkArea')):
+            raise ValueError('PUBLIC_LIFECYCLE_PROOF_REQUIRED')
+        if trace and (trace['state']!='predicate-met' or trace['phase']!=LIFECYCLE_PHASES[-1]): raise ValueError('PUBLIC_LIFECYCLE_TRACE')
+    return {key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value}
+
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof'))
+    mode=value.get('probeMode','full')
+    if type(mode) is not str or mode not in ('full','lifecycle-only'): raise ValueError('PUBLIC_PROBE_MODE')
+    if mode=='full' and any(key in value for key in ('skippedChecks','diagnosticOutcome','lifecycleProof')): raise ValueError('PUBLIC_FULL_MODE_REQUIRED')
     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
@@ -164,6 +208,12 @@ def public_result(value,backend):
         result['activationOutcome']=value['activationOutcome']
     if result.get('nativeDiagnostic',{}).get('state')=='hook-failed' and (backend not in ('gnome-wayland','gnome-x11') or value['status']=='passed-bounded-native-probe'):
         raise ValueError('PUBLIC_HOOK_FAILURE_CANNOT_PASS')
+    if mode=='lifecycle-only':
+        object_keys({key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value},('probeMode','skippedChecks','diagnosticOutcome'),('lifecycleProof',))
+        result.update(lifecycle_diagnostic({**result,**{key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value}},backend))
+    else:
+        if any(row['phase']=='fresh-lifecycle-native-launch' for row in result['observations']) or result.get('nativeDiagnostic',{}).get('phase')=='fresh-lifecycle-native-launch' or result.get('nativeDiagnostic',{}).get('lastObservation',{}).get('phase')=='fresh-lifecycle-native-launch': raise ValueError('PUBLIC_FULL_MODE_PHASE')
+        if 'probeMode' in value: result['probeMode']='full'
     if value['status']=='passed-bounded-native-probe':
         mandatory=('closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','explicitUiQuitExited','hiddenCliQuitExited')
         if value['stage']!='complete' or any(result.get(key) is not True for key in mandatory) or not all(key in result for key in ('runtime','shortcut','activationOutcome','initialPlacementInsideWorkArea','ordinaryShowNativeFocused')):
@@ -202,10 +252,13 @@ def hash_value(value):
     if type(value) is not str or not re.fullmatch(r'[0-9a-f]{64}',value): raise ValueError('PUBLIC_HASH_REQUIRED')
     return value
 
-def fallback_result(backend):
-    return {'task':'S0-01','backend':backend,'status':'unavailable','physicalDesktopMatrixEstablished':False,
+def fallback_result(backend,probe_mode='full'):
+    result={'task':'S0-01','backend':backend,'status':'unavailable','physicalDesktopMatrixEstablished':False,
         'evidenceKind':'actual-isolated-software-compositor-launcher','kernel':os.uname().release,
         'hostDisplayClipboardInputOrSettingsUsed':False,'launcherCompanionActivationOrPlacementUsed':False,'observations':[],'stage':'private-session'}
+    if probe_mode=='lifecycle-only': result.update(probeMode=probe_mode,status='incomplete',skippedChecks=list(LIFECYCLE_SKIPPED),diagnosticOutcome='failed')
+    elif probe_mode!='full': raise ValueError('PUBLIC_PROBE_MODE')
+    return result
 
 def publish(root,destination,value,manifest,backend,status,packages):
     # Validate EVERYTHING before creating the destination or copying any bytes.
@@ -224,6 +277,7 @@ def publish(root,destination,value,manifest,backend,status,packages):
             metadata=file.lstat()
             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>8*1024*1024 or file.read_bytes()[:8]!=b'\x89PNG\r\n\x1a\n': raise ValueError('PUBLIC_SCREENSHOT_REQUIRED')
             screenshots.append((file,name))
+    if result.get('diagnosticOutcome')=='complete' and {name for _,name in screenshots}!={'dark-launcher.png','light-capabilities.png'}: raise ValueError('PUBLIC_LIFECYCLE_SCREENSHOTS_REQUIRED')
     result.update(privateProcessTreeCleanupVerified=True,packages=safe_packages)
     destination.mkdir(parents=True,exist_ok=True)
     (destination/'report.json').write_text(json.dumps(result,indent=2)+'\n')

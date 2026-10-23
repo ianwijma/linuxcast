@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { stripTypeScriptTypes } from 'node:module';
 import { runInNewContext } from 'node:vm';
 import { buildNativeSession } from './build.ts';
-import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
 import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
@@ -487,4 +487,132 @@ test('prevalidation categories are capped at eight literals per enable, with no 
   expect(actual).toHaveLength(8); expect(new Set(actual).size).toBe(8);
   expect(actual.join()).not.toContain('synthetic-private');
   expect(parseObserverStartup({ latest: { checkpoints: actual.map(v => v.replace('LINUXCAST_S001_OBSERVER:', '')), requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } } }).latest.checkpoints).toHaveLength(8);
+});
+
+// Run the exact diagnostic branch without importing Electron, touching the
+// filesystem or driving a desktop. Every effect is recorded; failures propagate.
+async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidden' | false = false) {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('  const lifecycleOnly = async');
+  const end = text.indexOf("  stage = 'first-launch';", begin);
+  expect(begin).toBeGreaterThan(0); expect(end).toBeGreaterThan(begin);
+  const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.runDiagnostic = lifecycleOnly;`);
+  const events: string[] = [], failure = new Error('SYNTHETIC_PRIVATE_FAILURE');
+  const effect = (name: string) => { events.push(name); if (name === failAt) throw failure; };
+  const report: Record<string, unknown> = {}, own = { ...native(), nativeBackend: 'x11' as const };
+  const empty: NativeWindow = { count: 0, identityMatches: false, nativeBackend: 'unsupported', focused: false, hidden: true, geometry: null, workArea: null };
+  const child: { exitCode: number | null } = { exitCode: null };
+  let count = 1, hidden = false;
+  const page = {
+    evaluate: async () => { effect('appearance-light'); return { ok: true }; },
+    getByRole: (_role: string, options: { name: string; exact: boolean }) => ({ click: async () => {
+      expect(options.exact).toBe(true); effect(`click:${options.name}`);
+      if (options.name === 'Quit Linuxcast') child.exitCode = nonzeroExit === 'ui' ? 7 : 0;
+    } }),
+  };
+  const app = { process: () => child, evaluate: async () => { effect('close'); hidden = true; } };
+  const context = { stage: 'native-initial-identity', application: app as typeof app | undefined, pid: 101, main: '/fixed/main.cjs', backend: 'gnome-x11', report,
+    expect, requireNativeTarget, contained: () => true,
+    process: { exitCode: undefined as number | undefined, kill: (pid: number, signal: number) => { expect([pid, signal]).toEqual([101, 0]); effect('process-live'); return true; } },
+    capture: async (name: string, appearance: string, view: string) => { expect([name, appearance, view]).toEqual(['light-capabilities.png', 'light', 'capabilities']); effect('capture-light'); },
+    waitForExit: async () => { effect('wait-exit'); },
+    state: async () => { effect('state-hidden'); return { visible: !hidden }; },
+    observed: async (phase: string, predicate: (value: Observation) => boolean) => {
+      effect(`native:${phase}`);
+      let launcher = phase === 'fresh-lifecycle-native-launch' ? own : empty;
+      if (failAt === 'fresh-identity-mismatch' && phase === 'fresh-lifecycle-native-launch') launcher = { ...empty, count: 1 };
+      if (failAt === 'fresh-backend-mismatch' && phase === 'fresh-lifecycle-native-launch') launcher = { ...own, nativeBackend: 'wayland' };
+      if (failAt === 'close-still-visible' && phase === 'fresh-resident-native-hidden') launcher = own;
+      const observation: Observation = { request: 1, launcher, decoy: empty, decoyActivationIssued: false };
+      expect(predicate(observation)).toBe(true); return observation;
+    },
+    cli: async (main: string, command: string) => { expect([main, command]).toEqual(['/fixed/main.cjs', '--quit']); effect('cli-quit'); child.exitCode = nonzeroExit === 'hidden' ? 7 : 0; },
+    launch: async () => { effect('launch'); count++; child.exitCode = null; hidden = false; context.application = app; return page; },
+    // These operations are intentionally absent from the diagnostic branch.
+    challenge: () => { throw new Error('DECOY_ACTIVATION_FORBIDDEN'); }, spawnSync: () => { throw new Error('CHORD_FORBIDDEN'); },
+  };
+  runInNewContext(program, context);
+  let caught: unknown;
+  try { await (context as unknown as { runDiagnostic: (page: unknown) => Promise<void> }).runDiagnostic(page); }
+  catch (error) { caught = error; }
+  return { events, report, count, context, caught, failure };
+}
+
+test('lifecycle-only exact production branch uses two launches and no Show, decoy challenge or chord', async () => {
+  const fixture = await lifecycleBranchFixture();
+  expect(fixture.caught).toBeUndefined(); expect(fixture.count).toBe(2);
+  expect(fixture.events).toEqual(['appearance-light', 'click:Launcher capabilities', 'capture-light', 'click:Back to commands',
+    'wait-exit', 'click:Quit Linuxcast', 'native:after-ui-quit-native-window-absent', 'launch', 'native:fresh-lifecycle-native-launch',
+    'close', 'state-hidden', 'native:fresh-resident-native-hidden', 'process-live', 'wait-exit', 'cli-quit', 'native:after-hidden-cli-quit-native-window-absent']);
+  expect(fixture.report).toMatchObject({ diagnosticOutcome: 'complete', status: 'incomplete', explicitUiQuitExited: true,
+    closeRetainedResidentProcess: true, hiddenCliQuitExited: true, lifecycleProof: { launches: 2, darkSearchCaptured: true,
+      lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true } });
+  expect(fixture.context.process.exitCode).toBe(3); expect(fixture.context.stage).toBe('complete');
+  expect(fixture.context.application).toBeUndefined();
+  for (const key of ['activationOutcome', 'ordinaryShowNativeFocused', 'singletonShowRetainedPid', 'shortcut', 'decoyActivationUsedForChallengeSetup']) expect(fixture.report).not.toHaveProperty(key);
+});
+for (const failAt of ['appearance-light', 'click:Launcher capabilities', 'capture-light', 'click:Back to commands', 'wait-exit', 'click:Quit Linuxcast',
+  'native:after-ui-quit-native-window-absent', 'launch', 'native:fresh-lifecycle-native-launch', 'close', 'state-hidden', 'native:fresh-resident-native-hidden',
+  'process-live', 'cli-quit', 'native:after-hidden-cli-quit-native-window-absent']) test(`lifecycle-only production branch stops immediately at ${failAt}`, async () => {
+  const fixture = await lifecycleBranchFixture(failAt);
+  expect(fixture.caught).toBe(fixture.failure);
+  // Waiting for exit and clicking Quit are the existing single concurrent pair.
+  if (failAt === 'wait-exit') expect(fixture.events.slice(-2)).toEqual(['wait-exit', 'click:Quit Linuxcast']);
+  else expect(fixture.events.at(-1)).toBe(failAt);
+  expect(fixture.report).not.toHaveProperty('lifecycleProof'); expect(fixture.report).not.toHaveProperty('diagnosticOutcome', 'complete');
+});
+test('nonzero UI Quit cannot complete lifecycle-only or start a second launcher', async () => {
+  const fixture = await lifecycleBranchFixture(undefined, 'ui');
+  expect(fixture.caught).toBeDefined(); expect(fixture.count).toBe(1); expect(fixture.report).not.toHaveProperty('lifecycleProof');
+});
+
+
+test('lifecycle selection accepts only fixed X11 diagnostics and historical missing full mode', () => {
+  expect(parseProbeMode(undefined, 'gnome-wayland')).toBe('full');
+  expect(parseProbeMode('full', 'kwin-wayland')).toBe('full');
+  expect(parseProbeMode('lifecycle-only', 'gnome-x11')).toBe('lifecycle-only');
+  for (const value of [null, true, 'shortcut-only', 'synthetic-private-canary', { private: 'synthetic-private-canary' }]) expect(() => parseProbeMode(value, 'gnome-x11')).toThrow();
+  expect(() => parseProbeMode('lifecycle-only', 'gnome-wayland')).toThrow();
+});
+test('typed lifecycle metadata rejects forged completion, unknown skips and private proof fields', () => {
+  const value = { probeMode: 'lifecycle-only', skippedChecks: ['ordinary-show-native-focus', 'actual-x11-global-shortcut'], diagnosticOutcome: 'failed' };
+  expect(parseLifecycleDiagnostic(value, 'gnome-x11')).toEqual(value);
+  const complete = { ...value, diagnosticOutcome: 'complete', lifecycleProof: { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true } };
+  expect(parseLifecycleDiagnostic(complete, 'gnome-x11')).toEqual(complete);
+  for (const row of [{ ...value, private: 'synthetic-private-canary' }, { ...value, diagnosticOutcome: 'complete' },
+    { ...value, probeMode: 'full' }, { ...value, skippedChecks: [] }, { ...value, skippedChecks: ['actual-x11-global-shortcut', 'ordinary-show-native-focus'] },
+    { ...complete, lifecycleProof: { ...complete.lifecycleProof, private: 'synthetic-private-canary' } },
+    { ...complete, lifecycleProof: { ...complete.lifecycleProof, uiQuitExitCode: false } }, { ...complete, lifecycleProof: { ...complete.lifecycleProof, hiddenCliQuitExitCode: 1 } }]) {
+    expect(() => parseLifecycleDiagnostic(row, 'gnome-x11')).toThrow();
+  }
+});
+
+for (const scenario of ['valid-lifecycle-complete', 'valid-lifecycle-failed', 'valid-lifecycle-identity-failed', 'lifecycle-passed', 'lifecycle-missing-mode', 'lifecycle-wayland', 'lifecycle-unknown-mode',
+  'lifecycle-extra', 'lifecycle-private-proof', 'lifecycle-no-proof', 'lifecycle-exit-bool', 'lifecycle-exit-nonzero', 'lifecycle-no-runtime', 'lifecycle-no-screenshot',
+  'lifecycle-missing-observation', 'lifecycle-phase-reorder', 'lifecycle-cross-phase', 'lifecycle-forged-identity', 'lifecycle-outside-workarea', 'lifecycle-visible-close', 'lifecycle-nonabsent-quit',
+  'lifecycle-trace-cross-phase', 'lifecycle-trace-hook', 'lifecycle-activation-issued', 'lifecycle-focus-claim', 'lifecycle-shortcut-claim', 'lifecycle-activation-claim',
+  'lifecycle-skips-reordered', 'lifecycle-skips-extra', 'lifecycle-outcome-private', 'full-lifecycle-phase']) test(`lifecycle artifact mode boundary ${scenario}`, () => {
+  const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+  expect(child.status, child.stderr).toBe(0);
+  const result = JSON.parse(child.stdout);
+  if (scenario.startsWith('valid-')) expect(result.strictFixtureAccepted).toBe(true);
+  else expect(result).toMatchObject({ rejectedBeforePublication: true, publishedFiles: 0 });
+});
+
+test('nonzero hidden CLI Quit cannot complete the diagnostic after a successful UI Quit', async () => {
+  const fixture = await lifecycleBranchFixture(undefined, 'hidden');
+  expect(fixture.caught).toBeDefined(); expect(fixture.count).toBe(2); expect(fixture.report.explicitUiQuitExited).toBe(true);
+  expect(fixture.report).not.toHaveProperty('lifecycleProof'); expect(fixture.events.at(-1)).toBe('cli-quit');
+});
+test('lifecycle-only Wayland mode fails before target or compositor actions', () => {
+  const child = spawnSync('/usr/bin/python3', [source('run-session.py'), 'gnome-wayland', '--probe-mode', 'lifecycle-only'],
+    { encoding: 'utf8', env: { PATH: process.env.PATH }, timeout: 5000 });
+  expect(child.status).toBe(3);
+  expect(JSON.parse(child.stdout)).toEqual({ status: 'unavailable', reason: 'X11_DIAGNOSTIC_REQUIRED', physicalDesktopMatrixEstablished: false });
+});
+
+for (const failure of ['fresh-identity-mismatch', 'fresh-backend-mismatch', 'close-still-visible']) test(`strict native ${failure} remains terminal in the lifecycle branch`, async () => {
+  const fixture = await lifecycleBranchFixture(failure);
+  expect(fixture.caught).toBeDefined(); expect(fixture.report).not.toHaveProperty('lifecycleProof');
+  expect(fixture.report).not.toHaveProperty('hiddenCliQuitExited'); expect(fixture.events).not.toContain('cli-quit');
 });

@@ -1,0 +1,508 @@
+{
+  "task": "S0-01",
+  "backend": "gnome-x11",
+  "status": "incomplete",
+  "physicalDesktopMatrixEstablished": false,
+  "evidenceKind": "actual-isolated-software-compositor-launcher",
+  "kernel": "6.12.113+deb13-amd64",
+  "hostDisplayClipboardInputOrSettingsUsed": false,
+  "launcherCompanionActivationOrPlacementUsed": false,
+  "stage": "complete",
+  "observations": [
+    {
+      "phase": "initial-native-launch",
+      "native": {
+        "request": 1,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 186,
+            "width": 720,
+            "height": 429
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "single",
+            "primaryIdentity": "non-string",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "after-ui-quit-native-window-absent",
+      "native": {
+        "request": 2,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "fresh-lifecycle-native-launch",
+      "native": {
+        "request": 3,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 186,
+            "width": 720,
+            "height": 429
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "single",
+            "primaryIdentity": "non-string",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "fresh-resident-native-hidden",
+      "native": {
+        "request": 4,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "after-hidden-cli-quit-native-window-absent",
+      "native": {
+        "request": 5,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    }
+  ],
+  "initialPlacementInsideWorkArea": true,
+  "closeRetainedResidentProcess": true,
+  "explicitUiQuitExited": true,
+  "hiddenCliQuitExited": true,
+  "nativeDiagnostic": {
+    "phase": "after-hidden-cli-quit-native-window-absent",
+    "state": "predicate-met",
+    "lastObservation": {
+      "phase": "after-hidden-cli-quit-native-window-absent",
+      "native": {
+        "request": 5,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 0,
+            "y": 32,
+            "width": 360,
+            "height": 219
+          },
+          "workArea": {
+            "x": 0,
+            "y": 32,
+            "width": 1280,
+            "height": 868
+          },
+          "nativeBackend": "x11"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "mismatch",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    }
+  },
+  "consumerRead": {
+    "request": 5,
+    "pollCount": 4,
+    "outcomes": {
+      "missing": 0,
+      "other-serial": 3,
+      "matching": 1,
+      "parse-rejected": 0,
+      "poll-error": 0
+    },
+    "pollsCapped": false,
+    "elapsedMs": 874,
+    "elapsedCapped": false
+  },
+  "observerStartup": {
+    "latest": {
+      "checkpoints": [
+        "MODULE_ENTERED",
+        "ENABLE_ENTERED",
+        "PRIVATE_CONTEXT_ACCEPTED",
+        "POLL_INSTALLED",
+        "FIRST_POLL_TICK",
+        "CONTEXT_NOT_OBSERVED",
+        "STALE_REQUEST"
+      ],
+      "requests": [
+        {
+          "event": "REQUEST_VALIDATED",
+          "request": 1
+        },
+        {
+          "event": "REPLY_PUBLISHED",
+          "request": 1
+        },
+        {
+          "event": "REQUEST_VALIDATED",
+          "request": 2
+        },
+        {
+          "event": "REPLY_PUBLISHED",
+          "request": 2
+        },
+        {
+          "event": "REQUEST_VALIDATED",
+          "request": 3
+        },
+        {
+          "event": "REPLY_PUBLISHED",
+          "request": 3
+        },
+        {
+          "event": "REQUEST_VALIDATED",
+          "request": 4
+        },
+        {
+          "event": "REPLY_PUBLISHED",
+          "request": 4
+        },
+        {
+          "event": "REQUEST_VALIDATED",
+          "request": 5
+        },
+        {
+          "event": "REPLY_PUBLISHED",
+          "request": 5
+        }
+      ],
+      "extensionInfo": {
+        "status": "INFO_UNAVAILABLE"
+      }
+    },
+    "beforeChecker": {
+      "checkpoints": [
+        "MODULE_ENTERED",
+        "ENABLE_ENTERED",
+        "PRIVATE_CONTEXT_ACCEPTED",
+        "POLL_INSTALLED",
+        "FIRST_POLL_TICK",
+        "CONTEXT_NOT_OBSERVED"
+      ],
+      "requests": [],
+      "extensionInfo": {
+        "status": "INFO_UNAVAILABLE"
+      }
+    },
+    "lifecycle": {
+      "beforeChecker": {
+        "compositor": {
+          "state": "running",
+          "exitCode": null
+        },
+        "drain": {
+          "eofObserved": false,
+          "readerAlive": true,
+          "stopRequested": false
+        }
+      },
+      "afterChecker": {
+        "compositor": {
+          "state": "running",
+          "exitCode": null
+        },
+        "drain": {
+          "eofObserved": false,
+          "readerAlive": true,
+          "stopRequested": false
+        }
+      },
+      "finally": {
+        "compositor": {
+          "state": "running",
+          "exitCode": null
+        },
+        "drain": {
+          "eofObserved": false,
+          "readerAlive": false,
+          "stopRequested": true
+        }
+      }
+    }
+  },
+  "runtime": {
+    "electron": "45.0.0",
+    "chrome": "156.0.8078.48",
+    "ozone": "x11",
+    "noSandbox": false,
+    "sandbox": true,
+    "contextIsolation": true,
+    "nodeIntegration": false,
+    "webSecurity": true,
+    "renderer": {
+      "runtime": {
+        "sandboxed": true,
+        "contextIsolated": true
+      },
+      "process": "undefined",
+      "require": "undefined"
+    }
+  },
+  "probeMode": "lifecycle-only",
+  "skippedChecks": [
+    "ordinary-show-native-focus",
+    "actual-x11-global-shortcut"
+  ],
+  "diagnosticOutcome": "complete",
+  "lifecycleProof": {
+    "launches": 2,
+    "darkSearchCaptured": true,
+    "lightCapabilitiesCaptured": true,
+    "uiQuitExitCode": 0,
+    "hiddenCliQuitExitCode": 0,
+    "closeProcessAlive": true
+  },
+  "privateProcessTreeCleanupVerified": true,
+  "packages": [
+    "gnome-shell 48.7-0+deb13u2",
+    "kwin-wayland 4:6.3.6-1",
+    "kwin-x11 4:6.3.6-1",
+    "libqt6qml6 6.8.2+dfsg-7",
+    "mutter 48.7-0+deb13u1"
+  ]
+}

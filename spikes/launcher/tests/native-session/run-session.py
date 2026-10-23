@@ -46,7 +46,7 @@ def has_owner(name,env):
     value=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',name],env)
     return value.returncode==0 and value.stdout.strip()=='(true,)'
 
-def inner(backend,root):
+def inner(backend,root,probe_mode='full'):
     root=private_root(str(root),backend)
     env=private_environment(root,os.environ.get('LINUXCAST_S001_NODE'))
     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
@@ -116,7 +116,7 @@ def inner(backend,root):
                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
                 if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
                 if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
-            driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+            driver=subprocess.Popen([node,str(HERE/'check.ts'),backend,*([probe_mode] if probe_mode!='full' else [])],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             try: return driver.wait(timeout=180)
             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
             finally:
@@ -133,9 +133,11 @@ def inner(backend,root):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('backend',choices=BACKENDS)
+    parser.add_argument('--probe-mode',choices=('full','lifecycle-only'),default='full')
     parser.add_argument('--private-guest',action='store_true')
     parser.add_argument('--inner',type=pathlib.Path)
     arguments=parser.parse_args()
+    if arguments.probe_mode=='lifecycle-only' and not arguments.backend.endswith('x11'): return unavailable('X11_DIAGNOSTIC_REQUIRED')
     if not arguments.private_guest:
         return unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_USER_REQUIRED')
     try: target_guard()
@@ -144,7 +146,7 @@ def main():
         try:
             root=private_root(str(arguments.inner),arguments.backend)
             verify_build(HERE/'dist')
-            return inner(arguments.backend,root)
+            return inner(arguments.backend,root,arguments.probe_mode)
         except (ValueError,OSError,subprocess.TimeoutExpired): return unavailable('PRIVATE_COMPOSITOR_HARNESS_FAILED')
     try: verify_build(HERE/'dist')
     except (ValueError,OSError): return unavailable('BUILD_REVIEWED_HARNESS_FIRST')
@@ -164,7 +166,7 @@ def main():
     (applications/'io.github.ianwijma.Linuxcast.desktop').write_text('[Desktop Entry]\nType=Application\nName=Linuxcast\nExec=/usr/bin/false\nStartupWMClass=io.github.ianwijma.Linuxcast\nNoDisplay=true\n')
     services=root/'services'; services.mkdir()
     (root/'bus.conf').write_text('<busconfig><type>session</type><listen>unix:path='+str(root/'dbus-session')+'</listen><auth>EXTERNAL</auth><servicedir>'+str(services)+'</servicedir><policy context="default"><allow send_destination="*"/><allow receive_sender="*"/><allow own="*"/></policy></busconfig>')
-    command=['dbus-run-session','--config-file',str(root/'bus.conf'),'--','/usr/bin/python3',str(HERE/'run-session.py'),arguments.backend,'--private-guest','--inner',str(root)]
+    command=['dbus-run-session','--config-file',str(root/'bus.conf'),'--','/usr/bin/python3',str(HERE/'run-session.py'),arguments.backend,'--private-guest','--inner',str(root),*(['--probe-mode',arguments.probe_mode] if arguments.probe_mode!='full' else [])]
     if arguments.backend.endswith('x11'):
         auth=root/'xauthority';auth.touch(mode=0o600)
         command=['xvfb-run','--auth-file',str(auth),'-a','-s','-screen 0 1280x900x24 -nolisten tcp',*command]
@@ -180,15 +182,16 @@ def main():
             metadata=result_path.lstat()
             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid(): raise ValueError('PRIVATE_RESULT_FILE_REQUIRED')
             result=json.loads(result_path.read_text())
-        else: result=fallback_result(arguments.backend)
+        else: result=fallback_result(arguments.backend,arguments.probe_mode)
         startup=root/'observer-startup.json'
         if arguments.backend.startswith('gnome') and result.get('status')!='passed-bounded-native-probe' and startup.exists():
             metadata=startup.lstat()
             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>16384: raise ValueError('OBSERVER_STARTUP_FILE_REQUIRED')
             result['observerStartup']=startup_diagnostic(json.loads(startup.read_text()))
         packages=bounded(['dpkg-query','-W','-f=${Package} ${Version}\n','gnome-shell','mutter','kwin-wayland','kwin-x11','libqt6qml6'],env)
-        destination=HERE.parents[1]/'evidence/native-session'/arguments.backend
+        destination=HERE.parents[1]/'evidence/native-session'/(arguments.backend+('-lifecycle-only' if arguments.probe_mode=='lifecycle-only' else ''))
         manifest=verify_build(HERE/'dist')
+        if result.get('probeMode','full')!=arguments.probe_mode: raise ValueError('PROBE_MODE_MISMATCH')
         status,state=publish(root,destination,result,manifest,arguments.backend,status,packages.stdout)
         print(json.dumps({'backend':arguments.backend,'status':state,'exitCode':status,'privateProcessTreeCleanupVerified':cleanup,'physicalDesktopMatrixEstablished':False}))
         return status

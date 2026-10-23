@@ -1,0 +1,41 @@
+{
+  "kind": "S0-01-strict-unsigned-lifecycle-only-collector",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "runtimeInputsMatchSignedCommit": false,
+  "executedRuntimeCommit": null,
+  "verifiedSignedBaselineCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "probeMode": "lifecycle-only",
+  "archiveRepresentsWholeSignedTree": false,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "immutable": {
+    "path": "/tmp/linuxcast-s001-lifecycle-only-immutable",
+    "indexSha256": "e304c82ec1ae6124cd06ae4f775232c62bcd6fd498e4b316253edb4ddf88d9f0",
+    "archiveSha256": "ed4390dcc734aa9337f571594d5fbcdbd1c7cabf2b95ce358891e6c9328fcdc4",
+    "authoritySha256": "35cf513245a17205a22f9e8b408eb4ba1a4a070743864585d86328524deb7b7b",
+    "buildManifestSha256": "ef1499754c2aec7d7834fbedc70b1c8c1eb1c87bef6a892e382a01042d5b4541"
+  },
+  "checks": {
+    "collector": 30,
+    "orchestration": 25,
+    "mode": 12,
+    "outcome": "67/67 passed",
+    "pythonAst": "passed",
+    "completeBaselinePathTypeModeProof": "469regular/68directories/exact11overlays",
+    "runtimeInputsBound": 24,
+    "staticInputsBound": 2,
+    "unsignedRuntimeInputs": 4,
+    "unchangedPhase": true
+  },
+  "filesSha256": {
+    "README.md": "6f6ad0c0a8d693b58962a59cedd6d9f6f74abf34ecbd836c31b1942c58df12eb",
+    "collect.py": "e2cae87ba62c35d11c47a5b0e5b6e02e43830ef0ac8af28ac25b2f2d393a7043",
+    "collector.diff": "55e477ef79c27faa760045fa428801e21e8da60a1123b493f046217f2b551d0a",
+    "guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "host.py": "880c961803c2b6cdc6c05e38b1e5b9531f51a1f0da6234a61c178d2359d3e908",
+    "test_collect.py": "647e1810a77d7846ee8500e625de779bf3067a05750ff796038267d67080d42d",
+    "test_mode.py": "bec7eb7fb012c2c5e47fde631da5f7433ecdad6f6a44ca182b18f7e206768dca",
+    "test_orchestration.py": "3c9bc7bbae7d65e6d63272f047f0d5132718363d2f67e41919a95969894e8d8f"
+  }
+}
