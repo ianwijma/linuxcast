@@ -3,9 +3,10 @@
 This increment implements the shared capability, handshake, request and failure
 schemas plus bounded UTF-8 framing and native operation progress/failure contracts.
 It is production boundary code with synthetic
-fixtures, not evidence of a running desktop adapter. S0-01 and S0-03 are not yet
-accepted; do not integrate or call the contracts frozen until those prerequisites
-and the rest of F0-01 are complete.
+fixtures, not evidence of a running desktop adapter. S0-01 is not yet accepted; do not integrate or call the contracts frozen until
+that prerequisite and the rest of F0-01 are complete. The approved sequencing
+change removes only S0-03 from F0-01; input implementation and release gates
+still require full S0-03 acceptance.
 
 `src/protocol.ts` is the semantic source of truth. `native/protocol` mirrors its
 native messages with Serde. Both run the exact JSON cases in `fixtures/protocol.json`.
@@ -107,6 +108,27 @@ cannot establish that authority. Runtime ownership checks, reference resolution,
 consent, model compatibility, tool grants, budget enforcement and JSON Schema
 semantic validation still precede sending. No provider traffic occurs here.
 
+
+## Declarative views
+
+`src/views.ts` defines versioned list, grid, detail, form, text, image and PDF
+snapshots with semantic items/actions and opaque asset/file references. Unknown
+renderer execution/style fields, direct asset URLs and arbitrary file paths fail
+validation. Images in grids bind to item IDs. Pages have at most500 items total,
+text fields at most64KiB UTF-8, and item/section/field/action identities must be
+consistent. Form submit/cancel actions must exist with distinct IDs; secret fields cannot contain
+published initial values. The host receives semantic content, never executable
+components or callbacks.
+
+These schemas do not render or sanitize Markdown, resolve file grants, trust an
+action's declared effect, authorize dispatch or enforce live revisions/session
+limits/update rates. The host must classify effects from its trusted registry,
+validate the current view/revision/selected item, sanitize Markdown and safe links,
+and use the shared design primitives. A valid view never invokes an action by
+itself. The concrete image/PDF preview shape uses a typed `source` reference,
+keeping asset/file alternatives unambiguous; no remote executable URL is accepted.
+The fixtures prove parsing only, not visual or accessibility acceptance.
+
 Dependency pins and licences were checked against the installed package/crate
 metadata. `bun.lock` and `Cargo.lock` retain registry integrity checksums. Zod has
 no runtime dependencies; Serde was already present in the workspace lockfile.
@@ -128,7 +150,7 @@ linuxcast-protocol`; install the locked Rust dependencies before an offline run.
 It fails if Cargo cannot execute or either language disagrees with the fixtures.
 Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets -- -D warnings`.
 
-Still to implement in F0-01: command and declarative view contracts, workflow and
+Still to implement in F0-01: command contracts, workflow and
 provider catalog/status/harness/storage contracts, extension envelopes, response/event/subscription lifecycle,
 trusted effect contexts and runtime enforcement of native outcome/recovery
 contracts. The overview's native request `id` and the
