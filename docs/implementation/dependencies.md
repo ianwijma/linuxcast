@@ -20,7 +20,6 @@ flowchart TD
   F0_01["F0-01: Freeze shared contracts and compatibility fixtures"]
   S0_01 --> F0_01
   S0_02 --> F0_01
-  S0_03 --> F0_01
   S0_04 --> F0_01
   S0_05 --> F0_01
   S0_06 --> F0_01
