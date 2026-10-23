@@ -1,0 +1,14 @@
+gnome-shell=0
+kwin_wayland=0
+kwin_x11=0
+Xvfb=0
+electron=0
+node=0
+gdb=0
+dbus-daemon=2
+e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb  /home/debian/linuxcast-tools/bin/node
+10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235  /home/debian/linuxcast-tools/bin/bun
+owned-stage-removed=true
+private-roots-absent=true
+input-marker-absent=true
+RELEASE=2026-10-23T09:40:29Z
