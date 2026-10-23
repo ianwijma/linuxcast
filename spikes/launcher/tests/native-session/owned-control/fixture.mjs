@@ -9,6 +9,7 @@ import { mkdtempSync, mkdirSync, copyFileSync, readFileSync, writeFileSync, rmSy
 import { join, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
+import { runInNewContext } from 'node:vm';
 import { STEPS, SCOPE, runControl, publicResult, pairProof, negativeProof } from './core.mjs';
 import { verifySources, loadProduction } from './production.mjs';
 import { validateContext } from './control.mjs';
@@ -108,4 +109,22 @@ test('missing native entry arguments produce fixed unavailable evidence before a
   assert.equal(child.error,undefined,child.error?.code);
   assert.equal(child.status,3);assert.deepEqual(JSON.parse(child.stdout),{kind:SCOPE.kind,status:'unavailable',reason:'CONTROL_ENTRY_OR_RUNTIME_REJECTED',
     physicalDesktopMatrixEstablished:false,fullAcceptanceEstablished:false});
+});
+
+test('actual control Quit and cleanup retain the child and never query a closed dispatcher',async()=>{
+  const text=readFileSync(new URL('./control.mjs',import.meta.url),'utf8');
+  const cleanupBegin=text.indexOf('const cleanup = async () => {'),cleanupEnd=text.indexOf('  let result;',cleanupBegin);
+  const quitBegin=text.indexOf('quit: () => within(async () => {'),quitEnd=text.indexOf('      cleanup,',quitBegin);
+  assert(cleanupBegin>=0 && cleanupEnd>cleanupBegin && quitBegin>=0 && quitEnd>quitBegin);
+  for(const mode of ['quit-then-cleanup','cleanup-only','unconfirmed-quit']){
+    let closes=0,aborts=0;
+    const child={exitCode:null,signalCode:null};
+    const app={process(){assert.fail('CLOSED_DISPATCHER_ACCESS');},async close(){closes++;if(mode!=='unconfirmed-quit')child.exitCode=0;}};
+    const context={app,child,api:{abort(){aborts++;}},within:async operation=>operation(),quitAttempted:false,cleanupAttempted:false};
+    runInNewContext(text.slice(cleanupBegin,cleanupEnd)+'\nglobalThis.cleanup=cleanup; globalThis.quit=({'+text.slice(quitBegin,quitEnd)+'}).quit;',context);
+    if(mode!=='cleanup-only')await context.quit();
+    if(mode==='unconfirmed-quit')await assert.rejects(context.cleanup(),/CONTROL_QUIT_UNCONFIRMED/);
+    else await context.cleanup();
+    assert.equal(closes,1);assert.equal(aborts,1);assert.equal(context.quitAttempted,true);assert.equal(context.cleanupAttempted,true);
+  }
 });

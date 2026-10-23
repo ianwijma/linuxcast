@@ -30,7 +30,7 @@ export async function main(sourceRoot) {
   const { _electron, expect } = require('@playwright/test');
   const executable = createRequire(join(sourceRoot,'apps/desktop/package.json'))('electron');
   const { api, protocol } = await loadProduction(sourceRoot,expect);
-  let app, auxiliary, quitAttempted=false, cleanupAttempted=false;
+  let app, child, auxiliary, quitAttempted=false, cleanupAttempted=false;
   const within = async (operation, maximum=8000) => {
     const remaining = Math.min(maximum,end-performance.now());
     if (remaining<=0) throw new Error('CONTROL_DEADLINE');
@@ -41,7 +41,7 @@ export async function main(sourceRoot) {
   const profile = join(process.env.LINUXCAST_S001_MATRIX_ROOT,'linuxcast-launcher-owned-control');
   const cleanup = async () => {
     cleanupAttempted=true; api.abort();
-    if (app?.process().exitCode===null) {
+    if (child?.exitCode===null) {
       // No second uncertain Quit. The required outer reviewed supervisor
       // tears down all owned descendants if that one attempt did not finish.
       if (quitAttempted) throw new Error('CONTROL_QUIT_UNCONFIRMED');
@@ -55,6 +55,7 @@ export async function main(sourceRoot) {
     app = await within(timeout => _electron.launch({ executablePath:executable,chromiumSandbox:true,
       args:['--ozone-platform=x11',entry], env:{...process.env,TMPDIR:process.env.LINUXCAST_S001_MATRIX_ROOT,
         LINUXCAST_LAUNCHER_PROFILE:profile,LINUXCAST_LAUNCHER_SHORTCUT:'Ctrl+Alt+Shift+F12'},timeout }),60000);
+    child = app.process();
     const page = await within(() => app.firstWindow(),60000);
     await within(timeout => page.waitForURL('linuxcast://launcher/index.html',{timeout}),60000);
     await within(timeout => expect(page.getByRole('textbox',{name:'Search commands',exact:true})).toBeVisible({timeout}),60000);
@@ -67,8 +68,6 @@ export async function main(sourceRoot) {
             webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true}});
           window.webContents.setWindowOpenHandler(() => ({action:'deny'}));
           window.webContents.on('will-navigate',event => event.preventDefault());
-          const html="<!doctype html><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'none'\"><title>Linuxcast fixed auxiliary control</title><p>Public synthetic auxiliary window</p>";
-          await window.loadURL('data:text/html;charset=utf-8,'+encodeURIComponent(html));
           window.showInactive();return window;
         });
         const value = await auxiliary.evaluate(window => {
@@ -94,8 +93,8 @@ export async function main(sourceRoot) {
       quit: () => within(async () => {
         quitAttempted=true;
         await app.close();
-        if (app.process().signalCode!==null) throw new Error('CONTROL_QUIT');
-        return app.process().exitCode;
+        if (!child || child.signalCode!==null) throw new Error('CONTROL_QUIT');
+        return child.exitCode;
       },15000),
       cleanup,
     });
