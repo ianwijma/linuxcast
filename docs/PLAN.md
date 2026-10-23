@@ -36,7 +36,7 @@ Support the full chat lifecycle, Quick AI and saved commands, context previews, 
 
 The [roadmap](implementation/ROADMAP.md) and [task registry](implementation/tasks.json) turn the scope into independently owned PRs. First validate desktop focus/clipboard, privileged-input recovery, sandboxing, provider streaming and the editor's integration shape. Freeze contracts, then run UI, storage, permission, native adapter, extension, workflow, provider, browser and productivity lanes in parallel where dependencies allow.
 
-Use one isolated worktree per task. One coordinator owns contracts, manifests, lockfiles, migration numbering and task status. Task cards identify owned paths, input/output contracts, feature IDs, design references, implementation steps, validation commands and acceptance evidence. They are sized for GPT 6.1 Sol at high reasoning effort; no card should simply ask an agent to implement an entire subsystem without boundaries.
+Use one isolated worktree per task. One coordinator owns contracts, manifests, lockfiles, migration numbering and task status. Task cards identify owned paths, input/output contracts, feature IDs, design references, implementation steps, validation commands and acceptance evidence. Keep each card sized for one focused implementation change; no card should simply ask an agent to implement an entire subsystem without boundaries.
 
 Milestones: foundation alpha; desktop/extension/workflow alpha; complete productivity/AI beta; full local 1.0. Do not label a feature done before its acceptance evidence exists.
 
