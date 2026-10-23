@@ -17,7 +17,7 @@ def render_files(data):
     files = {}
     for task in tasks:
         lines = [f"# {task['id']} — {task['title']}", "",
-                 f"Status: **{task['status']}**. Lane: `{task['lane']}`. Target implementer: GPT 6.1 Sol, high reasoning effort.", "",
+                 f"Status: **{task['status']}**. Lane: `{task['lane']}`.", "",
                  "This card is generated from [tasks.json](../tasks.json). Edit the registry and rerun `python3 scripts/render_tasks.py`; do not independently edit this card.", "",
                  "## Goal and scope", "", task["title"] + ". Implement only the behaviour below and its referenced contracts. This is application work planned for a later PR; the documentation PR does not implement it.", "",
                  "Feature IDs: " + ", ".join(f"`{x}`" for x in task["featureIds"]) + ".", "",

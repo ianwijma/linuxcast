@@ -6,7 +6,7 @@ This repository currently contains the research and implementation handoff, not 
 
 Tasks use `planned`, `in-progress`, `blocked`, and `done`. Dependencies must be `done` before integration; mocked development may begin earlier only when the task card explicitly permits it and the contract is frozen. The coordinator records an owner and branch before concurrent work starts. A blocked task records its concrete blocker, not a vague progress note.
 
-Each task is intended for a bounded implementation run by GPT 6.1 Sol at high reasoning effort or a human engineer. If a card cannot be completed within a focused PR, split it before implementation while preserving feature coverage and acceptance checks. Do not replace specific requirements with a generic TODO.
+Each task is intended for a bounded implementation run. If a card cannot be completed within a focused PR, split it before implementation while preserving feature coverage and acceptance checks. Do not replace specific requirements with a generic TODO.
 
 Use `codex/<task-id>-<description>` branches and isolated worktrees. Shared contracts, migrations, manifests, lockfiles, and task-state updates have one coordinator owner. Prefer additive, reviewed contract changes; refresh dependent fixtures in the same integration change.
 
