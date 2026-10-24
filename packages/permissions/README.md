@@ -72,6 +72,10 @@ long-running feature jobs must use their separately supervised lifecycle rather
 than extending a single uncontrolled effect.
 
 Revocation clears local access and aborts sensitive work before SQLite deletion.
+A principal mutation gate blocks new/loading connections and new invocation/grant
+admission until durable writes, revocation and any late-write cleanup settle.
+This is explicit even for asynchronous store adapters; the actual storage owner
+also serializes SQLite operations on its single transport.
 Disconnect and capability generation changes abort old leases/prompts. Failed
 storage mutation quarantines that principal until the broker is restarted after
 storage recovery; no pending prefix of paginated decisions becomes a grant cache.
@@ -84,7 +88,7 @@ increasing generation. Session/lock transitions invalidate all contexts.
 
 `createDecisionStore` uses the actual F2 validated main StorageClient's three
 permission repository methods. Inventory reads accept at most 200 records per
-page and 10,000 per principal; IDs must increase and continuations must name the
+page and 10,000 records / 16 MiB per principal; IDs must increase and continuations must name the
 last returned ID. Audit is an in-memory ring of at most 1,024 allowlisted records:
 time, principal kind, outcome and permission IDs. No identity IDs, paths, origins,
 arguments, output, prompt text, tokens, credentials or raw exception details are

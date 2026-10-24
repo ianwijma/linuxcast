@@ -22,12 +22,15 @@ export function createDecisionStore(client:PermissionRepositoryClient):DecisionS
     async list(principalKey:string) {
       const records:DecisionRecord[]=[];
       let afterId:string|undefined;
+      let inventoryBytes=0;
       for(let page=0;page<=10_000;page++) {
         const params={principalKey,limit:200,...(afterId?{afterId}:{})};
         parseContract(permissionRepositoryContracts.get('permissions.list')!.params,params);
         const result=validated<{records:DecisionRecord[];nextCursor:string|null}>('permissions.list',await client.request('permissions.list',params));
         let previous=afterId;
         for(const record of result.records) {
+          inventoryBytes+=Buffer.byteLength(JSON.stringify(record));
+          if(inventoryBytes>16*1024*1024)throw new Error('Permission inventory exceeds byte limit.');
           if(key(record)!==principalKey || (previous!==undefined && record.id<=previous)) throw new Error('Invalid permission page.');
           previous=record.id;
           records.push(record);

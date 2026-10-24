@@ -28,6 +28,12 @@ describe('F3-01 bounded grant inventory',()=>{
       return {records:[{...record(1),privateContent:params.principalKey}],nextCursor:null};
     }));await expect(store.list(principalKey)).rejects.toThrow();
   });
+  it('bounds cumulative inventory bytes even below the record-count limit',async()=>{
+    const largePrincipal={kind:'builtin' as const,id:'x'.repeat(64_000)};
+    const largeKey=createHash('sha256').update(principalKeyMaterial(largePrincipal)).digest('hex');
+    let page=0;const store=createDecisionStore(client(()=>{const records=Array.from({length:8},(_,i)=>({...record(page*8+i+1),principal:largePrincipal}));page++;return {records,nextCursor:records.at(-1)!.id};}));
+    await expect(store.list(largeKey)).rejects.toThrow('byte limit');expect(page).toBeLessThan(40);
+  });
   it('rejects an inventory beyond the explicit total bound',async()=>{
     let page=0;const store=createDecisionStore(client(()=>{const records=Array.from({length:200},(_,i)=>record(page*200+i+1));page++;return {records,nextCursor:records.at(-1)!.id};}));await expect(store.list(principalKey)).rejects.toThrow('exceeds limit');expect(page).toBe(51);
   });

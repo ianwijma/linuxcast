@@ -94,6 +94,31 @@ describe('F3-01 trusted permission boundaries',()=>{
     const result=session.submit(submission);await tick();const revocation=f.broker.revoke(identity,memory.records[0]!.id);
     expect(signal!.aborted).toBe(true);expect(await result).toMatchObject({outcome:'cancelled',effectOutcome:'unknown',automaticReplay:false,requiresReview:true,remediationAction:'request-permission-again'});release();expect(await revocation).toBe(true);f.broker.close();
   });
+  it('blocks reconnect/loading connections and grant admission until asynchronous revocation settles',async()=>{
+    const memory=memoryStore();const f=fixture({},memory.store);const identity={};await f.broker.connect(identity,principal,[read]);
+    const session=f.broker.begin(identity,{source:'explicit-user-action'});const approval=await prompt(f.broker,session);await f.broker.decide(approval.id,'persistent');
+    const originalList=memory.store.list;let releaseRead!:(records:DecisionRecord[])=>void;
+    const captured=structuredClone(memory.records);memory.store.list=()=>new Promise(resolve=>{releaseRead=resolve;});
+    const loading=f.broker.connect({},principal,[read]);const rejected=expect(loading).rejects.toThrow('storage unavailable');
+    let releaseDelete!:()=>void;memory.store.revoke=()=>new Promise(resolve=>{releaseDelete=()=>{memory.records.length=0;resolve(true);};});
+    const revocation=f.broker.revoke(identity,memory.records[0]!.id);
+    await expect(f.broker.connect({},principal,[read])).rejects.toThrow('requires recovery');
+    expect(()=>f.broker.begin(identity,{source:'explicit-user-action'})).toThrow('Connection unavailable');
+    releaseRead(captured);await rejected;releaseDelete();expect(await revocation).toBe(true);
+    memory.store.list=originalList;const reconnected={};await f.broker.connect(reconnected,principal,[read]);
+    expect(await f.broker.begin(reconnected,{source:'explicit-user-action'}).submit(submission)).toMatchObject({outcome:'permission-required'});f.broker.close();
+  });
+  it('holds admission closed until a concurrent late grant and its cleanup both settle',async()=>{
+    const memory=memoryStore();const f=fixture({},memory.store);const identity={};await f.broker.connect(identity,principal,[read]);
+    const session=f.broker.begin(identity,{source:'explicit-user-action'});const approval=await prompt(f.broker,session);
+    let releasePut!:()=>void;memory.store.put=record=>new Promise(resolve=>{releasePut=()=>{memory.records.push(record);resolve(record);};});
+    const deciding=f.broker.decide(approval.id,'persistent');f.broker.disconnect(identity);
+    await expect(f.broker.connect({},principal,[read])).rejects.toThrow();
+    let releaseCleanup!:()=>void;memory.store.revoke=()=>new Promise(resolve=>{releaseCleanup=()=>{memory.records.length=0;resolve(true);};});
+    releasePut();await tick();await expect(f.broker.connect({},principal,[read])).rejects.toThrow();
+    releaseCleanup();expect(await deciding).toMatchObject({outcome:'unavailable'});
+    await f.broker.connect({},principal,[read]);f.broker.close();
+  });
   it('disconnect cancels dispatched work and refuses stale reconnect closure',async()=>{
     let resolve!:(value:unknown)=>void;const f=await granted({execute:async()=>new Promise(r=>{resolve=r;})});
     const pending=f.session.submit(submission);await tick();f.broker.disconnect(f.identity);expect(await pending).toMatchObject({outcome:'cancelled',effectOutcome:'unknown',remediationAction:'reconnect'});

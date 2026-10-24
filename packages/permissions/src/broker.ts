@@ -53,6 +53,7 @@ export class PermissionBroker {
   #invocations = new Set<Invocation>();
   #prompts = new Map<string,Invocation>();
   #quarantined = new Set<string>();
+  #mutations = new Map<string,number>();
   #audit: AuditRecord[] = [];
   #unsubscribe: () => void;
   #closed = false;
@@ -71,14 +72,17 @@ export class PermissionBroker {
     const principal=parseContract(effectPrincipalSchema,principalValue);
     const declarations=requirements(declared);
     const key=digest(principalKeyMaterial(principal));
-    if(this.#quarantined.has(key)) throw new Error('Permission storage requires recovery.');
+    if(this.#quarantined.has(key) || this.#mutations.has(key)) throw new Error('Permission storage requires recovery.');
     const connection:Connection={identity,principal:structuredClone(principal),key,declarationHash:digest(JSON.stringify(declarations.map(requirementKey).sort())),declarations:new Set(declarations.map(requirementKey)),records:new Map(),closed:false,ready:false,epoch:0};
     this.#connections.set(identity,connection);
     try {
       const records=await this.#store.list(key);
-      if(connection.closed || connection.epoch!==0 || this.#closed || records.length>10_000 || this.#quarantined.has(key)) throw new Error();
+      if(connection.closed || connection.epoch!==0 || this.#closed || records.length>10_000 || this.#mutations.has(key) || this.#quarantined.has(key)) throw new Error();
       const staged=new Map<string,DecisionRecord>();
+      let inventoryBytes=0;
       for(const value of records) {
+        inventoryBytes+=Buffer.byteLength(JSON.stringify(value));
+        if(inventoryBytes>16*1024*1024)throw new Error('Permission inventory exceeds byte limit.');
         const record=parseContract(permissionDecisionRecordSchema,value);
         if(digest(principalKeyMaterial(record.principal))!==key) throw new Error();
         if(record.declarationHash===connection.declarationHash && connection.declarations.has(requirementKey(record))) {
@@ -92,7 +96,7 @@ export class PermissionBroker {
   /** Only the trusted input/workflow/model controller chooses source/intent. */
   begin(identity:object, context:{source:Source;runId?:string;intentRef?:string}):{submit(value:unknown):Promise<BrokerOutcome>;cancel():void} {
     const connection=this.#connections.get(identity);
-    if(!connection || !connection.ready || connection.closed || this.#closed || this.#quarantined.has(connection.key) || this.#invocations.size>=256) throw new Error('Connection unavailable.');
+    if(!connection || !connection.ready || connection.closed || this.#closed || this.#quarantined.has(connection.key) || this.#mutations.has(connection.key) || this.#invocations.size>=256) throw new Error('Connection unavailable.');
     const invocation:Invocation={connection,context:{schemaVersion:1,invocationId:randomUUID(),principal:structuredClone(connection.principal),source:context.source,...(context.runId?{runId:context.runId}:{}),...(context.intentRef?{intentRef:context.intentRef}:{})},generation:this.#capabilities.generation,epoch:connection.epoch,controller:new AbortController(),requirements:[],once:new Set(),busy:false,done:false,dispatched:false,remediation:'request-permission-again'};
     this.#invocations.add(invocation);
     return {submit:async value=>{const outcome=await this.#submit(invocation,value);this.#audit.push({at:new Date().toISOString(),principalKind:connection.principal.kind,outcome:outcome.outcome,permissionIds:[...new Set(invocation.requirements.map(r=>r.permissionId))]});if(this.#audit.length>1024)this.#audit.shift();return outcome;},cancel:()=>this.#cancel(invocation,'request-permission-again')};
@@ -170,12 +174,13 @@ export class PermissionBroker {
   }
   async decide(promptId:string,decision:'once'|'persistent'|'deny'):Promise<{outcome:'recorded'|'unavailable';remediationAction?:'retry-storage'|'request-permission-again'}> {
     const invocation=this.#prompts.get(promptId);
-    if(!invocation || invocation.busy || !this.#fresh(invocation) || !invocation.prompt) return {outcome:'unavailable',remediationAction:'request-permission-again'};
+    if(!invocation || invocation.busy || this.#mutations.has(invocation.connection.key) || !this.#fresh(invocation) || !invocation.prompt) return {outcome:'unavailable',remediationAction:'request-permission-again'};
     const prompt=invocation.prompt;
     this.#prompts.delete(promptId); delete invocation.prompt;
     if(decision==='once') {for(const requirement of prompt.requirements)invocation.once.add(requirementKey(requirement));return {outcome:'recorded'};}
     if(decision!=='persistent' && decision!=='deny') return {outcome:'unavailable',remediationAction:'request-permission-again'};
     invocation.busy=true;
+    this.#startMutation(invocation.connection.key);
     try {
       const records:DecisionRecord[]=[];
       for(const requirement of prompt.requirements) {
@@ -191,8 +196,10 @@ export class PermissionBroker {
       if(decision==='deny') for(const pending of this.#invocations) if(pending.connection.key===invocation.connection.key && pending.requirements.some(r=>records.some(record=>requirementKey(record)===requirementKey(r)))) this.#cancel(pending,'review-permissions');
       return {outcome:'recorded'};
     } catch {this.#quarantine(invocation.connection.key);return {outcome:'unavailable',remediationAction:'retry-storage'};}
-    finally {invocation.busy=false;if(invocation.controller.signal.aborted)this.#invocations.delete(invocation);}
+    finally {this.#endMutation(invocation.connection.key);invocation.busy=false;if(invocation.controller.signal.aborted)this.#invocations.delete(invocation);}
   }
+  #startMutation(key:string):void {this.#mutations.set(key,(this.#mutations.get(key)??0)+1);}
+  #endMutation(key:string):void {const remaining=(this.#mutations.get(key)??1)-1;if(remaining)this.#mutations.set(key,remaining);else this.#mutations.delete(key);}
   #quarantine(key:string):void {this.#quarantined.add(key);for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'retry-storage');}
   /** Remove access immediately, before waiting on durable deletion. Failed
    * deletion quarantines the principal for this broker lifetime. */
@@ -201,9 +208,11 @@ export class PermissionBroker {
     if(!connection)return false;
     const record=[...connection.records.values()].find(r=>r.id===recordId);
     if(!record)return false;
+    this.#startMutation(connection.key);
     for(const current of this.#connections.values())if(current.key===connection.key) {current.records.delete(requirementKey(record));current.epoch++;}
     for(const invocation of this.#invocations)if(invocation.connection.key===connection.key)this.#cancel(invocation,'request-permission-again');
     try {await this.#store.revoke(recordId);return true;} catch {this.#quarantine(connection.key);return false;}
+    finally {this.#endMutation(connection.key);}
   }
   disconnect(identity:object):void {
     const connection=this.#connections.get(identity);if(!connection)return;
