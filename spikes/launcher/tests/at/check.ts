@@ -52,6 +52,7 @@ const snapshots: { label: string; snapshot: NativeSnapshot }[] = [];
 let lastNativeAttempt: { label: string; snapshot: NativeSnapshot } | undefined;
 const presentations: { label: string; generatedAfterNativeFocus: boolean; dispatchAttemptObserved: boolean }[] = [];
 let headingFocusEventReceiptObserved = false;
+let recordFocusEventReceiptObserved = false;
 const helpSentences = [
   'Linuxcast opened, but focus is unconfirmed for this request.',
   'Select Linuxcast using the desktop app switcher or click its window to type.',
@@ -111,6 +112,7 @@ const hasLabel = (text: string, marker: string, label: string) => text.split('\n
 // Orca48 event_manager._ignore logs this receipt before its ignore decisions.
 // Absence means only not observed in this debug slice, never proven nonreceipt.
 const hasHeadingFocusReceipt = (text: string) => text.split('\n').some(line => /^(?:\d{2}:\d{2}:\d{2}\.\d{6} - )?EVENT MANAGER: object:state-changed:focused for \[heading: 'Launcher capabilities'\] in [^\r\n]+ \(1, 0, [^\r\n]*\)$/.test(line));
+const hasRecordFocusReceipt = (text: string) => text.split('\n').some(line => /^(?:\d{2}:\d{2}:\d{2}\.\d{6} - )?EVENT MANAGER: object:state-changed:focused for \[toggle button: 'Record shortcut'\] in [^\r\n]+ \(1, 0, [^\r\n]*\)$/.test(line));
 const startupCompleted = () => log().includes('ORCA: Startup complete') || log().includes('ORCA: Starting Atspi main event loop');
 const orcaVersion = /[0-9]+\.[0-9]+(?:\.[0-9]+)?/.exec(spawnSync('/usr/bin/orca', ['--version'], { env, encoding: 'utf8', timeout: 20_000 }).stdout ?? '')?.[0] ?? 'unavailable';
 
@@ -256,6 +258,7 @@ try {
     await expect.poll(() => {
       const fresh = log().slice(offset);
       if (label === 'Launcher capabilities') headingFocusEventReceiptObserved ||= hasHeadingFocusReceipt(fresh);
+      if (label === 'Record shortcut') recordFocusEventReceiptObserved ||= hasRecordFocusReceipt(fresh);
       presentation.generatedAfterNativeFocus = hasLabel(fresh, 'SPEECH OUTPUT:', label);
       presentation.dispatchAttemptObserved = hasLabel(fresh, 'SPEECH DISPATCHER: Speaking', label);
       return !orcaExited && presentation.generatedAfterNativeFocus && presentation.dispatchAttemptObserved;
@@ -324,7 +327,7 @@ try {
   expect(orcaExited).toBe(false);
   writeFileSync(join(evidence, 'native-at.json'), JSON.stringify({ status: 'passed-native-focus', mode, expectedCheckpoints, skippedLegacyCheckpoints, snapshots }, null, 2) + '\n');
   writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'passed-generated-presentation', orcaVersion, startupCompleted: startupCompleted(),
-    mode, expectedCheckpoints, skippedLegacyCheckpoints, expectedPresentationCheckpoints, helpReading, headingFocusEventReceiptObserved, anchors, presentations, limitation: 'Ordinary focus: generated presentation and dispatch attempts only, not receipt. Essential help reading: completed Speech Dispatcher callback progression. No audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof.' }, null, 2) + '\n');
+    mode, expectedCheckpoints, skippedLegacyCheckpoints, expectedPresentationCheckpoints, helpReading, headingFocusEventReceiptObserved, recordFocusEventReceiptObserved, anchors, presentations, limitation: 'Ordinary focus: generated presentation and dispatch attempts only, not receipt. Essential help reading: completed Speech Dispatcher callback progression. No audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof.' }, null, 2) + '\n');
   writeFileSync(join(evidence, 'report.json'), JSON.stringify({ status: 'passed', stage, mode, expectedCheckpoints, skippedLegacyCheckpoints, nativeFocus: expectedCheckpoints.length, generatedPresentation: expectedPresentationCheckpoints.length, helpReading,
     affectedActivationHelpChecks: 4, syntheticUnconfirmedFocusState: true, actualGnomeFocusEstablished: false,
     boundary: 'Actual launcher on private Xvfb/session/AT buses; synthetic app-only observation; actual renderer sandbox; no host display hooks/settings or audible QA.' }, null, 2) + '\n');
@@ -333,7 +336,7 @@ try {
   // Operational stages/allowlisted booleans only. Never persist raw Orca debug,
   // unfiltered accessible text, application screenshots or exception payloads.
   writeFileSync(join(evidence, 'native-at.json'), JSON.stringify({ status: 'incomplete', stage, mode, expectedCheckpoints, skippedLegacyCheckpoints, snapshots, lastNativeAttempt }, null, 2) + '\n');
-  writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'incomplete', stage, mode, expectedCheckpoints, skippedLegacyCheckpoints, expectedPresentationCheckpoints, helpReading, headingFocusEventReceiptObserved, orcaVersion, startupCompleted: startupCompleted(), anchors, presentations,
+  writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: 'incomplete', stage, mode, expectedCheckpoints, skippedLegacyCheckpoints, expectedPresentationCheckpoints, helpReading, headingFocusEventReceiptObserved, recordFocusEventReceiptObserved, orcaVersion, startupCompleted: startupCompleted(), anchors, presentations,
     anyKnownGenerated: ['Dismiss launcher', 'Search commands', 'Hide launcher', 'Actions Ctrl K', 'Record shortcut', 'Cancel shortcut change', 'View activation help', 'Launcher capabilities', 'Launcher capability details'].some(label => hasLabel(log(), 'SPEECH OUTPUT:', label)),
     anyKnownDispatchAttemptObserved: ['Dismiss launcher', 'Search commands', 'Hide launcher', 'Actions Ctrl K', 'Record shortcut', 'Cancel shortcut change', 'View activation help', 'Launcher capabilities', 'Launcher capability details'].some(label => hasLabel(log(), 'SPEECH DISPATCHER: Speaking', label)) }, null, 2) + '\n');
   writeFileSync(join(evidence, 'report.json'), JSON.stringify({ status: 'incomplete', stage, mode, expectedCheckpoints, skippedLegacyCheckpoints, limitation: 'Required assertions did not all pass. No acceptance success or audible/compositor QA inferred.' }, null, 2) + '\n');

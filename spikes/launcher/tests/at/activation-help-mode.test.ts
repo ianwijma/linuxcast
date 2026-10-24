@@ -24,6 +24,75 @@ it('recognizes only the fixed fresh Orca heading focus-gained receipt', () => {
   const prior = marker + '\n';
   expect(hasReceipt((prior + 'unrelated fresh line').slice(prior.length))).toBe(false);
 });
+const recordReceipt = "11:00:00.000001 - EVENT MANAGER: object:state-changed:focused for [toggle button: 'Record shortcut'] in [public synthetic app] (1, 0, None)";
+const recordPredicate = section('const hasRecordFocusReceipt =', '\nconst startupCompleted');
+const recordReceiptMatcher = () => runInNewContext(`${stripTypeScriptTypes(recordPredicate)}\nhasRecordFocusReceipt`) as (text: string) => boolean;
+it('recognizes only the fixed Record toggle-button focus gain, never another role/name or loss', () => {
+  const hasReceipt = recordReceiptMatcher();
+  expect(hasReceipt(recordReceipt)).toBe(true);
+  expect(hasReceipt(recordReceipt.replace(/^.*? - /, ''))).toBe(true);
+  for (const line of [
+    recordReceipt.replace('(1, 0,', '(0, 0,'),
+    recordReceipt.replace('[toggle button:', '[button:'),
+    recordReceipt.replace('[toggle button:', '[heading:'),
+    recordReceipt.replace('Record shortcut', 'Record shortcut extra'),
+    recordReceipt.replace('Record shortcut', 'PRIVATE_SEED'),
+    recordReceipt.replace('state-changed:focused', 'state-changed:pressed'),
+    'prefix ' + recordReceipt,
+    "SPEECH OUTPUT: 'Record shortcut'",
+  ]) expect(hasReceipt(line)).toBe(false);
+  const prior = recordReceipt + '\n';
+  expect(hasReceipt((prior + 'unrelated fresh line').slice(prior.length))).toBe(false);
+});
+
+for (const scenario of ['fresh', 'absent', 'stale', 'receipt-only', 'missing-attempt', 'other-control']) {
+  it(`actual focus path keeps Record receipt observational and uses its existing fresh offset: ${scenario}`, async () => {
+    const label = scenario === 'other-control' ? 'Search commands' : 'Record shortcut';
+    const prior = recordReceipt + '\nPRIVATE_SEED\n';
+    const fresh = [
+      !['absent', 'stale'].includes(scenario) ? recordReceipt : '',
+      scenario !== 'receipt-only' ? `SPEECH OUTPUT: '${label}'` : '',
+      !['receipt-only', 'missing-attempt'].includes(scenario) ? `SPEECH DISPATCHER: Speaking '${label}'` : '',
+    ].join('\n');
+    const context = {
+      label, recordFocusEventReceiptObserved: false, headingFocusEventReceiptObserved: false,
+      nativeFocusCheck: async () => prior.length, log: () => prior + fresh,
+      hasRecordFocusReceipt: recordReceiptMatcher(),
+      hasHeadingFocusReceipt: () => false,
+      hasLabel: (text: string, marker: string, name: string) => text.split('\n').some(line => line.includes(marker) && line.includes(name)),
+      presentations: [], orcaExited: false, capture: async () => undefined,
+      expect: { poll: (predicate: () => boolean, options: { timeout: number }) => ({ toBe: async (value: boolean) => {
+        expect(options.timeout).toBe(10_000);
+        if (predicate() !== value) throw new Error('PRESENTATION_INCOMPLETE');
+      } }) },
+    };
+    const focus = section('  const focusCheck =', '\n  const readActivationHelp');
+    const execution = runInNewContext(`(async () => { ${stripTypeScriptTypes(focus)}\nawait focusCheck(label, 'toggle-button', {}, 'Tab'); })()`, context);
+    if (['receipt-only', 'missing-attempt'].includes(scenario)) await expect(execution).rejects.toThrow('PRESENTATION_INCOMPLETE');
+    else await execution;
+    expect(context.recordFocusEventReceiptObserved).toBe(['fresh', 'receipt-only', 'missing-attempt'].includes(scenario));
+  });
+}
+
+it('exports only the fixed Record receipt boolean in both existing Orca report paths', () => {
+  for (const status of ['passed-generated-presentation', 'incomplete']) {
+    const report = section(`  writeFileSync(join(evidence, 'orca.json'), JSON.stringify({ status: '${status}'`, '\n  writeFileSync');
+    let serialized = '';
+    runInNewContext(report, {
+      writeFileSync: (_path: string, data: string) => { serialized = data; }, join: () => 'orca.json', evidence: '',
+      stage: 'focus:Record shortcut', mode: 'default-nine', expectedCheckpoints: [], skippedLegacyCheckpoints: [], expectedPresentationCheckpoints: [],
+      helpReading: {}, headingFocusEventReceiptObserved: false, recordFocusEventReceiptObserved: true,
+      orcaVersion: '48.1', startupCompleted: () => true, anchors: [], presentations: [],
+      log: () => 'PRIVATE_SEED', hasLabel: () => false,
+    });
+    const value = JSON.parse(serialized) as Record<string, unknown>;
+    expect(value.recordFocusEventReceiptObserved).toBe(true);
+    expect(Object.keys(value).filter(key => key.startsWith('record'))).toEqual(['recordFocusEventReceiptObserved']);
+    expect(serialized).not.toContain('PRIVATE_SEED');
+    expect(serialized).not.toContain('EVENT MANAGER:');
+  }
+});
+
 for (const name of ['check.ts', 'xvfb-orca.ts', 'private-session.ts']) {
   it(`${name} permits only default or the fixed help flag before effects`, () => {
     const text = readFileSync(new URL(name, import.meta.url), 'utf8');

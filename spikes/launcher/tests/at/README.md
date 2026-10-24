@@ -12,6 +12,27 @@ manual-recovery reproduction remain outstanding; the focused result does not
 establish audible output or the desktop matrix. This dated documentation update
 followed execution; the executed README hash remains recorded in execution.json.
 
+### Source-only Record receipt observation
+
+The current checker adds `recordFocusEventReceiptObserved` to the existing
+success/incomplete Orca reports. It observes only the exact `Record shortcut`
+toggle-button focus-gain event in the same fresh slice already used by that
+control's presentation checks. Orca48.1 `event_manager.py:232-238` logs the
+event before its ignore decisions; `ax_utilities_debugging.py:66-89` formats
+its role/name and focus-gain detail. Its public role spelling is `toggle button`.
+True means that receipt was observed, not that Orca processed or spoke the
+control. False means not observed in this slice, not proven nonreceipt; the
+help-only mode skips Record and leaves this boolean false.
+
+This boolean never gates success. Native focus/event/role checks, generated
+presentation and dispatch-attempt checks, deadlines, mode routing and cleanup
+remain unchanged. Tests cover gain/loss, role/name rejection, stale/nonpublic
+input, the actual fresh-offset observation, unchanged success/failure behavior
+and boolean-only report serialization. No raw event, log or private path is
+exported. This increment has no runtime evidence: the accepted focused run
+executed checker `9313a473954c87f14b296a8c8e8587acaa5ffd84a01462257059650639c6ab4b`.
+It neither diagnoses the retained default-nine failure nor closes S0-01-UI.
+
 The current `check.ts` keeps all nine native focus/name/role checkpoints (four
 in `--activation-help-only` mode). The help landmark no longer requires its
 passive accessible name to be announced automatically. After its unchanged
