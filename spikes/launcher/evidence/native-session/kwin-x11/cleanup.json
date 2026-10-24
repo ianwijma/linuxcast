@@ -1,0 +1,10 @@
+{
+  "verifiedAtUtc": "2026-10-22T19:01:36.156237+00:00",
+  "privateProcessTreeCleanupVerified": true,
+  "processCounts": {"gnome-shell": 0, "kwin_wayland": 0, "kwin_x11": 0, "Xvfb": 0, "electron": 0, "node": 0, "gdb": 0, "dbus-daemon": 2, "python3": 0},
+  "checkingPythonProcessExcluded": true,
+  "privateMatrixRootsAbsent": true,
+  "inputLabMarkerPath": "/run/linuxcast-input-spike-lab",
+  "inputLabMarkerAbsent": true,
+  "physicalDesktopMatrixEstablished": false
+}

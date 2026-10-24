@@ -1,0 +1,17 @@
+{
+  "kind": "S0-01-reviewed-one-run-collector-source",
+  "nativeExecuted": false,
+  "guestAccessed": false,
+  "checks": {
+    "collector": 28,
+    "orchestration": 18
+  },
+  "sha256": {
+    "README.md": "2ce0e07880c921b84ad1cc1c0215c687dbfe0a134d246d1f209be12ee475d48b",
+    "collect.py": "f9c79944ed04cbc02e87d540eea57f68e5b736e7eab55f22a8a21fdae99404ae",
+    "guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "host.py": "598d5e74fbae34c46585be1e53ba12d39ca4f70deebfe8141124ec1eea92b807",
+    "test_collect.py": "a1a7a86302a0b039904985ed56acff16df1a1bb1cc826eeb37f6ddbc94cedf59",
+    "test_orchestration.py": "34c5b79c5549eee72c120bb44ba0fab590e76c74b0f80da663f7de5c7e6e45ef"
+  }
+}

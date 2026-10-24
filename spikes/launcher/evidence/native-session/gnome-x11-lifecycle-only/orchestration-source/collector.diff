@@ -1,0 +1,564 @@
+--- a/collect.py
++++ b/collect.py
+@@ -18,16 +18,18 @@
+ import tempfile
+ 
+ BACKEND = 'gnome-x11'
+-SIGNED_RUNTIME = '852f3abf2aeb227d7ada92e29e965830edc8e5e0'
++PROBE_MODE = 'lifecycle-only'
++RUNNER_ARGUMENTS = (BACKEND, '--private-guest', '--probe-mode', PROBE_MODE)
++SIGNED_BASELINE = '852f3abf2aeb227d7ada92e29e965830edc8e5e0'
+ SOURCE_SCOPE = 'declared-runtime-and-static-inputs'
+ ARCHIVE_BASELINE = '03df170788c2cd2358b15e93cf65dde51919db0c'
+-INCREMENT_MANIFEST = '463e4632b4b8bd034bd1a18b03d0e269c4f4791e1ecee68fb4ebef1cbaa62b0c'
+-INCREMENT = '312000a4bd3488fa589acf2d785c986f70622d262a60a68c22d1af86c75bde83'
+-ARCHIVE_HASH = '890f1429b331fdca52042aa56d99784100a7cb8feea7c6c9945ed3472624607a'
+-AUTHORITY_HASH = 'e3c880b2d2e59aaec895e7a7d340e21b84bd3a5df4743cbd5a0c13c670a1b940'
+-MANIFEST_HASH = '78ad174ca9e0aa3fce42aa5cb6032eb10fb2afe5f3984e80952a0e0daefe47f3'
+-ARCHIVE_CONSTRUCTION = {'baselineCommit': ARCHIVE_BASELINE, 'overlaySourceCommit': SIGNED_RUNTIME,
+-                        'reviewedIncrementSha256': INCREMENT, 'unsignedWhenPrepared': True}
++INCREMENT_MANIFEST = '87cb0c481ebc72b6674f6e73501d6f04404c733da8893c7afba43409c157902d'
++INCREMENT = '8056573a397791a68d072a5db78306afbbcc2f6b2d00817864ca6061449ca8f6'
++ARCHIVE_HASH = 'ed4390dcc734aa9337f571594d5fbcdbd1c7cabf2b95ce358891e6c9328fcdc4'
++AUTHORITY_HASH = '35cf513245a17205a22f9e8b408eb4ba1a4a070743864585d86328524deb7b7b'
++MANIFEST_HASH = 'ef1499754c2aec7d7834fbedc70b1c8c1eb1c87bef6a892e382a01042d5b4541'
++UNSIGNED_RUNTIME_INPUTS = ('check.ts', 'protocol.ts', 'run-session.py', 'artifacts.py')
++ARCHIVE_CONSTRUCTION = {'baselineCommit': '03df170788c2cd2358b15e93cf65dde51919db0c', 'signedOverlaySourceCommit': '852f3abf2aeb227d7ada92e29e965830edc8e5e0', 'reviewedUnsignedIncrementSha256': '199449fea49ce0215da0b11a978cf4607b76e2472fd1fa07400bf48b4e0fa465', 'reviewedUnsignedIncrementManifestSha256': 'ab67b85d4f14a0e273334b63cf173efbbd3caeef43f0ca00d665ada9303a72af', 'reviewedIncrementSha256': '8056573a397791a68d072a5db78306afbbcc2f6b2d00817864ca6061449ca8f6', 'unsignedWhenPrepared': True}
+ HOME = pathlib.Path('/home/debian')
+ RELATIVE = pathlib.Path('spikes/launcher/tests/native-session')
+ MARKER = pathlib.Path('/run/linuxcast-input-spike-lab')
+@@ -76,21 +78,22 @@
+     require(digest(raw) == AUTHORITY_HASH)
+     authority = json.loads(raw)
+     require(digest(regular_bytes(archive, 8 * 1024 * 1024)) == ARCHIVE_HASH)
+-    require(type(authority) is dict and set(authority) == {'sourceStatusScope', 'sourceSigned', 'sourceDirty',
+-        'runtimeInputsMatchSignedCommit', 'signedRuntimeCommit', 'verifiedRuntimeCommit', 'archiveRepresentsWholeSignedTree',
++    require(type(authority) is dict and set(authority) == {'probeMode', 'sourceStatusScope', 'sourceSigned', 'sourceDirty',
++        'runtimeInputsMatchSignedCommit', 'verifiedSignedBaselineCommit', 'unsignedRuntimeInputs', 'archiveRepresentsWholeSignedTree',
+         'archiveConstruction', 'reviewedIncrementSha256', 'reviewedIncrementManifestSha256', 'reviewedDiffPaths',
+         'reviewedPatchedFileSha256', 'archiveSha256', 'buildManifestSha256', 'sourceSha256', 'outputSha256',
+         'designTokensSha256', 'launcherDesktopFileSha256', 'dependencyAuthority'})
+-    require(authority['archiveSha256'] == ARCHIVE_HASH and authority['signedRuntimeCommit'] == SIGNED_RUNTIME)
+-    require(authority['verifiedRuntimeCommit'] == SIGNED_RUNTIME and authority['sourceStatusScope'] == SOURCE_SCOPE)
+-    require(authority['sourceSigned'] is True and authority['sourceDirty'] is False and authority['runtimeInputsMatchSignedCommit'] is True)
++    require(authority['probeMode'] == PROBE_MODE and authority['archiveSha256'] == ARCHIVE_HASH)
++    require(authority['verifiedSignedBaselineCommit'] == SIGNED_BASELINE and authority['sourceStatusScope'] == SOURCE_SCOPE)
++    require(authority['sourceSigned'] is False and authority['sourceDirty'] is True and authority['runtimeInputsMatchSignedCommit'] is False)
++    require(type(authority['unsignedRuntimeInputs']) is list and authority['unsignedRuntimeInputs'] == list(UNSIGNED_RUNTIME_INPUTS))
+     require(authority['archiveRepresentsWholeSignedTree'] is False)
+     require(type(authority['archiveConstruction']) is dict and authority['archiveConstruction'] == ARCHIVE_CONSTRUCTION)
+     require(authority['archiveConstruction']['unsignedWhenPrepared'] is True)
+     require(authority['reviewedIncrementSha256'] == INCREMENT and authority['reviewedIncrementManifestSha256'] == INCREMENT_MANIFEST)
+     require(authority['buildManifestSha256'] == MANIFEST_HASH)
+     source = stage / RELATIVE
+-    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 7)
++    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 11)
+     for name, expected in authority['sourceSha256'].items():
+         file = pathlib.Path(os.path.abspath(source / name))
+         require(file.is_relative_to(stage) and digest(regular_bytes(file, 16 * 1024 * 1024)) == expected)
+@@ -113,8 +116,28 @@
+     require(len(packages) == len(set(packages)))
+     core = {key: item for key, item in value.items() if key not in ('privateProcessTreeCleanupVerified', 'packages')}
+     result = artifacts.public_result(core, BACKEND)
++    require(result.get('probeMode') == PROBE_MODE and result['status'] in ('incomplete', 'cleanup-incomplete'))
+     result.update(privateProcessTreeCleanupVerified=True, packages=packages)
+     return result
++
++
++def selected_checks_completed(report, status, image_names):
++    """Selected diagnostics never change the full-probe incomplete outcome."""
++    require(type(status) is int and status == 3)
++    require(type(image_names) is set and image_names <= set(PNG_NAMES))
++    require(type(report) is dict and report.get('probeMode') == PROBE_MODE)
++    require(report.get('status') in ('incomplete', 'cleanup-incomplete'))
++    require(report.get('diagnosticOutcome') in ('complete', 'failed'))
++    if report['diagnosticOutcome'] == 'complete':
++        require(report['status'] == 'incomplete' and image_names == set(PNG_NAMES))
++        return True
++    return False
++
++
++def selected_completion_evidence(report, status, image_names, outcome, unchanged, cleanup):
++    if report is None: return False
++    selected = selected_checks_completed(report, status, image_names)
++    return selected and outcome == 'completed' and unchanged is True and cleanup['cleanReleaseVerified'] is True
+ 
+ 
+ def verify_unchanged_build(here, runner, expected_manifest):
+@@ -129,8 +152,7 @@
+     require(manifest == expected_manifest and manifest['sourceSha256'] == authority['sourceSha256'])
+     for key in ('designTokensSha256', 'launcherDesktopFileSha256'):
+         require(manifest[key] == authority[key])
+-    require(status in (0, 3))
+-    require((status == 0) == (report['status'] == 'passed-bounded-native-probe'))
++    require(type(status) is int and status == 3)
+     files = {'report.json': json_bytes(report), 'source-manifest.json': json_bytes(manifest)}
+     for name in PNG_NAMES:
+         file = source / name
+@@ -138,6 +160,7 @@
+             value = regular_bytes(file, 8 * 1024 * 1024)
+             require(value.startswith(b'\x89PNG\r\n\x1a\n'))
+             files[name] = value
++    selected_checks_completed(report, status, set(files) & set(PNG_NAMES))
+     return files, manifest
+ 
+ 
+@@ -288,7 +311,7 @@
+     supervision = importlib.import_module('supervision')
+     manifest = runner.verify_build(here / 'dist')
+     require(manifest['sourceSha256'] == authority['sourceSha256'])
+-    historical = stage / 'spikes/launcher/evidence/native-session/gnome-x11'
++    historical = stage / 'spikes/launcher/evidence/native-session/gnome-x11-lifecycle-only'
+     if historical.exists():
+         require(historical == historical.resolve(strict=True) and historical.is_dir())
+         shutil.rmtree(historical)
+@@ -297,7 +320,7 @@
+     started, files, status, outcome = utc(), {}, None, 'collector-rejected'
+     unchanged = False
+     try:
+-        outcome, status = invoke_once(['/usr/bin/python3', str(here / 'run-session.py'), BACKEND, '--private-guest'],
++        outcome, status = invoke_once(['/usr/bin/python3', str(here / 'run-session.py'), *RUNNER_ARGUMENTS],
+                                      runner_environment(stage), stage, supervision.Supervisor)
+         verify_authority(stage, archive, authority_path)
+         verify_unchanged_build(here, runner, manifest)
+@@ -318,11 +341,13 @@
+                    'ownGuestSourceArchivesAndCachesRemoved': removed,
+                    'cleanReleaseVerified': clean_baseline(after) and clean_baseline(released) and removed,
+                    'hostSettingsOrDisplaysChanged': False, 'physicalDesktopMatrixEstablished': False}
+-        provenance = {'task': 'S0-01', 'backend': BACKEND, 'collectorOutcome': outcome,
++        report = json.loads(files['report.json']) if 'report.json' in files else None
++        selected = selected_completion_evidence(report, status, set(files) & set(PNG_NAMES), outcome, unchanged, cleanup)
++        provenance = {'task': 'S0-01', 'backend': BACKEND, 'probeMode': PROBE_MODE, 'selectedChecksCompleted': selected, 'collectorOutcome': outcome,
+             'startedUtc': started, 'finishedUtc': finished, 'exitCode': status,
+-            'executedRuntimeCommit': SIGNED_RUNTIME if outcome == 'completed' and type(status) is int and unchanged else None,
+-            'runtimeInputsMatchSignedCommit': True, 'signedRuntimeCommit': SIGNED_RUNTIME, 'verifiedRuntimeCommit': SIGNED_RUNTIME,
+-            'sourceStatusScope': SOURCE_SCOPE, 'sourceSigned': True, 'sourceDirty': False, 'reviewedIncrementSha256': INCREMENT,
++            'executedRuntimeCommit': None,
++            'runtimeInputsMatchSignedCommit': False, 'verifiedSignedBaselineCommit': SIGNED_BASELINE, 'unsignedRuntimeInputs': list(UNSIGNED_RUNTIME_INPUTS),
++            'sourceStatusScope': SOURCE_SCOPE, 'sourceSigned': False, 'sourceDirty': True, 'reviewedIncrementSha256': INCREMENT,
+             'archiveRepresentsWholeSignedTree': False, 'collectorSha256': collector_hash,
+             'privateSocketPathMaxBytes': SOCKET_PATH_LIMIT, 'privateSocketPathLengths': socket_path_lengths,
+             'archiveConstruction': dict(ARCHIVE_CONSTRUCTION),
+@@ -337,7 +362,7 @@
+         private_collection_root(collection)
+         require(identity(collection) == collection_identity)
+         publish(destination, files)
+-    return 0 if outcome == 'completed' and status == 0 and cleanup['cleanReleaseVerified'] else 3
++    return 3  # Lifecycle-only never becomes a full-probe pass.
+ 
+ 
+ if __name__ == '__main__':
+--- a/host.py
++++ b/host.py
+@@ -19,10 +19,10 @@
+ import threading
+ 
+ HERE = pathlib.Path(__file__).resolve().parent
+-IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
++IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable')
+ SOURCE = pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/tests/native-session')
+ # Filled only when the final reviewed collector/phase is frozen.
+-COLLECTOR_HASH = 'c21169685848ccfc90de99b17baf3ae89b70448f9125c7182a058bcfea42939d'
++COLLECTOR_HASH = 'e2cae87ba62c35d11c47a5b0e5b6e02e43830ef0ac8af28ac25b2f2d393a7043'
+ PHASE_HASH = 'bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754'
+ CONTAINER = 'linuxcast-s0-04-vm'
+ SSH = ['docker', 'exec', '-i', CONTAINER, '/usr/bin/ssh', '-i', '/lab/test-key', '-p', '2222',
+@@ -75,28 +75,31 @@
+ 
+ 
+ def public_provenance(value, collector, authority, manifest, image_names):
+-    exact_keys(value, ('task', 'backend', 'collectorOutcome', 'startedUtc', 'finishedUtc', 'exitCode',
+-        'executedRuntimeCommit', 'runtimeInputsMatchSignedCommit', 'signedRuntimeCommit', 'verifiedRuntimeCommit', 'sourceStatusScope', 'sourceSigned', 'sourceDirty', 'reviewedIncrementSha256', 'archiveRepresentsWholeSignedTree', 'collectorSha256',
++    exact_keys(value, ('task', 'backend', 'probeMode', 'selectedChecksCompleted', 'collectorOutcome', 'startedUtc', 'finishedUtc', 'exitCode',
++        'executedRuntimeCommit', 'runtimeInputsMatchSignedCommit', 'verifiedSignedBaselineCommit', 'unsignedRuntimeInputs', 'sourceStatusScope', 'sourceSigned', 'sourceDirty', 'reviewedIncrementSha256', 'archiveRepresentsWholeSignedTree', 'collectorSha256',
+         'privateSocketPathMaxBytes', 'privateSocketPathLengths', 'archiveConstruction', 'archiveSha256', 'sourceArchiveAuthoritySha256', 'sourceInputsVerified', 'sourceSha256',
+         'outputSha256', 'designTokensSha256', 'launcherDesktopFileSha256', 'sourceUnchangedDuringRun',
+         'rendererPixelsCaptured', 'screenshotKind', 'physicalDesktopMatrixEstablished'))
++    require(value['probeMode'] == collector.PROBE_MODE)
++    boolean(value['selectedChecksCompleted'])
+     require(value['task'] == 'S0-01' and value['backend'] == 'gnome-x11')
+     require(type(value['collectorOutcome']) is str and value['collectorOutcome'] in collector.OUTCOMES)
+     timestamp(value['startedUtc'])
+     timestamp(value['finishedUtc'])
+     require(value['finishedUtc'] >= value['startedUtc'])
+     require(value['exitCode'] is None or (type(value['exitCode']) is int and -64 <= value['exitCode'] <= 255))
++    if value['collectorOutcome'] == 'completed': require(type(value['exitCode']) is int and value['exitCode'] == 3)
+     boolean(value['sourceUnchangedDuringRun'])
+-    confirmed = value['collectorOutcome'] == 'completed' and type(value['exitCode']) is int and value['sourceUnchangedDuringRun']
+-    require(value['executedRuntimeCommit'] == (collector.SIGNED_RUNTIME if confirmed else None))
+-    require(value['runtimeInputsMatchSignedCommit'] is True and value['sourceStatusScope'] == collector.SOURCE_SCOPE)
+-    require(value['signedRuntimeCommit'] == collector.SIGNED_RUNTIME and value['verifiedRuntimeCommit'] == collector.SIGNED_RUNTIME)
+-    require(value['sourceSigned'] is True and value['sourceDirty'] is False and value['reviewedIncrementSha256'] == collector.INCREMENT)
++    require(value['executedRuntimeCommit'] is None)
++    require(value['runtimeInputsMatchSignedCommit'] is False and value['sourceStatusScope'] == collector.SOURCE_SCOPE)
++    require(value['verifiedSignedBaselineCommit'] == collector.SIGNED_BASELINE)
++    require(type(value['unsignedRuntimeInputs']) is list and value['unsignedRuntimeInputs'] == list(collector.UNSIGNED_RUNTIME_INPUTS))
++    require(value['sourceSigned'] is False and value['sourceDirty'] is True and value['reviewedIncrementSha256'] == collector.INCREMENT)
+     require(value['archiveRepresentsWholeSignedTree'] is False and value['collectorSha256'] == COLLECTOR_HASH)
+     require(type(value['privateSocketPathMaxBytes']) is int and value['privateSocketPathMaxBytes'] == 107)
+     require(value['privateSocketPathLengths'] == collector.socket_layout(pathlib.Path('/home/debian/lc1-xxxxxxxx/source')))
+     require(all(type(length) is int for length in value['privateSocketPathLengths'].values()))
+-    exact_keys(value['archiveConstruction'], ('baselineCommit', 'overlaySourceCommit', 'reviewedIncrementSha256', 'unsignedWhenPrepared'))
++    exact_keys(value['archiveConstruction'], ('baselineCommit', 'signedOverlaySourceCommit', 'reviewedUnsignedIncrementSha256', 'reviewedUnsignedIncrementManifestSha256', 'reviewedIncrementSha256', 'unsignedWhenPrepared'))
+     require(value['archiveConstruction']['unsignedWhenPrepared'] is True)
+     require(value['archiveConstruction'] == collector.ARCHIVE_CONSTRUCTION)
+     require(value['archiveSha256'] == collector.ARCHIVE_HASH and value['sourceArchiveAuthoritySha256'] == collector.AUTHORITY_HASH)
+@@ -143,7 +146,7 @@
+     if value['phase'] != 'native-attempted':
+         require(not encoded)
+     else:
+-        require(code in (0, 3) and {'provenance.json', 'cleanup.json'} <= set(encoded))
++        require(type(code) is int and code == 3 and {'provenance.json', 'cleanup.json'} <= set(encoded))
+     files = {}
+     for name, data in encoded.items():
+         require(type(data) is str)
+@@ -161,15 +164,16 @@
+         report = collector.public_report(json.loads(files['report.json']), artifacts)
+         manifest = artifacts.public_manifest(json.loads(files['source-manifest.json']))
+         require(manifest == expected_manifest)
+-        require((code == 0) == (report['status'] == 'passed-bounded-native-probe'))
++        collector.selected_checks_completed(report, code, image_names)
+         files['report.json'] = collector.json_bytes(report)
+         files['source-manifest.json'] = collector.json_bytes(manifest)
+     if 'provenance.json' in files:
+         provenance = public_provenance(json.loads(files['provenance.json']), collector, authority, expected_manifest, image_names)
+         cleanup = public_cleanup(json.loads(files['cleanup.json']), collector)
+-        if code == 0:
+-            require(provenance['collectorOutcome'] == 'completed' and provenance['exitCode'] == 0 and
+-                    provenance['sourceUnchangedDuringRun'] is True and cleanup['cleanReleaseVerified'] is True and 'report.json' in files)
++        report = json.loads(files['report.json']) if 'report.json' in files else None
++        expected = collector.selected_completion_evidence(report, provenance['exitCode'], image_names,
++            provenance['collectorOutcome'], provenance['sourceUnchangedDuringRun'], cleanup)
++        require(provenance['selectedChecksCompleted'] is expected)
+         files['provenance.json'] = collector.json_bytes(provenance)
+         files['cleanup.json'] = collector.json_bytes(cleanup)
+     release = {key: value[key] for key in ('phase', 'collectorExitCode', 'before', 'release', 'ownedGuestCapsuleRemoved', 'expectedToolSha256', 'toolsVerifiedBeforeAndAfter')}
+@@ -279,7 +283,7 @@
+             stream.write(collector.json_bytes(release))
+         keep = True
+         print(json.dumps({'outcome': 'collected', 'capsule': str(capsule), 'guestReleaseVerified': release['guestReleaseVerified']}))
+-        return 0 if release['guestReleaseVerified'] and release['collectorExitCode'] == 0 else 3
++        return 3  # Completed selected diagnostics still leave the full gate open.
+     finally:
+         require(collector.identity(capsule) == identity and not capsule.is_symlink())
+         if not keep:
+--- a/test_collect.py
++++ b/test_collect.py
+@@ -16,7 +16,7 @@
+ 
+ import collect
+ 
+-SOURCE = pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/tests/native-session')
++SOURCE = pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-preparation-source/spikes/launcher/tests/native-session')
+ sys.path.insert(0, str(SOURCE))
+ artifacts = importlib.import_module('artifacts')
+ supervision = importlib.import_module('supervision')
+@@ -26,7 +26,7 @@
+     def setUp(self):
+         self.temporary = tempfile.TemporaryDirectory(prefix='linuxcast-collector-test-')
+         self.root = pathlib.Path(self.temporary.name)
+-        self.report = artifacts.fallback_result('gnome-x11')
++        self.report = artifacts.fallback_result('gnome-x11','lifecycle-only')
+         self.report.update(privateProcessTreeCleanupVerified=True, packages=['gnome-shell 48.7'])
+ 
+     def tearDown(self):
+@@ -48,8 +48,8 @@
+             collect.public_report(self.report, artifacts)
+ 
+     def capture_fixture(self):
+-        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/build-manifest.json')).read_text())
+-        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/authority.json').read_text())
++        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable/build-manifest.json')).read_text())
++        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable/authority.json').read_text())
+         (self.root / 'report.json').write_text(json.dumps(self.report))
+         (self.root / 'source-manifest.json').write_text(json.dumps(manifest))
+         return authority, manifest
+@@ -81,7 +81,7 @@
+     def test_postrun_build_rejects_self_consistent_manifest_or_output_change(self):
+         directory = self.root / 'dist'
+         directory.mkdir()
+-        original = (pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/build-manifest.json')).read_bytes()
++        original = (pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable/build-manifest.json')).read_bytes()
+         (directory / 'manifest.json').write_bytes(original)
+         manifest = json.loads(original)
+         altered = copy.deepcopy(manifest)
+@@ -105,7 +105,7 @@
+             collect.capture(self.root, authority, artifacts, 3, manifest)
+ 
+     def test_authority_rejects_tampered_renderer_and_declared_runtime_inputs(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
++        original = pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         stage = self.root / 'source'
+         stage.mkdir()
+@@ -115,7 +115,7 @@
+         for name in paths:
+             destination = stage / name
+             destination.parent.mkdir(parents=True, exist_ok=True)
+-            shutil.copyfile(pathlib.Path('/tmp/linuxcast-s0-01') / name, destination)
++            shutil.copyfile(pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-preparation-source') / name, destination)
+         collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+         for name in ('spikes/launcher/src/main.ts', 'spikes/launcher/src/renderer/main.tsx', *(str(collect.RELATIVE / name) for name in ('check.ts', 'protocol.ts', 'artifacts.py'))):
+             file = stage / name
+@@ -127,21 +127,27 @@
+             collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+ 
+     def test_authority_cannot_fall_back_to_the_previous_signed_runtime(self):
+-        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable', '/tmp/linuxcast-s001-consumer-immutable', '/tmp/linuxcast-s001-readiness-immutable'):
++        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable', '/tmp/linuxcast-s001-consumer-immutable', '/tmp/linuxcast-s001-readiness-immutable', '/tmp/linuxcast-s001-x11-focus-immutable'):
+             old = pathlib.Path(path)
+             with self.assertRaises(ValueError):
+                 collect.verify_authority(self.root, old / 'source.tgz', old / 'authority.json')
+ 
+-    def test_injected_authority_hash_cannot_bypass_scoped_signed_schema(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
++    def test_injected_authority_hash_cannot_bypass_strict_unsigned_schema(self):
++        original = pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         mutations = [lambda row: row.update(private='private-canary'),
+-                     lambda row: row.update(sourceSigned=False), lambda row: row.update(sourceDirty=True),
+-                     lambda row: row.update(runtimeInputsMatchSignedCommit=False), lambda row: row.update(sourceSigned=1),
+-                     lambda row: row.update(sourceStatusScope='whole-archive'), lambda row: row.update(signedRuntimeCommit='a'*40),
+-                     lambda row: row.update(verifiedRuntimeCommit='a'*40), lambda row: row.update(archiveRepresentsWholeSignedTree=True),
++                     lambda row: row.update(sourceSigned=True), lambda row: row.update(sourceDirty=False),
++                     lambda row: row.update(runtimeInputsMatchSignedCommit=True), lambda row: row.update(sourceSigned=1), lambda row: row.update(sourceDirty=1),
++                     lambda row: row.update(probeMode='full'), lambda row: row.update(probeMode='synthetic-private-canary'),
++                     lambda row: row.pop('unsignedRuntimeInputs'), lambda row: row.update(unsignedRuntimeInputs=[]),
++                     lambda row: row.update(unsignedRuntimeInputs=list(reversed(collect.UNSIGNED_RUNTIME_INPUTS))),
++                     lambda row: row.update(executedRuntimeCommit=collect.SIGNED_BASELINE),
++                     lambda row: row.update(sourceStatusScope='whole-archive'), lambda row: row.update(signedRuntimeCommit=collect.SIGNED_BASELINE),
++                     lambda row: row.update(verifiedSignedBaselineCommit='a'*40), lambda row: row.update(archiveRepresentsWholeSignedTree=True),
+                      lambda row: row['archiveConstruction'].update(baselineCommit='a'*40),
+-                     lambda row: row['archiveConstruction'].update(overlaySourceCommit='a'*40),
++                     lambda row: row['archiveConstruction'].update(signedOverlaySourceCommit='a'*40),
++                     lambda row: row['archiveConstruction'].update(reviewedUnsignedIncrementSha256='0'*64),
++                     lambda row: row['archiveConstruction'].update(reviewedUnsignedIncrementManifestSha256='0'*64),
+                      lambda row: row['archiveConstruction'].update(unsignedWhenPrepared=False),
+                      lambda row: row['archiveConstruction'].update(unsignedWhenPrepared=1),
+                      lambda row: row['archiveConstruction'].update(private='private-canary')]
+--- a/test_orchestration.py
++++ b/test_orchestration.py
+@@ -39,10 +39,10 @@
+         cleanup = {'beforeExecution': dated, 'afterRunner': dated, 'afterRelease': dated,
+                    'ownGuestSourceArchivesAndCachesRemoved': True, 'cleanReleaseVerified': True,
+                    'hostSettingsOrDisplaysChanged': False, 'physicalDesktopMatrixEstablished': False}
+-        provenance = {'task': 'S0-01', 'backend': 'gnome-x11', 'collectorOutcome': 'completed',
++        provenance = {'task': 'S0-01', 'backend': 'gnome-x11', 'probeMode': collect.PROBE_MODE, 'selectedChecksCompleted': False, 'collectorOutcome': 'completed',
+             'startedUtc': '2026-10-23T00:00:00+00:00', 'finishedUtc': '2026-10-23T00:00:01+00:00', 'exitCode': 3,
+-            'executedRuntimeCommit': collect.SIGNED_RUNTIME, 'runtimeInputsMatchSignedCommit': True,
+-            'signedRuntimeCommit': collect.SIGNED_RUNTIME, 'verifiedRuntimeCommit': collect.SIGNED_RUNTIME, 'sourceStatusScope': collect.SOURCE_SCOPE, 'sourceSigned': True, 'sourceDirty': False, 'reviewedIncrementSha256': collect.INCREMENT,
++            'executedRuntimeCommit': None, 'runtimeInputsMatchSignedCommit': False,
++            'verifiedSignedBaselineCommit': collect.SIGNED_BASELINE, 'unsignedRuntimeInputs': list(collect.UNSIGNED_RUNTIME_INPUTS), 'sourceStatusScope': collect.SOURCE_SCOPE, 'sourceSigned': False, 'sourceDirty': True, 'reviewedIncrementSha256': collect.INCREMENT,
+             'archiveRepresentsWholeSignedTree': False, 'collectorSha256': host.COLLECTOR_HASH,
+             'privateSocketPathMaxBytes': 107, 'privateSocketPathLengths': collect.socket_layout(pathlib.Path('/home/debian/lc1-xxxxxxxx/source')),
+             'archiveConstruction': dict(collect.ARCHIVE_CONSTRUCTION),
+@@ -50,7 +50,7 @@
+             'sourceInputsVerified': 24, 'sourceSha256': self.authority['sourceSha256'], 'outputSha256': self.manifest['outputSha256'],
+             'designTokensSha256': self.authority['designTokensSha256'], 'launcherDesktopFileSha256': self.authority['launcherDesktopFileSha256'],
+             'sourceUnchangedDuringRun': True, 'rendererPixelsCaptured': False, 'screenshotKind': 'not-captured', 'physicalDesktopMatrixEstablished': False}
+-        report = test_collect.artifacts.fallback_result('gnome-x11')
++        report = test_collect.artifacts.fallback_result('gnome-x11','lifecycle-only')
+         report.update(privateProcessTreeCleanupVerified=True, packages=['gnome-shell 48.7'])
+         files = {'provenance.json': provenance, 'cleanup.json': cleanup, 'report.json': report, 'source-manifest.json': self.manifest}
+         return {'phase': 'native-attempted', 'collectorExitCode': 3,
+@@ -97,16 +97,16 @@
+             with self.assertRaises(ValueError):
+                 self.validate(value)
+ 
+-    def test_scoped_signed_runtime_and_unsigned_archive_claims_are_exact(self):
+-        mutations = {'executedRuntimeCommit': None, 'runtimeInputsMatchSignedCommit': False,
+-                     'sourceSigned': False, 'sourceDirty': True, 'signedRuntimeCommit': 'a'*40,
+-                     'verifiedRuntimeCommit': 'a'*40, 'sourceStatusScope': 'whole-archive', 'reviewedIncrementSha256': '0'*64}
++    def test_strict_unsigned_runtime_and_mixed_archive_claims_are_exact(self):
++        mutations = {'executedRuntimeCommit': collect.SIGNED_BASELINE, 'runtimeInputsMatchSignedCommit': True,
++                     'sourceSigned': True, 'sourceDirty': False, 'signedRuntimeCommit': collect.SIGNED_BASELINE,
++                     'verifiedSignedBaselineCommit': 'a'*40, 'unsignedRuntimeInputs': [], 'probeMode': 'full', 'sourceStatusScope': 'whole-archive', 'reviewedIncrementSha256': '0'*64}
+         for key, changed in mutations.items():
+             value = self.response()
+             self.edit_file(value, 'provenance.json', lambda item: item.update({key: changed}))
+             with self.assertRaises(ValueError):self.validate(value)
+-        for key, changed in {'baselineCommit': 'a'*40, 'overlaySourceCommit': 'a'*40,
+-                             'unsignedWhenPrepared': False, 'private': 'private-canary'}.items():
++        for key, changed in {'baselineCommit': 'a'*40, 'signedOverlaySourceCommit': 'a'*40,
++                             'reviewedUnsignedIncrementSha256': '0'*64, 'reviewedUnsignedIncrementManifestSha256': '0'*64, 'unsignedWhenPrepared': False, 'private': 'private-canary'}.items():
+             value = self.response()
+             self.edit_file(value, 'provenance.json', lambda item: item['archiveConstruction'].update({key: changed}))
+             with self.assertRaises(ValueError):self.validate(value)
+@@ -118,8 +118,8 @@
+             self.edit_file(value, 'provenance.json', change)
+             files, _ = self.validate(value)
+             saved = json.loads(files['provenance.json'])
+-            self.assertIsNone(saved['executedRuntimeCommit']);self.assertEqual(saved['verifiedRuntimeCommit'], collect.SIGNED_RUNTIME)
+-            self.edit_file(value, 'provenance.json', lambda item: item.update(executedRuntimeCommit=collect.SIGNED_RUNTIME))
++            self.assertIsNone(saved['executedRuntimeCommit']);self.assertEqual(saved['verifiedSignedBaselineCommit'], collect.SIGNED_BASELINE)
++            self.edit_file(value, 'provenance.json', lambda item: item.update(executedRuntimeCommit=collect.SIGNED_BASELINE))
+             with self.assertRaises(ValueError):self.validate(value)
+ 
+     def test_lifecycle_public_report_roundtrip_and_nested_private_rejection(self):
+@@ -144,7 +144,7 @@
+         files, release = self.validate(value)
+         self.assertEqual(json.loads(files['report.json'])['consumerRead'], consumer)
+         self.assertEqual(release['collectorExitCode'], 3)
+-        self.assertEqual(json.loads(files['report.json'])['status'], 'unavailable')
++        self.assertEqual(json.loads(files['report.json'])['status'], 'incomplete')
+ 
+     def test_consumer_public_report_rejects_private_types_counts_and_forged_caps(self):
+         consumer = {'request': 2, 'pollCount': 0,
+@@ -179,7 +179,7 @@
+     def test_previous_signed_readiness_anchor_is_not_this_focus_candidate(self):
+         old = json.loads(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_text())
+         mutations = {'executedRuntimeCommit': old['signedRuntimeCommit'], 'signedRuntimeCommit': old['signedRuntimeCommit'],
+-                     'verifiedRuntimeCommit': old['verifiedRuntimeCommit'], 'archiveSha256': old['archiveSha256'],
++                     'verifiedSignedBaselineCommit': old['verifiedRuntimeCommit'], 'archiveSha256': old['archiveSha256'],
+                      'sourceArchiveAuthoritySha256': hashlib.sha256(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_bytes()).hexdigest(),
+                      'reviewedIncrementSha256': old['reviewedIncrementSha256']}
+         for key, changed in mutations.items():
+@@ -187,7 +187,7 @@
+             self.edit_file(value, 'provenance.json', lambda item: item.update({key: changed}))
+             with self.assertRaises(ValueError):self.validate(value)
+         value = self.response()
+-        self.edit_file(value, 'provenance.json', lambda item: item['archiveConstruction'].update(overlaySourceCommit=old['signedRuntimeCommit']))
++        self.edit_file(value, 'provenance.json', lambda item: item['archiveConstruction'].update(signedOverlaySourceCommit=old['signedRuntimeCommit']))
+         with self.assertRaises(ValueError):self.validate(value)
+ 
+     def test_forged_zero_exit_cannot_promote_incomplete(self):
+--- /dev/null
++++ b/test_mode.py
+@@ -0,0 +1,137 @@
++"""Synthetic proposal-only boundaries; no archive preparation or native action."""
++import base64
++import copy
++import importlib
++import json
++import pathlib
++import subprocess
++import sys
++import tempfile
++import unittest
++from unittest.mock import patch
++
++import collect
++import host
++sys.path.insert(0,'/tmp/linuxcast-s001-lifecycle-only-preparation-source/spikes/launcher/tests/native-session')
++artifacts=importlib.import_module('artifacts')
++
++
++def report_fixture():
++    value=artifacts.fallback_result('gnome-x11','lifecycle-only')
++    value.update(stage='complete',diagnosticOutcome='complete',initialPlacementInsideWorkArea=True,closeRetainedResidentProcess=True,explicitUiQuitExited=True,hiddenCliQuitExited=True,
++        lifecycleProof={'launches':2,'darkSearchCaptured':True,'lightCapabilitiesCaptured':True,'uiQuitExitCode':0,'hiddenCliQuitExitCode':0,'closeProcessAlive':True},
++        runtime={'electron':'45.0.0','chrome':'156.0.8078.48','ozone':'x11','noSandbox':False,'sandbox':True,'contextIsolation':True,'nodeIntegration':False,'webSecurity':True,
++            'renderer':{'runtime':{'sandboxed':True,'contextIsolated':True},'process':'undefined','require':'undefined'}})
++    own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':560},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
++    empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}
++    for index,phase in enumerate(artifacts.LIFECYCLE_PHASES):
++        value['observations'].append({'phase':phase,'native':{'request':index+1,'launcher':copy.deepcopy(own if phase in ('initial-native-launch','fresh-lifecycle-native-launch') else empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}})
++    value.update(privateProcessTreeCleanupVerified=True,packages=['gnome-shell 48.7'])
++    return value
++
++
++class ModeChecks(unittest.TestCase):
++    def test_exact_arguments_and_bad_entry_before_any_child(self):
++        self.assertEqual(collect.RUNNER_ARGUMENTS,('gnome-x11','--private-guest','--probe-mode','lifecycle-only'))
++        for module in (collect,host):
++            with patch.object(sys,'argv',['invalid-entry']), patch.object(module.subprocess,'Popen') as spawn:
++                with self.assertRaises(ValueError):module.main()
++                spawn.assert_not_called()
++
++    def test_complete_selected_is_incomplete_exit_three(self):
++        report=collect.public_report(report_fixture(),artifacts)
++        self.assertEqual(report['status'],'incomplete')
++        self.assertTrue(collect.selected_checks_completed(report,3,set(collect.PNG_NAMES)))
++        self.assertTrue(collect.selected_completion_evidence(report,3,set(collect.PNG_NAMES),'completed',True,{'cleanReleaseVerified':True}))
++
++    def test_failed_selected_cannot_promote(self):
++        report=artifacts.fallback_result('gnome-x11','lifecycle-only')
++        report.update(privateProcessTreeCleanupVerified=True,packages=[])
++        self.assertEqual(collect.public_report(report,artifacts),report)
++        self.assertFalse(collect.selected_completion_evidence(report,3,set(),'completed',True,{'cleanReleaseVerified':True}))
++        self.assertFalse(collect.selected_completion_evidence(None,None,set(),'collector-rejected',False,{'cleanReleaseVerified':True}))
++
++    def test_no_inherited_full_pass_or_mode_fallback(self):
++        for change in (lambda row:row.pop('probeMode'),lambda row:row.update(probeMode='full'),lambda row:row.update(probeMode='shortcut-only'),
++                       lambda row:row.update(status='passed-bounded-native-probe'),lambda row:row.update(activationOutcome='normal-show-and-shortcut-native-focus-observed'),
++                       lambda row:row.update(ordinaryShowNativeFocused=True),lambda row:row.update(private={'private':'synthetic-private-canary'})):
++            row=report_fixture();change(row)
++            with self.assertRaises(ValueError):collect.public_report(row,artifacts)
++
++    def test_zero_bool_and_noninteger_codes_cannot_be_selected(self):
++        for code in (0,False,True,None,3.0,'3',-15):
++            with self.assertRaises(ValueError):collect.selected_checks_completed(report_fixture(),code,set(collect.PNG_NAMES))
++
++    def test_complete_requires_both_fixed_images(self):
++        for names in (set(),{'dark-launcher.png'},{'light-capabilities.png'},{'dark-launcher.png','private-canary'}):
++            with self.assertRaises(ValueError):collect.selected_checks_completed(report_fixture(),3,names)
++
++    def test_cleanup_unknown_source_and_noncompleted_outcomes_prevent_completion(self):
++        row=report_fixture()
++        for outcome,unchanged,clean in (('runner-timeout',True,True),('cancelled',True,True),('collector-rejected',True,True),('completed',False,True),('completed',True,False)):
++            self.assertFalse(collect.selected_completion_evidence(row,3,set(collect.PNG_NAMES),outcome,unchanged,{'cleanReleaseVerified':clean}))
++
++    def test_capture_does_not_accept_full_or_missing_light(self):
++        snapshot=pathlib.Path('/tmp/linuxcast-s001-lifecycle-only-immutable')
++        authority=json.loads((snapshot/'authority.json').read_text());manifest=json.loads((snapshot/'build-manifest.json').read_text())
++        with tempfile.TemporaryDirectory(prefix='linuxcast-lifecycle-proposal-') as temporary:
++            root=pathlib.Path(temporary)
++            (root/'report.json').write_text(json.dumps(report_fixture()));(root/'source-manifest.json').write_text(json.dumps(manifest))
++            (root/'dark-launcher.png').write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic')
++            with self.assertRaises(ValueError):collect.capture(root,authority,artifacts,3,manifest)
++            (root/'light-capabilities.png').write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic')
++            files,_=collect.capture(root,authority,artifacts,3,manifest)
++            self.assertEqual(set(files),{'report.json','source-manifest.json',*collect.PNG_NAMES})
++            with self.assertRaises(ValueError):collect.capture(root,authority,artifacts,0,manifest)
++
++    def response_fixture(self):
++        # Reuse already-public prior metadata solely for scalar/header fixtures.
++        # These bytes do NOT constitute an authority for the new source/mode.
++        prior=pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/evidence/native-session/gnome-x11-explicit-focus')
++        provenance=json.loads((prior/'provenance.json').read_text());cleanup=json.loads((prior/'cleanup.json').read_text())
++        authority=json.loads((host.IMMUTABLE/'authority.json').read_text());manifest=json.loads((host.IMMUTABLE/'build-manifest.json').read_text())
++        provenance.pop('signedRuntimeCommit');provenance.pop('verifiedRuntimeCommit')
++        provenance.update(probeMode='lifecycle-only',selectedChecksCompleted=True,sourceSigned=False,sourceDirty=True,runtimeInputsMatchSignedCommit=False,
++            verifiedSignedBaselineCommit=collect.SIGNED_BASELINE,unsignedRuntimeInputs=list(collect.UNSIGNED_RUNTIME_INPUTS),executedRuntimeCommit=None,
++            reviewedIncrementSha256=collect.INCREMENT,archiveConstruction=dict(collect.ARCHIVE_CONSTRUCTION),archiveSha256=collect.ARCHIVE_HASH,
++            sourceArchiveAuthoritySha256=collect.AUTHORITY_HASH,sourceSha256=authority['sourceSha256'],outputSha256=manifest['outputSha256'],collectorSha256=host.COLLECTOR_HASH)
++        files={'report.json':collect.json_bytes(report_fixture()),'source-manifest.json':collect.json_bytes(manifest),
++               'provenance.json':collect.json_bytes(provenance),'cleanup.json':collect.json_bytes(cleanup)}
++        files.update({name:b'\x89PNG\r\n\x1a\npublic synthetic' for name in collect.PNG_NAMES})
++        release=json.loads((prior/'release.json').read_text())
++        response={key:release[key] for key in ('phase','collectorExitCode','before','release','ownedGuestCapsuleRemoved','expectedToolSha256','toolsVerifiedBeforeAndAfter')}
++        response['files']={name:base64.b64encode(data).decode() for name,data in files.items()}
++        return response,authority,manifest,provenance
++
++    def test_host_selected_completion_correlated_with_report_and_cleanup(self):
++        response,authority,manifest,_=self.response_fixture()
++        files,release=host.public_response(collect.json_bytes(response),collect,authority,artifacts,manifest)
++        self.assertEqual(release['collectorExitCode'],3)
++        self.assertTrue(json.loads(files['provenance.json'])['selectedChecksCompleted'])
++        self.assertEqual(json.loads(files['report.json'])['status'],'incomplete')
++
++    def test_host_cannot_promote_false_complete_or_inherit_old_provenance(self):
++        for change in (lambda row:row.pop('probeMode'),lambda row:row.update(probeMode='full'),lambda row:row.update(selectedChecksCompleted=False),
++                       lambda row:row.update(selectedChecksCompleted=1),lambda row:row.update(sourceUnchangedDuringRun=False,executedRuntimeCommit=None),
++                       lambda row:row.update(exitCode=0,selectedChecksCompleted=False),
++                       lambda row:row.update(private={'private':'synthetic-private-canary'})):
++            response,authority,manifest,provenance=self.response_fixture();change(provenance)
++            response['files']['provenance.json']=base64.b64encode(collect.json_bytes(provenance)).decode()
++            with self.assertRaises(ValueError):host.public_response(collect.json_bytes(response),collect,authority,artifacts,manifest)
++
++    def test_host_zero_exit_and_forged_cleanup_cannot_pass(self):
++        response,authority,manifest,_=self.response_fixture();response['collectorExitCode']=0
++        with self.assertRaises(ValueError):host.public_response(collect.json_bytes(response),collect,authority,artifacts,manifest)
++        response,authority,manifest,_=self.response_fixture()
++        cleanup=json.loads(base64.b64decode(response['files']['cleanup.json']))
++        cleanup['afterRelease']['fixedProcessCounts']['node']=1;cleanup['cleanReleaseVerified']=False
++        response['files']['cleanup.json']=base64.b64encode(collect.json_bytes(cleanup)).decode()
++        with self.assertRaises(ValueError):host.public_response(collect.json_bytes(response),collect,authority,artifacts,manifest)
++
++    def test_guest_phase_lifetime_and_existing_limits_are_unchanged(self):
++        previous=pathlib.Path('/tmp/linuxcast-s001-x11-focus-collector-review/guest_phase.py').read_bytes()
++        self.assertEqual((pathlib.Path(__file__).parent/'guest_phase.py').read_bytes(),previous)
++        self.assertEqual(collect.socket_layout(pathlib.Path('/home/debian/lc1-xxxxxxxx/source')),
++                         {'privateSessionBus':78,'nativeWaylandSocket':96,'runtimeBus':77,'atSpiSocket':95})
++
++if __name__=='__main__':unittest.main(verbosity=2)

@@ -1,0 +1,151 @@
+--- a/collect.py
++++ b/collect.py
+@@ -18,14 +18,14 @@
+ import tempfile
+ 
+ BACKEND = 'gnome-x11'
+-SIGNED_RUNTIME = 'e0fea79b96877a881ca398a55376cd98e3d8e58e'
++SIGNED_RUNTIME = '852f3abf2aeb227d7ada92e29e965830edc8e5e0'
+ SOURCE_SCOPE = 'declared-runtime-and-static-inputs'
+ ARCHIVE_BASELINE = '03df170788c2cd2358b15e93cf65dde51919db0c'
+-INCREMENT_MANIFEST = 'a04051fc594ceab5105e1e18623bfa200a85e2663548da33c2bb83338c6a228d'
+-INCREMENT = 'f2e583c714037467faa4c90b8fd84e007816a38f1ae956f77889b8dc0c270242'
+-ARCHIVE_HASH = 'be366f332ba713ee33f2bf972aa99f9d2a52f0ca689f46cf0a4a676db2715dde'
+-AUTHORITY_HASH = 'f7fcdd5a79f563389ae99ef69129ccc2ac2f8b35091b1d1c475408336896c7dc'
+-MANIFEST_HASH = '82b20010c6dbe4ea05e22d627cdfd9ae423ef7f4573e0406312d7da0465f9e3d'
++INCREMENT_MANIFEST = '463e4632b4b8bd034bd1a18b03d0e269c4f4791e1ecee68fb4ebef1cbaa62b0c'
++INCREMENT = '312000a4bd3488fa589acf2d785c986f70622d262a60a68c22d1af86c75bde83'
++ARCHIVE_HASH = '890f1429b331fdca52042aa56d99784100a7cb8feea7c6c9945ed3472624607a'
++AUTHORITY_HASH = 'e3c880b2d2e59aaec895e7a7d340e21b84bd3a5df4743cbd5a0c13c670a1b940'
++MANIFEST_HASH = '78ad174ca9e0aa3fce42aa5cb6032eb10fb2afe5f3984e80952a0e0daefe47f3'
+ ARCHIVE_CONSTRUCTION = {'baselineCommit': ARCHIVE_BASELINE, 'overlaySourceCommit': SIGNED_RUNTIME,
+                         'reviewedIncrementSha256': INCREMENT, 'unsignedWhenPrepared': True}
+ HOME = pathlib.Path('/home/debian')
+@@ -90,7 +90,7 @@
+     require(authority['reviewedIncrementSha256'] == INCREMENT and authority['reviewedIncrementManifestSha256'] == INCREMENT_MANIFEST)
+     require(authority['buildManifestSha256'] == MANIFEST_HASH)
+     source = stage / RELATIVE
+-    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 4)
++    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 7)
+     for name, expected in authority['sourceSha256'].items():
+         file = pathlib.Path(os.path.abspath(source / name))
+         require(file.is_relative_to(stage) and digest(regular_bytes(file, 16 * 1024 * 1024)) == expected)
+--- a/host.py
++++ b/host.py
+@@ -19,10 +19,10 @@
+ import threading
+ 
+ HERE = pathlib.Path(__file__).resolve().parent
+-IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
++IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
+ SOURCE = pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/tests/native-session')
+ # Filled only when the final reviewed collector/phase is frozen.
+-COLLECTOR_HASH = 'a9c76185a153db804dfd9c149cd47419400ab628945db12aaef460f5b1fd77b1'
++COLLECTOR_HASH = 'c21169685848ccfc90de99b17baf3ae89b70448f9125c7182a058bcfea42939d'
+ PHASE_HASH = 'bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754'
+ CONTAINER = 'linuxcast-s0-04-vm'
+ SSH = ['docker', 'exec', '-i', CONTAINER, '/usr/bin/ssh', '-i', '/lab/test-key', '-p', '2222',
+--- a/test_collect.py
++++ b/test_collect.py
+@@ -48,8 +48,8 @@
+             collect.public_report(self.report, artifacts)
+ 
+     def capture_fixture(self):
+-        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/build-manifest.json')).read_text())
+-        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_text())
++        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/build-manifest.json')).read_text())
++        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/authority.json').read_text())
+         (self.root / 'report.json').write_text(json.dumps(self.report))
+         (self.root / 'source-manifest.json').write_text(json.dumps(manifest))
+         return authority, manifest
+@@ -81,7 +81,7 @@
+     def test_postrun_build_rejects_self_consistent_manifest_or_output_change(self):
+         directory = self.root / 'dist'
+         directory.mkdir()
+-        original = (pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/build-manifest.json')).read_bytes()
++        original = (pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable/build-manifest.json')).read_bytes()
+         (directory / 'manifest.json').write_bytes(original)
+         manifest = json.loads(original)
+         altered = copy.deepcopy(manifest)
+@@ -104,8 +104,8 @@
+         with self.assertRaises(ValueError):
+             collect.capture(self.root, authority, artifacts, 3, manifest)
+ 
+-    def test_authority_rejects_tampered_renderer_and_each_new_consumer_runtime_input(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
++    def test_authority_rejects_tampered_renderer_and_declared_runtime_inputs(self):
++        original = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         stage = self.root / 'source'
+         stage.mkdir()
+@@ -117,7 +117,7 @@
+             destination.parent.mkdir(parents=True, exist_ok=True)
+             shutil.copyfile(pathlib.Path('/tmp/linuxcast-s0-01') / name, destination)
+         collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+-        for name in ('spikes/launcher/src/renderer/main.tsx', *(str(collect.RELATIVE / name) for name in ('check.ts', 'protocol.ts', 'artifacts.py'))):
++        for name in ('spikes/launcher/src/main.ts', 'spikes/launcher/src/renderer/main.tsx', *(str(collect.RELATIVE / name) for name in ('check.ts', 'protocol.ts', 'artifacts.py'))):
+             file = stage / name
+             unchanged = file.read_bytes()
+             file.write_text('private-canary')
+@@ -127,13 +127,13 @@
+             collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+ 
+     def test_authority_cannot_fall_back_to_the_previous_signed_runtime(self):
+-        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable', '/tmp/linuxcast-s001-consumer-immutable'):
++        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable', '/tmp/linuxcast-s001-consumer-immutable', '/tmp/linuxcast-s001-readiness-immutable'):
+             old = pathlib.Path(path)
+             with self.assertRaises(ValueError):
+                 collect.verify_authority(self.root, old / 'source.tgz', old / 'authority.json')
+ 
+     def test_injected_authority_hash_cannot_bypass_scoped_signed_schema(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-readiness-immutable')
++        original = pathlib.Path('/tmp/linuxcast-s001-x11-focus-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         mutations = [lambda row: row.update(private='private-canary'),
+                      lambda row: row.update(sourceSigned=False), lambda row: row.update(sourceDirty=True),
+--- a/test_orchestration.py
++++ b/test_orchestration.py
+@@ -176,6 +176,20 @@
+             with self.assertRaises(ValueError):
+                 self.validate(value)
+ 
++    def test_previous_signed_readiness_anchor_is_not_this_focus_candidate(self):
++        old = json.loads(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_text())
++        mutations = {'executedRuntimeCommit': old['signedRuntimeCommit'], 'signedRuntimeCommit': old['signedRuntimeCommit'],
++                     'verifiedRuntimeCommit': old['verifiedRuntimeCommit'], 'archiveSha256': old['archiveSha256'],
++                     'sourceArchiveAuthoritySha256': hashlib.sha256(pathlib.Path('/tmp/linuxcast-s001-readiness-immutable/authority.json').read_bytes()).hexdigest(),
++                     'reviewedIncrementSha256': old['reviewedIncrementSha256']}
++        for key, changed in mutations.items():
++            value = self.response()
++            self.edit_file(value, 'provenance.json', lambda item: item.update({key: changed}))
++            with self.assertRaises(ValueError):self.validate(value)
++        value = self.response()
++        self.edit_file(value, 'provenance.json', lambda item: item['archiveConstruction'].update(overlaySourceCommit=old['signedRuntimeCommit']))
++        with self.assertRaises(ValueError):self.validate(value)
++
+     def test_forged_zero_exit_cannot_promote_incomplete(self):
+         value = self.response()
+         value['collectorExitCode'] = 0
+--- a/README.md
++++ b/README.md
+@@ -1,13 +1,13 @@
+-# S0-01 readiness: local collector preparation
++# S0-01 signed X11 focus candidate collector — local preparation
+ 
+-LOCAL ONLY. No guest, native, staging, signing or publication action is authorized by this bundle. Source and collector require coordinator+independent review and a separate explicit one-run reservation.
++No guest/native/staging/signing/publishing authority. Independent+coordinator review and separate explicit one-run reservation are required. Actual candidate remains UNEXECUTED; ordinary X11focus predicate remains strict. Earlier signed e0 readiness capture is INCOMPLETE and immutable.
+ 
+-Scoped signed runtime: all24runtime and2static inputs match e0fea79b96877a881ca398a55376cd98e3d8e58e Git blobs; coordinator verified its normal SSH signature. sourceStatusScope=declared-runtime-and-static-inputs, sourceSigned=true, sourceDirty=false, runtimeInputsMatchSignedCommit=true, signedRuntimeCommit=verifiedRuntimeCommit=e0. These constants describe the prepared declared inputs, not a signed archive, continuous health or native success. sourceUnchangedDuringRun remains a separate checked fact. executedRuntimeCommit=e0 ONLY when collectorOutcome=completed, integer runner status observed and source unchanged; it is null on ambiguous/unavailable/rejected/changed-source results while verified anchor remains e0.
++New immutable snapshot /tmp/linuxcast-s001-x11-focus-immutable: archive890f1429 (5,720,933bytes<8MiB), authoritye3c880b2, rawmanifest78ad174c, index76a343ff. Exactly03df baseline469regular/68dirs plus7reviewed overlays fromsigned852f3abf2aeb227d7ada92e29e965830edc8e5e0 Git blobs: readiness4(f2e/e0unchanged) and focus3(791/852). Combineddiff312000a4 /combinedmanifest463e4632 bind both reviewed components and all7blobs. Complete path/type/mode/hash index proves no extra files/links/types/modes or copied working metadata/new evidence/dependency changes. All24runtime+2static inputs equal verifiedsigned852; archiveconstruction remains unsigned mixed03df+852, not whole signed tree.
+ 
+-Unsigned mixed archive: source snapshot /tmp/linuxcast-s001-readiness-immutable/source.tgz is5,718,329bytes (existing8MiB cap unchanged), SHAbe366f33; authorityf7fcdd5a, rawbuildmanifest82b20010, index148e8c9d. Exact03df170 baseline469regular/68directories plus ONLY4f2e overlays pulled directly from signed e0 Git blobs. archiveConstruction must equal baseline03df/overlaye0/reviewed f2e/unsignedWhenPrepared=true; archiveRepresentsWholeSignedTree=false always. Full e0 archive17,343,546bytes was too large; no cap increase. No symlinks/submodules/extra paths/modes, working metadata or recursive new evidence copied. Complete path/type/mode/hash index is in immutable snapshot. Only2runtime files change from03df; all24inputs andtokens/desktop match e0 exactly.
++Exact scoped provenance unchanged: sourceStatusScope=declared-runtime-and-static-inputs, sourceSigned=true/sourceDirty=false/runtimeInputsMatchSignedCommit=true, signedRuntimeCommit=verifiedRuntimeCommit=852. These describe prepared declared input provenance, not native success or a signed archive. executedRuntimeCommit852 ONLYcompleted observed integer status +sourceUnchangedDuringRun; otherwise null, verifiedanchor separate. ArchiveRepresentsWholeSignedTree=false and construction baseline03df/overlay852/combined312000/unsignedWhenPrepared=true are mandatory. Wrong old authorities/anchors/scopes/flags/construction/unknownfields rejected.
+ 
+-Collector changes over783d are only new exact pins, strict scoped-signed authority/provenance schema and related fixtures. Every old authority, extra root/construction field, incorrect flag/scope/base/overlay/anchor and false executed-commit claim is rejected. Authority tests inject a matching raw hash for malformed schemas and prove rejection before any runtime source read. Existing renderer/consumer source tamper, signed-output/manifestrawhash/equality, private nested artifact field and old-provenance rejection fixtures remain.
++Collector fork of0653 changes only these exact newpins, signedanchor, seven-patchedfile count and related regression coverage. Phase byte-identical bbe00ac5; all existing45startup/180checker/240outer/300collector/330phase/920transport deadlines, lc1/source/t/socket107bounds, private ownership/inode/exclusive/O_NOFOLLOW/collision controls, repeatedHUP teardown, cache/tool pins, source/build-postchecks and no retries/effect replay unchanged. No new native/display/input/policy/service effects.
+ 
+-Phase byte-identical bbe00ac5. Original45startup/180checker/240outer/300collector/330phase/920transport budgets; no retries/new queries/new backend/effect replay. Retains lc1/source/t/socket107 bound, HUP teardown protection, exact own0700/inode/regular/O_NOFOLLOW/O_EXCL ownership, collision preservation, cleanup-before-root-delete, exact Node/Bun pins and private install caches. Runtime readiness behavior is already-reviewed signed f2e, not modified by collector. No host policies or services touched.
++Harmless checks55/55 PASS1.264s (30collector/25orchestration) on host Python3.10.12. Includes prior54 with currentauthority and new rejection of old signed e0 focus-candidate provenance; actual main.ts tamper joins renderer/declared-source tamper checks. Exact full469/68path/type/mode comparison proves ONLY7signed overlays, all26inputs compared to852, AST/phase pins pass. Source candidate's202configured/strictTS checks were independently passed before normal signature852. These are local synthetic checks, not nativefocus evidence.
+ 
+-Harmless local checks54/54 PASS1.245s (30collector/24orchestration), Python AST and phase pin/all24signed archive checks pass. All baseline469files/68dirs with exactly4overlays and all26signed inputs were independently compared during preparation. Tests do not use a guest or desktop; private Unix socket and owned process/cancellation fixtures are explicit synthetic local checks. Historical7bae/783d/efdbc and actual incomplete artifacts remain immutable.
++Electron45Show already invokes widget activation, so the new normal X11restore/show/focus path may be redundant. No historical cause/fix, fullsession/portal/physical/targetUI/explicitQuit acceptance is inferred. Keep first futureoutcome and all actual limits truthful.

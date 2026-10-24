@@ -1,0 +1,48 @@
+{
+  "scope": "Pop!_OS22.04 GNOME42.9 X11 own-window diagnostic only",
+  "originalSequencePreserved": true,
+  "wmClassMatched": true,
+  "cliExitedSuccessfully": true,
+  "oneChordSent": true,
+  "cleanupCompleted": true,
+  "outcome": "not-focused",
+  "observations": [
+    {
+      "stage": "decoy-active-before-cli",
+      "primaryVisible": true,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": false,
+      "primaryShowObserved": false,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    },
+    {
+      "stage": "after-single-chord",
+      "primaryVisible": false,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": true,
+      "primaryShowObserved": false,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    },
+    {
+      "stage": "final",
+      "primaryVisible": false,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": true,
+      "primaryShowObserved": false,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    }
+  ],
+  "acceptanceEstablished": false
+}

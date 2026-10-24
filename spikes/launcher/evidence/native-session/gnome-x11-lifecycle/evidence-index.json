@@ -1,0 +1,29 @@
+{
+  "task": "S0-01",
+  "outcome": "incomplete",
+  "sourceSigned": false,
+  "physicalDesktopMatrixEstablished": false,
+  "sha256": {
+    "README.md": "ee3d39c4371ed76000e23c2a2587ba8346f4744a75aee6a3c605c926e5de57a4",
+    "cleanup.json": "0e8c8251ce5e6d824b55388d078c214399e08017d949df3f8bfadb4fcaa1ade4",
+    "dark-launcher.png": "f2036a4f6dac7514f1eef9a2dfa1acc2fb8d98d1f7aec902d919b6ba591c9f9f",
+    "orchestration-source/README.md": "2b6c60cd88841fb6d06e403d785929024aba1bc887c5fb575af3414d0b0e276b",
+    "orchestration-source/collect.py": "466f7358200055c3a7d29eaab7ef43b88995d4dcb982d02c9ad63523a57a3aff",
+    "orchestration-source/guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "orchestration-source/host.py": "daa0847eb5c2c951f4d2cdc2ddddfd2f0328903aa12cb651593baa82d7636c99",
+    "orchestration-source/manifest.json": "3f084a8850897250b3bff624e6237ebb5f4cfabb16a81a3a41f3f50c5a9fa6b4",
+    "orchestration-source/test_collect.py": "7c5930f32204927e567f74ce0c4de5be5533ca41d0cc0d30628c9950acd4de1d",
+    "orchestration-source/test_orchestration.py": "84daff23480f4de2d601a6d06ed28a73211b7ee2aea51dfe856167a18c0f8db2",
+    "provenance.json": "143ad84caf20865142acd9ce1f34ace702da53ae037ed40db817f0314cc43a7c",
+    "release.json": "7c5842febebaa69565bd9eb316db990ca3ef914d3f79e6f08fbbee3fc0db5ce5",
+    "report.json": "17735787135d107a8d49283822b31f1e3a0d117543dffdf9987213bf9c807376",
+    "source-authority/README.md": "14905d86cd94a277e4aeb3f860cfe7864e8fd4d0e1778ba1184b6470bac8962c",
+    "source-authority/authority.json": "b55edf2757b7ee7c81fdc9ad2c7895bb9f87c52378ba35ded9235b0f5e30c44d",
+    "source-authority/build-manifest.json": "6ec0c32036d57e4a2ed0faa83e643420f0478e38f024aeecfa161794b593f44b",
+    "source-authority/manifest.json": "11ebbf2dabeb25b8ac10aea5e6f692649748ad4b2ee371d6d97f9d8ac0c55b8b",
+    "source-authority/reviewed-increment-manifest.json": "1e9b8726d4b23d1305d34d4bf49e792e6c800e000ec5d13f9ead18102f8b5bf4",
+    "source-authority/reviewed-increment.diff": "43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1",
+    "source-authority/source.tgz": "216370402d265fa1a12c8a5850976271d980943855c5268fb661bb0d1a8bb0e9",
+    "source-manifest.json": "6ec0c32036d57e4a2ed0faa83e643420f0478e38f024aeecfa161794b593f44b"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "build.ts": "618e6ccbbfa543d1e47473ba2f3730a79d708721812d62128ad25679c4a44b1b",
+  "src/main.ts": "16b2994aecfa776edd8bd1e4330e0376e1e578038f00bc01f31821726db67c03",
+  "src/contract.ts": "6122155d29331d90631bc2744d6fe738a7c2ee3a69e473d84b9519abf1d225cd",
+  "src/preload.ts": "6012cadd85da0474bb33929657e5378b77732c64d39b5ee5ea52b820f7f64f42",
+  "src/renderer/main.tsx": "0385cd6d02866433dca8685b674ae7ae086cc84e2f2bdc3a4dd399013e40e29d",
+  "src/renderer/App.tsx": "411fe05d172977d398d7bd9d81586c605f6a26ab1b7c9b3ed26e027d8b717a81",
+  "src/renderer/style.css": "07591ed1f74622e921ef09e7e07b5ffdf17d72cf1884574a6b8be3a2b14ced37",
+  "resources/index.html": "4993bd2c7eee945524c699ff1bdb07e36a72ee9ab1817632999f37acbbfd9e7f",
+  "tests/activation-help-ui.ts": "4089d136481245f0a762adddf051e9bf0c41cb74c64561d999194f17a8548745",
+  "../../docs/design/tokens.json": "808a6a295c2e6292bb2e3cec38c9ac5db47ab6d9fd4ff9ba09f613555622f00f"
+}

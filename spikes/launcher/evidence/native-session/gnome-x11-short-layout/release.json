@@ -1,0 +1,41 @@
+{
+  "phase": "native-attempted",
+  "collectorExitCode": 3,
+  "before": {
+    "fixedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateMatrixRootsAbsent": true,
+    "inputLabMarkerAbsent": true
+  },
+  "release": {
+    "fixedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateMatrixRootsAbsent": true,
+    "inputLabMarkerAbsent": true
+  },
+  "ownedGuestCapsuleRemoved": true,
+  "expectedToolSha256": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "toolsVerifiedBeforeAndAfter": true,
+  "guestReleaseVerified": true,
+  "physicalDesktopMatrixEstablished": false,
+  "hostTransferCopiesRemoved": true
+}

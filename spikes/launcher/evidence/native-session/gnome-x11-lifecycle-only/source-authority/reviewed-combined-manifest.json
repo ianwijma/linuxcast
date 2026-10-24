@@ -1,0 +1,29 @@
+{
+  "kind": "S0-01-unsigned-lifecycle-only-combined-source",
+  "baselineArchiveCommit": "03df170788c2cd2358b15e93cf65dde51919db0c",
+  "verifiedSignedBaselineCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "runtimeInputsMatchSignedCommit": false,
+  "executedRuntimeCommit": null,
+  "archiveRepresentsWholeSignedTree": false,
+  "reviewedComponentDiffSha256": [
+    "312000a4bd3488fa589acf2d785c986f70622d262a60a68c22d1af86c75bde83",
+    "199449fea49ce0215da0b11a978cf4607b76e2472fd1fa07400bf48b4e0fa465"
+  ],
+  "unsignedSourceFreezeSha256": "ab67b85d4f14a0e273334b63cf173efbbd3caeef43f0ca00d665ada9303a72af",
+  "diffSha256": "8056573a397791a68d072a5db78306afbbcc2f6b2d00817864ca6061449ca8f6",
+  "filesSha256": {
+    "spikes/launcher/README.md": "a96e5add03684cff9893fdb807267e37f14b64932feb3832744892263585a633",
+    "spikes/launcher/src/main.ts": "70d7f1fea559d6b11817b00bcd1411bf51821b5bada1237c61c9af54cee802e2",
+    "spikes/launcher/tests/launcher.unit.test.ts": "0a8debd08714133638bccf13edb711f85f45f0ec2e34e3467fb9bb30367dd0fb",
+    "spikes/launcher/tests/native-session/artifact-canary.py": "94a352ab09939671d8176cb243cb2841d01dbed7e04d55dd2b5c3fb38bf76902",
+    "spikes/launcher/tests/native-session/artifacts.py": "c12d2268c1cf257fb9fb804cd5a444c6efb6f336f72d5a434fe3acabc22ce05e",
+    "spikes/launcher/tests/native-session/check.ts": "14909d3b13dd1a129a09cc3805cde94cd75db47ac3c89b8566e0d43c68bd34ee",
+    "spikes/launcher/tests/native-session/observer_startup.py": "e45715c19b77a21df95d46d3cb2eb3588b55aff9c4ecfe5a3265df432a62966f",
+    "spikes/launcher/tests/native-session/preparation.test.ts": "a3b5a7d5c095b83d9d417c20cb6e1d681ef24a95a320b7d44ed3da70a5be465a",
+    "spikes/launcher/tests/native-session/protocol.ts": "9c4d80b86e7c79b3ffb26cf4a0bf32e190b2f20b67b3c66bf9e78468f82ecbda",
+    "spikes/launcher/tests/native-session/run-session.py": "4c51dacecd090869f84eccda1c7d5285eb113cb160c22cb02c4611b4ffb6c82a",
+    "spikes/launcher/tests/native-session/startup-fixture.py": "1a5bf91cb9b6cd84848b7477ecb53b57267c39a6dfc81b05f5d40412a6feef9b"
+  }
+}

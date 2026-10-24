@@ -1,0 +1,48 @@
+{
+  "scope": "Exactly one actual focused private Xvfb/Orca run; not broad acceptance",
+  "status": "incomplete",
+  "sourceSigned": false,
+  "publishedHead": "632982ece67224b749d096d80e90285411853bc5",
+  "reviewedUnsignedOverlays": true,
+  "command": "node spikes/launcher/tests/at/xvfb-orca.ts --activation-help-only",
+  "outerTimeoutSeconds": 290,
+  "outerKillGraceSeconds": 10,
+  "innerDeadlinesUnchanged": true,
+  "readinessSha256": "91d68771eedaf8abce6f5d67379947bc892017821052006bebf06af879498885",
+  "sourceBaseArchiveSha256": "9a739904f4938dcc5987b96329146237c239d286a002f4739eae75cc79ec5944",
+  "finalAtArchiveSha256": "b1cb40d8a9e72f334c800ba33d2d49b502407051cf08e8392bc59f0777b48733",
+  "finalAtHashes": {
+    "spikes/launcher/tests/at/check.ts": "9af33f05f849d1abcee1601361baddc91bca94d678c42bc9034c711cc83b92e1",
+    "spikes/launcher/tests/at/README.md": "6c3d696dbccda47c7d1b56e184de01ebc4026e7e77f3bd56cf26fc6bb40a6caa",
+    "spikes/launcher/tests/at/activation-help-mode.test.ts": "18de9920126040b1625d15f3c17b415f1cd7d036fecf398e58e0ee6c5bfe4569"
+  },
+  "runtimes": {
+    "node": {
+      "sha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+      "version": "v24.22.1"
+    },
+    "bun": {
+      "sha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+      "version": "1.4.4"
+    }
+  },
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "startedAtUtc": "2026-10-24T07:48:44Z",
+  "sourceBaseManifestSha256": "eb02fe146d778817935137fe69269fdbc4857d15899a58046252e57b9b0945a4",
+  "finalAtManifestSha256": "41f85fc9d61f0c177ab6b085779844d9a2caac7cebe05416509aaa40994ec0de",
+  "preRunCleanupBaselineSha256": "b598f651f10c7b92c015d5094ffcc46dcb8dab9a99b7984db73b20acebe727bd",
+  "endedAtUtc": "2026-10-24T07:49:38Z",
+  "exitCode": 3,
+  "rerunPerformed": false,
+  "failureStage": "activation-help-say-all",
+  "copiedPublicFiles": [
+    "runtime.json",
+    "report.json",
+    "native-at.json",
+    "orca.json"
+  ],
+  "screenshotsAvailable": [],
+  "rawOrcaLogsOrProfilesExported": false,
+  "guestSourceRetainedForIndependentReview": true
+}

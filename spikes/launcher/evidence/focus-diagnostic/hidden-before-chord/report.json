@@ -1,0 +1,60 @@
+{
+  "scope": "Pop!_OS22.04 GNOME42.9 X11 own-window diagnostic only",
+  "originalSequencePreserved": false,
+  "wmClassMatched": true,
+  "cliExitedSuccessfully": true,
+  "oneChordSent": true,
+  "cleanupCompleted": true,
+  "outcome": "focused",
+  "observations": [
+    {
+      "stage": "decoy-active-before-cli",
+      "primaryVisible": true,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": false,
+      "primaryShowObserved": false,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    },
+    {
+      "stage": "hidden-decoy-active-before-chord",
+      "primaryVisible": false,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": true,
+      "primaryShowObserved": false,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    },
+    {
+      "stage": "after-single-chord",
+      "primaryVisible": true,
+      "primaryFocused": false,
+      "decoyVisible": true,
+      "decoyFocused": true,
+      "shortcutRegistered": true,
+      "primaryHideObserved": true,
+      "primaryShowObserved": true,
+      "primaryFocusObserved": false,
+      "rootActive": "decoy"
+    },
+    {
+      "stage": "final",
+      "primaryVisible": true,
+      "primaryFocused": true,
+      "decoyVisible": true,
+      "decoyFocused": false,
+      "shortcutRegistered": true,
+      "primaryHideObserved": true,
+      "primaryShowObserved": true,
+      "primaryFocusObserved": true,
+      "rootActive": "primary"
+    }
+  ],
+  "acceptanceEstablished": false
+}

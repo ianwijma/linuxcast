@@ -1,0 +1,16 @@
+Scope: affected activation-help UI only; no AT invocation.
+Platform: isolated Debian 13.7 amd64, private Xvfb X11 without a window manager, Electron 45.0.0.
+Actual UI start UTC: 2026-10-23T10:46:17.040285+00:00
+Actual UI finish UTC: 2026-10-23T10:46:51.019995+00:00
+Actual UI exit: 0
+Source baseline: 632982ece67224b749d096d80e90285411853bc5
+Six reviewed unsigned overlays; sourceSigned=false, sourceDirty=true, executedSourceCommit=null.
+Whole signed tree represented: false; tracked evidence excluded.
+Source hashes unchanged after execution: true.
+Own application closed and profiles removed: true.
+Owned stage removed; owned tree cleanup and clean release verified: true.
+Before and after fixed process counts: gnome-shell=0, kwin_wayland=0, kwin_x11=0, Xvfb=0, electron=0, node=0, gdb=0, dbus-daemon=2.
+Before and after private matrix roots absent and exact input marker absent: true.
+Pinned tools verified after execution: true.
+No host display/settings/clipboard/input, native GNOME activation, physical desktop matrix or acceptance closure established.
+Curated from the reviewed execution record; raw transport/execution metadata is excluded.

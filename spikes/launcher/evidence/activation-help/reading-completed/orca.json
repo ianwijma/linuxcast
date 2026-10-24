@@ -1,0 +1,77 @@
+{
+  "status": "passed-generated-presentation",
+  "orcaVersion": "48.1",
+  "startupCompleted": true,
+  "mode": "activation-help-only",
+  "expectedCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change"
+  ],
+  "expectedPresentationCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Search commands"
+  ],
+  "helpReading": {
+    "command": "KP_Add",
+    "desktopLayoutVerified": true,
+    "requested": true,
+    "sentences": [
+      {
+        "id": "reason",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      },
+      {
+        "id": "manual-remediation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      },
+      {
+        "id": "companion-limitation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      }
+    ]
+  },
+  "headingFocusEventReceiptObserved": true,
+  "anchors": [
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    }
+  ],
+  "presentations": [
+    {
+      "label": "View activation help",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Launcher capabilities",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Search commands",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    }
+  ],
+  "limitation": "Ordinary focus: generated presentation and dispatch attempts only, not receipt. Essential help reading: completed Speech Dispatcher callback progression. No audible/tactile, GNOME/KDE/Wayland or desktop-matrix proof."
+}

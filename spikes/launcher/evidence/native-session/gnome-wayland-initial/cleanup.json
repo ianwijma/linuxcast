@@ -1,0 +1,18 @@
+{
+  "privateProcessTreeCleanupVerified": true,
+  "processCounts": {
+    "gnome-shell": 0,
+    "kwin_x11": 0,
+    "kwin_wayland": 0,
+    "Xvfb": 0,
+    "electron": 0,
+    "node": 0,
+    "gdb": 0
+  },
+  "privateMatrixRootsAbsent": true,
+  "additionalCheckedMarkerPath": "/run/linuxcast-input-synthetic-lab",
+  "additionalCheckedMarkerAbsent": true,
+  "actualInputLabMarkerCheckedByThisPostRunHelper": false,
+  "actualInputLabMarkerPreflightGuardPassed": true,
+  "physicalDesktopMatrixEstablished": false
+}

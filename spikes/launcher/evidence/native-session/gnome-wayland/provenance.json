@@ -1,0 +1,20 @@
+{
+  "task": "S0-01",
+  "sourceInputEquivalentSignedCommit": "3c747cca0dbf8c6eebe7752dce37839f021436ac",
+  "sourceParentAtReview": "722113241715935aa192ecdc5fa988d0245a9067",
+  "reviewedSourceDirtyDiffSha256": "f1db2c06fd83e95017dc07140adafb4ee7cd1aa6138d3d0b539752adf303bef8",
+  "originalTransferArchiveSha256": "9b0eea34f31861d607369c4d961429a51a92af0bcff9d35ad90081338ad18303",
+  "replacementCheckerSha256": "3528f160390707e7dc7e48251e4bbe0cdb1d655a234c8a7501e30214bc7df593",
+  "exactExecutedSourceManifest": "source-manifest.json",
+  "all23SourceInputHashesMatchSignedCommit": true,
+  "command": "node spikes/launcher/tests/native-session/build.ts; python3 spikes/launcher/tests/native-session/run-session.py gnome-wayland --private-guest",
+  "frozenInstallPackages": 651,
+  "bun": "1.4.4",
+  "node": "24.22.1",
+  "explicitElectronSetupCompleted": true,
+  "exitCode": 0,
+  "nativeProbeStatus": "passed-bounded-native-probe",
+  "screenshotScope": "Actual synthetic Electron own-renderer/CDP pixels; not a compositor-wide screen capture",
+  "agentScreenshotInspection": "Dark search and light capability/remediation view both match their labels; no clipping or private content observed. Coordinator review remains separate.",
+  "physicalDesktopMatrixEstablished": false
+}

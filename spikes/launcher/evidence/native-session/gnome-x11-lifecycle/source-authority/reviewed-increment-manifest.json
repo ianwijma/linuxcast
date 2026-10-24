@@ -1,0 +1,31 @@
+{
+  "task": "S0-01",
+  "sourceBaselineCommit": "d8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab",
+  "sourceDirty": true,
+  "sourceSigned": false,
+  "nativeExecuted": false,
+  "guestAccessed": false,
+  "checks": {
+    "preparation": 128,
+    "typecheck": "passed",
+    "affectedLint": "passed",
+    "pythonAst": "passed",
+    "diffCheck": "passed"
+  },
+  "sourceSha256": {
+    "spikes/launcher/tests/native-session/observer_startup.py": "28b9494299397c8f23d9f33762163c74379198d1d48f10ed41037b3bdaacc9a7",
+    "spikes/launcher/tests/native-session/run-session.py": "2dbd5197ad297e41da977b25dc9d02da5404ec40e6d930d8b7dfccc52af7c47c",
+    "spikes/launcher/tests/native-session/protocol.ts": "5ac93c2f0114adcb68badd91b09f98f01f9f598f6db59aa81f9d396aaaa41411",
+    "spikes/launcher/tests/native-session/startup-fixture.py": "ee6728bf765ed7947720228308c96223425667f8e239ecbbf8a59fd9cbf9e582",
+    "spikes/launcher/tests/native-session/preparation.test.ts": "26c02023903f044337d9639be152dd97cd12ff6fdb36307ef6ad6e2b445ed51e"
+  },
+  "filesSha256": {
+    "README.md": "ae6cf9c237664ac2609908330ab8f5415296bd5c63018e09710804b916c7dc98",
+    "observer_startup.py": "28b9494299397c8f23d9f33762163c74379198d1d48f10ed41037b3bdaacc9a7",
+    "preparation.test.ts": "26c02023903f044337d9639be152dd97cd12ff6fdb36307ef6ad6e2b445ed51e",
+    "protocol.ts": "5ac93c2f0114adcb68badd91b09f98f01f9f598f6db59aa81f9d396aaaa41411",
+    "run-session.py": "2dbd5197ad297e41da977b25dc9d02da5404ec40e6d930d8b7dfccc52af7c47c",
+    "source.diff": "43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1",
+    "startup-fixture.py": "ee6728bf765ed7947720228308c96223425667f8e239ecbbf8a59fd9cbf9e582"
+  }
+}

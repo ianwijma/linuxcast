@@ -1,0 +1,64 @@
+{
+  "task": "S0-01",
+  "status": "passed",
+  "evidenceKind": "real-sandboxed-electron-ui-with-synthetic-focus-states",
+  "runtimeVersions": {
+    "electron": "45.0.0",
+    "chrome": "156.0.8078.48",
+    "node": "24.22.0"
+  },
+  "sourceSha256": {
+    "build.ts": "618e6ccbbfa543d1e47473ba2f3730a79d708721812d62128ad25679c4a44b1b",
+    "src/main.ts": "16b2994aecfa776edd8bd1e4330e0376e1e578038f00bc01f31821726db67c03",
+    "src/contract.ts": "6122155d29331d90631bc2744d6fe738a7c2ee3a69e473d84b9519abf1d225cd",
+    "src/preload.ts": "6012cadd85da0474bb33929657e5378b77732c64d39b5ee5ea52b820f7f64f42",
+    "src/renderer/main.tsx": "0385cd6d02866433dca8685b674ae7ae086cc84e2f2bdc3a4dd399013e40e29d",
+    "src/renderer/App.tsx": "b3e9df15e8856120a013523f72c8fa2810a461c85c1e98cf640adcf582985b1c",
+    "src/renderer/style.css": "b7c8b77911e7477af2fc5b98a9176859396d51ce443658cda9c140fe3336afe2",
+    "resources/index.html": "4993bd2c7eee945524c699ff1bdb07e36a72ee9ab1817632999f37acbbfd9e7f",
+    "tests/activation-help-ui.ts": "a8bbe18a2fdb080c17087b235b745974e71c9820c62aa7af8a86d98be2da1e86",
+    "../../docs/design/tokens.json": "808a6a295c2e6292bb2e3cec38c9ac5db47ab6d9fd4ff9ba09f613555622f00f"
+  },
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "sourceCommit": null,
+  "display": "private-Xvfb-X11-no-window-manager",
+  "sandboxed": true,
+  "views": [
+    "dark-unconfirmed.png",
+    "dark-activation-help.png",
+    "light-unconfirmed.png",
+    "light-activation-help.png"
+  ],
+  "axe": [
+    {
+      "appearance": "dark",
+      "view": "unconfirmed",
+      "violations": []
+    },
+    {
+      "appearance": "dark",
+      "view": "help",
+      "violations": []
+    },
+    {
+      "appearance": "light",
+      "view": "unconfirmed",
+      "violations": []
+    },
+    {
+      "appearance": "light",
+      "view": "help",
+      "violations": []
+    }
+  ],
+  "keyboardHelpAndEscapeReturn": true,
+  "syntheticFocusRecoveryAndLaterBlur": true,
+  "actualGnomeFocusEstablished": false,
+  "physicalDesktopMatrixEstablished": false,
+  "companionActivationUsed": false,
+  "hostDisplaySettingsClipboardInputUsed": false,
+  "acceptanceClosure": false,
+  "ownApplicationClosed": true,
+  "ownProfilesRemoved": true
+}

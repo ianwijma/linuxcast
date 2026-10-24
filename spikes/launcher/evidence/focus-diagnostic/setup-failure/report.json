@@ -1,0 +1,11 @@
+{
+  "scope": "Pop!_OS22.04 GNOME42.9 X11 own-window diagnostic only",
+  "originalSequencePreserved": true,
+  "wmClassMatched": false,
+  "cliExitedSuccessfully": false,
+  "oneChordSent": false,
+  "cleanupCompleted": true,
+  "outcome": "diagnostic-error",
+  "observations": [],
+  "acceptanceEstablished": false
+}

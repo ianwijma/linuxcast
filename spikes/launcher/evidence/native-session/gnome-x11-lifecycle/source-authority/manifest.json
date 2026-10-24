@@ -1,0 +1,17 @@
+{
+  "kind": "S0-01-unsigned-lifecycle-source-authority",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "signedSourceBaselineCommit": "d8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab",
+  "reviewedIncrementSha256": "43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1",
+  "exactChangedFiles": 5,
+  "changedRuntimeInputs": 3,
+  "filesSha256": {
+    "README.md": "14905d86cd94a277e4aeb3f860cfe7864e8fd4d0e1778ba1184b6470bac8962c",
+    "authority.json": "b55edf2757b7ee7c81fdc9ad2c7895bb9f87c52378ba35ded9235b0f5e30c44d",
+    "build-manifest.json": "6ec0c32036d57e4a2ed0faa83e643420f0478e38f024aeecfa161794b593f44b",
+    "reviewed-increment-manifest.json": "1e9b8726d4b23d1305d34d4bf49e792e6c800e000ec5d13f9ead18102f8b5bf4",
+    "reviewed-increment.diff": "43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1",
+    "source.tgz": "216370402d265fa1a12c8a5850976271d980943855c5268fb661bb0d1a8bb0e9"
+  }
+}

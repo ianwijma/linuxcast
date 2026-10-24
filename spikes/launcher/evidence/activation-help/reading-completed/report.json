@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "stage": "complete",
+  "mode": "activation-help-only",
+  "expectedCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change"
+  ],
+  "nativeFocus": 4,
+  "generatedPresentation": 3,
+  "helpReading": {
+    "command": "KP_Add",
+    "desktopLayoutVerified": true,
+    "requested": true,
+    "sentences": [
+      {
+        "id": "reason",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      },
+      {
+        "id": "manual-remediation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      },
+      {
+        "id": "companion-limitation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": true
+      }
+    ]
+  },
+  "affectedActivationHelpChecks": 4,
+  "syntheticUnconfirmedFocusState": true,
+  "actualGnomeFocusEstablished": false,
+  "boundary": "Actual launcher on private Xvfb/session/AT buses; synthetic app-only observation; actual renderer sandbox; no host display hooks/settings or audible QA."
+}

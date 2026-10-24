@@ -1,0 +1,39 @@
+{
+  "views": [
+    {
+      "appearance": "dark",
+      "view": "unconfirmed",
+      "violations": []
+    },
+    {
+      "appearance": "dark",
+      "view": "help",
+      "violations": []
+    },
+    {
+      "appearance": "light",
+      "view": "unconfirmed",
+      "violations": []
+    },
+    {
+      "appearance": "light",
+      "view": "help",
+      "violations": [
+        "scrollable-region-focusable"
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "build.ts": "618e6ccbbfa543d1e47473ba2f3730a79d708721812d62128ad25679c4a44b1b",
+    "src/main.ts": "f3685914fccef1c33cb7950665142f7bb12997115ac43de3eb42b9c40c13a535",
+    "src/contract.ts": "6122155d29331d90631bc2744d6fe738a7c2ee3a69e473d84b9519abf1d225cd",
+    "src/preload.ts": "6012cadd85da0474bb33929657e5378b77732c64d39b5ee5ea52b820f7f64f42",
+    "src/renderer/main.tsx": "0385cd6d02866433dca8685b674ae7ae086cc84e2f2bdc3a4dd399013e40e29d",
+    "src/renderer/App.tsx": "921e31c58ecda37731f80b16f8131fefbf4f6c541628b3402f923e7d7abe6647",
+    "src/renderer/style.css": "e998bd7131ad1c1ac9752ad5f4a90bed9bfcc6b129fbe202c1e04f8e9732359c",
+    "resources/index.html": "4993bd2c7eee945524c699ff1bdb07e36a72ee9ab1817632999f37acbbfd9e7f",
+    "tests/activation-help-ui.ts": "b74c230da94db7ab429b61981d6c35fde60236fe4e1cf9bdd3b8012434a19d3f",
+    "../../docs/design/tokens.json": "808a6a295c2e6292bb2e3cec38c9ac5db47ab6d9fd4ff9ba09f613555622f00f"
+  },
+  "scope": "OWN_SYNTHETIC_UI_ONLY"
+}
