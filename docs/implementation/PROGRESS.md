@@ -6,7 +6,7 @@ Updated 24 October 2026. Goal ACTIVE: complete all 97 agreed local 1.0 tasks thr
 
 The user explicitly authorized merging PR13, PR15 and PR19 **in their unfinished state**, documenting the gaps and continuing application work. This supersedes the earlier proof-first integration sequence and the pending approval question. Merge is not task acceptance or release completion. Do not change failed/pending checks to passes. Preserve all local 1.0 features, four-session release coverage and input safety gates. Stop open-ended proof instrumentation and repeated diagnostic runs; prioritize working application changes and smaller product PRs.
 
-PR13 merged into develop as2233d7e; physical held-key/crash recovery and authenticated locked/inactive device-owning enforcement remain pending. Optional privileged input service remains disabled/stopped. PR15 is being updated against that merge; its only conflict is dependency-inventory lock hashes. Preserve JS dependency records and recalculate actual merged lock hashes. S0-01 retains pending UI acceptance: full accessibility sequence and native notice/manual recovery remain incomplete. PR19 remains reviewed provisional contracts; its final acceptance/freeze is separate from integrating the development baseline.
+PR13 merged2233d7e, PR15 mergedcb3b522, PR19 merged3b39091. All three are integrated unfinished, with explicit PR notices and retained task gaps. The combined contract baseline passes508mappedchecks/typecheck; final planningCI40091309654 passes and narrowCargo/inventory union review is clean. S0-01/S0-03/F0-01 remain in-progress. No native, physical or full release acceptance follows from these merges.
 
 PR descriptions explicitly record user-authorized unfinished integration. Current-head planning CI passed before merge preparation; no requested reviewers/reviews/review comments or repository rulesets were present. Authenticated CLI confirms develop is not branch-protected. Use normal merge/check rules, never admin bypass.
 
@@ -48,3 +48,13 @@ Private0700 .worktrees/private-lab, containerlinuxcast-native-lab-v4 ID674cd884c
 Guest generic6.12.113+deb13-amd64/GNOME48.7/Mutter packages prepared, multi-user.target, noGDM; one-shotGRUB consumed so futureboot not verified. Electron45SHA b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb. No host physical input/settings/services changed.
 
 All previous proof agents idle except manifest_review reviewing the narrow PR15 inventory merge. Delegate next product tasks with exact owned paths and shared-file restrictions after integrated baseline is available. Main task completion count remains5; unfinished merges must not inflate it.
+
+## Application lanes now active
+
+User authorization is implemented: all3oldPRs merged. Reviewedsequencingbranch codex/foundation-sequencing now based3b39091, documentsunfinishedintegration, S0-01releasegate, andimplementationagainstintegratedbaseline. Rootpreparingpublication; taskregistrymarksF1-02/F2-01/D1-01in-progress withnoacceptedcriteria.
+
+Activeagents: launcher_reading→F1-02in.worktrees/linuxcast-f1-02/codex/f1-02-resident-shell, ownsapps/desktop/src/main+preload; reading_review→D1-01inlinuxcast-d1-01/codex/d1-01-primitives, ownspackages/ui/src/tokens+primitives; manifest_review→F2-01inlinuxcast-f2-01/codex/f2-01-storage, ownspackages/storage. Allbasedb4d48e3(ancestorofmerged3b39091),652lockedJSdepsinstalled. Rootcoordinatorintegrationworktree linuxcast-app-integration/codex/application-foundation based3b39091 ownsmanifests/locks/sharedcontracts/build/rendererwiring/testmaps.
+
+F2keepsspecifiedbetter-sqlite3/ElectronABIroute; no node:sqlite stacksubstitution. Roottopin/rebuilddependencyandverifySQLite>=3.51.3. Migration1assigned packages/storage/src/migrations/001-foundation.sql forfoundationmetadata/settings/commandusage/AIconversations+immutablerevisions; laterdomainmigrationsownedbycoordinator. LinuxabstractAF_UNIX ownerlockapproved(UID+canonicaldatadiridentity,acquirebeforeDBopen,rejectconnections,kernelcrashrelease); notmalicioussameuserprotection.
+
+F1proposesshellnarrowsharedAPIgetState/hide/reportContentHeight/quit/onState plusreadonlyruntimeflags, internalapporigin/linuxcastlinks;rootsharedcontractpending. F2utilityinitialization andtypedrepositoryIPC staymain-only; shutdownclosesDBandlock. D1implementsThemeProvider/useTheme/buttons/textfields/keycaps/loading/empty/error/unavailable+canonicalCSS/fontbindings;rootwilladdpackageexportsandrendererwiring. No furtherproofVMrunsscheduled.

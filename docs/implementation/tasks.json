@@ -256,7 +256,8 @@
         "Exactly one default-nine actual Debian13.7/cloud6.12.113/privateXvfb/Orca48.1/Electron45 diagnostic on signed2fcbdae selected inputs ran2026-10-24 10:41:50–10:43:07UTC, exit3/incomplete at focus:View activation help. First5native/generated/dispatch-attempt checks pass, including Record shortcut and Cancel; Record receipt observation is true. Sixth native focus reaches View activation help, but fresh generated/dispatch-attempt observations are false; heading, help reading and Escape are unreached. This does not explain or replace the prior Record failure, and the earlier focused reading pass retains its own source/run scope. Public fixed artifacts and3own-app dark/light screenshots are preserved in spikes/launcher/evidence/activation-help/default-nine-help-transition-incomplete/. Coordinator independently verified335selected Git blobs, five changed archive entries, all15private checksums and3PNGs;419preserved evidence paths are explicitly excluded from the signed-source subset, with no whole-tree claim. Cleanup10:44:14 verifies12owned counts0, private roots/input marker absent,754integrity entries and runtime/13Orca/packages unchanged; Docker independently confirms stopped10:44:42,exit0,pid0. No retry, raw logs/profile export, host input or acceptance-state change. Full default-nine accessibility and actual native notice/manual recovery remain outstanding.",
         "Signed5779554 (reviewed isolated42abbda) prepares a bounded GNOME-X11 activation-notice/manual desktop-switch diagnostic in the existing full harness. It retains the original failed ordinary-show checkpoint and overall incomplete/exit3; one private Alt+Tab is permitted only after exact owned native launcher/decoy, actual pending activation state and visible notice checks, repeated after dark/light capture. Separate recovery requires the same live native launcher focused, decoy not focused, actual focused/available state, notice removal and recovered screenshot; no input retry or force-focus fallback. Author467preparation fixtures (396existing+71new) pass before a final publication fix;72changed fixtures then pass independently including the added early-transient-decoy regression, with typecheck/lint/PythonAST/plan/diff clean. Independent review closed an overstrict earlier-row publication condition without weakening original-failure/fresh-recovery conditions. Six signed integrated source blobs match the reviewed lane. No app, observer, runner, shared contract or dependency change. This is source/test preparation only: no compositor/guest execution, native recovery result or criterion change. See spikes/launcher/tests/native-session/README.md; actual exact-source evidence/cleanup and full default-nine accessibility remain outstanding.",
         "Reviewed source-only help-focus progression increment adds four fixed receipt/Queued/Dequeued/processing-completed observations for View activation help in the existing fresh private Orca slice. Exact descriptor and queue identity remain in memory; duplicate/malformed/interleaved/truncated frames fail closed, and the first processing boundary must be canonical TOTAL followed immediately by matching FINISHED. Observations never gate success or alter deadlines, modes, native focus, generated-presentation/dispatch checks, reading or cleanup. Final checker ec0bd47b0c225db2cab2d1e70ec8fbaef0b320283674bb4d0c5727f34f52e462: author86mappedunit checks including50AT/type/lint/plan/diff pass. Independent original86check review and final50AT delta rerun pass, with five exact upstream source hashes/semantics independently matched. Those five hashes are prospective installed-runtime comparison requirements; historical13file authority is unchanged. Final docs identify latest help-button presentation failure and preserve earlier Record failure. No guest/native execution, raw log/descriptor/counter export, cause or criterion change; current actual default-nine outcome remains signed2fcbdae incomplete. Native notice/manual recovery and full sequence accessibility remain pending.",
-        "Actual signed55301bffde97ca3cf2a8bc893f8f39df7d0a3618 default-nine accessibility run11:24:51–11:26:13UTC on24October exits3/incomplete at focus:View activation help. First5native/generated/dispatch-attempt checks pass including Record/Cancel; help nativefocus passes and fixed receipt/queued/dequeued=true, processingCompleted=false, generated/attempt=false. Three Dismiss anchors and Record receipt pass; heading/landmark/SayAll/Escape are unreached. Absent processing completion does not prove nonprocessing or a cause. Source checker ec0bd47b and unchanged requirements/deadlines were independently reviewed. Fifteen exact public artifacts plus README/checksums in spikes/launcher/evidence/activation-help/default-nine-help-event-incomplete/ retain335signed Git inputs,419preserved exclusions, five prospective installed Orca hashes and separate historical13authority, runtime/readiness/execution/cleanup/runninghandoff, four fixed reports and three own dark/light PNGs. All16original checksums/335Gitblobs/11archive entries/419unchanged evidence and authority references were independently verified. Environment is isolated Debian13.7 generic6.12.113/Electron45/privateXvfb/Orca48.1/AT-SPI2.56.2/dummy SpeechDispatcher0.12 after reviewed GNOME/Mutter package preparation; prior cloud-kernel run is not a controlled comparison. Cleanup11:28:29 verifies18owned counts0/rootsmarkerabsent/all754integrity entries/runtime/packages/Orca unchanged; running handoff11:28:58 is not shutdown. No retry, raw-log publication, audible/native-compositor/fullmatrix proof or criterion promotion. Earlier failures/focused passes remain separate. Native notice/manual recovery and complete sequence accessibility remain outstanding."
+        "Actual signed55301bffde97ca3cf2a8bc893f8f39df7d0a3618 default-nine accessibility run11:24:51–11:26:13UTC on24October exits3/incomplete at focus:View activation help. First5native/generated/dispatch-attempt checks pass including Record/Cancel; help nativefocus passes and fixed receipt/queued/dequeued=true, processingCompleted=false, generated/attempt=false. Three Dismiss anchors and Record receipt pass; heading/landmark/SayAll/Escape are unreached. Absent processing completion does not prove nonprocessing or a cause. Source checker ec0bd47b and unchanged requirements/deadlines were independently reviewed. Fifteen exact public artifacts plus README/checksums in spikes/launcher/evidence/activation-help/default-nine-help-event-incomplete/ retain335signed Git inputs,419preserved exclusions, five prospective installed Orca hashes and separate historical13authority, runtime/readiness/execution/cleanup/runninghandoff, four fixed reports and three own dark/light PNGs. All16original checksums/335Gitblobs/11archive entries/419unchanged evidence and authority references were independently verified. Environment is isolated Debian13.7 generic6.12.113/Electron45/privateXvfb/Orca48.1/AT-SPI2.56.2/dummy SpeechDispatcher0.12 after reviewed GNOME/Mutter package preparation; prior cloud-kernel run is not a controlled comparison. Cleanup11:28:29 verifies18owned counts0/rootsmarkerabsent/all754integrity entries/runtime/packages/Orca unchanged; running handoff11:28:58 is not shutdown. No retry, raw-log publication, audible/native-compositor/fullmatrix proof or criterion promotion. Earlier failures/focused passes remain separate. Native notice/manual recovery and complete sequence accessibility remain outstanding.",
+        "User-authorized unfinished integration on24October2026: PR#15 https://github.com/ianwijma/linuxcast/pull/15 merged into develop at cb3b522918634ab8d36f3364811179e90e713b32. This preserves reviewed implementation and existing evidence to unblock application work. Merge does not establish task acceptance, contract freeze, native/physical recovery or release completion. Outstanding criteria and limitations remain; task stays in-progress."
       ],
       "owner": "s0_05_provider",
       "branch": "codex/s0-01-launcher",
@@ -534,7 +535,8 @@
         "Published source validation: 25 Rust checks, 10 private helper cases, 9 wrapper cases and strict clippy/formatting/TypeScript checks; the separate selection-proposal module has 19 synthetic checks. No real metadata query ran for that published selection increment. Coordinator and independent review pass; planning CI https://github.com/ianwijma/linuxcast/actions/runs/39886948557 succeeds. Private later diagnostics are not promoted into published acceptance evidence.",
         "Published reviewed PR13 source71849c9 adds the metadata guardian: independently bounded one-scan child lifecycle and strict four-false authority result, with66 fake-libudev/real-owned-process checks and21 private mocked-controller checks passing. Separate private metadata observations remain scoped: no event stream, device open/grab, worker Arm, consent or physical capture. Compatible authenticated live companion and selected-device consent remain unavailable.",
         "Published reviewed source2ba7da4 adds a test-only external root-helper parent-death check using production root bootstrap/fixed helper. External ordinary IDs/groups/capabilities/NNP pass; after authentic parent kill, helper SIGKILL is observed within1ms before helper cleanup signals while a duplicate control endpoint remains open. Ten-helper regression, independent7s guard, clippy/fmt pass. Disposable Debian userspace on host kernel7.1.1; not VM/desktop/physical recovery or external dumpability proof. See spikes/input/docs/root-parent-death.md in PR13.",
-        "Current manufactured regression passes in published68a9e92/PR13: existing bun run test:security -- S0-03 returns actual0 with both mapped tests, no skips and all14 ordered manufactured-device rows on Debian13.7 amd64/generic6.12.113/libevdev1.13.4/systemd257.13/Node24.22.1/Bun1.4.4. Original timing/assertion bounds unchanged: worker/supervisor recovery116/127ms, emergency99ms, watchdog kill500ms plus129ms kernel cleanup, lease disarm2ms after expiry plus112ms cleanup. Root reviewed sanitized report and cleanup evidence. First staging failure remains failed; historical outer failure remains FAILED_UNRESOLVED. All owned devices/processes/cgroups/staging/marker removed and original binaries/tools restored. Helper was staged but not invoked by this suite. See spikes/input/docs/current-regression.md. This closes only the current manufactured regression gap; AC01 physical/compositor recovery and AC02 device-owning live locked/inactive authenticated enforcement remain pending."
+        "Current manufactured regression passes in published68a9e92/PR13: existing bun run test:security -- S0-03 returns actual0 with both mapped tests, no skips and all14 ordered manufactured-device rows on Debian13.7 amd64/generic6.12.113/libevdev1.13.4/systemd257.13/Node24.22.1/Bun1.4.4. Original timing/assertion bounds unchanged: worker/supervisor recovery116/127ms, emergency99ms, watchdog kill500ms plus129ms kernel cleanup, lease disarm2ms after expiry plus112ms cleanup. Root reviewed sanitized report and cleanup evidence. First staging failure remains failed; historical outer failure remains FAILED_UNRESOLVED. All owned devices/processes/cgroups/staging/marker removed and original binaries/tools restored. Helper was staged but not invoked by this suite. See spikes/input/docs/current-regression.md. This closes only the current manufactured regression gap; AC01 physical/compositor recovery and AC02 device-owning live locked/inactive authenticated enforcement remain pending.",
+        "User-authorized unfinished integration on24October2026: PR#13 https://github.com/ianwijma/linuxcast/pull/13 merged into develop at 2233d7ede546d930173559abcc8dbdd7d0e08dd7. This preserves reviewed implementation and existing evidence to unblock application work. Merge does not establish task acceptance, contract freeze, native/physical recovery or release completion. Outstanding criteria and limitations remain; task stays in-progress."
       ],
       "owner": "review_f1_01",
       "branch": "codex/s0-03-input",
@@ -877,7 +879,7 @@
     {
       "id": "F0-01",
       "title": "Freeze shared contracts and compatibility fixtures",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F0",
       "dependsOn": [
@@ -962,7 +964,8 @@
         "Published signed65b6c3f (draft PR19) adds reviewed extension transport, typed settings/permission scopes and canonical opaque file/application references. Subsequent reviewed local preparation defines workflow values/bindings/graphs and explicit subgraph entry-exits, provider profiles/status/catalog and typed repository requests, explicit harness identity/session/operations/events, broker-owned effect dispatch records and concrete AI storage/provenance/recovery records. Full mapped contract suite374/374 passes including3Rust groups; strict typecheck/lint/browser bundle/plan validation pass on the Ubuntu-based host with pinned Node24.22.1/Bun1.4.4/Rust1.95. Independent reviews closed malformed-pointer backtracking, IANA timezone, attachment provenance and interrupted unknown-effect no-replay gaps. At this checkpoint these later files were staged/unsigned after normal Git signing failed; do not infer publication, freeze or runtime implementation. Extension manifest/remaining lifecycle schemas remain outstanding; S0-01 acceptance still blocks integration. No task/criterion status changes. See packages/contracts/README.md and provisional decision015.",
         "Local reviewed continuation on2026-10-24 adds strict native extension manifests and immutable package integrity/install/update/rollback/disable/uninstall request/result contracts. Full415 mapped contract checks pass including3Rust fixture groups; pinned Node24.22.1/Bun1.4.4/Rust1.95, typecheck/lint/browser bundle/plan checks pass on the Ubuntu-based host. Independent review closed missing remote MCP network declaration, integrity metadata incorrectly limited by the RPC frame cap, and configured-schedule update representation; tests include a legal9999-file integrity inventory over1MiB, exact version/integrity binding and retained-data/teardown outcomes. New and prior reviewed continuations are staged locally pending normal signing readiness; published PR19 HEAD remains65b6c3f. These parsers perform no install, execution, grants, archive extraction or system effects. All F0 criterion/status states stay pending/planned; command-session/view lifecycle definitions, full-scope review and S0-01 acceptance still precede freeze. See packages/contracts/README.md. A further independently reviewed extension-session start/terminal increment binds broker-owned immutable package/session/connection generation, validates and deeply copies normalized command inputs, and distinguishes failed/cancelled/interrupted outcomes without replay. Full430 mapped checks including3Rust groups, typecheck/lint pass; a nested-reference regression closes caller aliasing through identity-preserving validators. View revision/delta definitions and full-scope review remain outstanding; states unchanged.",
         "Local reviewed2026-10-24 continuation completes provisional NativeResultsV1 row/action contracts, atomic view snapshots/item deltas/revision-gap recovery/navigation, calendar-date fields, serializable node/tool descriptors, shared URL/contact references and eight reusable synthetic AI scenario fixtures. Full mapped508/508 checks pass including3Rust fixture groups; strict typecheck/lint/browser bundle and native Clippy with warnings denied pass on the Ubuntu-based host with Node24.22.1/Bun1.4.4/Rust1.95. Independent source reviews close same-ID replacement bypassing revision checks, opaque MCP version handling, trusted tool scope/directory pinning and the remaining typed resource omission. Full normative contract/fixture inventory audit identifies no further concrete omission; this is source review, not runtime or acceptance approval. Scenario expected call counts remain downstream test obligations, not simulated proof of provider/permission/persistence enforcement. Source remains local/unsigned pending normal signing readiness, published PR19 HEAD65b6c3f unchanged. S0-01 acceptance, final current-head review/checks and integration still precede freeze; all F0 statuses remain planned/pending. See packages/contracts/README.md and fixtures/ai/README.md.",
-        "Reviewed continuation published as normally signed9cbf70c on draft PR19 after user confirmed signing readiness. Signature verified against the configured public key; historical unsigned test provenance is unchanged. Final508mapped checks and clean source/inventory review remain as recorded above. A checkpoint-only merge from develop916835f resolves the old paused-progress-file conflict; no contract source or acceptance state changes. Current-head planning CI/review and S0-01 acceptance remain required before integration/freeze."
+        "Reviewed continuation published as normally signed9cbf70c on draft PR19 after user confirmed signing readiness. Signature verified against the configured public key; historical unsigned test provenance is unchanged. Final508mapped checks and clean source/inventory review remain as recorded above. A checkpoint-only merge from develop916835f resolves the old paused-progress-file conflict; no contract source or acceptance state changes. Current-head planning CI/review and S0-01 acceptance remain required before integration/freeze.",
+        "User-authorized unfinished integration on24October2026: PR#19 https://github.com/ianwijma/linuxcast/pull/19 merged into develop at 3b3909166f8ab7d95313200de491afcf09d4e078. This preserves reviewed implementation and existing evidence to unblock application work. Merge does not establish task acceptance, contract freeze, native/physical recovery or release completion. Outstanding criteria and limitations remain; task stays in-progress."
       ],
       "owner": "coordinator",
       "branch": "codex/f0-01-contracts",
@@ -973,7 +976,7 @@
     {
       "id": "F1-02",
       "title": "Build resident shell and secure windows",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F1",
       "dependsOn": [
@@ -1045,15 +1048,17 @@
         "bun run typecheck",
         "bun run test:security -- F1-02"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task’s checks remain required."
+      ],
+      "owner": "Assigned application implementation lane; coordinator owns shared integration",
+      "branch": "codex/f1-02-resident-shell",
       "limitations": []
     },
     {
       "id": "F2-01",
       "title": "Create storage owner and migration lifecycle",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F2",
       "dependsOn": [
@@ -1132,9 +1137,11 @@
         "bun run typecheck",
         "bun run test:integration -- F2-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task’s checks remain required."
+      ],
+      "owner": "Assigned application implementation lane; coordinator owns shared integration",
+      "branch": "codex/f2-01-storage",
       "limitations": []
     },
     {
@@ -1300,7 +1307,7 @@
     {
       "id": "D1-01",
       "title": "Bind tokens and accessible host primitives",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "D1",
       "dependsOn": [
@@ -1372,9 +1379,11 @@
         "bun run typecheck",
         "bun run test:ui -- D1-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task’s checks remain required."
+      ],
+      "owner": "Assigned application implementation lane; coordinator owns shared integration",
+      "branch": "codex/d1-01-primitives",
       "limitations": []
     },
     {
