@@ -6,13 +6,13 @@ Updated 24 October 2026. Goal ACTIVE: complete all 97 local 1.0 tasks through R1
 
 The user explicitly authorized merging the three older PRs unfinished, documenting gaps, and moving to application work. PR13 merged2233d7e; PR15 mergedcb3b522; PR19 merged3b39091. Sequencing/status PR22 mergeddf74103. Their PR descriptions and task evidence retain unfinished acceptance. S0-01 now gates R1-01 rather than F0-01; S0-03 still gates P2-01/release. No local1.0 scope reduction, physical-input permission or fabricated completion. Stop open-ended proof instrumentation.
 
-Main develop is df74103. No required reviewers/reviews or repository rulesets were present when merging; authenticated CLI confirms develop unprotected. Never bypass required checks. Normal 1Password signing works; preserve configured signing. Toolchain under `.worktrees/tools`: Node24.22.1, Bun1.4.4, Rust1.95. Temporary per-command allowed-signers verification can use the configured public key; never print keys or alter signing setup.
+Main develop is 6601c1c after application PR23 merged. No required reviewers/reviews or repository rulesets were present when merging; authenticated CLI confirms develop unprotected. Never bypass required checks. Normal 1Password signing works; preserve configured signing. Toolchain under `.worktrees/tools`: Node24.22.1, Bun1.4.4, Rust1.95. Temporary per-command allowed-signers verification can use the configured public key; never print keys or alter signing setup.
 
 ## Current application integration
 
 All worktrees are under `/home/ian/Projects/ianwijma/linuxcast/.worktrees/`.
 
-Coordinator branch: `linuxcast-app-integration` / `codex/application-foundation`. Integrated commits: shared contracts/dependencies abb8445; UI 9086a45; resident shell c377d6a; renderer/build 73d0e13; storage dependencies f9df166; storage source 0039006 (author 5fdf8bb); Electron test 7b9bb45; reviewed F0 acceptance 98374d4. Final utility wiring, runtime evidence and task updates are being committed/published.
+Coordinator worktree: `linuxcast-app-integration`, now on `codex/application-services` based merged6601c1c. Previous `codex/application-foundation` PR23 is merged. Integrated commits: shared contracts/dependencies abb8445; UI 9086a45; resident shell c377d6a; renderer/build 73d0e13; storage dependencies f9df166; storage source 0039006 (author 5fdf8bb); Electron test 7b9bb45; reviewed F0 acceptance 98374d4. Final utility wiring/runtime evidence commit89f1dc6 was published as PR23 and merged6601c1c. CI40093929717 passed; no requested reviews or review comments remained.
 
 Product code now builds and runs. The primary Electron instance owns one storage utility in the required XDG data directory. The renderer has no Node, generic IPC or network access. Hide preserves residence; a real second invocation toggles the same window; Quit verifies utility shutdown and exits zero. Search is explicitly unavailable until its application task is implemented.
 
@@ -20,15 +20,20 @@ Validation: 522 mapped contract checks including three Rust groups; 42 shell sec
 
 The Electron addon is explicitly rebuilt and selected by trusted nativeBinding. `bun run setup:sqlite` reproduces the build; `bun run build:desktop` copies the addon and SQL001 into dist. No default-prebuild substitution. The production service has no unconditional migration timeout; explicit Quit stays bounded. Recovery UI remains downstream, with no preview save/success claim.
 
-F0-01 is accepted after final review and sequencing PR22. F2-01 has complete storage-service acceptance including the bundled Electron runtime; Debian installer/upgrade validation remains F1-03/release work. F1-02 and D1-01 stay in-progress: bounded criteria pass, full actual assistive-technology/native-session UI acceptance remains pending. Registry: 7 done, 4 in-progress, 86 planned; 33 passed criteria, 7 justified not-applicable, 349 pending.
+F0-01 is accepted after final review and sequencing PR22. F2-01 has complete storage-service acceptance including the bundled Electron runtime; Debian installer/upgrade validation remains F1-03/release work. F1-02 and D1-01 stay in-progress: bounded criteria pass, full actual assistive-technology/native-session UI acceptance remains pending. Registry after starting two ready tasks: 7 done, 6 in-progress, 84 planned; 33 passed criteria, 7 justified not-applicable, 349 pending.
 
-Author/reviewer lanes remain available: launcher_reading at linuxcast-f1-02; manifest_review at linuxcast-f2-01; reading_review at linuxcast-d1-01. All source is integrated in the coordinator branch. No new proof VM work is scheduled.
+Active lanes:
+- manifest_review implements F3-01 at `linuxcast-f3-01` / `codex/f3-01-permission-brokers`, owns packages/permissions and packages/platform-contracts only. Capability/permission brokers, scoped decisions, revocation and safe audit; shared persistence/interface requests go to root.
+- reading_review implements L2-01 at `linuxcast-l2-01` / `codex/l2-01-file-index`, owns native/platform/src/index and packages/file-index only. Selected-root metadata/FTS, watch recovery and real generated 100k-path evidence; no independent SQLite writer or real-home crawl. Shared migration/API/dependency proposal goes to root first.
+- launcher_reading is available for independent review; its completed F1 worktree is linuxcast-f1-02. No proof VM work is scheduled.
+
+Shared requests now agreed: reserve migration002 for durable scoped permission allow/deny records (once grants stay invocation-bound memory), migration003 for file-index roots/metadata/FTS and staged scan generations. F3 will propose exact principal/declaration/scope schema before root implements storage methods. L2 may implement packages/file-index/src/repository.ts receiving the existing owner Database handle, never opening a writer; root imports its direct subpath and wires shared methods/migrations. Root must create permissions/platform-contracts/file-index manifests with existing pinned contracts/Zod, and native/platform Cargo/lib/fixed-index-bin wiring using existing dependencies. Both agents continue owned source while shared changes are prepared; mocks cannot satisfy persistence acceptance.
 
 ## Next actions
 
-1. Publish and integrate the reviewed application foundation PR with explicit unfinished F1/D1 notices, preserving the user's merge-and-build priority. Inspect current-head CI and repository reviews.
-2. Refresh develop and start newly ready F3-01 capability/permission brokers and L2-01 file index, each in an isolated branch/worktree with task-owned paths. F2-02 secrets and W1-01 workflow model are also ready; avoid excessive concurrent scope.
-3. Continue visible application work through D1-02 declarative views and L1-01 search/registry while keeping dependent acceptance honest. Full native/assistive-technology gates remain recorded, never silently converted to passes.
+1. Root coordinates the minimal permission persistence and file-index migration/typed methods, module manifests and native wiring requested by the two active lanes. All schemas/migrations/lockfiles/status remain root-owned. Preserve task-owned source boundaries.
+2. Review and integrate bounded product increments, with task-specific tests and honest UI/native limits. F2-02 secrets and W1-01 workflow model remain ready but are not started to avoid excessive simultaneous scope.
+3. Continue toward declarative views and visible launcher/search; unfinished F1/D1 actual assistive-technology/native-session checks remain recorded, never silently converted to passes.
 
 ## Retained recent evidence — no active diagnostic work
 

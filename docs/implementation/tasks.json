@@ -1305,7 +1305,7 @@
     {
       "id": "F3-01",
       "title": "Implement capability and permission brokers",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F3",
       "dependsOn": [
@@ -1377,9 +1377,11 @@
         "bun run typecheck",
         "bun run test:security -- F3-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned."
+      ],
+      "owner": "manifest_review",
+      "branch": "codex/f3-01-permission-brokers",
       "limitations": []
     },
     {
@@ -1978,7 +1980,7 @@
     {
       "id": "L2-01",
       "title": "Build file metadata index and watcher recovery",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -2051,9 +2053,11 @@
         "bun run typecheck",
         "bun run test:integration -- L2-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned."
+      ],
+      "owner": "reading_review",
+      "branch": "codex/l2-01-file-index",
       "limitations": []
     },
     {
