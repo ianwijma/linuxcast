@@ -91,6 +91,9 @@ arguments, output, prompt text, tokens, credentials or raw exception details are
 included. Tests use synthetic IDs/content; no real private material is needed.
 
 The two host packages introduce no visual surface. Their typed prompts,
-capability states and remediation actions are inputs to shared host UI; feature
-approval screens and backend-specific desktop validation remain their owning
-tasks. No user-facing keyboard/accessibility acceptance is claimed by unit tests.
+capability states and remediation actions are inputs to shared host UI. The actual
+host approval/remediation UI is still an F3-01 acceptance gap: F3-01-UI and the
+user-visible portion of F3-01-AC02 remain pending until that integration and its
+keyboard/accessibility evidence exist. This is not a transfer to another task or
+a not-applicable UI claim. Backend-specific desktop validation remains with the
+relevant capability feature. Unit tests do not establish user-facing acceptance.
