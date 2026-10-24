@@ -4,6 +4,7 @@ import { readFile, open, rename, statfs, unlink, readdir, lstat } from 'node:fs/
 import { join } from 'node:path';
 import type Database from 'better-sqlite3';
 import { StorageError } from './errors.ts';
+import { STORAGE_MIGRATION_ASSETS } from './schema-version.ts';
 import { privateDirectory, privateFile } from './paths.ts';
 
 export interface Migration { version: number; sql: string }
@@ -13,7 +14,9 @@ export interface RecoveryJournal {
   sha256: string; createdAt: string;
 }
 export async function foundationMigrations(): Promise<Migration[]> {
-  return [{ version: 1, sql: await readFile(new URL('./migrations/001-foundation.sql', import.meta.url), 'utf8') }];
+  return Promise.all(STORAGE_MIGRATION_ASSETS.map(async (name, index) => ({
+    version: index + 1, sql: await readFile(new URL(`./migrations/${name}`, import.meta.url), 'utf8'),
+  })));
 }
 const digest = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex');
 async function fileDigest(path: string): Promise<string> {

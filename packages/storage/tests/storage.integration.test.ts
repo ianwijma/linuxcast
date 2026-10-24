@@ -1,3 +1,4 @@
+import { STORAGE_SCHEMA_VERSION } from '../src/schema-version.ts';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mkdtemp, readFile, readdir, stat, writeFile, chmod, symlink, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -57,7 +58,7 @@ describe('F2-01 real SQLite storage owner', () => {
     const dir = await directory(); const owner = await open(dir);
     const [major, minor, patch] = owner.sqliteVersion.split('.').map(Number);
     expect(major! > 3 || (major === 3 && (minor! > 51 || (minor === 51 && patch! >= 3)))).toBe(true);
-    expect(owner.version).toBe(1);
+    expect(owner.version).toBe(STORAGE_SCHEMA_VERSION);
     const result = request(owner, 'settings.set', { id: 'ui.theme', value: 'dark', expectedRevision: 0 });
     expect(result).toMatchObject({ revision: 1, value: 'dark' });
     expect((await stat(join(dir, 'linuxcast.db'))).mode & 0o777).toBe(0o600);
@@ -72,14 +73,14 @@ describe('F2-01 real SQLite storage owner', () => {
     const dir = await directory(); const owner = await open(dir);
     await expect(StorageOwner.open({ dataDirectory: dir, applicationBuild: 'second' })).rejects.toMatchObject({reason:'owner-already-running'});
     await expect(StorageOwner.open({ dataDirectory: join(dir, '.'), applicationBuild: 'second' })).rejects.toMatchObject({reason:'owner-already-running'});
-    await owner.close(); expect((await open(dir)).version).toBe(1);
+    await owner.close(); expect((await open(dir)).version).toBe(STORAGE_SCHEMA_VERSION);
   });
   it('holds ownership across processes and kernel releases the lock after SIGKILL', async () => {
     const dir = await directory(); const proc = child('./fixtures/crash-owner.ts', [dir, 'owner']);
     await message(proc, 'ready');
     await expect(StorageOwner.open({ dataDirectory: dir, applicationBuild: 'competitor' })).rejects.toMatchObject({reason:'owner-already-running'});
     const exit = once(proc, 'exit'); proc.kill('SIGKILL'); await exit;
-    expect((await open(dir)).version).toBe(1);
+    expect((await open(dir)).version).toBe(STORAGE_SCHEMA_VERSION);
   });
   it('many concurrent IPC clients write through one owner with no lost usage increments', async () => {
     const dir = await directory(); const proc = child('../src/utility.ts', []);
@@ -112,7 +113,7 @@ describe('F2-01 real SQLite storage owner', () => {
     const closed=message(proc,'closed'); const exit=once(proc,'exit');
     if(phase==='during-initialize') proc.send({kind:'initialize',dataDirectory:dir,applicationBuild:'fixture'});
     proc.send({kind:'shutdown'}); await closed; expect((await exit)[0]).toBe(0);
-    expect((await open(dir)).version).toBe(1);
+    expect((await open(dir)).version).toBe(STORAGE_SCHEMA_VERSION);
   });
   it('optimistic writes reject stale revisions atomically', async () => {
     const owner = await open(await directory());
@@ -137,32 +138,32 @@ describe('F2-01 real SQLite storage owner', () => {
     request(owner,'settings.set',{id:'ui.theme',value:'dark',expectedRevision:0}); await owner.confirmSuccessfulLaunch(); await owner.close();
     expect((await stat(join(dir,'linuxcast.db-wal'))).size).toBeGreaterThan(32);
     const backup = vi.spyOn(Database.prototype, 'backup');
-    const migrations = [...await foundationMigrations(), {version:2,sql:'CREATE TABLE upgrade_fixture (id INTEGER PRIMARY KEY) STRICT;'}];
+    const migrations = [...await foundationMigrations(), {version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE upgrade_fixture (id INTEGER PRIMARY KEY) STRICT;'}];
     const upgraded = await StorageOwner.open({dataDirectory:dir,applicationBuild:'fixture-v2',migrations}); owners.push(upgraded);
-    expect(backup).toHaveBeenCalledOnce(); expect(upgraded.version).toBe(2);
+    expect(backup).toHaveBeenCalledOnce(); expect(upgraded.version).toBe(STORAGE_SCHEMA_VERSION + 1);
     const manifests = await Promise.all((await readdir(join(dir,'backups'))).filter(f=>f.endsWith('.json')).map(async f=>JSON.parse(await readFile(join(dir,'backups',f),'utf8')) as {id:string;fromVersion:number;sha256:string}));
-    const manifest = manifests.find(m=>m.fromVersion===1)!; const path = join(dir,'backups',`${manifest.id}.db`);
+    const manifest = manifests.find(m=>m.fromVersion===STORAGE_SCHEMA_VERSION)!; const path = join(dir,'backups',`${manifest.id}.db`);
     expect(createHash('sha256').update(await readFile(path)).digest('hex')).toBe(manifest.sha256);
     const snapshot = new Database(path,{readonly:true});
-    expect(schemaVersion(snapshot)).toBe(1);
+    expect(schemaVersion(snapshot)).toBe(STORAGE_SCHEMA_VERSION);
     expect(snapshot.prepare('SELECT value FROM settings').get()).toEqual({value:'"dark"'}); snapshot.close(); reader.close();
   });
   it('failed backup stops migration before schema changes and redacts native errors', async () => {
     const dir = await directory(); const owner = await open(dir); await owner.confirmSuccessfulLaunch(); await owner.close();
     vi.spyOn(Database.prototype,'backup').mockRejectedValue(new Error('seeded-private-content'));
-    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:2,sql:'CREATE TABLE never_created (id INTEGER);'}]}))
+    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE never_created (id INTEGER);'}]}))
       .rejects.toMatchObject({reason:'backup-failed',message:'Storage unavailable: backup-failed.'});
-    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(1); db.close();
+    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(STORAGE_SCHEMA_VERSION); db.close();
   });
   it('failed migration rolls back, preserves backup and requires explicit retry', async () => {
     const dir = await directory(); const owner = await open(dir);
     request(owner,'settings.set',{id:'ui.theme',value:'light',expectedRevision:0}); await owner.confirmSuccessfulLaunch(); await owner.close();
-    const migration = [...await foundationMigrations(),{version:2,sql:'CREATE TABLE failure_probe (id INTEGER); INSERT INTO missing_table VALUES(1);'}];
+    const migration = [...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE failure_probe (id INTEGER); INSERT INTO missing_table VALUES(1);'}];
     await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:migration})).rejects.toMatchObject({reason:'migration-failed'});
-    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(1);
+    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(STORAGE_SCHEMA_VERSION);
     expect(db.prepare("SELECT name FROM sqlite_master WHERE name='failure_probe'").get()).toBeUndefined(); db.close();
     await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'old'})).rejects.toMatchObject({reason:'recovery-required'});
-    const fixed = [...await foundationMigrations(),{version:2,sql:'CREATE TABLE failure_probe (id INTEGER);'}];
+    const fixed = [...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE failure_probe (id INTEGER);'}];
     const retry = await StorageOwner.open({dataDirectory:dir,applicationBuild:'fixed',migrations:fixed,retryFailedMigration:true}); owners.push(retry);
     expect(request(retry,'settings.get',{id:'ui.theme'})).toMatchObject({value:'light'});
   });
@@ -171,16 +172,16 @@ describe('F2-01 real SQLite storage owner', () => {
     const proc = child('./fixtures/crash-owner.ts',[dir,'transaction']); await message(proc,'inside-transaction');
     const exit = once(proc,'exit'); proc.kill('SIGKILL'); await exit;
     await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'recovery'})).rejects.toMatchObject({reason:'recovery-required'});
-    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(1);
+    const db = new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(STORAGE_SCHEMA_VERSION);
     expect(db.prepare("SELECT name FROM sqlite_master WHERE name='crash_probe'").get()).toBeUndefined(); db.close();
   });
   it('recognizes a commit completed before the final journal flush without replaying migration', async () => {
     const dir=await directory(); const owner=await open(dir); await owner.confirmSuccessfulLaunch(); await owner.close();
     const proc=child('./fixtures/crash-owner.ts',[dir,'commit']); await message(proc,'after-commit');
     const exit=once(proc,'exit'); proc.kill('SIGKILL'); await exit;
-    const migrations=[...await foundationMigrations(),{version:2,sql:'CREATE TABLE crash_probe (id INTEGER) STRICT;'}];
+    const migrations=[...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE crash_probe (id INTEGER) STRICT;'}];
     const recovered=await StorageOwner.open({dataDirectory:dir,applicationBuild:'recovery',migrations}); owners.push(recovered);
-    expect(recovered.version).toBe(2); await recovered.confirmSuccessfulLaunch();
+    expect(recovered.version).toBe(STORAGE_SCHEMA_VERSION + 1); await recovered.confirmSuccessfulLaunch();
   });
   it('stops before required backup when disk availability is insufficient', async () => {
     const dir=await directory(); const owner=await open(dir); await owner.confirmSuccessfulLaunch(); await owner.close();
@@ -189,7 +190,7 @@ describe('F2-01 real SQLite storage owner', () => {
       return source === 'page_count' ? Number.MAX_SAFE_INTEGER : real.call(this, source, options);
     });
     const backup=vi.spyOn(Database.prototype,'backup');
-    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:2,sql:'CREATE TABLE disk_fixture (id INTEGER);'}]}))
+    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE disk_fixture (id INTEGER);'}]}))
       .rejects.toMatchObject({reason:'insufficient-space'});
     expect(backup).not.toHaveBeenCalled();
   });
@@ -201,17 +202,17 @@ describe('F2-01 real SQLite storage owner', () => {
       if (sql==='BEGIN IMMEDIATE') this.pragma(`max_page_count = ${Number(this.pragma('page_count',{simple:true}))+1}`);
       return original.call(this,sql);
     });
-    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:2,sql:'CREATE TABLE disk_fixture (body BLOB); INSERT INTO disk_fixture VALUES(zeroblob(1048576));'}]}))
+    await expect(StorageOwner.open({dataDirectory:dir,applicationBuild:'v2',migrations:[...await foundationMigrations(),{version:STORAGE_SCHEMA_VERSION + 1,sql:'CREATE TABLE disk_fixture (body BLOB); INSERT INTO disk_fixture VALUES(zeroblob(1048576));'}]}))
       .rejects.toMatchObject({reason:'migration-failed'});
-    const db=new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(1);
+    const db=new Database(join(dir,'linuxcast.db'),{readonly:true}); expect(schemaVersion(db)).toBe(STORAGE_SCHEMA_VERSION);
     expect(db.prepare('SELECT value FROM settings').get()).toEqual({value:'"dark"'}); db.close();
   });
   it('retains the latest three confirmed snapshots and keeps a new unconfirmed snapshot', async () => {
     const dir=await directory(); const migrations=await foundationMigrations();
-    for(let version=1;version<=5;version++) {
-      if(version>1) migrations.push({version,sql:`CREATE TABLE retention_fixture_${version} (id INTEGER);`});
+    for(let version=STORAGE_SCHEMA_VERSION;version<=STORAGE_SCHEMA_VERSION+4;version++) {
+      if(version>STORAGE_SCHEMA_VERSION) migrations.push({version,sql:`CREATE TABLE retention_fixture_${version} (id INTEGER);`});
       const owner=await StorageOwner.open({dataDirectory:dir,applicationBuild:`v${version}`,migrations}); owners.push(owner);
-      if(version<5) await owner.confirmSuccessfulLaunch(); await owner.close();
+      if(version<STORAGE_SCHEMA_VERSION+4) await owner.confirmSuccessfulLaunch(); await owner.close();
     }
     expect((await readdir(join(dir,'backups'))).filter(f=>f.endsWith('.db'))).toHaveLength(4);
     const owner=await StorageOwner.open({dataDirectory:dir,applicationBuild:'v5',migrations}); owners.push(owner);

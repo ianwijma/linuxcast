@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import { STORAGE_MIGRATION_ASSETS } from '../../packages/storage/src/schema-version.ts';
 import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,7 +24,8 @@ await build({ absWorkingDir: root, entryPoints: ['packages/storage/src/utility.t
   define: { 'import.meta.url': 'storageModuleUrl' },
   legalComments: 'linked' });
 await mkdir(join(output, 'migrations'), { recursive: true });
-await cp(join(root, 'packages/storage/src/migrations/001-foundation.sql'), join(output, 'migrations/001-foundation.sql'));
+for (const name of STORAGE_MIGRATION_ASSETS)
+  await cp(join(root, 'packages/storage/src/migrations', name), join(output, 'migrations', name));
 await mkdir(join(output, 'sqlite'), { recursive: true });
 await cp(join(root, 'packages/storage/node_modules/better-sqlite3/build/Release/better_sqlite3.node'), join(output, 'sqlite/better_sqlite3.node'));
 await cp(join(root, 'apps/desktop/src/renderer/index.html'), join(output, 'renderer/index.html'));

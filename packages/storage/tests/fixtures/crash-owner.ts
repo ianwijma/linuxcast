@@ -1,3 +1,4 @@
+import { STORAGE_SCHEMA_VERSION } from '../../src/schema-version.ts';
 import { StorageOwner } from '../../src/owner.ts';
 import { foundationMigrations } from '../../src/migrations.ts';
 const directory = process.argv[2]!;
@@ -5,7 +6,7 @@ const mode = process.argv[3]!;
 if (mode === 'transaction' || mode === 'commit') {
   // A real process death inside an actual SQLite migration transaction. The SQL
   // is fixed test assembly, not accepted from a repository caller.
-  const migration = [...await foundationMigrations(), { version: 2, sql: 'CREATE TABLE crash_probe (id INTEGER) STRICT;' }];
+  const migration = [...await foundationMigrations(), { version: STORAGE_SCHEMA_VERSION + 1, sql: 'CREATE TABLE crash_probe (id INTEGER) STRICT;' }];
   const Database = (await import('better-sqlite3')).default;
   const original = Database.prototype.exec;
   Database.prototype.exec = function(sql: string) {

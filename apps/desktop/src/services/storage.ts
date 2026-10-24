@@ -1,6 +1,6 @@
 import { utilityProcess } from 'electron';
 import { join } from 'node:path';
-import { createStorageClient } from '@linuxcast/storage';
+import { createStorageClient, STORAGE_SCHEMA_VERSION } from '@linuxcast/storage';
 import type { ResidentService } from '../main/lifecycle.ts';
 
 /** A trusted main-owned child. No database path or generic repository API enters preload. */
@@ -31,7 +31,7 @@ export function startStorage(resourcesDirectory: string, dataDirectory: string, 
   child.on('message', (value: unknown) => {
     if (!value || typeof value !== 'object' || !('kind' in value)) return;
     if (value.kind === 'ready' && 'protocolVersion' in value && value.protocolVersion === 1 &&
-      'schemaVersion' in value && value.schemaVersion === 1) {
+      'schemaVersion' in value && value.schemaVersion === STORAGE_SCHEMA_VERSION) {
       ready = true; confirm();
     } else if (value.kind === 'unavailable') {
       console.error('STORAGE_UNAVAILABLE');

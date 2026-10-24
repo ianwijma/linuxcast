@@ -70,7 +70,8 @@
       "spikes/desktop/guest/restart-preparation.test.ts"
     ],
     "F2-01": [
-      "packages/storage/tests/storage.integration.test.ts"
+      "packages/storage/tests/storage.integration.test.ts",
+      "packages/storage/tests/permissions.integration.test.ts"
     ],
     "F1-02": [
       "apps/desktop/tests/shell.integration.test.ts"
@@ -95,6 +96,9 @@
       "apps/desktop/src/main/security.test.ts",
       "apps/desktop/src/main/ipc.test.ts",
       "apps/desktop/src/preload/api.test.ts"
+    ],
+    "F3-01": [
+      "packages/storage/tests/permissions.integration.test.ts"
     ]
   },
   "perf": {}

@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled']);
@@ -18,6 +19,7 @@ const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datet
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...createAiRepositoryContracts(),
+  ...permissionRepositoryContracts,
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],

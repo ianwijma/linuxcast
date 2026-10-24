@@ -86,6 +86,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/platform-contracts": "workspace:*",
         "better-sqlite3": "13.0.3",
         "zod": "4.6.7",
       },

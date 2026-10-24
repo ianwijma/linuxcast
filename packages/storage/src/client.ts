@@ -1,4 +1,6 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { principalKeyMaterial, scopeKeyMaterial } from '@linuxcast/platform-contracts/permissions';
+import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
 import { MAX_ENVELOPE_BYTES, parseRepositoryResponse } from '../../contracts/src/index.ts';
 import { storageContracts } from './method-contracts.ts';
 import type { StorageMethod, StorageMethods } from './repositories.ts';
@@ -16,7 +18,19 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if (method.startsWith('settings.')) valid = row.id === params.id;
+  if (method === 'permissions.list') {
+    const page = result as {records: DecisionRecord[]; nextCursor: string | null};
+    valid = page.records.every(record => createHash('sha256').update(principalKeyMaterial(record.principal)).digest('hex') === params.principalKey) &&
+      page.records.length <= Number(params.limit) &&
+      page.records.every((record, index) => record.id > (index === 0 ? (params.afterId as string | undefined) ?? '' : page.records[index - 1]!.id)) &&
+      (page.nextCursor === null || page.nextCursor === page.records.at(-1)?.id);
+  } else if (method === 'permissions.put') {
+    const expected = params.record as DecisionRecord, actual = result as DecisionRecord;
+    valid = principalKeyMaterial(actual.principal) === principalKeyMaterial(expected.principal) &&
+      actual.declarationHash === expected.declarationHash && actual.permissionId === expected.permissionId &&
+      scopeKeyMaterial(actual.scope) === scopeKeyMaterial(expected.scope) && actual.decision === expected.decision &&
+      actual.updatedAt === expected.updatedAt;
+  } else if (method.startsWith('settings.')) valid = row.id === params.id;
   else if (method.startsWith('commands.')) valid = row.commandId === params.commandId;
   else if (method === 'ai.conversations.get') valid = row.id === params.id;
   else if (method === 'ai.messages.list') valid = (result as {conversationId:string}[]).every(r => r.conversationId === params.conversationId);
