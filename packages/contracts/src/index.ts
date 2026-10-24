@@ -24,3 +24,4 @@ export * from './extension-session.ts';
 export * from './workflow-results.ts';
 export * from './view-lifecycle.ts';
 export * from './registry-descriptors.ts';
+export * from './desktop-shell.ts';

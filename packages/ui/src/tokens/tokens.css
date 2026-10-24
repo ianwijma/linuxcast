@@ -1,0 +1,61 @@
+/* Generated from docs/design/tokens.json by tokens/generate.ts. */
+:root {
+  --lc-font-ui: Inter, system-ui, sans-serif;
+  --lc-font-mono: JetBrains Mono, monospace;
+  --lc-text-caption: 0.75rem;
+  --lc-text-body: 0.875rem;
+  --lc-text-emphasis: 1rem;
+  --lc-text-panel-title: 1.25rem;
+  --lc-text-workspace-title: 1.75rem;
+  --lc-space-4: 0.25rem;
+  --lc-space-8: 0.5rem;
+  --lc-space-12: 0.75rem;
+  --lc-space-16: 1rem;
+  --lc-space-20: 1.25rem;
+  --lc-space-24: 1.5rem;
+  --lc-space-32: 2rem;
+  --lc-radius-shell: 1rem;
+  --lc-radius-popover: 0.75rem;
+  --lc-radius-row: 0.5rem;
+  --lc-radius-keycap: 0.25rem;
+  --lc-launcher-width: 45rem;
+  --lc-launcher-max-height: 35rem;
+  --lc-header-height: 3.5rem;
+  --lc-row-height: 2.5rem;
+  --lc-footer-height: 2.25rem;
+  --lc-action-panel-width: 17.5rem;
+  --lc-motion-state: 100ms;
+  --lc-motion-panel: 160ms;
+}
+[data-lc-theme="dark"] {
+  color-scheme: dark;
+  --lc-background: #111216;
+  --lc-surface: #1C1D22;
+  --lc-raised: #25262D;
+  --lc-selection: #35363F;
+  --lc-border: #454751;
+  --lc-text: #F5F5F7;
+  --lc-muted: #ADB0BB;
+  --lc-accent: #FF786E;
+  --lc-accent-text: #151519;
+  --lc-focus: #A6B9FF;
+  --lc-danger: #FF8F91;
+  --lc-warning: #F4C779;
+  --lc-success: #8AD8AE;
+}
+[data-lc-theme="light"] {
+  color-scheme: light;
+  --lc-background: #F2F3F6;
+  --lc-surface: #FFFFFF;
+  --lc-raised: #F7F7F9;
+  --lc-selection: #E8EAF0;
+  --lc-border: #B9BDC8;
+  --lc-text: #1C1D24;
+  --lc-muted: #535866;
+  --lc-accent: #B92F32;
+  --lc-accent-text: #FFFFFF;
+  --lc-focus: #3258BD;
+  --lc-danger: #B32235;
+  --lc-warning: #795000;
+  --lc-success: #17693E;
+}

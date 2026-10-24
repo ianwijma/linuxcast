@@ -1,0 +1,34 @@
+/* Generated semantic aliases; import after Tailwind and tokens.css. */
+@theme inline {
+  --color-background: var(--lc-background);
+  --color-surface: var(--lc-surface);
+  --color-raised: var(--lc-raised);
+  --color-selection: var(--lc-selection);
+  --color-border: var(--lc-border);
+  --color-text: var(--lc-text);
+  --color-muted: var(--lc-muted);
+  --color-accent: var(--lc-accent);
+  --color-accent-text: var(--lc-accent-text);
+  --color-focus: var(--lc-focus);
+  --color-danger: var(--lc-danger);
+  --color-warning: var(--lc-warning);
+  --color-success: var(--lc-success);
+  --font-ui: var(--lc-font-ui);
+  --font-mono: var(--lc-font-mono);
+  --text-caption: var(--lc-text-caption);
+  --text-body: var(--lc-text-body);
+  --text-emphasis: var(--lc-text-emphasis);
+  --text-panel-title: var(--lc-text-panel-title);
+  --text-workspace-title: var(--lc-text-workspace-title);
+  --radius-shell: var(--lc-radius-shell);
+  --radius-popover: var(--lc-radius-popover);
+  --radius-row: var(--lc-radius-row);
+  --radius-keycap: var(--lc-radius-keycap);
+  --spacing-1: var(--lc-space-4);
+  --spacing-2: var(--lc-space-8);
+  --spacing-3: var(--lc-space-12);
+  --spacing-4: var(--lc-space-16);
+  --spacing-5: var(--lc-space-20);
+  --spacing-6: var(--lc-space-24);
+  --spacing-8: var(--lc-space-32);
+}

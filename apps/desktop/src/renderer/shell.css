@@ -1,0 +1,8 @@
+html, body, #root { margin: 0; min-inline-size: 0; }
+.shell { border: 1px solid var(--lc-border); border-radius: var(--lc-radius-shell); overflow: hidden; }
+.shell-header { min-block-size: var(--lc-header-height); display: flex; flex-wrap: wrap; align-items: center; gap: var(--lc-space-12); padding: var(--lc-space-12) var(--lc-space-20); border-block-end: 1px solid var(--lc-border); background: var(--lc-surface); -webkit-app-region: drag; }
+.shell-header h1 { margin: 0; font-size: var(--lc-text-panel-title); font-weight: 600; }
+.shell-header span { font-size: var(--lc-text-caption); }
+.shell-content { padding: var(--lc-space-16); }
+.shell-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--lc-space-12); min-block-size: var(--lc-footer-height); padding: var(--lc-space-8) var(--lc-space-16); border-block-start: 1px solid var(--lc-border); background: var(--lc-surface); }
+.shell-actions { display: flex; flex-wrap: wrap; gap: var(--lc-space-8); }

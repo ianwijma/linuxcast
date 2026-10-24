@@ -20,7 +20,10 @@
     "test:perf": "node scripts/test-runner/run.ts perf",
     "package:deb": "node scripts/test-runner/package-deb.ts",
     "setup:electron": "node scripts/test-runner/setup-electron.ts",
-    "inventory:bootstrap": "node scripts/test-runner/inventory.ts"
+    "inventory:bootstrap": "node scripts/test-runner/inventory.ts",
+    "build:desktop": "node apps/desktop/build.ts",
+    "start:desktop": "electron apps/desktop/dist/main.cjs",
+    "setup:sqlite": "node apps/desktop/setup-sqlite.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
@@ -45,7 +48,9 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
     "vite": "7.3.7",
-    "vitest": "4.1.12"
+    "vitest": "4.1.12",
+    "@electron/rebuild": "4.2.1",
+    "@types/better-sqlite3": "9.6.0"
   },
   "workspaces": [
     "apps/*",

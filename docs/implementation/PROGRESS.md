@@ -1,35 +1,34 @@
 # Coordinator checkpoint
 
-Updated 24 October 2026. Goal ACTIVE: complete all 97 agreed local 1.0 tasks through R1-03. Objective file: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
+Updated 24 October 2026. Goal ACTIVE: complete all 97 local 1.0 tasks through R1-03. Objective: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
 
-## User-directed integration and application priority
+## User priority and integrated work
 
-The user explicitly authorized merging PR13, PR15 and PR19 **in their unfinished state**, documenting the gaps and continuing application work. This supersedes the earlier proof-first integration sequence and the pending approval question. Merge is not task acceptance or release completion. Do not change failed/pending checks to passes. Preserve all local 1.0 features, four-session release coverage and input safety gates. Stop open-ended proof instrumentation and repeated diagnostic runs; prioritize working application changes and smaller product PRs.
+The user explicitly authorized merging the three older PRs unfinished, documenting gaps, and moving to application work. PR13 merged2233d7e; PR15 mergedcb3b522; PR19 merged3b39091. Sequencing/status PR22 mergeddf74103. Their PR descriptions and task evidence retain unfinished acceptance. S0-01 now gates R1-01 rather than F0-01; S0-03 still gates P2-01/release. No local1.0 scope reduction, physical-input permission or fabricated completion. Stop open-ended proof instrumentation.
 
-PR13 merged2233d7e, PR15 mergedcb3b522, PR19 merged3b39091. All three are integrated unfinished, with explicit PR notices and retained task gaps. The combined contract baseline passes508mappedchecks/typecheck; final planningCI40091309654 passes and narrowCargo/inventory union review is clean. S0-01/S0-03/F0-01 remain in-progress. No native, physical or full release acceptance follows from these merges.
+Main develop is df74103. No required reviewers/reviews or repository rulesets were present when merging; authenticated CLI confirms develop unprotected. Never bypass required checks. Normal 1Password signing works; preserve configured signing. Toolchain under `.worktrees/tools`: Node24.22.1, Bun1.4.4, Rust1.95. Temporary per-command allowed-signers verification can use the configured public key; never print keys or alter signing setup.
 
-PR descriptions explicitly record user-authorized unfinished integration. Current-head planning CI passed before merge preparation; no requested reviewers/reviews/review comments or repository rulesets were present. Authenticated CLI confirms develop is not branch-protected. Use normal merge/check rules, never admin bypass.
+## Current application integration
 
-Next: finish PR15 and PR19 integration; apply the approved sequencing update; start F1-02 resident shell, F2-01 storage owner and D1-01 shared UI primitives in isolated lanes. Complete contract acceptance in parallel before claiming dependent tasks done. S0-01 remains on the release path and S0-03 gates P2-01. Integrated unfinished code is not a completed feature.
+All worktrees are under `/home/ian/Projects/ianwijma/linuxcast/.worktrees/`.
 
-## Worktrees and tools
+Coordinator branch: `linuxcast-app-integration` / `codex/application-foundation`. Integrated commits: shared contracts/dependencies abb8445; UI 9086a45; resident shell c377d6a; renderer/build 73d0e13; storage dependencies f9df166; storage source 0039006 (author 5fdf8bb); Electron test 7b9bb45; reviewed F0 acceptance 98374d4. Final utility wiring, runtime evidence and task updates are being committed/published.
 
-All persistent worktrees below live under `/home/ian/Projects/ianwijma/linuxcast/.worktrees/`:
+Product code now builds and runs. The primary Electron instance owns one storage utility in the required XDG data directory. The renderer has no Node, generic IPC or network access. Hide preserves residence; a real second invocation toggles the same window; Quit verifies utility shutdown and exits zero. Search is explicitly unavailable until its application task is implemented.
 
-- linuxcast-s0-01 / codex/s0-01-launcher: PR15; source/evidencec6e1ecf001ec3738bd2f7495fb377f23c293413d, merge2233d7e in progress. Existing runtime source55301bf is unchanged by evidence/merge. CI40090358452 passed c6e1ecf.
-- linuxcast-f0-01 / codex/f0-01-contracts: PR19; published251b3d1487c2a87081460f541a27b15929671fee, current checkpoint edits. Contract source unchanged since9cbf70c; CI40090039051 passed251b3d1.
-- linuxcast-s0-03 / codex/s0-03-input: publishedeedc502; PR13 now merged unfinished.
-- linuxcast-foundation-sequencing / codex/foundation-sequencing: seven-file reviewed proposal based916835f; not committed. Remove S0-01→F0-01 and add S0-01→R1-01, preserving all97tasks/status/acceptance. Update its approval wording and permit implementation against the integrated reviewed development baseline under the user's latest instruction, without claiming freeze/completion. Merge latestdevelop before publication.
-- linuxcast-s0-01-native-recovery / codex/s0-01-native-recovery: clean signed42abbda, integrated as5779554 in PR15.
-- linuxcast-f0-01-review and linuxcast-s0-01-review are stale review snapshots; read current implementation branches.
+Validation: 522 mapped contract checks including three Rust groups; 42 shell security plus 14 shell unit checks; 30 actual SQLite/process checks; 3 UI token checks; 7 Chromium component checks. Actual Electron 45 on private Xvfb passes renderer isolation, CSP/navigation/popup denial, dark/light images, production resident storage ownership and competing-writer denial, bundled SQLite 3.53.4 write/exit/reopen persistence, Hide/second invocation/Quit. Typecheck, lint and plan validation pass. Source, build/wiring and screenshot reviews are clean after concrete fixes. Xvfb is not GNOME/KDE/Wayland or Orca evidence.
 
-Normal1Password signing/push works after user unlocked it. Never change signing configuration. Existing public signer fingerprint SHA256:izd3tAxNjVzQP/GI/Qg1dDwbJyroHLxZBCvx7jUWbfY. Per-command temporary allowed-signers verification is available. Previously lost /tmp worktrees were reconstructed from indexes; backups primary.git/recovery-20261024, do not prune missing worktrees. .worktrees is locally ignored.
+The Electron addon is explicitly rebuilt and selected by trusted nativeBinding. `bun run setup:sqlite` reproduces the build; `bun run build:desktop` copies the addon and SQL001 into dist. No default-prebuild substitution. The production service has no unconditional migration timeout; explicit Quit stays bounded. Recovery UI remains downstream, with no preview save/success claim.
 
-Tools .worktrees/tools/{node,bun}: Node24.22.1 SHAe32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb; Bun1.4.4 SHA10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235. Frozen651JSdependencies restored; Rust1.95. Git/Docker/Cargo subprocess operations use normal permitted escalation.
+F0-01 is accepted after final review and sequencing PR22. F2-01 has complete storage-service acceptance including the bundled Electron runtime; Debian installer/upgrade validation remains F1-03/release work. F1-02 and D1-01 stay in-progress: bounded criteria pass, full actual assistive-technology/native-session UI acceptance remains pending. Registry: 7 done, 4 in-progress, 86 planned; 33 passed criteria, 7 justified not-applicable, 349 pending.
 
-## Contract baseline
+Author/reviewer lanes remain available: launcher_reading at linuxcast-f1-02; manifest_review at linuxcast-f2-01; reading_review at linuxcast-d1-01. All source is integrated in the coordinator branch. No new proof VM work is scheduled.
 
-F0-01 source covers versioned commands/views/capabilities/native IPC/outcomes, extensions/settings/resources/manifests/integrity/package/session lifecycle, workflow values/graphs/subgraphs/results/nodes, provider/catalog/selection/harness/effects/storage/tools, view revisions/deltas/navigation/date fields and eight shared synthetic AI scenarios. 508mappedcontract checks including3Rust groups, type/lint/browserbundle/Clippywarningsdenied/plan passed; independent increment reviews and full normative inventory audit clean. Runtime enforcement belongs to product tasks. No providers/OS effects or SQLite implementation are implied by schemas. Final acceptance metadata and freeze still need reconciliation after integration.
+## Next actions
+
+1. Publish and integrate the reviewed application foundation PR with explicit unfinished F1/D1 notices, preserving the user's merge-and-build priority. Inspect current-head CI and repository reviews.
+2. Refresh develop and start newly ready F3-01 capability/permission brokers and L2-01 file index, each in an isolated branch/worktree with task-owned paths. F2-02 secrets and W1-01 workflow model are also ready; avoid excessive concurrent scope.
+3. Continue visible application work through D1-02 declarative views and L1-01 search/registry while keeping dependent acceptance honest. Full native/assistive-technology gates remain recorded, never silently converted to passes.
 
 ## Retained recent evidence — no active diagnostic work
 
@@ -48,13 +47,3 @@ Private0700 .worktrees/private-lab, containerlinuxcast-native-lab-v4 ID674cd884c
 Guest generic6.12.113+deb13-amd64/GNOME48.7/Mutter packages prepared, multi-user.target, noGDM; one-shotGRUB consumed so futureboot not verified. Electron45SHA b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb. No host physical input/settings/services changed.
 
 All previous proof agents idle except manifest_review reviewing the narrow PR15 inventory merge. Delegate next product tasks with exact owned paths and shared-file restrictions after integrated baseline is available. Main task completion count remains5; unfinished merges must not inflate it.
-
-## Application lanes now active
-
-User authorization is implemented: all3oldPRs merged. Reviewedsequencingbranch codex/foundation-sequencing now based3b39091, documentsunfinishedintegration, S0-01releasegate, andimplementationagainstintegratedbaseline. Rootpreparingpublication; taskregistrymarksF1-02/F2-01/D1-01in-progress withnoacceptedcriteria.
-
-Activeagents: launcher_reading→F1-02in.worktrees/linuxcast-f1-02/codex/f1-02-resident-shell, ownsapps/desktop/src/main+preload; reading_review→D1-01inlinuxcast-d1-01/codex/d1-01-primitives, ownspackages/ui/src/tokens+primitives; manifest_review→F2-01inlinuxcast-f2-01/codex/f2-01-storage, ownspackages/storage. Allbasedb4d48e3(ancestorofmerged3b39091),652lockedJSdepsinstalled. Rootcoordinatorintegrationworktree linuxcast-app-integration/codex/application-foundation based3b39091 ownsmanifests/locks/sharedcontracts/build/rendererwiring/testmaps.
-
-F2keepsspecifiedbetter-sqlite3/ElectronABIroute; no node:sqlite stacksubstitution. Roottopin/rebuilddependencyandverifySQLite>=3.51.3. Migration1assigned packages/storage/src/migrations/001-foundation.sql forfoundationmetadata/settings/commandusage/AIconversations+immutablerevisions; laterdomainmigrationsownedbycoordinator. LinuxabstractAF_UNIX ownerlockapproved(UID+canonicaldatadiridentity,acquirebeforeDBopen,rejectconnections,kernelcrashrelease); notmalicioussameuserprotection.
-
-F1proposesshellnarrowsharedAPIgetState/hide/reportContentHeight/quit/onState plusreadonlyruntimeflags, internalapporigin/linuxcastlinks;rootsharedcontractpending. F2utilityinitialization andtypedrepositoryIPC staymain-only; shutdownclosesDBandlock. D1implementsThemeProvider/useTheme/buttons/textfields/keycaps/loading/empty/error/unavailable+canonicalCSS/fontbindings;rootwilladdpackageexportsandrendererwiring. No furtherproofVMrunsscheduled.
