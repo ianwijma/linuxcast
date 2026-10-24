@@ -98,7 +98,10 @@
       "apps/desktop/src/preload/api.test.ts"
     ],
     "F3-01": [
-      "packages/storage/tests/permissions.integration.test.ts"
+      "packages/storage/tests/permissions.integration.test.ts",
+      "packages/permissions/tests/broker.security.test.ts",
+      "packages/permissions/tests/pagination.security.test.ts",
+      "packages/permissions/tests/persistence.security.test.ts"
     ]
   },
   "perf": {}
