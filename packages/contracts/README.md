@@ -1,13 +1,14 @@
-# Shared contracts (provisional F0-01 preparation)
+# Shared contracts — version 1
 
-This package implements shared capability/native IPC, commands/views, extension
-lifecycle, workflow, provider/harness, AI storage and registry contracts, with
-bounded UTF-8 framing and reusable synthetic fixtures.
-It is production boundary code with synthetic
-fixtures, not evidence of a running desktop adapter. S0-01 is not yet accepted; do not integrate or call the contracts frozen until
-that prerequisite and the rest of F0-01 are complete. The approved sequencing
-change removes only S0-03 from F0-01; input implementation and release gates
-still require full S0-03 acceptance.
+The version-1 F0-01 baseline is accepted on24October2026 after integration in
+PR19, the user-approved sequencing change in PR22, and final contract review.
+It defines capability/native IPC, commands/views, extension lifecycle, workflow,
+provider/harness, AI storage and registry contracts, bounded UTF-8 framing and
+reusable synthetic fixtures. The additive desktop-shell API is included in the
+application foundation. The mapped suite passes522checks including the Rust
+fixture groups. Schemas are production boundary code, not desktop or provider
+runtime evidence. S0-01 remains an R1-01 release gate; S0-03 still gates privileged
+input implementation and release. Their unfinished checks remain outstanding.
 
 `src/protocol.ts` is the semantic source of truth. `native/protocol` mirrors its
 native messages with Serde. Both run the exact JSON cases in `fixtures/protocol.json`.
@@ -182,7 +183,7 @@ returns normalized scope data. It never creates a grant.
 kind, opaque grant/entry IDs, display name and optional presentation-only path.
 Application references have their own explicit kind. Declarative views reuse
 these references. This corrects the earlier provisional id-only file reference
-before freeze; there are no integrated version1 consumers to migrate. Actual
+before the accepted freeze; that earlier correction had no integrated version1 consumers to migrate. Actual
 file resolution, race checks, grant ownership and application lookup remain
 broker obligations; display paths do not authorize access.
 
@@ -208,9 +209,9 @@ It fails if Cargo cannot execute or either language disagrees with the fixtures.
 Also run `cargo clippy --locked --offline -p linuxcast-protocol --all-targets -- -D warnings`.
 
 The normative completeness review's view lifecycle/date, workflow results,
-workflow-node/tool metadata and shared AI scenario gaps now have provisional
+workflow-node/tool metadata and shared AI scenario gaps have reviewed
 contracts and fixtures below. URL/contact references complete the shared typed
-resource values. Final full-scope review and S0-01 acceptance still precede freeze. Runtime enforcement
+resource values. Final full-scope contract review is complete. Runtime enforcement
 of these contracts belongs to the consuming brokers, hosts and adapters; this
 freeze defines the schemas, compatibility fixtures and required obligations,
 not running OS/provider effects. The overview's native request `id` and the
@@ -224,7 +225,7 @@ change. Keep version/build fields distinct from app, SDK, workflow and database
 versions. Incompatible changes require explicit protocol version handling; never
 silently reuse grants or replay uncertain effects across a reconnect.
 
-## Workflow values and bindings (provisional)
+## Workflow values and bindings
 
 `src/workflows.ts` defines explicit literal, JSON Pointer and scalar-template
 bindings, typed invocation envelopes, named-port node results, safe error shapes
@@ -235,7 +236,7 @@ snapshots, trusted context construction and secret-handle policy remain runtime
 obligations. A context's identity/target fields do not authenticate their sender.
 Workflow definition/registry compatibility contracts are defined below; graph compilation and execution remain downstream.
 
-## Provider status and model catalogs (provisional)
+## Provider status and model catalogs
 
 `src/providers.ts` keeps authentication, inference permission, eligibility,
 quota/rate limits and availability distinct. A ready record requires explicit
@@ -248,7 +249,7 @@ parsing cannot establish their claims. Profile/endpoint schemas are defined belo
 and SecretStore operations remain outstanding. Harness and AI storage records are
 defined below; their runtime implementations remain downstream.
 
-## Explicit harness contracts (provisional)
+## Explicit harness contracts
 
 `src/harness.ts` separates an explicit harness submission from broker-selected
 run/runtime/model/account/billing identity. It copies content before snapshotting
@@ -262,7 +263,7 @@ runtime/version/auth checks, session ownership, tool grants, reconnect policy,
 ordered events, durable terminals and child lifecycle remain downstream work.
 These shapes never substitute a harness for the ordinary global AI selection.
 
-## Trusted effect dispatch records (provisional)
+## Trusted effect dispatch records
 
 `src/effects.ts` separates untrusted operation/argument submissions from broker
 principal/invocation context and registry-owned effect classifications. Unknown
@@ -272,7 +273,7 @@ is not authorization. The broker still checks fresh grants, query restrictions,
 intent/target freshness, confirmations, revocation and pre-dispatch persistence.
 A package's declared effect cannot replace the host operation classification.
 
-## AI storage records (provisional)
+## AI storage records
 
 `src/ai-storage.ts` gives conversations, user drafts, immutable message revisions/
 branches, attachments, run snapshots, tool approval/results, ordered event records
@@ -285,7 +286,7 @@ from application builds. Actual repository ownership, immutable persistence,
 foreign keys, event ordering/exactly-one terminal, recovery, retention and content
 redaction remain storage runtime requirements; schemas do not implement SQLite.
 
-## Workflow definitions and registry compatibility (provisional)
+## Workflow definitions and registry compatibility
 
 `src/workflow-graph.ts` defines versioned native graphs, nodes/edges, settings,
 permission requests and inert editor state. Node versions/configurations and
@@ -302,7 +303,7 @@ no execution authority. Cycle checks, registry-specific subgraph call validation
 scheduling/cancellation remain workflow-core work. Host compatibility and SPDX
 validation occur before package activation, using the package manager's registry.
 
-## Provider profiles and endpoints (provisional)
+## Provider profiles and endpoints
 
 `src/provider-profiles.ts` normalizes credential-free base URLs and separates
 HTTPS, explicitly granted loopback HTTP and per-endpoint opted-in insecure
@@ -315,7 +316,7 @@ proxy/CA trust, account checks and credential use remain broker obligations.
 Base URLs omit query/fragment/userinfo; provider-specific API parameters belong
 to the registered serializer rather than credential-bearing endpoint metadata.
 
-## Repository requests and replies (provisional)
+## Repository requests and replies
 
 `src/repositories.ts` defines versioned request/reply envelopes bound to the
 storage owner's method/parameter/result registry. Completed results must validate
@@ -328,7 +329,7 @@ is exposed. Parsing cannot establish sender ownership, approve a mutation, enfor
 revision uniqueness or prove a transaction committed. The single storage owner
 still implements transactions, durable replies, access checks and recovery.
 
-## Native extension manifests (provisional)
+## Native extension manifests
 
 `src/extension-manifest.ts` implements the native version1 manifest, bundled ESM
 entry paths, all shared setting/input kinds, command defaults and optional tool,
@@ -356,15 +357,15 @@ nodes use config/input/output wrappers and a handler ID. Skills reference bundle
 Markdown and optional resource paths. Models reuse the shared capabilities and
 carry no credentials or automatic selection. Endpoint TLS, origin, local-service
 consent and referenced permission coverage are enforced by the host before use.
-These provisional field choices have no integrated v1 consumer; incompatible
-changes after freeze require explicit version handling.
+These field choices were settled before the first integrated v1 consumer;
+incompatible changes require explicit version handling.
 
 Synthetic fixtures cover malformed IDs/versions/paths, missing files, unsafe
 settings/defaults, compatibility/registry failures, optional contributions and
 oversize manifests. They establish neither successful installation nor sandbox,
 network, credential, scheduler, model-selection or archive-integrity enforcement.
 
-## Immutable package lifecycle (provisional)
+## Immutable package lifecycle
 
 `src/package-lifecycle.ts` shares immutable extension/workflow identity records:
 package kind, reverse-DNS ID, SemVer and content integrity are separate fields.
@@ -404,7 +405,7 @@ The manager retains the last known-good version, pins running sessions to their
 original version, and restores pointer/registrations atomically on activation
 failure. Durable recovery and uninstall teardown require actual later tests.
 
-## Extension command sessions (provisional)
+## Extension command sessions
 
 `src/extension-session.ts` creates a bounded launch record from a submitted
 command/arguments/preferences and separate broker-owned session/connection/
@@ -424,9 +425,9 @@ These records do not authenticate a process, launch a sandbox, enforce grants or
 execute commands. The supervisor still owns response/time/resource limits,
 view-owned cancellation, exactly-one terminal, lease/subscription cleanup and
 TERM/KILL/descendant verification. View revision/delta contracts are defined
-below; the full cross-contract review remains before freeze.
+below and included in the completed cross-contract review.
 
-## Workflow interactive results (provisional)
+## Workflow interactive results
 
 `src/workflow-results.ts` defines the exact NativeResultsV1 row/action payload,
 query revision, opaque cursor, refresh and cache metadata. Whole frames remain
@@ -443,7 +444,7 @@ malformed results, enforces cache keys and cancellation, and rechecks row/action
 selection, grants and stale data before effects. Neither rendering results nor
 refresh metadata grants background execution or permission to mutate host data.
 
-## View updates and navigation (provisional)
+## View updates and navigation
 
 `src/view-lifecycle.ts` defines bounded snapshots, ordered list/grid item deltas,
 revision-gap snapshot requests, and push/replace/pop navigation. Stale revisions
@@ -460,7 +461,7 @@ rate/coalescing limits, query/selection/scroll/focus restoration, secret draft
 clearing, and cancellation when views close. These pure data contracts perform
 no rendering, command dispatch, permission grant or desktop operation.
 
-## Workflow and tool registry metadata (provisional)
+## Workflow and tool registry metadata
 
 `src/registry-descriptors.ts` defines serializable workflow-node metadata shared
 by inspectors and execution: type/version/category, config/input/output schemas,
@@ -487,7 +488,7 @@ validates arguments, obtains required approval, journals effects and returns
 bounded committed results. A host key never guarantees exactly-once effects in
 an external system; unknown outcomes require review without automatic replay.
 
-## Shared AI scenarios (provisional)
+## Shared AI scenarios
 
 `fixtures/ai/` publishes eight reusable synthetic scenarios for captured global
 selection/context, multipart success, truncated streams, approval and denial,
@@ -497,7 +498,7 @@ verify wire/record compatibility and implemented parser boundaries; expected
 runtime call counts remain obligations for future implementation tests, not
 claims of provider, approval, persistence or UI execution.
 
-## Typed URL and contact references (provisional)
+## Typed URL and contact references
 
 `src/resources.ts` includes explicit URL/contact kinds alongside file/application
 references. URLs carry inert text, accept only HTTP/HTTPS/mailto/tel, reject

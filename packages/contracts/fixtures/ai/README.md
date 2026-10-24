@@ -1,6 +1,6 @@
 # Shared synthetic AI scenarios
 
-These version1 JSON fixtures are the provisional F0-01 handoff required by
+These version1 JSON fixtures are the accepted F0-01 handoff required by
 `docs/architecture/ai.md` before feature implementation fans out. All content,
 identities, references, timestamps and URLs are synthetic. They contain no
 credentials or captured user content and perform no provider/network/effect calls.

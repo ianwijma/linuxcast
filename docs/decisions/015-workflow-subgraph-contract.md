@@ -1,6 +1,6 @@
-# Provisional workflow subgraph wire shape
+# Workflow subgraph wire shape
 
-Status: proposed within F0-01 preparation; not frozen or integrated.
+Status: accepted24October2026 as part of F0-01 version1; integrated in PR19, with final acceptance after sequencing PR22.
 
 ## Context
 
