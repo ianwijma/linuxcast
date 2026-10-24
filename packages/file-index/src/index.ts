@@ -42,7 +42,9 @@ export class RootIndexer {
     const cancel=() => controller.abort();
     signal?.addEventListener('abort',cancel,{once:true});
     if (signal?.aborted) cancel();
-    this.active=this.run(controller.signal).finally(() => {
+    this.active=this.run(controller.signal).catch(async error => {
+      const session=this.session;this.session=undefined;await session?.close();throw error;
+    }).finally(() => {
       signal?.removeEventListener('abort',cancel);this.active=undefined;this.controller=undefined;
     });
     return this.active;
@@ -50,9 +52,9 @@ export class RootIndexer {
   private async run(signal:AbortSignal):Promise<void> {
     const scanId=randomUUID(),rootId=this.config.id;
     if (signal.aborted) {this.update({state:'cancelled'});return;}
-    await this.storage.request('files.scan.begin',{rootId,scanId});
-    let published=false;
+    let published=false,began=false;
     try {
+      await this.storage.request('files.scan.begin',{rootId,scanId});began=true;
       this.session ??= await NativeIndexSession.open(this.executable,this.config);
       if (signal.aborted) throw new Error('Cancelled.');
       for await (const event of this.session.scan(scanId,signal)) {
@@ -68,9 +70,13 @@ export class RootIndexer {
         await this.storage.request('files.scan.abort',{rootId,scanId,unavailable:false});
         this.update({state:'cancelled'});
       }
-    } catch {
-      if (!published) await this.storage.request('files.scan.abort',{rootId,scanId,unavailable:!signal.aborted});
-      await this.session?.close();this.session=undefined;
+    } catch(error) {
+      try {
+        if(!began) throw error;
+        if (!published) await this.storage.request('files.scan.abort',{rootId,scanId,unavailable:!signal.aborted});
+      } finally {
+        const session=this.session;this.session=undefined;await session?.close();
+      }
       this.update({state:signal.aborted?'cancelled':'unavailable'});
     }
     // Short owner transactions yield so foreground repository calls can run.
@@ -101,6 +107,7 @@ export class RootIndexer {
   }
   async stop():Promise<void> {
     this.stopped=true;this.watching=false;clearTimeout(this.timer);this.controller?.abort();
-    await this.active;await this.session?.close();this.session=undefined;
+    try {await this.active;}
+    finally {const session=this.session;this.session=undefined;await session?.close();}
   }
 }

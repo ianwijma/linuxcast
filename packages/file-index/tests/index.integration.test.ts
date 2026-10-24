@@ -1,4 +1,4 @@
-import {afterAll,afterEach,beforeAll,describe,expect,it} from 'vitest';
+import {afterAll,afterEach,beforeAll,describe,expect,it,vi} from 'vitest';
 import {mkdtemp,mkdir,writeFile,readFile,readdir,rename,rm,chmod,symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
@@ -25,6 +25,7 @@ afterEach(async () => {
   for(const session of sessions.splice(0)) await session.close();
   for(const db of databases.splice(0)) db.close();
   for(const dir of dirs.splice(0)) await rm(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+  vi.restoreAllMocks();
 });
 afterAll(() => expect(indexers).toHaveLength(0));
 async function directory() {const dir=await mkdtemp(join(tmpdir(),'linuxcast-index-'));dirs.push(dir);return dir;}
@@ -153,6 +154,43 @@ describe('L2-01 native selected-root metadata and sole-owner repository',()=>{
     await adapter.request('files.scan.prune',{rootId:root.id});
     expect(await readFile(join(dir,'original.txt'),'utf8')).toBe('synthetic private contents');
     expect(await adapter.request('files.roots.list',{})).toEqual([]);
+  });
+  it('storage abort failure still awaits real native child teardown and preserves the error',async()=>{
+    const dir=await directory();await writeFile(join(dir,'fixture.txt'),'');const {adapter}=await storage();
+    const failure=new Error('Synthetic storage unavailable.');
+    const broken:IndexStorage={request:async(method,params)=>{
+      if(method==='files.scan.finish'||method==='files.scan.abort') throw failure;
+      return adapter.request(method,params);
+    }};
+    const close=vi.spyOn(NativeIndexSession.prototype,'close');
+    const job=await index(config(dir),broken);
+    await expect(job.reconcile()).rejects.toBe(failure);
+    expect(close).toHaveBeenCalled();await Promise.all(close.mock.results.map(result=>result.value));
+    await job.stop();
+  });
+  it('stop closes an existing native session when the next storage begin rejects',async()=>{
+    const dir=await directory();await writeFile(join(dir,'fixture.txt'),'');const {adapter}=await storage();
+    const failure=new Error('Synthetic storage unavailable.');let broken=false;
+    const connection:IndexStorage={request:async(method,params)=>{
+      if(broken&&method==='files.scan.begin') throw failure;
+      return adapter.request(method,params);
+    }};
+    const job=await index(config(dir),connection);await job.reconcile();
+    const close=vi.spyOn(NativeIndexSession.prototype,'close');broken=true;
+    const run=job.reconcile();const stopped=job.stop();
+    await expect(run).rejects.toBe(failure);await expect(stopped).rejects.toBe(failure);
+    expect(close).toHaveBeenCalled();await Promise.all(close.mock.results.map(result=>result.value));
+  });
+  it('storage prune failure after publication also closes the retained watcher',async()=>{
+    const dir=await directory();await writeFile(join(dir,'fixture.txt'),'');const {adapter}=await storage();
+    const failure=new Error('Synthetic storage unavailable.');
+    const broken:IndexStorage={request:async(method,params)=>{
+      if(method==='files.scan.prune') throw failure;
+      return adapter.request(method,params);
+    }};
+    const close=vi.spyOn(NativeIndexSession.prototype,'close');const job=await index(config(dir),broken);
+    await expect(job.reconcile()).rejects.toBe(failure);
+    expect(close).toHaveBeenCalled();await Promise.all(close.mock.results.map(result=>result.value));
   });
   it('100,000 real generated files remain current after rename/delete and complete reconciliation',async()=>{
     const dir=await directory();

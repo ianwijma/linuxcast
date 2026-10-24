@@ -89,6 +89,12 @@ ten-case run passes with cleanup. Fixtures contain public synthetic names and
 empty or explicitly synthetic bodies; neither content nor absolute fixture paths
 are included in retained diagnostics. These checks support the privacy criterion.
 
+Three subsequent targeted lifecycle regressions pass with actual native children:
+failed storage publication plus failed abort still awaits native teardown, and
+Stop closes an existing child when the next storage begin rejects, and a failed
+prune after publication closes its retained watcher. Storage
+errors remain errors; shutdown does not report an unclosed child as stopped.
+
 No product UI is added (UI criterion not applicable); L2-02 owns dedicated file
 search presentation under DESIGN's list/grid/detail/form rules. Progress/error
 types here support that future surface. No desktop, whole-home crawl, content
