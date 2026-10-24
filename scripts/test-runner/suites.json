@@ -10,6 +10,13 @@
       "spikes/launcher/tests/launcher.ui-fixture.test.tsx",
       "spikes/launcher/tests/at/profile-environment.test.ts",
       "spikes/launcher/tests/at/activation-help-mode.test.ts"
+    ],
+    "D1-01": [
+      "packages/ui/src/tokens/tokens.test.ts"
+    ],
+    "F1-02": [
+      "apps/desktop/src/main/lifecycle.test.ts",
+      "apps/desktop/src/main/shell.test.ts"
     ]
   },
   "contracts": {
@@ -36,7 +43,8 @@
       "packages/contracts/tests/view-lifecycle.contract.test.ts",
       "packages/contracts/tests/registry-descriptors.contract.test.ts",
       "packages/contracts/tests/ai-scenarios.contract.test.ts",
-      "packages/contracts/tests/resources.contract.test.ts"
+      "packages/contracts/tests/resources.contract.test.ts",
+      "packages/contracts/tests/desktop-shell.contract.test.ts"
     ],
     "S0-05": [
       "spikes/ai/provider.contract.test.ts",
@@ -46,6 +54,9 @@
   "ui": {
     "S0-06": [
       "spikes/workflow-ui/tests/workflow-ui.test.ts"
+    ],
+    "D1-01": [
+      "packages/ui/src/primitives/primitives.test.ts"
     ]
   },
   "integration": {
@@ -71,6 +82,13 @@
     "S0-03": [
       "spikes/input/kernel.security.test.ts",
       "spikes/input/plugin-socket.security.test.ts"
+    ],
+    "F1-02": [
+      "apps/desktop/src/main/commands.test.ts",
+      "apps/desktop/src/main/assets.test.ts",
+      "apps/desktop/src/main/security.test.ts",
+      "apps/desktop/src/main/ipc.test.ts",
+      "apps/desktop/src/preload/api.test.ts"
     ]
   },
   "perf": {}

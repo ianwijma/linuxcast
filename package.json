@@ -20,7 +20,9 @@
     "test:perf": "node scripts/test-runner/run.ts perf",
     "package:deb": "node scripts/test-runner/package-deb.ts",
     "setup:electron": "node scripts/test-runner/setup-electron.ts",
-    "inventory:bootstrap": "node scripts/test-runner/inventory.ts"
+    "inventory:bootstrap": "node scripts/test-runner/inventory.ts",
+    "build:desktop": "node apps/desktop/build.ts",
+    "start:desktop": "electron apps/desktop/dist/main.cjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
