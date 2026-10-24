@@ -1,0 +1,451 @@
+{
+  "status": "incomplete",
+  "stage": "focus:View activation help",
+  "mode": "default-nine",
+  "expectedCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change",
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [],
+  "snapshots": [
+    {
+      "label": "Search commands",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": true
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands"
+        ],
+        "event_sequence": 2
+      }
+    },
+    {
+      "label": "Hide launcher",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": true
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands",
+          "Hide launcher"
+        ],
+        "event_sequence": 3
+      }
+    },
+    {
+      "label": "Actions Ctrl K",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": true
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands",
+          "Hide launcher",
+          "Actions Ctrl K"
+        ],
+        "event_sequence": 4
+      }
+    },
+    {
+      "label": "Record shortcut",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Record shortcut",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": true
+          },
+          {
+            "label": "Cancel shortcut change",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands",
+          "Hide launcher",
+          "Actions Ctrl K",
+          "Dismiss launcher",
+          "Record shortcut"
+        ],
+        "event_sequence": 6
+      }
+    },
+    {
+      "label": "Cancel shortcut change",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Record shortcut",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Cancel shortcut change",
+            "role": "button",
+            "kind": "button",
+            "focused": true
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands",
+          "Hide launcher",
+          "Actions Ctrl K",
+          "Dismiss launcher",
+          "Record shortcut",
+          "Cancel shortcut change"
+        ],
+        "event_sequence": 7
+      }
+    },
+    {
+      "label": "View activation help",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "View activation help",
+            "role": "button",
+            "kind": "button",
+            "focused": true
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands",
+          "Hide launcher",
+          "Actions Ctrl K",
+          "Dismiss launcher",
+          "Record shortcut",
+          "Cancel shortcut change",
+          "Search commands",
+          "Dismiss launcher",
+          "View activation help"
+        ],
+        "event_sequence": 10
+      }
+    }
+  ],
+  "lastNativeAttempt": {
+    "label": "View activation help",
+    "snapshot": {
+      "status": "observed",
+      "applications": 2,
+      "controls": [
+        {
+          "label": "Search commands",
+          "role": "static",
+          "kind": "other",
+          "focused": false
+        },
+        {
+          "label": "Search commands",
+          "role": "entry",
+          "kind": "entry",
+          "focused": false
+        },
+        {
+          "label": "Dismiss launcher",
+          "role": "button",
+          "kind": "button",
+          "focused": false
+        },
+        {
+          "label": "View activation help",
+          "role": "button",
+          "kind": "button",
+          "focused": true
+        },
+        {
+          "label": "Launcher capabilities",
+          "role": "toggle button",
+          "kind": "toggle-button",
+          "focused": false
+        },
+        {
+          "label": "Launcher capabilities",
+          "role": "static",
+          "kind": "other",
+          "focused": false
+        },
+        {
+          "label": "Hide launcher",
+          "role": "toggle button",
+          "kind": "toggle-button",
+          "focused": false
+        },
+        {
+          "label": "Hide launcher",
+          "role": "static",
+          "kind": "other",
+          "focused": false
+        },
+        {
+          "label": "Actions Ctrl K",
+          "role": "button",
+          "kind": "button",
+          "focused": false
+        }
+      ],
+      "focus_events": [
+        "Dismiss launcher",
+        "Search commands",
+        "Hide launcher",
+        "Actions Ctrl K",
+        "Dismiss launcher",
+        "Record shortcut",
+        "Cancel shortcut change",
+        "Search commands",
+        "Dismiss launcher",
+        "View activation help"
+      ],
+      "event_sequence": 10
+    }
+  }
+}
