@@ -1,0 +1,70 @@
+{
+  "fixtureVersion": 1,
+  "id": "selection-snapshot",
+  "synthetic": true,
+  "submission": {
+    "schemaVersion": 1,
+    "purpose": "chat",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Synthetic request."
+          }
+        ]
+      }
+    ],
+    "context": [
+      {
+        "id": "synthetic-selection-context",
+        "sourceKind": "selection",
+        "displayName": "Synthetic selected text",
+        "capturedAtMs": 1000,
+        "reference": {
+          "id": "synthetic-selection-blob",
+          "displayName": "Synthetic selected text",
+          "mimeType": "text/plain",
+          "sizeBytes": 19
+        },
+        "origin": {
+          "applicationId": "synthetic-editor",
+          "windowHandle": "synthetic-window"
+        },
+        "transmissionPolicy": "preview-required"
+      }
+    ],
+    "offeredToolIds": [],
+    "limits": {
+      "timeoutMs": 10000,
+      "toolSteps": 3,
+      "outputBytes": 4096
+    }
+  },
+  "brokerContext": {
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "origin": {
+      "kind": "builtin",
+      "id": "synthetic-chat"
+    },
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    }
+  },
+  "changedGlobalSelection": {
+    "revision": 4,
+    "providerProfileId": "synthetic-profile",
+    "modelId": "synthetic-next-model"
+  },
+  "expected": {
+    "capturedSelection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    },
+    "reroute": false
+  }
+}

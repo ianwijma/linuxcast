@@ -1,0 +1,80 @@
+{
+  "fixtureVersion": 1,
+  "id": "capability-rejection",
+  "synthetic": true,
+  "submission": {
+    "schemaVersion": 1,
+    "purpose": "chat",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Synthetic request."
+          },
+          {
+            "type": "image",
+            "reference": {
+              "id": "synthetic-image",
+              "displayName": "Synthetic image",
+              "mimeType": "image/png",
+              "sizeBytes": 32
+            }
+          }
+        ]
+      }
+    ],
+    "context": [],
+    "offeredToolIds": [],
+    "limits": {
+      "timeoutMs": 10000,
+      "toolSteps": 3,
+      "outputBytes": 4096
+    }
+  },
+  "brokerContext": {
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "origin": {
+      "kind": "builtin",
+      "id": "synthetic-chat"
+    },
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    }
+  },
+  "capabilities": {
+    "text": true,
+    "imageInput": false,
+    "fileInputMimeTypes": [
+      "text/plain"
+    ],
+    "toolCalls": true,
+    "structuredOutput": "json-schema",
+    "reasoningControls": [],
+    "contextTokens": null,
+    "outputTokens": null,
+    "tokenUsage": "reported",
+    "cancellation": "upstream"
+  },
+  "failureEvent": {
+    "schemaVersion": 1,
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "sequence": 2,
+    "terminal": true,
+    "kind": "failed",
+    "failure": {
+      "code": "capability-unavailable",
+      "message": "Selected model does not support images. Choose a capable model or remove the attachment.",
+      "retryable": false
+    }
+  },
+  "expected": {
+    "providerRequests": 0,
+    "preserveDraft": true,
+    "preserveAttachments": true,
+    "fallbackProviderRequests": 0
+  }
+}

@@ -1,0 +1,543 @@
+[
+  {
+    "id": "capability-available",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":3,\"reasonCode\":\"synthetic\",\"remediationAction\":\"open-settings\"}",
+    "valid": true
+  },
+  {
+    "id": "capability-permission-required",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"permission-required\",\"backend\":null,\"generation\":3,\"reasonCode\":\"synthetic\",\"remediationAction\":\"open-settings\"}",
+    "valid": true
+  },
+  {
+    "id": "capability-component-required",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"component-required\",\"backend\":null,\"generation\":3,\"reasonCode\":\"synthetic\",\"remediationAction\":\"open-settings\"}",
+    "valid": true
+  },
+  {
+    "id": "capability-unsupported",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"unsupported\",\"backend\":null,\"generation\":3,\"reasonCode\":\"synthetic\",\"remediationAction\":\"open-settings\"}",
+    "valid": true
+  },
+  {
+    "id": "capability-temporarily-unavailable",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"temporarily-unavailable\",\"backend\":null,\"generation\":3,\"reasonCode\":\"synthetic\",\"remediationAction\":\"open-settings\"}",
+    "valid": true
+  },
+  {
+    "id": "unknown-state",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"enabled\",\"backend\":\"x11\",\"generation\":3}",
+    "valid": false
+  },
+  {
+    "id": "negative-generation",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":-1}",
+    "valid": false
+  },
+  {
+    "id": "fraction-generation",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":1.5}",
+    "valid": false
+  },
+  {
+    "id": "unsafe-generation",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":9007199254740992}",
+    "valid": false
+  },
+  {
+    "id": "caller-authority",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":3,\"principal\":\"builtin\"}",
+    "valid": false
+  },
+  {
+    "id": "null-reason",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":3,\"reasonCode\":null}",
+    "valid": false
+  },
+  {
+    "id": "missing-backend",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"generation\":3}",
+    "valid": false
+  },
+  {
+    "id": "integral-exponent",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":\"x11\",\"generation\":3e0}",
+    "valid": true
+  },
+  {
+    "id": "handshake",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":1,\"componentBuild\":\"synthetic-fixture\",\"supportedMethods\":[\"ping\"],\"capabilityGeneration\":0}",
+    "valid": true
+  },
+  {
+    "id": "unknown-major",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":2,\"componentBuild\":\"synthetic-fixture\",\"supportedMethods\":[\"ping\"],\"capabilityGeneration\":0}",
+    "valid": false
+  },
+  {
+    "id": "string-major",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":\"1\",\"componentBuild\":\"synthetic-fixture\",\"supportedMethods\":[\"ping\"],\"capabilityGeneration\":0}",
+    "valid": false
+  },
+  {
+    "id": "handshake-extra",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":1,\"componentBuild\":\"synthetic-fixture\",\"supportedMethods\":[\"ping\"],\"capabilityGeneration\":0,\"token\":\"synthetic-only\"}",
+    "valid": false
+  },
+  {
+    "id": "failure-invalid-request",
+    "kind": "failure",
+    "json": "{\"code\":\"invalid-request\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-permission-denied",
+    "kind": "failure",
+    "json": "{\"code\":\"permission-denied\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-capability-unavailable",
+    "kind": "failure",
+    "json": "{\"code\":\"capability-unavailable\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-cancelled",
+    "kind": "failure",
+    "json": "{\"code\":\"cancelled\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-deadline-exceeded",
+    "kind": "failure",
+    "json": "{\"code\":\"deadline-exceeded\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-conflict",
+    "kind": "failure",
+    "json": "{\"code\":\"conflict\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "failure-internal",
+    "kind": "failure",
+    "json": "{\"code\":\"internal\",\"message\":\"Synthetic safe message.\",\"retryable\":false,\"details\":{\"backend\":\"fixture\",\"attempt\":1,\"recovered\":false}}",
+    "valid": true
+  },
+  {
+    "id": "unknown-error-code",
+    "kind": "failure",
+    "json": "{\"code\":\"UNSUPPORTED\",\"message\":\"Synthetic.\",\"retryable\":false}",
+    "valid": false
+  },
+  {
+    "id": "error-null-details",
+    "kind": "failure",
+    "json": "{\"code\":\"internal\",\"message\":\"Synthetic.\",\"retryable\":false,\"details\":null}",
+    "valid": false
+  },
+  {
+    "id": "error-complex-details",
+    "kind": "failure",
+    "json": "{\"code\":\"internal\",\"message\":\"Synthetic.\",\"retryable\":false,\"details\":{\"unexpected\":{}}}",
+    "valid": false
+  },
+  {
+    "id": "request",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{}}",
+    "valid": true
+  },
+  {
+    "id": "request-deadline",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{},\"deadlineMs\":1000}",
+    "valid": true
+  },
+  {
+    "id": "unknown-method",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"root.execute\",\"params\":{}}",
+    "valid": false
+  },
+  {
+    "id": "unknown-params",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{\"execute\":\"synthetic\"}}",
+    "valid": false
+  },
+  {
+    "id": "null-params",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":null}",
+    "valid": false
+  },
+  {
+    "id": "negative-deadline",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{},\"deadlineMs\":-1}",
+    "valid": false
+  },
+  {
+    "id": "null-deadline",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{},\"deadlineMs\":null}",
+    "valid": false
+  },
+  {
+    "id": "spoofed-principal",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\",\"params\":{},\"principal\":\"builtin\"}",
+    "valid": false
+  },
+  {
+    "id": "missing-params",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"synthetic-invocation\",\"method\":\"ping\"}",
+    "valid": false
+  },
+  {
+    "id": "duplicate-version",
+    "kind": "request",
+    "json": "{\"protocolVersion\":2,\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{}}",
+    "valid": false
+  },
+  {
+    "id": "escaped-duplicate",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{},\"\\u0069d\":\"other\"}",
+    "valid": false
+  },
+  {
+    "id": "nested-duplicate",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{\"x\":1,\"x\":2}}",
+    "valid": false
+  },
+  {
+    "id": "invalid-json",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":",
+    "valid": false
+  },
+  {
+    "id": "numeric-overflow",
+    "kind": "capability",
+    "json": "{\"id\":\"x\",\"state\":\"available\",\"backend\":null,\"generation\":1e400}",
+    "valid": false
+  },
+  {
+    "id": "trailing-json",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\": 1, \"componentBuild\": \"synthetic-fixture\", \"supportedMethods\": [\"ping\"], \"capabilityGeneration\": 0} null",
+    "valid": false
+  },
+  {
+    "id": "bom-json",
+    "kind": "handshake",
+    "json": "﻿{\"protocolVersion\": 1, \"componentBuild\": \"synthetic-fixture\", \"supportedMethods\": [\"ping\"], \"capabilityGeneration\": 0}",
+    "valid": false
+  },
+  {
+    "id": "lone-high-surrogate",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":1,\"componentBuild\":\"\\ud800\",\"supportedMethods\":[],\"capabilityGeneration\":0}",
+    "valid": false
+  },
+  {
+    "id": "lone-low-surrogate",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":1,\"componentBuild\":\"\\udfff\",\"supportedMethods\":[],\"capabilityGeneration\":0}",
+    "valid": false
+  },
+  {
+    "id": "paired-surrogate",
+    "kind": "handshake",
+    "json": "{\"protocolVersion\":1,\"componentBuild\":\"\\ud83d\\udc27\",\"supportedMethods\":[],\"capabilityGeneration\":0}",
+    "valid": true
+  },
+  {
+    "id": "rounded-generation-point-one",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":null,\"generation\":9007199254740991.1}",
+    "valid": true,
+    "expected": {
+      "generation": 9007199254740991
+    }
+  },
+  {
+    "id": "rounded-deadline-point-one",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{},\"deadlineMs\":9007199254740991.1}",
+    "valid": true,
+    "expected": {
+      "deadlineMs": 9007199254740991
+    }
+  },
+  {
+    "id": "rounded-generation-point-four",
+    "kind": "capability",
+    "json": "{\"id\":\"launcher.activate\",\"state\":\"available\",\"backend\":null,\"generation\":9007199254740991.4}",
+    "valid": true,
+    "expected": {
+      "generation": 9007199254740991
+    }
+  },
+  {
+    "id": "rounded-deadline-point-four",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{},\"deadlineMs\":9007199254740991.4}",
+    "valid": true,
+    "expected": {
+      "deadlineMs": 9007199254740991
+    }
+  },
+  {
+    "id": "reserved-param-not-hidden",
+    "kind": "request",
+    "json": "{\"protocolVersion\":1,\"id\":\"fixture\",\"method\":\"ping\",\"params\":{\"__proto__\":{\"synthetic\":true}}}",
+    "valid": false
+  },
+  {
+    "id": "reserved-detail-preserved",
+    "kind": "failure",
+    "json": "{\"code\":\"internal\",\"message\":\"Synthetic.\",\"retryable\":false,\"details\":{\"__proto__\":\"synthetic\"}}",
+    "valid": true,
+    "expected": {
+      "details": {
+        "__proto__": "synthetic"
+      }
+    }
+  },
+  {
+    "id": "reserved-nonfinite-detail",
+    "kind": "failure",
+    "json": "{\"code\":\"internal\",\"message\":\"Synthetic.\",\"retryable\":false,\"details\":{\"__proto__\":1e400}}",
+    "valid": false
+  },
+  {
+    "id": "native-requested",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"requested\",\"terminal\":false}}",
+    "valid": true,
+    "expected": {
+      "progress": {
+        "stage": "requested",
+        "terminal": false
+      }
+    }
+  },
+  {
+    "id": "native-acknowledged",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"acknowledged\",\"terminal\":false}}",
+    "valid": true,
+    "expected": {
+      "progress": {
+        "stage": "acknowledged",
+        "terminal": false
+      }
+    }
+  },
+  {
+    "id": "native-observed-placement",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"observed\",\"terminal\":true,\"observation\":{\"postcondition\":\"placed\",\"matchesRequested\":true}}}",
+    "valid": true,
+    "expected": {
+      "progress": {
+        "stage": "observed",
+        "terminal": true,
+        "observation": {
+          "postcondition": "placed",
+          "matchesRequested": true
+        }
+      }
+    }
+  },
+  {
+    "id": "native-observed-geometry-only",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"observed\",\"terminal\":true,\"observation\":{\"geometry\":{\"x\":0,\"y\":0,\"width\":720,\"height\":480}}}}",
+    "valid": false
+  },
+  {
+    "id": "native-observed-mismatched-placement",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"observed\",\"terminal\":true,\"observation\":{\"postcondition\":\"placed\",\"matchesRequested\":false}}}",
+    "valid": false
+  },
+  {
+    "id": "native-ack-not-terminal",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"acknowledged\",\"terminal\":true}}",
+    "valid": false
+  },
+  {
+    "id": "native-ack-cannot-carry-observation",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"acknowledged\",\"terminal\":false,\"observation\":{\"postcondition\":\"placed\",\"matchesRequested\":true}}}",
+    "valid": false
+  },
+  {
+    "id": "native-observation-must-be-terminal",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"observed\",\"terminal\":false,\"observation\":{\"postcondition\":\"placed\",\"matchesRequested\":true}}}",
+    "valid": false
+  },
+  {
+    "id": "native-unknown-operation",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"arbitrary.execute\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"requested\",\"terminal\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-wrong-capability",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"input.capture\",\"generation\":3,\"progress\":{\"stage\":\"requested\",\"terminal\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-unknown-version",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":2,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"requested\",\"terminal\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-empty-invocation",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"requested\",\"terminal\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-cancelled-unknown-effect",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"failed\",\"terminal\":true,\"failure\":{\"code\":\"cancelled\",\"message\":\"Synthetic cancellation.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": true,
+    "expected": {
+      "progress": {
+        "stage": "failed",
+        "terminal": true,
+        "failure": {
+          "code": "cancelled",
+          "message": "Synthetic cancellation.",
+          "retryable": false
+        },
+        "effectOutcome": "unknown",
+        "autoReplay": false
+      }
+    }
+  },
+  {
+    "id": "native-cancelled-no-undo-claim",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"failed\",\"terminal\":true,\"failure\":{\"code\":\"cancelled\",\"message\":\"Synthetic cancellation.\",\"retryable\":false},\"effectOutcome\":\"undone\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-unavailable",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": true,
+    "expected": {
+      "progress": {
+        "stage": "compositor-unavailable",
+        "terminal": true,
+        "capability": {
+          "id": "launcher.position",
+          "state": "temporarily-unavailable",
+          "backend": "kwin",
+          "generation": 3,
+          "reasonCode": "compositor-failed",
+          "remediationAction": "reload-desktop-component"
+        },
+        "failure": {
+          "code": "capability-unavailable",
+          "message": "Synthetic compositor failure.",
+          "retryable": false
+        },
+        "effectOutcome": "unknown",
+        "autoReplay": false
+      }
+    }
+  },
+  {
+    "id": "native-compositor-automatic-replay",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":true}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-not-terminal",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":false,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-known-unapplied",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"not-applied\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-available",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"available\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-empty-action",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-wrong-id",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"windows.resize\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-stale-generation",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":2,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-wrong-reason",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"synthetic-other\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-retryable",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"capability-unavailable\",\"message\":\"Synthetic compositor failure.\",\"retryable\":true},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  },
+  {
+    "id": "native-compositor-wrong-code",
+    "kind": "nativeEvent",
+    "json": "{\"protocolVersion\":1,\"invocationId\":\"synthetic-native-invocation\",\"operation\":\"native.place\",\"capabilityId\":\"launcher.position\",\"generation\":3,\"progress\":{\"stage\":\"compositor-unavailable\",\"terminal\":true,\"capability\":{\"id\":\"launcher.position\",\"state\":\"temporarily-unavailable\",\"backend\":\"kwin\",\"generation\":3,\"reasonCode\":\"compositor-failed\",\"remediationAction\":\"reload-desktop-component\"},\"failure\":{\"code\":\"internal\",\"message\":\"Synthetic compositor failure.\",\"retryable\":false},\"effectOutcome\":\"unknown\",\"autoReplay\":false}}",
+    "valid": false
+  }
+]

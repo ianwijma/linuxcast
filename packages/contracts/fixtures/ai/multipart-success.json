@@ -1,0 +1,152 @@
+{
+  "fixtureVersion": 1,
+  "id": "multipart-success",
+  "synthetic": true,
+  "submission": {
+    "schemaVersion": 1,
+    "purpose": "chat",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Synthetic request."
+          },
+          {
+            "type": "image",
+            "reference": {
+              "id": "synthetic-image",
+              "displayName": "Synthetic image",
+              "mimeType": "image/png",
+              "sizeBytes": 32
+            }
+          },
+          {
+            "type": "file",
+            "reference": {
+              "id": "synthetic-file",
+              "displayName": "Synthetic file",
+              "mimeType": "text/plain",
+              "sizeBytes": 16
+            }
+          }
+        ]
+      }
+    ],
+    "context": [],
+    "offeredToolIds": [],
+    "limits": {
+      "timeoutMs": 10000,
+      "toolSteps": 3,
+      "outputBytes": 4096
+    }
+  },
+  "brokerContext": {
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "origin": {
+      "kind": "builtin",
+      "id": "synthetic-chat"
+    },
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    }
+  },
+  "capabilities": {
+    "text": true,
+    "imageInput": true,
+    "fileInputMimeTypes": [
+      "text/plain"
+    ],
+    "toolCalls": true,
+    "structuredOutput": "json-schema",
+    "reasoningControls": [],
+    "contextTokens": null,
+    "outputTokens": null,
+    "tokenUsage": "reported",
+    "cancellation": "upstream"
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 1,
+      "terminal": false,
+      "kind": "run-started",
+      "selection": {
+        "revision": 3,
+        "providerProfileId": "synthetic-profile",
+        "modelId": "synthetic-model"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 2,
+      "terminal": false,
+      "kind": "status-delta",
+      "status": "Preparing synthetic response."
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 3,
+      "terminal": false,
+      "kind": "text-delta",
+      "text": "Synthetic "
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 4,
+      "terminal": false,
+      "kind": "text-delta",
+      "text": "response."
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 5,
+      "terminal": false,
+      "kind": "source",
+      "source": {
+        "referenceId": "synthetic-source",
+        "title": "Synthetic source",
+        "url": "https://example.invalid/fixture"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 6,
+      "terminal": false,
+      "kind": "usage",
+      "inputTokens": 10,
+      "outputTokens": 4,
+      "source": "reported"
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 7,
+      "terminal": true,
+      "kind": "completed"
+    }
+  ],
+  "chunkSizes": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    13
+  ],
+  "expected": {
+    "text": "Synthetic response.",
+    "terminal": "completed",
+    "providerProfileId": "synthetic-profile",
+    "toolDispatches": 0
+  }
+}

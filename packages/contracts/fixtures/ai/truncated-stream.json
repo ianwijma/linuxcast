@@ -1,0 +1,84 @@
+{
+  "fixtureVersion": 1,
+  "id": "truncated-stream",
+  "synthetic": true,
+  "submission": {
+    "schemaVersion": 1,
+    "purpose": "chat",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Synthetic request."
+          }
+        ]
+      }
+    ],
+    "context": [],
+    "offeredToolIds": [],
+    "limits": {
+      "timeoutMs": 10000,
+      "toolSteps": 3,
+      "outputBytes": 4096
+    }
+  },
+  "brokerContext": {
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "origin": {
+      "kind": "builtin",
+      "id": "synthetic-chat"
+    },
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    }
+  },
+  "completeEvents": [
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 1,
+      "terminal": false,
+      "kind": "run-started",
+      "selection": {
+        "revision": 3,
+        "providerProfileId": "synthetic-profile",
+        "modelId": "synthetic-model"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 2,
+      "terminal": false,
+      "kind": "status-delta",
+      "status": "Preparing synthetic response."
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 3,
+      "terminal": false,
+      "kind": "text-delta",
+      "text": "Synthetic "
+    }
+  ],
+  "truncatedEvent": {
+    "schemaVersion": 1,
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "sequence": 4,
+    "terminal": false,
+    "kind": "text-delta",
+    "text": "unfinished"
+  },
+  "dropTailBytes": 1,
+  "expected": {
+    "partialText": "Synthetic ",
+    "terminal": "failed",
+    "failureCode": "invalid-request",
+    "automaticReplay": false
+  }
+}
