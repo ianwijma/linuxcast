@@ -1,4 +1,9 @@
+import { FILE_INDEX_METHODS } from '@linuxcast/file-index/contracts';
+import type { FileIndexMethod, FileIndexMethods } from '@linuxcast/file-index/contracts';
+import { dispatchFileIndex, FileIndexRepositoryError } from '@linuxcast/file-index/repository';
 import type Database from 'better-sqlite3';
+import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
+import { listPermissionDecisions, putPermissionDecision, revokePermissionDecision } from './permissions.ts';
 import { conversationRecordSchema, messageRevisionRecordSchema, parseContract, parseRepositoryRequest,
   MAX_ENVELOPE_BYTES, uiTextSchema } from '../../contracts/src/index.ts';
 import type { MessageRevisionRecord } from '../../contracts/src/index.ts';
@@ -9,7 +14,10 @@ type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
 export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string; pinned: boolean; alias: string | null }
-export interface StorageMethods {
+export interface StorageMethods extends FileIndexMethods {
+  'permissions.list': { params: {principalKey: string; afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string | null} };
+  'permissions.put': { params: {record: DecisionRecord}; result: DecisionRecord };
+  'permissions.revoke': { params: {id: string}; result: boolean };
   'settings.get': { params: {id: SettingId}; result: Setting | null };
   'settings.set': { params: {id: SettingId; expectedRevision: number; value: string | boolean}; result: Setting };
   'commands.recordUse': { params: {commandId: string}; result: CommandUsage };
@@ -20,7 +28,7 @@ export interface StorageMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = ['settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -61,12 +69,23 @@ export class Repositories {
       throw new StorageError('invalid-request');
     }
     const method = request.method as StorageMethod;
-    const result = this.execute(method, request.params);
+    const result = transaction(this.db, () => {
+      const value = parseContract(storageContracts.get(method)!.result, this.execute(method, request.params));
+      if (Buffer.byteLength(JSON.stringify(value)) > MAX_ENVELOPE_BYTES - 4096) throw new StorageError('invalid-request');
+      return value;
+    });
     return { requestId: request.requestId, method, result };
   }
   private execute(method: StorageMethod, input: unknown): unknown {
     const db = this.db;
+    if ((FILE_INDEX_METHODS as readonly string[]).includes(method)) {
+      try { return dispatchFileIndex(db, method as FileIndexMethod, input); }
+      catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }
+    }
     switch (method) {
+      case 'permissions.list': return listPermissionDecisions(db, input as StorageMethods['permissions.list']['params']);
+      case 'permissions.put': return putPermissionDecision(db, (input as StorageMethods['permissions.put']['params']).record);
+      case 'permissions.revoke': return revokePermissionDecision(db, (input as StorageMethods['permissions.revoke']['params']).id);
       case 'settings.get': {
         const p = object(input, ['id']); return this.getSetting(settingId(p.id));
       }

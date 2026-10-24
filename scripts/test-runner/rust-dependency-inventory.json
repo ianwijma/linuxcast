@@ -1,6 +1,6 @@
 {
   "scope": "Rust workspace development inventory, not the final shipped-content SBOM",
-  "cargoLockSha256": "01a5940f327f8918692af21cfdfef5053fa8fa0f85fa6854417e7ccbfe943ef5",
+  "cargoLockSha256": "07693a75d13e9d180b86583aee18c5946fe9eedfc67eb74ba52fe1c8b8fe3031",
   "dependencies": [
     {
       "name": "aead",
@@ -509,6 +509,13 @@
     {
       "name": "linuxcast-input-spike",
       "version": "0.0.0",
+      "license": "GPL-3.0-only",
+      "repository": null,
+      "source": null
+    },
+    {
+      "name": "linuxcast-platform",
+      "version": "0.1.0",
       "license": "GPL-3.0-only",
       "repository": null,
       "source": null

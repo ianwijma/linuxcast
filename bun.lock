@@ -55,11 +55,39 @@
         "zod": "4.6.7",
       },
     },
+    "packages/file-index": {
+      "name": "@linuxcast/file-index",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "zod": "4.6.7",
+      },
+    },
+    "packages/permissions": {
+      "name": "@linuxcast/permissions",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/platform-contracts": "workspace:*",
+        "@linuxcast/storage": "workspace:*",
+        "zod": "4.6.7",
+      },
+    },
+    "packages/platform-contracts": {
+      "name": "@linuxcast/platform-contracts",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "zod": "4.6.7",
+      },
+    },
     "packages/storage": {
       "name": "@linuxcast/storage",
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/file-index": "workspace:*",
+        "@linuxcast/platform-contracts": "workspace:*",
         "better-sqlite3": "13.0.3",
         "zod": "4.6.7",
       },
@@ -288,6 +316,12 @@
     "@linuxcast/contracts": ["@linuxcast/contracts@workspace:packages/contracts"],
 
     "@linuxcast/desktop": ["@linuxcast/desktop@workspace:apps/desktop"],
+
+    "@linuxcast/file-index": ["@linuxcast/file-index@workspace:packages/file-index"],
+
+    "@linuxcast/permissions": ["@linuxcast/permissions@workspace:packages/permissions"],
+
+    "@linuxcast/platform-contracts": ["@linuxcast/platform-contracts@workspace:packages/platform-contracts"],
 
     "@linuxcast/storage": ["@linuxcast/storage@workspace:packages/storage"],
 

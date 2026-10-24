@@ -1225,7 +1225,7 @@
     {
       "id": "F2-02",
       "title": "Implement secrets and local data controls",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F2",
       "dependsOn": [
@@ -1297,15 +1297,17 @@
         "bun run typecheck",
         "bun run test:security -- F2-02"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
+      "evidence": [
+        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership."
+      ],
+      "owner": "manifest_review",
+      "branch": "codex/f2-02-secrets",
       "limitations": []
     },
     {
       "id": "F3-01",
       "title": "Implement capability and permission brokers",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "F3",
       "dependsOn": [
@@ -1343,10 +1345,17 @@
         {
           "id": "F3-01-AC01",
           "text": "Spoofed caller IDs never expand access.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F3-01; bun run typecheck; bun run lint",
+              "outcome": "58 mapped checks pass. Connection-derived principals reject spoofing, changed identity/declarations and scope expansion; once grants remain invocation-bound. Reviewed mutation gates invalidate concurrent stale grant inventories.",
+              "platform": "Ubuntu-based amd64 development host; Node24.22.1, Bun1.4.4, Rust1.95, SQLite3.53.4. Production Electron45 private-Xvfb smoke passes; no GNOME/KDE/Wayland, Orca or Debian package acceptance inferred.",
+              "reference": "6cdce53/9ae9af6/fc11f9e; packages/permissions/tests/broker.security.test.ts; packages/permissions/tests/persistence.security.test.ts"
+            }
+          ]
         },
         {
           "id": "F3-01-AC02",
@@ -1367,20 +1376,33 @@
         {
           "id": "F3-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F3-01; independent source review",
+              "outcome": "Synthetic fixtures only; bounded audit output contains allowlisted time/principal-kind/outcome/permission IDs, omitting identities, paths, origins, arguments, outputs and secrets.",
+              "platform": "Ubuntu-based amd64 development host; Node24.22.1, Bun1.4.4, Rust1.95, SQLite3.53.4. Production Electron45 private-Xvfb smoke passes; no GNOME/KDE/Wayland, Orca or Debian package acceptance inferred.",
+              "reference": "packages/permissions/src/broker.ts; packages/permissions/tests/broker.security.test.ts; independent launcher_reading review"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:security -- F3-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
+        "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained."
+      ],
+      "owner": "manifest_review",
+      "branch": "codex/application-services",
+      "limitations": [
+        "Host permission approval/management/remediation UI remains unimplemented. F3-01-UI and the user-visible portion of AC02 remain pending; typed remediation is not visible UI acceptance.",
+        "Actual file/network/window effects must provide fresh validation and durable preparation through the broker; this package does not claim desktop backend success."
+      ]
     },
     {
       "id": "D1-01",
@@ -1491,7 +1513,7 @@
     {
       "id": "D1-02",
       "title": "Implement declarative view renderer",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "D1",
       "dependsOn": [
@@ -1564,10 +1586,14 @@
         "bun run typecheck",
         "bun run test:ui -- D1-02"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership."
+      ],
+      "owner": "reading_review",
+      "branch": "codex/d1-02-view-renderer",
+      "limitations": [
+        "Development uses merged D1-01 primitives and accepted F0-01 contracts. D1-01 actual assistive-technology/native-session UI acceptance remains pending; this dependent task cannot be declared complete based only on browser fixtures."
+      ]
     },
     {
       "id": "D1-03",
@@ -1978,7 +2004,7 @@
     {
       "id": "L2-01",
       "title": "Build file metadata index and watcher recovery",
-      "status": "planned",
+      "status": "done",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -2017,44 +2043,71 @@
         {
           "id": "L2-01-AC01",
           "text": "100k-path fixture search returns current paths after reconciliation.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- L2-01; cargo test --locked --offline -p linuxcast-platform; cargo clippy --locked --offline -p linuxcast-platform --all-targets -- -D warnings; bun run typecheck; bun run lint",
+              "outcome": "100,000 actual generated files indexed; after100renames and100deletions, every retained file path matches fresh directory listings (99,900 files), and50FTS queries return current paths. Actual typed utility-owner integration verifies selected-root scan/rename, schema2 upgrade, prior settings preservation, interrupted staging invisibility and bounded prune.",
+              "platform": "Ubuntu-based amd64 development host; Node24.22.1, Bun1.4.4, Rust1.95, SQLite3.53.4. Production Electron45 private-Xvfb smoke passes; no GNOME/KDE/Wayland, Orca or Debian package acceptance inferred.",
+              "reference": "7f3e45c/b9d3c0a/7ea48fe; packages/file-index/tests/index.integration.test.ts; packages/storage/tests/file-index.integration.test.ts; native/platform/src/index/walk.rs"
+            }
+          ]
         },
         {
           "id": "L2-01-AC02",
           "text": "Permission failures and excluded mounts never stall the whole index.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- L2-01; cargo test --locked --offline -p linuxcast-platform; cargo clippy --locked --offline -p linuxcast-platform --all-targets -- -D warnings; bun run typecheck; bun run lint",
+              "outcome": "Actual chmod-denied subtree does not stall readable files and recovers after access returns. openat2 NO_XDEV rejects fixed /proc mount before enumeration; exclusions and symlinks are pruned. Real inotify overflow triggers reconciliation. Three real-child failure checks verify shutdown despite storage errors.",
+              "platform": "Ubuntu-based amd64 development host; Node24.22.1, Bun1.4.4, Rust1.95, SQLite3.53.4. Production Electron45 private-Xvfb smoke passes; no GNOME/KDE/Wayland, Orca or Debian package acceptance inferred.",
+              "reference": "7f3e45c/b9d3c0a/7ea48fe; packages/file-index/tests/index.integration.test.ts; packages/storage/tests/file-index.integration.test.ts; native/platform/src/index/walk.rs"
+            }
+          ]
         },
         {
           "id": "L2-01-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Metadata index, native worker and typed repository only; no user-facing surface is introduced. File-search presentation belongs to L2-02 under the canonical design system.",
           "evidence": []
         },
         {
           "id": "L2-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- L2-01; cargo test --locked --offline -p linuxcast-platform; cargo clippy --locked --offline -p linuxcast-platform --all-targets -- -D warnings; bun run typecheck; bun run lint",
+              "outcome": "Private generated synthetic fixture roots only; metadata-only native crawl, no file content extraction or original-file deletion. Fixed diagnostics exclude paths/content; reviewed fixtures contain no user data.",
+              "platform": "Ubuntu-based amd64 development host; Node24.22.1, Bun1.4.4, Rust1.95, SQLite3.53.4. Production Electron45 private-Xvfb smoke passes; no GNOME/KDE/Wayland, Orca or Debian package acceptance inferred.",
+              "reference": "7f3e45c/b9d3c0a/7ea48fe; packages/file-index/tests/index.integration.test.ts; packages/storage/tests/file-index.integration.test.ts; native/platform/src/index/walk.rs"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:integration -- L2-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
+        "24October2026: source415291b/7ca47fd integrated7f3e45c/b9d3c0a; sole-owner migration003/client/recovery integration7ea48fe. Final mapped L2 suite14/14 passes, including100k actual files and actual utility-owner migration/reopen; F2 regression35/35, native tests2/2, Clippy warnings denied, typecheck/lint and bundled Electron/schema003 smoke pass. Independent review resolved native cleanup on storage failure and verified final integration."
+      ],
+      "owner": "reading_review",
+      "branch": "codex/application-services",
+      "limitations": [
+        "No file-search/selection UI is introduced; L2-02 owns file-search presentation. Main must supply approved selected roots and fixed native executable; index records are not file-open authority.",
+        "These Linux development-host fixtures do not establish Debian reference-system latency, physical-machine performance or the release desktop/session matrix. Filesystem reconciliation is not an atomic live filesystem snapshot."
+      ]
     },
     {
       "id": "L2-02",

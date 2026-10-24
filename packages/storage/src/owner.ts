@@ -1,3 +1,4 @@
+import { recoverFileIndex } from '@linuxcast/file-index/repository';
 import Database from 'better-sqlite3';
 import { join } from 'node:path';
 import { StorageError } from './errors.ts';
@@ -65,6 +66,8 @@ export class StorageOwner {
         throw new StorageError('storage-unavailable');
       }
       await migrate(db, directory, options.applicationBuild, migrations, options.retryFailedMigration);
+      // Migration003 introduces this domain. Historic migration fixtures remain supported.
+      if (schemaVersion(db) >= 3) recoverFileIndex(db);
       return new StorageOwner(db, directory, release);
     } catch (error) {
       if (db?.open) db.close();

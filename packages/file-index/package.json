@@ -1,0 +1,16 @@
+{
+  "name": "@linuxcast/file-index",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "exports": {
+    ".": "./src/index.ts",
+    "./repository": "./src/repository.ts",
+    "./contracts": "./src/contracts.ts"
+  },
+  "dependencies": {
+    "@linuxcast/contracts": "workspace:*",
+    "zod": "4.6.7"
+  }
+}
