@@ -166,7 +166,7 @@ Package upgrades stop the service before replacing binaries, preserve grants, an
 
 ## Native integration and release gates
 
-Complete the following spikes before dependent features are marked implemented:
+Complete the following spikes before the corresponding native capabilities are marked implemented. Shared contract baseline integration and non-native foundation implementation may proceed using explicit unsupported/component-required outcomes under the [foundation sequencing decision](../implementation/ROADMAP.md#foundation-sequencing-decision); they do not establish native acceptance. S0-01 remains an explicit R1-01 prerequisite, and S0-03 still gates P2-01:
 
 1. Launcher identity/global shortcut, focus/placement and portal consent on GNOME 48 and Plasma 6.3 Wayland, then both X11 sessions.
 2. GNOME clipboard/window protocol and KWin long-poll command transport, including helper/companion restart and generation invalidation.

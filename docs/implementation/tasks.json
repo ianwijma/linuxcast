@@ -762,7 +762,6 @@
       "phase": "implementation",
       "lane": "F0",
       "dependsOn": [
-        "S0-01",
         "S0-02",
         "S0-04",
         "S0-05",
@@ -789,7 +788,8 @@
       "inputs": [
         "Approved feature behaviour and normative references below",
         "Dependency output contracts and shared deterministic fixtures",
-        "S0-02 finding: freeze requested-versus-acknowledged-versus-observed native outcomes and explicit compositor-failure recovery; geometry/read-only/restart evidence does not establish placement. See docs/architecture/linux-integration.md#feasibility-finding-carried-into-implementation."
+        "S0-02 finding: freeze requested-versus-acknowledged-versus-observed native outcomes and explicit compositor-failure recovery; geometry/read-only/restart evidence does not establish placement. See docs/architecture/linux-integration.md#feasibility-finding-carried-into-implementation.",
+        "S0-01 carry-forward: PR15 records native Wayland focus-or-component requirements and resident Close/explicit Quit evidence. Its full accessibility sequence and native activation-notice recovery remain incomplete. Contract freeze preserves requested/observed/unsupported outcomes and does not claim those UI or desktop checks passed; S0-01 remains an explicit R1-01 prerequisite."
       ],
       "outputs": [
         "Freeze shared contracts and compatibility fixtures with documented capability/error states",
@@ -6634,7 +6634,8 @@
         "E1-05",
         "F2-03",
         "L2-07",
-        "E1-06"
+        "E1-06",
+        "S0-01"
       ],
       "ownedPaths": [
         "tests/e2e/",
