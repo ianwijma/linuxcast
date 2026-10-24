@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "operation": "REVIEWED_RESOURCE_RELEASE_AFTER_INCOMPLETE_WRAPPER",
+  "complete": true,
+  "wrapperGatePassed": false,
+  "originalArtifactSha256": "f0aab921a8e525a183c2b56fe86c2390ffde3d4113e86a7d892db7828d2b5be8",
+  "collectorManifestSha256": "9da26182246f7b1ac8958fbd28ec70e8321279b07693ace23dd62734bb35a170",
+  "elapsedMs": 17322.907,
+  "beforeReleaseBaseline": {
+    "schemaVersion": 1,
+    "task": "S0-03",
+    "operation": "READ_ONLY_PREFLIGHT",
+    "distribution": "debian",
+    "debianVersion": "13.7",
+    "kernel": "6.12.113+deb13-amd64",
+    "architecture": "x86_64",
+    "libsystemdVersion": "257.13-1~deb13u1",
+    "libevdevVersion": "1.13.4+dfsg-1",
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "inputProcessesAbsent": true,
+    "graphicalSessionsAbsent": true,
+    "markerAbsent": true,
+    "manufacturedDevicesAbsent": true,
+    "privateRootsAbsent": true,
+    "dedicatedNonloginAccountValid": true,
+    "acceptedArtifacts": {
+      "linuxcast-input-spike-supervisor": {
+        "sha256": "1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a",
+        "expectedSha256": "1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      },
+      "linuxcast-input-spike-worker": {
+        "sha256": "45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8",
+        "expectedSha256": "45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      },
+      "linuxcast-input-spike-synthetic-lab": {
+        "sha256": "9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51",
+        "expectedSha256": "9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      }
+    },
+    "nodeChecksumMatches": true,
+    "acceptedBunFound": true,
+    "fixturePackageVersions": {
+      "vitest": "4.1.12",
+      "vite": "7.3.7",
+      "typescript": "6.0.3"
+    },
+    "inputProgramsExecuted": false,
+    "markerCreated": false,
+    "policyChanged": false,
+    "ready": true
+  },
+  "afterReleaseBaseline": {
+    "schemaVersion": 1,
+    "task": "S0-03",
+    "operation": "READ_ONLY_PREFLIGHT",
+    "distribution": "debian",
+    "debianVersion": "13.7",
+    "kernel": "6.12.113+deb13-amd64",
+    "architecture": "x86_64",
+    "libsystemdVersion": "257.13-1~deb13u1",
+    "libevdevVersion": "1.13.4+dfsg-1",
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "inputProcessesAbsent": true,
+    "graphicalSessionsAbsent": true,
+    "markerAbsent": true,
+    "manufacturedDevicesAbsent": true,
+    "privateRootsAbsent": true,
+    "dedicatedNonloginAccountValid": true,
+    "acceptedArtifacts": {
+      "linuxcast-input-spike-supervisor": {
+        "sha256": "1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a",
+        "expectedSha256": "1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      },
+      "linuxcast-input-spike-worker": {
+        "sha256": "45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8",
+        "expectedSha256": "45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      },
+      "linuxcast-input-spike-synthetic-lab": {
+        "sha256": "9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51",
+        "expectedSha256": "9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51",
+        "rootOwnedRegularNonWritable": true,
+        "matches": true
+      }
+    },
+    "nodeChecksumMatches": false,
+    "acceptedBunFound": false,
+    "fixturePackageVersions": {
+      "vitest": "4.1.12",
+      "vite": "7.3.7",
+      "typescript": "6.0.3"
+    },
+    "inputProgramsExecuted": false,
+    "markerCreated": false,
+    "policyChanged": false,
+    "ready": false
+  },
+  "onlyOwnedResourcesRemoved": true,
+  "ownedStageAndRuntimeExecutablesAbsent": true,
+  "allFiveCreatedToolPathsMissing": true,
+  "allOwnedStagePathsMissing": true,
+  "ownedContainerCopiesAbsent": true,
+  "privateControlStateRemoved": true,
+  "originalWrapperOutcomeUnchanged": true,
+  "inputOrObservationProgramsExecutedDuringRelease": false,
+  "policyChanged": false,
+  "ac01Complete": false,
+  "ac02Complete": false
+}

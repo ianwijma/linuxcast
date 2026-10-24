@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "verifiedAtUtc": "2026-10-22T19:42:14.368688+00:00",
+  "sourceCommit": "8a62ab283d6a55fce076ca60e8b320852c2fb316",
+  "runtimeDiffSha256": "81a52535c5fd6e36d812269e5f20ddcbcce06dde47024a64b01c48043e8c833a",
+  "binarySha256": "7ea51672bfd419b375efb10f68d2e9ef70ac19e3f381fb1b3fe82db3eeb18e6c",
+  "artifacts": [
+    {
+      "transport": "SSH_NO_PTY",
+      "artifactSha256": "ac8d2c8b4c9bca35f4976a24fa7f7db389661c2800a5318bcbdf61db8e05b411",
+      "elapsedMs": 5028.231,
+      "maximumQueryMs": 51,
+      "rows": 20,
+      "generationBefore": 1,
+      "generationAfter": 2,
+      "cleanupVerified": true
+    },
+    {
+      "transport": "SSH_ALLOCATED_PTY",
+      "artifactSha256": "5d7e490c5a8c8e52add566ec79a6e76498e4ab7ee886929f0e00f325a217faab",
+      "elapsedMs": 5027.806,
+      "maximumQueryMs": 42,
+      "rows": 20,
+      "generationBefore": 1,
+      "generationAfter": 2,
+      "cleanupVerified": true
+    }
+  ],
+  "allRuntimeSourceHashesUnchanged": true,
+  "guestReservationReleased": true,
+  "wrapperProcessesAbsent": true,
+  "ownedGuestStagingDirectoriesRemoved": true,
+  "ownedContainerStagingFileRemoved": true,
+  "observerTemporaryPathsAbsent": true,
+  "processCounts": {
+    "gnome-shell": 0,
+    "kwin_wayland": 0,
+    "kwin_x11": 0,
+    "Xvfb": 0,
+    "electron": 0,
+    "node": 0,
+    "gdb": 0,
+    "dbus-daemon": 2
+  },
+  "inputLabMarkerAbsent": true,
+  "privateMatrixRootsAbsent": true,
+  "publicSchemasIndependentlyValidated": true,
+  "successfulDataAcquisitionOnly": true,
+  "supervisorEnforcementEstablished": false,
+  "physicalRecoveryEstablished": false,
+  "ac01Complete": false,
+  "ac02Complete": false,
+  "captureControllerSha256": "57bcf454cce75ce8dbf6f5e3429c86c0b8b857775a29047ea87928d08947577f"
+}

@@ -1,0 +1,10 @@
+{
+  "realPeerTransport": true,
+  "mockSessionAndBus": true,
+  "retainedSocketDeathDenied": true,
+  "midQueryDeathDenied": true,
+  "sameUidNonrevival": true,
+  "sessionAndUidChangesTerminal": true,
+  "wrongUidUnsupportedWrongFdDisconnectedDenied": true,
+  "clientPrincipalAndRightsNotAccepted": true
+}

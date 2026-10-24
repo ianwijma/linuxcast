@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "kind": "EXACT_GENERIC_SOURCE_SNAPSHOTS",
+  "snapshots": [
+    {
+      "prefix": "3c91a2aa",
+      "manifestSha256": "3c91a2aa6dfca78c2926849e95adf5f96b2a5a7390491078f5ac2d9a0efa8e30",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    },
+    {
+      "prefix": "ecb78882",
+      "manifestSha256": "ecb78882aec0ca5fa3d7a8d37fd7f3029990f1162f9bf71f9dc39764d3465ed2",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    },
+    {
+      "prefix": "ca658956",
+      "manifestSha256": "ca6589561f2a9c526e121b1252b08f7660c01553ae1d6797d52d74e700bf81f9",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    },
+    {
+      "prefix": "34469d1a",
+      "manifestSha256": "34469d1aaf39e392fb2f30b3cd965db935d9814d6fa520e011c527305936e256",
+      "pathMapping": "ORIGINAL_FIXED_SOURCE_BASENAME_TO_ARCHIVE_PREFIX_BASENAME"
+    }
+  ],
+  "memberCount": 40,
+  "archiveMetadataIsSynthetic": true,
+  "recordedRuntimePathsOrPrivateJournalContentsIncluded": false,
+  "previous30MemberArchivePreservedSeparately": true
+}

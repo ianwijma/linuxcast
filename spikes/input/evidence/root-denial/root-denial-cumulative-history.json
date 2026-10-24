@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "kind": "NEW_STRICT_PROJECTION_NOT_BYTE_IDENTICAL_ORIGINALS",
+  "events": [
+    {
+      "event": "PREPARATION_FIRST_INCOMPLETE",
+      "originalWholeArtifactSha256": "89c1506c8296eefdce191de12a78bc5bf5bbe09b0c65869051bf77245fde7563",
+      "complete": false,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "REVIEWED_PREPARATION_SUMMARY"
+    },
+    {
+      "event": "EMPTY_STAGE_RECOVERY",
+      "originalWholeArtifactSha256": "f98408e0d4f31057d792ad8b89a3e693013e5bede5d600faa576b5b2b1e89686",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": true,
+      "evidenceKind": "ACTUAL_RESOURCE_CLEANUP_RESULT"
+    },
+    {
+      "event": "CORRECTED_PREPARATION",
+      "originalWholeArtifactSha256": "586e4f0e791f48fe8522ad84fe160859c9bafc3faac2967453799aafcb38ceed",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "REVIEWED_PREPARATION_SUMMARY"
+    },
+    {
+      "event": "OBSERVATION_FIRST_INCOMPLETE",
+      "originalWholeArtifactSha256": "82e0c02032d2f2985d74d8ff6e648fc2e7d71bfb6da9cdb79a04eefdc26a81e2",
+      "complete": false,
+      "nativeObservationAttempted": true,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "EXACT_FIRST_OBSERVATION"
+    },
+    {
+      "event": "SOURCE_STAGE_RECOVERY",
+      "originalWholeArtifactSha256": "f7905573b1b0dd0a0eaac89f2113602eeca102982760f6c27cf21c1551bf9c82",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": true,
+      "evidenceKind": "ACTUAL_RESOURCE_CLEANUP_RESULT"
+    },
+    {
+      "event": "HELPER0555_PREPARATION",
+      "originalWholeArtifactSha256": "642703dfeee563379beac47c72bd916acc530db25889f97b3dfa0f043699bf99",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "REVIEWED_PREPARATION_SUMMARY"
+    },
+    {
+      "event": "HELPER0555_OBSERVATION_FIRST_INCOMPLETE",
+      "originalWholeArtifactSha256": "52a3f3985d9da6d17f0a42fcbefc63a46a8940223227c2932a5b5ffd4a029eb0",
+      "complete": false,
+      "nativeObservationAttempted": true,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "EXACT_FIRST_OBSERVATION"
+    },
+    {
+      "event": "HELPER0555_SOURCE_STAGE_RECOVERY",
+      "originalWholeArtifactSha256": "798c952b49485d69e74c1476954c5f059f95fa34215190b06259455b10b82886",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": true,
+      "reviewedCleanupSourceSha256": "33d22d99e96478047b1b7470d5cc9b1933e9dee2166e405b8641b34018272ec1",
+      "reviewedCleanupManifestSha256": "239526b00378619c3443b34d7109a505f87afe915adcfb8ca43c958c8a44fe83",
+      "evidenceKind": "ACTUAL_RESOURCE_CLEANUP_RESULT"
+    },
+    {
+      "event": "NATIVE_CAPSULE_PREPARATION",
+      "originalWholeArtifactSha256": "e0d9793fe2f890712c3cf27c7db828a9a26668075507da3825a01ea45d277ea8",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "REVIEWED_PREPARATION_SUMMARY"
+    },
+    {
+      "event": "NATIVE_CAPSULE_FIRST_OBSERVATION",
+      "originalWholeArtifactSha256": "86b1511f3a918ff49fc874dde4f5882d51078ac80c6708b809b2d0358fa463bd",
+      "complete": true,
+      "nativeObservationAttempted": true,
+      "resourceCleanupOnly": false,
+      "evidenceKind": "EXACT_FIRST_OBSERVATION"
+    },
+    {
+      "event": "NATIVE_CAPSULE_ORDINARY_RELEASE",
+      "originalWholeArtifactSha256": "8aadbd799c8af5d4a132d2c4530f1be884b79b11fd4a15c6ba9a6b41f093f01a",
+      "complete": true,
+      "nativeObservationAttempted": false,
+      "resourceCleanupOnly": true,
+      "evidenceKind": "ACTUAL_RESOURCE_CLEANUP_RESULT"
+    }
+  ],
+  "originalPrivateJournalsPublished": false,
+  "actualRootDropEstablished": true,
+  "newCollectorObservationAttemptedAsOfSnapshot": true,
+  "acceptanceCriteriaClosed": false,
+  "resourceCleanupCompleteForLatestObservation": true,
+  "boundedClaimScope": "DEVICE_FREE_ENGINEERING_ENTRY_AND_OWNED_HELPER_ONLY",
+  "deviceOwningLiveEnforcementEstablished": false,
+  "physicalHeldKeyRecoveryEstablished": false,
+  "graphicalLockedInactiveProofEstablished": false,
+  "fourteenCaseRegressionAfterCurrentSupervisorEstablished": false,
+  "directParentDeathTrialPerformed": false
+}
