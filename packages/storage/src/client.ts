@@ -1,3 +1,5 @@
+import { rootConfigSchema } from '@linuxcast/file-index/contracts';
+import type { RootState, FileCandidate } from '@linuxcast/file-index/contracts';
 import { createHash, randomUUID } from 'node:crypto';
 import { principalKeyMaterial, scopeKeyMaterial } from '@linuxcast/platform-contracts/permissions';
 import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
@@ -18,7 +20,19 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if (method === 'permissions.list') {
+  if (method === 'files.roots.put') {
+    valid = JSON.stringify(rootConfigSchema.parse((result as RootState).config)) === JSON.stringify(rootConfigSchema.parse(params.config));
+  } else if (method === 'files.roots.list') {
+    const roots = result as RootState[];
+    valid = roots.every((root, index) => index === 0 || root.config.id > roots[index - 1]!.config.id);
+  } else if (method === 'files.scan.finish') {
+    const root = result as RootState;
+    valid = root.config.id === params.rootId && root.generation === params.scanId;
+  } else if (method === 'files.search') {
+    const candidates = result as FileCandidate[];
+    valid = candidates.length <= Number(params.limit) && candidates.every(candidate =>
+      (params.rootId === undefined || candidate.rootId === params.rootId) && candidate.id === `${candidate.rootId}:${candidate.path}`);
+  } else if (method === 'permissions.list') {
     const page = result as {records: DecisionRecord[]; nextCursor: string | null};
     valid = page.records.every(record => createHash('sha256').update(principalKeyMaterial(record.principal)).digest('hex') === params.principalKey) &&
       page.records.length <= Number(params.limit) &&

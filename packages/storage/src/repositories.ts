@@ -1,3 +1,6 @@
+import { FILE_INDEX_METHODS } from '@linuxcast/file-index/contracts';
+import type { FileIndexMethod, FileIndexMethods } from '@linuxcast/file-index/contracts';
+import { dispatchFileIndex, FileIndexRepositoryError } from '@linuxcast/file-index/repository';
 import type Database from 'better-sqlite3';
 import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
 import { listPermissionDecisions, putPermissionDecision, revokePermissionDecision } from './permissions.ts';
@@ -11,7 +14,7 @@ type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
 export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string; pinned: boolean; alias: string | null }
-export interface StorageMethods {
+export interface StorageMethods extends FileIndexMethods {
   'permissions.list': { params: {principalKey: string; afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string | null} };
   'permissions.put': { params: {record: DecisionRecord}; result: DecisionRecord };
   'permissions.revoke': { params: {id: string}; result: boolean };
@@ -25,7 +28,7 @@ export interface StorageMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = ['permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -75,6 +78,10 @@ export class Repositories {
   }
   private execute(method: StorageMethod, input: unknown): unknown {
     const db = this.db;
+    if ((FILE_INDEX_METHODS as readonly string[]).includes(method)) {
+      try { return dispatchFileIndex(db, method as FileIndexMethod, input); }
+      catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }
+    }
     switch (method) {
       case 'permissions.list': return listPermissionDecisions(db, input as StorageMethods['permissions.list']['params']);
       case 'permissions.put': return putPermissionDecision(db, (input as StorageMethods['permissions.put']['params']).record);

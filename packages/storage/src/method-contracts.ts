@@ -1,3 +1,4 @@
+import { fileIndexContracts } from '@linuxcast/file-index/contracts';
 import * as z from 'zod';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema } from '../../contracts/src/index.ts';
@@ -20,6 +21,7 @@ const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datet
 export const storageContracts: RepositoryContracts = new Map([
   ...createAiRepositoryContracts(),
   ...permissionRepositoryContracts,
+  ...fileIndexContracts,
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],
