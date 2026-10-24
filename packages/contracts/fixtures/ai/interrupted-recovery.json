@@ -1,0 +1,46 @@
+{
+  "fixtureVersion": 1,
+  "id": "interrupted-recovery",
+  "synthetic": true,
+  "persistedRun": {
+    "schemaVersion": 1,
+    "id": "10000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "conversationId": "20000000-0000-4000-8000-000000000001",
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    },
+    "inputRevisionIds": [],
+    "outputRevisionIds": [],
+    "partialOutputRef": null,
+    "state": "interrupted",
+    "interruptedAt": "2026-01-01T00:00:00Z",
+    "effectOutcome": "unknown",
+    "requiresReview": true,
+    "automaticReplay": false
+  },
+  "persistedToolResult": {
+    "schemaVersion": 1,
+    "id": "40000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "callId": "synthetic-call",
+    "excerpt": "Interrupted synthetic effect.",
+    "artifact": null,
+    "effectOutcome": "unknown",
+    "requiresReview": true,
+    "automaticReplay": false
+  },
+  "expected": {
+    "state": "interrupted",
+    "toolDispatches": 0,
+    "requiresReview": true,
+    "automaticReplay": false
+  }
+}

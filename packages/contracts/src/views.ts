@@ -40,6 +40,7 @@ export const formFieldSchema = z.discriminatedUnion('kind', [
   // Secret values never arrive in a published ViewModel or its fixtures.
   z.strictObject({ ...field, kind: z.literal('secret') }),
   z.strictObject({ ...field, kind: z.literal('number'), value: z.number().nullable(), min: z.number().optional(), max: z.number().optional() }),
+  z.strictObject({ ...field, kind: z.literal('date'), value: z.iso.date().nullable(), min: z.iso.date().optional(), max: z.iso.date().optional() }),
   z.strictObject({ ...field, kind: z.literal('boolean'), value: z.boolean() }),
   z.strictObject({ ...field, kind: z.literal('enum'), value: text.nullable(),
     options: z.array(z.strictObject({ label: text, value: text })).min(1) }),
@@ -51,7 +52,7 @@ export const formFieldSchema = z.discriminatedUnion('kind', [
     (value.value !== null && !value.options.some(option => option.value === value.value)))) {
     context.addIssue({ code: 'custom', message: 'Invalid enum selection.' });
   }
-  if (value.kind === 'number' && ((value.min !== undefined && value.max !== undefined && value.min > value.max) ||
+  if ((value.kind === 'number' || value.kind === 'date') && ((value.min !== undefined && value.max !== undefined && value.min > value.max) ||
     (value.value !== null && ((value.min !== undefined && value.value < value.min) || (value.max !== undefined && value.value > value.max))))) {
     context.addIssue({ code: 'custom', message: 'Invalid numeric field.' });
   }
