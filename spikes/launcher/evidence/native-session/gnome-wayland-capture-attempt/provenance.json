@@ -1,0 +1,15 @@
+{
+  "task": "S0-01",
+  "sourceParentCommit": "722113241715935aa192ecdc5fa988d0245a9067",
+  "reviewedSourceDirtyDiffSha256": "f30cdfdd35a193f2a333559fe7a14826a731a28b1fddfab2333fc51a9d78f073",
+  "reviewedSourceDirtyDiffFile": "reviewed-source-diff.patch.gz",
+  "reviewedSourceDirtyDiffEncoding": "gzip; SHA256 identifies the exact decompressed diff",
+  "originalTransferArchiveSha256": "9b0eea34f31861d607369c4d961429a51a92af0bcff9d35ad90081338ad18303",
+  "replacementCheckerSha256": "e600803ba16fd93e48b5cfff8bfec1678ef36416d09a91c49ff7b46568f3668f",
+  "exactExecutedSourceManifest": "source-manifest.json",
+  "command": "node spikes/launcher/tests/native-session/build.ts; python3 spikes/launcher/tests/native-session/run-session.py gnome-wayland --private-guest",
+  "exitCode": 0,
+  "nativeProbeStatus": "passed-bounded-native-probe",
+  "screenshotReview": "Dark search is correct; light-capabilities still shows stale ready/search pixels despite exact DOM assertions and bounded double-rAF. Capability visual evidence remains deficient.",
+  "physicalDesktopMatrixEstablished": false
+}

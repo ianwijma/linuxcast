@@ -1,0 +1,23 @@
+{
+  "kind": "S0-01-scoped-signed-runtime-x11-focus-snapshot",
+  "sourceStatusScope": "declared-runtime-and-static-inputs",
+  "sourceSigned": true,
+  "sourceDirty": false,
+  "runtimeInputsMatchSignedCommit": true,
+  "signedRuntimeCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "archiveRepresentsWholeSignedTree": false,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "archiveRegularFiles": 469,
+  "archiveDirectories": 68,
+  "archiveBytes": 5720933,
+  "filesSha256": {
+    "README.md": "b699817f33702efa6c3205d15c64af677518c981bccc96925623c3f76fdace23",
+    "archive-path-index.json": "23ffb367e79e326cbc394e3c8dae3e96934e9fff1a30c66ce86d304573bf7ce9",
+    "authority.json": "e3c880b2d2e59aaec895e7a7d340e21b84bd3a5df4743cbd5a0c13c670a1b940",
+    "build-manifest.json": "78ad174ca9e0aa3fce42aa5cb6032eb10fb2afe5f3984e80952a0e0daefe47f3",
+    "reviewed-combined-manifest.json": "463e4632b4b8bd034bd1a18b03d0e269c4f4791e1ecee68fb4ebef1cbaa62b0c",
+    "reviewed-combined.diff": "312000a4bd3488fa589acf2d785c986f70622d262a60a68c22d1af86c75bde83",
+    "source.tgz": "890f1429b331fdca52042aa56d99784100a7cb8feea7c6c9945ed3472624607a"
+  }
+}

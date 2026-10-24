@@ -1,0 +1,101 @@
+{
+  "task": "S0-01",
+  "backend": "kwin-wayland",
+  "status": "incomplete",
+  "physicalDesktopMatrixEstablished": false,
+  "evidenceKind": "actual-isolated-software-compositor-launcher",
+  "kernel": "6.12.113+deb13-amd64",
+  "hostDisplayClipboardInputOrSettingsUsed": false,
+  "launcherCompanionActivationOrPlacementUsed": false,
+  "stage": "decoy-challenge",
+  "observations": [
+    {
+      "phase": "initial-native-launch",
+      "native": {
+        "request": 1,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 170,
+            "width": 720,
+            "height": 560
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoyActivationIssued": false
+      }
+    },
+    {
+      "phase": "after-close-native-hidden",
+      "native": {
+        "request": 2,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoyActivationIssued": false
+      }
+    }
+  ],
+  "initialPlacementInsideWorkArea": true,
+  "closeRetainedResidentProcess": true,
+  "runtime": {
+    "electron": "45.0.0",
+    "chrome": "156.0.8078.48",
+    "ozone": "wayland",
+    "noSandbox": false,
+    "sandbox": true,
+    "contextIsolation": true,
+    "nodeIntegration": false,
+    "webSecurity": true,
+    "renderer": {
+      "runtime": {
+        "sandboxed": true,
+        "contextIsolated": true
+      },
+      "process": "undefined",
+      "require": "undefined"
+    }
+  },
+  "privateProcessTreeCleanupVerified": true,
+  "packages": [
+    "gnome-shell 48.7-0+deb13u2",
+    "kwin-wayland 4:6.3.6-1",
+    "kwin-x11 4:6.3.6-1",
+    "libqt6qml6 6.8.2+dfsg-7",
+    "mutter 48.7-0+deb13u1"
+  ]
+}

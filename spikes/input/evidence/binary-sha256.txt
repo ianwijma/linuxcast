@@ -1,0 +1,3 @@
+1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a  linuxcast-input-spike-supervisor
+45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8  linuxcast-input-spike-worker
+9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51  linuxcast-input-spike-synthetic-lab

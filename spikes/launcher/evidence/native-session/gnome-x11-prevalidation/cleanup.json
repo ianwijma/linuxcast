@@ -1,0 +1,51 @@
+{
+  "beforeExecution": {
+    "checkedUtc": "2026-10-22T21:46:01.197693+00:00",
+    "fixedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateMatrixRootsAbsent": true,
+    "inputLabMarkerAbsent": true
+  },
+  "afterRunner": {
+    "checkedUtc": "2026-10-22T21:46:03.056929+00:00",
+    "fixedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateMatrixRootsAbsent": true,
+    "inputLabMarkerAbsent": true
+  },
+  "afterRelease": {
+    "checkedUtc": "2026-10-22T21:46:12.099184+00:00",
+    "fixedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "privateMatrixRootsAbsent": true,
+    "inputLabMarkerAbsent": true
+  },
+  "ownGuestSourceArchivesAndCachesRemoved": true,
+  "cleanReleaseVerified": true,
+  "hostSettingsOrDisplaysChanged": false,
+  "physicalDesktopMatrixEstablished": false
+}

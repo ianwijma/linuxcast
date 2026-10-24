@@ -1,0 +1,5 @@
+{
+  "status": "incomplete",
+  "stage": "focus:Search commands",
+  "limitation": "Required assertions did not all pass. No acceptance success or audible/compositor QA inferred."
+}

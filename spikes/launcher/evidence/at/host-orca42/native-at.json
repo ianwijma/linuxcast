@@ -1,0 +1,56 @@
+{
+  "status": "incomplete",
+  "stage": "focus:Search commands",
+  "snapshots": [
+    {
+      "label": "Search commands",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": true
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "push button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "push button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "Search commands"
+        ],
+        "event_sequence": 2
+      }
+    }
+  ]
+}

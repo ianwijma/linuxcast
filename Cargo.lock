@@ -759,6 +759,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "linuxcast-input-spike"
+version = "0.0.0"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "linuxcast-protocol"
 version = "0.1.0"
 dependencies = [

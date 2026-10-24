@@ -1,0 +1,32 @@
+{
+  "task": "S0-01",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "sourceBaselineCommit": "03df170788c2cd2358b15e93cf65dde51919db0c",
+  "worktreeHeadWhenFrozen": "8acf715e10fe9665c18535a84f6bc58a5b8854b1",
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "checks": {
+    "configuredPreparation": 178,
+    "strictTypecheckFinalExitCode": 0,
+    "strictTypecheckPriorProcessExitCode": 139,
+    "affectedLint": "passed",
+    "pythonAst": "passed",
+    "diffCheck": "passed",
+    "planningValidation": "passed"
+  },
+  "sourceSha256": {
+    "spikes/launcher/tests/native-session/observer_startup.py": "e45715c19b77a21df95d46d3cb2eb3588b55aff9c4ecfe5a3265df432a62966f",
+    "spikes/launcher/tests/native-session/run-session.py": "100c0bcbbc464122ea92df0fe20fdd847b92a7669259a8846769c627363ffd37",
+    "spikes/launcher/tests/native-session/startup-fixture.py": "1a5bf91cb9b6cd84848b7477ecb53b57267c39a6dfc81b05f5d40412a6feef9b",
+    "spikes/launcher/tests/native-session/preparation.test.ts": "3d9293c1a00824e53f5b8d1cf9cbca5fbe73b3642880fdcdac4f7c8b07457e26"
+  },
+  "filesSha256": {
+    "README.md": "0b0089e370dccfd38a631a0d1447181dff737ae80c22b121eddc9b63167d9d07",
+    "observer_startup.py": "e45715c19b77a21df95d46d3cb2eb3588b55aff9c4ecfe5a3265df432a62966f",
+    "preparation.test.ts": "3d9293c1a00824e53f5b8d1cf9cbca5fbe73b3642880fdcdac4f7c8b07457e26",
+    "run-session.py": "100c0bcbbc464122ea92df0fe20fdd847b92a7669259a8846769c627363ffd37",
+    "source.diff": "f2e583c714037467faa4c90b8fd84e007816a38f1ae956f77889b8dc0c270242",
+    "startup-fixture.py": "1a5bf91cb9b6cd84848b7477ecb53b57267c39a6dfc81b05f5d40412a6feef9b"
+  }
+}

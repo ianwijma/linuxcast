@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "operation": "PREPARE_MAPPED_TEST_SOURCE_ONLY",
+  "sourcePrepared": true,
+  "sourceFileCount": 17353,
+  "manifestSha256": "7fb05b9bbcd84bf3950423fe56adf27148c28e42e9f3a2bf80d658d27f31dda4",
+  "collectorManifestSha256": "9da26182246f7b1ac8958fbd28ec70e8321279b07693ace23dd62734bb35a170",
+  "sourceDiffSha256": "d83d44dd8d096cbd59cc9e91867ee042ff647605ad22031bd05c3df3b82b3892",
+  "allFrozenHashesUnchanged": true,
+  "testsExecuted": false,
+  "markerCreated": false,
+  "nativeArtifactReplaced": false,
+  "dependenciesInstalledOrDownloaded": false
+}

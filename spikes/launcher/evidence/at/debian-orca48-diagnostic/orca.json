@@ -1,0 +1,37 @@
+{
+  "status": "incomplete",
+  "stage": "focus:Record shortcut",
+  "orcaVersion": "48.1",
+  "startupCompleted": true,
+  "anchors": [
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "delivered": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "delivered": true
+    }
+  ],
+  "presentations": [
+    {
+      "label": "Search commands",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Hide launcher",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    },
+    {
+      "label": "Actions Ctrl K",
+      "generatedAfterNativeFocus": true,
+      "deliveredToSpeechDispatcher": true
+    }
+  ],
+  "anyKnownGenerated": true,
+  "anyKnownDelivered": true
+}

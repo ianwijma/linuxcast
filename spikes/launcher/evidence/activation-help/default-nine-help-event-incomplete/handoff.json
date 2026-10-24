@@ -1,0 +1,19 @@
+{
+  "scope": "Exclusive AT reservation finished; running guest released for separately authorized native reservation",
+  "checkedAtUtc": "2026-10-24T11:28:58.420644+00:00",
+  "container": "linuxcast-native-lab-v4",
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "running": true,
+  "startedAtUtc": "2026-10-24T11:15:56.717676686Z",
+  "kernel": "6.12.113+deb13-amd64",
+  "defaultTarget": "multi-user.target",
+  "signedSourceSubsetCommit": "55301bffde97ca3cf2a8bc893f8f39df7d0a3618",
+  "selectedSignedInputs": 335,
+  "preservedEvidenceInputs": 419,
+  "wholeSignedTreeVerified": false,
+  "cleanupAndIntegrityVerified": true,
+  "cleanupSha256": "25573341483ebc123923b90e41c1f4809f96f1ff39ab4c4581a6e5adcba84b6e",
+  "sourceRetained": true,
+  "rawLogsOrPrivateProfilesExported": false,
+  "nextTestAuthorizedByThisRecord": false
+}

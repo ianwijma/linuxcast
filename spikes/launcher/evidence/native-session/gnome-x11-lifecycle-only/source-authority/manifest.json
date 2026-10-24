@@ -1,0 +1,28 @@
+{
+  "kind": "S0-01-unsigned-lifecycle-only-immutable",
+  "sourceStatusScope": "declared-runtime-and-static-inputs",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "runtimeInputsMatchSignedCommit": false,
+  "executedRuntimeCommit": null,
+  "verifiedSignedBaselineCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "archiveRepresentsWholeSignedTree": false,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "archiveRegularFiles": 469,
+  "archiveDirectories": 68,
+  "overlayCount": 11,
+  "unsignedRuntimeInputCount": 4,
+  "knownSignedRuntimeInputCount": 20,
+  "knownSignedStaticInputCount": 2,
+  "archiveBytes": 5709150,
+  "filesSha256": {
+    "README.md": "7c76e42bba929e90f5afef8ce154872c3295940900d9ba1695a1cd5677e0e372",
+    "archive-path-index.json": "603f477b3719995d7dad857c6d89d33b12bd4f4678f145f7a19c1491044b1a0a",
+    "authority.json": "35cf513245a17205a22f9e8b408eb4ba1a4a070743864585d86328524deb7b7b",
+    "build-manifest.json": "ef1499754c2aec7d7834fbedc70b1c8c1eb1c87bef6a892e382a01042d5b4541",
+    "reviewed-combined-manifest.json": "87cb0c481ebc72b6674f6e73501d6f04404c733da8893c7afba43409c157902d",
+    "reviewed-combined.diff": "8056573a397791a68d072a5db78306afbbcc2f6b2d00817864ca6061449ca8f6",
+    "source.tgz": "ed4390dcc734aa9337f571594d5fbcdbd1c7cabf2b95ce358891e6c9328fcdc4"
+  }
+}

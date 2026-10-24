@@ -1,0 +1,18 @@
+1060b44313a1536926d89303625b9f91272a1f59a5d05ac803e026843e11ef7a  /opt/linuxcast-input-spike/linuxcast-input-spike-supervisor
+9211ceb29ae2373717f2fc74d591544898ac2931c3f83deaf21186b7b6da7e51  /opt/linuxcast-input-spike/linuxcast-input-spike-synthetic-lab
+45fae18d283eee7bfbff39fbe060b29c040d951db248d04bc5aa5eba1ce00eb8  /opt/linuxcast-input-spike/linuxcast-input-spike-worker
+$ node scripts/test-runner/run.ts security "S0-03"
+
+ RUN  v4.1.12 /home/debian/linuxcast-input-source
+
+ ✓ spikes/input/kernel.security.test.ts (1 test) 8941ms
+   ✓ actual reviewed Debian synthetic input recovery; missing runner fails this gate  8915ms
+ ✓ spikes/input/plugin-socket.security.test.ts (1 test) 9097ms
+   ✓ mandatory extension sandbox cannot reach the input control socket hierarchy  9084ms
+
+ Test Files  2 passed (2)
+      Tests  2 passed (2)
+   Start at  17:07:40
+   Duration  21.47s (transform 501ms, setup 0ms, import 991ms, tests 18.04s, environment 2ms)
+
+JSON report written to /home/debian/linuxcast-input-tmp/linuxcast-test-report-ahfeW6/results.json

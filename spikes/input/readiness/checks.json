@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "AUTHOR_LOCAL_CHECK_SUMMARY",
+  "task": "S0-03",
+  "tests": 19,
+  "outcome": "PASSED",
+  "command": "python3 -B -m unittest -v test_readiness",
+  "planningValidation": "PASSED",
+  "pythonVersion": "3.10.12",
+  "actualMetadataEnumerations": 0,
+  "actualKernelPeerAuthenticationTrials": 0,
+  "nativeOrDeviceRuns": 0,
+  "sessionOrCompanionQueries": 0,
+  "fixtureScope": "synthetic libudev and trusted-parent lifetime seams; real sanitized Python startup only",
+  "ac01Complete": false,
+  "ac02Complete": false,
+  "sourceSha256": {
+    "readiness.py": "1c766776f8105e19bb82f86d5e8a9696f0482fa6fd86f4d876f90dc60983a0f5",
+    "udev_metadata.py": "add9a465d6d669c0c171ae6558d30eb390907ddc1b2c4cb05a480c1721e502cc",
+    "test_readiness.py": "ce8da51f0876865a6f5591f2198ac164e644b3bf7abe3f7e4c0095f42a93886a",
+    "README.md": "5cae96bec4a56074568d02f7b69883dce3829ab7a59f8c3e743fcae5d18246cc"
+  }
+}

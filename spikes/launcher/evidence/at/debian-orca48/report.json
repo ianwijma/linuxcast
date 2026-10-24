@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "stage": "complete",
+  "nativeFocus": 5,
+  "generatedPresentation": 5,
+  "boundary": "Actual launcher on private Xvfb/session/AT buses; synthetic app-only observation; actual renderer sandbox; no host display hooks/settings or audible QA."
+}

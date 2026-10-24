@@ -1,0 +1,4 @@
+START=2026-10-23T09:38:36Z
+{"backend": "kwin-x11", "status": "incomplete", "exitCode": 3, "privateProcessTreeCleanupVerified": true, "physicalDesktopMatrixEstablished": false}
+END=2026-10-23T09:39:13Z
+ACTUAL_RUNNER_EXIT=3

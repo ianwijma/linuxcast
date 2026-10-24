@@ -1,0 +1,18 @@
+{
+  "task": "S0-01",
+  "sourceParentCommit": "722113241715935aa192ecdc5fa988d0245a9067",
+  "reviewedSourceDirtyDiffSha256": "b958f455da7a8f0b7de62a45b8d22ccd15933ae6216b50a083c92b0c55d14cd4",
+  "reviewedSourceDirtyDiffFile": "reviewed-source-diff.patch.gz",
+  "reviewedSourceDirtyDiffEncoding": "gzip; SHA256 identifies the exact decompressed diff",
+  "transferArchiveSha256": "9b0eea34f31861d607369c4d961429a51a92af0bcff9d35ad90081338ad18303",
+  "exactExecutedSourceManifest": "source-manifest.json",
+  "command": "node spikes/launcher/tests/native-session/build.ts; python3 spikes/launcher/tests/native-session/run-session.py gnome-wayland --private-guest",
+  "frozenInstallPackages": 651,
+  "bun": "1.4.4",
+  "node": "24.22.1",
+  "explicitElectronSetupCompleted": true,
+  "exitCode": 0,
+  "nativeProbeStatus": "passed-bounded-native-probe",
+  "screenshotReview": "Both initial images show light ready/search content. Requested dark/capability states are not established; screenshot paint synchronization needs correction.",
+  "physicalDesktopMatrixEstablished": false
+}

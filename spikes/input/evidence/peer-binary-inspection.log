@@ -1,0 +1,213 @@
+COMMAND: readelf --version-info spikes/input/.target/debug/linuxcast-input-spike-context-probe
+
+Version symbols section '.gnu.version' contains 112 entries:
+ Addr: 0x0000000000000dc0  Offset: 0x00000dc0  Link: 4 (.dynsym)
+  000:   0 (*local*)       2 (GLIBC_2.34)    0 (*local*)       0 (*local*)    
+  004:   0 (*local*)       3 (GLIBC_2.2.5)   4 (GCC_3.0)       5 (GLIBC_2.14) 
+  008:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  00c:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  010:   6 (GLIBC_2.17)    3 (GLIBC_2.2.5)   7 (GLIBC_2.3)     3 (GLIBC_2.2.5)
+  014:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  018:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   8 (LIBSYSTEMD_209)    3 (GLIBC_2.2.5)
+  01c:   8 (LIBSYSTEMD_209)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221) 
+  020:   9 (LIBSYSTEMD_221)    3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   9 (LIBSYSTEMD_221) 
+  024:   9 (LIBSYSTEMD_221)    a (LIBSYSTEMD_240)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221) 
+  028:   9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221) 
+  02c:   9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    3 (GLIBC_2.2.5)   b (GLIBC_2.33) 
+  030:   9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221)    9 (LIBSYSTEMD_221) 
+  034:   2 (GLIBC_2.34)    3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  038:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   4 (GCC_3.0)       c (GLIBC_2.30) 
+  03c:   3 (GLIBC_2.2.5)   4 (GCC_3.0)       4 (GCC_3.0)       3 (GLIBC_2.2.5)
+  040:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  044:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   2 (GLIBC_2.34)    3 (GLIBC_2.2.5)
+  048:   2 (GLIBC_2.34)    b (GLIBC_2.33)    d (GCC_3.3)       3 (GLIBC_2.2.5)
+  04c:   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   e (GLIBC_2.32) 
+  050:   2 (GLIBC_2.34)    3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+  054:   b (GLIBC_2.33)    3 (GLIBC_2.2.5)   6 (GLIBC_2.17)    3 (GLIBC_2.2.5)
+  058:   f (GLIBC_2.3)     3 (GLIBC_2.2.5)  10 (GLIBC_2.28)   11 (GLIBC_2.18) 
+  05c:   2 (GLIBC_2.34)    2 (GLIBC_2.34)    2 (GLIBC_2.34)   12 (GLIBC_2.16) 
+  060:   3 (GLIBC_2.2.5)   2 (GLIBC_2.34)    3 (GLIBC_2.2.5)   2 (GLIBC_2.34) 
+  064:   2 (GLIBC_2.34)   13 (GLIBC_2.3.4)   4 (GCC_3.0)      14 (GCC_4.2.0)  
+  068:   4 (GCC_3.0)       4 (GCC_3.0)       4 (GCC_3.0)       4 (GCC_3.0)    
+  06c:   4 (GCC_3.0)       3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)   3 (GLIBC_2.2.5)
+
+Version needs section '.gnu.version_r' contains 4 entries:
+ Addr: 0x0000000000000ea0  Offset: 0x00000ea0  Link: 8 (.dynstr)
+  000000: Version: 1  File: libsystemd.so.0  Cnt: 3
+  0x0040:   Name: LIBSYSTEMD_209  Flags: none  Version: 8
+  0x0050:   Name: LIBSYSTEMD_221  Flags: none  Version: 9
+  0x0060:   Name: LIBSYSTEMD_240  Flags: none  Version: 10
+  0x0010: Version: 1  File: libgcc_s.so.1  Cnt: 3
+  0x0070:   Name: GCC_3.0  Flags: none  Version: 4
+  0x0080:   Name: GCC_3.3  Flags: none  Version: 13
+  0x0090:   Name: GCC_4.2.0  Flags: none  Version: 20
+  0x0020: Version: 1  File: libc.so.6  Cnt: 12
+  0x00a0:   Name: GLIBC_2.2.5  Flags: none  Version: 3
+  0x00b0:   Name: GLIBC_2.3  Flags: none  Version: 15
+  0x00c0:   Name: GLIBC_2.3.4  Flags: none  Version: 19
+  0x00d0:   Name: GLIBC_2.14  Flags: none  Version: 5
+  0x00e0:   Name: GLIBC_2.16  Flags: none  Version: 18
+  0x00f0:   Name: GLIBC_2.17  Flags: none  Version: 6
+  0x0100:   Name: GLIBC_2.18  Flags: none  Version: 17
+  0x0110:   Name: GLIBC_2.28  Flags: none  Version: 16
+  0x0120:   Name: GLIBC_2.30  Flags: none  Version: 12
+  0x0130:   Name: GLIBC_2.32  Flags: none  Version: 14
+  0x0140:   Name: GLIBC_2.33  Flags: none  Version: 11
+  0x0150:   Name: GLIBC_2.34  Flags: none  Version: 2
+  0x0030: Version: 1  File: ld-linux-x86-64.so.2  Cnt: 1
+  0x0160:   Name: GLIBC_2.3  Flags: none  Version: 7
+
+COMMAND: readelf --dynamic spikes/input/.target/debug/linuxcast-input-spike-context-probe
+
+Dynamic section at offset 0x7a508 contains 30 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libsystemd.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000001e (FLAGS)              BIND_NOW
+ 0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000007 (RELA)               0x1750
+ 0x0000000000000008 (RELASZ)             26832 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          1038
+ 0x0000000000000017 (JMPREL)             0x8020
+ 0x0000000000000002 (PLTRELSZ)           960 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x7d788
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x340
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x1038
+ 0x000000000000000a (STRSZ)              1813 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x1010
+ 0x0000000000000019 (INIT_ARRAY)         0x798b8
+ 0x000000000000001b (INIT_ARRAYSZ)       16 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x798b0
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x785c4
+ 0x000000000000000d (FINI)               0x785dc
+ 0x000000006ffffff0 (VERSYM)             0xdc0
+ 0x000000006ffffffe (VERNEED)            0xea0
+ 0x000000006fffffff (VERNEEDNUM)         4
+ 0x0000000000000000 (NULL)               0x0
+
+COMMAND: readelf --wide --dyn-syms spikes/input/.target/debug/linuxcast-input-spike-context-probe
+
+Symbol table '.dynsym' contains 112 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.34 (2)
+     2: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__
+     3: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND _ITM_deregisterTMCloneTable
+     4: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND _ITM_registerTMCloneTable
+     5: 0000000000000000     0 FUNC    WEAK   DEFAULT  UND __cxa_finalize@GLIBC_2.2.5 (3)
+     6: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_Resume@GCC_3.0 (4)
+     7: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND memcpy@GLIBC_2.14 (5)
+     8: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND clearenv@GLIBC_2.2.5 (3)
+     9: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND memcmp@GLIBC_2.2.5 (3)
+    10: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND memset@GLIBC_2.2.5 (3)
+    11: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND write@GLIBC_2.2.5 (3)
+    12: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _exit@GLIBC_2.2.5 (3)
+    13: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND close@GLIBC_2.2.5 (3)
+    14: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND fcntl@GLIBC_2.2.5 (3)
+    15: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __errno_location@GLIBC_2.2.5 (3)
+    16: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND clock_gettime@GLIBC_2.17 (6)
+    17: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getsockopt@GLIBC_2.2.5 (3)
+    18: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __tls_get_addr@GLIBC_2.3 (7)
+    19: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND memmove@GLIBC_2.2.5 (3)
+    20: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND syscall@GLIBC_2.2.5 (3)
+    21: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getuid@GLIBC_2.2.5 (3)
+    22: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strcmp@GLIBC_2.2.5 (3)
+    23: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND calloc@GLIBC_2.2.5 (3)
+    24: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND free@GLIBC_2.2.5 (3)
+    25: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getpid@GLIBC_2.2.5 (3)
+    26: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_pid_get_session@LIBSYSTEMD_209 (8)
+    27: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strnlen@GLIBC_2.2.5 (3)
+    28: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_session_get_uid@LIBSYSTEMD_209 (8)
+    29: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_get_sender@LIBSYSTEMD_221 (9)
+    30: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_get_path@LIBSYSTEMD_221 (9)
+    31: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_close@LIBSYSTEMD_221 (9)
+    32: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_unref@LIBSYSTEMD_221 (9)
+    33: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND poll@GLIBC_2.2.5 (3)
+    34: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strlen@GLIBC_2.2.5 (3)
+    35: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_read@LIBSYSTEMD_221 (9)
+    36: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_process@LIBSYSTEMD_221 (9)
+    37: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_set_method_call_timeout@LIBSYSTEMD_240 (10)
+    38: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_add_match@LIBSYSTEMD_221 (9)
+    39: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_new_method_call@LIBSYSTEMD_221 (9)
+    40: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_unref@LIBSYSTEMD_221 (9)
+    41: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_set_auto_start@LIBSYSTEMD_221 (9)
+    42: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_append@LIBSYSTEMD_221 (9)
+    43: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_call@LIBSYSTEMD_221 (9)
+    44: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_has_signature@LIBSYSTEMD_221 (9)
+    45: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_message_enter_container@LIBSYSTEMD_221 (9)
+    46: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strncmp@GLIBC_2.2.5 (3)
+    47: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND lstat@GLIBC_2.33 (11)
+    48: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_new@LIBSYSTEMD_221 (9)
+    49: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_set_address@LIBSYSTEMD_221 (9)
+    50: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_set_bus_client@LIBSYSTEMD_221 (9)
+    51: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sd_bus_start@LIBSYSTEMD_221 (9)
+    52: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND dlsym@GLIBC_2.34 (2)
+    53: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND dl_iterate_phdr@GLIBC_2.2.5 (3)
+    54: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND bcmp@GLIBC_2.2.5 (3)
+    55: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND munmap@GLIBC_2.2.5 (3)
+    56: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_attr_destroy@GLIBC_2.2.5 (3)
+    57: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND read@GLIBC_2.2.5 (3)
+    58: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetIP@GCC_3.0 (4)
+    59: 0000000000000000     0 FUNC    WEAK   DEFAULT  UND gettid@GLIBC_2.30 (12)
+    60: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND open64@GLIBC_2.2.5 (3)
+    61: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetTextRelBase@GCC_3.0 (4)
+    62: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetDataRelBase@GCC_3.0 (4)
+    63: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getenv@GLIBC_2.2.5 (3)
+    64: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND malloc@GLIBC_2.2.5 (3)
+    65: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND posix_memalign@GLIBC_2.2.5 (3)
+    66: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND realloc@GLIBC_2.2.5 (3)
+    67: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND writev@GLIBC_2.2.5 (3)
+    68: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND signal@GLIBC_2.2.5 (3)
+    69: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_attr_init@GLIBC_2.2.5 (3)
+    70: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_attr_setstacksize@GLIBC_2.34 (2)
+    71: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sysconf@GLIBC_2.2.5 (3)
+    72: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_create@GLIBC_2.34 (2)
+    73: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND fstat64@GLIBC_2.33 (11)
+    74: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_Backtrace@GCC_3.3 (13)
+    75: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND lseek64@GLIBC_2.2.5 (3)
+    76: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND dup@GLIBC_2.2.5 (3)
+    77: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND abort@GLIBC_2.2.5 (3)
+    78: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_self@GLIBC_2.2.5 (3)
+    79: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_getattr_np@GLIBC_2.32 (14)
+    80: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_attr_getstack@GLIBC_2.34 (2)
+    81: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sigaction@GLIBC_2.2.5 (3)
+    82: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pause@GLIBC_2.2.5 (3)
+    83: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getcwd@GLIBC_2.2.5 (3)
+    84: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND stat64@GLIBC_2.33 (11)
+    85: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND exit@GLIBC_2.2.5 (3)
+    86: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND clock_nanosleep@GLIBC_2.17 (6)
+    87: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND mmap64@GLIBC_2.2.5 (3)
+    88: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND realpath@GLIBC_2.3 (15)
+    89: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND readlink@GLIBC_2.2.5 (3)
+    90: 0000000000000000     0 FUNC    WEAK   DEFAULT  UND statx@GLIBC_2.28 (16)
+    91: 0000000000000000     0 FUNC    WEAK   DEFAULT  UND __cxa_thread_atexit_impl@GLIBC_2.18 (17)
+    92: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_key_create@GLIBC_2.34 (2)
+    93: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_key_delete@GLIBC_2.34 (2)
+    94: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_setspecific@GLIBC_2.34 (2)
+    95: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getauxval@GLIBC_2.16 (18)
+    96: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND sigaltstack@GLIBC_2.2.5 (3)
+    97: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_attr_getguardsize@GLIBC_2.34 (2)
+    98: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND mprotect@GLIBC_2.2.5 (3)
+    99: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_setname_np@GLIBC_2.34 (2)
+   100: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pthread_detach@GLIBC_2.34 (2)
+   101: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __xpg_strerror_r@GLIBC_2.3.4 (19)
+   102: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetLanguageSpecificData@GCC_3.0 (4)
+   103: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetIPInfo@GCC_4.2.0 (20)
+   104: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_GetRegionStart@GCC_3.0 (4)
+   105: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_SetGR@GCC_3.0 (4)
+   106: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_SetIP@GCC_3.0 (4)
+   107: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_RaiseException@GCC_3.0 (4)
+   108: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _Unwind_DeleteException@GCC_3.0 (4)
+   109: 000000000007f398     8 OBJECT  GLOBAL DEFAULT   31 environ@GLIBC_2.2.5 (3)
+   110: 000000000007f398     8 OBJECT  WEAK   DEFAULT   31 _environ@GLIBC_2.2.5 (3)
+   111: 000000000007f398     8 OBJECT  GLOBAL DEFAULT   31 __environ@GLIBC_2.2.5 (3)
+
+COMMAND: readelf --wide --dyn-syms /usr/lib/x86_64-linux-gnu/libsystemd.so.0
+   490: 00000000000813d0   272 FUNC    GLOBAL DEFAULT   13 sd_pidfd_get_session@@LIBSYSTEMD_253
