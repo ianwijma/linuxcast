@@ -16,11 +16,11 @@ export const permissionScopeSchema = z.discriminatedUnion('kind',[
 const scopeKinds: Record<z.infer<typeof permissionIdSchema>, z.infer<typeof permissionScopeSchema>['kind']> = {
   'files.read':'resource','files.write':'resource','network.fetch':'origin','network.local':'origin',
   'clipboard.read':'global','clipboard.history':'resource','clipboard.write':'global','input.paste':'application',
-  'input.shortcut':'application','applications.launch':'application','windows.control':'application',
+  'input.shortcut':'application','applications.launch':'application','windows.control':'resource',
   'ai.generate':'global','notifications.show':'global','background.run':'global','scripts.execute':'resource',
 };
 const requirementShape = {permissionId:permissionIdSchema,scope:permissionScopeSchema};
-const compatible = (value:{permissionId:z.infer<typeof permissionIdSchema>;scope:z.infer<typeof permissionScopeSchema>}) => scopeKinds[value.permissionId]===value.scope.kind;
+const compatible = (value:{permissionId:z.infer<typeof permissionIdSchema>;scope:z.infer<typeof permissionScopeSchema>}) => scopeKinds[value.permissionId]===value.scope.kind || (value.permissionId==='applications.launch' && value.scope.kind==='resource');
 export const permissionRequirementSchema = z.strictObject(requirementShape).refine(compatible);
 export const permissionDecisionRecordSchema = z.strictObject({
   schemaVersion:z.literal(1),id:z.uuid(),principal:effectPrincipalSchema,declarationHash:z.string().regex(/^[a-f0-9]{64}$/u),
