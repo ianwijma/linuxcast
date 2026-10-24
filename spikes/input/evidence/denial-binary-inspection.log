@@ -1,0 +1,13 @@
+linuxcast-input-spike-denial-probe
+0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+Forbidden undefined input/hard-linked optional symbols: NONE
+Generic libc ioctl import present: True (not evidence of an input ioctl; new source has no input operation).
+linuxcast-input-spike-denial-helper
+0x0000000000000001 (NEEDED)             Shared library: [libsystemd.so.0]
+0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+Forbidden undefined input/hard-linked optional symbols: NONE
+Generic libc ioctl import present: False (not evidence of an input ioctl; new source has no input operation).

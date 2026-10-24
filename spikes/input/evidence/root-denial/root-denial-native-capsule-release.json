@@ -1,0 +1,5 @@
+{
+  "guest": true,
+  "container": true,
+  "finalBaseline": true
+}

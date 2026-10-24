@@ -1,0 +1,3 @@
+512d92b1062e61c14b0a8793e9318d5a3efd8a998acabbf1cd942a3c4b402d5d  spikes/input/src/bin/peer-probe.rs
+7a348745294160b8d8540e00d527be7d48364cd3be91169b91bdaf6b23bd37cb  spikes/input/src/peer_observer.rs
+ae0fdb9358cbab8d05a822b9d0e358a0c1c65c237d9040107f83cbdb5c57d047  spikes/input/tests/peer-observer-private.rs

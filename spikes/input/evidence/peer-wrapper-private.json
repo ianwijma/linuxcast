@@ -1,0 +1,13 @@
+{
+  "privateNoQueryFixture": true,
+  "normalCleanup": true,
+  "queryFailureCleanup": true,
+  "startupFailureCleanup": true,
+  "cancellationCleanup": true,
+  "deadlineCleanup": true,
+  "retainedDescendantCleanup": true,
+  "parentDeathCleanup": true,
+  "fixedInvocationPrivacy": true,
+  "independentSevenSecondDeadline": true,
+  "liveQueries": 0
+}

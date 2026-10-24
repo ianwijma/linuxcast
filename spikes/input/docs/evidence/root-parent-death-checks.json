@@ -1,0 +1,77 @@
+{
+  "acceptance": {
+    "S0-03-AC01": "pending",
+    "S0-03-AC02": "pending",
+    "currentManufacturedSecurityRegression": "PENDING",
+    "designApplicability": "ENGINEERING_ONLY_NO_PRODUCT_UI",
+    "historicalOuterWrapper": "FAILED_UNRESOLVED",
+    "lockedInactiveLiveEnforcement": false,
+    "physicalHeldKeyCompositorRecovery": false,
+    "positiveCompanionConsentOrCaptureGrant": false,
+    "privacy": "FIXED_SYNTHETIC_BOOLS_TIMING_HASHES_NO_PRIVATE_PROCESS_IDENTIFIERS"
+  },
+  "actualKernel": "7.1.1-76070101-generic",
+  "actualResultSha256": "6c9c3ef740ae36c11677efe72bc16c72faa358f4433a08b6fc41ddd7898eea60",
+  "actualToolExitCode": 0,
+  "affectedChecks": {
+    "clippy": "cargo clippy --offline --locked -p linuxcast-input-spike --test denial-private -- -D warnings",
+    "clippyResult": "PASS",
+    "compile": "cargo test --offline --locked -p linuxcast-input-spike --test denial-private --no-run",
+    "format": "rustfmt --check --edition 2024 spikes/input/src/denial_observer.rs spikes/input/tests/denial-private.rs spikes/input/tests/support/root-parent-death.rs",
+    "formatResult": "PASS",
+    "guardianUnchangedSuiteRerun": false,
+    "ordinaryHelperCases": 10,
+    "ordinaryIndependentSevenSecondGuard": "PASS",
+    "ordinaryRegression": "cargo test --offline --locked -p linuxcast-input-spike --test denial-private",
+    "ordinaryResult": "PASS",
+    "rootCase": "denial_private --private-root-parent-death"
+  },
+  "buildImage": "linuxcast-s0-03-context-build:debian13",
+  "buildImageSha256": "d99e0a39fcbca61433ce22b65842f7dc8c81b3df0f5ffd04b2ad767c879d557a",
+  "fixtureBinarySha256": "60a667f80898180f594f767899aefc74963f377bb7a2d9790d74acc49833a58f",
+  "helperBinaryMatchesHistoricalReviewedArtifact": true,
+  "helperBinarySha256": "b80cc6a4c5577040ee679a9c657d6e6db04c8b4478cbb46ab70d6d2d883d1bc9",
+  "productionChangeRequired": false,
+  "runtimeRestrictions": {
+    "containerCapabilities": [
+      "SETUID",
+      "SETGID",
+      "KILL"
+    ],
+    "cpus": 1,
+    "hostDevicesMounted": false,
+    "hostServicesOrPolicyChanged": false,
+    "memoryMiB": 512,
+    "network": "none",
+    "noNewPrivileges": true,
+    "pidsLimit": 64,
+    "vmAccessed": false
+  },
+  "runtimeScope": "DISPOSABLE_CONTAINER_ON_HOST_KERNEL_NOT_DEBIAN_VM_OR_DESKTOP_MATRIX",
+  "rustVersion": "1.95.0",
+  "schemaVersion": 1,
+  "scope": "ACTUAL_ROOT_TO_ORDINARY_HELPER_OWN_PROCESS_PARENT_DEATH_NO_QUERY_NO_INPUT",
+  "sourceSha256": {
+    "spikes/input/src/denial_observer.rs": "72b43f296bde1afdfbbeb1ccfce428f5d2da86cb3ee2b5ff9d4fbc692e2a2f15",
+    "spikes/input/tests/denial-private.rs": "ad75a4e538b2b0cab6dee950728b4f9013bbf9c35a85e0d678a18d17e91ea779",
+    "spikes/input/tests/support/root-parent-death.rs": "31fc4c4457739227b6771642f64f66c22eec0a60ccb2dbe67f02bf2ae3378592"
+  },
+  "sourceSignedAtExecution": false,
+  "task": "S0-03",
+  "testOnlyAddition": true,
+  "userland": "Debian13_pinned_build_image",
+  "verification": {
+    "controlEndpointHeldOpenAcrossParentDeath": true,
+    "directParentDeathObservedMs": 1,
+    "externalDumpabilityMeasured": false,
+    "externalOrdinaryIdsGroupsCapabilitiesNnpAndParentChecked": true,
+    "externalPdeathsigReadbackMeasured": false,
+    "helperSigkillWaitStatusBeforeAnyCleanupSignal": true,
+    "independentConnectorAliveUntilCleanup": true,
+    "inputDeviceOperations": false,
+    "liveContextQueries": false,
+    "observationBoundMs": 500,
+    "ownedCleanupVerified": true,
+    "workerOrSupervisorInputRecoveryProved": false
+  }
+}

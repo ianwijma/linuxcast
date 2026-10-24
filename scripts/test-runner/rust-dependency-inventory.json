@@ -1,6 +1,6 @@
 {
-  "scope": "F1-01 Rust development inventory, not the final shipped-content SBOM",
-  "cargoLockSha256": "b101850ee36039784f244bf6269faa20299d315889e1542c2ee401a64a671350",
+  "scope": "Rust workspace development inventory, not the final shipped-content SBOM",
+  "cargoLockSha256": "33f3b3224bb3c8d1ffa166d68955f88073686138bc853d592248a333a7908dd0",
   "dependencies": [
     {
       "name": "aead",
@@ -465,6 +465,13 @@
       "source": "registry+https://github.com/rust-lang/crates.io-index"
     },
     {
+      "name": "itoa",
+      "version": "1.0.18",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/dtolnay/itoa",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
       "name": "keccak",
       "version": "0.1.6",
       "license": "Apache-2.0 OR MIT",
@@ -495,6 +502,13 @@
     {
       "name": "linuxcast-build-checks",
       "version": "0.1.0",
+      "license": "GPL-3.0-only",
+      "repository": null,
+      "source": null
+    },
+    {
+      "name": "linuxcast-input-spike",
+      "version": "0.0.0",
       "license": "GPL-3.0-only",
       "repository": null,
       "source": null
@@ -808,6 +822,13 @@
       "source": "registry+https://github.com/rust-lang/crates.io-index"
     },
     {
+      "name": "serde_json",
+      "version": "1.0.154",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/serde-rs/json",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
       "name": "sha2",
       "version": "0.10.9",
       "license": "MIT OR Apache-2.0",
@@ -1050,6 +1071,13 @@
       "version": "0.11.9",
       "license": "Unicode-3.0",
       "repository": "https://github.com/unicode-org/icu4x",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "license": "MIT",
+      "repository": "https://github.com/dtolnay/zmij",
       "source": "registry+https://github.com/rust-lang/crates.io-index"
     }
   ]

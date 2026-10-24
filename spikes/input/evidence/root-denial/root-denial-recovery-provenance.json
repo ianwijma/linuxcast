@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "rawExecutedWrappersPublished": false,
+  "privateAuthorityConstantsPublished": false,
+  "localVerificationOfOriginalSourcesAndJournalsPassed": true,
+  "executedEmptyRecoverySourceSha256": "e5a8969b15318eb4dbf6bc4ff8ab117f7ffd8853de31800744c1db03a496fc50",
+  "executedStageRecoverySourceSha256": "f888811094edfb26ca68197c06ab33cea93001a9d305b2b0e1e834522d4e6788",
+  "genericExcerpts": [
+    {
+      "file": "recovery-empty-guard.py",
+      "function": "empty_release_code",
+      "originalWholeSourceSha256": "e5a8969b15318eb4dbf6bc4ff8ab117f7ffd8853de31800744c1db03a496fc50",
+      "originalFirstLine": 29,
+      "originalLastLine": 45,
+      "excerptSha256": "ac730af27e88eb2ed6af4749651e73ab7facdf9d751b837aa6d7bab18c00955e",
+      "kind": "EXACT_FUNCTION_SLICE_NOT_WHOLE_EXECUTED_WRAPPER"
+    },
+    {
+      "file": "recovery-stages-guard.py",
+      "function": "stage_cleanup_code",
+      "originalWholeSourceSha256": "95b751cce6763fbbb601670a887957c2638e7e44a61e7be410203531756c8227",
+      "originalFirstLine": 358,
+      "originalLastLine": 380,
+      "excerptSha256": "66e7251b9a3e672de42e57a68d6f373ac8d1155b0b4bf440d1523585e97df1bd",
+      "kind": "EXACT_FUNCTION_SLICE_NOT_WHOLE_EXECUTED_WRAPPER"
+    }
+  ],
+  "redactedRecipeSha256": "29914554b472a5be77149f73ac93e183ed1bd7fb693ea36c331a8a68a191e685",
+  "redactedRecipeExecuted": false,
+  "redactedRecipeByteIdenticalToExecutedWrapper": false,
+  "replayRequiresUnpublishedPrivateOwnershipAuthority": true,
+  "executedLatestStageRecoverySourceSha256": "33d22d99e96478047b1b7470d5cc9b1933e9dee2166e405b8641b34018272ec1",
+  "executedLatestStageRecoveryManifestSha256": "239526b00378619c3443b34d7109a505f87afe915adcfb8ca43c958c8a44fe83"
+}

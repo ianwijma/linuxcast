@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "REVIEWED_PREPARATION_SUMMARY",
+  "kind": "NEW_STRICT_PROJECTION_NOT_BYTE_IDENTICAL_ORIGINAL",
+  "originalWholeArtifactSha256": "e0d9793fe2f890712c3cf27c7db828a9a26668075507da3825a01ea45d277ea8",
+  "complete": true,
+  "collectorManifestSha256": "34469d1aaf39e392fb2f30b3cd965db935d9814d6fa520e011c527305936e256",
+  "runtimeSourceManifestSha256": "22cd0d8c5992f0585b82a78ee1aa04fdae9cb275eb52bb0b86a300533c281b2b",
+  "proofBasis": "REVIEWED_PREPARE_CONTROL_FLOW_AND_STAGING_GUARDS_NOT_RAW_STDOUT",
+  "noExtraRemoteMetadataInspectionClaimed": true,
+  "reviewedStagingGuardsPassed": true,
+  "stagedPayloads": [
+    {
+      "name": "collector.py",
+      "sha256": "cf4e1a619ff51438e4baff339a9040fa8d5568f174f3c1473a04996a2492c02d",
+      "bytes": 21403,
+      "containerAndGuestComplete": true
+    },
+    {
+      "name": "family.py",
+      "sha256": "470c0bee8a6771f8f1634f34308f5ce9e640c2a4a64b83b5b5352ee77edd30c5",
+      "bytes": 5379,
+      "containerAndGuestComplete": true
+    },
+    {
+      "name": "linuxcast-input-spike-supervisor",
+      "sha256": "4fd4609ab5acfd5131c403fe0b9dd9a8460bf35f698798d1025ef401401fba00",
+      "bytes": 8981168,
+      "containerAndGuestComplete": true
+    },
+    {
+      "name": "linuxcast-input-spike-denial-helper",
+      "sha256": "b80cc6a4c5577040ee679a9c657d6e6db04c8b4478cbb46ab70d6d2d883d1bc9",
+      "bytes": 7259392,
+      "containerAndGuestComplete": true
+    }
+  ],
+  "nativeProgramsExecuted": false,
+  "helperInstalled": false,
+  "contextQueryPerformed": false,
+  "inputDeviceOperations": false
+}

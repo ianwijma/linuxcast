@@ -1,0 +1,220 @@
+{
+  "acceptance": {
+    "S0-03-AC01": "pending",
+    "S0-03-AC02": "pending",
+    "privacyEvidenceScope": "SYNTHETIC_FIXTURES_FIXED_PROTOCOL_AND_SOURCE_REVIEW",
+    "productUiChanged": false,
+    "taskCompletionClaimed": false
+  },
+  "additionalCoordinatorVerification": {
+    "evidenceKind": "COORDINATOR_REPORTED_CHECK_SUMMARY",
+    "plan": {
+      "command": "python3 scripts/validate_plan.py",
+      "features": 57,
+      "receiptReference": "bd5db1",
+      "result": "PASS",
+      "sources": 279,
+      "tasks": 97
+    },
+    "typecheck": {
+      "command": "bun run typecheck",
+      "receiptReference": "baef05",
+      "result": "PASS"
+    }
+  },
+  "bounds": {
+    "adapterElapsedSeconds": 1,
+    "guardianOverallSeconds": 5,
+    "outerCaptureSeconds": 8,
+    "outerCleanupReserveSeconds": 2,
+    "packetBytes": 4096,
+    "querySeconds": 2,
+    "termGraceMilliseconds": 250
+  },
+  "protocol": {
+    "attemptedStageLabels": 17,
+    "canCapture": false,
+    "consentEstablished": false,
+    "deviceOpenAvailable": false,
+    "explicitNegativeOrUnexpected": "WHOLE_SNAPSHOT_UNAVAILABLE",
+    "extraNativeApiOrClockUnameFilesystemQueriesAdded": 0,
+    "maximumAllInspectedEntries": 128,
+    "newTagOrErrnoApi": false,
+    "qualifiedCountsAreCompleteHardwareCensus": false,
+    "scanCount": 1,
+    "schemaVersion": 4,
+    "startPacketVersion": 1,
+    "workerArmAvailable": false,
+    "zeroMeaning": "NOT_POSITIVELY_QUALIFIED_INCLUDING_POSSIBLE_COLLAPSED_ERROR"
+  },
+  "publication": {
+    "documentationAndCheckMetadataOnlyUpdate": true,
+    "fileCount": 11,
+    "generatedPrivatePathsIncluded": false,
+    "hardwareIdentifiersOrInventoriesIncluded": false,
+    "privateAggregateValuesIncluded": false,
+    "privateCapsulesOrControllersIncluded": false,
+    "privateMetadataEvidenceOrRowsIncluded": false,
+    "rawLogsIncluded": false,
+    "runtimeAndTestsChangedAfterUnitFreeze": false,
+    "sshKeysOrAuthFilesIncluded": false
+  },
+  "publicationDocumentationSha256": {
+    "GUARDIAN.md": "638d91cd718c23d1351b055d4b7b01f9a25903139e425096399fc40b61c3685d",
+    "README.md": "dd691fcf95294e11f0476bfaac140cda60352f41157b342c34b2a25091f10f6b"
+  },
+  "remainingLimitations": [
+    "PHYSICAL_HELD_KEY_AND_COMPOSITOR_RECOVERY_PENDING",
+    "LOCKED_INACTIVE_GRAPHICAL_TRANSITION_PROOF_PENDING",
+    "DEVICE_OWNING_SUPERVISOR_LIVE_VETO_INTEGRATION_PENDING",
+    "AUTHENTICATED_POSITIVE_COMPANION_AND_CONSENT_PENDING",
+    "NATIVE_HELPER_READY_SELF_READBACK_NOT_EXTERNAL_PDEATHSIG_DUMPABILITY_OR_DIRECT_PARENT_DEATH_TRIAL",
+    "GUARDIAN_OWNED_CHILD_FIXTURES_DO_NOT_CLOSE_NATIVE_OR_PHYSICAL_GATE",
+    "HOST_UBUNTU_GNOME42_SYSTEMD249_NOT_DEBIAN13_TARGET_MATRIX",
+    "NO_SERVICE_ENABLEMENT_DEVICE_OPEN_ARM_OR_POLICY_CHANGE"
+  ],
+  "requiredCurrentManufacturedRegression": {
+    "currentNativeOrSecurityPassClaimed": false,
+    "historicalMappedSecurityTestsPassed": 2,
+    "historicalNativeScenariosPassed": 14,
+    "historicalOuterWrapperStatus": "FAILED_UNRESOLVED",
+    "requiresFreshDebianGenericRunnerAndReviewedCollector": true,
+    "separateResourceCleanupPromotesHistoricalWrapper": false,
+    "silentlySkipped": false,
+    "status": "PENDING"
+  },
+  "runtimeSha256": {
+    "guardian.py": "4b5772aafccd01b86c239f1c77e7bb0c8959fdb5569a17ba899be104e47cb4a3",
+    "guardian_child.py": "589f3e9b6d9fd2326ccd5b82b38bd6f3a7a8e4613eb73d06aab91aa096eff29b",
+    "guardian_family.py": "9c0d0618b61a85e2c46bcf3397ebb8a67b7f179438cb5b111f20d2fc3512e7ad",
+    "readiness.py": "1c766776f8105e19bb82f86d5e8a9696f0482fa6fd86f4d876f90dc60983a0f5",
+    "udev_metadata.py": "c22ae4178000cb050d98873935909fd8432c2a38032dbf3f1e14a0f23074e218"
+  },
+  "schemaVersion": 1,
+  "scope": "PUBLIC_SOURCE_AND_SYNTHETIC_OWNED_PROCESS_CHECK_METADATA_ONLY",
+  "separatePrivateControllerUnitChecks": {
+    "author": {
+      "passed": 21,
+      "seconds": 1.347
+    },
+    "coordinator": {
+      "passed": 21,
+      "seconds": 1.386
+    },
+    "independentReviewer": {
+      "passed": 21,
+      "seconds": 1.372
+    },
+    "publishedControllerSourceOrState": false,
+    "scope": "OWN_RANDOM_TEMP_FILES_MOCKED_CONTEXT_AND_TRANSPORT",
+    "sourceReviews": "COORDINATOR_AND_INDEPENDENT_CLEAN"
+  },
+  "separatePrivateObservationVerification": {
+    "aggregateValuesPublished": false,
+    "allFourAuthorityFieldsFalse": true,
+    "allHardwareInspectionEstablished": false,
+    "authenticatedLiveCompanionUnavailable": true,
+    "completed": true,
+    "consentOrCaptureAuthorityEstablished": false,
+    "doesNotCloseAcceptance": true,
+    "errorFreeGlobalInspectionEstablished": false,
+    "evidenceKind": "COORDINATOR_AND_INDEPENDENT_PRIVATE_ARTIFACT_REVIEW_SUMMARY",
+    "hardwareAbsenceEstablished": false,
+    "rawEvidencePublished": false,
+    "schemaVersion": 4,
+    "sourceWasUnsignedAtExecution": true
+  },
+  "sourceProvenance": {
+    "familyOriginalSourceSha256": "470c0bee8a6771f8f1634f34308f5ce9e640c2a4a64b83b5b5352ee77edd30c5",
+    "familyRuntimeSha256": "9c0d0618b61a85e2c46bcf3397ebb8a67b7f179438cb5b111f20d2fc3512e7ad",
+    "fullSignedTreeRebuildClaimed": false,
+    "nativeInputSourcesChanged": false,
+    "originalSnapshotsAndActualFirstOutcomesPreservedPrivately": true,
+    "originalUnitSnapshotScope": "UNIT_ONLY_NO_LIVE_METADATA_IN_THOSE_CHECKS",
+    "signedBaselineCommit": "7e933c57979424fdd51f03b541c8acad75efe331",
+    "sourceSignedAtExecution": false,
+    "thenUnsignedExecutionPreserved": true,
+    "threeExplicitUnsignedDeltasFromSignedBaseline": {
+      "README.md": {
+        "currentSha256": "dd691fcf95294e11f0476bfaac140cda60352f41157b342c34b2a25091f10f6b",
+        "signedBaselineSha256": "5cae96bec4a56074568d02f7b69883dce3829ab7a59f8c3e743fcae5d18246cc"
+      },
+      "test_readiness.py": {
+        "currentSha256": "94cb6cc78ba374da3e8bacd2f7d0663f3db5c5cef20df1e632b633a6b90974bf",
+        "signedBaselineSha256": "ce8da51f0876865a6f5591f2198ac164e644b3bf7abe3f7e4c0095f42a93886a"
+      },
+      "udev_metadata.py": {
+        "currentSha256": "c22ae4178000cb050d98873935909fd8432c2a38032dbf3f1e14a0f23074e218",
+        "signedBaselineSha256": "add9a465d6d669c0c171ae6558d30eb390907ddc1b2c4cb05a480c1721e502cc"
+      }
+    },
+    "unchangedSignedBaselineFilesExcludedFromNewPublication": {
+      "checks.json": "1925941864a1732ad9897d7b1a187184b4ef0599f5c0dd6f88884ba9c99925db",
+      "readiness.py": "1c766776f8105e19bb82f86d5e8a9696f0482fa6fd86f4d876f90dc60983a0f5"
+    },
+    "unitCheckSnapshotSha256": "c9cbb23219f211fb28fcebad9d8e31a97373645d819c4288213377b1311ed418",
+    "unitFreezeManifestSha256": "cbe81fa580c962e5fabc7e88ffb86e6ac658dfbfc62bce134691daccf7c40468"
+  },
+  "sourceUnitChecks": {
+    "actualMetadataQueriedInUnitChecks": false,
+    "actualOwnProcessesLibcSocketpairsPidfds": true,
+    "author": {
+      "passed": 66,
+      "seconds": 6.587,
+      "skipped": 0
+    },
+    "coordinator": {
+      "passed": 66,
+      "seconds": 6.582,
+      "skipped": 0
+    },
+    "evidenceKind": "REVIEWED_UNITTEST_SUMMARIES_NOT_RAW_LOGS",
+    "firstPureFixtureRun": {
+      "correctedFixtureOnly": true,
+      "errors": 4,
+      "passed": 37,
+      "preserved": true,
+      "reason": "NEW_TEST_USED_UNSUPPORTED_CATALOG_SECRET_KEYWORD"
+    },
+    "firstRestrictedRun": {
+      "errors": 1,
+      "failed": 5,
+      "passed": 60,
+      "preserved": true,
+      "reason": "OWN_SOCKET_SANDBOX_EPERM",
+      "seconds": 1.757
+    },
+    "fullCommand": "python3 -B -W error::ResourceWarning -m unittest -v test_guardian test_readiness test_adapter_stages test_per_device",
+    "fullGroups": {
+      "adapterStages": 9,
+      "guardian": 24,
+      "perDevice": 14,
+      "readiness": 19
+    },
+    "fullyPositiveTraceSizes": [
+      1,
+      2,
+      128
+    ],
+    "independentReviewer": {
+      "passed": 66,
+      "seconds": 6.588,
+      "skipped": 0
+    },
+    "intentionalWholeFailureParityCasesSuperseded": [
+      "initialized0",
+      "seat0"
+    ],
+    "libudevFullyFake": true,
+    "newPerDeviceGroups": 14,
+    "testRunnerFilteredOrReplaced": false,
+    "unchangedOldTraceCases": 24
+  },
+  "task": "S0-03",
+  "testSha256": {
+    "test_adapter_stages.py": "df42ffb8a2d8138eb4538eaab1c025e45aabbb6b031036a45d6f871a10e380b8",
+    "test_guardian.py": "ebf0d697d40adb21c6e178e1504f312bb8083dc32056283e7141f1bd7e6b6bb0",
+    "test_per_device.py": "fd861d0f6aa5b23dae4336fbcc60afc863de6043b1b1e7ed8c5a6f8726ec61de",
+    "test_readiness.py": "94cb6cc78ba374da3e8bacd2f7d0663f3db5c5cef20df1e632b633a6b90974bf"
+  }
+}

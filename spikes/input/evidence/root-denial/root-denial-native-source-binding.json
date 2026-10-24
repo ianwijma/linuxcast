@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "signedSourceCommit": "c50c1876c322788e438591a7ae20a262d91d5b7c",
+  "runtimeSourceManifestSha256": "22cd0d8c5992f0585b82a78ee1aa04fdae9cb275eb52bb0b86a300533c281b2b",
+  "sixSourceFiles": [
+    {
+      "path": "spikes/input/src/bin/denial-helper.rs",
+      "sha256": "dbd600d52dce0b9b9598d5393881d6dfb253be60a802973abaa2c4a2ba27e20d"
+    },
+    {
+      "path": "spikes/input/src/bin/supervisor.rs",
+      "sha256": "cda8a57a24db2552ffa39398c415052a9c362282a0c90d933641a55ea1fa1b66"
+    },
+    {
+      "path": "spikes/input/src/denial_observer.rs",
+      "sha256": "0aa2de9f276795fa52266190d305bc8d473e8bdef6dadf2f0ca3a968998761be"
+    },
+    {
+      "path": "spikes/input/src/lib.rs",
+      "sha256": "e96d5a5a6d17877ebd6abffdcde7a6c2b1088592b07f256c684a278400e3a579"
+    },
+    {
+      "path": "spikes/input/src/peer_bootstrap.rs",
+      "sha256": "2a29f7633cc402e267f617e3c9a6b1b543fbbc8a07f03fe5e41fe484dc86e0c6"
+    },
+    {
+      "path": "spikes/input/tests/denial-private.rs",
+      "sha256": "fdf333148ab4d4fb6ff5fbb3a19f62efb5421a00606afb11a45de5964efcbf21"
+    }
+  ],
+  "verificationBasis": "COORDINATOR_VERIFIED_C50_SIGNED_BLOBS_PLUS_LOCAL_EXACT_RUNTIME_MANIFEST",
+  "sourceContentAtExecutionMatchesSignedSixBlobs": true,
+  "originalBinaryBuildUsedThenUnsignedReviewedSources": true,
+  "sourceSignedAtOriginalBuild": false,
+  "fullSignedTreeRebuildPerformedOrClaimed": false,
+  "supervisorUsedSha256": "4fd4609ab5acfd5131c403fe0b9dd9a8460bf35f698798d1025ef401401fba00",
+  "helperUsedSha256": "b80cc6a4c5577040ee679a9c657d6e6db04c8b4478cbb46ab70d6d2d883d1bc9",
+  "differentDebugBuildPathsNotClaimedByteIdentical": true,
+  "historicalThirteenSourceAndReviewFilesUnchanged": true
+}
