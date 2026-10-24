@@ -1395,7 +1395,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
-        "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained."
+        "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained.",
+        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending."
       ],
       "owner": "manifest_review",
       "branch": "codex/application-services",
@@ -2100,7 +2101,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
-        "24October2026: source415291b/7ca47fd integrated7f3e45c/b9d3c0a; sole-owner migration003/client/recovery integration7ea48fe. Final mapped L2 suite14/14 passes, including100k actual files and actual utility-owner migration/reopen; F2 regression35/35, native tests2/2, Clippy warnings denied, typecheck/lint and bundled Electron/schema003 smoke pass. Independent review resolved native cleanup on storage failure and verified final integration."
+        "24October2026: source415291b/7ca47fd integrated7f3e45c/b9d3c0a; sole-owner migration003/client/recovery integration7ea48fe. Final mapped L2 suite14/14 passes, including100k actual files and actual utility-owner migration/reopen; F2 regression35/35, native tests2/2, Clippy warnings denied, typecheck/lint and bundled Electron/schema003 smoke pass. Independent review resolved native cleanup on storage failure and verified final integration.",
+        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending."
       ],
       "owner": "reading_review",
       "branch": "codex/application-services",
