@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated 2026-10-24 08:32 UTC. Persistent Goal ACTIVE: complete all 97 agreed local 1.0 tasks through R1-03. Objective file: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`. This supersedes the previous paused/temporary-path checkpoint; no acceptance requirements changed.
+Updated 2026-10-24 08:36 UTC. Persistent Goal ACTIVE: complete all 97 agreed local 1.0 tasks through R1-03. Objective file: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`. This supersedes the previous paused/temporary-path checkpoint; no acceptance requirements changed.
 
 ## Integrated state
 
@@ -52,3 +52,9 @@ After coordinator source review, ordinary v4 resume08:12:28 verified754source fi
 4. Keep registry states honest and checkpoint durable. Full goal remains unfinished; no acceptance-state changes this continuation. Guest stopped, no test reservation remains. Manifest reviewer idle/completed; reading reviewer completed final docs-only recheck; its stale registry limitation finding was corrected to the two precise remaining UI gaps and card regenerated. Launcher author continues read-only Record investigation. No guest runtime is active.
 
 Record diagnostic source-only continuation: author adds one fixed recordFocusEventReceiptObserved boolean to the existing fresh Record focus slice, exact toggle-button/name/gain1 marker; no acceptance predicate/deadline/routing changes.71mappedunits including35AT/type/lint/plan pass, independent71-check review clean. Files are UNSTAGED over prior reviewed47path index: checkebce9905b85dc29841e28830ba7ca720aa8d832856a004e72c47d28c297e9ef8, test64637fa1135e2d5388f64980d707ab4663251ec7382b24b368ef20319214378f, README5bc594abed4159811626fa3e834ba0223e0f8aa763635ce97499373f2e39c591. Root review/sign separately before any single diagnostic reservation. No runtime executed; prior9313a focused result unchanged.
+
+## Publication and checkpoint reconciliation
+
+User confirmed1Password unlocked. Normal signing succeeded for F0 source9cbf70c and S0 source/evidence d8e129e, plus separately reviewed Record observation2fcbdae. All signatures verified against the existing configured public key using temporary per-command allowed-signers material; no persistent signing configuration changed. PR19/15 branches were pushed and descriptions rewritten for current scope. PR15 current2fcbdae planning CI40086425899 passes; no GitHub reviews, requested reviewers or review threads on eitherPR. PR19 had no CI because the old916835f main checkpoint conflicted with the new checkpoint; merging develop changes only PROGRESS.md. The old paused/tmp-path/signing-pending checkpoint is superseded by this resumed goal, recovered paths, successful reading result and explicit signing reply; historical failures and fullscope/release requirements are retained. No task acceptance or merge-to-develop occurred.
+
+F0 source/fixtures inventory and508checks are complete as provisional preparation. S0 Record observation2fcbdae is now separately signed/published, root and independent review clean with71mappedchecks. It is still unexecuted; no default-nine/VM reservation is active. Current guest stopped. Next: finish checkpoint merge/checks, then choose a separately justified bounded diagnostic step for Record and native notice/manual recovery. Prior run evidence remains on unsigned9313a executedsource, never relabelled signed.
