@@ -8,6 +8,8 @@ import type { ChildProcess } from 'node:child_process';
 // No session services autoactivate. Manage a separate real AT bus/registry and
 // discovery service explicitly; never load host portals, keyrings or gvfs.
 if (process.env.LINUXCAST_LAUNCHER_XVFB !== '1' || !/\/xvfb-run\.[^/]+\/Xauthority$/.test(process.env.XAUTHORITY ?? '')) throw new Error('Disposable xvfb-run entrypoint required');
+const modeArguments = process.argv.slice(2);
+if (modeArguments.length > 1 || (modeArguments.length === 1 && modeArguments[0] !== '--activation-help-only')) throw new Error('Unsupported AT mode');
 const directory = mkdtempSync(resolve(tmpdir(), 'linuxcast-s001-at-bus-'));
 mkdirSync(resolve(directory, 'services'));
 mkdirSync(resolve(directory, 'at-services'));
@@ -24,7 +26,7 @@ try {
     at.once('exit', () => reject(new Error('Private AT bus failed')));
   });
   registry = spawn('/usr/libexec/at-spi2-registryd', [], { stdio: 'ignore', env: { ...privateEnv, AT_SPI_BUS_ADDRESS: atAddress } });
-  const child = spawn('dbus-run-session', ['--config-file', resolve(directory, 'bus.conf'), '--', process.execPath, fileURLToPath(new URL('./check.ts', import.meta.url))],
+  const child = spawn('dbus-run-session', ['--config-file', resolve(directory, 'bus.conf'), '--', process.execPath, fileURLToPath(new URL('./check.ts', import.meta.url)), ...modeArguments],
     { stdio: 'inherit', env: { ...privateEnv, AT_SPI_BUS_ADDRESS: atAddress, LINUXCAST_LAUNCHER_PRIVATE_AT: '1' } });
   process.exitCode = await new Promise<number>((resolve, reject) => { child.once('error', reject); child.once('exit', code => resolve(code ?? 1)); });
 } finally {

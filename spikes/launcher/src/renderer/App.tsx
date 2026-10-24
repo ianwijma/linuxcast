@@ -42,15 +42,15 @@ export function App() {
       setRecording(next.recording);
     });
   }, [load]);
-  useEffect(() => {
-    if (state?.visible && view === "search") queryRef.current?.focus();
+  useLayoutEffect(() => {
+    if (state?.visible && view === "search") queryRef.current?.focus({ preventScroll: true });
   }, [state?.visible, view]);
   useEffect(() => {
     if (actions) firstAction.current?.focus();
   }, [actions]);
   useLayoutEffect(() => {
+    if (view !== "search") headingRef.current?.focus({ preventScroll: true });
     if (scrollRef.current) scrollRef.current.scrollTop = view === "search" ? searchScrollRef.current : 0;
-    if (view !== "search") headingRef.current?.focus();
   }, [view]);
   useEffect(() => {
     const inner = contentRef.current;
@@ -75,7 +75,7 @@ export function App() {
     observer.observe(inner);
     measure();
     return () => observer.disconnect();
-  }, [state?.session]);
+  }, [state?.session, view]);
   const rows = [
     {
       id: "capabilities",
@@ -249,6 +249,7 @@ export function App() {
       <div
         ref={scrollRef}
         className="content"
+        key={view}
         tabIndex={view === "search" ? undefined : 0}
         role={view === "search" ? undefined : "region"}
         aria-label={view === "capabilities" ? "Launcher capability details" : view === "shortcut" ? "Shortcut details" : undefined}

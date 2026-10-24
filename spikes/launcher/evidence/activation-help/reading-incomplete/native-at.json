@@ -1,0 +1,227 @@
+{
+  "status": "incomplete",
+  "stage": "activation-help-say-all",
+  "mode": "activation-help-only",
+  "expectedCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change"
+  ],
+  "snapshots": [
+    {
+      "label": "View activation help",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Search commands",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Search commands",
+            "role": "entry",
+            "kind": "entry",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "View activation help",
+            "role": "button",
+            "kind": "button",
+            "focused": true
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "toggle button",
+            "kind": "toggle-button",
+            "focused": false
+          },
+          {
+            "label": "Hide launcher",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "View activation help"
+        ],
+        "event_sequence": 2
+      }
+    },
+    {
+      "label": "Launcher capabilities",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Launcher capabilities",
+            "role": "heading",
+            "kind": "heading",
+            "focused": true
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capability details",
+            "role": "landmark",
+            "kind": "landmark",
+            "focused": false
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "View activation help",
+          "Launcher capabilities"
+        ],
+        "event_sequence": 3
+      }
+    },
+    {
+      "label": "Launcher capability details",
+      "snapshot": {
+        "status": "observed",
+        "applications": 2,
+        "controls": [
+          {
+            "label": "Launcher capabilities",
+            "role": "heading",
+            "kind": "heading",
+            "focused": false
+          },
+          {
+            "label": "Launcher capabilities",
+            "role": "static",
+            "kind": "other",
+            "focused": false
+          },
+          {
+            "label": "Dismiss launcher",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          },
+          {
+            "label": "Launcher capability details",
+            "role": "landmark",
+            "kind": "landmark",
+            "focused": true
+          },
+          {
+            "label": "Actions Ctrl K",
+            "role": "button",
+            "kind": "button",
+            "focused": false
+          }
+        ],
+        "focus_events": [
+          "Dismiss launcher",
+          "View activation help",
+          "Launcher capabilities",
+          "Dismiss launcher",
+          "Launcher capability details"
+        ],
+        "event_sequence": 5
+      }
+    }
+  ],
+  "lastNativeAttempt": {
+    "label": "Launcher capability details",
+    "snapshot": {
+      "status": "observed",
+      "applications": 2,
+      "controls": [
+        {
+          "label": "Launcher capabilities",
+          "role": "heading",
+          "kind": "heading",
+          "focused": false
+        },
+        {
+          "label": "Launcher capabilities",
+          "role": "static",
+          "kind": "other",
+          "focused": false
+        },
+        {
+          "label": "Dismiss launcher",
+          "role": "button",
+          "kind": "button",
+          "focused": false
+        },
+        {
+          "label": "Launcher capability details",
+          "role": "landmark",
+          "kind": "landmark",
+          "focused": true
+        },
+        {
+          "label": "Actions Ctrl K",
+          "role": "button",
+          "kind": "button",
+          "focused": false
+        }
+      ],
+      "focus_events": [
+        "Dismiss launcher",
+        "View activation help",
+        "Launcher capabilities",
+        "Dismiss launcher",
+        "Launcher capability details"
+      ],
+      "event_sequence": 5
+    }
+  }
+}

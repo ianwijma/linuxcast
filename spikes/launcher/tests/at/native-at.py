@@ -17,7 +17,8 @@ except Exception as error:
     sys.exit(3)
 
 target_pid = int(sys.argv[1])
-expected = {"Search commands", "Hide launcher", "Actions Ctrl K", "Record shortcut", "Cancel shortcut change", "Dismiss launcher"}
+expected = {"Search commands", "Hide launcher", "Actions Ctrl K", "Record shortcut", "Cancel shortcut change", "Dismiss launcher",
+            "View activation help", "Launcher capabilities", "Launcher capability details"}
 events = []
 event_sequence = 0
 allowed_pids = {target_pid, os.getpid()}
@@ -65,7 +66,7 @@ def inspect():
                 raise RuntimeError("bounded-tree-exceeded")
             if obj.name in expected:
                 found.append({"label": obj.name, "role": obj.getRoleName(),
-                              "kind": "entry" if obj.getRole() == pyatspi.ROLE_ENTRY else "button" if obj.getRole() == pyatspi.ROLE_PUSH_BUTTON else "toggle-button" if obj.getRole() == pyatspi.ROLE_TOGGLE_BUTTON else "other",
+                              "kind": "entry" if obj.getRole() == pyatspi.ROLE_ENTRY else "button" if obj.getRole() == pyatspi.ROLE_PUSH_BUTTON else "toggle-button" if obj.getRole() == pyatspi.ROLE_TOGGLE_BUTTON else "heading" if obj.getRole() == pyatspi.ROLE_HEADING else "landmark" if obj.getRole() == pyatspi.ROLE_LANDMARK else "other",
                               "focused": obj.getState().contains(pyatspi.STATE_FOCUSED)})
             for child in obj:
                 walk(child, depth + 1)

@@ -1,0 +1,74 @@
+{
+  "status": "incomplete",
+  "stage": "activation-help-say-all",
+  "mode": "activation-help-only",
+  "expectedCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change"
+  ],
+  "expectedPresentationCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Search commands"
+  ],
+  "helpReading": {
+    "command": "KP_Add",
+    "desktopLayoutVerified": true,
+    "requested": true,
+    "sentences": [
+      {
+        "id": "reason",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": false
+      },
+      {
+        "id": "manual-remediation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": false
+      },
+      {
+        "id": "companion-limitation",
+        "generatedAfterCommand": true,
+        "deliveredToSpeechDispatcher": false
+      }
+    ]
+  },
+  "headingFocusEventReceiptObserved": true,
+  "orcaVersion": "48.1",
+  "startupCompleted": true,
+  "anchors": [
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    }
+  ],
+  "presentations": [
+    {
+      "label": "View activation help",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Launcher capabilities",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    }
+  ],
+  "anyKnownGenerated": true,
+  "anyKnownDispatchAttemptObserved": true
+}

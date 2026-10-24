@@ -303,4 +303,5 @@ footer button {
 }
 .content {
   scrollbar-gutter: stable;
+  overflow-anchor: none;
 }

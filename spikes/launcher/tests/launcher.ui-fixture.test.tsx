@@ -163,18 +163,18 @@ for (const entry of ["row", "notice"] as const) for (const exit of ["Escape", "B
     fireEvent.change(search, { target: { value: "shortcut" } });
     const row = view.getByRole("button", { name: "Change session shortcut" });
     act(() => row.focus());
-    const scroll = view.container.querySelector<HTMLDivElement>(".content")!;
+    const scroll = () => view.container.querySelector<HTMLDivElement>(".content")!;
     for (let cycle = 0; cycle < 2; cycle++) {
-      scroll.scrollTop = 115;
+      scroll().scrollTop = 115;
       fireEvent.click(entry === "row" ? view.getByRole("button", { name: "Change session shortcut" }) : view.getByRole("button", { name: "View activation help" }));
       const heading = view.getByRole("heading", { name: entry === "row" ? "Session shortcut" : "Launcher capabilities" });
       await waitFor(() => expect(document.activeElement).toBe(heading));
-      expect(scroll.scrollTop).toBe(0);
-      scroll.scrollTop = 500;
+      expect(scroll().scrollTop).toBe(0);
+      scroll().scrollTop = 500;
       if (exit === "Back") fireEvent.click(view.getByRole("button", { name: "Back to commands" }));
       else fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
       await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
-      expect(scroll.scrollTop).toBe(115);
+      expect(scroll().scrollTop).toBe(115);
       expect((view.getByRole("textbox", { name: "Search commands" }) as HTMLInputElement).value).toBe("shortcut");
       expect(view.getByRole("button", { name: "Change session shortcut" }).getAttribute("aria-pressed")).toBe("true");
     }
@@ -188,17 +188,46 @@ it("restores the parent offset at activation after focusing help scrolls its par
   window.linuxcast = fixtureApi(async () => ({ ok: true, value: pending }));
   const view = render(<App />);
   const help = await view.findByRole("button", { name: "View activation help" });
-  const scroll = view.container.querySelector<HTMLDivElement>(".content")!;
-  expect(scroll.scrollTop).toBe(0);
+  const scroll = () => view.container.querySelector<HTMLDivElement>(".content")!;
+  expect(scroll().scrollTop).toBe(0);
   // jsdom has no layout: model the browser's focus-scroll effect at that exact event.
-  help.addEventListener("focus", () => { scroll.scrollTop = 73; });
+  help.addEventListener("focus", () => { scroll().scrollTop = 73; });
   act(() => help.focus());
-  expect(scroll.scrollTop).toBe(73);
+  expect(scroll().scrollTop).toBe(73);
   fireEvent.click(help);
   await waitFor(() => expect(document.activeElement).toBe(view.getByRole("heading", { name: "Launcher capabilities" })));
-  expect(scroll.scrollTop).toBe(0);
-  scroll.scrollTop = 500;
+  expect(scroll().scrollTop).toBe(0);
+  scroll().scrollTop = 500;
   fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
   await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
-  expect(scroll.scrollTop).toBe(73);
+  expect(scroll().scrollTop).toBe(73);
 });
+
+for (const exit of ["Escape", "Back"] as const) {
+  it(`keeps child and restored parent scroll stable when navigation focus would scroll after ${exit}`, async () => {
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    const pending: LauncherState = { ...waylandComponentFixture, session: "x11", capabilities: capabilities("x11", false, true) };
+    window.linuxcast = fixtureApi(async () => ({ ok: true, value: pending }));
+    const view = render(<App />);
+    const help = await view.findByRole("button", { name: "View activation help" });
+    const scroll = () => view.container.querySelector<HTMLDivElement>(".content")!;
+    const nativeFocus = HTMLElement.prototype.focus;
+    const focus = vi.spyOn(HTMLElement.prototype, "focus").mockImplementation(function (this: HTMLElement, options?: FocusOptions) {
+      nativeFocus.call(this, options);
+      // jsdom has no browser scrolling. Model navigation focus moving the shared
+      // scroll region unless the caller explicitly preserves its position.
+      if (this.tagName === "INPUT" && !options?.preventScroll) scroll().scrollTop += 4;
+    });
+    try {
+      scroll().scrollTop = 115;
+      fireEvent.click(help);
+      await waitFor(() => expect(document.activeElement).toBe(view.getByRole("heading", { name: "Launcher capabilities" })));
+      expect(scroll().scrollTop).toBe(0);
+      scroll().scrollTop = 500;
+      if (exit === "Back") fireEvent.click(view.getByRole("button", { name: "Back to commands" }));
+      else fireEvent.keyDown(view.getByRole("main"), { key: "Escape" });
+      await waitFor(() => expect(document.activeElement).toBe(view.getByRole("textbox", { name: "Search commands" })));
+      expect(scroll().scrollTop).toBe(115);
+    } finally { focus.mockRestore(); }
+  });
+}

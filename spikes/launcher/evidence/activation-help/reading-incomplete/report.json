@@ -1,0 +1,19 @@
+{
+  "status": "incomplete",
+  "stage": "activation-help-say-all",
+  "mode": "activation-help-only",
+  "expectedCheckpoints": [
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change"
+  ],
+  "limitation": "Required assertions did not all pass. No acceptance success or audible/compositor QA inferred."
+}
