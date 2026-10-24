@@ -198,7 +198,12 @@ export class PermissionBroker {
     } catch {this.#quarantine(invocation.connection.key);return {outcome:'unavailable',remediationAction:'retry-storage'};}
     finally {this.#endMutation(invocation.connection.key);invocation.busy=false;if(invocation.controller.signal.aborted)this.#invocations.delete(invocation);}
   }
-  #startMutation(key:string):void {this.#mutations.set(key,(this.#mutations.get(key)??0)+1);}
+  #startMutation(key:string):void {
+    this.#mutations.set(key,(this.#mutations.get(key)??0)+1);
+    // A paginated read is not an atomic snapshot. Even if the mutation and its
+    // cleanup finish first, a read started earlier must never admit stale grants.
+    for(const connection of this.#connections.values())if(connection.key===key && !connection.ready)connection.epoch++;
+  }
   #endMutation(key:string):void {const remaining=(this.#mutations.get(key)??1)-1;if(remaining)this.#mutations.set(key,remaining);else this.#mutations.delete(key);}
   #quarantine(key:string):void {this.#quarantined.add(key);for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'retry-storage');}
   /** Remove access immediately, before waiting on durable deletion. Failed

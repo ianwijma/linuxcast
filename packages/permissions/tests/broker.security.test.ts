@@ -119,6 +119,16 @@ describe('F3-01 trusted permission boundaries',()=>{
     releaseCleanup();expect(await deciding).toMatchObject({outcome:'unavailable'});
     await f.broker.connect({},principal,[read]);f.broker.close();
   });
+  it('rejects a list spanning a disconnected grant write even after cleanup and gate release',async()=>{
+    const memory=memoryStore();const f=fixture({},memory.store);const identity={};await f.broker.connect(identity,principal,[read]);
+    const session=f.broker.begin(identity,{source:'explicit-user-action'});const approval=await prompt(f.broker,session);
+    let releaseRead!:(records:DecisionRecord[])=>void;memory.store.list=()=>new Promise(resolve=>{releaseRead=resolve;});
+    const loading=f.broker.connect({},principal,[read]);const rejected=expect(loading).rejects.toThrow('storage unavailable');
+    let stored!:DecisionRecord;let releasePut!:()=>void;memory.store.put=record=>new Promise(resolve=>{stored=record;releasePut=()=>{memory.records.push(record);resolve(record);};});
+    const deciding=f.broker.decide(approval.id,'persistent');f.broker.disconnect(identity);releasePut();
+    expect(await deciding).toMatchObject({outcome:'unavailable'});expect(memory.records).toEqual([]);
+    releaseRead([stored]);await rejected;f.broker.close();
+  });
   it('disconnect cancels dispatched work and refuses stale reconnect closure',async()=>{
     let resolve!:(value:unknown)=>void;const f=await granted({execute:async()=>new Promise(r=>{resolve=r;})});
     const pending=f.session.submit(submission);await tick();f.broker.disconnect(f.identity);expect(await pending).toMatchObject({outcome:'cancelled',effectOutcome:'unknown',remediationAction:'reconnect'});
