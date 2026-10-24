@@ -768,6 +768,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "linuxcast-platform"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "linuxcast-protocol",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "linuxcast-protocol"
 version = "0.1.0"
 dependencies = [
