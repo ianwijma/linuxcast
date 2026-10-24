@@ -18,7 +18,6 @@ flowchart TD
   S0_06["S0-06: Prove visual workflow and declarative view integration"]
   F1_01 --> S0_06
   F0_01["F0-01: Freeze shared contracts and compatibility fixtures"]
-  S0_01 --> F0_01
   S0_02 --> F0_01
   S0_04 --> F0_01
   S0_05 --> F0_01
@@ -301,6 +300,7 @@ flowchart TD
   F2_03 --> R1_01
   L2_07 --> R1_01
   E1_06 --> R1_01
+  S0_01 --> R1_01
   R1_02["R1-02: Verify visual accessibility and performance budgets"]
   R1_01 --> R1_02
   R1_03["R1-03: Validate package lifecycle and publish release assets"]
