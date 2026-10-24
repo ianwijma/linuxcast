@@ -1,7 +1,7 @@
 {
   "scope": "F1-01 development dependencies, not the packaged 1.0 SBOM. Missing platform or non-registry manifest metadata has null licenses; re-inventory shipped contents at R1-03.",
   "lockfileSha256": {
-    "bun.lock": "76e417b92aabc2689ddfa44f6cdf80b1feaae12ef8d43e4aca211d6c8dd6e784",
+    "bun.lock": "4932a39cf4356f12b613077d9465c3c284598f3580223184537ea64cea019cc0",
     "Cargo.lock": "01a5940f327f8918692af21cfdfef5053fa8fa0f85fa6854417e7ccbfe943ef5",
     "rust-toolchain.toml": "24ef3b9d3edbd850aa386cb0a98e10450b0030991a4537cb359f54d49dbbb33a"
   },
