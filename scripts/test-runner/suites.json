@@ -68,6 +68,12 @@
       "spikes/desktop/transport.test.ts",
       "spikes/desktop/native.integration.test.ts",
       "spikes/desktop/guest/restart-preparation.test.ts"
+    ],
+    "F2-01": [
+      "packages/storage/tests/storage.integration.test.ts"
+    ],
+    "F1-02": [
+      "apps/desktop/tests/shell.integration.test.ts"
     ]
   },
   "security": {

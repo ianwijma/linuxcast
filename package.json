@@ -22,7 +22,8 @@
     "setup:electron": "node scripts/test-runner/setup-electron.ts",
     "inventory:bootstrap": "node scripts/test-runner/inventory.ts",
     "build:desktop": "node apps/desktop/build.ts",
-    "start:desktop": "electron apps/desktop/dist/main.cjs"
+    "start:desktop": "electron apps/desktop/dist/main.cjs",
+    "setup:sqlite": "node apps/desktop/setup-sqlite.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

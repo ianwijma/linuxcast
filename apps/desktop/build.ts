@@ -13,9 +13,19 @@ for (const entry of ['main', 'preload']) {
     external: ['electron'], target: 'node24', legalComments: 'linked' });
 }
 await build({ absWorkingDir: root, entryPoints: ['apps/desktop/src/renderer/index.tsx'],
-  outdir: join(output, 'renderer'), platform: 'browser', format: 'esm', bundle: true,
+  outdir: join(output, 'renderer'), platform: 'browser', format: 'esm', bundle: true, jsx: 'automatic',
   minify: true, target: 'chrome145', define: { 'process.env.NODE_ENV': '"production"' },
   loader: { '.woff2': 'file', '.woff': 'file' }, assetNames: 'fonts/[name]-[hash]', legalComments: 'linked' });
+await build({ absWorkingDir: root, entryPoints: ['packages/storage/src/utility.ts'],
+  outfile: join(output, 'storage.cjs'), platform: 'node', format: 'cjs', bundle: true,
+  target: 'node24',
+  banner: { js: "const storageModuleUrl = require('node:url').pathToFileURL(__filename).href;" },
+  define: { 'import.meta.url': 'storageModuleUrl' },
+  legalComments: 'linked' });
+await mkdir(join(output, 'migrations'), { recursive: true });
+await cp(join(root, 'packages/storage/src/migrations/001-foundation.sql'), join(output, 'migrations/001-foundation.sql'));
+await mkdir(join(output, 'sqlite'), { recursive: true });
+await cp(join(root, 'packages/storage/node_modules/better-sqlite3/build/Release/better_sqlite3.node'), join(output, 'sqlite/better_sqlite3.node'));
 await cp(join(root, 'apps/desktop/src/renderer/index.html'), join(output, 'renderer/index.html'));
 const resources = await readdir(join(output, 'renderer'), { recursive: true, withFileTypes: true });
 const assets = resources.filter(entry => entry.isFile() && !entry.name.endsWith('.LEGAL.txt'))

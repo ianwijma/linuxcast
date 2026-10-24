@@ -1036,18 +1036,32 @@
         {
           "id": "F1-02-AC01",
           "text": "Renderer cannot access Node or create unrestricted navigation.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F1-02; bun run test:unit -- F1-02; private-Xvfb bun run test:integration -- F1-02",
+              "outcome": "42security and14unit checks pass; actual sandboxed Electron renderer has no Node/require, exposes only the narrow API, and rejects network, frame navigation and popups.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Sourcec377d6a, build73d0e13 and apps/desktop/evidence/shell-{dark,light}.png"
+            }
+          ]
         },
         {
           "id": "F1-02-AC02",
           "text": "Second invocation toggles existing launcher and malformed deep links are rejected.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F1-02; bun run test:unit -- F1-02; private-Xvfb bun run test:integration -- F1-02",
+              "outcome": "Actual secondary Electron invocation toggles the same resident window; strict malformed deep-link/CLI cases pass deterministic checks. Hide keeps the primary process; explicit Quit exits0 after storage shutdown.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Sourcec377d6a, build73d0e13 and apps/desktop/evidence/shell-{dark,light}.png"
+            }
+          ]
         },
         {
           "id": "F1-02-UI",
@@ -1060,10 +1074,17 @@
         {
           "id": "F1-02-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F1-02; bun run test:unit -- F1-02; private-Xvfb bun run test:integration -- F1-02",
+              "outcome": "Only synthetic application preview text and temporary test data appear in committed evidence; test uses private Xvfb/profile/runtime directories and excludes the host session bus.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Sourcec377d6a, build73d0e13 and apps/desktop/evidence/shell-{dark,light}.png"
+            }
+          ]
         }
       ],
       "validation": [
@@ -1071,16 +1092,19 @@
         "bun run test:security -- F1-02"
       ],
       "evidence": [
-        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required."
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required.",
+        "Application foundation24October2026 adds reviewed production implementation and bounded actual runtime evidence. Applicable design: tokens, shell/navigation, states/motion, accessibility and review gate. Native desktop matrix and full assistive-technology paths remain outstanding; task stays in-progress despite passing individual checks."
       ],
       "owner": "Assigned application implementation lane; coordinator owns shared integration",
-      "branch": "codex/f1-02-resident-shell",
-      "limitations": []
+      "branch": "codex/application-foundation",
+      "limitations": [
+        "Actual Electron/native assistive-technology and the full supported desktop-session checks remain outstanding. Private Xvfb and Chromium evidence is not Wayland, GNOME/KDE or Orca acceptance."
+      ]
     },
     {
       "id": "F2-01",
       "title": "Create storage owner and migration lifecycle",
-      "status": "in-progress",
+      "status": "done",
       "phase": "implementation",
       "lane": "F2",
       "dependsOn": [
@@ -1117,42 +1141,70 @@
         {
           "id": "F2-01-AC01",
           "text": "Concurrent clients do not open independent writers.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- F2-01; private-Xvfb bun run test:integration -- F1-02; bun run typecheck; bun run lint",
+              "outcome": "Real concurrent client/owner tests pass. Bundled Electron application owns one storage utility; another utility targeting its same private XDG directory is denied owner-already-running.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source5fdf8bb integrated0039006; packages/storage/tests/storage.integration.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            }
+          ]
         },
         {
           "id": "F2-01-AC02",
           "text": "Migration failure restores/reports recoverably; newer schema refuses unsafe downgrade.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- F2-01; private-Xvfb bun run test:integration -- F1-02; bun run typecheck; bun run lint",
+              "outcome": "Actual SQLite/process checks cover rollback, SIGKILL before/after migration commit, recoverable reporting and explicit retry, checksum validation, backup retention, SQLITE_FULL and refusal of newer schema.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source5fdf8bb integrated0039006; packages/storage/tests/storage.integration.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            }
+          ]
         },
         {
           "id": "F2-01-AC03",
           "text": "Packaged SQLite runtime reports version >=3.51.3 (WAL-reset fix); backups use SQLite backup API rather than copying an active DB without WAL.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- F2-01; private-Xvfb bun run test:integration -- F1-02; bun run typecheck; bun run lint",
+              "outcome": "The production bundle uses the rebuilt Electron addon and reports SQLite3.53.4 in actual utility processes; writes persist through clean exit/reopen. Online SQLite backup API retains committed WAL data in integration fixtures. Debian installer validation remains F1-03/release work.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source5fdf8bb integrated0039006; packages/storage/tests/storage.integration.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            }
+          ]
         },
         {
           "id": "F2-01-UI",
           "text": "Relevant design states and keyboard/accessibility paths are covered for user-facing changes.",
-          "status": "pending",
+          "status": "not-applicable",
           "conditional": "This task introduces or changes user-facing behaviour.",
-          "justification": "",
+          "justification": "Trusted storage service and typed repository transport only; no user-facing content or recovery screen. Recovery errors are explicit; presentation belongs to consuming UI tasks.",
           "evidence": []
         },
         {
           "id": "F2-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:integration -- F2-01; private-Xvfb bun run test:integration -- F1-02; bun run typecheck; bun run lint",
+              "outcome": "Independent review confirms synthetic records, fixed safe errors and no private content, credentials or raw input in fixtures or screenshots.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source5fdf8bb integrated0039006; packages/storage/tests/storage.integration.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            }
+          ]
         }
       ],
       "validation": [
@@ -1160,11 +1212,15 @@
         "bun run test:integration -- F2-01"
       ],
       "evidence": [
-        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required."
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required.",
+        "Application foundation24October2026: independently reviewed storage source5fdf8bb/0039006, 30actualSQLite/process checks and actual bundledElectron utility persistence/version/owner tests pass. SQLite3.53.4; private XDG data directory, one primary owner, typed validated requests/results, immutable message revisions and recoverable migrations. Typecheck/lint/plan pass. No Debian installer or native desktop acceptance inferred."
       ],
-      "owner": "Assigned application implementation lane; coordinator owns shared integration",
-      "branch": "codex/f2-01-storage",
-      "limitations": []
+      "owner": "manifest_review",
+      "branch": "codex/application-foundation",
+      "limitations": [
+        "Debian installation/upgrade/package ABI matrix is validated by F1-03 and release tasks, separately from this production-bundle runtime check.",
+        "Recovery results are reported by the service; a full recovery UI and feature-owned data migrations are downstream work."
+      ]
     },
     {
       "id": "F2-02",
@@ -1367,18 +1423,32 @@
         {
           "id": "D1-01-AC01",
           "text": "Dark/light/opaque and reduced-motion examples pass visual checks.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:ui -- D1-01; bun run test:unit -- D1-01; independent source and screenshot review",
+              "outcome": "Seven actual Chromium component checks and independently inspected screenshots cover dark/light opaque appearance and reduced motion; actualElectron shell screenshots use the same primitives.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source9086a45; packages/ui/src/primitives/evidence/ and apps/desktop/evidence/"
+            }
+          ]
         },
         {
           "id": "D1-01-AC02",
           "text": "Keyboard focus, labels and text scaling remain usable.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:ui -- D1-01; bun run test:unit -- D1-01; independent source and screenshot review",
+              "outcome": "Browser keyboard labels/focus/native control behavior, 200percent text and forced-colors checks pass; canonical token/contrast checks3/3 pass.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source9086a45; packages/ui/src/primitives/evidence/ and apps/desktop/evidence/"
+            }
+          ]
         },
         {
           "id": "D1-01-UI",
@@ -1391,10 +1461,17 @@
         {
           "id": "D1-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:ui -- D1-01; bun run test:unit -- D1-01; independent source and screenshot review",
+              "outcome": "All five component images and both application screenshots contain only public synthetic fixture/preview text; bundled font licenses verified.",
+              "platform": "Ubuntu-based amd64 host; pinned Node24.22.1/Bun1.4.4; actual Electron45.0.0 on private Xvfb, SQLite3.53.4. No real desktop-session or Orca claim.",
+              "reference": "Source9086a45; packages/ui/src/primitives/evidence/ and apps/desktop/evidence/"
+            }
+          ]
         }
       ],
       "validation": [
@@ -1402,11 +1479,14 @@
         "bun run test:ui -- D1-01"
       ],
       "evidence": [
-        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required."
+        "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task\u2019s checks remain required.",
+        "Application foundation24October2026 adds reviewed production implementation and bounded actual runtime evidence. Applicable design: tokens, shell/navigation, states/motion, accessibility and review gate. Native desktop matrix and full assistive-technology paths remain outstanding; task stays in-progress despite passing individual checks."
       ],
       "owner": "Assigned application implementation lane; coordinator owns shared integration",
-      "branch": "codex/d1-01-primitives",
-      "limitations": []
+      "branch": "codex/application-foundation",
+      "limitations": [
+        "Actual Electron/native assistive-technology and the full supported desktop-session checks remain outstanding. Private Xvfb and Chromium evidence is not Wayland, GNOME/KDE or Orca acceptance."
+      ]
     },
     {
       "id": "D1-02",
