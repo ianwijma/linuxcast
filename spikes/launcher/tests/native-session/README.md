@@ -93,3 +93,44 @@ preparation checks and31 runner/32 control fixtures. An actual target run is
 still required; full session, accessibility and release gates
 remain outstanding. Applicable design sections are Shell/navigation,
 Accessibility and Review gate; no product UI or canonical tokens change here.
+## GNOME X11 activation-notice recovery diagnostic (source preparation)
+
+The full GNOME X11 probe now has one bounded diagnostic after its existing
+ordinary-show native-focus assertion fails. That assertion and its deadlines
+are unchanged. The original validated `predicate-unmet` checkpoint is retained
+in `noticeRecovery.originalFailure`; even completed recovery leaves the overall
+probe **incomplete/exit3** and does not continue to the shortcut/lifecycle tail.
+No new probe mode, observer, launcher activation operation or application change
+is introduced. Other backends, lifecycle-only mode, startup/identity failures,
+observer failures and already-focused Show cannot enter the diagnostic.
+
+The diagnostic binds the same live application process and native window handle
+using the existing owned-window reader, then requires fresh native X11 identity,
+visible/unfocused launcher and focused decoy, actual application state reporting
+the activation component requirement, and the visible fixed notice/help action.
+It captures own-renderer dark/light notice pixels and repeats those conditions
+before sending exactly one `xdotool key --clearmodifiers alt+Tab` on the private
+display. It uses the existing five-second input bound, native observation bounds
+and overall runner deadline; there is no retry, alternate chord or force-focus
+fallback. Target handles, PIDs, event payloads and exceptions are not exported.
+
+Completion separately requires native focus on that same live launcher, the
+decoy no longer focused, actual state reporting focus/activation available,
+notice removal and a recovered light screenshot. A final native observation
+checks focus after capture. Fixed booleans distinguish preconditions, attempted
+switch, completed input command, observed recovery and captured screenshots.
+A successful input command alone is not recovery. Partial failure keeps its
+original failure and available bounded observations; cleanup remains the same.
+The strict public schema rejects wrong routes, missing/reordered observations,
+inconsistent flags, private fields, missing required screenshots and attempts to
+promote this diagnostic into overall success.
+
+This is source/test preparation for S0-01-UI, not actual native evidence. Tests
+execute the production branch against fixed fake effects and test artifact
+publication with temporary synthetic files. No compositor or guest has run this
+increment. A future reserved native run must retain exact source/runtime
+provenance, before/after observations, app-only screenshots and verified cleanup.
+An observed Alt+Tab recovery would establish the private XTest desktop-switch
+path only, not physical interaction, automatic activation, portal consent or the
+full release matrix. S0-01's own four-session activation/placement exercise and
+remaining accessibility acceptance remain separately tracked by the coordinator.

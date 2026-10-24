@@ -9,12 +9,126 @@ import { stripTypeScriptTypes } from 'node:module';
 import { EventEmitter } from 'node:events';
 import { runInNewContext } from 'node:vm';
 import { buildNativeSession } from './build.ts';
-import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, parseOwnedX11Handle, parseOwnedX11Provenance, OWNED_X11_FAILURES, OWNED_X11_KIND, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities } from './protocol.ts';
-import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
+import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, parseOwnedX11Handle, parseOwnedX11Provenance, OWNED_X11_FAILURES, OWNED_X11_KIND, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities, canRecoverActivationNotice, noticeNativeState } from './protocol.ts';
+import type { ConsumerOutcome, NativeWindow, Observation, NativeDiagnostic, NoticeRecovery } from './protocol.ts';
 import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
 const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
 const native = (): NativeWindow => ({ count: 1, identityMatches: true, nativeBackend: 'wayland', focused: false, hidden: false,
   geometry: { x: 32, y: 32, width: 720, height: 560 }, workArea: { x: 0, y: 0, width: 1280, height: 900 } });
+
+const noticeObservation = (request = 5, recovered = false): Observation => ({ request, decoyActivationIssued: false,
+  launcher: { ...native(), nativeBackend: 'x11', focused: recovered }, decoy: { ...native(), nativeBackend: 'x11', focused: !recovered } });
+const noticeFailure = (): NativeDiagnostic => ({ phase: 'ordinary-show-native-focus', state: 'predicate-unmet',
+  lastObservation: { phase: 'ordinary-show-native-focus', native: noticeObservation() } });
+
+for (const scenario of ['valid', 'kwin', 'wayland', 'lifecycle', 'prior-success', 'missing', 'startup', 'hook', 'stale-phase', 'parsed-only', 'focused', 'foreign', 'multiple', 'hidden', 'no-geometry', 'wrong-backend', 'decoy-unfocused', 'activation-issued']) {
+  test(`notice recovery start gate: ${scenario}`, () => {
+    const failure = noticeFailure();
+    if (scenario === 'startup') failure.phase = 'initial-native-launch';
+    if (scenario === 'hook') failure.state = 'hook-failed';
+    if (scenario === 'stale-phase') failure.lastObservation!.phase = 'ordinary-singleton-cli-show';
+    if (scenario === 'parsed-only') failure.state = 'parsed';
+    const observation = failure.lastObservation!.native;
+    if (scenario === 'focused') observation.launcher.focused = true;
+    if (scenario === 'foreign') observation.launcher.identityMatches = false;
+    if (scenario === 'multiple') observation.launcher.count = 2;
+    if (scenario === 'hidden') observation.launcher.hidden = true;
+    if (scenario === 'no-geometry') observation.launcher.geometry = null;
+    if (scenario === 'wrong-backend') observation.launcher.nativeBackend = 'wayland';
+    if (scenario === 'decoy-unfocused') observation.decoy.focused = false;
+    if (scenario === 'activation-issued') observation.decoyActivationIssued = true;
+    expect(canRecoverActivationNotice(scenario === 'kwin' ? 'kwin-x11' : scenario === 'wayland' ? 'gnome-wayland' : 'gnome-x11',
+      scenario === 'lifecycle' ? 'lifecycle-only' : 'full', scenario === 'prior-success', scenario === 'missing' ? undefined : failure)).toBe(scenario === 'valid');
+  });
+}
+
+// Execute the actual diagnostic with only fixed fake app/native/DOM operations.
+// No Electron import, display, bus, guest, or native input is evaluated.
+async function noticeRecoveryFixture(scenario = 'complete') {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf('const recoverActivationNotice = async'), end = text.indexOf('\ntry {\n  const main =', begin);
+  expect(begin).toBeGreaterThan(0); expect(end).toBeGreaterThan(begin);
+  const events: string[] = []; let switched = false, beforeCalls = 0, bindings = 0;
+  const child = { pid: 101, exitCode: null, signalCode: null };
+  const notice = { kind: 'notice', getByRole: () => ({ kind: 'help' }) };
+  const page = { getByRole: () => notice, evaluate: async () => ({ ok: true }) };
+  const app = { firstWindow: async () => page, process: () => child };
+  const report: { ordinaryShowNativeFocused: boolean; noticeRecovery?: NoticeRecovery } = { ordinaryShowNativeFocused: false };
+  const fixedFailure = noticeFailure();
+  if (scenario === 'ineligible') fixedFailure.phase = 'initial-native-launch';
+  const context = {
+    backend: 'gnome-x11', probeMode: 'full', report, application: app, pid: 101, env: {}, performance: { now: () => 10 },
+    canRecoverActivationNotice, noticeNativeState, fixtureRecovery: undefined as undefined | ((failure: NativeDiagnostic) => Promise<void>),
+    captureOwnedWindow: async () => { bindings++; if (scenario === 'dead') throw new Error('PRIVATE_CANARY');
+      return { pid: 101, handle: scenario === 'replaced' && bindings > 2 || scenario === 'replaced-after-switch' && switched ? 'replacement' : 'same', xid: 100 }; },
+    observed: async (phase: string, predicate: (value: Observation) => boolean) => {
+      events.push(phase); if (phase === 'notice-before-manual-switch') beforeCalls++;
+      const value = noticeObservation(5 + events.length, switched);
+      if (scenario === 'recheck-focused' && beforeCalls === 2) value.launcher.focused = true;
+      if (scenario === 'no-native-recovery' && switched) value.launcher.focused = false;
+      if (scenario === 'wrong-native' && switched) value.launcher.identityMatches = false;
+      if (scenario === 'observer-error') throw new Error('PRIVATE_CANARY');
+      if (!predicate(value)) throw new Error('NATIVE_PREDICATE');
+      return value;
+    },
+    state: async () => ({ visible: scenario !== 'state-hidden', focused: scenario === 'state-focused' || switched && scenario !== 'state-not-recovered',
+      capabilities: [{ id: 'launcher.activate', state: scenario === 'wrong-capability' || scenario === 'wrong-recovered-capability' && switched ? 'temporarily-unavailable' : switched ? 'available' : 'component-required' }] }),
+    capture: async (name: string) => { events.push(name); if (scenario === 'capture-failed' && name === 'notice-light.png') throw new Error('PRIVATE_CANARY'); },
+    spawnSync: (command: string, args: string[], options: { timeout: number }) => {
+      events.push('key'); expect(command).toBe('xdotool'); expect(args).toEqual(['key', '--clearmodifiers', 'alt+Tab']); expect(options.timeout).toBe(5000);
+      switched = true; return { status: scenario === 'key-failed' ? 1 : 0 };
+    },
+    expect: (value: unknown) => ({
+      toBe: (expected: unknown) => expect(value).toBe(expected), toBeNull: () => expect(value).toBeNull(), toMatchObject: (expected: object) => expect(value).toMatchObject(expected),
+      toBeVisible: async () => { if (scenario === 'notice-absent') throw new Error('NO_NOTICE'); },
+      toHaveCount: async (count: number) => { expect(count).toBe(0); if (scenario === 'notice-remains') throw new Error('NOTICE_REMAINS'); },
+    }),
+  };
+  runInNewContext(stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.fixtureRecovery = recoverActivationNotice;`), context, { timeout: 1000 });
+  await context.fixtureRecovery!(fixedFailure);
+  return { events, report, failure: fixedFailure };
+}
+
+for (const scenario of ['complete', 'ineligible', 'dead', 'replaced', 'recheck-focused', 'observer-error', 'state-hidden', 'state-focused', 'wrong-capability', 'notice-absent', 'capture-failed', 'key-failed', 'no-native-recovery', 'wrong-native', 'notice-remains', 'replaced-after-switch', 'state-not-recovered', 'wrong-recovered-capability']) {
+  test(`actual notice recovery keeps input bounded and requires native plus app proof: ${scenario}`, async () => {
+    const { events, report, failure } = await noticeRecoveryFixture(scenario);
+    expect(events.filter(value => value === 'key')).toHaveLength(['complete', 'key-failed', 'no-native-recovery', 'wrong-native', 'notice-remains', 'replaced-after-switch', 'state-not-recovered', 'wrong-recovered-capability'].includes(scenario) ? 1 : 0);
+    if (scenario === 'ineligible') { expect(report.noticeRecovery).toBeUndefined(); expect(events).toEqual([]); }
+    else {
+      expect(report.noticeRecovery!.originalFailure).toEqual(failure);
+      expect(report.noticeRecovery!.status).toBe(scenario === 'complete' ? 'complete' : 'incomplete');
+      expect(JSON.stringify(report)).not.toContain('PRIVATE_CANARY');
+    }
+    expect(report.ordinaryShowNativeFocused).toBe(false);
+  });
+}
+
+test('ordinary native focus failure still throws after successful recovery and never enters shortcut checks', async () => {
+  const text = readFileSync(source('check.ts'), 'utf8');
+  const begin = text.indexOf("    try { await observed('ordinary-show-native-focus'"), end = text.indexOf('    expect(current.shortcut.state)', begin);
+  expect(begin).toBeGreaterThan(0); expect(end).toBeGreaterThan(begin);
+  const failure = noticeFailure(), events: string[] = [];
+  const program = `(async () => { ${stripTypeScriptTypes(text.slice(begin, end))}\nevents.push('shortcut'); })()`;
+  await expect(runInNewContext(program, { events, observed: async () => { throw new Error('FAILED_FOCUS'); }, nativeTrace: { snapshot: () => failure },
+    recoverActivationNotice: async (value: NativeDiagnostic) => { expect(value).toEqual(failure); events.push('recovery'); } })).rejects.toThrow('ORDINARY_SHOW_NATIVE_FOCUS_FAILED');
+  expect(events).toEqual(['recovery']);
+  events.length = 0;
+  await runInNewContext(program, { events, observed: async () => undefined, nativeTrace: { snapshot: () => { throw new Error('UNEXPECTED_FAILURE_READ'); } },
+    recoverActivationNotice: async () => { throw new Error('UNEXPECTED_RECOVERY'); } });
+  expect(events).toEqual(['shortcut']);
+});
+
+for (const scenario of ['valid-complete', 'valid-partial', 'valid-transient-decoy', 'private', 'original-private', 'bool-type', 'no-original', 'wrong-original', 'wrong-original-state', 'stale-original', 'original-focused',
+  'no-prior', 'no-runtime', 'wrong-backend', 'wrong-mode', 'wrong-stage', 'forged-pass', 'prior-success', 'no-proof', 'diagnostic-only-no-proof', 'no-precondition', 'no-command', 'no-recovery', 'no-screenshot',
+  'native-unfocused', 'native-foreign', 'native-hidden', 'native-no-geometry', 'native-decoy', 'native-activation', 'missing-recheck', 'stale-before', 'phase-order', 'extra-switch', 'incomplete-complete-flags']) {
+  test(`notice artifact publication preserves failure and rejects unsupported claims: ${scenario}`, () => {
+    const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), `notice-${scenario}`], { encoding: 'utf8', timeout: 5000 });
+    expect(child.status, child.stderr).toBe(0);
+    const result = JSON.parse(child.stdout);
+    if (scenario.startsWith('valid-')) expect(result).toMatchObject({ originalFailureRetained: true, overallIncomplete: true, exitCode: 3 });
+    else expect(result).toMatchObject({ rejectedBeforePublication: true, publishedFiles: 0 });
+  });
+}
 
 test('preparation never launches a compositor without the explicit disposable target guard', () => {
   const child = spawnSync('/usr/bin/python3', [source('run-session.py'), 'gnome-wayland'], { encoding: 'utf8', env: { PATH: process.env.PATH }, timeout: 5000 });

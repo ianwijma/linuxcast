@@ -14,6 +14,73 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
         'outputSha256':{name:'b'*64 for name in OUTPUTS},'designTokensSha256':'c'*64,'launcherDesktopFileSha256':'d'*64}
     runtime={'electron':'45.0.0','chrome':'156.0.8078.48','ozone':'wayland','noSandbox':False,'sandbox':True,'contextIsolation':True,'nodeIntegration':False,'webSecurity':True,
         'renderer':{'runtime':{'sandboxed':True,'contextIsolated':True},'process':'undefined','require':'undefined'}}
+    if case.startswith('notice-'):
+        from artifacts import NOTICE_FLAGS, NOTICE_SCREENSHOTS
+        backend='gnome-x11';report=fallback_result(backend)
+        own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':560},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
+        def notice_row(serial,recovered=False):
+            value={'request':serial,'launcher':copy.deepcopy(own),'decoy':copy.deepcopy(own),'decoyActivationIssued':False}
+            value['launcher']['focused']=recovered;value['decoy']['focused']=not recovered
+            return value
+        report.update(status='incomplete',stage='ordinary-cli-show',ordinaryShowNativeFocused=False,runtime={**copy.deepcopy(runtime),'ozone':'x11'})
+        report['observations']=[{'phase':'ordinary-singleton-cli-show','native':notice_row(4)}]
+        proof={'status':'complete','originalFailure':{'phase':'ordinary-show-native-focus','state':'predicate-unmet',
+            'lastObservation':{'phase':'ordinary-show-native-focus','native':notice_row(5)}},**{key:True for key in NOTICE_FLAGS}}
+        report['noticeRecovery']=proof
+        report['observations'] += [{'phase':'notice-before-manual-switch','native':notice_row(n)} for n in (6,7)]
+        report['observations'] += [{'phase':'notice-after-manual-switch','native':notice_row(n,True)} for n in (8,9)]
+        for name in NOTICE_SCREENSHOTS:(root/name).write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic fixture')
+        if case=='notice-valid-partial':
+            proof.update(status='incomplete',**{key:False for key in NOTICE_FLAGS});report['observations']=report['observations'][:1]
+        elif case=='notice-valid-transient-decoy':report['observations'][0]['native']['decoy']['focused']=False
+        elif case=='notice-private':proof['private']='synthetic-private-canary'
+        elif case=='notice-original-private':proof['originalFailure']['lastObservation']['native']['launcher']['private']='synthetic-private-canary'
+        elif case=='notice-bool-type':proof['switchAttempted']=1
+        elif case=='notice-no-original':del proof['originalFailure']
+        elif case=='notice-wrong-original':proof['originalFailure']['phase']='initial-native-launch'
+        elif case=='notice-wrong-original-state':proof['originalFailure']['state']='parsed'
+        elif case=='notice-stale-original':proof['originalFailure']['lastObservation']['native']['request']=4
+        elif case=='notice-original-focused':proof['originalFailure']['lastObservation']['native']['launcher']['focused']=True
+        elif case=='notice-no-prior':report['observations'].pop(0)
+        elif case=='notice-no-runtime':del report['runtime']
+        elif case=='notice-wrong-backend':backend='kwin-x11';report['backend']=backend
+        elif case=='notice-wrong-mode':report['probeMode']='lifecycle-only'
+        elif case=='notice-wrong-stage':report['stage']='actual-x11-global-shortcut'
+        elif case=='notice-forged-pass':report['status']='passed-bounded-native-probe'
+        elif case=='notice-prior-success':report['ordinaryShowNativeFocused']=True
+        elif case=='notice-no-proof':del report['noticeRecovery']
+        elif case=='notice-diagnostic-only-no-proof':
+            del report['noticeRecovery'];report['observations']=report['observations'][:1]
+            report['nativeDiagnostic']={'phase':'notice-before-manual-switch','state':'predicate-unmet','lastObservation':{'phase':'notice-before-manual-switch','native':notice_row(6)}}
+        elif case=='notice-no-precondition':proof['preconditionsObserved']=False
+        elif case=='notice-no-command':proof['switchCommandCompleted']=False
+        elif case=='notice-no-recovery':proof['focusRecoveryObserved']=False
+        elif case=='notice-no-screenshot':(root/'notice-recovered-light.png').unlink()
+        elif case=='notice-native-unfocused':report['observations'][-1]['native']['launcher']['focused']=False
+        elif case=='notice-native-foreign':report['observations'][-1]['native']['launcher']['identityMatches']=False
+        elif case=='notice-native-hidden':report['observations'][1]['native']['launcher']['hidden']=True
+        elif case=='notice-native-no-geometry':report['observations'][1]['native']['launcher']['geometry']=None
+        elif case=='notice-native-decoy':report['observations'][-1]['native']['decoy']['focused']=True
+        elif case=='notice-native-activation':report['observations'][1]['native']['decoyActivationIssued']=True
+        elif case=='notice-missing-recheck':report['observations'].pop(2)
+        elif case=='notice-stale-before':report['observations'][1]['native']['request']=5
+        elif case=='notice-phase-order':report['observations'][2]['phase']='notice-after-manual-switch'
+        elif case=='notice-extra-switch':proof['switchAttempts']=2
+        elif case=='notice-incomplete-complete-flags':proof['status']='incomplete'
+        elif case!='notice-valid-complete':raise ValueError('UNKNOWN_NOTICE_CASE')
+        try: outcome=publish(root,destination,report,manifest,backend,3,'')
+        except ValueError:
+            if case.startswith('notice-valid-'):raise
+            assert not destination.exists()
+            print(json.dumps({'case':case,'rejectedBeforePublication':True,'publishedFiles':0}))
+        else:
+            if not case.startswith('notice-valid-'):raise AssertionError('INVALID_NOTICE_PUBLISHED')
+            assert outcome==(3,'incomplete')
+            public=json.loads((destination/'report.json').read_text())
+            assert public['ordinaryShowNativeFocused'] is False and public['noticeRecovery']==proof
+            assert 'synthetic-private-canary' not in (destination/'report.json').read_text()
+            print(json.dumps({'case':case,'originalFailureRetained':True,'overallIncomplete':True,'exitCode':3}))
+        sys.exit(0)
     def complete():
         value=fallback_result('gnome-wayland')
         empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}

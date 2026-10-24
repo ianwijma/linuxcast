@@ -14,12 +14,28 @@ export type Observation = { request: number; launcher: NativeWindow; decoy: Nati
   diagnostics?: { launcher: WindowDiagnostic; decoy: WindowDiagnostic } };
 export const NATIVE_PHASES = ['decoy-native-ready', 'decoy-focused-before-ordinary-show', 'initial-native-launch', 'after-close-native-hidden',
   'ordinary-singleton-cli-show', 'wayland-singleton-toggle-hidden', 'wayland-singleton-reopened', 'ordinary-show-native-focus',
-  'actual-x11-shortcut-native-focus', 'fresh-lifecycle-native-launch', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
+  'actual-x11-shortcut-native-focus', 'notice-before-manual-switch', 'notice-after-manual-switch', 'fresh-lifecycle-native-launch', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
 export type NativePhase = typeof NATIVE_PHASES[number];
 export const HOOK_FAILURE_STAGES = ['enumerate', 'launcher', 'decoy', 'activation', 'publish'] as const;
 export type HookFailureReply = { request: number; hookFailure: { stage: typeof HOOK_FAILURE_STAGES[number]; outcome: 'native-read-failed' } };
 const PROGRESS = ['request-written', 'reply-rejected', 'parsed', 'predicate-met', 'predicate-unmet', 'hook-failed'] as const;
 export type NativeDiagnostic = { phase: NativePhase; state: typeof PROGRESS[number]; lastObservation?: { phase: NativePhase; native: Observation }; hookFailure?: HookFailureReply };
+export type NoticeRecovery = { status: 'incomplete' | 'complete'; originalFailure: NativeDiagnostic;
+  noticeScreenshotsCaptured: boolean; preconditionsObserved: boolean; switchAttempted: boolean;
+  switchCommandCompleted: boolean; focusRecoveryObserved: boolean; recoveryScreenshotCaptured: boolean };
+/** A refused ordinary show is retained; no startup/observer failure permits input. */
+export function canRecoverActivationNotice(backend: Backend, mode: string, ordinaryFocused: unknown, failure: NativeDiagnostic | undefined): boolean {
+  if (backend !== 'gnome-x11' || mode !== 'full' || ordinaryFocused !== false
+    || failure?.phase !== 'ordinary-show-native-focus' || failure.state !== 'predicate-unmet'
+    || failure.lastObservation?.phase !== 'ordinary-show-native-focus' || failure.hookFailure) return false;
+  return noticeNativeState(failure.lastObservation.native, false);
+}
+export function noticeNativeState(value: Observation, recovered: boolean): boolean {
+  try { requireNativeTarget(value.launcher, 'gnome-x11'); requireNativeTarget(value.decoy, 'gnome-x11'); }
+  catch { return false; }
+  return !value.decoyActivationIssued && !value.launcher.hidden && !value.decoy.hidden
+    && value.launcher.focused === recovered && value.decoy.focused === !recovered;
+}
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('NATIVE_SCHEMA');
   return value as Record<string, unknown>;

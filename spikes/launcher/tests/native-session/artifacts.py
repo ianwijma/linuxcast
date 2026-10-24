@@ -14,10 +14,47 @@ SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py', 
     '../../../../package.json','../../../../bun.lock','../../../../apps/desktop/package.json')
 OUTPUTS=('extension.js','kwin-script.js','metadata.json')
 STAGES=('build','first-launch','native-initial-identity','resident-close','decoy-challenge','ordinary-cli-show','actual-x11-global-shortcut','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session')
-PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','fresh-lifecycle-native-launch','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
+PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','notice-before-manual-switch','notice-after-manual-switch','fresh-lifecycle-native-launch','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
 DIAGNOSTIC_PHASES=(*PHASES,'decoy-activation-request')
 FLAGS=('initialPlacementInsideWorkArea','closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','explicitUiQuitExited','hiddenCliQuitExited')
 ACTIVATION=('normal-show-focused-component-placement-still-required','actionable-component-required','normal-show-and-shortcut-native-focus-observed')
+NOTICE_PHASES=('notice-before-manual-switch','notice-after-manual-switch')
+NOTICE_FLAGS=('noticeScreenshotsCaptured','preconditionsObserved','switchAttempted','switchCommandCompleted','focusRecoveryObserved','recoveryScreenshotCaptured')
+NOTICE_SCREENSHOTS=('notice-dark.png','notice-light.png','notice-recovered-light.png')
+
+def notice_native_state(value,recovered):
+    for key in ('launcher','decoy'):
+        window=value[key]
+        if window['count']!=1 or not window['identityMatches'] or window['nativeBackend']!='x11' or window['hidden'] or window['geometry'] is None or window['workArea'] is None: raise ValueError('PUBLIC_NOTICE_IDENTITY')
+    if value['decoyActivationIssued'] or value['launcher']['focused'] is not recovered or value['decoy']['focused'] is recovered: raise ValueError('PUBLIC_NOTICE_FOCUS')
+
+def notice_recovery(value,result,backend):
+    object_keys(value,('status','originalFailure',*NOTICE_FLAGS))
+    if backend!='gnome-x11' or result.get('probeMode','full')!='full' or result['stage']!='ordinary-cli-show' or result['status'] not in ('incomplete','cleanup-incomplete') or result.get('ordinaryShowNativeFocused') is not False: raise ValueError('PUBLIC_NOTICE_ROUTE')
+    original=native_diagnostic(value['originalFailure'])
+    if original['phase']!='ordinary-show-native-focus' or original['state']!='predicate-unmet' or original.get('lastObservation',{}).get('phase')!='ordinary-show-native-focus' or 'hookFailure' in original: raise ValueError('PUBLIC_NOTICE_ORIGINAL_FAILURE')
+    notice_native_state(original['lastObservation']['native'],False)
+    prior=[row for row in result['observations'] if row['phase'] not in NOTICE_PHASES]
+    if 'runtime' not in result or not prior or prior[-1]['phase']!='ordinary-singleton-cli-show' or prior[-1]['native']['request']>=original['lastObservation']['native']['request']: raise ValueError('PUBLIC_NOTICE_PRIOR_SHOW')
+    # The earlier singleton-show checkpoint requires only the exact launcher
+    # identity/backend/geometry; the decoy may still be transitioning there.
+    # Strict two-window focus conditions belong to the later failed checkpoint
+    # and the fresh diagnostic observations, not this earlier row.
+    launcher=prior[-1]['native']['launcher']
+    if launcher['count']!=1 or not launcher['identityMatches'] or launcher['nativeBackend']!='x11' or launcher['geometry'] is None or launcher['workArea'] is None or launcher['focused']: raise ValueError('PUBLIC_NOTICE_PRIOR_LAUNCHER')
+    proof={'status':value['status'],'originalFailure':original,**{key:boolean(value[key]) for key in NOTICE_FLAGS}}
+    if proof['status'] not in ('incomplete','complete') or (proof['status']=='complete')!=all(proof[key] for key in NOTICE_FLAGS): raise ValueError('PUBLIC_NOTICE_OUTCOME')
+    for previous,current in zip(NOTICE_FLAGS,NOTICE_FLAGS[1:]):
+        if proof[current] and not proof[previous]: raise ValueError('PUBLIC_NOTICE_ORDER')
+    rows=[row for row in result['observations'] if row['phase'] in NOTICE_PHASES]
+    before=[row for row in rows if row['phase']==NOTICE_PHASES[0]]
+    after=[row for row in rows if row['phase']==NOTICE_PHASES[1]]
+    if rows!=before+after or len(before)>2 or len(after)>2: raise ValueError('PUBLIC_NOTICE_PHASE_ORDER')
+    for row in rows:
+        if row['native']['request']<=original['lastObservation']['native']['request']: raise ValueError('PUBLIC_NOTICE_STALE')
+        notice_native_state(row['native'],row['phase']==NOTICE_PHASES[1])
+    if (proof['noticeScreenshotsCaptured'] and not before) or (proof['preconditionsObserved'] and len(before)!=2) or (after and not proof['switchCommandCompleted']) or (proof['focusRecoveryObserved'] and not after) or (proof['recoveryScreenshotCaptured'] and len(after)!=2): raise ValueError('PUBLIC_NOTICE_EVIDENCE')
+    return proof
 
 def object_keys(value,required,optional=()):
     if type(value) is not dict or not set(required)<=set(value) or not set(value)<=set(required)|set(optional): raise ValueError('PUBLIC_ARTIFACT_SCHEMA')
@@ -201,7 +238,7 @@ def lifecycle_diagnostic(value,backend):
 
 def public_result(value,backend):
     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof','ownedTargetObserver','ownedTargetFailure'))
+    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof','ownedTargetObserver','ownedTargetFailure','noticeRecovery'))
     mode=value.get('probeMode','full')
     if type(mode) is not str or mode not in ('full','lifecycle-only'): raise ValueError('PUBLIC_PROBE_MODE')
     owned=backend=='kwin-x11' and mode=='lifecycle-only'
@@ -249,6 +286,8 @@ def public_result(value,backend):
     else:
         if any(row['phase']=='fresh-lifecycle-native-launch' for row in result['observations']) or result.get('nativeDiagnostic',{}).get('phase')=='fresh-lifecycle-native-launch' or result.get('nativeDiagnostic',{}).get('lastObservation',{}).get('phase')=='fresh-lifecycle-native-launch': raise ValueError('PUBLIC_FULL_MODE_PHASE')
         if 'probeMode' in value: result['probeMode']='full'
+    if 'noticeRecovery' in value: result['noticeRecovery']=notice_recovery(value['noticeRecovery'],result,backend)
+    elif any(row['phase'] in NOTICE_PHASES for row in result['observations']) or result.get('nativeDiagnostic',{}).get('phase') in NOTICE_PHASES or result.get('nativeDiagnostic',{}).get('lastObservation',{}).get('phase') in NOTICE_PHASES: raise ValueError('PUBLIC_NOTICE_PROOF_REQUIRED')
     if value['status']=='passed-bounded-native-probe':
         mandatory=('closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','explicitUiQuitExited','hiddenCliQuitExited')
         if value['stage']!='complete' or any(result.get(key) is not True for key in mandatory) or not all(key in result for key in ('runtime','shortcut','activationOutcome','initialPlacementInsideWorkArea','ordinaryShowNativeFocused')):
@@ -307,13 +346,18 @@ def publish(root,destination,value,manifest,backend,status,packages):
     for line in packages.splitlines():
         if re.fullmatch(r'(?:'+('|'.join(approved))+r') [0-9][A-Za-z0-9:~+.-]{0,99}',line): safe_packages.append(line)
     screenshots=[]
-    for name in ('dark-launcher.png','light-capabilities.png'):
+    for name in ('dark-launcher.png','light-capabilities.png',*(NOTICE_SCREENSHOTS if 'noticeRecovery' in result else ())):
         file=root/name
         if file.exists():
             metadata=file.lstat()
             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>8*1024*1024 or file.read_bytes()[:8]!=b'\x89PNG\r\n\x1a\n': raise ValueError('PUBLIC_SCREENSHOT_REQUIRED')
             screenshots.append((file,name))
     if result.get('diagnosticOutcome')=='complete' and {name for _,name in screenshots}!={'dark-launcher.png','light-capabilities.png'}: raise ValueError('PUBLIC_LIFECYCLE_SCREENSHOTS_REQUIRED')
+    if 'noticeRecovery' in result:
+        proof=result['noticeRecovery'];present={name for _,name in screenshots}
+        required=set(NOTICE_SCREENSHOTS[:2]) if proof['noticeScreenshotsCaptured'] else set()
+        if proof['recoveryScreenshotCaptured']: required.add(NOTICE_SCREENSHOTS[2])
+        if not required<=present: raise ValueError('PUBLIC_NOTICE_SCREENSHOTS_REQUIRED')
     result.update(privateProcessTreeCleanupVerified=True,packages=safe_packages)
     destination.mkdir(parents=True,exist_ok=True)
     (destination/'report.json').write_text(json.dumps(result,indent=2)+'\n')

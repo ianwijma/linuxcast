@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { buildLauncher } from '../../build.ts';
 import { APP_ID, APP_URL } from '../../src/contract.ts';
 import type { LauncherState } from '../../src/contract.ts';
-import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities, parseProbeMode, LIFECYCLE_SKIPPED, OWNED_X11_KIND, OWNED_X11_FAILURES, parseOwnedX11Handle, parseObservation } from './protocol.ts';
-import type { Backend, NativePhase, Observation, OwnedX11Failure } from './protocol.ts';
+import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, requireOwnedLifecycleTarget, ownedGeometryCapabilities, parseProbeMode, LIFECYCLE_SKIPPED, OWNED_X11_KIND, OWNED_X11_FAILURES, parseOwnedX11Handle, parseObservation, canRecoverActivationNotice, noticeNativeState } from './protocol.ts';
+import type { Backend, NativePhase, Observation, OwnedX11Failure, NativeDiagnostic, NoticeRecovery } from './protocol.ts';
 
 const backend = process.argv[2] as Backend;
 const probeMode = parseProbeMode(process.argv[3], backend);
@@ -268,6 +268,61 @@ const waitForExit = (app: ElectronApplication) => new Promise<void>((resolve, re
   app.once('close', () => { clearTimeout(timer); resolve(); });
 });
 
+// Only the failed GNOME X11 ordinary-focus checkpoint can enter this bounded
+// diagnostic. It never resumes the full probe or changes its failed outcome.
+const recoverActivationNotice = async (failure: NativeDiagnostic | undefined) => {
+  if (!canRecoverActivationNotice(backend, probeMode, report.ordinaryShowNativeFocused, failure)) return;
+  const proof: NoticeRecovery = { status: 'incomplete', originalFailure: failure!, noticeScreenshotsCaptured: false,
+    preconditionsObserved: false, switchAttempted: false, switchCommandCompleted: false,
+    focusRecoveryObserved: false, recoveryScreenshotCaptured: false };
+  report.noticeRecovery = proof;
+  try {
+    const app = application!, child = app.process(), page = await app.firstWindow();
+    const binding = await captureOwnedWindow(app, page, performance.now() + 8000);
+    expect(binding.pid).toBe(pid);
+    const sameTarget = async () => {
+      expect(application).toBe(app); expect(app.process()).toBe(child);
+      expect(child.exitCode).toBeNull(); expect(child.signalCode).toBeNull();
+      const current = await captureOwnedWindow(app, page, performance.now() + 8000);
+      expect(current.pid).toBe(binding.pid); expect(current.handle).toBe(binding.handle); expect(current.xid).toBe(binding.xid);
+    };
+    const notice = page.getByRole('region', { name: 'Unconfirmed activation', exact: true });
+    const beforeSwitch = async () => {
+      await sameTarget();
+      await observed('notice-before-manual-switch', value => noticeNativeState(value, false));
+      const current = await state();
+      expect(current.visible).toBe(true); expect(current.focused).toBe(false);
+      expect(current.capabilities.find(value => value.id === 'launcher.activate')?.state).toBe('component-required');
+      await expect(notice).toBeVisible({ timeout: 5000 });
+      await expect(notice.getByRole('button', { name: 'View activation help', exact: true })).toBeVisible({ timeout: 5000 });
+    };
+    await beforeSwitch();
+    for (const appearance of ['dark', 'light'] as const) {
+      expect(await page.evaluate(theme => window.linuxcast.setAppearance(theme), appearance)).toMatchObject({ ok: true });
+      await capture(`notice-${appearance}.png`, appearance, 'search');
+    }
+    proof.noticeScreenshotsCaptured = true;
+    // Screenshots/theme acknowledgements cannot stand in for fresh refusal.
+    await beforeSwitch();
+    proof.preconditionsObserved = true;
+    proof.switchAttempted = true;
+    expect(spawnSync('xdotool', ['key', '--clearmodifiers', 'alt+Tab'], { env, timeout: 5000 }).status).toBe(0);
+    proof.switchCommandCompleted = true;
+    await observed('notice-after-manual-switch', value => noticeNativeState(value, true));
+    await sameTarget();
+    const current = await state();
+    expect(current.visible).toBe(true); expect(current.focused).toBe(true);
+    expect(current.capabilities.find(value => value.id === 'launcher.activate')?.state).toBe('available');
+    await expect(notice).toHaveCount(0, { timeout: 5000 });
+    proof.focusRecoveryObserved = true;
+    await capture('notice-recovered-light.png', 'light', 'search');
+    await sameTarget();
+    await observed('notice-after-manual-switch', value => noticeNativeState(value, true));
+    await sameTarget();
+    proof.recoveryScreenshotCaptured = true; proof.status = 'complete';
+  } catch { /* Fixed partial booleans only; never export the exception or retry input. */ }
+};
+
 try {
   const main = await buildLauncher();
   const launch = async () => {
@@ -377,7 +432,13 @@ try {
     expect(application!.process().pid).toBe(pid);
   } else {
     // Give the WM bounded time for ordinary show activation, never force focus.
-    await observed('ordinary-show-native-focus', value => value.launcher.focused);
+    try { await observed('ordinary-show-native-focus', value => value.launcher.focused); }
+    catch {
+      await recoverActivationNotice(nativeTrace.snapshot());
+      // Manual recovery cannot retroactively pass ordinary activation or reach
+      // the shortcut/lifecycle tail. The outer catch retains incomplete/exit3.
+      throw new Error('ORDINARY_SHOW_NATIVE_FOCUS_FAILED');
+    }
     expect(current.shortcut.state).toBe('available'); expect(current.shortcut.effective).toBe('Ctrl+Alt+Shift+F12');
     stage = 'actual-x11-global-shortcut';
     await cli(main, '--toggle'); await expect.poll(async () => (await state()).visible).toBe(false);
