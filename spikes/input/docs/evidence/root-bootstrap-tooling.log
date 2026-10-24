@@ -1,0 +1,99 @@
+STEP rustup component add rustfmt clippy --toolchain 1.95.0-x86_64-unknown-linux-gnu
+info: downloading component rustfmt
+info: downloading component clippy
+STEP rustc --version
+rustc 1.95.0 (59807616e 2026-04-14)
+STEP rustfmt --version
+rustfmt 1.9.0-stable (59807616e1 2026-04-14)
+STEP cargo clippy --version
+clippy 0.1.95 (59807616e1 2026-04-14)
+STEP cargo fmt -p linuxcast-input-spike
+STEP cargo clippy --locked --offline -p linuxcast-input-spike --all-targets -- -D warnings
+    Checking linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+error: try not to call a closure in the expression where it is declared
+  --> spikes/input/src/bin/denial-helper.rs:7:18
+   |
+ 7 |       let result = (|| {
+   |  __________________^
+ 8 | |         // Strict empty-env launch contract, no environment mutation here.
+ 9 | |         match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
+10 | |             [mode] if mode == "--internal-denial" => denial_observer::helper(),
+...  |
+14 | |     })();
+   | |________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.95.0/index.html#redundant_closure_call
+   = note: `-D clippy::redundant-closure-call` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::redundant_closure_call)]`
+help: try doing something like
+   |
+ 7 ~     let result = (match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
+ 8 +             [mode] if mode == "--internal-denial" => denial_observer::helper(),
+ 9 +             [mode] if mode == "--internal-root-denial" => denial_observer::root_helper(),
+10 +             _ => Err(fail("PRIVATE_DENIAL_HELPER_REQUIRED")),
+11 ~         });
+   |
+
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-helper") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-helper" test) due to 1 previous error
+STEP rustup component add rustfmt clippy --toolchain 1.95.0-x86_64-unknown-linux-gnu
+info: downloading component rustfmt
+info: downloading component clippy
+STEP cargo fmt -p linuxcast-input-spike
+STEP cargo clippy --locked --offline -p linuxcast-input-spike --all-targets -- -D warnings
+    Checking linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.30s
+STEP cargo fmt -p linuxcast-input-spike --check
+STEP rustup component add rustfmt clippy --toolchain 1.95.0-x86_64-unknown-linux-gnu
+info: downloading component rustfmt
+info: downloading component clippy
+STEP cargo fmt -p linuxcast-input-spike
+STEP cargo clippy --locked --offline -p linuxcast-input-spike --all-targets -- -D warnings
+    Checking linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+error: direct cast of function item into an integer
+   --> spikes/input/src/bin/../denial_observer.rs:522:36
+    |
+522 |     action.sa_sigaction = deadline as usize;
+    |                                    ^^^^^^^^
+    |
+    = note: `-D function-casts-as-integer` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(function_casts_as_integer)]`
+help: first cast to a pointer `as *const ()`
+    |
+522 |     action.sa_sigaction = deadline as *const () as usize;
+    |                                    ++++++++++++
+
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-helper") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-probe") due to 1 previous error
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-supervisor") due to 1 previous error
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-helper" test) due to 1 previous error
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-denial-probe" test) due to 1 previous error
+error: direct cast of function item into an integer
+   --> spikes/input/tests/../src/denial_observer.rs:522:36
+    |
+522 |     action.sa_sigaction = deadline as usize;
+    |                                    ^^^^^^^^
+    |
+    = note: `-D function-casts-as-integer` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(function_casts_as_integer)]`
+help: first cast to a pointer `as *const ()`
+    |
+522 |     action.sa_sigaction = deadline as *const () as usize;
+    |                                    ++++++++++++
+
+error: could not compile `linuxcast-input-spike` (bin "linuxcast-input-spike-supervisor" test) due to 1 previous error
+error: could not compile `linuxcast-input-spike` (test "denial-private") due to 1 previous error
+STEP rustup component add rustfmt clippy --toolchain 1.95.0-x86_64-unknown-linux-gnu
+info: downloading component rustfmt
+info: downloading component clippy
+STEP cargo fmt -p linuxcast-input-spike
+STEP cargo clippy --locked --offline -p linuxcast-input-spike --all-targets -- -D warnings
+   Compiling linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.63s
+STEP cargo fmt -p linuxcast-input-spike --check
+STEP cargo fmt -p linuxcast-input-spike --check
+STEP cargo clippy --locked --offline -p linuxcast-input-spike --all-targets -- -D warnings
+    Checking linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.31s

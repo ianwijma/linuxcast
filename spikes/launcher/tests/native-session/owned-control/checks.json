@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-01",
+  "scope": "SOURCE_PLACEMENT_ONLY_NO_NATIVE_AUTHORITY",
+  "reviewedCapsuleManifestSha256": "501a59c8591e549de45be39c62021ec2c4377ceed82a58700e2f2002c5d20099",
+  "reviewedProductionSourceCommit": "40a5b9bbd1848033c4bc75011efc1f00a2ff88b6",
+  "metadataBaselineAtReview": "09edd2920662b7b6cee749e8c64008fa2ba77d23",
+  "placementNote": "README source-only capsule references are preserved history. This placement adds explicit standard Node imports/globalThis spelling and removes only an unused verifier return binding, retaining source verification order. No guard, behavior, budget or output schema changed. Normal signing/publication remains coordinator-owned.",
+  "commands": {
+    "fixtures": "/tmp/linuxcast-node24/node spikes/launcher/tests/native-session/owned-control/fixture.mjs /tmp/linuxcast-s0-01",
+    "lint": "/tmp/linuxcast-node24/node node_modules/eslint/bin/eslint.js spikes/launcher/tests/native-session/owned-control/*.mjs --max-warnings 0",
+    "plan": "python3 scripts/validate_plan.py"
+  },
+  "results": {
+    "nodeChecksPassed": 29,
+    "nodeChecksFailed": 0,
+    "nodeChecksSkipped": 0,
+    "nestedPythonGroups": 5,
+    "durationMilliseconds": 378.553407,
+    "eslintExit": 0,
+    "planValidationExit": 0,
+    "javascriptSyntaxChecks": 4,
+    "pythonASTChecks": 2
+  },
+  "platform": "Pop!_OS22.04 amd64; Node24.22.1; Python3.10.12",
+  "initialExactCopyLintResult": "41 undeclared standard Node globals plus one unused binding; approved import/globalThis/unused-binding-only integration delta fixes all42 without config changes. Exact initial copy29 fixture checks also passed.",
+  "nativeExecuted": false,
+  "guestAccessed": false,
+  "archivePrepared": false,
+  "acceptanceClaimed": false,
+  "existingReviewedProductionPathsUnchanged": 10,
+  "sourceSha256": {
+    "control.mjs": "2c654f123739ab1d46aa7629f0300ba01b76449dc2bb2dbb1ac3848e3de70b63",
+    "core.mjs": "d91cbd627d80b039edfd002003428962144fa9c2bf0d6716fafd15586b73ad17",
+    "production.mjs": "9694e25f3d148df727abc0b3a1a9e8a2119df716f7c3ce173a1a53b0b9f02fe4",
+    "pair.py": "a04c1dd04b0e432c915aac5bca0cf915ccad60ece6ea04f81aa052c4a26db881",
+    "runtime-authority.json": "d21bd6cbd368c8d74405d878c04ba385342c600b5636f3fbb5bca8a26d89ce20",
+    "fixture.mjs": "993c5e91d012bce20ce9a85ba45ce1a083a12107271555582ceb47e468e73623",
+    "pair-fixture.py": "dcdfe0486cf5be8178ff308578ae94b55342658175753af248c0e5958431730a",
+    "README.md": "80521d274dea71cb021824c2bd1cab6456f76d6ee36eb1f86f2076394bcdf8d5"
+  }
+}

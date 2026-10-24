@@ -1,0 +1,25 @@
+{
+  "scope": "Actual launcher Electron on disposable Xvfb, no compositor/desktop matrix claim",
+  "electron": "45.0.0",
+  "chrome": "156.0.8078.48",
+  "embeddedNode": "24.22.0",
+  "harnessNode": "24.22.1",
+  "kernel": "6.12.113+deb13-amd64",
+  "orcaVersion": "unavailable",
+  "sandbox": true,
+  "contextIsolation": true,
+  "nodeIntegration": false,
+  "webSecurity": true,
+  "noSandboxArgument": false,
+  "renderer": {
+    "runtime": {
+      "sandboxed": true,
+      "contextIsolated": true
+    },
+    "process": "undefined",
+    "require": "undefined"
+  },
+  "accessible": true,
+  "distro": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"",
+  "checkerSha256": "b4e7563f72cbd07d734e650766231b9e702aea8f5f6f65e9ead176f6b9e0988b"
+}

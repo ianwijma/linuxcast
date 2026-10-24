@@ -1,0 +1,20 @@
+{
+  "task": "S0-01",
+  "backend": "gnome-x11",
+  "status": "unavailable",
+  "physicalDesktopMatrixEstablished": false,
+  "evidenceKind": "actual-isolated-software-compositor-launcher",
+  "kernel": "6.12.113+deb13-amd64",
+  "hostDisplayClipboardInputOrSettingsUsed": false,
+  "launcherCompanionActivationOrPlacementUsed": false,
+  "stage": "private-session",
+  "observations": [],
+  "privateProcessTreeCleanupVerified": true,
+  "packages": [
+    "gnome-shell 48.7-0+deb13u2",
+    "kwin-wayland 4:6.3.6-1",
+    "kwin-x11 4:6.3.6-1",
+    "libqt6qml6 6.8.2+dfsg-7",
+    "mutter 48.7-0+deb13u1"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "scope": "Actual launcher Electron on disposable Xvfb, no compositor/desktop matrix claim",
+  "electron": "45.0.0",
+  "chrome": "156.0.8078.48",
+  "embeddedNode": "24.22.0",
+  "harnessNode": "24.22.1",
+  "kernel": "7.1.1-76070101-generic",
+  "orcaVersion": "42.0",
+  "sandbox": true,
+  "contextIsolation": true,
+  "nodeIntegration": false,
+  "webSecurity": true,
+  "noSandboxArgument": false,
+  "renderer": {
+    "runtime": {
+      "sandboxed": true,
+      "contextIsolated": true
+    },
+    "process": "undefined",
+    "require": "undefined"
+  },
+  "accessible": true,
+  "distro": "PRETTY_NAME=\"Pop!_OS 22.04 LTS\"",
+  "checkerSha256": "b6da1c7c0735a9c74b94e832cf3b7b62ee2f5c97f03a14b134a36b50625078f6"
+}

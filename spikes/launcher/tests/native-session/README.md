@@ -1,0 +1,136 @@
+# S0-01 native session probe — bounded GNOME Wayland evidence
+
+This task-owned harness has actual isolated Debian13 native runs after independent source review and an explicit coordinator VM reservation. The GNOME48 Wayland bounded native assertions pass with independently inspected final own-renderer images; earlier screenshot defects are preserved. The subsequent decoy-only KWin Wayland rerun also passes bounded native checks; both X11 scenarios remain incomplete, with their exact limits retained below. This closes no broad physical/session or UI acceptance gate. Do not run it on the user's desktop.
+
+Relevant contract: [S0-01 card](../../../../docs/implementation/tasks/S0-01.md), [Linux integration](../../../../docs/architecture/linux-integration.md#launcher-and-desktop-identity), [security](../../../../docs/architecture/security.md), [testing/release](../../../../docs/implementation/testing-release.md), and DESIGN Shell/navigation, Accessibility and Review gate with canonical tokens. It builds the unchanged actual launcher, including its main/custom protocol/preload/renderer, rather than a replacement UI or simulated native backend. F1-01 is the accepted prerequisite. All formats here are provisional private spike diagnostics, not F0 contracts or a production companion.
+
+## Prepared command and prerequisites
+
+After review and reservation only:
+
+```sh
+node spikes/launcher/tests/native-session/build.ts
+python3 spikes/launcher/tests/native-session/run-session.py gnome-wayland --private-guest
+python3 spikes/launcher/tests/native-session/run-session.py gnome-x11 --private-guest
+python3 spikes/launcher/tests/native-session/run-session.py kwin-wayland --private-guest
+python3 spikes/launcher/tests/native-session/run-session.py kwin-x11 --private-guest
+```
+
+Run each backend separately, never concurrently with input/device or other graphical experiments. The entry refuses root, missing explicit consent flag, a non-Debian13 target, or an enabled input-lab marker. It creates its own HOME/XDG/private runtime, private session D-Bus with no activation services and private keyfile GSettings. X11 uses new Xvfb/Xauthority; native Wayland has no inherited DISPLAY/Xauthority and starts only the software/headless GNOME or virtual KWin backend. No host display, session credentials, settings, desktop entry, portal, service or physical device is used. Private desktop metadata is identity-only (`Exec=/usr/bin/false`), never a shell launch route or host installation.
+
+Required guest packages/runtimes: pinned Node24.22.1/Bun1.4.4/frozen project dependencies and explicit Electron45 setup; Debian GNOME48/Shell/Mutter and KWin6.3.6; GJS; Python3/gi/GTK3; gsettings/gdbus/D-Bus; Xvfb/xauth/xdotool for X11; working Mesa software rendering and Electron's actual Chromium sandbox. No extra JavaScript dependency or manifest change is needed. The private entry guard requires every canonical owned0700 HOME/XDG directory, keyfile settings, fixed system schema/data search paths, and one owned private pathname D-Bus socket with only an optional legitimate GUID. Fallback/abstract/external bus addresses, loader/settings/service overrides and unknown environment names are rejected before settings or native calls. A shell-added PWD is accepted only when it matches the actual canonical working directory. The runner rebuilds a minimal environment; direct Node entry invokes the same reviewed Python guard in an isolated clean child before build/GTK/Electron side effects, including actual target-user/platform/input-marker validation. Unknown environment values are redacted rather than copied to that validator. Package absence or failed startup is unavailable, not a pass. This private bus deliberately does not activate a desktop portal: shortcut-service absence is recorded as unsupported, never user consent or an effective portal binding.
+
+## Observations and actions
+
+The GNOME48 extension and KWin6.3 script inspect only exact driver-supplied launcher/decoy PIDs, then require the fixed native app identity before reading focus/geometry/work area. They never read window titles, captions, content, clipboard, key streams, unrelated window geometry, or unrelated application identity. They may activate only the matched fixed public GTK decoy for explicit challenge setup. They never activate, raise, move, resize or force-focus the launcher. The driver then tests the application's ordinary `show()`/singleton CLI path and records actual compositor observations.
+
+GNOME uses `Meta.Window.get_client_type()`. KWin's scripted `Window` does not expose the effects API's `waylandClient` property; this diagnostic instead reads the already matched QObject's native metaobject class through Qt's wrapper string and discards the address/object-name portion. Exact `KWin::XdgToplevelWindow` means Wayland; exact `KWin::X11Window` means X11; every unknown class fails the backend gate. This is a pinned implementation-detail probe, not an invented public KWin API. It must be confirmed by actual target execution. Native backend evidence is independent of Electron's requested Ozone flag, which is checked separately; an XWayland window fails the native Wayland gate.
+
+The prepared flow requires:
+
+1. Actual renderer sandbox/context isolation/web security, absent renderer Node, Electron45 and the expected Ozone setting.
+2. Matched native identity/backend and actual initial geometry/work area. X11 must fit the work area; Wayland reports compositor-selected placement with the existing actionable component requirement.
+3. Native hidden state after window Close while the same process remains resident.
+4. A matched fixed decoy focused as explicit setup, followed by ordinary CLI `--show`, one launcher window and retained PID. X11 must regain native focus. Wayland records actual native focus or verifies the visible actionable activation/placement component requirement.
+5. Actual registered X11 shortcut activation using one fixed XTest key on the private display, or accurately reported Wayland shortcut/portal state with no invented effective key/consent proof.
+6. Singleton toggle/hide/reopen, explicit UI Quit, native window disappearance, a fresh launch, hidden CLI Quit and native disappearance.
+7. Dark launcher/light capability screenshots from only the launcher's renderer. No screenshot or identity is captured from the decoy or compositor desktop.
+
+The outer process-local supervisor is copied unchanged from reviewed S0-02 sourceb066f4a. Its SHA256 is `0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb` and is included in the source manifest. Local subreaper adoption, pidfd/ancestry checks, repeated-cancellation protection, concurrent SIGTERM and bounded SIGKILL/reaping cover detached child sessions. A SIGKILL of this outer owner itself remains outside its cooperative-cancellation claim. Temporary profiles and raw compositor output are discarded; no raw compositor output is retained. Successful cleanup is required before a complete probe result is recorded.
+
+## Evidence and remaining scope
+
+The next reviewed diagnostic increment adds fixed own-PID/identity/readiness enums, request/parse/predicate progress, and the last fully parsed allowlisted observation even when its predicate fails. It retains exact native identity/backend/geometry/focus assertions and activates no decoy until its identity and geometry are ready. No raw IDs, class names, titles or exception text are retained. Both GNOME/KWin hook sources are exercised offline with synthetic getter traps: unrelated-PID metadata is never inspected, identity mismatch blocks geometry access, and zero geometry cannot pass or activate a decoy before a later ready observation. Full TypeScript/Python schemas reject unknown/nested private fields and inconsistent readiness. Expanded preparation checks pass58/58 with strict typecheck/lint/Python syntax. This source-only result is separate from the archived3528 native evidence; new native execution requires exact-hash review and exclusive reservation.
+
+The signed13b9e2a diagnostic source then ran exactly once on each previously incomplete target after independent58/58 review. All three remain incomplete, with enriched safe evidence in the `*-diagnostics/` sibling directories: KWin Wayland receives valid replies but rejects both fixed decoy identity channels; GNOME X11 establishes initial native identity/geometry, then receives no matching parsed reply after Close; KWin X11 finds two launcher-PID candidates and refuses to inspect their identity/geometry. No cause/fix or acceptance success is inferred. All23 manifest input hashes match the signed source, no source changed between runs, and the exact-marker/process/stage cleanup release is retained. The earlier52 host integration result belongs to its own recorded source; no current68-check mapped host result is inferred by adding58 to10.
+
+The final independently reviewed capture-only source3528f160390707e7dc7e48251e4bbe0cdb1d655a234c8a7501e30214bc7df593 retains exact DOM/theme and bounded paint checks, then captures the actual Electron own renderer through Playwright/CDP without focus/activation calls. Its actual GNOME Wayland rerun passes exit0 and produces the correct dark-search/light-capability images under `evidence/native-session/gnome-wayland/`. All23 executed source-input hashes match signed3c747cc; final provenance and timestamped exact-marker/process cleanup are retained there. These are own-renderer pixels, not compositor-wide screenshots; broad acceptance remains pending.
+
+The same unchanged source then ran the remaining three scenarios sequentially. KWin6.3.6 Wayland exits3 at `decoy-challenge`: actual launcher PID/app identity, native Wayland QObject backend, strict sandbox, geometry and resident close pass; the fixed decoy PID has one window but fails exact identity, so it is never activated. GNOME48 X11 and KWin6.3.6 X11 exit3 at `native-initial-identity` after strict actual Electron/X11 sandbox checks. Their empty persisted observation arrays mean no initial launcher-count predicate succeeded; the driver currently saves only successful predicate observations, so missing acknowledgement versus count/identity/geometry readiness cannot be distinguished. Each safe report, full matching manifest, provenance, precise limitation and timestamped cleanup is retained under its own `evidence/native-session/<backend>/`. No source fix/assertion weakening occurred during these runs; diagnostic follow-up requires new review.
+
+The initial22October2026UTC GNOME48.7 run used source parent7221132 plus the independently reviewed nine-file dirty diffSHA256b958f455da7a8f0b7de62a45b8d22ccd15933ae6216b50a083c92b0c55d14cd4, frozen651-package installation and explicit Electron45 setup. `evidence/native-session/gnome-wayland-initial/` preserves the full exact-input manifest, reviewed diff, provenance, original screenshots and cleanup. Exit0 means `passed-bounded-native-probe`: native Meta Wayland identity, strict renderer sandbox, initial geometry, close/resident singleton, CLI show/toggle/reopen, UI Quit and hidden CLI Quit pass. Ordinary show remains unfocused and reports the actionable component requirement. No portal service/effective binding/consent is proven. Fixed post-run compositor/Electron/node/Xvfb counts are zero and private roots/input marker absent. Both initial screenshots show light ready/search pixels, so their requested dark/capability states are **not established**; capture paint synchronization awaits a separately reviewed fix. This visual limitation does not change the recorded native assertions and is not silently treated as successful visual evidence.
+
+Future actual runs write bounded safe `evidence/native-session/<backend>/report.json`, source manifest, and app-only dark/light screenshots. Reports distinguish native focus outcomes, placement, lifecycle, shortcut/portal availability and cleanup. A strict full public schema validates every result/manifest field, nested runtime/native observation, fixed phase/status, hash and physicalDesktopMatrixEstablished:false before creating a destination or copying reports/screenshots. Unknown fields, private canaries, forged physical=true, missing success observations or mismatched native backends reject the entire publication. No arbitrary source JSON is copied verbatim. A failed phase is incomplete; missing native evidence cannot silently pass. The manifest identifies the actual launcher, host tokens, hooks and cleanup source. Both private entry stages verify fixed allowlisted source/output hashes before compositor execution; a changed generated hook, renderer entrypoint or static HTML fails preflight. The bounded first-party list includes renderer/main.tsx, resources/index.html, every current application source read by launcher/build.ts and its generator, plus frozen root package/lock/desktop-package fingerprints. Canonical tokens and desktop metadata have separate hashes; frozen installation remains dependency authority. The KWin hook is explicitly lowered with esbuild target ES2016 for the pinned QJSEngine, without claiming runtime support from Node syntax acceptance. Reports always retain `physicalDesktopMatrixEstablished:false`: isolated software compositor API proof is separate from physical GPU/session/monitor, portal consent, lock/suspend and broad release acceptance. Earlier host-X11 and private-Xvfb/Orca evidence remain separate.
+
+Offline preparation checks: `preparation.test.ts` exercises the entry guard, independent native backend/identity rejection (including XWayland mismatch), stale/arbitrary/unsafe observation denial, exact actual-source manifest generation/tampered-output rejection, and harmless real detached-child/grandchild SIGTERM/SIGINT teardown. The reviewed-fix suite now passes42/42: seven baseline/provenance cases,22 private-entry cases and13 full-artifact cases. It includes copied-tree renderer/HTML tampering; rejection before any publication of top-level/nested private fields, forged physical proof and extra manifest keys; and actual private pathname D-Bus/direct-driver validation through a harmless shell-added PWD. The positive driver guard substitutes this host's platform eligibility only; separate platform-denial fixtures remain explicit, so it proves no Debian/compositor operation. All checks run without launching a compositor or window. Strict root typecheck/lint and Python AST checks pass. The coordinator owns the shared test map and task/criterion status; suggested integration mapping is this test file.
+
+Primary source/API evidence (reviewed22 October2026 UTC): [Mutter48 window APIs](https://github.com/GNOME/mutter/blob/48.0/src/meta/window.h), [KWin6.3.6 Window properties](https://github.com/KDE/kwin/blob/v6.3.6/src/window.h), [KWin workspace](https://github.com/KDE/kwin/blob/v6.3.6/src/scripting/workspace_wrapper.h), [native Wayland class](https://github.com/KDE/kwin/blob/v6.3.6/src/xdgshellwindow.h), [native X11 class](https://github.com/KDE/kwin/blob/v6.3.6/src/x11window.h), [Qt6.8.2 object wrapper](https://github.com/qt/qtdeclarative/blob/v6.8.2/src/qml/jsruntime/qv4qobjectwrapper.cpp), [Electron BrowserWindow](https://www.electronjs.org/docs/latest/api/browser-window), [Electron app/single-instance lifecycle](https://www.electronjs.org/docs/latest/api/app). API/source availability is not successful target runtime evidence.
+
+A separately reviewed decoy-only correction sets the fixed expected program name before importing GTK or constructing the application. GTK3.24.49 [creates the Wayland xdg app_id from g_get_prgname](https://github.com/GNOME/gtk/blob/3.24.49/gdk/wayland/gdkwindow-wayland.c#L2053-L2059); its later [GTK application metadata](https://github.com/GNOME/gtk/blob/3.24.49/gdk/wayland/gdkwindow-wayland.c#L4966-L5013) is a separate channel. The existing exact-ID observers are unchanged. Python syntax/diff checks and all58 offline preparation checks pass (3.15s); no native rerun has yet established whether this resolves the observed KWin decoy mismatch. Earlier failure evidence remains intact.
+
+The exact signed7c decoy-only snapshot then ran once on actual isolated KWin6.3.6 Wayland, exit0: exact native identities/backend, resident/singleton/quit behavior and ordinary-show focus pass. Placement remains component-required, and portal consent/effective binding is unproven. All23 input hashes and both correct dark/light CDP images were independently reviewed. See [the separate result](../../evidence/native-session/kwin-wayland-decoy-identity/README.md); previous identity failures remain unchanged. The immutable archive excluded later GNOME work, and the guest was released clean after source/cache removal. This establishes no physical/full-session acceptance.
+
+## Lifecycle-only unavailable geometry
+
+The `kwin-x11 --probe-mode lifecycle-only` diagnostic tests S0-01 AC02: resident
+Close, explicit UI Quit and hidden CLI Quit. Its exact page-associated primary,
+PID/class checks, managed membership, pidfd lifetime, generation/nonce, event
+race checks, hidden state, successful exit and native absence remain required.
+This mode does not test focus, shortcut or placement and always returns
+`incomplete`/exit3, including when its selected lifecycle checks complete.
+
+A bare private KWin session can omit `_NET_FRAME_EXTENTS` and `_NET_WORKAREA`.
+Only genuinely absent properties become `null` rectangles in this route. Wrong
+types, formats, lengths, trailing bytes, native errors, invalid client dimensions
+and identity/lifetime failures remain terminal. No zero extents, screen-sized
+work area or client-to-frame substitution is invented. Strict geometry callers
+still reject missing properties; the full native/focus/placement probes and
+GNOME/Wayland observation paths retain their original requirements.
+
+`ownedTargetObserver.geometryCapabilities` reports `frame` and `workArea` as
+`available` or `unavailable`, derived from the recorded known-X11 phase
+observations. Each capability is unavailable if any such recorded rectangle is
+null. The publisher checks this relation, binds it to the exact-owned lifecycle
+route and rejects placement claims in this variant. Non-null geometry remains
+an EWMH frame; the existing `geometryKind` describes that source rather than
+claiming that a rectangle was available. Historical reports without capability
+metadata retain their original strict geometry and placement validation.
+
+Synthetic tests exercise the actual typed property/geometry methods, target
+state machine, lifecycle branch and publication boundary. They do not establish
+native lifecycle acceptance. Independent source review and42 changed checks pass, alongside396 total
+preparation checks and31 runner/32 control fixtures. An actual target run is
+still required; full session, accessibility and release gates
+remain outstanding. Applicable design sections are Shell/navigation,
+Accessibility and Review gate; no product UI or canonical tokens change here.
+## GNOME X11 activation-notice recovery diagnostic (source preparation)
+
+The full GNOME X11 probe now has one bounded diagnostic after its existing
+ordinary-show native-focus assertion fails. That assertion and its deadlines
+are unchanged. The original validated `predicate-unmet` checkpoint is retained
+in `noticeRecovery.originalFailure`; even completed recovery leaves the overall
+probe **incomplete/exit3** and does not continue to the shortcut/lifecycle tail.
+No new probe mode, observer, launcher activation operation or application change
+is introduced. Other backends, lifecycle-only mode, startup/identity failures,
+observer failures and already-focused Show cannot enter the diagnostic.
+
+The diagnostic binds the same live application process and native window handle
+using the existing owned-window reader, then requires fresh native X11 identity,
+visible/unfocused launcher and focused decoy, actual application state reporting
+the activation component requirement, and the visible fixed notice/help action.
+It captures own-renderer dark/light notice pixels and repeats those conditions
+before sending exactly one `xdotool key --clearmodifiers alt+Tab` on the private
+display. It uses the existing five-second input bound, native observation bounds
+and overall runner deadline; there is no retry, alternate chord or force-focus
+fallback. Target handles, PIDs, event payloads and exceptions are not exported.
+
+Completion separately requires native focus on that same live launcher, the
+decoy no longer focused, actual state reporting focus/activation available,
+notice removal and a recovered light screenshot. A final native observation
+checks focus after capture. Fixed booleans distinguish preconditions, attempted
+switch, completed input command, observed recovery and captured screenshots.
+A successful input command alone is not recovery. Partial failure keeps its
+original failure and available bounded observations; cleanup remains the same.
+The strict public schema rejects wrong routes, missing/reordered observations,
+inconsistent flags, private fields, missing required screenshots and attempts to
+promote this diagnostic into overall success.
+
+This is source/test preparation for S0-01-UI, not actual native evidence. Tests
+execute the production branch against fixed fake effects and test artifact
+publication with temporary synthetic files. No compositor or guest has run this
+increment. A future reserved native run must retain exact source/runtime
+provenance, before/after observations, app-only screenshots and verified cleanup.
+An observed Alt+Tab recovery would establish the private XTest desktop-switch
+path only, not physical interaction, automatic activation, portal consent or the
+full release matrix. S0-01's own four-session activation/placement exercise and
+remaining accessibility acceptance remain separately tracked by the coordinator.

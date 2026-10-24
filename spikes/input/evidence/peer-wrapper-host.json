@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "outcome": "ACTUAL_HOST_UNAVAILABLE",
+  "command": "linuxcast-input-spike-peer-probe --observe-private-peer",
+  "sourceCommit": "8a62ab283d6a55fce076ca60e8b320852c2fb316",
+  "integrationCheckpoint": "da2b283eb71b60bee5c71c2b8ab6f5c0d3dbaaed",
+  "runtimeSourceDiffSha256": "81a52535c5fd6e36d812269e5f20ddcbcce06dde47024a64b01c48043e8c833a",
+  "binarySha256": "7ea51672bfd419b375efb10f68d2e9ef70ac19e3f381fb1b3fe82db3eeb18e6c",
+  "distribution": "Pop!_OS22.04",
+  "kernel": "7.1.1-76070101-generic",
+  "architecture": "x86_64",
+  "libsystemdVersion": "249.11-0ubuntu3.20pop0~1778766019~22.04~5586583",
+  "emptyEnvironmentLaunch": true,
+  "elapsedMs": 4.218,
+  "exitCode": 3,
+  "outerProcessDeadlineMs": 7750,
+  "outerCleanupBudgetMs": 8000,
+  "outerTimeout": false,
+  "stdoutBytes": 60,
+  "stderrBytes": 118,
+  "rows": [
+    {
+      "phase": "UNAVAILABLE",
+      "denial": "PEER_SESSION_UNSUPPORTED"
+    }
+  ],
+  "diagnostics": [
+    {
+      "component": "PEER_PROBE",
+      "stage": "STARTUP",
+      "code": "PRIVATE_PEER_OBSERVATION_INCOMPLETE",
+      "io_kind": null,
+      "errno": null
+    }
+  ],
+  "strictPublicSchemaValidated": true,
+  "wrapperReaped": true,
+  "ownedProcessGroupAbsent": true,
+  "ownedTemporaryPathsRemoved": true,
+  "successfulPeerSessionObservation": false,
+  "liveSessionQueryEstablished": false,
+  "inputOperationsPerformed": false,
+  "guestUsed": false,
+  "ac01Complete": false,
+  "ac02Complete": false
+}

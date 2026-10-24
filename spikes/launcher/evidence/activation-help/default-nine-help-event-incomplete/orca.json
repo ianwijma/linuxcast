@@ -1,0 +1,110 @@
+{
+  "status": "incomplete",
+  "stage": "focus:View activation help",
+  "mode": "default-nine",
+  "expectedCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change",
+    "View activation help",
+    "Launcher capabilities",
+    "Launcher capability details",
+    "Search commands"
+  ],
+  "skippedLegacyCheckpoints": [],
+  "expectedPresentationCheckpoints": [
+    "Search commands",
+    "Hide launcher",
+    "Actions Ctrl K",
+    "Record shortcut",
+    "Cancel shortcut change",
+    "View activation help",
+    "Launcher capabilities",
+    "Search commands"
+  ],
+  "helpReading": {
+    "command": "KP_Add",
+    "desktopLayoutVerified": true,
+    "requested": false,
+    "sentences": [
+      {
+        "id": "reason",
+        "generatedAfterCommand": false,
+        "deliveredToSpeechDispatcher": false
+      },
+      {
+        "id": "manual-remediation",
+        "generatedAfterCommand": false,
+        "deliveredToSpeechDispatcher": false
+      },
+      {
+        "id": "companion-limitation",
+        "generatedAfterCommand": false,
+        "deliveredToSpeechDispatcher": false
+      }
+    ]
+  },
+  "headingFocusEventReceiptObserved": false,
+  "recordFocusEventReceiptObserved": true,
+  "helpFocusEvent": {
+    "receiptObserved": true,
+    "queuedObserved": true,
+    "dequeuedObserved": true,
+    "processingCompletedObserved": false
+  },
+  "orcaVersion": "48.1",
+  "startupCompleted": true,
+  "anchors": [
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "nativeFocused": true,
+      "generated": true,
+      "dispatchAttemptObserved": true
+    }
+  ],
+  "presentations": [
+    {
+      "label": "Search commands",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Hide launcher",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Actions Ctrl K",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Record shortcut",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "Cancel shortcut change",
+      "generatedAfterNativeFocus": true,
+      "dispatchAttemptObserved": true
+    },
+    {
+      "label": "View activation help",
+      "generatedAfterNativeFocus": false,
+      "dispatchAttemptObserved": false
+    }
+  ],
+  "anyKnownGenerated": true,
+  "anyKnownDispatchAttemptObserved": true
+}

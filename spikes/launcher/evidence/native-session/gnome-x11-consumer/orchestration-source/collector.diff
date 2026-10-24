@@ -1,0 +1,223 @@
+--- a/collect.py
++++ b/collect.py
+@@ -19,11 +19,11 @@
+ 
+ BACKEND = 'gnome-x11'
+ SIGNED_BASELINE = 'd8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab'
+-INCREMENT_MANIFEST = '1e9b8726d4b23d1305d34d4bf49e792e6c800e000ec5d13f9ead18102f8b5bf4'
+-INCREMENT = '43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1'
+-ARCHIVE_HASH = '216370402d265fa1a12c8a5850976271d980943855c5268fb661bb0d1a8bb0e9'
+-AUTHORITY_HASH = 'b55edf2757b7ee7c81fdc9ad2c7895bb9f87c52378ba35ded9235b0f5e30c44d'
+-MANIFEST_HASH = '6ec0c32036d57e4a2ed0faa83e643420f0478e38f024aeecfa161794b593f44b'
++INCREMENT_MANIFEST = '4f84be42701e6200622c49df226ce326080a222cefd63e1eca2f1bdfd3b5d167'
++INCREMENT = 'efdbc5d72bdc0169484fe5ca55b45c8a0bf08ff64c8d5d24e0c19260d8b54103'
++ARCHIVE_HASH = '7bae027914e1ce33ddb0ed384e48b7924f6e4b0579ae051916bcba7541e971fd'
++AUTHORITY_HASH = '85fc6343bdc6888e00cfa5182a1f8ca78d515cbeb5b73fbac933a82b92565e92'
++MANIFEST_HASH = '6cb4791f7ca07ddf034585dca2778bc3d1067b17e511c9fe8f103dc061d74422'
+ HOME = pathlib.Path('/home/debian')
+ RELATIVE = pathlib.Path('spikes/launcher/tests/native-session')
+ MARKER = pathlib.Path('/run/linuxcast-input-spike-lab')
+@@ -75,8 +75,11 @@
+     require(authority['archiveSha256'] == ARCHIVE_HASH and authority['signedSourceBaselineCommit'] == SIGNED_BASELINE)
+     require(authority['reviewedIncrementSha256'] == INCREMENT and authority['sourceDirty'] is True and authority['sourceSigned'] is False)
+     require(authority['reviewedIncrementManifestSha256'] == INCREMENT_MANIFEST and authority['buildManifestSha256'] == MANIFEST_HASH)
++    require(authority['reviewedComponentIncrementSha256'] == [
++        '43922b47b6a9e084054fec278dbeffbdbaf417c7c598c8a23e7163be8bd5a1f1',
++        '5ddf091419ba927790d785879b9e3185a29a3d90eb32b7a56469ac2ca0507bf6'])
+     source = stage / RELATIVE
+-    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 5)
++    require(len(authority['sourceSha256']) == 24 and len(authority['reviewedPatchedFileSha256']) == 8)
+     for name, expected in authority['sourceSha256'].items():
+         file = pathlib.Path(os.path.abspath(source / name))
+         require(file.is_relative_to(stage) and digest(regular_bytes(file, 16 * 1024 * 1024)) == expected)
+--- a/host.py
++++ b/host.py
+@@ -19,10 +19,10 @@
+ import threading
+ 
+ HERE = pathlib.Path(__file__).resolve().parent
+-IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable')
++IMMUTABLE = pathlib.Path('/tmp/linuxcast-s001-consumer-immutable')
+ SOURCE = pathlib.Path('/tmp/linuxcast-s0-01/spikes/launcher/tests/native-session')
+ # Filled only when the final reviewed collector/phase is frozen.
+-COLLECTOR_HASH = '466f7358200055c3a7d29eaab7ef43b88995d4dcb982d02c9ad63523a57a3aff'
++COLLECTOR_HASH = 'b9791ee62da4d27d5070360f69f1925cb01892eb8b94a49b8571cb0f47eb6aa1'
+ PHASE_HASH = 'bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754'
+ CONTAINER = 'linuxcast-s0-04-vm'
+ SSH = ['docker', 'exec', '-i', CONTAINER, '/usr/bin/ssh', '-i', '/lab/test-key', '-p', '2222',
+--- a/test_collect.py
++++ b/test_collect.py
+@@ -48,8 +48,8 @@
+             collect.public_report(self.report, artifacts)
+ 
+     def capture_fixture(self):
+-        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable/build-manifest.json')).read_text())
+-        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable/authority.json').read_text())
++        manifest = json.loads((pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/build-manifest.json')).read_text())
++        authority = json.loads(pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/authority.json').read_text())
+         (self.root / 'report.json').write_text(json.dumps(self.report))
+         (self.root / 'source-manifest.json').write_text(json.dumps(manifest))
+         return authority, manifest
+@@ -81,7 +81,7 @@
+     def test_postrun_build_rejects_self_consistent_manifest_or_output_change(self):
+         directory = self.root / 'dist'
+         directory.mkdir()
+-        original = (pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable/build-manifest.json')).read_bytes()
++        original = (pathlib.Path('/tmp/linuxcast-s001-consumer-immutable/build-manifest.json')).read_bytes()
+         (directory / 'manifest.json').write_bytes(original)
+         manifest = json.loads(original)
+         altered = copy.deepcopy(manifest)
+@@ -104,8 +104,8 @@
+         with self.assertRaises(ValueError):
+             collect.capture(self.root, authority, artifacts, 3, manifest)
+ 
+-    def test_authority_rejects_tampered_actual_renderer_input(self):
+-        original = pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable')
++    def test_authority_rejects_tampered_renderer_and_each_new_consumer_runtime_input(self):
++        original = pathlib.Path('/tmp/linuxcast-s001-consumer-immutable')
+         authority = json.loads((original / 'authority.json').read_text())
+         stage = self.root / 'source'
+         stage.mkdir()
+@@ -117,14 +117,20 @@
+             destination.parent.mkdir(parents=True, exist_ok=True)
+             shutil.copyfile(pathlib.Path('/tmp/linuxcast-s0-01') / name, destination)
+         collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+-        (stage / 'spikes/launcher/src/renderer/main.tsx').write_text('private-canary')
+-        with self.assertRaises(ValueError):
++        for name in ('spikes/launcher/src/renderer/main.tsx', *(str(collect.RELATIVE / name) for name in ('check.ts', 'protocol.ts', 'artifacts.py'))):
++            file = stage / name
++            unchanged = file.read_bytes()
++            file.write_text('private-canary')
++            with self.assertRaises(ValueError):
++                collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
++            file.write_bytes(unchanged)
+             collect.verify_authority(stage, original / 'source.tgz', original / 'authority.json')
+ 
+     def test_authority_cannot_fall_back_to_the_previous_signed_runtime(self):
+-        old = pathlib.Path('/tmp/linuxcast-s001-prevalidation-51ed-immutable')
+-        with self.assertRaises(ValueError):
+-            collect.verify_authority(self.root, old / 'source.tgz', old / 'authority.json')
++        for path in ('/tmp/linuxcast-s001-prevalidation-51ed-immutable', '/tmp/linuxcast-s001-lifecycle-immutable'):
++            old = pathlib.Path(path)
++            with self.assertRaises(ValueError):
++                collect.verify_authority(self.root, old / 'source.tgz', old / 'authority.json')
+ 
+     def test_cleanup_and_package_types(self):
+         for field, value in (('privateProcessTreeCleanupVerified', 1), ('packages', ['/private/canary']),
+--- a/test_orchestration.py
++++ b/test_orchestration.py
+@@ -120,6 +120,47 @@
+         with self.assertRaises(ValueError):
+             self.validate(value)
+ 
++    def test_consumer_public_report_roundtrip_at_explicit_saturation(self):
++        consumer = {'request': 2, 'pollCount': 255,
++                    'outcomes': {'missing': 0, 'other-serial': 255, 'matching': 0, 'parse-rejected': 0, 'poll-error': 0},
++                    'pollsCapped': True, 'elapsedMs': 180000, 'elapsedCapped': True}
++        value = self.response()
++        self.edit_file(value, 'report.json', lambda item: item.update(consumerRead=consumer))
++        files, release = self.validate(value)
++        self.assertEqual(json.loads(files['report.json'])['consumerRead'], consumer)
++        self.assertEqual(release['collectorExitCode'], 3)
++        self.assertEqual(json.loads(files['report.json'])['status'], 'unavailable')
++
++    def test_consumer_public_report_rejects_private_types_counts_and_forged_caps(self):
++        consumer = {'request': 2, 'pollCount': 0,
++                    'outcomes': {'missing': 0, 'other-serial': 0, 'matching': 0, 'parse-rejected': 0, 'poll-error': 0},
++                    'pollsCapped': False, 'elapsedMs': 1, 'elapsedCapped': False}
++        mutations = [lambda row: row.update(private='synthetic-private-canary'),
++                     lambda row: row['outcomes'].update(private='synthetic-private-canary'),
++                     lambda row: row.update(pollCount=True), lambda row: row.update(request=True),
++                     lambda row: row.update(pollsCapped=True), lambda row: row.update(elapsedCapped=True),
++                     lambda row: row['outcomes'].update(missing=1),
++                     lambda row: row['outcomes'].update(matching='synthetic-private-canary')]
++        for change in mutations:
++            value = self.response()
++            altered = copy.deepcopy(consumer)
++            change(altered)
++            self.edit_file(value, 'report.json', lambda item: item.update(consumerRead=altered))
++            with self.assertRaises(ValueError):
++                self.validate(value)
++
++    def test_previous_lifecycle_provenance_is_not_a_consumer_run(self):
++        previous = json.loads(pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable/authority.json').read_text())
++        mutations = {'reviewedIncrementSha256': previous['reviewedIncrementSha256'],
++                     'archiveSha256': previous['archiveSha256'],
++                     'sourceArchiveAuthoritySha256': hashlib.sha256(pathlib.Path('/tmp/linuxcast-s001-lifecycle-immutable/authority.json').read_bytes()).hexdigest(),
++                     'collectorSha256': '466f7358200055c3a7d29eaab7ef43b88995d4dcb982d02c9ad63523a57a3aff'}
++        for name, old in mutations.items():
++            value = self.response()
++            self.edit_file(value, 'provenance.json', lambda item: item.update({name: old}))
++            with self.assertRaises(ValueError):
++                self.validate(value)
++
+     def test_forged_zero_exit_cannot_promote_incomplete(self):
+         value = self.response()
+         value['collectorExitCode'] = 0
+--- a/README.md
++++ b/README.md
+@@ -1,56 +1,15 @@
+-# Unsigned lifecycle snapshot collector: local preparation only
++# S0-01 unsigned consumer collector preparation
+ 
+-No Docker, SSH, guest, native display, guest staging, signing or push action occurred
+-in preparing or verifying this bundle. Root/independent006 review and separate
+-explicit reservation/execution authority are required. A command flag does not
+-grant permission.
++LOCAL ONLY: this source bundle neither accesses the guest nor authorizes a native run. It updates the previously reviewed3f084a lifecycle collector only for the new exact consumer+ lifecycle authority. No retries, new backend, source behavior, readiness wait, native effect or timing budget is introduced. Phase is byte-identical bbe00ac5.
+ 
+-The immutable source is /tmp/linuxcast-s001-lifecycle-immutable/source.tgz, built
+-from exact git archive of signed d8b6f6e8cedfe76e5c97fdac6a0ebe81940f9cab plus
+-ONLY the frozen five-file43922 lifecycle overlay. File-for-file comparison proves
+-455 tracked archive files with exactly five changed files and three changed
+-runtime inputs: observer_startup.py, run-session.py, protocol.ts. New uncommitted
+-evidence and all other working-tree state are excluded. New authority pins24
+-inputs/5overlays/static resources/3outputs and the new raw6ec0 build manifest.
+-Historical8bf/ed9/51ed/706e archives, source and actual evidence stay unchanged.
++Immutable inputs: /tmp/linuxcast-s001-consumer-immutable/source.tgz (7bae0279), authority.json (85fc6343), build-manifest.json (6cb4791f). Source derives from signed baseline d8b6 + exact8 reviewed efdbc5d7 overlays, component increments43922(lifecycle) and5ddf0914(consumer). Authority pins reviewed4f84 manifest, all8overlay files,24runtime inputs,3static outputs, tokens and desktop file. archive-path-index.json lists all455regular file hashes/modes and66directory paths/modes. No installed dependencies, new evidence or unrelated worktree state is included.
+ 
+-Provenance explicitly requires executedRuntimeCommit=null,
+-runtimeInputsMatchSignedCommit=false, sourceSigned=false, sourceDirty=true,
+-signedSourceBaselineCommit=d8b6 and reviewedIncrementSha256=43922. The archive is
+-not a whole signed tree. No fallback accepts the prior signed runtime authority;
+-normal signing failure does not authorize unsigned commits or configuration
+-changes. The preserved archive/authority/review patch manifests are the authority
+-for a possible later explicitly approved unsigned-snapshot execution.
++Five runtime inputs differ from d8: check.ts, protocol.ts, run-session.py, observer_startup.py and artifacts.py. Provenance must remain executedRuntimeCommit=null, runtimeInputsMatchSignedCommit=false, signedSourceBaselineCommit=d8b6, sourceSigned=false, sourceDirty=true, reviewedIncrementSha256=efdbc5d7; whole archive is not a signed tree. Old439/216/6ec0 and51ed authority are not accepted as this run. The authority records both component hashes. New authority, archive, manifest and collector are exact pins; no permissive fallback.
+ 
+-The orchestration remains derived from reviewed706e: exact lc1-eight-character
+-owned0700 root, same-stage t TMPDIR, numeric path lengths78/96/77/95,max107 and
+-random suffix precheck; historical/new other-root detection; canonical owner/
+-inode/no-follow/exclusive copies; fixed Node/Bun hashes before/after; all install/
+-Electron/XDG/temp caches private; repeated-HUP shield during existing supervisor
+-teardown. Original45/180/240 native budgets and300/330/920 cleanup guards remain,
+-with no retries, added readiness waits, query, identity/replay/activation changes.
++Native boundary unchanged: run-session original45s startup/180s checker/240s total; collector300s/phase330s/transport920s, once only. Fixed gnome-x11. No request replay, source fixes or retries. Short lc1- collection/source/t layout retains private socket numeric bounds78/96/77/95(max107), private owned0700/inode/O_NOFOLLOW/O_EXCL paths, historical roots detection, minimal environment, exact Node/Bun hashes and private install caches. HUP teardown shield and reviewed Supervisor remain unchanged. Source preflight, exact build-manifest rawhash/equality after execution, strict publisher/host schemas and verified cleanup-before-delete remain enforced.
+ 
+-Host.py verifies exact new source/authority/build-manifest/collector/phase pins,
+-then creates a private local capsule and uses the reviewed stdin-only fixed
+-Docker/SSH path. There are no container transfer files or key reads. Guest_phase
+-owns its new root before extraction/preparation, and always removes it in finally;
+-collect.py uses the reviewed Supervisor and one unchanged runner invocation.
+-Only fixed public report/manifest, optional own-renderer/CDP images, strictly
+-validated provenance/cleanup/release may be exported. Every nested lifecycle
+-field is validated by the new Python report schema. Raw child output/errors,
+-private IDs/paths and arbitrary file names never become durable output. A false
+-clean release, physical matrix or signed-source claim rejects. Failed collection
+-does not rerun or claim a verified release without a valid response.
++Reports may optionally contain only the exact reconstructed consumerRead schema. Matching includes terminal typed hook failure, so it is not success evidence; diagnostic saturation does not alter polling. Host rejects private fields, booleans masquerading as counts, impossible sums and unsaturated cap claims. Earlier actual lifecycle/short-layout outcomes remain INCOMPLETE and are not reinterpreted.
+ 
+-The updated source diagnostic records only own compositor Popen state/exit code
+-and independent EOF/readerAlive/stopRequested facts at reached boundaries. Its
+-finally sample is after bounded drain close but before outer process teardown,
+-not post-cleanup proof. No crash/cause label or acceptance closure is inferred.
++Harmless checks52/52 PASS1.173s on host Python3.10.12; no bus/display/guest/native runner is invoked. Includes same original49checks (private Unix bind107/108, owned detached child and repeatedHUP cleanup, bounded overflow, path/type/inode collisions, tools/caches) plus3consumer public-schema/old-provenance regressions. Expanded tamper test rejects renderer and each of3new consumer runtime files. Python AST and exact archive455regular/66directories/eight-only overlay comparisons pass. Source163configured preparation and strictTS were independently passed by coordinator before this archive.
+ 
+-Harmless local checks:29collector+20orchestration=49 pass, including old-authority
+-rejection, changed-source rejection, unsigned-to-signed provenance mutations,
+-lifecycle report/private-field roundtrip, full repeated-HUP resistant-child
+-cleanup, socket107accept/108+113reject, ownership collisions and cache/tool pins.
+-The source-only runtime suite separately passes128checks plus strict type/lint/
+-AST verification. Unix bind fixtures need ordinary approved local permission;
+-no guest/network/display action is performed by these tests.
++Execution requires coordinator and independent review of the exact manifest and a separate explicit reservation. No signing, staging, publishing or guest preparation was performed.

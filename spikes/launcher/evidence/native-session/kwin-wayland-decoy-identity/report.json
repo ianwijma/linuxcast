@@ -1,0 +1,649 @@
+{
+  "task": "S0-01",
+  "backend": "kwin-wayland",
+  "status": "passed-bounded-native-probe",
+  "physicalDesktopMatrixEstablished": false,
+  "evidenceKind": "actual-isolated-software-compositor-launcher",
+  "kernel": "6.12.113+deb13-amd64",
+  "hostDisplayClipboardInputOrSettingsUsed": false,
+  "launcherCompanionActivationOrPlacementUsed": false,
+  "stage": "complete",
+  "observations": [
+    {
+      "phase": "initial-native-launch",
+      "native": {
+        "request": 1,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 170,
+            "width": 720,
+            "height": 560
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "after-close-native-hidden",
+      "native": {
+        "request": 2,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "decoy-native-ready",
+      "native": {
+        "request": 3,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "decoy-focused-before-ordinary-show",
+      "native": {
+        "request": 5,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "ordinary-singleton-cli-show",
+      "native": {
+        "request": 6,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 170,
+            "width": 720,
+            "height": 560
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "wayland-singleton-toggle-hidden",
+      "native": {
+        "request": 7,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "wayland-singleton-reopened",
+      "native": {
+        "request": 8,
+        "launcher": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 280,
+            "y": 170,
+            "width": 720,
+            "height": 560
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": false,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "after-ui-quit-native-window-absent",
+      "native": {
+        "request": 9,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "fresh-resident-native-hidden",
+      "native": {
+        "request": 10,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    },
+    {
+      "phase": "after-hidden-cli-quit-native-window-absent",
+      "native": {
+        "request": 11,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    }
+  ],
+  "initialPlacementInsideWorkArea": true,
+  "closeRetainedResidentProcess": true,
+  "decoyActivationUsedForChallengeSetup": true,
+  "singletonShowRetainedPid": true,
+  "ordinaryShowNativeFocused": true,
+  "componentRequirementVisible": true,
+  "explicitUiQuitExited": true,
+  "hiddenCliQuitExited": true,
+  "nativeDiagnostic": {
+    "phase": "after-hidden-cli-quit-native-window-absent",
+    "state": "predicate-met",
+    "lastObservation": {
+      "phase": "after-hidden-cli-quit-native-window-absent",
+      "native": {
+        "request": 11,
+        "launcher": {
+          "count": 0,
+          "identityMatches": false,
+          "focused": false,
+          "hidden": true,
+          "geometry": null,
+          "workArea": null,
+          "nativeBackend": "unsupported"
+        },
+        "decoy": {
+          "count": 1,
+          "identityMatches": true,
+          "focused": true,
+          "hidden": false,
+          "geometry": {
+            "x": 460,
+            "y": 341,
+            "width": 360,
+            "height": 217
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 900
+          },
+          "nativeBackend": "wayland"
+        },
+        "decoyActivationIssued": false,
+        "diagnostics": {
+          "launcher": {
+            "pidMatch": "none",
+            "primaryIdentity": "not-inspected",
+            "secondaryIdentity": "not-inspected",
+            "geometry": "not-inspected",
+            "workArea": "not-inspected"
+          },
+          "decoy": {
+            "pidMatch": "single",
+            "primaryIdentity": "match",
+            "secondaryIdentity": "match",
+            "geometry": "ready",
+            "workArea": "ready"
+          }
+        }
+      }
+    }
+  },
+  "runtime": {
+    "electron": "45.0.0",
+    "chrome": "156.0.8078.48",
+    "ozone": "wayland",
+    "noSandbox": false,
+    "sandbox": true,
+    "contextIsolation": true,
+    "nodeIntegration": false,
+    "webSecurity": true,
+    "renderer": {
+      "runtime": {
+        "sandboxed": true,
+        "contextIsolated": true
+      },
+      "process": "undefined",
+      "require": "undefined"
+    }
+  },
+  "shortcut": {
+    "state": "permission-required",
+    "effectiveBindingExposed": false,
+    "portalServicePresent": false,
+    "consentOrEffectiveBindingProven": false
+  },
+  "activationOutcome": "normal-show-focused-component-placement-still-required",
+  "privateProcessTreeCleanupVerified": true,
+  "packages": [
+    "gnome-shell 48.7-0+deb13u2",
+    "kwin-wayland 4:6.3.6-1",
+    "kwin-x11 4:6.3.6-1",
+    "libqt6qml6 6.8.2+dfsg-7",
+    "mutter 48.7-0+deb13u1"
+  ]
+}

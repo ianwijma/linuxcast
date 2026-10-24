@@ -1,0 +1,76 @@
+{
+  "scope": "Exactly one default-nine diagnostic with four fixed help-event progression booleans",
+  "signedSourceSubset": true,
+  "signedCommit": "55301bffde97ca3cf2a8bc893f8f39df7d0a3618",
+  "signatureVerifiedAgainstConfiguredPublicKey": true,
+  "selectedSignedInputCount": 335,
+  "excludedPreservedEvidenceCount": 419,
+  "wholeSignedTreeVerified": false,
+  "sourceManifestSha256": "6665f4d3a62d2273af7fbcee7f3b1db5c683de3ede9dc433a7ebc1e24e06a30c",
+  "signedChangesArchiveSha256": "daa3a87953c765323a49e3db5e480198ac80887bfdf4acb0d31c2584afd99b26",
+  "readinessSha256": "13377029286a6f37ed104e3c6df6d18495c3246127c63254d8ded4b4858b92b4",
+  "resumeBaselineSha256": "6b73986fbaf55f89913f8ab75e46b881270194806a44cc80381c7527bf58ccd1",
+  "historicalOrcaAuthorityReference": "../../readiness.json",
+  "historicalOrcaAuthoritySha256": "91d68771eedaf8abce6f5d67379947bc892017821052006bebf06af879498885",
+  "genericPreparationReference": "../native-preparation-20261024T110028Z/generic-boot-readiness.json",
+  "genericPreparationSha256": "291717d0928b5600e2dc47b6c6ab160ad8654fe6a9270440db4f448141297b41",
+  "command": "node spikes/launcher/tests/at/xvfb-orca.ts",
+  "outerTimeoutSeconds": 290,
+  "outerKillGraceSeconds": 10,
+  "innerDeadlinesUnchanged": true,
+  "runtimeHashes": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "atHashes": {
+    "spikes/launcher/tests/at/check.ts": "ec0bd47b0c225db2cab2d1e70ec8fbaef0b320283674bb4d0c5727f34f52e462",
+    "spikes/launcher/tests/at/activation-help-mode.test.ts": "8e646c39e3e29683f3e3a2e8d25e10656e93fae382e216dfd47aa26472f5157c",
+    "spikes/launcher/tests/at/README.md": "99d14706bb9913b14d47ce9e21c18cb104805ade1b5c0d18625b470537f0a146"
+  },
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "kernel": "6.12.113+deb13-amd64",
+  "environmentDifferenceFromPriorRun": "Prepared generic6.12.113+deb13-amd64 with GNOME/Mutter packages; prior run used cloud kernel. Not a controlled comparison or historical cause diagnosis.",
+  "rerunPerformed": false,
+  "rawOrcaLogsOrProfilesExported": false,
+  "startedAtUtc": "2026-10-24T11:24:51.856990+00:00",
+  "endedAtUtc": "2026-10-24T11:26:13.197865+00:00",
+  "exitCode": 3,
+  "clearedPriorUntrackedFixedOutputs": true,
+  "copiedPublicFiles": [
+    "runtime.json",
+    "report.json",
+    "native-at.json",
+    "orca.json",
+    "dark-search.png",
+    "dark-actions.png",
+    "light-shortcut.png"
+  ],
+  "screenshotsAvailable": [
+    "dark-search.png",
+    "dark-actions.png",
+    "light-shortcut.png"
+  ],
+  "missingFixedFiles": [
+    "light-activation-help.png"
+  ],
+  "status": "incomplete",
+  "finalStage": "focus:View activation help",
+  "helpFocusEvent": {
+    "receiptObserved": true,
+    "queuedObserved": true,
+    "dequeuedObserved": true,
+    "processingCompletedObserved": false
+  },
+  "recordFocusEventReceiptObserved": true,
+  "copiedPublicFilesVerifiedAgainstGuestBeforeRemoval": true,
+  "ownedOutputFilesRemovedAfterPreservation": true,
+  "privateExecutionLogRemoved": true,
+  "artifactPrivacyReview": "Four fixed public JSON reports and three own-app screenshots reviewed; public control labels/pixels only. No raw logs, profiles, keys or unrelated application contents exported.",
+  "guestShutdownPerformed": false,
+  "guestHandedBackRunning": true,
+  "handoffAtUtc": "2026-10-24T11:28:58.420644+00:00",
+  "cleanupAndIntegrityVerified": true,
+  "guestSourceRetained": true,
+  "acceptanceLimitation": "Default-nine incomplete at help-button presentation. Receipt/queue/dequeue observed; unambiguous processing completion and required presentation unobserved. No cause diagnosis, historical reinterpretation, audible/tactile or desktop-matrix claim."
+}

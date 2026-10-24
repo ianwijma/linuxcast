@@ -1,0 +1,20 @@
+{
+  "task": "S0-01",
+  "outcome": "unavailable",
+  "physicalDesktopMatrixEstablished": false,
+  "sha256": {
+    "README.md": "7876a49e023455f541d61f8d47feeebf2d13d0fce4ba3b2f37363a1d7a41e503",
+    "cleanup.json": "dac48031a11ebd617f094d118db9edc7654068ffb2ac986509c69b1a37829d2c",
+    "orchestration-source/README.md": "d50a9de49f5fb0ccffac459ec6a0df79cc445e1b69f1f31573426b8f00ab7117",
+    "orchestration-source/collect.py": "08f8f29ce9c85077fbaf1e1ea26a5b673ec7188153c20d86d3da12b0d5ae6dd6",
+    "orchestration-source/guest_phase.py": "abe52fa2b35c1e881cdea8635e42bd7c02726694211cd649aded91a073e1ec68",
+    "orchestration-source/host.py": "02201747a1257f4a91aabeebe16752561745ec1c93c0e9d083bc3519cd9169c4",
+    "orchestration-source/manifest.json": "1cca456f603acfb703645c60feb080d8e9883e83996d47814f4f2950865f724e",
+    "orchestration-source/test_collect.py": "c4f4016f4029ab67616ddc05fcb31a98ec66bb9fc860ab3df137f57a63910cb6",
+    "orchestration-source/test_orchestration.py": "23dff9ee60d8e3a0a4720b47e59b235a66bc27d4d0ee232c518eda5f29a3bb18",
+    "provenance.json": "68a671f02bb2f4ea0da9431ce9774dde2293f2ae74c9cb5defdf553d1f047968",
+    "release.json": "7c5842febebaa69565bd9eb316db990ca3ef914d3f79e6f08fbbee3fc0db5ce5",
+    "report.json": "26ae9f97124c115aebcb2eb1c5be133b0981253ed3416d662915da167cfff346",
+    "source-manifest.json": "56f2e4270f49b516c3f4d52581310040288f346560730a5bff55e9798b02faf9"
+  }
+}

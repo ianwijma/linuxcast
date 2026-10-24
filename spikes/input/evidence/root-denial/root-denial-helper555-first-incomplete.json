@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "operation": "ROOT_PROOF_COLLECT_ONCE",
+  "rootReport": {
+    "schemaVersion": 1,
+    "operation": "ROOT_DEVICE_FREE_DENIAL_ONCE",
+    "preflight": {
+      "nativeOriginalsUnchanged": true,
+      "inputProgramsAbsent": true,
+      "graphicalSessionsAbsent": true,
+      "manufacturedDevicesAbsent": true,
+      "markerAbsent": true,
+      "privateDesktopRootsAbsent": true,
+      "guiProcessesAbsent": true,
+      "busBaselineUnchanged": true
+    },
+    "runtime": {
+      "distribution": "debian",
+      "debianVersion": "13.7",
+      "kernel": "6.12.113+deb13-amd64",
+      "architecture": "x86_64",
+      "libsystemdVersion": "257.13-1~deb13u1",
+      "pythonVersion": "3.13.5"
+    },
+    "supervisorSha256": "4fd4609ab5acfd5131c403fe0b9dd9a8460bf35f698798d1025ef401401fba00",
+    "helperSha256": "b80cc6a4c5577040ee679a9c657d6e6db04c8b4478cbb46ab70d6d2d883d1bc9",
+    "actualRows": [],
+    "diagnostics": [],
+    "actualRootDropProof": false,
+    "ownConnectorPeerBound": false,
+    "pdeathProofKind": "READY_REQUIRES_REVIEWED_HELPER_SELF_READBACK",
+    "directParentDeathTrialPerformed": false,
+    "noInputBranchExecuted": false,
+    "wrapperGatePassed": false,
+    "failureCode": "ROOT_DENIAL_OBSERVATION_INCOMPLETE",
+    "failureStage": "SPAWN_SUPERVISOR",
+    "ownedLifetimeObservation": {
+      "knownLive": 1,
+      "knownExitReady": 0,
+      "unknown": 0,
+      "knownReaped": 0
+    },
+    "ownedStopElapsedMs": 10.994,
+    "criticalCleanupElapsedMs": 98.6,
+    "cleanup": {
+      "ownedChildrenAbsent": true,
+      "ownedGroupsAbsent": true,
+      "signalOperationsSucceeded": true,
+      "ownedObjectsRemoved": true,
+      "withinCleanupBudget": true
+    },
+    "ordinaryCancellationObserved": false,
+    "postflight": {
+      "nativeOriginalsUnchanged": true,
+      "inputProgramsAbsent": true,
+      "graphicalSessionsAbsent": true,
+      "manufacturedDevicesAbsent": true,
+      "markerAbsent": true,
+      "privateDesktopRootsAbsent": true,
+      "guiProcessesAbsent": true,
+      "busBaselineUnchanged": true
+    },
+    "helperPathAbsent": true
+  },
+  "rootCapsuleRemoved": true,
+  "bootstrapCancellationObserved": false,
+  "complete": false
+}

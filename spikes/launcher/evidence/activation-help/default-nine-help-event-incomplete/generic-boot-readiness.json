@@ -1,0 +1,93 @@
+{
+  "scope": "Post-install generic-boot preparation readiness only; no source synchronization or desktop/application/AT/native test",
+  "checkedAtUtc": "2026-10-24T11:17:38.895391+00:00",
+  "guestUid": 1000,
+  "debianVersion": "13.7",
+  "kernel": "6.12.113+deb13-amd64",
+  "kernelConfig": {
+    "CONFIG_UNIX_DIAG": "CONFIG_UNIX_DIAG=m",
+    "CONFIG_INPUT_EVDEV": "CONFIG_INPUT_EVDEV=m",
+    "CONFIG_DRM": "CONFIG_DRM=m",
+    "CONFIG_DRM_BOCHS": "CONFIG_DRM_BOCHS=m",
+    "CONFIG_DRM_QXL": "CONFIG_DRM_QXL=m",
+    "CONFIG_DRM_VIRTIO_GPU": "CONFIG_DRM_VIRTIO_GPU=m",
+    "CONFIG_VIRTIO_PCI": "CONFIG_VIRTIO_PCI=y"
+  },
+  "defaultTarget": "multi-user.target",
+  "oneTimeGrubNextEntryConsumed": true,
+  "policyRcDRestoredAbsent": true,
+  "cloudKernelPreserved": true,
+  "genericImageAndInitramfsPresent": true,
+  "installedPackages": [
+    "gjs 1.82.3-1 installed",
+    "gnome-shell 48.7-0+deb13u2 installed",
+    "libegl-mesa0:amd64 25.0.7-2+deb13u1 installed",
+    "linux-image-6.12.113+deb13-amd64 6.12.113-1 installed",
+    "linux-image-amd64 6.12.113-1 installed",
+    "mutter 48.7-0+deb13u1 installed"
+  ],
+  "dpkgAuditClean": true,
+  "selectedSignedCommit": "2fcbdaed159ff10aa313ad0555eaf379ce1f7f40",
+  "selectedSourceCount": 335,
+  "selectedChangedPaths": [],
+  "preservedEvidenceCount": 419,
+  "preservedEvidenceChangedPaths": [],
+  "wholeSignedTreeVerified": false,
+  "runtimeHashes": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "historicalOrcaComparison": {
+    "count": 13,
+    "changedPaths": []
+  },
+  "prospectiveOrcaComparison": {
+    "authority": "Five upstream source hashes independently reviewed for signed55301bf AT observation; separate from historical13 authority",
+    "expectedHashes": {
+      "event_manager.py": "2d181d4595444455ea2379d7bff2bf1cc25def9fb8170d3cd1ff81b1b08a5972",
+      "ax_object.py": "13c06867590b427f51d846425be4a560c7a71ac515482e7d91abc482f6a9a002",
+      "ax_utilities_application.py": "d1ec5dd19127a3004b19986e22e1affdb33414a1e3628364f0888bb661177377",
+      "ax_utilities_debugging.py": "c21b12c5e7ff1fa5120f9073f3b2a9478826623fed581279c2e77b267a3c6482",
+      "debug.py": "ca2159aba7c42282b65235e493c67f092b893fc0b7e9b00c602a4705c995ffd8"
+    },
+    "actualHashes": {
+      "event_manager.py": "2d181d4595444455ea2379d7bff2bf1cc25def9fb8170d3cd1ff81b1b08a5972",
+      "ax_object.py": "13c06867590b427f51d846425be4a560c7a71ac515482e7d91abc482f6a9a002",
+      "ax_utilities_application.py": "d1ec5dd19127a3004b19986e22e1affdb33414a1e3628364f0888bb661177377",
+      "ax_utilities_debugging.py": "c21b12c5e7ff1fa5120f9073f3b2a9478826623fed581279c2e77b267a3c6482",
+      "debug.py": "ca2159aba7c42282b65235e493c67f092b893fc0b7e9b00c602a4705c995ffd8"
+    },
+    "changedPaths": []
+  },
+  "processCounts": {
+    "gnome-shell": 0,
+    "kwin_x11": 0,
+    "kwin_wayland": 0,
+    "Xvfb": 0,
+    "Xorg": 0,
+    "electron": 0,
+    "node": 0,
+    "orca": 0,
+    "speech-dispatch": 0,
+    "sd_dummy": 0,
+    "at-spi2-registr": 0,
+    "dbus-broker": 0,
+    "esbuild": 0,
+    "pipewire": 0,
+    "wireplumber": 0
+  },
+  "systemDbusDaemonUids": [
+    996
+  ],
+  "privateTestRootCounts": {
+    "linuxcast-s001-matrix-": 0,
+    "linuxcast-s001-at-bus-": 0,
+    "linuxcast-launcher-at-": 0,
+    "xvfb-run.": 0
+  },
+  "inputLabMarkerPresent": false,
+  "sourceSynchronized": false,
+  "testExecuted": false,
+  "limitation": "Package/kernel readiness only. No native graphics, desktop, application or AT integration acceptance established."
+}

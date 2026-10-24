@@ -1,0 +1,54 @@
+{
+  "checkedAtUtc": "2026-10-24T10:41:24.040042+00:00",
+  "uid": 1000,
+  "debianVersion": "13.7",
+  "kernel": "6.12.113+deb13-cloud-amd64",
+  "counts": {
+    "dbus-daemon": 0,
+    "dbus-broker": 0,
+    "at-spi2-registr": 0,
+    "speech-dispatch": 0,
+    "sd_dummy": 0,
+    "Xvfb": 0,
+    "electron": 0,
+    "chrome_crashpad": 0,
+    "orca": 0,
+    "node": 0,
+    "esbuild": 0,
+    "python3": 0
+  },
+  "privateRootsPresent": {
+    "linuxcast-s001-at-bus-": false,
+    "linuxcast-launcher-at-": false,
+    "xvfb-run.": false
+  },
+  "inputLabMarkerPresent": false,
+  "guestManifestSha256": "205efa27a29737daf45df89f84f361a067416258caeb6f60c9605a779c04c0e0",
+  "sourceFilesVerified": 754,
+  "sourceChangedPaths": [],
+  "runtimeHashes": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "runtimeHashesUnchanged": true,
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "orcaSourceChangedPaths": [],
+  "packages": {
+    "orca": "48.1-1+deb13u2",
+    "at-spi2-core": "2.56.2-1+deb13u2",
+    "python3-gi": "3.50.0-4+b1",
+    "python3-pyatspi": "2.46.1-1",
+    "python3-dbus": "1.4.0-1",
+    "speech-dispatcher": "0.12.0-5",
+    "speech-dispatcher-audio-plugins": "0.12.0-5",
+    "dbus-x11": "1.16.2-2",
+    "xvfb": "2:21.1.16-1.3+deb13u4",
+    "xauth": "1:1.1.2-1.1",
+    "xdotool": "1:3.20160805.1-5.1"
+  },
+  "packagesUnchanged": true,
+  "electronUnchanged": true,
+  "signedSelectedInputsVerified": 335,
+  "preservedExcludedEvidenceFilesVerified": 419,
+  "wholeSignedTreeVerified": false
+}

@@ -1,0 +1,52 @@
+info: syncing channel updates for 1.95.0-x86_64-unknown-linux-gnu
+info: latest update on 2026-04-16 for version 1.95.0 (59807616e 2026-04-14)
+info: downloading component clippy
+   Compiling linuxcast-input-spike v0.0.0 (/workspace/spikes/input)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.26s
+     Running unittests src/lib.rs (spikes/input/.target/debug/deps/linuxcast_input_spike-8a75de16431c276f)
+
+running 8 tests
+test diagnostics::tests::diagnostics_never_format_private_error_text_or_paths ... ok
+test safety::tests::chord_precedes_forwarding ... ok
+test protocol::tests::strict_fixed_frame_grammar ... ok
+test safety::tests::late_kernel_recovery_is_never_success ... ok
+test safety::tests::lease_boundary_generation_and_no_rearm ... ok
+test safety::tests::session_denials_are_closed ... ok
+test unix::tests::unexpected_ancillary_descriptors_are_closed ... ok
+test unix::tests::real_scm_rights_closes_sender_copy_and_authenticates_peer ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/supervisor.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_supervisor-10205d7b4004e3e7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/synthetic-lab.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_synthetic_lab-e2e9ff716b410406)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/worker.rs (spikes/input/.target/debug/deps/linuxcast_input_spike_worker-88a7a00489ca8481)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/nondevice.rs (spikes/input/.target/debug/deps/nondevice-6a542e319f5c27c7)
+
+running 3 tests
+test lab_requires_explicit_reviewed_guest_invocation_before_device_access ... ok
+test actual_unprivileged_post_initialization_syscall_policy ... ok
+test worker_cannot_be_started_as_an_arbitrary_executor ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests linuxcast_input_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

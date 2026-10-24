@@ -1,0 +1,4 @@
+Command: node spikes/launcher/tests/at/xvfb-orca.ts
+Launcher AT incomplete at focus:Search commands; no acceptance success inferred.
+Exit:3
+No audible, target desktop or complete UI acceptance success.

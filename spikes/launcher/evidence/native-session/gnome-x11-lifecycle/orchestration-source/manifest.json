@@ -1,0 +1,19 @@
+{
+  "kind": "S0-01-unsigned-lifecycle-collector-draft",
+  "sourceSigned": false,
+  "sourceDirty": true,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "checks": {
+    "collector": 29,
+    "orchestration": 20
+  },
+  "filesSha256": {
+    "README.md": "2b6c60cd88841fb6d06e403d785929024aba1bc887c5fb575af3414d0b0e276b",
+    "collect.py": "466f7358200055c3a7d29eaab7ef43b88995d4dcb982d02c9ad63523a57a3aff",
+    "guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "host.py": "daa0847eb5c2c951f4d2cdc2ddddfd2f0328903aa12cb651593baa82d7636c99",
+    "test_collect.py": "7c5930f32204927e567f74ce0c4de5be5533ca41d0cc0d30628c9950acd4de1d",
+    "test_orchestration.py": "84daff23480f4de2d601a6d06ed28a73211b7ee2aea51dfe856167a18c0f8db2"
+  }
+}

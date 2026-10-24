@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "7c87655c7f59263c67f429e41690f9fbd13f0d20",
+  "archiveSha256": "12b4f925593d32415d2744e9cfb400fbc6c956890204ee3803bfdc3fe3b3f3f9",
+  "sourceInputsVerified": 23,
+  "authorityVerifiedBeforeExecution": true,
+  "checkerSha256": "857190255a87a50a2b0f052f06f7a1c1d8bb59cb263f2734023b7bb7d62aa817",
+  "startedUtc": "2026-10-22T19:44:14.562269+00:00",
+  "finishedUtc": "2026-10-22T19:44:53.795344+00:00",
+  "exitCode": 0,
+  "physicalDesktopMatrixEstablished": false,
+  "sourceArchiveAuthoritySha256": "f5484eba3a4d48046be8f4848c48266543e2b1299fa2cf8c80da1e6b72554f96",
+  "frozenInstallationPackages": 651,
+  "sourceUnchangedDuringRun": true,
+  "rendererPixels": "actual-own-renderer-CDP",
+  "inputMarker": "/run/linuxcast-input-spike-lab",
+  "inputMarkerAbsentBeforeExecution": true
+}

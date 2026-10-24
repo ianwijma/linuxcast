@@ -1,0 +1,140 @@
+{
+  "fixtureVersion": 1,
+  "id": "tool-approval",
+  "synthetic": true,
+  "submission": {
+    "schemaVersion": 1,
+    "purpose": "chat",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Synthetic request."
+          }
+        ]
+      }
+    ],
+    "context": [],
+    "offeredToolIds": [
+      "linuxcast:synthetic-tool"
+    ],
+    "limits": {
+      "timeoutMs": 10000,
+      "toolSteps": 3,
+      "outputBytes": 4096
+    }
+  },
+  "brokerContext": {
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "origin": {
+      "kind": "builtin",
+      "id": "synthetic-chat"
+    },
+    "selection": {
+      "revision": 3,
+      "providerProfileId": "synthetic-profile",
+      "modelId": "synthetic-model"
+    }
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 1,
+      "terminal": false,
+      "kind": "run-started",
+      "selection": {
+        "revision": 3,
+        "providerProfileId": "synthetic-profile",
+        "modelId": "synthetic-model"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 2,
+      "terminal": false,
+      "kind": "tool-argument-fragment",
+      "callId": "synthetic-call",
+      "fragment": "{\"value\":"
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "10000000-0000-4000-8000-000000000001",
+      "sequence": 3,
+      "terminal": false,
+      "kind": "tool-request",
+      "request": {
+        "callId": "synthetic-call",
+        "name": "linuxcast:synthetic-tool",
+        "arguments": {
+          "value": 1
+        }
+      }
+    }
+  ],
+  "pendingApproval": {
+    "schemaVersion": 1,
+    "id": "30000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "callId": "synthetic-call",
+    "toolId": "linuxcast:synthetic-tool",
+    "arguments": {
+      "value": 1
+    },
+    "state": "pending"
+  },
+  "decision": {
+    "schemaVersion": 1,
+    "id": "30000000-0000-4000-8000-000000000001",
+    "revision": 2,
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "callId": "synthetic-call",
+    "toolId": "linuxcast:synthetic-tool",
+    "arguments": {
+      "value": 1
+    },
+    "state": "approved",
+    "decisionRef": "synthetic-decision",
+    "decidedAt": "2026-01-01T00:00:00Z"
+  },
+  "committedResult": {
+    "schemaVersion": 1,
+    "id": "40000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "runId": "10000000-0000-4000-8000-000000000001",
+    "callId": "synthetic-call",
+    "excerpt": "Synthetic result.",
+    "artifact": null,
+    "effectOutcome": "completed",
+    "isError": false
+  },
+  "committedMessage": {
+    "role": "tool",
+    "parts": [
+      {
+        "type": "tool-result",
+        "callId": "synthetic-call",
+        "result": {
+          "value": 1
+        },
+        "isError": false
+      }
+    ]
+  },
+  "expected": {
+    "dispatchBeforeDecision": 0,
+    "toolDispatches": 1,
+    "equivalentFallbackDispatches": 0,
+    "appendMessageOnlyAfterCommit": true
+  }
+}

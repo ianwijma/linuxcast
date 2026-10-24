@@ -1,0 +1,53 @@
+{
+  "scope": "Exactly one focused private Xvfb/Orca run of reviewed per-utterance source correction",
+  "sourceSigned": false,
+  "publishedHead": "632982ece67224b749d096d80e90285411853bc5",
+  "reviewedUnsignedOverlays": true,
+  "command": "node spikes/launcher/tests/at/xvfb-orca.ts --activation-help-only",
+  "outerTimeoutSeconds": 290,
+  "outerKillGraceSeconds": 10,
+  "innerDeadlinesUnchanged": true,
+  "sourceManifestSha256": "993cfbcb82b9a2d16df617daadb03c658c1a3902d791ffb093b16f1df034a773",
+  "reviewedAtArchiveSha256": "efbe8ea8bedcc89d08100528ff441bc3013e0dc80d3e860dbd3e53f2234e4ecc",
+  "reviewedAtHashes": {
+    "spikes/launcher/tests/at/check.ts": "9313a473954c87f14b296a8c8e8587acaa5ffd84a01462257059650639c6ab4b",
+    "spikes/launcher/tests/at/activation-help-mode.test.ts": "477b5a6a73032b70b074e2d8cce99bd1ec38cab6a6113bf9a11885fe4d10d9e6",
+    "spikes/launcher/tests/at/README.md": "867f1c48f3b246133931ca7bee396206ade8ebc85063f89f2aec4839b7ebe458"
+  },
+  "readinessSha256": "5d4ff5c7ed04a1a7ccd1752ebef18c245e8b6b809caa6ea315d587f2c09f27dd",
+  "priorReadinessSha256": "91d68771eedaf8abce6f5d67379947bc892017821052006bebf06af879498885",
+  "runtimeHashes": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "startedAtUtc": "2026-10-24T08:15:13.488165+00:00",
+  "endedAtUtc": "2026-10-24T08:16:05.384040+00:00",
+  "exitCode": 0,
+  "rerunPerformed": false,
+  "rawOrcaLogsOrProfilesExported": false,
+  "status": "passed",
+  "finalStage": "complete",
+  "copiedPublicFiles": [
+    "runtime.json",
+    "report.json",
+    "native-at.json",
+    "orca.json",
+    "light-activation-help.png"
+  ],
+  "screenshotsAvailable": [
+    "light-activation-help.png"
+  ],
+  "guestShutdownPerformed": true,
+  "containerStoppedAtUtc": "2026-10-24T08:17:33.666071681Z",
+  "containerState": {
+    "running": false,
+    "status": "exited",
+    "exitCode": 0,
+    "pid": 0
+  },
+  "artifactPrivacyReview": "Four fixed public JSON reports and owned help screenshot only; fixed public control labels verified and screenshot visually inspected. No raw logs/profiles/keys exported.",
+  "guestSourceRetained": true,
+  "acceptanceLimitation": "Private Xvfb/synthetic unconfirmed activation only; ordinary focus markers establish generation/attempt, essential help END progression establishes delivery. No audible/tactile or GNOME/KDE/Wayland matrix acceptance. Prior failed run unchanged."
+}

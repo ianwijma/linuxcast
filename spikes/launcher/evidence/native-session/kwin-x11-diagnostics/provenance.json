@@ -1,0 +1,20 @@
+{
+  "task": "S0-01",
+  "backend": "kwin-x11",
+  "sourceCommit": "13b9e2a7e882fe218fecba00974041538edb3296",
+  "reviewedSourceDiffSha256": "8f2fbe52810c8bc03a703c2570540d59f280ad9fd1a4e27f3552558be792723e",
+  "sourceTransferArchiveSha256": "b562ab1152d5dd682c60d48e9c383de62880a1f3f2c452dd9531d531f978ea43",
+  "checkerSha256": "857190255a87a50a2b0f052f06f7a1c1d8bb59cb263f2734023b7bb7d62aa817",
+  "exactExecutedSourceManifest": "source-manifest.json",
+  "all23SourceInputHashesMatchSignedCommit": true,
+  "frozenInstallPackages": 651,
+  "explicitElectronSetupCompleted": true,
+  "targetGuardPassed": true,
+  "kernel": "6.12.113+deb13-amd64",
+  "command": "python3 spikes/launcher/tests/native-session/run-session.py kwin-x11 --private-guest",
+  "exitCode": 3,
+  "status": "incomplete",
+  "sourceChangedDuringExecution": false,
+  "historicalOutputDirectoriesRemovedBeforeExecution": true,
+  "physicalDesktopMatrixEstablished": false
+}

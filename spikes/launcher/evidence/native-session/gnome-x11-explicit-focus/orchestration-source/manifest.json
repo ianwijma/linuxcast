@@ -1,0 +1,36 @@
+{
+  "kind": "S0-01-scoped-signed-x11-focus-collector",
+  "sourceStatusScope": "declared-runtime-and-static-inputs",
+  "sourceSigned": true,
+  "sourceDirty": false,
+  "runtimeInputsMatchSignedCommit": true,
+  "signedRuntimeCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "verifiedRuntimeCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "archiveRepresentsWholeSignedTree": false,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "snapshot": {
+    "path": "/tmp/linuxcast-s001-x11-focus-immutable",
+    "archiveSha256": "890f1429b331fdca52042aa56d99784100a7cb8feea7c6c9945ed3472624607a",
+    "authoritySha256": "e3c880b2d2e59aaec895e7a7d340e21b84bd3a5df4743cbd5a0c13c670a1b940",
+    "buildManifestSha256": "78ad174ca9e0aa3fce42aa5cb6032eb10fb2afe5f3984e80952a0e0daefe47f3",
+    "indexSha256": "76a343ff7ea6168044d5e7bf792fa027783e2f4f77b3a68e75150c678205a58f"
+  },
+  "checks": {
+    "collector": 30,
+    "orchestration": 25,
+    "pythonAst": "passed",
+    "fullArchivePathTypeModeProof": "469regular/68directories/exact7signedoverlays",
+    "signedRuntimeInputs": 24,
+    "signedStaticInputs": 2
+  },
+  "filesSha256": {
+    "README.md": "098bc2cd603c7e487d0335cf07bd0c6ce2b1d63557f64154ee58403259ad74db",
+    "collect.py": "c21169685848ccfc90de99b17baf3ae89b70448f9125c7182a058bcfea42939d",
+    "collector.diff": "1ab95a85a049b393fa34ef078dab841f185b5e91eb53e1084e4e464db6dbd34d",
+    "guest_phase.py": "bbe00ac54edd320d98d4255e5e2bcb1c71b1304e5eb81c6631a71f9959282754",
+    "host.py": "74ba04bfc8b7d8f03cba3a893c42fff8334081d6477a59ba2f459a80d09d4328",
+    "test_collect.py": "9c761e63205943d7c1917da85a931f6d0b1449d58563a2d480c9d2ef951cd5df",
+    "test_orchestration.py": "00971ac3a5b31d6390df0e9e474582169a33b37069a872b446a7ac5cea566446"
+  }
+}

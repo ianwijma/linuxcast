@@ -1,0 +1,680 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "transport": "SSH_NO_PTY",
+  "outcome": "ACTUAL_GUEST_DATA_ACQUISITION",
+  "sourceCommit": "8a62ab283d6a55fce076ca60e8b320852c2fb316",
+  "registrationCommit": "da2b283eb71b60bee5c71c2b8ab6f5c0d3dbaaed",
+  "runtimeSourceDiffSha256": "81a52535c5fd6e36d812269e5f20ddcbcce06dde47024a64b01c48043e8c833a",
+  "binarySha256Before": "7ea51672bfd419b375efb10f68d2e9ef70ac19e3f381fb1b3fe82db3eeb18e6c",
+  "outerProcessDeadlineMs": 7750,
+  "outerCleanupBudgetMs": 8000,
+  "initialBaseline": {
+    "distribution": "Debian",
+    "debianVersion": "13.7",
+    "kernel": "6.12.113+deb13-amd64",
+    "architecture": "x86_64",
+    "libsystemdVersion": "257.13-1~deb13u1",
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "inputLabMarkerAbsent": true,
+    "privateMatrixRootsAbsent": true,
+    "observerTemporaryPathsAbsent": true,
+    "nonRootAccount": true
+  },
+  "observation": {
+    "distribution": "Debian",
+    "debianVersion": "13.7",
+    "kernel": "6.12.113+deb13-amd64",
+    "architecture": "x86_64",
+    "libsystemdVersion": "257.13-1~deb13u1",
+    "stdinIsTty": false,
+    "loginctlSelfType": "tty",
+    "elapsedMs": 5028.231,
+    "exitCode": 0,
+    "outerTimeout": false,
+    "boundsRejected": false,
+    "wrapperReaped": true,
+    "ownedProcessGroupAbsent": true,
+    "stdoutBytes": 9990,
+    "stderrBytes": 0,
+    "rows": [
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1482257,
+          "queryElapsedMs": 51,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1482485,
+          "queryElapsedMs": 29,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1482736,
+          "queryElapsedMs": 30,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1482985,
+          "queryElapsedMs": 29,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1483235,
+          "queryElapsedMs": 29,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1483485,
+          "queryElapsedMs": 29,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1483738,
+          "queryElapsedMs": 32,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1483985,
+          "queryElapsedMs": 29,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1484237,
+          "queryElapsedMs": 31,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "BEFORE_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 1,
+          "observedMs": 1484486,
+          "queryElapsedMs": 30,
+          "snapshotFresh": true,
+          "pidSessionBound": true,
+          "uidMatched": true,
+          "logindOwnerRoot": true,
+          "active": true,
+          "local": false,
+          "graphical": false,
+          "userSession": true,
+          "seatZero": false,
+          "logindLockHintKnown": true,
+          "logindLockHintLocked": false,
+          "denials": [
+            "REMOTE",
+            "NOT_GRAPHICAL",
+            "NOT_SEAT_ZERO",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1484707,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1484956,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1485206,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1485456,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1485706,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1485956,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1486206,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1486456,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1486706,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      },
+      {
+        "phase": "AFTER_CONTROLLED_TERMINATION",
+        "report": {
+          "monitorOnly": true,
+          "canArm": false,
+          "companionAvailable": false,
+          "lockKnown": false,
+          "generation": 2,
+          "observedMs": 1486956,
+          "queryElapsedMs": 0,
+          "snapshotFresh": false,
+          "pidSessionBound": false,
+          "uidMatched": false,
+          "logindOwnerRoot": false,
+          "active": false,
+          "local": false,
+          "graphical": false,
+          "userSession": false,
+          "seatZero": false,
+          "logindLockHintKnown": false,
+          "logindLockHintLocked": false,
+          "denials": [
+            "PEER_DEAD",
+            "SNAPSHOT_STALE",
+            "COMPANION_UNAVAILABLE",
+            "UNKNOWN_LOCK"
+          ]
+        }
+      }
+    ],
+    "diagnostics": [],
+    "strictPublicSchemaValidated": true,
+    "successfulDataAcquisition": true,
+    "binarySha256After": "7ea51672bfd419b375efb10f68d2e9ef70ac19e3f381fb1b3fe82db3eeb18e6c",
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "inputLabMarkerAbsent": true,
+    "privateMatrixRootsAbsent": true,
+    "observerTemporaryPathsAbsent": true
+  },
+  "cleanup": {
+    "processCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "node": 0,
+      "gdb": 0,
+      "dbus-daemon": 2
+    },
+    "inputLabMarkerAbsent": true,
+    "privateMatrixRootsAbsent": true,
+    "observerTemporaryPathsAbsent": true,
+    "stagingDirectoryRemoved": true
+  },
+  "containerStagingFileRemoved": true,
+  "supervisorEnforcementEstablished": false,
+  "inputOperationsPerformed": false,
+  "ac01Complete": false,
+  "ac02Complete": false
+}

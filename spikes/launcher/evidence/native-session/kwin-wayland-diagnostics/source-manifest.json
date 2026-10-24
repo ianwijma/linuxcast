@@ -1,0 +1,35 @@
+{
+  "kind": "S0-01-private-native-compositor-probe",
+  "sourceSha256": {
+    "build.ts": "e6d475faf146d8d11d930d617a27f9ef453068d8a4c0eebe19135c938e84bcc9",
+    "check.ts": "857190255a87a50a2b0f052f06f7a1c1d8bb59cb263f2734023b7bb7d62aa817",
+    "protocol.ts": "f987245a43735202c87166459dba3266df46712bf8e5c60fd55be8c2b7aeca30",
+    "run-session.py": "97b95e9f9180e5425881dca9b8dbdf894addce7a3cf6ef5ec07f4e55436fb62e",
+    "supervision.py": "0d26ee0a9e4f581bb53be2dd59576cd82976e66f3403e1fae3a1113d225c45bb",
+    "private.py": "5eede70c1e363fa67ca65e31d2d120a279fcdc1e0b6f030039ffd664260023a9",
+    "artifacts.py": "6defe5e89dbde09eb91363d4cef2a61227df81894c2c99dfb25d7b6681c297d0",
+    "gnome-extension.js": "493ebaba52666f36f7c4f90400de09560c7390f1dc4be1b1af8157470fa1e44e",
+    "kwin-script.js": "2cc2a128bdbee111c5cdccfe904a2f49f38bdf46b0ccd46438e2c621ea9a73bf",
+    "kwin-bus.py": "de09299863046f08bb5da820a4c80b939c2631de95c16d41d6ff6641555147c3",
+    "decoy.py": "f65cdb724fa8cc834bdcbfa8722cb37a361c481c73f280d938c60c889fab9260",
+    "../../src/main.ts": "0df9bfbfd5b11b1309017150d63346ddd0b7739b59dc25312496b004ed4234cb",
+    "../../src/profile.ts": "a62d625430828dc211a256cd6fd9ce057ea1db5dffb40b9428147660c7fbf2ac",
+    "../../src/preload.ts": "6012cadd85da0474bb33929657e5378b77732c64d39b5ee5ea52b820f7f64f42",
+    "../../src/contract.ts": "2934ed1907f3747d5d04e93ffaef89276ade0fecf527fe85af6657e4d61f8b29",
+    "../../src/renderer/main.tsx": "0385cd6d02866433dca8685b674ae7ae086cc84e2f2bdc3a4dd399013e40e29d",
+    "../../src/renderer/App.tsx": "7ecf5221f0f22eb218834c5f85a6ebbeb3aad8667652b9c6b1db6472b21b5aa1",
+    "../../src/renderer/style.css": "01364b935afbf060e370c4172b18c350645ebb00f0d255be8c3891c7babb03f7",
+    "../../build.ts": "618e6ccbbfa543d1e47473ba2f3730a79d708721812d62128ad25679c4a44b1b",
+    "../../resources/index.html": "4993bd2c7eee945524c699ff1bdb07e36a72ee9ab1817632999f37acbbfd9e7f",
+    "../../../../package.json": "40304678f7f03ff6bc0dc87918f5a60dc2cdd0d556eb91f6c859696adda4ce94",
+    "../../../../bun.lock": "59687d2927ddecf336003a61d9ff8cfc7913d4df185b7dc9dadca5d03f154f3b",
+    "../../../../apps/desktop/package.json": "8975a8159ac86f2be3c08cf804c32af00f234ff3660c1dc2426737adee1f8bad"
+  },
+  "outputSha256": {
+    "extension.js": "493ebaba52666f36f7c4f90400de09560c7390f1dc4be1b1af8157470fa1e44e",
+    "kwin-script.js": "6cb9c5e9954d49b4f7bf50cff1c809ddae5f2fcb3a46b327c83bef732aa58224",
+    "metadata.json": "611cfa85a505be3ba70f90a8a0214c129684400247bfb9fe2fc35d9843869290"
+  },
+  "designTokensSha256": "808a6a295c2e6292bb2e3cec38c9ac5db47ab6d9fd4ff9ba09f613555622f00f",
+  "launcherDesktopFileSha256": "f1cd8f7b7de948d9d4fab5a53938d461b8109ef80985b73c6083a751c5bca3ca"
+}

@@ -1,0 +1,27 @@
+{
+  "signedRuntimeCommit": "852f3abf2aeb227d7ada92e29e965830edc8e5e0",
+  "archiveBaselineCommit": "03df170788c2cd2358b15e93cf65dde51919db0c",
+  "sourceStatusScope": "declared-runtime-and-static-inputs",
+  "sourceSigned": true,
+  "sourceDirty": false,
+  "components": {
+    "readiness": {
+      "reviewedDiffSha256": "f2e583c714037467faa4c90b8fd84e007816a38f1ae956f77889b8dc0c270242",
+      "reviewedManifestSha256": "a04051fc594ceab5105e1e18623bfa200a85e2663548da33c2bb83338c6a228d"
+    },
+    "x11Focus": {
+      "reviewedDiffSha256": "791fe70acd5357f37043b7beee3e6498814cff246473deeb99b8431b6838326a",
+      "reviewedManifestSha256": "d74d184e8373966dd2508d94ed4664db292dbdc3b2e961c3c8ebdc5e855dac8a"
+    }
+  },
+  "combinedDiffSha256": "312000a4bd3488fa589acf2d785c986f70622d262a60a68c22d1af86c75bde83",
+  "sourceSha256": {
+    "spikes/launcher/tests/native-session/observer_startup.py": "e45715c19b77a21df95d46d3cb2eb3588b55aff9c4ecfe5a3265df432a62966f",
+    "spikes/launcher/tests/native-session/run-session.py": "100c0bcbbc464122ea92df0fe20fdd847b92a7669259a8846769c627363ffd37",
+    "spikes/launcher/tests/native-session/startup-fixture.py": "1a5bf91cb9b6cd84848b7477ecb53b57267c39a6dfc81b05f5d40412a6feef9b",
+    "spikes/launcher/tests/native-session/preparation.test.ts": "3d9293c1a00824e53f5b8d1cf9cbca5fbe73b3642880fdcdac4f7c8b07457e26",
+    "spikes/launcher/src/main.ts": "70d7f1fea559d6b11817b00bcd1411bf51821b5bada1237c61c9af54cee802e2",
+    "spikes/launcher/tests/launcher.unit.test.ts": "0a8debd08714133638bccf13edb711f85f45f0ec2e34e3467fb9bb30367dd0fb",
+    "spikes/launcher/README.md": "61f852672da2e3fc91c996e4e112f086619024b0a2344efe371404265e682fe2"
+  }
+}

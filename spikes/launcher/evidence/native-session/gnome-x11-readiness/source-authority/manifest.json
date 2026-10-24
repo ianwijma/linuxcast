@@ -1,0 +1,23 @@
+{
+  "kind": "S0-01-scoped-signed-runtime-readiness-snapshot",
+  "sourceStatusScope": "declared-runtime-and-static-inputs",
+  "sourceSigned": true,
+  "sourceDirty": false,
+  "runtimeInputsMatchSignedCommit": true,
+  "signedRuntimeCommit": "e0fea79b96877a881ca398a55376cd98e3d8e58e",
+  "archiveRepresentsWholeSignedTree": false,
+  "guestAccessed": false,
+  "nativeExecuted": false,
+  "archiveRegularFiles": 469,
+  "archiveDirectories": 68,
+  "archiveBytes": 5718329,
+  "filesSha256": {
+    "README.md": "0b17838efe260e3cf6ada5fa309639e008b9d3021767764d1880020235a5f8c1",
+    "archive-path-index.json": "7bdaad006a280bfeeb9dc956c4915fe6001a8a4fa6f4758357f1c86642234132",
+    "authority.json": "f7fcdd5a79f563389ae99ef69129ccc2ac2f8b35091b1d1c475408336896c7dc",
+    "build-manifest.json": "82b20010c6dbe4ea05e22d627cdfd9ae423ef7f4573e0406312d7da0465f9e3d",
+    "reviewed-increment-manifest.json": "a04051fc594ceab5105e1e18623bfa200a85e2663548da33c2bb83338c6a228d",
+    "reviewed-increment.diff": "f2e583c714037467faa4c90b8fd84e007816a38f1ae956f77889b8dc0c270242",
+    "source.tgz": "be366f332ba713ee33f2bf972aa99f9d2a52f0ca689f46cf0a4a676db2715dde"
+  }
+}

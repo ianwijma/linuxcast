@@ -1,0 +1,53 @@
+[package]
+name = "linuxcast-input-spike"
+version = "0.0.0"
+publish = false
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+libc.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-supervisor"
+path = "src/bin/supervisor.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-worker"
+path = "src/bin/worker.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-synthetic-lab"
+path = "src/bin/synthetic-lab.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-context-probe"
+path = "src/bin/context-probe.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-peer-probe"
+path = "src/bin/peer-probe.rs"
+
+[[test]]
+name = "peer-observer-private"
+path = "tests/peer-observer-private.rs"
+harness = false
+
+[[bin]]
+name = "linuxcast-input-spike-denial-probe"
+path = "src/bin/denial-probe.rs"
+
+[[bin]]
+name = "linuxcast-input-spike-denial-helper"
+path = "src/bin/denial-helper.rs"
+
+[[test]]
+name = "denial-private"
+path = "tests/denial-private.rs"
+harness = false

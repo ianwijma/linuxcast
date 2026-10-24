@@ -1,0 +1,963 @@
+diff --git a/spikes/launcher/README.md b/spikes/launcher/README.md
+index c9f5292..0207aa6 100644
+--- a/spikes/launcher/README.md
++++ b/spikes/launcher/README.md
+@@ -29,7 +29,7 @@ The integration suite requires the authorized real GNOME X11 session (`DISPLAY=:
+ - Renderer: `sandbox: true`, `contextIsolation: true`, `nodeIntegration: false`, web security enabled, no webviews or Node in workers/subframes. Actual renderer checks see no `require` or `process`.
+ - Preload: named state, hide, quit, appearance, shortcut/recording and bounded content-height methods only. No generic IPC channel, filesystem, process, URL, credential or external-network method is exposed. Main validates payload version/fields, sending WebContents, exact main frame and exact packaged URL on every call.
+ - Resources: fixed custom-protocol asset manifest, no arbitrary paths, remote scripts or `unsafe-eval`. CSP denies renderer network, frames, objects and form submission; navigation, new windows, downloads and permissions are denied. Malformed CLI/IPC diagnostics contain only safe fixed messages/codes.
+-- X11: one normal `show()` activation request; native focus is observed through Electron and the GNOME `_NET_ACTIVE_WINDOW` property. Bounds are initially requested within the primary work area; content-height updates are validated/clamped to the current work area and canonical maximum. The window manager may adjust placement. This does not prove every X11 desktop/session.
++- X11: the current source candidate restores a minimized window, issues one normal `show()` and one explicit `focus()` per Show or toggle-to-visible request. Native focus is still observed through Electron and the compositor; the candidate is **not natively executed or proven**. Bounds are initially requested within the primary work area; content-height updates are validated/clamped to the current work area and canonical maximum. The window manager may adjust placement. This does not prove every X11 desktop/session.
+ - Native Wayland: the application explicitly selects the native Wayland backend when that session is identified. It never changes to XWayland as a fallback, loops focus/position calls, or enforces always-on-top. Focus and placement remain **component-required** until a supported activation/companion path is validated. Normal desktop opening/activation is the visible fallback. The GNOME 48 or Plasma 6.3 companion must be enabled separately in the full client; this spike neither installs nor enables one.
+ - Wayland shortcut readback: Electron 45 reports registration, but exposes no portal-selected effective accelerator. The prototype reports the requested key separately and displays “Managed by desktop” plus consent/settings guidance, never inventing the effective binding. Real portal allow/deny/cancel/rebind testing remains outstanding.
+ 
+@@ -78,3 +78,57 @@ The final UI review also reproduced loss of keyboard focus when Ctrl+K closed it
+ `node spikes/launcher/tests/at/xvfb-orca.ts` builds the unchanged launcher and tests its real custom-protocol renderer/preload under a private Xvfb display, private session/AT buses and actual Orca/private dummy Speech Dispatcher. It checks native role/focus delivery and fresh presentation for search, action-panel focus/restoration and shortcut controls, while retaining the strict Electron sandbox. [Harness scope and evidence](evidence/at/README.md) distinguish these assertions from fixtures, audible QA and native compositor integration.
+ 
+ After independent source review, an authorized private-Xvfb run on the host's **Orca42 remains incomplete (exit3)**. Actual Electron sandbox checks, Orca startup/Dismiss anchor presentation and the first native Search role/focus check pass. The fresh Search presentation/per-label speech-delivery check misses its10s deadline, so the other four control checks were not executed. [Archived host evidence](evidence/at/host-orca42/README.md) records that exact boundary; it cannot pass S0-01-UI. The later reserved **Debian13/Orca48.1 run passes exit0**: all five exact native focus/event roles, freshly generated presentations and per-label private Speech Dispatcher deliveries pass. [Target evidence](evidence/at/debian-orca48/README.md) records source hashes, runtime/package versions, inspected dark/light app-only screenshots and verified cleanup/release. Initial Debian setup/role-check failures remain archived. No global accessibility settings, host display hooks or desktop installation are used. This establishes actual screen-reader generation/delivery on Electron/private Xvfb, with dummy/null speech output; audible/tactile quality, native compositor integration and every target desktop/session matrix entry remain unverified. The coordinator retains acceptance ownership.
++
++## X11 singleton focus candidate — source only
++
++Applicable design sections remain Shell and navigation, Accessibility and Review gate; canonical tokens and renderer layout are unchanged. The reviewed readiness attempt's ordinary Show made the launcher visible but left the synthetic decoy focused. Its strict X11 focus predicate failed and remains unchanged. This new candidate is **native UNEXECUTED** and does not change task/criterion status.
++
++Only explicit `x11` sessions restore when minimized before the existing one Show, then call focus once immediately after Show. User Show and toggle-to-visible use this normal command path; visible-toggle still only hides, Quit still quits, unready commands queue, absent/destroyed windows do nothing, and renderer recovery still reloads once. Wayland/unknown sessions never receive minimized-state queries, restore or explicit focus. There are no loops, timers, `app.focus`, observer activation, new waits or retries. Published capabilities continue to use actual `isFocused()`; a refused focus call remains unavailable and a native failure.
++
++Primary pinned Electron45 documentation shows conditional restore and explicit focus in its [single-instance example](https://raw.githubusercontent.com/electron/electron/v45.0.0/docs/api/app.md). However, [BaseWindow documentation](https://raw.githubusercontent.com/electron/electron/v45.0.0/docs/api/base-window.md) already describes Show as focusing, and [NativeWindowViews source](https://raw.githubusercontent.com/electron/electron/v45.0.0/shell/browser/native_window_views.cc) calls widget activation inside Show as well as Focus. The extra explicit call may be redundant; neither a cause nor a successful native fix is established.
++
++Deterministic tests execute type-only-stripped exact production `applyCommand` and state-snapshot functions with synthetic window spies/traps. They cover hidden/visible/minimized commands, conditional restore→Show→focus order, exactly one call per request, hide/quit/unready/destroyed/null boundaries, one-time reload recovery, no Wayland/unknown explicit activation, and published focus/capability remaining unavailable when focus is refused. These tests are not Electron/compositor evidence. Actual reviewed GNOME/KDE X11 focus/lifecycle, global shortcut and explicit Quit checks plus affected-state/accessibility review remain required under a separately authorized native run.
++
++Source-only verification: configured Node24.22.1/Vitest launcher unit21/21, UI fixtures3/3 and native preparation178/178 pass together202/202 (6.18s) on Pop!_OS22.04 amd64. Strict TypeScript, affected-source lint, planning validator and diff checks pass. No actual host/guest Electron, GNOME/KWin, screenshot or screen-reader run exercised this candidate; those results remain UNEXECUTED.
++
++### Separate X11 lifecycle diagnostic (source only)
++
++The full native probe still requires ordinary Show focus and actual global
++shortcut focus on X11; its predicates and first failed outcomes are unchanged.
++The signed explicit-focus candidate852f3ab did not establish a fix in its one
++reviewed GNOME48.7 X11 run. Exact failed evidence and source scope are preserved
++in `evidence/native-session/gnome-x11-explicit-focus/`.
++
++The explicit `run-session.py <x11-backend> --private-guest --probe-mode lifecycle-only`
++mode is a separate diagnostic. It verifies initial native identity/backend,
++sandbox/context isolation/no renderer Node, dark search and light capabilities,
++UI Quit with exit0 and native absence, then one fresh launch with the same
++strict identity/backend gates, resident Close with a live process and native
++hidden window, and hidden CLI Quit with exit0/native absence. The first launch
++and fresh launch share the existing launcher implementation; no application
++behaviour changes are made by this increment.
++
++The mode performs no ordinary Show, decoy activation or global chord, and carries
++exact skipped checks `ordinary-show-native-focus` and
++`actual-x11-global-shortcut`. It never claims activation or shortcut success.
++Even when these selected lifecycle checks complete, its status is `incomplete`
++and exit code3, with `diagnosticOutcome=complete` and bounded phase proofs;
++a failed selected phase is terminal and records `diagnosticOutcome=failed`.
++Unknown observer, identity, render, process, cancellation or cleanup failures
++cannot be caught as an ordinary focus failure and continued. The full default
++mode and historical reports without a mode remain full probes. Wayland is
++rejected for this diagnostic and its full probe is unchanged.
++
++All original startup45/checker180/outer240-second budgets, native8/12-second
++observation bounds, private guards, source authority and descendant cleanup
++remain in force. A later collector must explicitly pin this diagnostic mode;
++no collector snapshot or native run for it has been prepared or authorized.
++Source-only synthetic branch/schema fixtures do not establish Debian lifecycle,
++shortcut, target-session accessibility, portal, physical or complete UI proof.
++Relevant design sections remain Shell/navigation, Accessibility and Review gate.
++
++Local source verification: configured Node24.22.1/Vitest4.1.12 checks257/257
++passed (21 launcher unit, three UI fixtures, 233 native preparation), plus strict
++TypeScript, ESLint, Python AST, plan validation and whitespace checks. Platform:
++Pop!_OS22.04 amd64/Bun1.4.4. Private Unix socket fixtures required local sandbox
++permission; no compositor, Electron UI or guest was run for this increment.
+diff --git a/spikes/launcher/src/main.ts b/spikes/launcher/src/main.ts
+index e476b2f..b275204 100644
+--- a/spikes/launcher/src/main.ts
++++ b/spikes/launcher/src/main.ts
+@@ -111,12 +111,15 @@ if (!ownsInstance) {
+       publish();
+       return;
+     }
+-    // One normal show request. Native Wayland focus/position is never force-looped.
++    // One normal request. X11 uses the documented restore/show/focus path;
++    // Wayland and unknown sessions retain Show without explicit focus/restore.
+     if (rendererFailed) {
+       window.webContents.reload();
+       rendererFailed = false;
+     }
++    if (hint === "x11" && window.isMinimized()) window.restore();
+     window.show();
++    if (hint === "x11") window.focus();
+     publish();
+   };
+   const registerShortcut = (requested: string): Shortcut => {
+diff --git a/spikes/launcher/tests/launcher.unit.test.ts b/spikes/launcher/tests/launcher.unit.test.ts
+index 0743d8e..d7340d4 100644
+--- a/spikes/launcher/tests/launcher.unit.test.ts
++++ b/spikes/launcher/tests/launcher.unit.test.ts
+@@ -1,8 +1,11 @@
+ import { describe, expect, it } from "vitest";
+-import { mkdtempSync, chmodSync, rmSync, symlinkSync } from "node:fs";
++import { mkdtempSync, chmodSync, rmSync, symlinkSync, readFileSync } from "node:fs";
+ import { join } from "node:path";
+ import { tmpdir } from "node:os";
++import { stripTypeScriptTypes } from "node:module";
++import { runInNewContext } from "node:vm";
+ import {
++  APP_ID,
+   parseCommand,
+   parseInstanceData,
+   isRequest,
+@@ -10,6 +13,7 @@ import {
+   sessionHint,
+   capabilities,
+ } from "../src/contract.ts";
++import type { Command, LauncherState } from "../src/contract.ts";
+ import { prepareProfile } from "../src/profile.ts";
+ describe("S0-01 strict launcher data boundaries", () => {
+   it("routes only singleton show/toggle/quit data and rejects code paths secrets and extra fields without echo", () => {
+@@ -131,3 +135,112 @@ describe("S0-01 strict launcher data boundaries", () => {
+     }
+   });
+ });
++
++// Exercise the actual production function and state snapshot, type-only stripped.
++// Electron is never imported and no native window or display is used here.
++function commandFixture(options: { hint?: LauncherState["session"]; visible?: boolean; minimized?: boolean;
++  ready?: boolean; destroyed?: boolean; absent?: boolean; rendererFailed?: boolean; focusAccepted?: boolean } = {}) {
++  const text = readFileSync(new URL("../src/main.ts", import.meta.url), "utf8");
++  const snapshotStart = text.indexOf("  const snapshot ="), snapshotEnd = text.indexOf("  const publish =", snapshotStart);
++  const commandStart = text.indexOf("  const applyCommand ="), commandEnd = text.indexOf("  const registerShortcut =", commandStart);
++  expect(snapshotStart).toBeGreaterThanOrEqual(0); expect(snapshotEnd).toBeGreaterThan(snapshotStart);
++  expect(commandStart).toBeGreaterThan(snapshotEnd); expect(commandEnd).toBeGreaterThan(commandStart);
++  const program = stripTypeScriptTypes(`${text.slice(snapshotStart, snapshotEnd)}\n${text.slice(commandStart, commandEnd)}\n globalThis.fixtureCommand = applyCommand; globalThis.fixtureSnapshot = snapshot;`);
++  const effects: string[] = [], published: LauncherState[] = [];
++  let visible = options.visible ?? false, minimized = options.minimized ?? false, focused = false;
++  let minimizeQueries = 0;
++  const hint = options.hint ?? "x11";
++  const window = {
++    isDestroyed: () => options.destroyed ?? false,
++    isVisible: () => visible,
++    isFocused: () => focused,
++    isMinimized: () => {
++      if (hint !== "x11") throw new Error("NON_X11_RESTORE_QUERY");
++      minimizeQueries++; return minimized;
++    },
++    restore: () => { if (hint !== "x11") throw new Error("NON_X11_RESTORE"); effects.push("restore"); minimized = false; },
++    show: () => { effects.push("show"); visible = true; },
++    focus: () => { if (hint !== "x11") throw new Error("NON_X11_FOCUS"); effects.push("focus"); focused = options.focusAccepted ?? false; },
++    hide: () => { effects.push("hide"); visible = false; focused = false; },
++    webContents: { reload: () => effects.push("reload") },
++  };
++  const context = {
++    window: options.absent ? null : window, hint, APP_ID, capabilities,
++    quitting: false, launcherReady: options.ready ?? true, rendererFailed: options.rendererFailed ?? false,
++    pendingCommand: "show" as Command, recording: false,
++    shortcut: { requested: "Ctrl+Space", effective: null, state: "temporarily-unavailable", reason: "Synthetic fixture" },
++    nativeTheme: { shouldUseDarkColors: true },
++    app: { quit: () => effects.push("quit") },
++    publish: () => { effects.push("publish"); published.push(context.fixtureSnapshot!()); },
++    fixtureCommand: undefined as undefined | ((request: Command) => void),
++    fixtureSnapshot: undefined as undefined | (() => LauncherState),
++  };
++  runInNewContext(program, context, { timeout: 1000 });
++  return { run: (request: Command) => context.fixtureCommand!(request), effects, published, context,
++    minimizeQueries: () => minimizeQueries };
++}
++
++describe("S0-01 normal X11 command focus candidate, native success unexecuted", () => {
++  for (const row of [
++    { name: "hidden Show", request: "show", visible: false, minimized: false },
++    { name: "hidden toggle", request: "toggle", visible: false, minimized: false },
++    { name: "visible Show", request: "show", visible: true, minimized: false },
++    { name: "minimized Show", request: "show", visible: false, minimized: true },
++    { name: "minimized toggle", request: "toggle", visible: false, minimized: true },
++  ] as const) it(`actual command ${row.name} restores if needed, shows once and explicitly focuses once`, () => {
++    const fixture = commandFixture(row);
++    fixture.run(row.request);
++    expect(fixture.effects).toEqual([...(row.minimized ? ["restore"] : []), "show", "focus", "publish"]);
++    expect(fixture.minimizeQueries()).toBe(1);
++    expect(fixture.published).toHaveLength(1); expect(fixture.published[0]?.visible).toBe(true);
++  });
++
++  for (const hint of ["x11", "wayland", "unknown"] as const) it(`actual ${hint} visible toggle only hides, without restore/show/focus`, () => {
++    const fixture = commandFixture({ hint, visible: true, minimized: true }); fixture.run("toggle");
++    expect(fixture.effects).toEqual(["hide", "publish"]); expect(fixture.minimizeQueries()).toBe(0);
++    expect(fixture.published[0]?.visible).toBe(false); expect(fixture.published[0]?.focused).toBe(false);
++  });
++
++  for (const hint of ["wayland", "unknown"] as const) it(`actual ${hint} Show and hidden toggle never query minimized state or restore/focus`, () => {
++    for (const request of ["show", "toggle"] as const) {
++      const fixture = commandFixture({ hint, minimized: true }); fixture.run(request);
++      expect(fixture.effects).toEqual(["show", "publish"]); expect(fixture.minimizeQueries()).toBe(0);
++      expect(fixture.published[0]?.focused).toBe(false);
++    }
++  });
++
++  it("actual renderer recovery reloads once before restore/show/focus and clears the failure flag", () => {
++    const fixture = commandFixture({ minimized: true, rendererFailed: true }); fixture.run("show");
++    expect(fixture.effects).toEqual(["reload", "restore", "show", "focus", "publish"]);
++    expect(fixture.context.rendererFailed).toBe(false);
++    fixture.run("show");
++    expect(fixture.effects).toEqual(["reload", "restore", "show", "focus", "publish", "show", "focus", "publish"]);
++  });
++
++  it("actual snapshot keeps X11 focus unavailable when the normal focus call is refused", () => {
++    const refused = commandFixture(); refused.run("show");
++    expect(refused.effects).toEqual(["show", "focus", "publish"]);
++    expect(refused.published[0]?.focused).toBe(false);
++    expect(refused.published[0]?.capabilities[0]?.state).toBe("temporarily-unavailable");
++    const accepted = commandFixture({ focusAccepted: true }); accepted.run("show");
++    expect(accepted.published[0]?.focused).toBe(true);
++    expect(accepted.published[0]?.capabilities[0]?.state).toBe("available");
++  });
++
++  it("actual quit bypasses readiness and invalid-window paths without show/focus or publication", () => {
++    const fixture = commandFixture({ ready: false, absent: true }); fixture.run("quit");
++    expect(fixture.effects).toEqual(["quit"]); expect(fixture.context.quitting).toBe(true);
++    expect(fixture.published).toEqual([]);
++  });
++
++  it("actual not-ready command only updates the pending command", () => {
++    const fixture = commandFixture({ ready: false }); fixture.run("toggle");
++    expect(fixture.context.pendingCommand).toBe("toggle"); expect(fixture.effects).toEqual([]);
++    expect(fixture.minimizeQueries()).toBe(0);
++  });
++
++  for (const options of [{ absent: true }, { destroyed: true }]) it("actual absent or destroyed window never receives restore/show/focus", () => {
++    const fixture = commandFixture(options); fixture.run("show");
++    expect(fixture.effects).toEqual([]); expect(fixture.minimizeQueries()).toBe(0);
++  });
++});
+diff --git a/spikes/launcher/tests/native-session/artifact-canary.py b/spikes/launcher/tests/native-session/artifact-canary.py
+index 31f4266..e8f99a5 100644
+--- a/spikes/launcher/tests/native-session/artifact-canary.py
++++ b/spikes/launcher/tests/native-session/artifact-canary.py
+@@ -44,6 +44,63 @@ with tempfile.TemporaryDirectory(prefix='linuxcast-s001-artifact-test-') as temp
+         return value
+     consumer={'request':2,'pollCount':3,'outcomes':{'missing':2,'other-serial':1,'matching':0,'parse-rejected':0,'poll-error':0},
+               'pollsCapped':False,'elapsedMs':100,'elapsedCapped':False}
++    if case.startswith(('lifecycle-','valid-lifecycle-')) or case=='full-lifecycle-phase':
++        from artifacts import LIFECYCLE_PHASES,LIFECYCLE_SKIPPED
++        backend='gnome-x11';report=fallback_result(backend,'lifecycle-only')
++        own={'count':1,'identityMatches':True,'nativeBackend':'x11','focused':False,'hidden':False,'geometry':{'x':32,'y':32,'width':720,'height':560},'workArea':{'x':0,'y':0,'width':1280,'height':900}}
++        empty={'count':0,'identityMatches':False,'nativeBackend':'unsupported','focused':False,'hidden':True,'geometry':None,'workArea':None}
++        report.update(stage='complete',diagnosticOutcome='complete',initialPlacementInsideWorkArea=True,closeRetainedResidentProcess=True,explicitUiQuitExited=True,hiddenCliQuitExited=True,
++            lifecycleProof={'launches':2,'darkSearchCaptured':True,'lightCapabilitiesCaptured':True,'uiQuitExitCode':0,'hiddenCliQuitExitCode':0,'closeProcessAlive':True},runtime=copy.deepcopy(runtime))
++        report['runtime']['ozone']='x11'
++        for index,phase in enumerate(LIFECYCLE_PHASES):
++            report['observations'].append({'phase':phase,'native':{'request':index+1,'launcher':copy.deepcopy(own if phase in ('initial-native-launch','fresh-lifecycle-native-launch') else empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}})
++        for name in ('dark-launcher.png','light-capabilities.png'): (root/name).write_bytes(b'\x89PNG\r\n\x1a\npublic synthetic fixture')
++        if case in ('valid-lifecycle-failed','valid-lifecycle-identity-failed'):
++            report=fallback_result(backend,'lifecycle-only')
++            if case=='valid-lifecycle-identity-failed':
++                report['stage']='native-initial-identity'
++                report['observations']=[{'phase':'initial-native-launch','native':{'request':1,'launcher':copy.deepcopy(empty),'decoy':copy.deepcopy(empty),'decoyActivationIssued':False}}]
++                report['observations'][0]['native']['launcher']['count']=1
++        elif case=='lifecycle-passed':report['status']='passed-bounded-native-probe'
++        elif case=='lifecycle-missing-mode':del report['probeMode']
++        elif case=='lifecycle-wayland':backend='gnome-wayland';report['backend']=backend;report['runtime']['ozone']='wayland'
++        elif case=='lifecycle-unknown-mode':report['probeMode']='synthetic-private-canary'
++        elif case=='lifecycle-extra':report['private']='synthetic-private-canary'
++        elif case=='lifecycle-private-proof':report['lifecycleProof']['private']='synthetic-private-canary'
++        elif case=='lifecycle-no-proof':del report['lifecycleProof']
++        elif case=='lifecycle-exit-bool':report['lifecycleProof']['uiQuitExitCode']=False
++        elif case=='lifecycle-exit-nonzero':report['lifecycleProof']['hiddenCliQuitExitCode']=7
++        elif case=='lifecycle-no-runtime':del report['runtime']
++        elif case=='lifecycle-no-screenshot':(root/'light-capabilities.png').unlink()
++        elif case=='lifecycle-missing-observation':report['observations'].pop()
++        elif case=='lifecycle-phase-reorder':report['observations'][0]['phase']=LIFECYCLE_PHASES[1]
++        elif case=='lifecycle-cross-phase':report['observations'][1]['phase']='ordinary-singleton-cli-show'
++        elif case=='lifecycle-forged-identity':report['observations'][0]['native']['launcher']=copy.deepcopy(empty)
++        elif case=='lifecycle-outside-workarea':report['observations'][0]['native']['launcher']['geometry']['x']=-500
++        elif case=='lifecycle-visible-close':report['observations'][3]['native']['launcher']=copy.deepcopy(own)
++        elif case=='lifecycle-nonabsent-quit':report['observations'][1]['native']['launcher']=copy.deepcopy(own)
++        elif case=='lifecycle-trace-cross-phase':report['nativeDiagnostic']={'phase':'ordinary-show-native-focus','state':'predicate-unmet'}
++        elif case=='lifecycle-trace-hook':report['nativeDiagnostic']={'phase':LIFECYCLE_PHASES[-1],'state':'hook-failed','hookFailure':{'request':6,'hookFailure':{'stage':'launcher','outcome':'native-read-failed'}}}
++        elif case=='lifecycle-activation-issued':report['observations'][0]['native']['decoyActivationIssued']=True
++        elif case=='lifecycle-focus-claim':report['ordinaryShowNativeFocused']=True
++        elif case=='lifecycle-shortcut-claim':report['shortcut']={'state':'available','nativeXTestActivationObserved':True,'effective':'Ctrl+Alt+Shift+F12'}
++        elif case=='lifecycle-activation-claim':report['activationOutcome']='normal-show-and-shortcut-native-focus-observed'
++        elif case=='lifecycle-skips-reordered':report['skippedChecks'].reverse()
++        elif case=='lifecycle-skips-extra':report['skippedChecks'].append('synthetic-private-canary')
++        elif case=='lifecycle-outcome-private':report['diagnosticOutcome']='synthetic-private-canary'
++        elif case=='full-lifecycle-phase':
++            report=complete();backend='gnome-wayland';report['observations'][0]['phase']='fresh-lifecycle-native-launch'
++        elif case!='valid-lifecycle-complete':raise ValueError('UNKNOWN_LIFECYCLE_FIXTURE')
++        if case.startswith('valid-'):
++            status,state=publish(root,destination,report,manifest,backend,3,'')
++            saved=json.loads((destination/'report.json').read_text())
++            assert status==3 and state=='incomplete' and saved['probeMode']=='lifecycle-only'
++            assert saved['diagnosticOutcome']==('complete' if case=='valid-lifecycle-complete' else 'failed')
++            print(json.dumps({'strictFixtureAccepted':True}));sys.exit(0)
++        try:publish(root,destination,report,manifest,backend,3,'')
++        except ValueError:pass
++        else:raise AssertionError('INVALID_LIFECYCLE_ARTIFACT_PUBLISHED')
++        assert not destination.exists();print(json.dumps({'rejectedBeforePublication':True,'publishedFiles':0}));sys.exit(0)
+     if case in ('valid-consumer','valid-consumer-zero','valid-consumer-capped'):
+         report['consumerRead']=copy.deepcopy(consumer)
+         if case=='valid-consumer-zero':
+diff --git a/spikes/launcher/tests/native-session/artifacts.py b/spikes/launcher/tests/native-session/artifacts.py
+index bdf5a89..0fcdf60 100644
+--- a/spikes/launcher/tests/native-session/artifacts.py
++++ b/spikes/launcher/tests/native-session/artifacts.py
+@@ -14,7 +14,7 @@ SOURCES=('build.ts','check.ts','protocol.ts','run-session.py','supervision.py',
+     '../../../../package.json','../../../../bun.lock','../../../../apps/desktop/package.json')
+ OUTPUTS=('extension.js','kwin-script.js','metadata.json')
+ STAGES=('build','first-launch','native-initial-identity','resident-close','decoy-challenge','ordinary-cli-show','actual-x11-global-shortcut','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session')
+-PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
++PHASES=('decoy-native-ready','decoy-focused-before-ordinary-show','initial-native-launch','after-close-native-hidden','ordinary-singleton-cli-show','wayland-singleton-toggle-hidden','wayland-singleton-reopened','ordinary-show-native-focus','actual-x11-shortcut-native-focus','fresh-lifecycle-native-launch','after-ui-quit-native-window-absent','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
+ DIAGNOSTIC_PHASES=(*PHASES,'decoy-activation-request')
+ FLAGS=('initialPlacementInsideWorkArea','closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','explicitUiQuitExited','hiddenCliQuitExited')
+ ACTIVATION=('normal-show-focused-component-placement-still-required','actionable-component-required','normal-show-and-shortcut-native-focus-observed')
+@@ -131,9 +131,53 @@ def shortcut(value,backend):
+     return {'state':value['state'],'effectiveBindingExposed':exact(value['effectiveBindingExposed'],False),
+         'portalServicePresent':boolean(value['portalServicePresent']),'consentOrEffectiveBindingProven':exact(value['consentOrEffectiveBindingProven'],False)}
+ 
++LIFECYCLE_SKIPPED=['ordinary-show-native-focus','actual-x11-global-shortcut']
++LIFECYCLE_PHASES=('initial-native-launch','after-ui-quit-native-window-absent','fresh-lifecycle-native-launch','fresh-resident-native-hidden','after-hidden-cli-quit-native-window-absent')
++
++def lifecycle_diagnostic(value,backend):
++    if not backend.endswith('x11') or value['status'] not in ('incomplete','cleanup-incomplete'): raise ValueError('PUBLIC_LIFECYCLE_MODE')
++    exact(value['probeMode'],'lifecycle-only');exact(value['skippedChecks'],LIFECYCLE_SKIPPED)
++    if value['diagnosticOutcome'] not in ('complete','failed'): raise ValueError('PUBLIC_LIFECYCLE_OUTCOME')
++    forbidden=('decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','ordinaryShowNativeFocused','componentRequirementVisible','activationOutcome','shortcut')
++    if any(key in value for key in forbidden): raise ValueError('PUBLIC_LIFECYCLE_ACTIVATION_FORBIDDEN')
++    if value['stage'] not in ('build','first-launch','native-initial-identity','light-component-state','explicit-ui-quit','fresh-launch-hidden-cli-quit','complete','private-session'): raise ValueError('PUBLIC_LIFECYCLE_STAGE')
++    rows=value['observations'];phases=[row['phase'] for row in rows]
++    if phases!=list(LIFECYCLE_PHASES[:len(phases)]): raise ValueError('PUBLIC_LIFECYCLE_PHASE_SEQUENCE')
++    for row in rows:
++        phase=row['phase'];native=row['native'];window=native['launcher']
++        if native['decoyActivationIssued']: raise ValueError('PUBLIC_LIFECYCLE_ACTIVATION_FORBIDDEN')
++        # Failed identity/predicate observations remain safe failure evidence;
++        # only a completed diagnostic may claim the strict phase proofs.
++        if value['diagnosticOutcome']!='complete': continue
++        if phase in ('initial-native-launch','fresh-lifecycle-native-launch'):
++            if window['count']!=1 or not window['identityMatches'] or window['nativeBackend']!='x11' or window['geometry'] is None or window['workArea'] is None:
++                raise ValueError('PUBLIC_LIFECYCLE_IDENTITY')
++            frame=window['geometry'];area=window['workArea']
++            if frame['x']<area['x'] or frame['y']<area['y'] or frame['x']+frame['width']>area['x']+area['width']+1 or frame['y']+frame['height']>area['y']+area['height']+1: raise ValueError('PUBLIC_LIFECYCLE_PLACEMENT')
++        elif phase=='fresh-resident-native-hidden':
++            if not (window['count']==0 or window['hidden']): raise ValueError('PUBLIC_LIFECYCLE_HIDDEN')
++        elif window['count']!=0: raise ValueError('PUBLIC_LIFECYCLE_QUIT')
++    trace=value.get('nativeDiagnostic')
++    if trace:
++        if trace['phase'] not in LIFECYCLE_PHASES: raise ValueError('PUBLIC_LIFECYCLE_TRACE')
++        last=trace.get('lastObservation')
++        if last and (last['phase'] not in LIFECYCLE_PHASES or last['native']['decoyActivationIssued']): raise ValueError('PUBLIC_LIFECYCLE_TRACE')
++    if 'lifecycleProof' in value:
++        proof=value['lifecycleProof'];object_keys(proof,('launches','darkSearchCaptured','lightCapabilitiesCaptured','uiQuitExitCode','hiddenCliQuitExitCode','closeProcessAlive'))
++        for key,expected in (('launches',2),('darkSearchCaptured',True),('lightCapabilitiesCaptured',True),('uiQuitExitCode',0),('hiddenCliQuitExitCode',0),('closeProcessAlive',True)):
++            exact(proof[key],expected)
++    if value['diagnosticOutcome']=='complete':
++        if value['status']!='incomplete' or value['stage']!='complete' or phases!=list(LIFECYCLE_PHASES) or 'runtime' not in value or 'lifecycleProof' not in value or any(value.get(flag) is not True for flag in ('closeRetainedResidentProcess','explicitUiQuitExited','hiddenCliQuitExited','initialPlacementInsideWorkArea')):
++            raise ValueError('PUBLIC_LIFECYCLE_PROOF_REQUIRED')
++        if trace and (trace['state']!='predicate-met' or trace['phase']!=LIFECYCLE_PHASES[-1]): raise ValueError('PUBLIC_LIFECYCLE_TRACE')
++    return {key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value}
++
+ def public_result(value,backend):
+     required=('task','backend','status','physicalDesktopMatrixEstablished','evidenceKind','kernel','hostDisplayClipboardInputOrSettingsUsed','launcherCompanionActivationOrPlacementUsed','observations','stage')
+-    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead'))
++    object_keys(value,required,(*FLAGS,'runtime','activationOutcome','shortcut','nativeDiagnostic','observerStartup','consumerRead','probeMode','skippedChecks','diagnosticOutcome','lifecycleProof'))
++    mode=value.get('probeMode','full')
++    if type(mode) is not str or mode not in ('full','lifecycle-only'): raise ValueError('PUBLIC_PROBE_MODE')
++    if mode=='full' and any(key in value for key in ('skippedChecks','diagnosticOutcome','lifecycleProof')): raise ValueError('PUBLIC_FULL_MODE_REQUIRED')
+     if backend not in BACKENDS or value['status'] not in ('passed-bounded-native-probe','incomplete','cleanup-incomplete','unavailable') or value['stage'] not in STAGES: raise ValueError('PUBLIC_RESULT_STATE')
+     if type(value['kernel']) is not str or not re.fullmatch(r'[0-9][A-Za-z0-9_.+~-]{0,119}',value['kernel']): raise ValueError('PUBLIC_KERNEL_VERSION')
+     result={'task':exact(value['task'],'S0-01'),'backend':exact(value['backend'],backend),'status':value['status'],
+@@ -164,6 +208,12 @@ def public_result(value,backend):
+         result['activationOutcome']=value['activationOutcome']
+     if result.get('nativeDiagnostic',{}).get('state')=='hook-failed' and (backend not in ('gnome-wayland','gnome-x11') or value['status']=='passed-bounded-native-probe'):
+         raise ValueError('PUBLIC_HOOK_FAILURE_CANNOT_PASS')
++    if mode=='lifecycle-only':
++        object_keys({key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value},('probeMode','skippedChecks','diagnosticOutcome'),('lifecycleProof',))
++        result.update(lifecycle_diagnostic({**result,**{key:value[key] for key in ('probeMode','skippedChecks','diagnosticOutcome','lifecycleProof') if key in value}},backend))
++    else:
++        if any(row['phase']=='fresh-lifecycle-native-launch' for row in result['observations']) or result.get('nativeDiagnostic',{}).get('phase')=='fresh-lifecycle-native-launch' or result.get('nativeDiagnostic',{}).get('lastObservation',{}).get('phase')=='fresh-lifecycle-native-launch': raise ValueError('PUBLIC_FULL_MODE_PHASE')
++        if 'probeMode' in value: result['probeMode']='full'
+     if value['status']=='passed-bounded-native-probe':
+         mandatory=('closeRetainedResidentProcess','decoyActivationUsedForChallengeSetup','singletonShowRetainedPid','explicitUiQuitExited','hiddenCliQuitExited')
+         if value['stage']!='complete' or any(result.get(key) is not True for key in mandatory) or not all(key in result for key in ('runtime','shortcut','activationOutcome','initialPlacementInsideWorkArea','ordinaryShowNativeFocused')):
+@@ -202,10 +252,13 @@ def hash_value(value):
+     if type(value) is not str or not re.fullmatch(r'[0-9a-f]{64}',value): raise ValueError('PUBLIC_HASH_REQUIRED')
+     return value
+ 
+-def fallback_result(backend):
+-    return {'task':'S0-01','backend':backend,'status':'unavailable','physicalDesktopMatrixEstablished':False,
++def fallback_result(backend,probe_mode='full'):
++    result={'task':'S0-01','backend':backend,'status':'unavailable','physicalDesktopMatrixEstablished':False,
+         'evidenceKind':'actual-isolated-software-compositor-launcher','kernel':os.uname().release,
+         'hostDisplayClipboardInputOrSettingsUsed':False,'launcherCompanionActivationOrPlacementUsed':False,'observations':[],'stage':'private-session'}
++    if probe_mode=='lifecycle-only': result.update(probeMode=probe_mode,status='incomplete',skippedChecks=list(LIFECYCLE_SKIPPED),diagnosticOutcome='failed')
++    elif probe_mode!='full': raise ValueError('PUBLIC_PROBE_MODE')
++    return result
+ 
+ def publish(root,destination,value,manifest,backend,status,packages):
+     # Validate EVERYTHING before creating the destination or copying any bytes.
+@@ -224,6 +277,7 @@ def publish(root,destination,value,manifest,backend,status,packages):
+             metadata=file.lstat()
+             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>8*1024*1024 or file.read_bytes()[:8]!=b'\x89PNG\r\n\x1a\n': raise ValueError('PUBLIC_SCREENSHOT_REQUIRED')
+             screenshots.append((file,name))
++    if result.get('diagnosticOutcome')=='complete' and {name for _,name in screenshots}!={'dark-launcher.png','light-capabilities.png'}: raise ValueError('PUBLIC_LIFECYCLE_SCREENSHOTS_REQUIRED')
+     result.update(privateProcessTreeCleanupVerified=True,packages=safe_packages)
+     destination.mkdir(parents=True,exist_ok=True)
+     (destination/'report.json').write_text(json.dumps(result,indent=2)+'\n')
+diff --git a/spikes/launcher/tests/native-session/check.ts b/spikes/launcher/tests/native-session/check.ts
+index 731c56e..e2b3649 100644
+--- a/spikes/launcher/tests/native-session/check.ts
++++ b/spikes/launcher/tests/native-session/check.ts
+@@ -9,10 +9,12 @@ import { fileURLToPath } from 'node:url';
+ import { buildLauncher } from '../../build.ts';
+ import { APP_ID, APP_URL } from '../../src/contract.ts';
+ import type { LauncherState } from '../../src/contract.ts';
+-import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget } from './protocol.ts';
++import { BACKENDS, contained, ConsumerTrace, NativeTrace, requireNativeTarget, parseProbeMode, LIFECYCLE_SKIPPED } from './protocol.ts';
+ import type { Backend, NativePhase, Observation } from './protocol.ts';
+ 
+ const backend = process.argv[2] as Backend;
++const probeMode = parseProbeMode(process.argv[3], backend);
++if (process.argv.length > 4) throw new Error('PROBE_MODE_REQUIRED');
+ const root = process.env.LINUXCAST_S001_MATRIX_ROOT ?? '';
+ // One reviewed guard covers Python and direct Node entry. This executes before
+ // build, Electron/GTK launch, D-Bus calls, settings or compositor operations.
+@@ -33,6 +35,7 @@ const profile = join(root, 'linuxcast-launcher-native-session');
+ const env = { ...process.env, TMPDIR: root, LINUXCAST_LAUNCHER_PROFILE: profile, LINUXCAST_LAUNCHER_SHORTCUT: 'Ctrl+Alt+Shift+F12' } as Record<string, string>;
+ const observations: { phase: string; native: Observation }[] = [];
+ const report: Record<string, unknown> = { task: 'S0-01', backend, status: 'running', physicalDesktopMatrixEstablished: false,
++  probeMode, ...(probeMode === 'lifecycle-only' ? { skippedChecks: [...LIFECYCLE_SKIPPED], diagnosticOutcome: 'failed' } : {}),
+   evidenceKind: 'actual-isolated-software-compositor-launcher', kernel: release(), hostDisplayClipboardInputOrSettingsUsed: false,
+   launcherCompanionActivationOrPlacementUsed: false, observations };
+ let application: ElectronApplication | undefined;
+@@ -162,6 +165,37 @@ try {
+       sandbox: runtime.sandbox, contextIsolation: runtime.contextIsolation, nodeIntegration: runtime.nodeIntegration, webSecurity: runtime.webSecurity, renderer };
+     return page;
+   };
++  const lifecycleOnly = async (page: Awaited<ReturnType<typeof launch>>) => {
++    stage = 'light-component-state';
++    expect(await page.evaluate(() => window.linuxcast.setAppearance('light'))).toMatchObject({ ok: true });
++    await page.getByRole('button', { name: 'Launcher capabilities', exact: true }).click();
++    await capture('light-capabilities.png', 'light', 'capabilities');
++    await page.getByRole('button', { name: 'Back to commands', exact: true }).click();
++    stage = 'explicit-ui-quit';
++    const first = application!.process();
++    const firstExit = waitForExit(application!);
++    await Promise.all([page.getByRole('button', { name: 'Quit Linuxcast', exact: true }).click(), firstExit]);
++    expect(first.exitCode).toBe(0);
++    await observed('after-ui-quit-native-window-absent', value => value.launcher.count === 0);
++    report.explicitUiQuitExited = true;
++    application = undefined;
++    stage = 'fresh-launch-hidden-cli-quit'; await launch();
++    const fresh = await observed('fresh-lifecycle-native-launch', value => value.launcher.count === 1 && (!value.launcher.identityMatches || (!!value.launcher.geometry && !!value.launcher.workArea)));
++    requireNativeTarget(fresh.launcher, backend); expect(contained(fresh.launcher)).toBe(true);
++    const second = application!.process();
++    await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
++    await expect.poll(async () => (await state()).visible).toBe(false);
++    await observed('fresh-resident-native-hidden', value => value.launcher.count === 0 || value.launcher.hidden);
++    expect(second.exitCode).toBeNull(); expect(process.kill(pid, 0)).toBe(true);
++    report.closeRetainedResidentProcess = true;
++    const secondExit = waitForExit(application!);
++    await Promise.all([cli(main, '--quit'), secondExit]); expect(second.exitCode).toBe(0);
++    await observed('after-hidden-cli-quit-native-window-absent', value => value.launcher.count === 0);
++    application = undefined; report.hiddenCliQuitExited = true;
++    report.lifecycleProof = { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true,
++      uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true };
++    stage = 'complete'; report.diagnosticOutcome = 'complete'; report.status = 'incomplete'; process.exitCode = 3;
++  };
+   stage = 'first-launch';
+   let page = await launch();
+   stage = 'native-initial-identity';
+@@ -171,6 +205,8 @@ try {
+   if (!wayland) expect(contained(initial.launcher)).toBe(true);
+   expect(await page.evaluate(() => window.linuxcast.setAppearance('dark'))).toMatchObject({ ok: true });
+   await capture('dark-launcher.png', 'dark', 'search');
++  if (probeMode === 'lifecycle-only') { await lifecycleOnly(page); }
++  else {
+   stage = 'resident-close';
+   const original = application!.process();
+   await application!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.close());
+@@ -238,10 +274,11 @@ try {
+   await observed('after-hidden-cli-quit-native-window-absent', value => value.launcher.count === 0);
+   application = undefined; report.hiddenCliQuitExited = true;
+   stage = 'complete'; report.status = 'passed-bounded-native-probe';
+-} catch { report.status = 'incomplete'; process.exitCode = 3; }
++  }
++} catch { report.status = 'incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; }
+ finally {
+   decoy.kill('SIGTERM');
+-  if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; process.exitCode = 3; });
++  if (application?.process().exitCode === null) await application.close().catch(() => { application?.process().kill('SIGKILL'); report.status = 'cleanup-incomplete'; if (probeMode === 'lifecycle-only') report.diagnosticOutcome = 'failed'; process.exitCode = 3; });
+   // The outer process-local supervisor independently reaps every descendant.
+   rmSync(profile, { recursive: true, force: true });
+   report.stage = stage;
+diff --git a/spikes/launcher/tests/native-session/observer_startup.py b/spikes/launcher/tests/native-session/observer_startup.py
+index 5c901a0..4458fc9 100644
+--- a/spikes/launcher/tests/native-session/observer_startup.py
++++ b/spikes/launcher/tests/native-session/observer_startup.py
+@@ -39,6 +39,16 @@ def snapshot(value):
+     return {'checkpoints':list(checkpoints),'requests':safe,'extensionInfo':info(value['extensionInfo'])}
+ 
+ 
++def readiness(value):
++    # One strict, locked monitor snapshot supplies all markers. Its lifetime
++    # deduplicated checkpoints retain bad transitions, even after later enables.
++    markers=set(snapshot(value)['checkpoints'])
++    if 'PRIVATE_CONTEXT_REJECTED' in markers: return 'rejected'
++    if 'DISABLED' in markers: return 'disabled'
++    if {'PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK'}<=markers: return 'ready'
++    return 'pending'
++
++
+ def lifecycle_sample(value):
+     if type(value) is not dict or set(value)!= {'compositor','drain'}: raise ValueError('OBSERVER_LIFECYCLE_SCHEMA')
+     process=value['compositor'];drain=value['drain']
+diff --git a/spikes/launcher/tests/native-session/preparation.test.ts b/spikes/launcher/tests/native-session/preparation.test.ts
+index 55a0a5a..bff83b6 100644
+--- a/spikes/launcher/tests/native-session/preparation.test.ts
++++ b/spikes/launcher/tests/native-session/preparation.test.ts
+@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
+ import { stripTypeScriptTypes } from 'node:module';
+ import { runInNewContext } from 'node:vm';
+ import { buildNativeSession } from './build.ts';
+-import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
++import { CONSUMER_OUTCOMES, ConsumerTrace, parseConsumerRead, parseProbeMode, parseLifecycleDiagnostic, NativeTrace, parseNativeDiagnostic, parseObservation, parseHookFailureReply, parseObserverStartup, requireNativeTarget } from './protocol.ts';
+ import type { ConsumerOutcome, NativeWindow, Observation } from './protocol.ts';
+ import { hookFixture, syntheticWindow } from './observation-fixtures.ts';
+ const source = (name: string) => fileURLToPath(new URL(name, import.meta.url));
+@@ -375,7 +375,10 @@ for (const cancellation of ['SIGTERM', 'SIGINT'] as const) test(`private owner $
+   }
+ }, 6000);
+ 
+-for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
++for (const scenario of ['parser', 'prevalidation-parser', 'drain', 'typed-info', 'schema', 'lifecycle-schema', 'lifecycle-eof-running', 'lifecycle-exited-pipe-held', 'query-deadline', 'gio-call', 'runner-order', 'runner-deadline', 'readiness-schema',
++  'runner-ready-delayed', 'runner-ready-missing-accepted', 'runner-ready-missing-poll', 'runner-ready-missing-tick', 'runner-ready-all-missing', 'runner-ready-no-transport',
++  'runner-ready-rejected', 'runner-ready-disabled', 'runner-ready-query-deadline', 'runner-ready-exit', 'runner-ready-late-exit', 'runner-ready-late-disabled',
++  'runner-ready-last-boundary-deadline', 'runner-ready-kwin-unchanged']) test(`fixed observer startup ${scenario} has no desktop or private output`, () => {
+   const result = spawnSync('/usr/bin/python3', [source('startup-fixture.py'), scenario], { encoding: 'utf8', timeout: 5000 });
+   expect(result.status, result.stderr).toBe(0);
+   expect(result.stdout.trim().split('\n').at(-1)).toBe(`startup-${scenario}-passed`);
+@@ -485,3 +488,131 @@ test('prevalidation categories are capped at eight literals per enable, with no
+   expect(actual.join()).not.toContain('synthetic-private');
+   expect(parseObserverStartup({ latest: { checkpoints: actual.map(v => v.replace('LINUXCAST_S001_OBSERVER:', '')), requests: [], extensionInfo: { status: 'INFO_UNAVAILABLE' } } }).latest.checkpoints).toHaveLength(8);
+ });
++
++// Run the exact diagnostic branch without importing Electron, touching the
++// filesystem or driving a desktop. Every effect is recorded; failures propagate.
++async function lifecycleBranchFixture(failAt?: string, nonzeroExit: 'ui' | 'hidden' | false = false) {
++  const text = readFileSync(source('check.ts'), 'utf8');
++  const begin = text.indexOf('  const lifecycleOnly = async');
++  const end = text.indexOf("  stage = 'first-launch';", begin);
++  expect(begin).toBeGreaterThan(0); expect(end).toBeGreaterThan(begin);
++  const program = stripTypeScriptTypes(`${text.slice(begin, end)}\nglobalThis.runDiagnostic = lifecycleOnly;`);
++  const events: string[] = [], failure = new Error('SYNTHETIC_PRIVATE_FAILURE');
++  const effect = (name: string) => { events.push(name); if (name === failAt) throw failure; };
++  const report: Record<string, unknown> = {}, own = { ...native(), nativeBackend: 'x11' as const };
++  const empty: NativeWindow = { count: 0, identityMatches: false, nativeBackend: 'unsupported', focused: false, hidden: true, geometry: null, workArea: null };
++  const child: { exitCode: number | null } = { exitCode: null };
++  let count = 1, hidden = false;
++  const page = {
++    evaluate: async () => { effect('appearance-light'); return { ok: true }; },
++    getByRole: (_role: string, options: { name: string; exact: boolean }) => ({ click: async () => {
++      expect(options.exact).toBe(true); effect(`click:${options.name}`);
++      if (options.name === 'Quit Linuxcast') child.exitCode = nonzeroExit === 'ui' ? 7 : 0;
++    } }),
++  };
++  const app = { process: () => child, evaluate: async () => { effect('close'); hidden = true; } };
++  const context = { stage: 'native-initial-identity', application: app as typeof app | undefined, pid: 101, main: '/fixed/main.cjs', backend: 'gnome-x11', report,
++    expect, requireNativeTarget, contained: () => true,
++    process: { exitCode: undefined as number | undefined, kill: (pid: number, signal: number) => { expect([pid, signal]).toEqual([101, 0]); effect('process-live'); return true; } },
++    capture: async (name: string, appearance: string, view: string) => { expect([name, appearance, view]).toEqual(['light-capabilities.png', 'light', 'capabilities']); effect('capture-light'); },
++    waitForExit: async () => { effect('wait-exit'); },
++    state: async () => { effect('state-hidden'); return { visible: !hidden }; },
++    observed: async (phase: string, predicate: (value: Observation) => boolean) => {
++      effect(`native:${phase}`);
++      let launcher = phase === 'fresh-lifecycle-native-launch' ? own : empty;
++      if (failAt === 'fresh-identity-mismatch' && phase === 'fresh-lifecycle-native-launch') launcher = { ...empty, count: 1 };
++      if (failAt === 'fresh-backend-mismatch' && phase === 'fresh-lifecycle-native-launch') launcher = { ...own, nativeBackend: 'wayland' };
++      if (failAt === 'close-still-visible' && phase === 'fresh-resident-native-hidden') launcher = own;
++      const observation: Observation = { request: 1, launcher, decoy: empty, decoyActivationIssued: false };
++      expect(predicate(observation)).toBe(true); return observation;
++    },
++    cli: async (main: string, command: string) => { expect([main, command]).toEqual(['/fixed/main.cjs', '--quit']); effect('cli-quit'); child.exitCode = nonzeroExit === 'hidden' ? 7 : 0; },
++    launch: async () => { effect('launch'); count++; child.exitCode = null; hidden = false; context.application = app; return page; },
++    // These operations are intentionally absent from the diagnostic branch.
++    challenge: () => { throw new Error('DECOY_ACTIVATION_FORBIDDEN'); }, spawnSync: () => { throw new Error('CHORD_FORBIDDEN'); },
++  };
++  runInNewContext(program, context);
++  let caught: unknown;
++  try { await (context as unknown as { runDiagnostic: (page: unknown) => Promise<void> }).runDiagnostic(page); }
++  catch (error) { caught = error; }
++  return { events, report, count, context, caught, failure };
++}
++
++test('lifecycle-only exact production branch uses two launches and no Show, decoy challenge or chord', async () => {
++  const fixture = await lifecycleBranchFixture();
++  expect(fixture.caught).toBeUndefined(); expect(fixture.count).toBe(2);
++  expect(fixture.events).toEqual(['appearance-light', 'click:Launcher capabilities', 'capture-light', 'click:Back to commands',
++    'wait-exit', 'click:Quit Linuxcast', 'native:after-ui-quit-native-window-absent', 'launch', 'native:fresh-lifecycle-native-launch',
++    'close', 'state-hidden', 'native:fresh-resident-native-hidden', 'process-live', 'wait-exit', 'cli-quit', 'native:after-hidden-cli-quit-native-window-absent']);
++  expect(fixture.report).toMatchObject({ diagnosticOutcome: 'complete', status: 'incomplete', explicitUiQuitExited: true,
++    closeRetainedResidentProcess: true, hiddenCliQuitExited: true, lifecycleProof: { launches: 2, darkSearchCaptured: true,
++      lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true } });
++  expect(fixture.context.process.exitCode).toBe(3); expect(fixture.context.stage).toBe('complete');
++  expect(fixture.context.application).toBeUndefined();
++  for (const key of ['activationOutcome', 'ordinaryShowNativeFocused', 'singletonShowRetainedPid', 'shortcut', 'decoyActivationUsedForChallengeSetup']) expect(fixture.report).not.toHaveProperty(key);
++});
++for (const failAt of ['appearance-light', 'click:Launcher capabilities', 'capture-light', 'click:Back to commands', 'wait-exit', 'click:Quit Linuxcast',
++  'native:after-ui-quit-native-window-absent', 'launch', 'native:fresh-lifecycle-native-launch', 'close', 'state-hidden', 'native:fresh-resident-native-hidden',
++  'process-live', 'cli-quit', 'native:after-hidden-cli-quit-native-window-absent']) test(`lifecycle-only production branch stops immediately at ${failAt}`, async () => {
++  const fixture = await lifecycleBranchFixture(failAt);
++  expect(fixture.caught).toBe(fixture.failure);
++  // Waiting for exit and clicking Quit are the existing single concurrent pair.
++  if (failAt === 'wait-exit') expect(fixture.events.slice(-2)).toEqual(['wait-exit', 'click:Quit Linuxcast']);
++  else expect(fixture.events.at(-1)).toBe(failAt);
++  expect(fixture.report).not.toHaveProperty('lifecycleProof'); expect(fixture.report).not.toHaveProperty('diagnosticOutcome', 'complete');
++});
++test('nonzero UI Quit cannot complete lifecycle-only or start a second launcher', async () => {
++  const fixture = await lifecycleBranchFixture(undefined, 'ui');
++  expect(fixture.caught).toBeDefined(); expect(fixture.count).toBe(1); expect(fixture.report).not.toHaveProperty('lifecycleProof');
++});
++
++
++test('lifecycle selection accepts only fixed X11 diagnostics and historical missing full mode', () => {
++  expect(parseProbeMode(undefined, 'gnome-wayland')).toBe('full');
++  expect(parseProbeMode('full', 'kwin-wayland')).toBe('full');
++  expect(parseProbeMode('lifecycle-only', 'gnome-x11')).toBe('lifecycle-only');
++  for (const value of [null, true, 'shortcut-only', 'synthetic-private-canary', { private: 'synthetic-private-canary' }]) expect(() => parseProbeMode(value, 'gnome-x11')).toThrow();
++  expect(() => parseProbeMode('lifecycle-only', 'gnome-wayland')).toThrow();
++});
++test('typed lifecycle metadata rejects forged completion, unknown skips and private proof fields', () => {
++  const value = { probeMode: 'lifecycle-only', skippedChecks: ['ordinary-show-native-focus', 'actual-x11-global-shortcut'], diagnosticOutcome: 'failed' };
++  expect(parseLifecycleDiagnostic(value, 'gnome-x11')).toEqual(value);
++  const complete = { ...value, diagnosticOutcome: 'complete', lifecycleProof: { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true } };
++  expect(parseLifecycleDiagnostic(complete, 'gnome-x11')).toEqual(complete);
++  for (const row of [{ ...value, private: 'synthetic-private-canary' }, { ...value, diagnosticOutcome: 'complete' },
++    { ...value, probeMode: 'full' }, { ...value, skippedChecks: [] }, { ...value, skippedChecks: ['actual-x11-global-shortcut', 'ordinary-show-native-focus'] },
++    { ...complete, lifecycleProof: { ...complete.lifecycleProof, private: 'synthetic-private-canary' } },
++    { ...complete, lifecycleProof: { ...complete.lifecycleProof, uiQuitExitCode: false } }, { ...complete, lifecycleProof: { ...complete.lifecycleProof, hiddenCliQuitExitCode: 1 } }]) {
++    expect(() => parseLifecycleDiagnostic(row, 'gnome-x11')).toThrow();
++  }
++});
++
++for (const scenario of ['valid-lifecycle-complete', 'valid-lifecycle-failed', 'valid-lifecycle-identity-failed', 'lifecycle-passed', 'lifecycle-missing-mode', 'lifecycle-wayland', 'lifecycle-unknown-mode',
++  'lifecycle-extra', 'lifecycle-private-proof', 'lifecycle-no-proof', 'lifecycle-exit-bool', 'lifecycle-exit-nonzero', 'lifecycle-no-runtime', 'lifecycle-no-screenshot',
++  'lifecycle-missing-observation', 'lifecycle-phase-reorder', 'lifecycle-cross-phase', 'lifecycle-forged-identity', 'lifecycle-outside-workarea', 'lifecycle-visible-close', 'lifecycle-nonabsent-quit',
++  'lifecycle-trace-cross-phase', 'lifecycle-trace-hook', 'lifecycle-activation-issued', 'lifecycle-focus-claim', 'lifecycle-shortcut-claim', 'lifecycle-activation-claim',
++  'lifecycle-skips-reordered', 'lifecycle-skips-extra', 'lifecycle-outcome-private', 'full-lifecycle-phase']) test(`lifecycle artifact mode boundary ${scenario}`, () => {
++  const child = spawnSync('/usr/bin/python3', [source('artifact-canary.py'), scenario], { encoding: 'utf8', timeout: 5000 });
++  expect(child.status, child.stderr).toBe(0);
++  const result = JSON.parse(child.stdout);
++  if (scenario.startsWith('valid-')) expect(result.strictFixtureAccepted).toBe(true);
++  else expect(result).toMatchObject({ rejectedBeforePublication: true, publishedFiles: 0 });
++});
++
++test('nonzero hidden CLI Quit cannot complete the diagnostic after a successful UI Quit', async () => {
++  const fixture = await lifecycleBranchFixture(undefined, 'hidden');
++  expect(fixture.caught).toBeDefined(); expect(fixture.count).toBe(2); expect(fixture.report.explicitUiQuitExited).toBe(true);
++  expect(fixture.report).not.toHaveProperty('lifecycleProof'); expect(fixture.events.at(-1)).toBe('cli-quit');
++});
++test('lifecycle-only Wayland mode fails before target or compositor actions', () => {
++  const child = spawnSync('/usr/bin/python3', [source('run-session.py'), 'gnome-wayland', '--probe-mode', 'lifecycle-only'],
++    { encoding: 'utf8', env: { PATH: process.env.PATH }, timeout: 5000 });
++  expect(child.status).toBe(3);
++  expect(JSON.parse(child.stdout)).toEqual({ status: 'unavailable', reason: 'X11_DIAGNOSTIC_REQUIRED', physicalDesktopMatrixEstablished: false });
++});
++
++for (const failure of ['fresh-identity-mismatch', 'fresh-backend-mismatch', 'close-still-visible']) test(`strict native ${failure} remains terminal in the lifecycle branch`, async () => {
++  const fixture = await lifecycleBranchFixture(failure);
++  expect(fixture.caught).toBeDefined(); expect(fixture.report).not.toHaveProperty('lifecycleProof');
++  expect(fixture.report).not.toHaveProperty('hiddenCliQuitExited'); expect(fixture.events).not.toContain('cli-quit');
++});
+diff --git a/spikes/launcher/tests/native-session/protocol.ts b/spikes/launcher/tests/native-session/protocol.ts
+index b121ceb..924bf53 100644
+--- a/spikes/launcher/tests/native-session/protocol.ts
++++ b/spikes/launcher/tests/native-session/protocol.ts
+@@ -14,7 +14,7 @@ export type Observation = { request: number; launcher: NativeWindow; decoy: Nati
+   diagnostics?: { launcher: WindowDiagnostic; decoy: WindowDiagnostic } };
+ export const NATIVE_PHASES = ['decoy-native-ready', 'decoy-focused-before-ordinary-show', 'initial-native-launch', 'after-close-native-hidden',
+   'ordinary-singleton-cli-show', 'wayland-singleton-toggle-hidden', 'wayland-singleton-reopened', 'ordinary-show-native-focus',
+-  'actual-x11-shortcut-native-focus', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
++  'actual-x11-shortcut-native-focus', 'fresh-lifecycle-native-launch', 'after-ui-quit-native-window-absent', 'fresh-resident-native-hidden', 'after-hidden-cli-quit-native-window-absent', 'decoy-activation-request'] as const;
+ export type NativePhase = typeof NATIVE_PHASES[number];
+ export const HOOK_FAILURE_STAGES = ['enumerate', 'launcher', 'decoy', 'activation', 'publish'] as const;
+ export type HookFailureReply = { request: number; hookFailure: { stage: typeof HOOK_FAILURE_STAGES[number]; outcome: 'native-read-failed' } };
+@@ -239,3 +239,30 @@ export function parseObserverStartup(value: unknown): ObserverStartup {
+   }
+   return result;
+ }
++
++/** Diagnostic selection is independent of native focus acceptance. */
++export type ProbeMode = 'full' | 'lifecycle-only';
++export const LIFECYCLE_SKIPPED = ['ordinary-show-native-focus', 'actual-x11-global-shortcut'] as const;
++export function parseProbeMode(value: unknown, backend: Backend): ProbeMode {
++  if (value === undefined || value === 'full') return 'full';
++  if (value === 'lifecycle-only' && backend.endsWith('x11')) return value;
++  throw new Error('PROBE_MODE_REQUIRED');
++}
++export type LifecycleDiagnostic = { probeMode: 'lifecycle-only'; skippedChecks: typeof LIFECYCLE_SKIPPED[number][];
++  diagnosticOutcome: 'complete' | 'failed'; lifecycleProof?: { launches: 2; darkSearchCaptured: true; lightCapabilitiesCaptured: true;
++    uiQuitExitCode: 0; hiddenCliQuitExitCode: 0; closeProcessAlive: true } };
++export function parseLifecycleDiagnostic(value: unknown, backend: Backend): LifecycleDiagnostic {
++  const row = object(value); keys(row, ['probeMode', 'skippedChecks', 'diagnosticOutcome'], ['lifecycleProof']);
++  if (parseProbeMode(row.probeMode, backend) !== 'lifecycle-only' || !Array.isArray(row.skippedChecks)
++    || row.skippedChecks.length !== LIFECYCLE_SKIPPED.length || row.skippedChecks.some((v, i) => v !== LIFECYCLE_SKIPPED[i])
++    || typeof row.diagnosticOutcome !== 'string' || !['complete', 'failed'].includes(row.diagnosticOutcome)) throw new Error('LIFECYCLE_SCHEMA');
++  const result: LifecycleDiagnostic = { probeMode: 'lifecycle-only', skippedChecks: [...LIFECYCLE_SKIPPED], diagnosticOutcome: row.diagnosticOutcome as 'complete' | 'failed' };
++  if ('lifecycleProof' in row) {
++    const proof = object(row.lifecycleProof); keys(proof, ['launches', 'darkSearchCaptured', 'lightCapabilitiesCaptured', 'uiQuitExitCode', 'hiddenCliQuitExitCode', 'closeProcessAlive']);
++    if (proof.launches !== 2 || proof.darkSearchCaptured !== true || proof.lightCapabilitiesCaptured !== true
++      || proof.uiQuitExitCode !== 0 || proof.hiddenCliQuitExitCode !== 0 || proof.closeProcessAlive !== true) throw new Error('LIFECYCLE_PROOF');
++    result.lifecycleProof = { launches: 2, darkSearchCaptured: true, lightCapabilitiesCaptured: true, uiQuitExitCode: 0, hiddenCliQuitExitCode: 0, closeProcessAlive: true };
++  }
++  if (result.diagnosticOutcome === 'complete' && !result.lifecycleProof) throw new Error('LIFECYCLE_PROOF_REQUIRED');
++  return result;
++}
+diff --git a/spikes/launcher/tests/native-session/run-session.py b/spikes/launcher/tests/native-session/run-session.py
+index 61485b2..0cf193b 100644
+--- a/spikes/launcher/tests/native-session/run-session.py
++++ b/spikes/launcher/tests/native-session/run-session.py
+@@ -17,7 +17,7 @@ import time
+ from private import private_root, private_environment, target_guard
+ from supervision import Supervisor, Cancelled
+ from artifacts import public_manifest, fallback_result, publish
+-from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample
++from observer_startup import ShellDrain, query_once, diagnostic as startup_diagnostic, runtime_sample, readiness
+ 
+ HERE=pathlib.Path(__file__).resolve().parent
+ BACKENDS=('gnome-wayland','gnome-x11','kwin-wayland','kwin-x11')
+@@ -46,7 +46,7 @@ def has_owner(name,env):
+     value=bounded(['gdbus','call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.NameHasOwner',name],env)
+     return value.returncode==0 and value.stdout.strip()=='(true,)'
+ 
+-def inner(backend,root):
++def inner(backend,root,probe_mode='full'):
+     root=private_root(str(root),backend)
+     env=private_environment(root,os.environ.get('LINUXCAST_S001_NODE'))
+     env['DBUS_SESSION_BUS_ADDRESS']=os.environ['DBUS_SESSION_BUS_ADDRESS']
+@@ -78,14 +78,25 @@ def inner(backend,root):
+         try:
+             owner='org.gnome.Shell' if family=='gnome' else 'org.kde.KWin'
+             deadline=time.monotonic()+45
++            transport_ready=False
+             while time.monotonic()<deadline:
+                 if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
+-                if has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists()): break
++                if not transport_ready:
++                    transport_ready=has_owner(owner,env) and (not wayland or (root/'runtime'/env['WAYLAND_DISPLAY']).exists())
++                    if transport_ready and monitor:
++                        # Same one diagnostic query at the original transport
++                        # boundary, sharing this original startup deadline.
++                        monitor.set_info(query_once(env,deadline))
++                if monitor:
++                    if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
++                    observer_state=readiness(monitor.snapshot())
++                    if observer_state in ('rejected','disabled'): return unavailable('PRIVATE_OBSERVER_START_REJECTED')
++                    if transport_ready and observer_state=='ready': break
++                elif transport_ready: break
++                # Once transport is latched, only the private pipe snapshot is
++                # polled; no new bus queries or separate wait window are added.
+                 time.sleep(0.2)
+             else: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+-            if monitor:
+-                monitor.set_info(query_once(env,deadline))
+-                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
+             if family=='kwin':
+                 subprocess.Popen(['/usr/bin/python3',str(HERE/'kwin-bus.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                 deadline=time.monotonic()+5
+@@ -101,8 +112,11 @@ def inner(backend,root):
+             if monitor:
+                 lifecycle['beforeChecker']=runtime_sample(compositor,monitor)
+                 before_checker=monitor.snapshot()
++                if readiness(before_checker)!='ready': return unavailable('PRIVATE_OBSERVER_START_REJECTED')
+                 (root/'observer-startup.json').write_text(json.dumps(startup_diagnostic({'beforeChecker':before_checker,'latest':before_checker})))
+-            driver=subprocess.Popen([node,str(HERE/'check.ts'),backend],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
++                if compositor.poll() is not None: return unavailable('TARGET_COMPOSITOR_START_FAILED')
++                if time.monotonic()>=deadline: return unavailable('TARGET_COMPOSITOR_START_DEADLINE')
++            driver=subprocess.Popen([node,str(HERE/'check.ts'),backend,*([probe_mode] if probe_mode!='full' else [])],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+             try: return driver.wait(timeout=180)
+             except subprocess.TimeoutExpired: return unavailable('LAUNCHER_MATRIX_DRIVER_DEADLINE')
+             finally:
+@@ -119,9 +133,11 @@ def inner(backend,root):
+ def main():
+     parser=argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('backend',choices=BACKENDS)
++    parser.add_argument('--probe-mode',choices=('full','lifecycle-only'),default='full')
+     parser.add_argument('--private-guest',action='store_true')
+     parser.add_argument('--inner',type=pathlib.Path)
+     arguments=parser.parse_args()
++    if arguments.probe_mode=='lifecycle-only' and not arguments.backend.endswith('x11'): return unavailable('X11_DIAGNOSTIC_REQUIRED')
+     if not arguments.private_guest:
+         return unavailable('EXPLICIT_DISPOSABLE_DEBIAN13_USER_REQUIRED')
+     try: target_guard()
+@@ -130,7 +146,7 @@ def main():
+         try:
+             root=private_root(str(arguments.inner),arguments.backend)
+             verify_build(HERE/'dist')
+-            return inner(arguments.backend,root)
++            return inner(arguments.backend,root,arguments.probe_mode)
+         except (ValueError,OSError,subprocess.TimeoutExpired): return unavailable('PRIVATE_COMPOSITOR_HARNESS_FAILED')
+     try: verify_build(HERE/'dist')
+     except (ValueError,OSError): return unavailable('BUILD_REVIEWED_HARNESS_FIRST')
+@@ -150,7 +166,7 @@ def main():
+     (applications/'io.github.ianwijma.Linuxcast.desktop').write_text('[Desktop Entry]\nType=Application\nName=Linuxcast\nExec=/usr/bin/false\nStartupWMClass=io.github.ianwijma.Linuxcast\nNoDisplay=true\n')
+     services=root/'services'; services.mkdir()
+     (root/'bus.conf').write_text('<busconfig><type>session</type><listen>unix:path='+str(root/'dbus-session')+'</listen><auth>EXTERNAL</auth><servicedir>'+str(services)+'</servicedir><policy context="default"><allow send_destination="*"/><allow receive_sender="*"/><allow own="*"/></policy></busconfig>')
+-    command=['dbus-run-session','--config-file',str(root/'bus.conf'),'--','/usr/bin/python3',str(HERE/'run-session.py'),arguments.backend,'--private-guest','--inner',str(root)]
++    command=['dbus-run-session','--config-file',str(root/'bus.conf'),'--','/usr/bin/python3',str(HERE/'run-session.py'),arguments.backend,'--private-guest','--inner',str(root),*(['--probe-mode',arguments.probe_mode] if arguments.probe_mode!='full' else [])]
+     if arguments.backend.endswith('x11'):
+         auth=root/'xauthority';auth.touch(mode=0o600)
+         command=['xvfb-run','--auth-file',str(auth),'-a','-s','-screen 0 1280x900x24 -nolisten tcp',*command]
+@@ -166,15 +182,16 @@ def main():
+             metadata=result_path.lstat()
+             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid(): raise ValueError('PRIVATE_RESULT_FILE_REQUIRED')
+             result=json.loads(result_path.read_text())
+-        else: result=fallback_result(arguments.backend)
++        else: result=fallback_result(arguments.backend,arguments.probe_mode)
+         startup=root/'observer-startup.json'
+         if arguments.backend.startswith('gnome') and result.get('status')!='passed-bounded-native-probe' and startup.exists():
+             metadata=startup.lstat()
+             if not stat.S_ISREG(metadata.st_mode) or metadata.st_uid!=os.getuid() or metadata.st_size>16384: raise ValueError('OBSERVER_STARTUP_FILE_REQUIRED')
+             result['observerStartup']=startup_diagnostic(json.loads(startup.read_text()))
+         packages=bounded(['dpkg-query','-W','-f=${Package} ${Version}\n','gnome-shell','mutter','kwin-wayland','kwin-x11','libqt6qml6'],env)
+-        destination=HERE.parents[1]/'evidence/native-session'/arguments.backend
++        destination=HERE.parents[1]/'evidence/native-session'/(arguments.backend+('-lifecycle-only' if arguments.probe_mode=='lifecycle-only' else ''))
+         manifest=verify_build(HERE/'dist')
++        if result.get('probeMode','full')!=arguments.probe_mode: raise ValueError('PROBE_MODE_MISMATCH')
+         status,state=publish(root,destination,result,manifest,arguments.backend,status,packages.stdout)
+         print(json.dumps({'backend':arguments.backend,'status':state,'exitCode':status,'privateProcessTreeCleanupVerified':cleanup,'physicalDesktopMatrixEstablished':False}))
+         return status
+diff --git a/spikes/launcher/tests/native-session/startup-fixture.py b/spikes/launcher/tests/native-session/startup-fixture.py
+index 228a3c0..de691d7 100644
+--- a/spikes/launcher/tests/native-session/startup-fixture.py
++++ b/spikes/launcher/tests/native-session/startup-fixture.py
+@@ -171,6 +171,120 @@ elif case=='gio-call':
+         except ValueError:pass
+         else:raise AssertionError('QUERY_BEFORE_PRIVATE_GUARD')
+     assert len(calls)==1
++elif case=='readiness-schema':
++    required=('PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK')
++    def value(markers):return {'checkpoints':list(markers),'requests':[],'extensionInfo':{'status':'INFO_UNAVAILABLE'}}
++    assert startup.readiness(value(required))=='ready'
++    assert startup.readiness(value((*required,'CONTEXT_NOT_OBSERVED')))=='ready'
++    for missing in required:
++        assert startup.readiness(value([marker for marker in required if marker!=missing]))=='pending'
++    active=value(());active['extensionInfo']={'status':'INFO_AVAILABLE','state':1,'enabled':True}
++    assert startup.readiness(active)=='pending'
++    for bad,state in (('PRIVATE_CONTEXT_REJECTED','rejected'),('DISABLED','disabled')):
++        output=startup.FixedOutput()
++        for marker in (*required,bad,'ENABLE_ENTERED',*required):output.feed(startup.PREFIX+marker.encode()+b'\n')
++        assert startup.readiness(output.snapshot())==state
++    assert startup.readiness(value((*required,'DISABLED','PRIVATE_CONTEXT_REJECTED')))=='rejected'
++    # Independently incomplete snapshots never combine their evidence.
++    assert startup.readiness(value(required[:2]))=='pending'
++    assert startup.readiness(value(required[2:]))=='pending'
++    output=startup.FixedOutput()
++    for marker in required:
++        line=startup.PREFIX+marker.encode()
++        output.feed(line[:12]);assert startup.readiness(output.snapshot())=='pending'
++        output.feed(line[12:]+b'synthetic-private-canary\n')
++        assert startup.readiness(output.snapshot())=='pending'
++        output.feed(b'x'*257+line+b'\n')
++        assert startup.readiness(output.snapshot())=='pending'
++    for marker in required:
++        line=startup.PREFIX+marker.encode()+b'\n'
++        output.feed(line[:12]);output.feed(line[12:])
++    assert startup.readiness(output.snapshot())=='ready'
++    assert 'synthetic-private-canary' not in json.dumps(output.snapshot())
++    invalid=value(required);invalid['private']='synthetic-private-canary'
++    try:startup.readiness(invalid)
++    except ValueError:pass
++    else:raise AssertionError('READINESS_PRIVATE_ACCEPTED')
++elif case.startswith('runner-ready-'):
++    scenario=case.removeprefix('runner-ready-')
++    assert scenario in ('delayed','missing-accepted','missing-poll','missing-tick','all-missing','no-transport',
++                        'rejected','disabled','query-deadline','exit','late-exit','late-disabled','last-boundary-deadline','kwin-unchanged')
++    spec=importlib.util.spec_from_file_location('readiness_runner',pathlib.Path(__file__).with_name('run-session.py'))
++    runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
++    events=[];now=[100.0];monitors=[];queried=[False];owner_calls=[];driver_starts=[]
++    required=('PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK')
++    with tempfile.TemporaryDirectory(prefix='linuxcast-s001-readiness-fixture-') as temporary:
++        root=pathlib.Path(temporary)
++        class Monitor(startup.FixedOutput):
++            def __init__(self,_stream):
++                super().__init__();self.closed=False;monitors.append(self)
++                self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
++                if scenario in ('rejected','disabled','late-exit','late-disabled','last-boundary-deadline'):
++                    for marker in required:self.feed(startup.PREFIX+marker.encode()+b'\n')
++                if scenario in ('rejected','disabled'):
++                    self.feed(startup.PREFIX+('PRIVATE_CONTEXT_REJECTED' if scenario=='rejected' else 'DISABLED').encode()+b'\n')
++            def close(self):self.closed=True;events.append('drain-close')
++            def health(self):
++                if scenario=='late-disabled':self.feed(startup.PREFIX+b'DISABLED\n')
++                if scenario=='last-boundary-deadline':now[0]=145.0
++                return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
++        class Child:
++            stdout=None
++            def poll(self):
++                if scenario=='exit' and now[0]>=100.4:return -9
++                if scenario=='late-exit' and queried[0]:
++                    # First post-query poll is the immediate pre-driver recheck.
++                    return -9
++                return None
++            def wait(self,timeout):assert timeout==180;events.append('driver-wait');return 3
++        def spawn(command,**kwargs):
++            if command[0]=='/fixed-shell':events.append('shell')
++            elif command[0]=='/usr/bin/python3':
++                assert scenario=='kwin-unchanged' and command[-1].endswith('kwin-bus.py');events.append('kwin-bus')
++            else:
++                assert command[0]=='/fixed-node';events.append('checker');driver_starts.append(now[0])
++                if scenario!='kwin-unchanged':
++                    assert startup.readiness(monitors[0].snapshot())=='ready'
++                    assert now[0]>=100.6
++                    assert (root/'observer-startup.json').exists()
++            return Child()
++        def owner(name,_env):
++            owner_calls.append(name)
++            # All extension markers can be ready without transport; this must
++            # not start the checker or spend an extension info call.
++            return scenario!='no-transport'
++        def query(_env,deadline):
++            assert deadline==145.0 and not queried[0]
++            queried[0]=True;events.append('one-info')
++            if scenario=='query-deadline':now[0]=145.0
++            return {'status':'INFO_UNAVAILABLE'}
++        def sleep(seconds):
++            assert seconds==0.2
++            now[0]=round(now[0]+seconds,6)
++            if now[0]>=100.6 and monitors:
++                missing={'missing-accepted':'PRIVATE_CONTEXT_ACCEPTED','missing-poll':'POLL_INSTALLED','missing-tick':'FIRST_POLL_TICK'}.get(scenario)
++                for marker in required:
++                    if marker!=missing and scenario!='all-missing':monitors[0].feed(startup.PREFIX+marker.encode()+b'\n')
++        backend='kwin-x11' if scenario=='kwin-unchanged' else 'gnome-x11'
++        with patch.object(runner,'private_root',return_value=root),patch.dict(os.environ,{'DBUS_SESSION_BUS_ADDRESS':'private-fixture','LINUXCAST_S001_NODE':'/fixed-node','DISPLAY':':99','XAUTHORITY':str(root/'xauthority')},clear=True),patch.object(runner.shutil,'which',return_value='/fixed-shell'),patch.object(runner,'bounded',return_value=types.SimpleNamespace(returncode=0,stdout='(int32 1,)')),patch.object(runner,'has_owner',side_effect=owner),patch.object(runner.time,'monotonic',side_effect=lambda:now[0]),patch.object(runner.time,'sleep',side_effect=sleep),patch.object(runner.subprocess,'Popen',side_effect=spawn),patch.object(runner,'ShellDrain',Monitor),patch.object(runner,'query_once',side_effect=query):
++            assert runner.inner(backend,root)==3
++        if scenario=='kwin-unchanged':
++            assert events==['shell','kwin-bus','checker','driver-wait']
++            assert owner_calls==['org.kde.KWin',runner.BUS,runner.BUS]
++            assert not monitors and not queried[0] and driver_starts==[100.0]
++        else:
++            value=startup.diagnostic(json.loads((root/'observer-startup.json').read_text()))
++            assert events[-1]=='drain-close'
++            assert queried[0] is (scenario!='no-transport')
++            assert owner_calls.count('org.gnome.Shell')==(225 if scenario=='no-transport' else 1)
++            assert set(value['lifecycle'])==({'beforeChecker','afterChecker','finally'} if scenario=='delayed' else {'beforeChecker','finally'} if scenario in ('late-exit','late-disabled','last-boundary-deadline') else {'finally'})
++            if scenario=='delayed':
++                assert driver_starts==[100.6]
++                assert value['beforeChecker']['extensionInfo']=={'status':'INFO_UNAVAILABLE'}
++                assert startup.readiness(value['beforeChecker'])=='ready'
++            else:assert not driver_starts and 'driver-wait' not in events
++            if scenario in ('all-missing','missing-accepted','missing-poll','missing-tick','no-transport','query-deadline','last-boundary-deadline'):assert now[0]==145.0
++
+ elif case in ('runner-order','runner-deadline'):
+     spec=importlib.util.spec_from_file_location('startup_runner',pathlib.Path(__file__).with_name('run-session.py'))
+     runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
+@@ -178,7 +292,10 @@ elif case in ('runner-order','runner-deadline'):
+     with tempfile.TemporaryDirectory(prefix='linuxcast-s001-matrix-startup-') as temporary:
+         root=pathlib.Path(temporary)
+         class Monitor(startup.FixedOutput):
+-            def __init__(self,_stream):super().__init__();self.closed=False;self.feed(startup.PREFIX+b'MODULE_ENTERED\n')
++            def __init__(self,_stream):
++                super().__init__();self.closed=False
++                for marker in ('MODULE_ENTERED','PRIVATE_CONTEXT_ACCEPTED','POLL_INSTALLED','FIRST_POLL_TICK'):
++                    self.feed(startup.PREFIX+marker.encode()+b'\n')
+             def close(self):self.closed=True;events.append('drain-close')
+             def health(self):return {'eofObserved':False,'readerAlive':not self.closed,'stopRequested':self.closed}
+         class Child:

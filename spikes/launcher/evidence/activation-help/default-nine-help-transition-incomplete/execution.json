@@ -1,0 +1,61 @@
+{
+  "scope": "Exactly one default-nine diagnostic run with new fixed Record receipt observation",
+  "signedSourceSubset": true,
+  "signedCommit": "2fcbdaed159ff10aa313ad0555eaf379ce1f7f40",
+  "signatureVerifiedAgainstConfiguredPublicKey": true,
+  "selectedSignedInputCount": 335,
+  "excludedPreservedEvidenceCount": 419,
+  "wholeSignedTreeVerified": false,
+  "sourceManifestSha256": "205efa27a29737daf45df89f84f361a067416258caeb6f60c9605a779c04c0e0",
+  "signedChangesArchiveSha256": "c3ce8830c37a8f7b105ccf96e0098d6aed2e55f0a89a27dd84941a4a1c83bb7e",
+  "readinessSha256": "2391a4d9673313bd67db28899bbf1f7f5e73dcb10ce195021cd70fa736a709df",
+  "priorReadinessSha256": "91d68771eedaf8abce6f5d67379947bc892017821052006bebf06af879498885",
+  "command": "node spikes/launcher/tests/at/xvfb-orca.ts",
+  "outerTimeoutSeconds": 290,
+  "outerKillGraceSeconds": 10,
+  "innerDeadlinesUnchanged": true,
+  "runtimeHashes": {
+    "node": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+    "bun": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235"
+  },
+  "electronSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "atHashes": {
+    "spikes/launcher/tests/at/check.ts": "ebce9905b85dc29841e28830ba7ca720aa8d832856a004e72c47d28c297e9ef8",
+    "spikes/launcher/tests/at/activation-help-mode.test.ts": "64637fa1135e2d5388f64980d707ab4663251ec7382b24b368ef20319214378f",
+    "spikes/launcher/tests/at/README.md": "5bc594abed4159811626fa3e834ba0223e0f8aa763635ce97499373f2e39c591"
+  },
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "startedAtUtc": "2026-10-24T10:41:50.241344+00:00",
+  "endedAtUtc": "2026-10-24T10:43:07.003218+00:00",
+  "exitCode": 3,
+  "rerunPerformed": false,
+  "rawOrcaLogsOrProfilesExported": false,
+  "status": "incomplete",
+  "finalStage": "focus:View activation help",
+  "copiedPublicFiles": [
+    "runtime.json",
+    "report.json",
+    "native-at.json",
+    "orca.json",
+    "dark-search.png",
+    "dark-actions.png",
+    "light-shortcut.png"
+  ],
+  "screenshotsAvailable": [
+    "dark-search.png",
+    "dark-actions.png",
+    "light-shortcut.png"
+  ],
+  "recordFocusEventReceiptObserved": true,
+  "guestShutdownPerformed": true,
+  "containerStoppedAtUtc": "2026-10-24T10:44:42.94744667Z",
+  "containerState": {
+    "running": false,
+    "status": "exited",
+    "exitCode": 0,
+    "pid": 0
+  },
+  "artifactPrivacyReview": "Four fixed public JSON reports and three owned app screenshots; public control labels and pixels reviewed. No raw logs/profiles/keys exported.",
+  "guestSourceRetained": true,
+  "acceptanceLimitation": "Diagnostic default-nine incomplete at View activation help. Record receipt/native/generated/attempt observations pass here, not a historical cause diagnosis. No whole signedtree, audible/tactile or desktop-matrix claim."
+}

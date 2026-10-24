@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "task": "S0-03",
+  "artifact": "denial-reviewed-collectors.tar.gz",
+  "sha256": "ef4426d38e1eb50557b4b1b61d5cbc8b698c9d2a2cf1f2f4810ff9537f12b4b6",
+  "sourceOnly": true,
+  "privateStateKeysContainerFilesOrRawLogsIncluded": false,
+  "collectorManifestSha256": "9da26182246f7b1ac8958fbd28ec70e8321279b07693ace23dd62734bb35a170",
+  "originalPrefix": "/tmp/",
+  "archivePrefix": "",
+  "mapping": "Each archive basename preserves the exact original /tmp/ file bytes; the original absolute-path hash manifest is unchanged. Extract into a fresh private directory and use the basename mapping for read-only verification. No execution is implied.",
+  "initialBaselineSnapshot": "linuxcast-s003-denial-baseline-initial.py preserves the actual first failed preflight source. It is provenance only; the corrected reviewed baseline is linuxcast-s003-denial-baseline.py.",
+  "members": [
+    {
+      "name": "linuxcast-s003-denial-baseline-initial.py",
+      "sha256": "4912ce94399634da69e649990e3f56b54111e8fbe5d0afae5a306d0c0c4bde4b"
+    },
+    {
+      "name": "linuxcast-s003-denial-baseline.py",
+      "sha256": "7f2c3d49976927c0fbb72fdadc2beda0a1998444e05ca7a3f302c7f5be85a4b3"
+    },
+    {
+      "name": "linuxcast-s003-denial-collector-index.txt",
+      "sha256": "d57d4a8199eb4d3f2a36f5068dfc3f385e5b6de93f162663e7b54449d1fb8ae9"
+    },
+    {
+      "name": "linuxcast-s003-denial-collectors.sha256",
+      "sha256": "9da26182246f7b1ac8958fbd28ec70e8321279b07693ace23dd62734bb35a170"
+    },
+    {
+      "name": "linuxcast-s003-denial-control.py",
+      "sha256": "6d76086ad3b646a9d5dc810af169767bb5f7f9c1a6d0778d2327a0b9d4eee2e2"
+    },
+    {
+      "name": "linuxcast-s003-denial-guest.py",
+      "sha256": "e00b576da20f6ab3ad355c7536290abccffe6709e53187a2e6d6ee768ccde857"
+    },
+    {
+      "name": "linuxcast-s003-denial-kernel.py",
+      "sha256": "22e86fc446d78ee965462fabf7203ab545b6d04ecfc445ffa2e12d8f7d1a0f91"
+    },
+    {
+      "name": "linuxcast-s003-denial-owned-group.py",
+      "sha256": "296f5aec22ad1efaffcfd6d8b136e3de045fb92a70fef2287f3c340901272898"
+    },
+    {
+      "name": "linuxcast-s003-denial-plumbing-results.json",
+      "sha256": "959736fb1d60cbdeafa9906b67a9ceed20487b547b14746c3a5c83f506a499cc"
+    },
+    {
+      "name": "linuxcast-s003-denial-plumbing-tests.py",
+      "sha256": "02a7615d4eb5b077bf106025c39c7e9694c1c8b2794c146c44fe2e9cb381a277"
+    },
+    {
+      "name": "linuxcast-s003-denial-runtime.py",
+      "sha256": "ebf8998945d3813f83851257e1ee63627d9e56e64126bd8e84351e7cd352dff4"
+    }
+  ]
+}

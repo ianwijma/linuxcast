@@ -1,0 +1,111 @@
+{
+  "backend": "Debian synthetic libevdev/uinput; no graphical session",
+  "physicalHardwareProof": false,
+  "results": [
+    {
+      "mechanismDeadlineMs": 250,
+      "noAutomaticRearm": true,
+      "observerToleranceMs": 75,
+      "otherClientRegrabbed": true,
+      "recoveryMs": 133,
+      "scenario": "worker-sigkill",
+      "syntheticModifiersObserved": true,
+      "virtualDeviceRemoved": true
+    },
+    {
+      "mechanismDeadlineMs": 250,
+      "noAutomaticRearm": true,
+      "observerToleranceMs": 75,
+      "otherClientRegrabbed": true,
+      "recoveryMs": 128,
+      "scenario": "supervisor-sigkill",
+      "syntheticModifiersObserved": true,
+      "virtualDeviceRemoved": true
+    },
+    {
+      "mechanismDeadlineMs": 500,
+      "noAutomaticRearm": true,
+      "observerToleranceMs": 75,
+      "otherClientRegrabbed": true,
+      "recoveryMs": 628,
+      "scenario": "worker-watchdog",
+      "syntheticModifiersObserved": true,
+      "virtualDeviceRemoved": true
+    },
+    {
+      "mechanismDeadlineMs": 1000,
+      "noAutomaticRearm": true,
+      "observerToleranceMs": 75,
+      "otherClientRegrabbed": true,
+      "recoveryMs": 1102,
+      "scenario": "app-lease",
+      "syntheticModifiersObserved": true,
+      "virtualDeviceRemoved": true
+    },
+    {
+      "mechanismDeadlineMs": 100,
+      "noAutomaticRearm": true,
+      "observerToleranceMs": 75,
+      "otherClientRegrabbed": true,
+      "recoveryMs": 127,
+      "scenario": "emergency",
+      "syntheticModifiersObserved": true,
+      "virtualDeviceRemoved": true
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "locked"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "unknown-lock"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "inactive"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "tty"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "remote"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "stale-context"
+    },
+    {
+      "armDenied": true,
+      "contextEvidence": "root-owned synthetic fixture, not a live logind transition",
+      "otherClientCanGrab": true,
+      "scenario": "stale-generation"
+    },
+    {
+      "contextRevocationDisarms": true,
+      "rootPeerPassedDAC": true,
+      "rootPeerUidDeniedBeforeAuthorizedClient": true,
+      "scenario": "peer-credentials-and-context-revoke",
+      "wrongUidDenied": true
+    },
+    {
+      "freshPostArmInputObserved": true,
+      "preArmCompletedInputNotForwarded": true,
+      "scenario": "prearm-completed-input-backlog"
+    }
+  ],
+  "task": "S0-03"
+}

@@ -1,0 +1,15 @@
+{
+  "session": "Pop!_OS22.04 GNOME42.9 X11",
+  "identity": "io.github.ianwijma.Linuxcast",
+  "wmClassMatched": true,
+  "shortcut": "Ctrl+Alt+Shift+F12",
+  "decoyFocusObserved": true,
+  "shortcutActivationFocused": true,
+  "placement": {
+    "x": 2840,
+    "y": 1520,
+    "width": 720,
+    "height": 429
+  },
+  "nativeWayland": "not exercised; matching companion or validated activation path required"
+}

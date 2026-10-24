@@ -9,7 +9,7 @@ root = Path(__file__).resolve().parents[2]
 data = json.load(sys.stdin)
 packages = sorted(data["packages"], key=lambda package: (package["name"], package["version"]))
 result = {
-    "scope": "F1-01 Rust development inventory, not the final shipped-content SBOM",
+    "scope": "Rust workspace development inventory, not the final shipped-content SBOM",
     "cargoLockSha256": hashlib.sha256((root / "Cargo.lock").read_bytes()).hexdigest(),
     "dependencies": [
         {key: package.get(key) for key in ("name", "version", "license", "repository", "source")}

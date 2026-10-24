@@ -1,0 +1,7 @@
+# KWin Wayland — incomplete native probe
+
+Exact unchanged checker3528f160390707e7dc7e48251e4bbe0cdb1d655a234c8a7501e30214bc7df593/source inputs matching signed3c747cc ran in the reserved isolated Debian13 KWin6.3.6/Qt6.8.2 virtual Wayland session. [Full manifest](source-manifest.json), [safe report](report.json) and [post-run cleanup](cleanup.json) are preserved. Exit3/statusincomplete at `decoy-challenge` is not acceptance success.
+
+Actual strict Electron45 sandbox/context isolation/no renderer Node pass. KWin observes the exact launcher PID/app identity, native Wayland QObject backend and real geometry/work area; closing retains the resident process and hides the native window. The fixed decoy PID has one window but fails the exact app-identity check, so the observer never activates it. Ordinary CLI show/focus challenge, shortcut/portal state, UI/hidden CLI Quit and light capability state remain unexecuted. The identity mismatch cause is unproven; no assertion or identity gate was weakened.
+
+The partial dark image is only the synthetic Electron own renderer/CDP, not a compositor screenshot. No private content or host display/settings is used. Fixed native processes/private roots are gone and the exact input marker is absent after the run. No source change occurred during execution; any fix requires separate review. Broad physical/session matrix and portal consent remain outstanding.
