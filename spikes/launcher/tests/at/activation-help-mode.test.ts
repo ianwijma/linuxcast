@@ -27,6 +27,148 @@ it('recognizes only the fixed fresh Orca heading focus-gained receipt', () => {
 const recordReceipt = "11:00:00.000001 - EVENT MANAGER: object:state-changed:focused for [toggle button: 'Record shortcut'] in [public synthetic app] (1, 0, None)";
 const recordPredicate = section('const hasRecordFocusReceipt =', '\nconst startupCompleted');
 const recordReceiptMatcher = () => runInNewContext(`${stripTypeScriptTypes(recordPredicate)}\nhasRecordFocusReceipt`) as (text: string) => boolean;
+type HelpFocusEvent = { receiptObserved: boolean; queuedObserved: boolean; dequeuedObserved: boolean; processingCompletedObserved: boolean };
+const noHelpEvent: HelpFocusEvent = { receiptObserved: false, queuedObserved: false, dequeuedObserved: false, processingCompletedObserved: false };
+const fullHelpEvent: HelpFocusEvent = { receiptObserved: true, queuedObserved: true, dequeuedObserved: true, processingCompletedObserved: true };
+const helpEventMatcher = () => runInNewContext(`${stripTypeScriptTypes(section('const observeHelpFocusEvent =', '\nconst startupCompleted'))}\nobserveHelpFocusEvent`) as (fresh: string) => HelpFocusEvent;
+const helpDescriptor = "object:state-changed:focused for [button: 'View activation help'] in Linuxcast (Chromium 145.0) (1, 0, None)";
+const helpReceipt = `11:00:00.000001 - EVENT MANAGER: ${helpDescriptor}`;
+const helpQueued = `11:00:00.000002 - EVENT MANAGER: Queued ${helpDescriptor} priority: 3, counter: 7`;
+const helpDequeued = `11:00:00.000003 - EVENT MANAGER: Dequeued ${helpDescriptor} priority: 3, counter: 7`;
+const helpStart = 'vvvvv START PRIORITY-3 OBJECT EVENT OBJECT:STATE-CHANGED:FOCUSED (queue size: 2) vvvvv';
+const helpFinish = '^^^^^ FINISHED PRIORITY-3 OBJECT EVENT OBJECT:STATE-CHANGED:FOCUSED ^^^^^';
+const helpTotal = 'TOTAL PROCESSING TIME: 0.1234';
+const helpFrame = [helpDequeued, '', helpStart, '11:00:00.000004 - public synthetic processing', helpTotal, helpFinish];
+const helpEventLines = [helpReceipt,
+  `11:00:00.000001 - EVENT MANAGER: Queueing ${helpDescriptor}`,
+  `11:00:00.000001 - EVENT MANAGER: ${helpDescriptor} has priority level: 3`,
+  helpQueued, `11:00:00.000003 - EVENT MANAGER: Dequeueing ${helpDescriptor}`, ...helpFrame];
+
+it('observes the help event receipt, actual queue insertion, dequeue and completed frame in order', () => {
+  const observe = helpEventMatcher();
+  expect(observe(helpReceipt)).toEqual({ ...noHelpEvent, receiptObserved: true });
+  expect(observe([helpReceipt, helpQueued].join('\n'))).toEqual({ ...noHelpEvent, receiptObserved: true, queuedObserved: true });
+  expect(observe([helpReceipt, helpQueued, helpDequeued].join('\n'))).toEqual({ ...fullHelpEvent, processingCompletedObserved: false });
+  expect(observe(helpEventLines.join('\n'))).toEqual(fullHelpEvent);
+  const obsoleted = `11:00:00.000004 - EVENT MANAGER: ${helpDescriptor} obsoleted by ${helpDescriptor} more recent duplicate`;
+  expect(observe([helpReceipt, helpQueued, helpDequeued, '', helpStart, obsoleted, helpTotal, helpFinish].join('\n'))).toEqual(fullHelpEvent);
+  expect(observe(helpEventLines.map(line => line.replace(/^\d{2}:\d{2}:\d{2}\.\d{6} - /, '')).join('\n'))).toEqual(fullHelpEvent);
+  expect(observe(helpEventLines.join('\n').replace('EVENT MANAGER: Queued', 'EVENT MANAGER: Queueing'))).toEqual({ ...noHelpEvent, receiptObserved: true });
+});
+
+it('rejects another help event role/name/type, focus loss and private targets', () => {
+  const observe = helpEventMatcher();
+  const full = helpEventLines.join('\n');
+  for (const invalid of [
+    full.replaceAll('[button:', '[toggle button:'), full.replaceAll('[button:', '[heading:'),
+    full.replaceAll('View activation help', 'View activation help extra'), full.replaceAll('View activation help', 'PRIVATE_SEED'),
+    full.replaceAll('state-changed:focused', 'state-changed:pressed'), full.replaceAll('(1, 0,', '(0, 0,'),
+    full.replaceAll('(1, 0, None)', '(0, 0, fake (1, 0, None))'), full.replaceAll('(1, 0,', '(1, 1,'),
+    full.split('\n').map(line => 'prefix ' + line).join('\n'),
+  ]) expect(observe(invalid)).toEqual(noHelpEvent);
+});
+
+it('requires one matching descriptor across receipt, queue and dequeue', () => {
+  const observe = helpEventMatcher();
+  for (const changed of [helpQueued.replace('Linuxcast (', 'PRIVATE_APP ('), helpQueued.replace('None)', 'PRIVATE_DATA)')]) {
+    expect(observe([helpReceipt, changed, ...helpFrame].join('\n'))).toEqual({ ...noHelpEvent, receiptObserved: true });
+  }
+  for (const changed of [helpDequeued.replace('Linuxcast (', 'Other ('), helpDequeued.replace('None)', 'Other)')]) {
+    expect(observe([helpReceipt, helpQueued, changed, ...helpFrame.slice(1)].join('\n'))).toEqual({ ...noHelpEvent, receiptObserved: true, queuedObserved: true });
+  }
+});
+
+it('rejects mismatched queue identity and reordered or absent receipt/queue/dequeue', () => {
+  const observe = helpEventMatcher();
+  for (const changed of [helpDequeued.replace('counter: 7', 'counter: 8'), helpDequeued.replace('priority: 3', 'priority: 4')]) {
+    expect(observe([helpReceipt, helpQueued, changed, ...helpFrame.slice(1)].join('\n')).dequeuedObserved).toBe(false);
+  }
+  expect(observe([helpQueued, helpReceipt, ...helpFrame].join('\n')).queuedObserved).toBe(false);
+  expect(observe([helpReceipt, helpDequeued, helpQueued, ...helpFrame.slice(1)].join('\n')).dequeuedObserved).toBe(false);
+  expect(observe([helpQueued, ...helpFrame].join('\n'))).toEqual(noHelpEvent);
+  expect(observe([helpReceipt, ...helpFrame].join('\n'))).toEqual({ ...noHelpEvent, receiptObserved: true });
+  expect(observe([helpReceipt, helpQueued, ...helpFrame.slice(1)].join('\n')).dequeuedObserved).toBe(false);
+});
+
+it('does not skip duplicate or malformed target records to select a favorable sequence', () => {
+  const observe = helpEventMatcher();
+  for (const duplicate of [helpReceipt, helpReceipt.replace('(1, 0, None)', '(1, broken)')]) {
+    expect(observe([duplicate, ...helpEventLines].join('\n'))).toEqual({ ...noHelpEvent, receiptObserved: true });
+  }
+  for (const duplicate of [helpQueued, helpQueued.replace('counter: 7', 'counter: invalid')]) {
+    expect(observe([helpReceipt, duplicate, helpQueued, ...helpFrame].join('\n')).queuedObserved).toBe(false);
+  }
+  for (const duplicate of [helpDequeued, helpDequeued.replace('counter: 7', 'counter: invalid')]) {
+    expect(observe([helpReceipt, helpQueued, duplicate, ...helpFrame].join('\n')).dequeuedObserved).toBe(false);
+  }
+});
+
+it('requires the immediately associated source-defined start frame', () => {
+  const observe = helpEventMatcher();
+  for (const frame of [
+    [helpDequeued, helpStart, helpTotal, helpFinish],
+    [helpDequeued, '', 'unrelated intervening line', helpStart, helpTotal, helpFinish],
+    [helpDequeued, '', helpStart.replace('PRIORITY-3', 'PRIORITY-4'), helpTotal, helpFinish],
+    [helpDequeued, '', helpStart.replace('STATE-CHANGED:FOCUSED', 'STATE-CHANGED:SHOWING'), helpTotal, helpFinish],
+    [helpDequeued, '', helpStart.replace('queue size: 2', 'queue size: invalid'), helpTotal, helpFinish],
+  ]) expect(observe([helpReceipt, helpQueued, ...frame].join('\n'))).toEqual({ ...fullHelpEvent, processingCompletedObserved: false });
+});
+
+it('refuses nested, interleaved or malformed boundaries rather than borrowing a later finish', () => {
+  const observe = helpEventMatcher();
+  for (const boundary of [
+    helpStart, 'vvvvv unsupported start', '^^^^^ malformed finish',
+    '11:00:00.000004 - ' + helpStart, '11:00:00.000004 - ' + helpFinish,
+    'TOTAL PROCESSING TIME: invalid', helpTotal, '11:00:00.000004 - ' + helpTotal,
+    helpFinish.replace('PRIORITY-3', 'PRIORITY-4'), helpFinish.replace('STATE-CHANGED:FOCUSED', 'STATE-CHANGED:SHOWING'),
+    helpDequeued.replace('View activation help', 'PRIVATE_SEED'),
+    helpDequeued.replace('Dequeued', 'Dequeueing').replace('View activation help', 'PRIVATE_SEED'),
+  ]) expect(observe([helpReceipt, helpQueued, helpDequeued, '', helpStart, boundary, helpTotal, helpFinish].join('\n')).processingCompletedObserved).toBe(false);
+});
+
+it('requires the complete processing-time and finish lines without granting presentation success', () => {
+  const observe = helpEventMatcher();
+  for (const ending of [[], [helpTotal], [helpFinish], ['TOTAL PROCESSING TIME: invalid', helpFinish], [helpTotal, helpFinish + ' trailing']]) {
+    expect(observe([helpReceipt, helpQueued, helpDequeued, '', helpStart, ...ending].join('\n'))).toEqual({ ...fullHelpEvent, processingCompletedObserved: false });
+  }
+  const prior = helpEventLines.join('\n') + '\n';
+  expect(observe((prior + 'unrelated fresh line').slice(prior.length))).toEqual(noHelpEvent);
+  expect(observe([helpReceipt, helpQueued, helpDequeued, '', helpStart, 'SPEECH OUTPUT: View activation help'].join('\n')).processingCompletedObserved).toBe(false);
+});
+
+for (const scenario of ['fresh', 'absent', 'stale', 'events-only', 'missing-attempt', 'other-control', 'later-ambiguity']) {
+  it(`keeps help-event observations outside the unchanged fresh presentation predicate: ${scenario}`, async () => {
+    const label = scenario === 'other-control' ? 'Search commands' : 'View activation help';
+    const prior = helpEventLines.join('\n') + '\nPRIVATE_SEED\n';
+    let poll = 0;
+    const context = {
+      label, helpFocusEvent: { ...noHelpEvent }, recordFocusEventReceiptObserved: false, headingFocusEventReceiptObserved: false,
+      nativeFocusCheck: async () => prior.length,
+      log: () => prior + [
+        !['absent', 'stale'].includes(scenario) ? helpEventLines.join('\n') : '',
+        scenario === 'later-ambiguity' && poll > 1 ? helpReceipt : '',
+        scenario !== 'events-only' && !(scenario === 'later-ambiguity' && poll === 1) ? `SPEECH OUTPUT: '${label}'` : '',
+        !['events-only', 'missing-attempt'].includes(scenario) ? `SPEECH DISPATCHER: Speaking '${label}'` : '',
+      ].join('\n'),
+      observeHelpFocusEvent: helpEventMatcher(), hasRecordFocusReceipt: () => false, hasHeadingFocusReceipt: () => false,
+      hasLabel: (text: string, marker: string, name: string) => text.split('\n').some(line => line.includes(marker) && line.includes(name)),
+      presentations: [], orcaExited: false, capture: async () => undefined,
+      expect: { poll: (predicate: () => boolean, options: { timeout: number }) => ({ toBe: async (value: boolean) => {
+        expect(options.timeout).toBe(10_000);
+        poll += 1;
+        if (scenario === 'later-ambiguity') { expect(predicate()).toBe(false); poll += 1; }
+        if (predicate() !== value) throw new Error('PRESENTATION_INCOMPLETE');
+      } }) },
+    };
+    const focus = section('  const focusCheck =', '\n  const readActivationHelp');
+    const execution = runInNewContext(`(async () => { ${stripTypeScriptTypes(focus)}\nawait focusCheck(label, 'button', {}, 'Tab'); })()`, context);
+    if (['events-only', 'missing-attempt'].includes(scenario)) await expect(execution).rejects.toThrow('PRESENTATION_INCOMPLETE');
+    else await execution;
+    expect(context.helpFocusEvent).toEqual(['absent', 'stale', 'other-control'].includes(scenario) ? noHelpEvent
+      : scenario === 'later-ambiguity' ? { ...noHelpEvent, receiptObserved: true } : fullHelpEvent);
+  });
+}
+
 it('recognizes only the fixed Record toggle-button focus gain, never another role/name or loss', () => {
   const hasReceipt = recordReceiptMatcher();
   expect(hasReceipt(recordReceipt)).toBe(true);
@@ -82,14 +224,20 @@ it('exports only the fixed Record receipt boolean in both existing Orca report p
       writeFileSync: (_path: string, data: string) => { serialized = data; }, join: () => 'orca.json', evidence: '',
       stage: 'focus:Record shortcut', mode: 'default-nine', expectedCheckpoints: [], skippedLegacyCheckpoints: [], expectedPresentationCheckpoints: [],
       helpReading: {}, headingFocusEventReceiptObserved: false, recordFocusEventReceiptObserved: true,
+      helpFocusEvent: helpEventMatcher()(helpEventLines.join('\n').replaceAll('None)', 'PRIVATE_SEED)')),
       orcaVersion: '48.1', startupCompleted: () => true, anchors: [], presentations: [],
       log: () => 'PRIVATE_SEED', hasLabel: () => false,
     });
     const value = JSON.parse(serialized) as Record<string, unknown>;
     expect(value.recordFocusEventReceiptObserved).toBe(true);
+    expect(value.helpFocusEvent).toEqual(fullHelpEvent);
+    expect(Object.keys(value.helpFocusEvent as Record<string, unknown>)).toEqual(Object.keys(noHelpEvent));
+    expect(Object.values(value.helpFocusEvent as Record<string, unknown>).every(item => typeof item === 'boolean')).toBe(true);
     expect(Object.keys(value).filter(key => key.startsWith('record'))).toEqual(['recordFocusEventReceiptObserved']);
     expect(serialized).not.toContain('PRIVATE_SEED');
     expect(serialized).not.toContain('EVENT MANAGER:');
+    expect(serialized).not.toContain('counter:');
+    expect(serialized).not.toContain('Linuxcast (Chromium');
   }
 });
 

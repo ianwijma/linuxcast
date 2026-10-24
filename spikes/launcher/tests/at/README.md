@@ -7,10 +7,74 @@ passed all four native focus checkpoints, all three essential utterance
 completion checks and Escape/Search restoration. See the exact
 [completed reading evidence](../../evidence/activation-help/reading-completed/README.md).
 The [earlier incomplete run](../../evidence/activation-help/reading-incomplete/README.md)
-remains failed. The default-nine Record presentation failure and native notice/
-manual-recovery reproduction remain outstanding; the focused result does not
+remains failed. The full default-nine path currently stops at help-button
+presentation; native notice/manual-recovery reproduction also remains
+outstanding. The earlier Record failure stays preserved. The focused result does not
 establish audible output or the desktop matrix. This dated documentation update
 followed execution; the executed README hash remains recorded in execution.json.
+
+### Source-only help event progression observation
+
+The subsequent [default-nine diagnostic](../../evidence/activation-help/default-nine-help-transition-incomplete/README.md)
+on signed `2fcbdae` source passed the first five native/generated/dispatch-attempt
+checks, including Record and Cancel, then stopped at View activation help:
+native focus passed but fresh generated presentation and dispatch attempt were
+unobserved. The help heading, reading and Escape checkpoints were not reached.
+That outcome remains incomplete and does not diagnose the earlier Record failure
+or supersede the separate focused reading pass.
+
+This source-only increment adds exactly four `helpFocusEvent` booleans to the
+existing success/incomplete Orca reports: `receiptObserved`, `queuedObserved`,
+`dequeuedObserved` and `processingCompletedObserved`. Only the exact public
+`View activation help` button focus-gain event is eligible. The helper uses the
+same fresh offset already taken before its Tab key, retains its complete event
+descriptor and queue priority/counter only in memory, and requires ordered
+receipt, actual Queued insertion, matching Dequeued removal and its immediately
+associated complete START/TOTAL/FINISHED processing frame. The earlier `Queueing`
+log marker does not prove actual insertion; only `Queued` does. Malformed or duplicate target records, mismatched identities,
+nested/interleaved frames and truncated boundaries cannot supply later progress.
+Each poll recomputes the observations so later ambiguity cannot retain an earlier
+favorable completion. No additional wait or success condition is introduced.
+
+True means the corresponding source-defined marker/progression was observed.
+Processing completion means `_process_object_event` returned, including paths
+that intentionally ignore or obsolete an event; it does not prove presentation,
+delivery or a successful focus change. False means no unambiguous observation
+in that slice, not proven nonreceipt or a diagnosed failure. There is no route
+enum and no parsing of targetless ignored-event or same-locus explanations.
+Orca's application text has no PID: the existing private-bus own-process/native
+target guard remains required and these logs do not replace it. The Dismiss
+anchor proves native focus and fresh generation, not event-queue quiescence.
+
+Source basis is the same official Orca48.1 archive cited below:
+`event_manager.py:232-238,503-522,537-557` defines receipt, queue identity and
+processing frames; `ax_utilities_debugging.py:66-89` defines exact event/name
+formatting; `ax_utilities_application.py:48-60` supplies name/toolkit/version
+parentheses; `ax_object.py:799-815` supplies the nonlocalized `button` role;
+`debug.py:99-115` preserves the untimestamped frame delimiters. Priority and
+obsolescence messages repeat event text but are not receipt markers.
+
+For a future separately reviewed installed-source comparison, the inspected
+upstream SHA256 values are:
+
+| Orca48.1 source file | SHA256 |
+| --- | --- |
+| `src/orca/event_manager.py` | `2d181d4595444455ea2379d7bff2bf1cc25def9fb8170d3cd1ff81b1b08a5972` |
+| `src/orca/ax_object.py` | `13c06867590b427f51d846425be4a560c7a71ac515482e7d91abc482f6a9a002` |
+| `src/orca/ax_utilities_application.py` | `d1ec5dd19127a3004b19986e22e1affdb33414a1e3628364f0888bb661177377` |
+| `src/orca/ax_utilities_debugging.py` | `c21b12c5e7ff1fa5120f9073f3b2a9478826623fed581279c2e77b267a3c6482` |
+| `src/orca/debug.py` | `ca2159aba7c42282b65235e493c67f092b893fc0b7e9b00c602a4705c995ffd8` |
+
+These are inspected source hashes, not new installed-runtime verification. The
+historical thirteen-file authority and prior execution records are unchanged.
+Harmless tests cover progression, name/role/gain rejection, descriptor/queue
+identity/order, ambiguous or incomplete frames, stale output, observation-only
+integration and serialization of four booleans without raw text or identities.
+Native focus, fresh generated presentation, dispatch attempts, reading completion,
+ten-second presentation deadline, mode routing and privacy cleanup are unchanged.
+There is no VM/desktop run for this increment. It prepares investigation of
+**S0-01-UI**, which remains pending with native notice/manual recovery and wider
+release gates. It establishes no new AC01, AC02 or runtime privacy acceptance.
 
 ### Source-only Record receipt observation
 
