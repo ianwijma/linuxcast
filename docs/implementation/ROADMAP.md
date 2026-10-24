@@ -9,8 +9,40 @@ The authoritative [task registry](tasks.json) contains 97 bounded task cards, ea
 1. Integrate the planning PR. Run `python3 scripts/validate_plan.py` and inspect `python3 scripts/plan_status.py`.
 2. Complete [F1-01](tasks/F1-01.md): workspace/dependency bootstrap and real task-scoped check runners. Do not invent passing stub scripts.
 3. Run feasibility tasks [S0-01](tasks/S0-01.md) through [S0-06](tasks/S0-06.md) in parallel where runners/devices permit. Their source belongs under isolated spikes; findings distinguish demonstrated behaviour from assumptions.
-4. Complete [F0-01](tasks/F0-01.md): freeze shared contracts using the spike findings. If a required mechanism fails, revise the affected specification and dependent tasks explicitly; do not silently remove agreed scope.
+4. Complete [F0-01](tasks/F0-01.md): freeze shared contracts using the spike findings and its listed prerequisites. S0-01 remaining UI/native checks continue independently and gate R1-01 rather than unrelated foundation implementation; see the sequencing decision below. If a required mechanism fails, revise the affected specification and dependent tasks explicitly; do not silently remove agreed scope.
 5. Dispatch dependency-ready work below. One coordinator owns shared interfaces and integration; up to three feature agents can work alongside it without overlapping paths. More workers may be used if ownership remains disjoint.
+
+## Foundation sequencing decision
+
+The remaining S0-01 accessibility sequence and native activation-notice recovery
+checks do not block F0-01 contract integration. Reviewed launcher findings already
+identify the contract requirements: native identity, resident lifecycle,
+requested-versus-observed focus, and explicit component/unsupported outcomes.
+Those findings must be carried into the contract review, without treating the
+unfinished spike as accepted. The user authorized unfinished integration on 24 October 2026. The reviewed
+version-one contract baseline may be integrated and used for application
+implementation while F0-01 acceptance is finalized. Final freeze and completed
+dependent-task claims still require F0-01 acceptance; integration alone is not
+acceptance.
+
+S0-01 remains in progress with every existing acceptance requirement unchanged.
+It is an explicit prerequisite of R1-01, so its unresolved checks cannot disappear
+from the 1.0 release dependency path. S0-03 continues to gate P2-01 and the input
+release path. No physical input authority or native success follows from this
+sequencing change.
+
+After the reviewed F0-01 baseline is integrated, prioritize F1-02 (resident shell), F2-01 (storage owner)
+and D1-01 (shared UI primitives) in separate bounded product PRs. Use their own
+acceptance checks and close each PR once those checks and review pass. New spike
+instrumentation or repeated desktop runs need a specific unresolved question and
+a bounded attempt; successful foundation work must not wait on unrelated spike
+polish. Full native, accessibility, security and package release gates remain.
+
+This replaces the all-launcher-proof-before-contracts ordering, not the agreed
+feature scope or acceptance criteria. The user approved this order and explicitly
+authorized merging the existing unfinished PRs on 24 October 2026. Record remaining
+limitations in their PR descriptions, task cards and coordinator checkpoint. Keep
+tasks in progress until their acceptance and prerequisites are complete.
 
 ## Parallel lanes
 
@@ -45,7 +77,7 @@ The authoritative [task registry](tasks.json) contains 97 bounded task cards, ea
 
 Use one task/PR/isolated worktree, normally `codex/<task-id>-<description>`. The coordinator sets owner and branch in the registry, then marks `in-progress`. Dependency-owned contracts must not be edited by feature agents. Every task links the canonical design; UI uses shared primitives, not feature-specific approximations.
 
-Mock-based development may overlap dependencies only after the contract fixture is frozen. It does not mark the dependent task done. A task is done only after integration, successful relevant acceptance, and evidence recorded as PR/commit/check/platform references. `blocked` records a concrete external dependency or failed mechanism; it is not a substitute for implementation effort.
+Application implementation may use the integrated reviewed F0-01 contract baseline under the user-approved foundation sequencing decision while final contract acceptance is completed. Otherwise mock-based development may overlap dependencies only after the contract fixture is frozen. It does not mark the dependent task done. A task is done only after integration, successful relevant acceptance, and evidence recorded as PR/commit/check/platform references. `blocked` records a concrete external dependency or failed mechanism; it is not a substitute for implementation effort.
 
 Update the registry, rerun `python3 scripts/render_tasks.py`, then validate. The coordinator owns task-state changes to avoid concurrent manifest conflicts. Do not edit generated cards independently. Keep source/feature mappings current when scope is refined.
 
