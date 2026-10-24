@@ -4,7 +4,13 @@
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",
-  "dependencies": { "react": "19.3.1", "react-dom": "19.3.1" },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "@linuxcast/contracts": "workspace:*",
+    "@linuxcast/storage": "workspace:*",
+    "@linuxcast/ui": "workspace:*"
+  },
   "devDependencies": {
     "electron": "45.0.0",
     "@electron-forge/cli": "7.11.2",

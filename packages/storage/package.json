@@ -1,0 +1,15 @@
+{
+  "name": "@linuxcast/storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "exports": {
+    ".": "./src/index.ts",
+    "./utility": "./src/utility.ts"
+  },
+  "dependencies": {
+    "@linuxcast/contracts": "workspace:*",
+    "better-sqlite3": "13.0.3"
+  }
+}
