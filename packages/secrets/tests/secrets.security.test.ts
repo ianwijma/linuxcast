@@ -44,6 +44,11 @@ describe('F2-02 secret boundary',()=>{
     expect(JSON.stringify([...metadata.records.values()])).not.toContain(secret);let observed=false;expect(await f.store.use(reference,owner,async value=>{observed=value===secret;})).toEqual({outcome:'used'});expect(observed).toBe(true);
     await f.store.close();const reopened=await SecretStore.open({dataDirectory:f.directory,safeStorage:f.api,references:metadata.refs});stores.push(reopened);expect(await reopened.use(reference,owner,async value=>{expect(value===secret).toBe(true);})).toEqual({outcome:'used'});
   });
+  it('binds ciphertext to its exact reference and owner instead of trusting the filename alone',async()=>{
+    const f=await setup();const first=await stored(f.store);const secondResult=await f.store.store({...owner,ownerId:'second-provider'},generated(),'persistent');if(secondResult.outcome!=='stored')throw new Error();
+    const firstPath=join(f.directory,'secrets',`${first.id}.blob`);const secondPath=join(f.directory,'secrets',`${secondResult.reference.id}.blob`);const otherCiphertext=await readFile(secondPath);await writeFile(firstPath,otherCiphertext,{mode:0o600});
+    let used=false;expect(await f.store.use(first,owner,async()=>{used=true;})).toMatchObject({outcome:'unavailable'});expect(used).toBe(false);
+  });
   it('rejects wrong owner and missing refs before decryption',async()=>{
     const f=await setup();const reference=await stored(f.store);vi.mocked(f.api.decryptString).mockClear();expect(await f.store.use(reference,{...owner,ownerId:'different'},async()=>{})).toMatchObject({outcome:'unavailable',status:{reason:'not-found'}});expect(f.api.decryptString).not.toHaveBeenCalled();
   });

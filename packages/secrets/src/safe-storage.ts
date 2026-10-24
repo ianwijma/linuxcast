@@ -40,7 +40,7 @@ export class SafeStorageAdapter {
     try {
       if(ciphertext.length<4 || ciphertext.length>128*1024 || ciphertext.subarray(0,3).toString('ascii')!=='v11')throw new Error();
       const value=this.#api.decryptString(ciphertext);
-      if(!value || Buffer.byteLength(value)>64*1024 || this.status().state!=='available')throw new Error();
+      if(!value || Buffer.byteLength(value)>128*1024 || this.status().state!=='available')throw new Error();
       return value;
     } catch {throw new Error('Secure decryption failed.');}
   }

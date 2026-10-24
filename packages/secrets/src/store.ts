@@ -1,3 +1,4 @@
+import * as z from 'zod';
 import { constants } from 'node:fs';
 import { mkdir, open, unlink, link, readdir } from 'node:fs/promises';
 import type { FileHandle } from 'node:fs/promises';
@@ -7,6 +8,7 @@ import { secretReferenceSchema } from '../../platform-contracts/src/secrets.ts';
 import { SafeStorageAdapter, unavailable } from './safe-storage.ts';
 import type { ElectronSafeStorage, SecretReferences, SecretOwner, SecretReference, SecretReferenceRecord, SecretStatus, StoreResult } from './types.ts';
 const uuid=/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/u;
+const encryptedEnvelopeSchema=z.strictObject({schemaVersion:z.literal(1),referenceId:z.uuid(),ownerKind:z.enum(['provider','account','browser-pairing','backup']),ownerId:z.string().max(200),valueBase64:z.string().max(88_000)});
 const ownerKinds=new Set(['provider','account','browser-pairing','backup']);
 function validOwner(value:SecretOwner):boolean {return ownerKinds.has(value.ownerKind) && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u.test(value.ownerId);}
 function sameOwner(a:SecretOwner,b:SecretOwner):boolean {return a.ownerKind===b.ownerKind && a.ownerId===b.ownerId;}
@@ -71,7 +73,7 @@ export class SecretStore {
     void operation.then(()=>{this.#writes.delete(operation);},()=>{this.#writes.delete(operation);});return operation;
   }
   async #store(owner:SecretOwner,value:string,persistence:'persistent'|'session-only'):Promise<StoreResult> {
-    if(!validOwner(owner) || typeof value!=='string' || !value || Buffer.byteLength(value)>64*1024 || !['persistent','session-only'].includes(persistence))return {outcome:'unavailable',status:unavailable('invalid-request')};
+    if(!validOwner(owner) || typeof value!=='string' || !value || Buffer.byteLength(value)>64*1024 || Buffer.from(value,'utf8').toString('utf8')!==value || !['persistent','session-only'].includes(persistence))return {outcome:'unavailable',status:unavailable('invalid-request')};
     if(this.#closed || this.#locked)return {outcome:'unavailable',status:unavailable(this.#locked?'locked':'unavailable')};
     const id=randomUUID();const epoch=this.#epoch;
     if(persistence==='session-only') {
@@ -81,7 +83,7 @@ export class SecretStore {
     }
     const status=this.status();if(this.#reconciling)return {outcome:'unavailable',status:unavailable('storage-failed')};if(status.state!=='available')return {outcome:'unavailable',status};
     let ciphertext:Buffer;
-    try {ciphertext=this.#adapter.encrypt(value);}catch{return {outcome:'unavailable',status:unavailable('encryption-failed')};}
+    try {ciphertext=this.#adapter.encrypt(JSON.stringify({schemaVersion:1,referenceId:id,...owner,valueBase64:Buffer.from(value,'utf8').toString('base64')}));}catch{return {outcome:'unavailable',status:unavailable('encryption-failed')};}
     const filename=this.#path(id);const staging=`${filename}.${randomUUID()}.tmp`;
     let published=false;
     try {
@@ -125,7 +127,13 @@ export class SecretStore {
           const stat=await file.stat();if(!stat.isFile() || stat.uid!==process.getuid?.() || (stat.mode&0o777)!==0o600 || stat.size>128*1024 || stat.nlink!==1)throw new Error();
           ciphertext=await file.readFile();
         }finally{await file.close();}
-        try {value=this.#adapter.decrypt(ciphertext);}finally{ciphertext.fill(0);}
+        try {
+          const envelope=encryptedEnvelopeSchema.parse(JSON.parse(this.#adapter.decrypt(ciphertext)));
+          if(envelope.referenceId!==reference.id || !sameOwner(envelope,owner))throw new Error();
+          const decoded=Buffer.from(envelope.valueBase64,'base64');
+          try {if(!decoded.length || decoded.length>64*1024 || decoded.toString('base64')!==envelope.valueBase64)throw new Error();value=decoded.toString('utf8');if(Buffer.from(value,'utf8').compare(decoded)!==0)throw new Error();}
+          finally {decoded.fill(0);}
+        }finally{ciphertext.fill(0);}
       }
       if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:unavailable('cancelled')};
       await consumer(value,controller.signal);

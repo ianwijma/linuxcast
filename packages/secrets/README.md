@@ -29,7 +29,9 @@ and [pinned API documentation](https://github.com/electron/electron/blob/v45.0.0
 The data directory comes from trusted main's XDG resolution. Its `secrets`
 directory is0700, files0600; a pinned directory descriptor, fixed UUID filenames,
 exclusive staging, no-follow reads, link publication and fsync guard file access.
-The repository stores owner identity, opaque ID and UTC metadata only. A value is
+The encrypted envelope binds the exact reference UUID and owner identity to the
+credential; swapping two valid ciphertext files cannot cross those bindings. The
+repository stores owner identity, opaque ID and UTC metadata only. A value is
 bounded to64KiB; encrypted bytes to128KiB. Session storage is bounded to256 items
 and1MiB total. Values/owners are copied before asynchronous persistence. Failed
 publication/metadata writes attempt encrypted-file and reference cleanup and
