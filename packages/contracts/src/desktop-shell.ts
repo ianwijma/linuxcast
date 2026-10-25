@@ -4,7 +4,7 @@ import { capabilityStatusSchema, rpcFailureSchema } from './protocol.ts';
 export const SHELL_APP_ID = 'io.github.ianwijma.Linuxcast';
 export const SHELL_CHANNELS = {
   getState: 'shell:get-state', hide: 'shell:hide', contentHeight: 'shell:content-height',
-  quit: 'shell:quit', state: 'shell:state',
+  quit: 'shell:quit', state: 'shell:state', openDataSettings: 'shell:open-data-settings',
 } as const;
 
 export const shellRequestSchema = z.strictObject({ protocolVersion: z.literal(1) });
@@ -35,6 +35,7 @@ export interface DesktopShellApi {
   readonly runtime: { readonly sandboxed: true; readonly contextIsolated: true };
   getState(): Promise<ShellStateReply>;
   hideLauncher(): Promise<ShellCommandReply>;
+  openDataSettings(): Promise<ShellCommandReply>;
   reportContentHeight(height: number): Promise<ShellCommandReply>;
   quit(): Promise<ShellCommandReply>;
   onState(listener: (state: DesktopShellState) => void): () => void;

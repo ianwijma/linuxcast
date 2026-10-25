@@ -62,6 +62,7 @@ function Shell() {
       <footer className="shell-footer">
         <span className="lc-muted"><Keycap>Esc</Keycap> Hide window</span>
         <div className="shell-actions">
+          <Button busy={busy} disabled={!api} onClick={() => { void api?.openDataSettings().then(reply => { if (!reply.ok) setError(true); }); }}>Local data</Button>
           <Button ref={hide} busy={busy} disabled={!api} onClick={() => { void command('hide'); }}>Hide</Button>
           <Button busy={busy} disabled={!api} onClick={() => { void command('quit'); }}>Quit Linuxcast</Button>
         </div>

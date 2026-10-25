@@ -16,6 +16,7 @@ export interface ResidentShellOptions {
   resourcesDirectory: string;
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
+  openDataSettings?: () => Promise<void>;
 }
 
 /** Called once, synchronously before Electron readiness, by the packaged entry. */
@@ -121,6 +122,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
     services.push(...(options.createServices?.() ?? []));
     removeIpc = registerShellIpc(ipcMain, {
       contents: () => window?.webContents, state: snapshot, hide: () => lifecycle.hide(),
+      ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
       resize: height => {
         if (!window || window.isDestroyed()) return;
         const area = screen.getDisplayMatching(window.getBounds()).workArea;
