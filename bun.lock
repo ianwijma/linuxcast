@@ -39,6 +39,7 @@
         "@linuxcast/applications": "workspace:*",
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/data-controls": "workspace:*",
+        "@linuxcast/file-search": "workspace:*",
         "@linuxcast/search": "workspace:*",
         "@linuxcast/storage": "workspace:*",
         "@linuxcast/ui": "workspace:*",
@@ -56,6 +57,18 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+      },
+    },
+    "packages/builtins/file-search": {
+      "name": "@linuxcast/file-search",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/data-controls": "workspace:*",
+        "@linuxcast/file-index": "workspace:*",
+        "@linuxcast/ui": "workspace:*",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
       },
     },
     "packages/contracts": {
@@ -361,6 +374,8 @@
     "@linuxcast/desktop": ["@linuxcast/desktop@workspace:apps/desktop"],
 
     "@linuxcast/file-index": ["@linuxcast/file-index@workspace:packages/file-index"],
+
+    "@linuxcast/file-search": ["@linuxcast/file-search@workspace:packages/builtins/file-search"],
 
     "@linuxcast/permissions": ["@linuxcast/permissions@workspace:packages/permissions"],
 
