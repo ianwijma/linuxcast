@@ -1,9 +1,10 @@
 import * as z from 'zod';
+import { httpUrlSchema } from './open-url.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
-export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
-export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias'} as const;
+export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
+export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
 export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
 export const normalizeCommandAlias=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
@@ -11,6 +12,7 @@ export const launcherCommandsRequestSchema=z.strictObject({protocolVersion:z.lit
 const launcherActionRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 const revision=z.number().int().positive().safe();
 export const launcherExecuteRequestSchema=launcherActionRequestSchema.extend({commandId:launcherCommandIdSchema,revision});
+export const launcherOpenUrlRequestSchema=launcherActionRequestSchema.extend({revision,url:httpUrlSchema});
 export const launcherPinRequestSchema=launcherExecuteRequestSchema.extend({pinned:z.boolean()});
 export const launcherAliasRequestSchema=launcherExecuteRequestSchema.extend({alias:commandAliasSchema.nullable()});
 export const launcherCommandMetadataSchema=z.strictObject({
@@ -24,11 +26,14 @@ export const launcherCommandsSnapshotSchema=z.strictObject({revision,commands:z.
 const failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const launcherCommandsReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:launcherCommandsSnapshotSchema}),failed]);
 export const launcherExecuteReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.enum(['completed','dispatched'])})}),failed]);
+export const launcherOpenUrlReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('dispatched')})}),failed]);
+export type LauncherOpenUrlReply=z.infer<typeof launcherOpenUrlReplySchema>;
 export type LauncherCommandMetadata=z.infer<typeof launcherCommandMetadataSchema>;
 export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSchema>;
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
 export interface LauncherApi {
+  openLauncherUrl(request:{revision:number;url:string}):Promise<LauncherOpenUrlReply>;
   setLauncherAlias(request:Pick<z.infer<typeof launcherAliasRequestSchema>,'commandId'|'revision'|'alias'>):Promise<LauncherCommandsReply>;
   setLauncherPinned(request:Pick<z.infer<typeof launcherPinRequestSchema>,'commandId'|'revision'|'pinned'>):Promise<LauncherCommandsReply>;
   getLauncherCommands(request?:{cursor?:string}):Promise<LauncherCommandsReply>;
