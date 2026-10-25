@@ -24,7 +24,7 @@ export function createApplications({helperPath}:{helperPath:string}) {
     let normalized:NativeApplicationRequest;try{normalized=nativeApplicationRequestSchema.parse(input);}catch{throw new ApplicationsUnavailable('invalid-request');}
     if(stopped)throw new ApplicationsUnavailable('stopped');if(signal?.aborted)throw new ApplicationsUnavailable('cancelled');if(active.size>=MAX_HELPERS)throw new ApplicationsUnavailable('busy');
     const wire=JSON.stringify(normalized)+'\n';if(Buffer.byteLength(wire)>MAX_INPUT)throw new ApplicationsUnavailable('invalid-request');
-    const env=environment();const outcome=normalized.operation==='launch'?'unknown':'not-dispatched';
+    const env=environment();const outcome=normalized.operation==='launch' || normalized.operation==='open-url'?'unknown':'not-dispatched';
     return new Promise((resolve,reject)=>{
       const child=spawn(helperPath,['applications'],{stdio:['pipe','pipe','ignore'],env,shell:false});
       let failure:ApplicationsUnavailableReason|undefined,bytes=0,ended=false;const chunks:Buffer[]=[];
@@ -70,6 +70,17 @@ export function createApplications({helperPath}:{helperPath:string}) {
       let identity:Pick<NativeApplication,'desktopId'|'fingerprint'>;try{identity=nativeApplicationSchema.pick({desktopId:true,fingerprint:true}).parse(application);}catch{throw new ApplicationsUnavailable('invalid-request');}
       const raw=await request({protocolVersion:1,operation:'launch',...identity},options.signal);
       const parsed=nativeApplicationLaunchReplySchema.safeParse(raw);if(!parsed.success)throw new ApplicationsUnavailable('invalid-reply','unknown');if(!parsed.data.ok)throw new ApplicationsUnavailable(parsed.data.error,['invalid-request','stale-application','unavailable'].includes(parsed.data.error)?'not-dispatched':'unknown');return parsed.data.value.outcome;
+    },
+    async openUrl(url:string,options:{signal?:AbortSignal}={}):Promise<'dispatched'>{
+      const raw=await request({protocolVersion:1,operation:'open-url',url},options.signal);
+      const parsed=nativeApplicationLaunchReplySchema.safeParse(raw);
+      if(!parsed.success)throw new ApplicationsUnavailable('invalid-reply','unknown');
+      if(!parsed.data.ok){
+        const reason=parsed.data.error;
+        if(reason==='invalid-request' || reason==='unavailable')throw new ApplicationsUnavailable(reason,'not-dispatched');
+        throw new ApplicationsUnavailable(reason==='launch-failed'?reason:'invalid-reply','unknown');
+      }
+      return parsed.data.value.outcome;
     },
     async stop(){stopped=true;const pending=[...active];pending.forEach(handle=>handle.cancel('stopped'));await Promise.all(pending.map(handle=>handle.done));},
     async terminate(){stopped=true;const pending=[...active];pending.forEach(handle=>handle.cancel('stopped',true));await Promise.all(pending.map(handle=>handle.done));},

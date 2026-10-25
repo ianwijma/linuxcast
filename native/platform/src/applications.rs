@@ -1,4 +1,5 @@
-//! Bounded desktop application discovery/launch. All Exec interpretation belongs to GIO.
+//! Bounded desktop application discovery/launch and explicit HTTP(S) handoff.
+//! All Exec interpretation belongs to GIO; URLs are passed as one literal URI.
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -10,6 +11,7 @@ use std::ptr;
 
 const REQUEST_MAX: u64 = 65_536;
 const CATALOGUE_MAX: usize = 10_000;
+const URL_MAX: usize = 8192;
 type Object = *mut c_void;
 #[repr(C)]
 struct GList {
@@ -20,6 +22,8 @@ struct GList {
 #[link(name = "gio-2.0")]
 unsafe extern "C" {
     fn g_app_info_get_all() -> *mut GList;
+    fn g_app_info_get_default_for_uri_scheme(scheme: *const c_char) -> Object;
+    fn g_app_info_supports_uris(info: Object) -> c_int;
     fn g_app_info_get_id(info: Object) -> *const c_char;
     fn g_app_info_get_display_name(info: Object) -> *const c_char;
     fn g_app_info_get_name(info: Object) -> *const c_char;
@@ -67,6 +71,12 @@ unsafe extern "C" {
     fn g_free(memory: Object);
     fn g_list_free(list: *mut GList);
     fn g_error_free(error: Object);
+    fn g_uri_parse(uri: *const c_char, flags: c_int, error: *mut Object) -> Object;
+    fn g_uri_unref(uri: Object);
+    fn g_uri_get_scheme(uri: Object) -> *const c_char;
+    fn g_uri_get_userinfo(uri: Object) -> *const c_char;
+    fn g_uri_get_host(uri: Object) -> *const c_char;
+    fn g_uri_get_port(uri: Object) -> c_int;
     fn g_compute_checksum_for_data(kind: c_int, data: *const u8, length: usize) -> *mut c_char;
 }
 // GIO borrowed getters remain valid while their owning reference lives. Full-transfer
@@ -83,6 +93,15 @@ struct OwnedString(*mut c_char);
 impl Drop for OwnedString {
     fn drop(&mut self) {
         unsafe { g_free(self.0.cast()) }
+    }
+}
+// GUri is reference counted independently of GObject, since GLib 2.66.
+struct OwnedUri(Object);
+impl Drop for OwnedUri {
+    fn drop(&mut self) {
+        if !self.0.is_null() {
+            unsafe { g_uri_unref(self.0) }
+        }
     }
 }
 struct OwnedError(Object);
@@ -127,6 +146,12 @@ fn valid_id(id: &str) -> bool {
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "lowercase", deny_unknown_fields)]
 enum Request {
+    #[serde(rename = "open-url")]
+    OpenUrl {
+        #[serde(rename = "protocolVersion")]
+        protocol_version: u8,
+        url: String,
+    },
     List {
         #[serde(rename = "protocolVersion")]
         protocol_version: u8,
@@ -284,6 +309,135 @@ fn launch(id: String, fingerprint: String) -> Value {
     if current.desktop_id.as_bytes() != id.as_bytes() || current.fingerprint != fingerprint {
         return failure("stale-application");
     }
+    dispatch(app.0, ptr::null_mut())
+}
+/// The trusted main adapter sends URL.href's ASCII wire representation. Reject
+/// ambiguous/noncanonical authorities rather than guessing like a browser's input
+/// fixer. This validation does not resolve DNS, fetch, or authorize network access.
+fn validated_url(url: &str) -> Option<(CString, &'static CStr)> {
+    if url.is_empty()
+        || url.len() > URL_MAX
+        || !url.is_ascii()
+        || url
+            .bytes()
+            .any(|b| b.is_ascii_control() || b.is_ascii_whitespace() || b == b'\\')
+    {
+        return None;
+    }
+    let (rest, scheme, default_port) = if let Some(rest) = url.strip_prefix("https://") {
+        (rest, c"https", 443)
+    } else if let Some(rest) = url.strip_prefix("http://") {
+        (rest, c"http", 80)
+    } else {
+        return None;
+    };
+    let authority_end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
+    let authority = &rest[..authority_end];
+    // URL.href always includes at least '/' after an HTTP(S) authority.
+    if authority.is_empty()
+        || !rest[authority_end..].starts_with('/')
+        || authority.contains(['@', '%'])
+    {
+        return None;
+    }
+    let (host, port) = if let Some(ipv6) = authority.strip_prefix('[') {
+        let (address, suffix) = ipv6.split_once(']')?;
+        address.parse::<std::net::Ipv6Addr>().ok()?;
+        // URL.href serializes IPv6 as lowercase hexadecimal, including mapped
+        // IPv4 addresses. Rust's Display uses dotted IPv4 for those mapped values.
+        if address.bytes().any(|b| b.is_ascii_uppercase() || b == b'.') {
+            return None;
+        }
+        let port = if suffix.is_empty() {
+            None
+        } else {
+            Some(suffix.strip_prefix(':')?)
+        };
+        (address, port)
+    } else {
+        let (host, port) = authority
+            .split_once(':')
+            .map_or((authority, None), |(host, port)| (host, Some(port)));
+        // HTTP URL hosts have different rules from DNS labels. Preserve valid
+        // ASCII/IDNA host spelling; do not impose DNS label/length restrictions.
+        // Encoded hosts and conflicting authority punctuation are not wire data.
+        let dns = host.strip_suffix('.').unwrap_or(host);
+        if host.is_empty()
+            || host
+                .bytes()
+                .any(|b| b.is_ascii_uppercase() || b"<>[]^|".contains(&b))
+        {
+            return None;
+        }
+        let last = dns.rsplit('.').next()?;
+        let decimal = !last.is_empty() && last.bytes().all(|b| b.is_ascii_digit());
+        let hexadecimal = last.strip_prefix("0x").is_some_and(|digits| {
+            !digits.is_empty() && digits.bytes().all(|b| b.is_ascii_hexdigit())
+        });
+        if (decimal || hexadecimal) && host.parse::<std::net::Ipv4Addr>().ok()?.to_string() != host
+        {
+            return None;
+        }
+        (host, port)
+    };
+    let port = match port {
+        Some(port) => {
+            let parsed = port.parse::<u16>().ok()?;
+            if parsed.to_string() != port || parsed == default_port {
+                return None;
+            }
+            i32::from(parsed)
+        }
+        None => -1,
+    };
+    let bytes = url.as_bytes();
+    for (index, byte) in bytes.iter().enumerate() {
+        if *byte == b'%'
+            && (index + 2 >= bytes.len()
+                || !bytes[index + 1].is_ascii_hexdigit()
+                || !bytes[index + 2].is_ascii_hexdigit())
+        {
+            return None;
+        }
+    }
+    let wire = CString::new(url).ok()?;
+    let mut error = OwnedError(ptr::null_mut());
+    // ENCODED retains valid percent escapes (including non-UTF-8 octets) as
+    // opaque data. Do not enable PARSE_RELAXED, NON_DNS or scheme normalization.
+    let uri = OwnedUri(unsafe { g_uri_parse(wire.as_ptr(), 1 << 3, &mut error.0) });
+    if uri.0.is_null()
+        || unsafe { !g_uri_get_userinfo(uri.0).is_null() }
+        || unsafe { string(g_uri_get_scheme(uri.0)) }.as_deref() != scheme.to_str().ok()
+        || unsafe { string(g_uri_get_host(uri.0)) }.as_deref() != Some(host)
+        || unsafe { g_uri_get_port(uri.0) } != port
+    {
+        return None;
+    }
+    Some((wire, scheme))
+}
+fn open_url(url: String) -> Value {
+    let Some((wire, scheme)) = validated_url(&url) else {
+        return failure("invalid-request");
+    };
+    // Full-transfer reference. Resolve the default on every request and require
+    // the desktop implementation whose launch API can isolate standard streams.
+    let app = OwnedObject(unsafe { g_app_info_get_default_for_uri_scheme(scheme.as_ptr()) });
+    if app.0.is_null()
+        || unsafe { g_type_check_instance_is_a(app.0, g_desktop_app_info_get_type()) } == 0
+        || unsafe { g_app_info_supports_uris(app.0) } == 0
+    {
+        return failure("unavailable");
+    }
+    // Both this node and its CString data are borrowed only for the synchronous
+    // call. Do not use OwnedList: it owns GObjects, whereas this list owns nothing.
+    let mut uris = GList {
+        data: wire.as_ptr().cast_mut().cast(),
+        next: ptr::null_mut(),
+        prev: ptr::null_mut(),
+    };
+    dispatch(app.0, &mut uris)
+}
+fn dispatch(app: Object, uris: *mut GList) -> Value {
     let Ok(null) = std::fs::OpenOptions::new()
         .read(true)
         .write(true)
@@ -298,8 +452,8 @@ fn launch(id: String, fingerprint: String) -> Value {
     let mut error = OwnedError(ptr::null_mut());
     let success = unsafe {
         g_desktop_app_info_launch_uris_as_manager_with_fds(
-            app.0,
-            ptr::null_mut(),
+            app,
+            uris,
             ptr::null_mut(),
             1 << 2,
             None,
@@ -334,6 +488,10 @@ fn respond(bytes: &[u8]) -> Value {
         return failure("invalid-request");
     };
     match request {
+        Request::OpenUrl {
+            protocol_version: 1,
+            url,
+        } => open_url(url),
         Request::List {
             protocol_version: 1,
             after_id,

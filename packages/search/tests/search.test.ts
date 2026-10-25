@@ -29,7 +29,7 @@ describe('L1-01 bounded registered command ranking',()=>{
   });
   it('bounds results, registry size and query length and rejects duplicate identities',()=>{
     expect(rankCommands(Array.from({length:100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'',now)).toHaveLength(20);
-    expect(()=>rankCommands(Array.from({length:4100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
+    expect(()=>rankCommands(Array.from({length:4101},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
   });
   it('cancels old queries and rejects late completion after replacement, hide or disconnect',()=>{
     const generations=new QueryGenerations(),first=generations.begin('data'),second=generations.begin('hide');expect(first.signal.aborted).toBe(true);expect(generations.current(first.generation)).toBe(false);expect(generations.current(second.generation)).toBe(true);generations.cancel();expect(second.signal.aborted).toBe(true);expect(generations.current(second.generation)).toBe(false);
@@ -43,4 +43,14 @@ describe('L1-01 bounded registered command ranking',()=>{
 it('L1-01 saved Unicode aliases normalize exact queries without changing authority or usage',()=>{
   const saved=make('linuxcast:hide','Hide Linuxcast',{usage:{alias:'Ｆｏｃｕｓ   Desk',pinned:false,useCount:7,lastUsedAt:new Date(now).toISOString()}}),title=make('linuxcast:quit','Focus desk',{usage:{alias:null,pinned:true,useCount:90,lastUsedAt:new Date(now).toISOString()}});
   const before=structuredClone(saved);expect(rankCommands([title,saved],'  FOCUS desk  ',now).map(value=>value.id)).toEqual([saved.id,title.id]);expect(saved).toEqual(before);expect(rankCommands([{...saved,usage:{...saved.usage!,alias:null}}],'focus desk',now)).toEqual([]);
+});
+
+it('L1-02 valid HTTP queries match only an already registered Open URL command without changing its aliases',()=>{
+  const url=make('linuxcast:open-url','Open URL',{aliases:['url']}),before=structuredClone(url);
+  for(const query of ['https://example.org/','HTTP://例え.example/path?x=public'])expect(rankCommands([url],query,now)).toEqual([url]);
+  for(const query of ['example.org','file:///tmp/public','javascript:alert(1)','https://user@example.org/','https://example.org/white space'])expect(rankCommands([url],query,now)).toEqual([]);
+  expect(rankCommands([], 'https://example.org/',now)).toEqual([]);expect(url).toEqual(before);
+});
+it('L1-02 admits four builtins plus4096application identities and rejects4101records',()=>{
+  const commands=Array.from({length:4100},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
 });

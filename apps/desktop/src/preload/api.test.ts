@@ -11,7 +11,7 @@ function fixture() {
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['openLauncherUrl', 'setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });
@@ -81,4 +81,17 @@ it('bounds alias metadata before IPC and exposes only the named alias operation'
   expect(transport.invoke).toHaveBeenLastCalledWith('launcher:set-alias',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'😀'.repeat(64)});
   await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:null});
   expect(transport.invoke).toHaveBeenLastCalledWith('launcher:set-alias',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:null});
+});
+
+
+it('keeps URL opening a named typed HTTP action and refuses dangerous schemes/credentials before IPC',async()=>{
+  const {api,transport}=fixture();
+  for(const url of ['javascript:alert(1)','file:///etc/passwd','linuxcast://launcher/show','mailto:public@example.invalid','https://user:pass@example.invalid/','https://@example.invalid/','https:///example.invalid/','https://example.invalid/a b','https://example.invalid/%zz','https://example.invalid/\\evil','https://example.invalid/\ud800','https://example.invalid/?x=\nvalue','x'.repeat(8193)])expect((await api.openLauncherUrl({revision:1,url})).ok).toBe(false);
+  expect((await api.openLauncherUrl({revision:1,url:'https://example.invalid',argv:['unsafe']} as never)).ok).toBe(false);
+  expect(transport.invoke).not.toHaveBeenCalled();
+  transport.invoke.mockResolvedValue({ok:true,value:{outcome:'dispatched'}});
+  expect(await api.openLauncherUrl({revision:1,url:'HTTPS://EXAMPLE.invalid:443/路径?public=%24%28literal%29'})).toEqual({ok:true,value:{outcome:'dispatched'}});
+  expect(transport.invoke).toHaveBeenCalledExactlyOnceWith('launcher:open-url',{protocolVersion:1,revision:1,url:'https://example.invalid/%E8%B7%AF%E5%BE%84?public=%24%28literal%29'});
+  transport.invoke.mockResolvedValue({ok:true,value:{outcome:'completed'}});
+  expect((await api.openLauncherUrl({revision:1,url:'http://[::1]:8080/'})).ok).toBe(false);
 });

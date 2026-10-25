@@ -37,6 +37,23 @@ impl Fixture {
     fn entry(&self, id: &str, extra: &str) {
         fs::write(self.root.join("data/applications").join(id), format!("[Desktop Entry]\nType=Application\nName=Synthetic Application\nComment=Public fixture\nExec=\"{}\" \"two words\" \"literal;$(no-shell)\" %c %% %f %u\n{extra}\n",self.root.join("fixture executable").display())).unwrap();
     }
+    fn url_handler(&self, id: &str, field_code: &str, extra: &str) {
+        fs::write(self.root.join("data/applications").join(id), format!("[Desktop Entry]\nType=Application\nName=Public URL Handler\nExec=\"{}\" {field_code}\nMimeType=x-scheme-handler/http;x-scheme-handler/https;\n{extra}\n", self.root.join("fixture executable").display())).unwrap();
+        self.url_default(id);
+    }
+    fn url_default(&self, id: &str) {
+        fs::write(self.root.join("config/mimeapps.list"), format!("[Default Applications]\nx-scheme-handler/http={id};\nx-scheme-handler/https={id};\n")).unwrap();
+    }
+    fn open_url(&self, url: &str) -> Value {
+        self.request(json!({"protocolVersion":1,"operation":"open-url","url":url}))
+    }
+    fn marker(&self) -> Value {
+        let until = Instant::now() + Duration::from_secs(3);
+        while !self.root.join("marker.json").exists() && Instant::now() < until {
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        serde_json::from_slice(&fs::read(self.root.join("marker.json")).unwrap()).unwrap()
+    }
     fn request_bytes(&self, input: &[u8]) -> Value {
         let mut child = Command::new(env!("CARGO_BIN_EXE_linuxcast-platform"))
             .arg("applications")
@@ -185,5 +202,164 @@ fn changed_exec_is_stale_and_gio_spawn_failure_is_not_success() {
     );
     let current = f.list()["value"]["applications"][0].clone();
     assert_eq!(f.launch(&current)["error"], "launch-failed");
+    assert!(!f.root.join("marker.json").exists());
+}
+
+#[test]
+fn http_and_https_dispatch_one_literal_uri_with_isolated_stdio() {
+    let f = Fixture::new();
+    f.url_handler("browser.desktop", "%u", "NoDisplay=true");
+    // Public encoded shell-looking text stays data. No browser or network is used.
+    for url in [
+        "https://example.com/search?q=%24%28touch%20NO_SHELL%29%3B%20%22two%20words%22#public",
+        "http://example.com:8080/path?literal=;$(no-shell)&encoded=%ff",
+        "https://xn--bcher-kva.example/%E2%9C%93#%E2%9C%93",
+        "http://127.0.0.1:8080/",
+        "http://example.com:0/",
+        "https://example.com:65535/",
+        "https://[::1]:8443/",
+        "https://[::ffff:c000:201]/",
+        "https://example.com/%00%0A%5C%40",
+        "https://example..com/",
+        "https://.example.com/",
+        "https://foo!bar.example/",
+        // WHATWG URL.href preserves these named hosts; they are not IPv4 suffixes.
+        "http://0xg/",
+        "http://example.0xfoo/",
+        "http://./",
+        "http://../",
+    ] {
+        assert_eq!(
+            f.open_url(url),
+            json!({"protocolVersion":1,"ok":true,"value":{"outcome":"dispatched"}})
+        );
+        let marker = f.marker();
+        assert_eq!(marker["argv"], json!([url]));
+        assert_eq!(marker["stdin"], "");
+        fs::remove_file(f.root.join("marker.json")).unwrap();
+    }
+    let maximum = format!(
+        "https://example.com/{}",
+        "a".repeat(8192 - "https://example.com/".len())
+    );
+    assert_eq!(f.open_url(&maximum)["value"]["outcome"], "dispatched");
+    assert_eq!(f.marker()["argv"], json!([maximum]));
+}
+
+#[test]
+fn scheme_default_is_resolved_again_and_missing_or_non_uri_handlers_are_unavailable() {
+    let f = Fixture::new();
+    assert_eq!(f.open_url("https://example.com/")["error"], "unavailable");
+    f.url_default("nonexistent.desktop");
+    assert_eq!(f.open_url("https://example.com/")["error"], "unavailable");
+    f.url_handler("files-only.desktop", "%f", "");
+    assert_eq!(f.open_url("https://example.com/")["error"], "unavailable");
+    f.url_handler("browser.desktop", "%u", "");
+    fs::write(f.root.join("config/mimeapps.list"), "[Default Applications]\nx-scheme-handler/http=files-only.desktop;\nx-scheme-handler/https=browser.desktop;\n").unwrap();
+    assert_eq!(f.open_url("http://example.com/")["error"], "unavailable");
+    assert_eq!(
+        f.open_url("https://example.com/")["value"]["outcome"],
+        "dispatched"
+    );
+    assert_eq!(f.marker()["argv"], json!(["https://example.com/"]));
+    fs::remove_file(f.root.join("marker.json")).unwrap();
+    // Updating the configured default is observed by the next one-shot helper.
+    f.url_default("files-only.desktop");
+    assert_eq!(f.open_url("http://example.com/")["error"], "unavailable");
+    fs::remove_file(f.root.join("fixture executable")).unwrap();
+    f.url_default("browser.desktop");
+    assert_eq!(f.open_url("https://example.com/")["error"], "unavailable");
+    assert!(!f.root.join("marker.json").exists());
+}
+
+#[test]
+fn url_handoff_rejects_adversarial_inputs_versions_and_extra_fields_before_dispatch() {
+    let f = Fixture::new();
+    f.url_handler("browser.desktop", "%u", "");
+    for url in [
+        "",
+        "https://",
+        "https:///path",
+        "https://?q=public",
+        "https:/example.com/",
+        "javascript:alert(1)",
+        "file:///tmp/public",
+        "linuxcast://anything",
+        "mailto:public@example.com",
+        "ftp://example.com/",
+        "//example.com/",
+        "HTTPS://example.com/",
+        "https://EXAMPLE.com/",
+        "https://example.com",
+        "https://user:pass@example.com/",
+        "https://@example.com/",
+        "https://user%40example.com/",
+        "https://example.com\\@evil.example/",
+        "https://exa mple.com/",
+        "https://example.com/a b",
+        " https://example.com/",
+        "https://example.com/\n",
+        "https://example.com/\t",
+        "https://example.com/\0",
+        "https://example.com/\u{7f}",
+        "https://example.com/\u{a0}",
+        "https://bücher.example/",
+        "https://example.com/%",
+        "https://example.com/%0",
+        "https://example.com/%zz",
+        "https://%65xample.com/",
+        "https://example.com:/",
+        "https://example.com:443/",
+        "http://example.com:80/",
+        "https://example.com:00081/",
+        "https://example.com:-1/",
+        "https://example.com:65536/",
+        "https://example.com:1:2/",
+        "https://example.com:one/",
+        "https://[::1/",
+        "https://[bad]/",
+        "https://[::1]junk/",
+        "https://[fe80::1%25eth0]/",
+        "https://ex^ample.com/",
+        "https://ex|ample.com/",
+        "https://ex<ample.com/",
+        "https://ex>ample.com/",
+        "https://127.1/",
+        "http://2130706433/",
+        "http://0x7f.0.0.1/",
+        "http://0177.0.0.1/",
+        "http://256.0.0.1/",
+    ] {
+        assert_eq!(
+            f.open_url(url),
+            json!({"protocolVersion":1,"ok":false,"error":"invalid-request"}),
+            "URL must be rejected: {url:?}"
+        );
+    }
+    for request in [
+        json!({"protocolVersion":2,"operation":"open-url","url":"https://example.com/"}),
+        json!({"protocolVersion":1,"operation":"open-url","url":null}),
+        json!({"protocolVersion":1,"operation":"open-url","url":["https://example.com/"]}),
+        json!({"protocolVersion":1,"operation":"open-url","url":"https://example.com/","argv":[]}),
+        json!({"protocolVersion":1,"operation":"open-url","url":"https://example.com/","scheme":"file"}),
+    ] {
+        assert_eq!(f.request(request)["error"], "invalid-request");
+    }
+    assert_eq!(
+        f.open_url(&format!("https://example.com/{}", "a".repeat(8192)))["error"],
+        "invalid-request"
+    );
+    assert!(!f.root.join("marker.json").exists());
+}
+
+#[test]
+fn url_handler_working_directory_failure_is_not_success() {
+    let f = Fixture::new();
+    f.url_handler(
+        "browser.desktop",
+        "%u",
+        "Path=/nonexistent-linuxcast-fixture-directory",
+    );
+    assert_eq!(f.open_url("https://example.com/")["error"], "launch-failed");
     assert!(!f.root.join("marker.json").exists());
 }

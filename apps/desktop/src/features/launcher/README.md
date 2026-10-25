@@ -2,11 +2,12 @@
 
 `Launcher` uses the existing shared `ViewRenderer` and `ViewSession`. Main supplies
 `LauncherApi` and a named Hide callback; the renderer receives only metadata and
-sends a selected command ID with the registry revision. Main retains all actual
+sends a selected command ID with the registry revision. The explicit URL Form
+uses the separate named URL API with only revision and a validated address. Main retains all actual
 handlers, sender validation, current availability checks and usage persistence.
 No shell, provider, file or generic repository interface is added to rendering.
 
-The initial registry exposes Local data, Hide Linuxcast and Quit Linuxcast. Cold
+The registry exposes Local data, Hide Linuxcast, Quit Linuxcast and Open URL. Cold
 empty-query ordering follows main's useful default order. Local saved favourites,
 usage and aliases are read through main, and query text stays in the renderer.
 New query generations invalidate old work; accepted refreshes preserve selected
@@ -82,13 +83,44 @@ Design: Shell and navigation; Results and actions; List, grid, detail and form;
 States and motion; Accessibility; Review gate. No feature-specific CSS or new
 components, dependencies, execution permissions or storage interfaces are added.
 
+## Explicit Open URL
+
+The registered **Open URL** command opens one shared Form, with a persistent URL
+label, Open URL submission and Cancel. A valid HTTP/HTTPS root query locally
+matches this existing command and visibly prefills the canonical ASCII address.
+Opening the Form, editing, pinning, alias changes, cancel and back never send a
+URL. Invalid addresses remain editable with inline errors. The shared URL schema
+rejects credentials, unsupported schemes, raw whitespace/control/surrogate and
+backslash characters, malformed escapes and addresses exceeding 8,192 canonical
+UTF-8 bytes. The dedicated Form accepts this bound while root search retains its
+512-code-unit limit. Parsing is local and performs no network requests.
+
+Only a current explicit submission calls `openLauncherUrl({revision, url})`.
+Pending submission disables fields and duplicate requests. Stale actions,
+hidden/disposed UI and late replies cannot dispatch again or publish a result.
+Known unavailable handoff shows remediation as a status error and retains the
+valid draft for an explicit unchanged-value retry after browser settings are
+fixed. Known invalid/stale requests retain an inline error and offer Reload.
+Unknown outcomes tell the user to check the browser, retain the draft and gate
+new submissions until explicit Reload. This gate survives cancel, ordinary
+command success and automatic hide/show/refresh; Reload never repeats a URL.
+
+A strict dispatched-only receipt pops the Form and requests the existing named
+Hide callback. A Hide failure is reported separately from the dispatched browser
+handoff. No completed-page/focused-browser toast is shown. Main owns dispatch and
+records only command usage after acknowledgement; this slice does not save URL
+contents/history. Other aliases, pins, paged applications, root query, selection
+and primary action remain in the existing system. Shared design sections are
+Shell and navigation; Results and actions; List, grid, detail and form; States and
+motion; Accessibility; Review gate. No feature-specific component/CSS is added.
+
 ## Application catalogue
 
 Main supplies pages of at most 100 metadata rows at one registry revision. The
 controller validates all pages, consistent availability, unique IDs, cursor
 revision/offset and bounded total count/bytes before replacing the live catalogue.
 Failed, stale or hidden refreshes do not publish a mixed partial snapshot. Search
-stays local over up to 4,099 rows, takes the first 20 per provider, and presents a
+stays local over up to 4,100 rows, takes the first 20 per provider, and presents a
 separate Applications section using existing shared list primitives. Application
 primary actions say Open; built-in Open/Hide/Quit retain their meaning. No desktop
 ID, executable path, shell command or native fingerprint reaches presentation.
@@ -104,10 +136,10 @@ identity or one that no longer matches the query is released normally.
 
 ## Evidence and limits
 
-- `packages/search/tests/search.test.ts`: ten bounded ranking/generation tests.
-- `tests/controller.test.ts`: 42 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
-- `tests/catalogue.test.ts`: 28 atomic pagination and pin/alias integrity checks.
-- `tests/launcher.ui.test.ts`: 23 Chromium component checks covering keyboard,
+- `packages/search/tests/search.test.ts`: 12 bounded ranking/generation/URL matching tests.
+- `tests/controller.test.ts`: 67 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/catalogue.test.ts`: 29 atomic pagination and pin/alias integrity checks.
+- `tests/launcher.ui.test.ts`: 33 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
@@ -118,12 +150,15 @@ identity or one that no longer matches the query is released normally.
   unknown launch outcomes. The alias slice adds dark/light shared Form, inline
   collision and unconfirmed states, keyboard save/remove/cancel and exact query
   checks. Alias fixtures observe requests and keep synthetic metadata in memory;
-  they do not establish real persistence. These checks ran with Node 24.22.1/Bun 1.4.4.
+  they do not establish real persistence. The URL slice adds dark/light Form,
+  invalid and unknown outcomes plus unavailable handoff. Its fixture observes
+  requests only, and browser checks verify no external requests on typing,
+  navigation or synthetic submit. These checks ran with Node 24.22.1/Bun 1.4.4.
 
 Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator
 owns the actual main/preload/storage/Electron flow and its validation. Debian
 GNOME/KDE Wayland/X11 and native assistive-technology acceptance remain pending,
 along with full L1 providers, ranking controls and explicit fallbacks. F1/D1
-native gates remain pending. Typed URI/file/argv/shell flows, desktop actions and run-history controls remain
+native gates remain pending. Broader typed URI/file/argv/shell flows, desktop actions and URL/run-history controls remain
 outstanding in L1-02. This slice does not mark all L1-01 or L1-02 complete.
