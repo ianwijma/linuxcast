@@ -223,6 +223,11 @@ fn http_and_https_dispatch_one_literal_uri_with_isolated_stdio() {
         "https://example..com/",
         "https://.example.com/",
         "https://foo!bar.example/",
+        // WHATWG URL.href preserves these named hosts; they are not IPv4 suffixes.
+        "http://0xg/",
+        "http://example.0xfoo/",
+        "http://./",
+        "http://../",
     ] {
         assert_eq!(
             f.open_url(url),

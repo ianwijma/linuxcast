@@ -370,8 +370,11 @@ fn validated_url(url: &str) -> Option<(CString, &'static CStr)> {
             return None;
         }
         let last = dns.rsplit('.').next()?;
-        if (last.bytes().all(|b| b.is_ascii_digit()) || last.starts_with("0x"))
-            && host.parse::<std::net::Ipv4Addr>().ok()?.to_string() != host
+        let decimal = !last.is_empty() && last.bytes().all(|b| b.is_ascii_digit());
+        let hexadecimal = last.strip_prefix("0x").is_some_and(|digits| {
+            !digits.is_empty() && digits.bytes().all(|b| b.is_ascii_hexdigit())
+        });
+        if (decimal || hexadecimal) && host.parse::<std::net::Ipv4Addr>().ok()?.to_string() != host
         {
             return None;
         }
