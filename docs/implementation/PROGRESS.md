@@ -36,7 +36,15 @@ Validation:17L1 unit/controller +9launcher security +7L1 browser checks pass. Re
 
 Current user sequencing is complete: F2 bounded increment merged first; manifest_review was then redirected to actual launcher application code, which is now also merged. Both author and reviewer agents finished; none has another infrastructure/proof assignment.
 
-Selected next L1-01 product increment: expose command pin/unpin through existing Actions and SQLite command usage so users can control empty-query ordering. Keep this separate and small; root owns exact typed main/preload and atomic storage update, then manifest_review can own only lane-local Actions/controller UI in an isolated branch. Do not start new desktop proofs or broaden this into a generic preferences framework. Actual persistence/reopen and stable-selection evidence required before merge. The broader search providers, aliases/visibility administration and configured fallbacks remain required future increments. No acceptance gate or full local1.0 scope is removed. F2 remaining credential/diagnostics UI is backlog, not assigned back to manifest_review.
+## Current L1-01 pin increment
+
+Coordinator `.worktrees/linuxcast-application-controls` / `codex/launcher-follow-up`, basee303fcd. Shared actual persistence/API13e9dac; author3a50c48 integrated0890391. UI uses existing Actions and visible Pinned accessory; original primary and selected identity survive reordering. Main validates exact sender/frame/revision/ID/boolean, serializes effects, and returns acknowledged metadata. Owner atomically changes only pinned, preserves usage/alias and never executes/records use. No migration, dependency or new framework. Unconfirmed pin changes require explicit Reload, including after another successful command.
+
+Validation:25L1 units/controller,12security,6pin checks (4actual owner+2malformed-ack protocol),11browser cases and43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin reorders while preserving selection/primary and useCount0; usage clear retains pin; Hide/secondtoggle/Quit/relaunch preserves favourite; keyboard Unpin persists through final owner reopen with count unchanged. Actual dark/light app screenshots inspected; component affected-state screenshots/axe checked. Typecheck/lint/plan/diff pass. Initial sandbox-limited owner run failed before DB open because local abstract sockets were denied; permitted actual-owner rerun passed. No desktop/Orca/release claim.
+
+Independent owner/API reviewer launcher_reading clean; UI reviewer reading_review clean after one focused recovery fix/regression. manifest_review source is committed and has no process active, same `.worktrees/linuxcast-l1-01` / `codex/l1-01-command-pins`. No F2 infrastructure/research/proof or VM/device work assigned.
+
+Next: publish focused pin PR, inspect current-head CI/reviews/comments, merge normally and refresh develop. Then prioritize the actual installed-application catalogue/launch flow (L1-02) using native GIO plus the existing launcher/storage/UI, with a small typed interface and explicit unavailable states. Keep provider/alias/visibility/fallback and nativeAT/desktop/release gaps recorded. Complete local1.0 scope remains unchanged; no whole L1 or dependent-task completion inferred.
 
 ## Retained proof state
 

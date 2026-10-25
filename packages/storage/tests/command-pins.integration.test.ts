@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import Database from 'better-sqlite3';
+import { createStorageClient } from '../src/client.ts';
 import { StorageOwner } from '../src/owner.ts';
 const directories:string[]=[], owners:StorageOwner[]=[];
 afterEach(async()=>{for(const owner of owners.splice(0))await owner.close();for(const directory of directories.splice(0))await rm(directory,{recursive:true,force:true});});
@@ -39,4 +40,14 @@ describe('L1-01 atomic command pin persistence',()=>{
     for(const params of [{commandId:'linuxcast:hide',pinned:1},{commandId:'linuxcast:hide',pinned:'true'},{commandId:'../private',pinned:true},{commandId:'linuxcast:hide',pinned:true,useCount:900}])expect(()=>request(owner,'commands.setPinned',params)).toThrow();
     expect(request(owner,'commands.getUsage',{commandId:'linuxcast:hide'})).toBeNull();
   });
+});
+
+
+it.each([{commandId:'linuxcast:quit',pinned:true},{commandId:'linuxcast:hide',pinned:false}])('rejects mismatched pin acknowledgements without replay: %j',async result=>{
+  let receive:(value:unknown)=>void=()=>{};const sent:unknown[]=[];
+  const client=createStorageClient({send:value=>sent.push(value),onMessage:listener=>{receive=listener;return()=>{};}});
+  const pending=client.request('commands.setPinned',{commandId:'linuxcast:hide',pinned:true});
+  const envelope=sent[0] as {request:{requestId:string;method:string}};
+  receive({kind:'response',response:{schemaVersion:1,requestId:envelope.request.requestId,method:envelope.request.method,outcome:'completed',result:{...result,useCount:0,lastUsedAt:null,alias:null}}});
+  await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(sent).toHaveLength(1);
 });

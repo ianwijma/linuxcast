@@ -58,6 +58,18 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   await expect.poll(()=>page.getByRole('heading',{name:'No matching results'}).isVisible()).toBe(true);
   await query.fill('');
   await expect.poll(()=>page.getByRole('option').count()).toBe(3);
+  // Pinning is an explicit metadata edit, not a command execution.
+  await query.press('ArrowDown');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
+  await query.press('Control+k');
+  await page.getByRole('searchbox',{name:'Find an action'}).fill('Pin command');
+  await page.getByRole('searchbox',{name:'Find an action'}).press('Enter');
+  await expect.poll(()=>page.getByRole('option').first().textContent()).toContain('Hide Linuxcast');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
+  await expect.poll(()=>page.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
+  })).toMatchObject({pinned:true,useCount:0,lastUsedAt:null});
   expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(profile);
   expect(await page.evaluate(() => {
     const windowApi = window as unknown as { require?: unknown; process?: unknown; linuxcast?: DesktopShellApi };
@@ -112,12 +124,14 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   expect(before).toMatchObject({encrypted:false,data:{category:'command-usage'}});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
+  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
   await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
   const afterFile=join(temporary,'usage-after.json');await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});},afterFile);
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}));
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
+  expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null}));
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records.every((record:{useCount:number})=>record.useCount===0)).toBe(true);
   await data.getByRole('button',{name:'Close settings'}).click();await expect.poll(()=>data.isClosed()).toBe(true);
   expect(await app.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Linuxcast storage').length)).toBe(1);
@@ -202,4 +216,30 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   await page.keyboard.press('Enter');
   expect(await exited).toBe(0);
   application = undefined;
+  // Relaunch the same real private profile: pins must be durable, not renderer state.
+  application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
+  const restarted=application,reopened=await restarted.firstWindow();await reopened.waitForURL(appUrl);
+  const reopenedQuery=reopened.getByRole('searchbox',{name:'Search commands',exact:true});
+  await reopenedQuery.waitFor();
+  await expect.poll(()=>reopened.getByRole('option').first().textContent()).toContain('Hide Linuxcast');
+  const savedUsage=await reopened.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
+  });
+  expect(savedUsage).toMatchObject({pinned:true,useCount:1});
+  await reopenedQuery.press('Control+k');
+  await reopened.getByRole('searchbox',{name:'Find an action'}).fill('Unpin command');
+  await reopened.getByRole('searchbox',{name:'Find an action'}).press('Enter');
+  await expect.poll(()=>reopened.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
+  })).toMatchObject({pinned:false,useCount:1});
+  await reopenedQuery.fill('quit');
+  await expect.poll(()=>reopened.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');
+  const stopped=new Promise<number|null>(resolve=>restarted.process().once('exit',resolve));
+  await reopenedQuery.press('Enter',{noWaitAfter:true});expect(await stopped).toBe(0);application=undefined;
+  const persisted=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-pin-reopen'});
+  try {
+    expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.getUsage',params:{commandId:'linuxcast:hide'}}).result).toMatchObject({pinned:false,useCount:1});
+  } finally {await persisted.close();}
 }, 60000);
