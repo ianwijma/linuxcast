@@ -29,7 +29,7 @@ describe('L1-01 bounded registered command ranking',()=>{
   });
   it('bounds results, registry size and query length and rejects duplicate identities',()=>{
     expect(rankCommands(Array.from({length:100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'',now)).toHaveLength(20);
-    expect(()=>rankCommands(Array.from({length:4101},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
+    expect(()=>rankCommands(Array.from({length:4102},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
   });
   it('cancels old queries and rejects late completion after replacement, hide or disconnect',()=>{
     const generations=new QueryGenerations(),first=generations.begin('data'),second=generations.begin('hide');expect(first.signal.aborted).toBe(true);expect(generations.current(first.generation)).toBe(false);expect(generations.current(second.generation)).toBe(true);generations.cancel();expect(second.signal.aborted).toBe(true);expect(generations.current(second.generation)).toBe(false);
@@ -51,6 +51,6 @@ it('L1-02 valid HTTP queries match only an already registered Open URL command w
   for(const query of ['example.org','file:///tmp/public','javascript:alert(1)','https://user@example.org/','https://example.org/white space'])expect(rankCommands([url],query,now)).toEqual([]);
   expect(rankCommands([], 'https://example.org/',now)).toEqual([]);expect(url).toEqual(before);
 });
-it('L1-02 admits four builtins plus4096application identities and rejects4101records',()=>{
-  const commands=Array.from({length:4100},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
+it('L1-02 admits five builtins plus4096application identities and rejects4102records',()=>{
+  const commands=Array.from({length:4101},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
 });

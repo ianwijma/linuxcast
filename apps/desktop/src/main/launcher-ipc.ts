@@ -17,6 +17,7 @@ export interface LauncherActions {
   quitting(): boolean;
   hide(): void;
   quit(): void;
+  openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
   getUsage?: (commandId: string) => Promise<CommandUsage | null>;
@@ -52,6 +53,8 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     {id:'linuxcast:quit', title:'Quit Linuxcast', subtitle:'Stop Linuxcast and its application services', aliases:['quit','exit'], keywords:['stop','close'], enabled:true},
     {id:'linuxcast:open-url',title:'Open URL',subtitle:'Open an HTTP or HTTPS address in your default browser',aliases:['url','open url'],keywords:['web','browser','address','link'],enabled:!!actions.openUrl,
       ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
+    {id:'linuxcast:open-file-search',title:'File search',subtitle:'Search filenames in folders you choose',aliases:['files','file search'],keywords:['folder','filename','index'],enabled:!!actions.openFileSearch,
+      ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   const recordUse = async (id: string) => {
@@ -222,7 +225,8 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
         await recordUse(command.id);
         return {ok:true,value:{outcome}};
       }
-      if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
+      if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
+      else if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
       else actions.hide();
       await recordUse(command.id);
       return {ok:true,value:{outcome:'completed'}};

@@ -3,7 +3,7 @@ import { httpUrlSchema } from './open-url.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
-export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
+export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
 export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
 export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
