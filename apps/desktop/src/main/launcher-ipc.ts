@@ -6,7 +6,7 @@ import type { NativeApplication } from '../../../../packages/contracts/src/appli
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema, launcherPinRequestSchema,
+  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias,
 } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply } from '../../../../packages/contracts/src/launcher.ts';
 import type { CommandUsage } from '@linuxcast/storage';
@@ -23,6 +23,7 @@ export interface LauncherActions {
   listApplications?: () => Promise<NativeApplication[]>;
   launchApplication?: (application: Pick<NativeApplication,'desktopId'|'fingerprint'>) => Promise<'dispatched'>;
   setPinned?: (commandId: string, pinned: boolean) => Promise<CommandUsage>;
+  setAlias?: (commandId: string, alias: string | null) => Promise<CommandUsage>;
 }
 
 const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | 'internal'): Extract<LauncherExecuteReply,{ok:false}> => ({
@@ -113,6 +114,43 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       start=offset;
     }else await refreshApplications();
     return snapshot(start);
+  });
+  ipc.handle(LAUNCHER_CHANNELS.setAlias, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
+    if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
+    const parsed=launcherAliasRequestSchema.safeParse(payload);
+    if(!parsed.success || parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active() || busy)return failure('cancelled');
+    const {commandId,alias}=parsed.data,registered=descriptors();
+    if(!registered.some(command=>command.id===commandId))return failure('permission-denied');
+    if(!actions.setAlias || !actions.getUsage)return {ok:false,error:{code:'capability-unavailable',message:'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
+    busy=true;
+    let attempted=false;
+    try {
+      if(alias!==null){
+        const normalized=normalizeCommandAlias(alias),others=registered.filter(command=>command.id!==commandId);
+        let collision=others.some(command=>command.aliases.some(value=>normalizeCommandAlias(value)===normalized));
+        // Bound owner concurrency below the client's pending-request limit. No query enters storage.
+        for(let start=0;!collision && start<others.length;start+=32){
+          const chunk=others.slice(start,start+32);
+          const usage=await Promise.all(chunk.map(command=>actions.getUsage!(command.id)));
+          collision=usage.some((row,index)=>{
+            if(row && row.commandId!==chunk[index]!.id)throw new Error('Usage identity.');
+            return row?.alias!==null && row?.alias!==undefined && normalizeCommandAlias(row.alias)===normalized;
+          });
+        }
+        if(collision)return {ok:false,error:{code:'conflict',message:'Another command already uses this alias. Choose a different alias.',retryable:false}};
+      }
+      if(!active() || revision!==parsed.data.revision)return failure('invalid-request');
+      attempted=true;
+      const usage=await actions.setAlias(commandId,alias);
+      if(!active() || revision!==parsed.data.revision || !descriptors().some(command=>command.id===commandId))throw new Error('Registry changed during alias edit.');
+      if(usage.commandId!==commandId || usage.alias!==alias)throw new Error('Invalid saved alias.');
+      const reply=await snapshot(0,usage);
+      if(!reply.ok)throw new Error('Alias acknowledgement unavailable.');
+      return reply;
+    }catch{
+      return {ok:false,error:{code:attempted?'internal':'capability-unavailable',message:attempted?'The alias change could not be confirmed. Reload commands before trying again.':'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
+    }finally{busy=false;}
   });
   ipc.handle(LAUNCHER_CHANNELS.setPinned, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');

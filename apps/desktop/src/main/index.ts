@@ -20,6 +20,10 @@ startResidentShell({ resourcesDirectory: __dirname,
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.setPinned',{commandId,pinned},{timeoutMs:1000});
   },
+  async setCommandAlias(commandId,alias) {
+    if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
+    return storage.repository.request('commands.setAlias',{commandId,alias},{timeoutMs:1000});
+  },
   async recordCommandUse(commandId) {
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.recordUse',{commandId},{timeoutMs:250});

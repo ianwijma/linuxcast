@@ -11,7 +11,7 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
   const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openDataSettings:vi.fn(async()=>{}),
-    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
+    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setAlias:vi.fn(async(commandId:string,alias:string|null)=>({commandId,alias,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false})),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
   const execute=(commandId='linuxcast:open-local-data',revision=1)=>invoke(LAUNCHER_CHANNELS.execute,{protocolVersion:1,commandId,revision});
@@ -147,4 +147,50 @@ it('never acknowledges an empty pin after concurrent catalogue removal during th
   finish({commandId:id,pinned:true,useCount:0,lastUsedAt:null,alias:null});
   expect(await pending).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed')}});
   expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+
+
+it('alias edits validate sender/identity/revision and persist metadata without execution',async()=>{
+  const f=fixture(),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'my-hide'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const invalid of [{...payload,commandId:'unknown:command'},{...payload,revision:2},{...payload,alias:'bad\nvalue'},{...payload,alias:'x'.repeat(65)},{...payload,path:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,invalid)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(f.actions.setAlias).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:true,value:{updateOnly:true,nextCursor:null,commands:[{id:'linuxcast:hide',usage:{alias:'my-hide',pinned:false,useCount:4}}]}});
+  expect(f.actions.setAlias).toHaveBeenCalledExactlyOnceWith('linuxcast:hide','my-hide');
+  expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('rejects normalized collisions with declared and stored aliases while allowing own alias/removal',async()=>{
+  const f=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:quit'?'Public   Alias':'own'})});
+  const payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'ＱＵＩＴ'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'public alias'})).toMatchObject({ok:false,error:{code:'conflict'}});
+  expect(f.actions.setAlias).not.toHaveBeenCalled();
+  const own=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:hide'?'own':null})});
+  expect(await own.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'own'})).toMatchObject({ok:true});
+  expect(await own.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:null})).toMatchObject({ok:true,value:{commands:[{usage:{alias:null}}]}});
+});
+it('checks aliases beyond page100 and blocks concurrent effects until acknowledgement',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setAlias']>>>)=>void;
+  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i)),getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId.startsWith('application:')?'existing':null}),setAlias:()=>new Promise(resolve=>{finish=resolve;})});
+  const first=await catalogue(f),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:first.revision,alias:'existing'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'new'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());
+  expect(await f.execute('linuxcast:hide',first.revision)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:'linuxcast:hide',revision:first.revision,pinned:true})).toMatchObject({ok:false});
+  finish({commandId:'linuxcast:hide',alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:true});
+});
+it('distinguishes pre-write storage unavailability from uncertain alias write and never replays',async()=>{
+  const before=fixture({getUsage:async()=>{throw new Error('SYNTHETIC_PRIVATE');}}),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'new'};
+  expect(await before.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'capability-unavailable'}});expect(before.actions.setAlias).not.toHaveBeenCalled();
+  const after=fixture({setAlias:async()=>{throw new Error('SYNTHETIC_PRIVATE');}});
+  const reply=await after.invoke(LAUNCHER_CHANNELS.setAlias,payload);expect(reply).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed'),retryable:false}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');
+});
+it('never acknowledges an alias for an application removed during the write',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setAlias']>>>)=>void;
+  const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setAlias:()=>new Promise(resolve=>{finish=resolve;})});
+  const first=await catalogue(f),id=first.commands.find(command=>command.provider==='applications')!.id;
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:id,revision:first.revision,alias:'new'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());records.splice(0);await catalogue(f);
+  finish({commandId:id,alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:false,error:{code:'internal'}});
 });
