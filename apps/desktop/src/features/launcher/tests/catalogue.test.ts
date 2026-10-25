@@ -20,7 +20,7 @@ describe('L1-02 atomic renderer catalogue',()=>{
     if(mode==='bad-cursor')second=page([application(2)],{nextCursor:'arbitrary'});
     const fetch=vi.fn().mockResolvedValueOnce(first).mockResolvedValueOnce(second);await expect(collectCatalogue(fetch)).rejects.toThrow();expect(fetch).toHaveBeenCalledTimes(2);
   });
-  it('bounds the complete catalogue to 4099 identities',async()=>{
+  it('bounds the complete catalogue to 4100 identities',async()=>{
     let start=0;await expect(collectCatalogue(async()=>{const entries=Array.from({length:100},(_,i)=>application(start+i));start+=100;return page(entries,{nextCursor:`1:${start}`});})).rejects.toThrow('limit');
   });
   it('merges an acknowledged pin into a full catalogue without discarding other pages',()=>{
@@ -69,4 +69,9 @@ describe('L1-01 alias acknowledgement integrity',()=>{
     if(mode==='application-state')reply.applicationState='unavailable';
     expect(()=>mergeAliasReply(current,reply,current.commands[110]!.id,'new alias')).toThrow();
   });
+});
+
+it('L1-02 collects4100identities including4builtins without dropping finalpage',async()=>{
+  const commands=Array.from({length:4096},(_,i)=>application(i));commands.push(...['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url'].map(id=>({id:id as LauncherCommandMetadata['id'],title:id,aliases:[],keywords:[],enabled:true,usage:null})));
+  const result=await collectCatalogue(async cursor=>{const offset=cursor?Number(cursor.split(':')[1]):0;return page(commands.slice(offset,offset+100),{nextCursor:offset+100<commands.length?`1:${offset+100}`:null});});expect(result.commands).toHaveLength(4100);expect(result.commands.at(-1)!.id).toBe('linuxcast:open-url');
 });

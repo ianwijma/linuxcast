@@ -1,3 +1,4 @@
+import { httpUrlSchema } from '@linuxcast/contracts';
 /** Pure local ranking. Entries come only from the trusted command registry;
  * matching a name or alias never creates an executable command. */
 export interface SearchCommand {
@@ -5,12 +6,13 @@ export interface SearchCommand {
   usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
 }
 export const MAX_QUERY_LENGTH=512;
-export const MAX_COMMANDS=4099;
+export const MAX_COMMANDS=4100;
 export const MAX_COMMAND_RESULTS=20;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 function subsequence(query:string,text:string):boolean {let cursor=0;for(const character of text)if(character===query[cursor])cursor++;return cursor===query.length;}
-function match(command:SearchCommand,query:string):number|null {
+function match(command:SearchCommand,query:string,urlQuery:boolean):number|null {
   if(!query)return 0;
+  if(urlQuery && command.id==='linuxcast:open-url')return 0;
   const aliases=[...command.aliases,...(command.usage?.alias?[command.usage.alias]:[])].map(normalize);
   if(aliases.includes(query))return 0;
   const title=normalize(command.title),keywords=command.keywords.map(normalize);
@@ -29,8 +31,8 @@ function frecency(command:SearchCommand,now:number):number {
 export function rankCommands<T extends SearchCommand>(commands:readonly T[],query:string,now=Date.now(),selectedId:string|null=null):T[] {
   if(query.length>MAX_QUERY_LENGTH || commands.length>MAX_COMMANDS || !Number.isFinite(now))throw new Error('Search limit exceeded.');
   if(new Set(commands.map(command=>command.id)).size!==commands.length)throw new Error('Duplicate command identity.');
-  const normalized=normalize(query);
-  const ranked=commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
+  const normalized=normalize(query),urlQuery=httpUrlSchema.safeParse(query).success;
+  const ranked=commands.map((command,index)=>({command,index,tier:match(command,normalized,urlQuery)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
     .sort((a,b)=>a.tier-b.tier || Number(Boolean(b.command.usage?.pinned))-Number(Boolean(a.command.usage?.pinned)) || frecency(b.command,now)-frecency(a.command,now) || (!normalized?a.index-b.index:a.command.title.localeCompare(b.command.title,'en')) || a.command.id.localeCompare(b.command.id,'en'))
     .map(entry=>entry.command);
   const counts=new Map<string,number>();

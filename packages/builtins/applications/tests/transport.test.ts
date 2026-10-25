@@ -63,8 +63,10 @@ let input='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>input+
   if(mode==='fixture:too-many'){const start=q.afterId?Number(q.afterId.slice(1,5))+1:0;const entries=Array.from({length:100},(_,i)=>app('x'+String(start+i).padStart(4,'0')+'.desktop'));return send({applications:entries,nextCursor:entries.at(-1).desktopId});}
   return send(q.afterId?{applications:[app('c.desktop')],nextCursor:null}:{applications:[app('a.desktop'),app('b.desktop')],nextCursor:'b.desktop'});
  }
- const mode=q.desktopId.slice(0,-8);fs.writeFileSync(path.join(dir,q.desktopId+'.pid'),String(process.pid));
- if(['invalid-request','stale-application','unavailable','launch-failed'].includes(mode))return process.stdout.write(JSON.stringify({protocolVersion:1,ok:false,error:mode})+'\n');
+ const mode=q.operation==='open-url'?process.env.XDG_CURRENT_DESKTOP.slice('fixture:url-'.length):q.desktopId.slice(0,-8);
+ if(q.operation==='open-url')fs.appendFileSync(path.join(dir,'urls'),q.url+'\n');
+ fs.writeFileSync(path.join(dir,(q.operation==='open-url'?'open-url':q.desktopId)+'.pid'),String(process.pid));
+ if(['invalid-request','stale-application','unavailable','launch-failed','catalogue-too-large'].includes(mode))return process.stdout.write(JSON.stringify({protocolVersion:1,ok:false,error:mode})+'\n');
  if(mode.startsWith('hang')){setInterval(()=>{},1000);return;}
  if(mode==='double'){send({outcome:'dispatched'});send({outcome:'dispatched'});return;}
  if(mode==='truncated')return process.stdout.write('{"protocolVersion":1');
@@ -78,3 +80,26 @@ let input='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>input+
  send({outcome:'dispatched'});
 });
 `;
+
+describe('L1-02 explicit HTTP URL transport (request-observing helper only)',()=>{
+  it('sends a canonical address as JSON data through the existing fixed helper without shell interpolation',async()=>{
+    vi.stubEnv('XDG_CURRENT_DESKTOP','fixture:url-normal');const api=service();
+    expect(await api.openUrl('HTTPS://例え.example:443/$(literal);echo?x=%20#public')).toBe('dispatched');
+    expect(await readFile(join(directory,'urls'),'utf8')).toBe('https://xn--r8jz45g.example/$(literal);echo?x=%20#public\n');expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
+  });
+  it.each(['file:///tmp/public','javascript:alert(1)','example.org','https://user:password@example.org/','https://@example.org/','https://example.org/white space','https://example.org/\\path','https://example.org/\u0000','https://example.org/\ud800'])('rejects invalid URL %j without spawning a helper',async url=>{
+    await expect(service().openUrl(url)).rejects.toMatchObject({reason:'invalid-request',effectOutcome:'not-dispatched'});await expect(readFile(join(directory,'invocations'),'utf8')).rejects.toHaveProperty('code','ENOENT');
+  });
+  it.each(['invalid-request','unavailable','launch-failed','stale-application','catalogue-too-large'])('classifies fixed %s URL failure without replay',async reason=>{
+    vi.stubEnv('XDG_CURRENT_DESKTOP',`fixture:url-${reason}`);await expect(service().openUrl('https://example.org/')).rejects.toMatchObject({reason:['stale-application','catalogue-too-large'].includes(reason)?'invalid-reply':reason,effectOutcome:['invalid-request','unavailable'].includes(reason)?'not-dispatched':'unknown'});expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
+  });
+  it.each(['double','truncated','utf8','oversized','wrong-shape','wrong-version','extra','nonzero'])('rejects %s URL replies with an unknown outcome',async mode=>{
+    vi.stubEnv('XDG_CURRENT_DESKTOP',`fixture:url-${mode}`);await expect(service().openUrl('https://example.org/')).rejects.toMatchObject({effectOutcome:'unknown'});expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
+  });
+  it('cancels an in-flight URL helper and retains uncertainty without replay',async()=>{
+    vi.stubEnv('XDG_CURRENT_DESKTOP','fixture:url-hang');const api=service(),abort=new AbortController(),pending=api.openUrl('https://example.org/',{signal:abort.signal}).catch(error=>error);const child=await pid('open-url');abort.abort();expect(await pending).toMatchObject({reason:'cancelled',effectOutcome:'unknown'});expect(()=>process.kill(child,0)).toThrow();expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
+  });
+  it('times out a silent URL helper without replay or a dispatched claim',async()=>{
+    vi.stubEnv('XDG_CURRENT_DESKTOP','fixture:url-hang');const pending=service().openUrl('https://example.org/').catch(error=>error),child=await pid('open-url');expect(await pending).toMatchObject({reason:'deadline-exceeded',effectOutcome:'unknown'});expect(()=>process.kill(child,0)).toThrow();expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
+  },5000);
+});
