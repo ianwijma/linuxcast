@@ -39,6 +39,9 @@ describe('L1-01 launcher presentation controller',()=>{
     const f=setup({executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>{throw new Error('synthetic private error');})});await settled();await invoke(f.controller);expect(f.controller.session.getSnapshot().frames[0]!.view.status).toEqual({kind:'error',message:'The command outcome is unknown. Check its result before trying again.'});
     vi.mocked(f.api.getLauncherCommands).mockResolvedValue({ok:true,value:{...snapshot,commands:[...snapshot.commands,snapshot.commands[0]!]}});await f.controller.refresh();expect(f.controller.session.getSnapshot().frames[0]!.view.status?.kind).toBe('error');
   });
+  it('preserves explicit unknown launch outcomes and never automatically retries them',async()=>{
+    const f=setup({executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>({ok:false,error:{code:'deadline-exceeded',message:'synthetic private detail',retryable:false}}))});await settled();await invoke(f.controller);expect(f.controller.session.getSnapshot().frames[0]!.view.status?.message).toBe('The command outcome is unknown. Check its result before trying again.');expect(f.api.executeLauncherCommand).toHaveBeenCalledTimes(1);
+  });
   it('restores the root after Escape and preserves selection if Hide fails',async()=>{
     const f=setup();await settled();f.controller.session.select('linuxcast-launcher','linuxcast:quit');vi.mocked(f.dismiss).mockRejectedValue(new Error('fixture'));f.controller.session.pop();await settled();expect(f.dismiss).toHaveBeenCalledTimes(1);expect(f.controller.session.getSnapshot().frames[0]!.selection).toBe('linuxcast:quit');expect(f.controller.session.getSnapshot().frames[0]!.view.status?.message).toContain('could not hide');
   });
@@ -80,6 +83,20 @@ describe('L1-01 launcher presentation controller',()=>{
     const start={...snapshot,revision:2};const reply=pinnedSnapshot('linuxcast:open-local-data',kind!=='wrong-pin');reply.revision=kind==='old-revision'?1:2;if(kind==='missing-command')reply.commands=reply.commands.filter(command=>command.id!=='linuxcast:open-local-data');
     const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:start})),setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async()=>({ok:true,value:reply}))});await settled();await pin(f.controller,true);
     expect(items(f.controller)[0]?.accessories).toBeUndefined();expect(f.controller.session.getSnapshot().frames[0]!.view.status?.message).toContain('could not be confirmed');expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+  });
+
+  it('opens application identities and merges a pin update without dropping hidden catalogue pages',async()=>{
+    const apps=Array.from({length:110},(_,i)=>({id:`application:${i.toString(16).padStart(64,'0')}`,provider:'applications' as const,title:`Public App ${i}`,aliases:[],keywords:[],enabled:true,usage:null}));const all=[...snapshot.commands,...apps];
+    const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async request=>({ok:true,value:{...snapshot,commands:request?.cursor?all.slice(100):all.slice(0,100),nextCursor:request?.cursor?null:'1:100',applicationState:'available'}})),setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async request=>({ok:true,value:{...snapshot,updateOnly:true,nextCursor:null,commands:[{...all.find(command=>command.id===request.commandId)!,usage:{pinned:request.pinned,useCount:0,lastUsedAt:null,alias:null}}]}}))});
+    await settled();f.controller.query('Public App 109');await settled();expect(items(f.controller)[0]?.actions?.[0]?.title).toBe('Open');await invoke(f.controller,apps[109]!.id);expect(f.api.executeLauncherCommand).toHaveBeenCalledWith({commandId:apps[109]!.id,revision:1});await pin(f.controller,true);
+    f.controller.query('Public App 108');await settled();expect(items(f.controller).some(item=>item.id===apps[108]!.id)).toBe(true);
+  });
+  it('ignores a late second page after hiding and reopening with a new catalogue',async()=>{
+    let finish!:(value:Awaited<ReturnType<LauncherApi['getLauncherCommands']>>)=>void;const get=vi.fn<LauncherApi['getLauncherCommands']>().mockResolvedValueOnce({ok:true,value:{...snapshot,nextCursor:'1:3'}}).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({getLauncherCommands:get});await settled();f.controller.setVisible(false);get.mockResolvedValue({ok:true,value:{...snapshot,revision:2}});f.controller.setVisible(true);await settled();finish({ok:true,value:{...snapshot,commands:[],nextCursor:null}});await settled();await invoke(f.controller);expect(f.api.executeLauncherCommand).toHaveBeenCalledWith({commandId:'linuxcast:open-local-data',revision:2});expect(items(f.controller)).toHaveLength(3);
+  });
+  it('keeps the prior complete catalogue when a later refresh page fails',async()=>{
+    const f=setup();await settled();const oldIds=items(f.controller).map(value=>value.id);vi.mocked(f.api.getLauncherCommands).mockResolvedValueOnce({ok:true,value:{...snapshot,nextCursor:'1:3'}}).mockRejectedValueOnce(new Error('synthetic page failure'));
+    await f.controller.refresh();expect(items(f.controller).map(value=>value.id)).toEqual(oldIds);expect(f.controller.session.getSnapshot().frames[0]!.view.status?.kind).toBe('error');
   });
 
 });

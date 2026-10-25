@@ -1,11 +1,11 @@
 /** Pure local ranking. Entries come only from the trusted command registry;
  * matching a name or alias never creates an executable command. */
 export interface SearchCommand {
-  id:string;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
+  id:string;provider?:'commands'|'applications'|undefined;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
   usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
 }
 export const MAX_QUERY_LENGTH=512;
-export const MAX_COMMANDS=100;
+export const MAX_COMMANDS=4099;
 export const MAX_COMMAND_RESULTS=20;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 function subsequence(query:string,text:string):boolean {let cursor=0;for(const character of text)if(character===query[cursor])cursor++;return cursor===query.length;}
@@ -30,9 +30,11 @@ export function rankCommands<T extends SearchCommand>(commands:readonly T[],quer
   if(query.length>MAX_QUERY_LENGTH || commands.length>MAX_COMMANDS || !Number.isFinite(now))throw new Error('Search limit exceeded.');
   if(new Set(commands.map(command=>command.id)).size!==commands.length)throw new Error('Duplicate command identity.');
   const normalized=normalize(query);
-  return commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
+  const ranked=commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
     .sort((a,b)=>a.tier-b.tier || Number(Boolean(b.command.usage?.pinned))-Number(Boolean(a.command.usage?.pinned)) || frecency(b.command,now)-frecency(a.command,now) || (!normalized?a.index-b.index:a.command.title.localeCompare(b.command.title,'en')) || a.command.id.localeCompare(b.command.id,'en'))
-    .slice(0,MAX_COMMAND_RESULTS).map(entry=>entry.command);
+    .map(entry=>entry.command);
+  const counts=new Map<string,number>();
+  return ranked.filter(command=>{const provider=command.provider??(command.id.startsWith('application:')?'applications':'commands');const count=counts.get(provider)??0;if(count>=MAX_COMMAND_RESULTS)return false;counts.set(provider,count+1);return true;}).slice(0,100);
 }
 export function preserveSelection(commands:readonly SearchCommand[],selectedId:string|null):string|null {
   return commands.some(command=>command.id===selectedId)?selectedId:commands.find(command=>command.enabled)?.id??commands[0]?.id??null;

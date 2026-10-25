@@ -1,4 +1,4 @@
-# First usable launcher flow — bounded L1-01 increment
+# Launcher commands and applications — bounded L1-01/L1-02 increments
 
 `Launcher` uses the existing shared `ViewRenderer` and `ViewSession`. Main supplies
 `LauncherApi` and a named Hide callback; the renderer receives only metadata and
@@ -15,7 +15,9 @@ Loading blocks execution. Disabled rows remain discoverable with their reason.
 Only an explicit current item action can dispatch; stale revisions, hidden views,
 unknown IDs and duplicate in-flight requests cannot. Requests have a five-second
 presentation deadline; unknown outcomes show an error and never auto-replay.
-A Quit receipt is never displayed as proof that the application exited.
+A Quit or application-launch receipt is never displayed as proof of a completed
+system operation. Explicit deadline-exceeded replies retain unknown-outcome
+wording; the user checks the result before attempting another launch.
 
 Design: DESIGN.md Shell and navigation, Results and actions, States and motion,
 Accessibility, and Review gate. The shared list provides arrows from the query,
@@ -45,21 +47,42 @@ explicit reload before another pin edit; no mutation is replayed automatically.
 Reload remains available even if a later ordinary command succeeds. Hidden or
 cancelled replies are ignored; reopening fetches authoritative state again.
 
+## Application catalogue
+
+Main supplies pages of at most 100 metadata rows at one registry revision. The
+controller validates all pages, consistent availability, unique IDs, cursor
+revision/offset and bounded total count/bytes before replacing the live catalogue.
+Failed, stale or hidden refreshes do not publish a mixed partial snapshot. Search
+stays local over up to 4,099 rows, takes the first 20 per provider, and presents a
+separate Applications section using existing shared list primitives. Application
+primary actions say Open; built-in Open/Hide/Quit retain their meaning. No desktop
+ID, executable path, shell command or native fingerprint reaches presentation.
+
+Application pins use the same explicit metadata actions. A validated one-row
+`updateOnly` acknowledgement merges the matching target without losing other
+pages; a partial full-snapshot reply rejects. Unavailable application discovery
+keeps built-ins usable and offers Reload commands. Selection remains a stable ID
+across query results and pin reordering.
+
 ## Evidence and limits
 
-- `packages/search/tests/search.test.ts`: eight bounded ranking/generation tests.
-- `tests/controller.test.ts`: 17 current registry/selection/action/failure tests, including pin acknowledgements.
-- `tests/launcher.ui.test.ts`: 11 Chromium component checks covering keyboard,
+- `packages/search/tests/search.test.ts`: nine bounded ranking/generation tests.
+- `tests/controller.test.ts`: 21 current registry/selection/action/failure tests, including pin acknowledgements.
+- `tests/catalogue.test.ts`: 11 atomic pagination and pin-merge checks.
+- `tests/launcher.ui.test.ts`: 14 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
-  viewed for layout. These use the three real command names with an explicitly
+  viewed for layout. These use the three real command names and public synthetic applications with an explicitly
   labelled request-observing API fixture and in-memory pin metadata. They do not
   execute system operations or establish SQLite persistence. The pin increment
-  includes dark/light pinned, unconfirmed and unavailable affected states.
+  includes dark/light pinned, unconfirmed and unavailable affected states. The
+  application slice adds dark/light application lists, unavailable discovery and
+  unknown launch outcomes. These checks ran with Node 24.22.1/Bun 1.4.4.
 
 Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator
 owns the actual main/preload/storage/Electron flow and its validation. Debian
 GNOME/KDE Wayland/X11 and native assistive-technology acceptance remain pending,
 along with full L1 providers, ranking controls and explicit fallbacks. F1/D1
-native gates remain pending. This bounded slice does not mark all L1-01 complete.
+native gates remain pending. Typed URI/file/argv/shell flows, desktop actions and run-history controls remain
+outstanding in L1-02. This slice does not mark all L1-01 or L1-02 complete.
