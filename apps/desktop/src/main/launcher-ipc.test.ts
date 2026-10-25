@@ -143,7 +143,7 @@ it('never acknowledges an empty pin after concurrent catalogue removal during th
   const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setPinned:()=>new Promise(resolve=>{finish=resolve;})});
   const first=await catalogue(f),id=first.commands.at(-1)!.id;
   const pending=f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:id,revision:first.revision,pinned:true});
-  records.pop();await catalogue(f);
+  records.pop();expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
   finish({commandId:id,pinned:true,useCount:0,lastUsedAt:null,alias:null});
   expect(await pending).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed')}});
   expect(f.actions.recordUse).not.toHaveBeenCalled();
@@ -195,7 +195,7 @@ it('never acknowledges an alias for an application removed during the write',asy
   const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setAlias:()=>new Promise(resolve=>{finish=resolve;})});
   const first=await catalogue(f),id=first.commands.find(command=>command.provider==='applications')!.id;
   const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:id,revision:first.revision,alias:'new'});
-  await vi.waitFor(()=>expect(finish).toBeDefined());records.splice(0);await catalogue(f);
+  await vi.waitFor(()=>expect(finish).toBeDefined());records.splice(0);expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
   finish({commandId:id,alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:false,error:{code:'internal'}});
 });
 
@@ -206,4 +206,21 @@ it('does not write after a slow alias collision preflight reaches its deadline',
     expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
     expect(f.actions.setAlias).not.toHaveBeenCalled();
   }finally{clock.mockRestore();}
+});
+
+it('does not let Reload confirm old metadata while an alias write is pending',async()=>{
+  let finish!:()=>void,saved:string|null=null;
+  const f=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:hide'?saved:null}),setAlias:(commandId,alias)=>new Promise(resolve=>{finish=()=>{saved=alias;resolve({commandId,alias,useCount:0,lastUsedAt:null,pinned:false});};})});
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  finish();expect(await pending).toMatchObject({ok:true});
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{commands:expect.arrayContaining([expect.objectContaining({id:'linuxcast:hide',usage:expect.objectContaining({alias:'public'})})])}});
+});
+it('rejects a catalogue read that started before a metadata edit, even if the edit already finished',async()=>{
+  let finish!:()=>void;const blocked=new Promise<void>(resolve=>{finish=resolve;});
+  const f=fixture({getUsage:async commandId=>{await blocked;return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:null};}});
+  const pending=f.invoke(LAUNCHER_CHANNELS.getCommands);
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:null})).toMatchObject({ok:true});
+  finish();expect(await pending).toMatchObject({ok:false,error:{code:'cancelled'}});
 });
