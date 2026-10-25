@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID, randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
 import { SecretStore } from '../src/store.ts';
+import { privateSmokeEnvironment } from './smoke-environment.ts';
 import { SafeStorageAdapter } from '../src/safe-storage.ts';
 import type { ElectronSafeStorage, SecretReferences, SecretReferenceRecord, SecretReference } from '../src/types.ts';
 const directories:string[]=[];const stores:SecretStore[]=[];
@@ -30,6 +31,11 @@ async function setup(api=fakeSafeStorage(),refs=references().refs) {
 async function stored(store:SecretStore,secret=generated(),mode:'persistent'|'session-only'='persistent'):Promise<SecretReference> {const result=await store.store(owner,secret,mode);expect(result.outcome).toBe('stored');if(result.outcome!=='stored')throw new Error();return result.reference;}
 
 describe('F2-02 secret boundary',()=>{
+  it('builds a private allowlisted smoke environment before D-Bus starts',()=>{
+    const env=privateSmokeEnvironment('/tmp/synthetic-keyring');expect(env.HOME).toBe('/tmp/synthetic-keyring/home');expect(env.XDG_DATA_HOME).toBe('/tmp/synthetic-keyring/data');
+    for(const name of ['DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','DBUS_SESSION_BUS_ADDRESS','SESSION_MANAGER','ELECTRON_RUN_AS_NODE','NODE_OPTIONS','LD_PRELOAD'])expect(env).not.toHaveProperty(name);
+    expect(privateSmokeEnvironment('/tmp/synthetic-keyring','unix:path=/tmp/synthetic-bus').DBUS_SESSION_BUS_ADDRESS).toBe('unix:path=/tmp/synthetic-bus');
+  });
   it.each(['basic_text','unknown','unrecognized'])('refuses %s persistence even when encryption API claims available',async backend=>{
     const f=await setup(fakeSafeStorage(backend));expect(await f.store.store(owner,generated(),'persistent')).toMatchObject({outcome:'unavailable',status:{reason:backend==='basic_text'?'insecure-backend':'unavailable',sessionOnlyAvailable:true}});
     expect(f.api.encryptString).not.toHaveBeenCalled();expect(await readdir(join(f.directory,'secrets'))).toEqual([]);

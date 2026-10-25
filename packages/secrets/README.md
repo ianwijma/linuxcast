@@ -64,7 +64,9 @@ labelled encryption test double for denial, roundtrip failure, scope, ownership,
 link attacks, cleanup and lifecycle boundaries. It is not OS-keyring proof.
 
 `tests/run-keyring-smoke.ts <installed Electron45 binary>` launches a disposable
-private D-Bus session, Xvfb and GNOME keyring with generated unlock input. Actual
+private HOME and XDG directories before starting D-Bus, Xvfb and GNOME keyring
+with generated unlock input. An allowlisted environment excludes inherited
+display, session, keyring and process-injection variables. Actual
 Electron safeStorage and SecretStore write/reopen/use/delete are exercised; output
 contains only fixed statuses/version/backend and cleanup booleans. It uses an
 explicit in-memory reference fixture; SQLite reference persistence is a separate
@@ -72,7 +74,14 @@ actual-owner integration check. The observed pass used Electron45.0.0,
 gnome-keyring40.0/libsecret on Pop!_OS22.04 host; it does not establish Debian13,
 KDE, host desktop session or full packaged-app integration acceptance.
 
-F2-02 remains incomplete until actual storage-owner integration, independent
-review and shared host secret/data-control UI (including keyboard/accessibility
+`tests/persistence.security.test.ts` uses the real SQLite child owner, actual
+typed repository client and private encrypted files with a generated test cipher.
+It verifies metadata-only persistence across owner restart, deletion surviving
+restart, explicit session-only non-persistence and cleanup after owner disconnect.
+The test cipher does not establish OS-keyring security; the separate actual
+Electron smoke establishes the stated secure backend roundtrip.
+
+F2-02 remains incomplete until final application integration, independent review
+and shared host secret/data-control UI (including keyboard/accessibility
 and affected light/dark states) are verified. Typed statuses are not substitute
 UI evidence, and F2-02-UI is not marked not-applicable.
