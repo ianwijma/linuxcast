@@ -6,7 +6,7 @@ import type { NativeApplication } from '../../../../packages/contracts/src/appli
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema, launcherPinRequestSchema,
+  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias,
 } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply } from '../../../../packages/contracts/src/launcher.ts';
 import type { CommandUsage } from '@linuxcast/storage';
@@ -23,6 +23,7 @@ export interface LauncherActions {
   listApplications?: () => Promise<NativeApplication[]>;
   launchApplication?: (application: Pick<NativeApplication,'desktopId'|'fingerprint'>) => Promise<'dispatched'>;
   setPinned?: (commandId: string, pinned: boolean) => Promise<CommandUsage>;
+  setAlias?: (commandId: string, alias: string | null) => Promise<CommandUsage>;
 }
 
 const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | 'internal'): Extract<LauncherExecuteReply,{ok:false}> => ({
@@ -37,6 +38,7 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
 /** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
+  let metadataPending=false,metadataGeneration=0;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
@@ -106,13 +108,56 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     const parsed=launcherCommandsRequestSchema.safeParse(payload);
     if (!parsed.success) return failure('invalid-request');
     if (!active()) return failure('cancelled');
+    const admittedMetadata=metadataGeneration;
     let start=0;
     if(parsed.data.cursor){
       const [version=0,offset=-1]=parsed.data.cursor.split(':').map(Number);
       if(version!==revision||!Number.isSafeInteger(offset)||offset<1||offset>=descriptors().length)return failure('invalid-request');
       start=offset;
     }else await refreshApplications();
-    return snapshot(start);
+    if(metadataPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
+    const reply=await snapshot(start);
+    return metadataPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+  });
+  ipc.handle(LAUNCHER_CHANNELS.setAlias, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
+    if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
+    const parsed=launcherAliasRequestSchema.safeParse(payload);
+    if(!parsed.success || parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active() || busy)return failure('cancelled');
+    const {commandId,alias}=parsed.data,registered=descriptors();
+    if(!registered.some(command=>command.id===commandId))return failure('permission-denied');
+    if(!actions.setAlias || !actions.getUsage)return {ok:false,error:{code:'capability-unavailable',message:'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
+    busy=true;metadataPending=true;metadataGeneration++;
+    let attempted=false;
+    const preflightExpires=Date.now()+2000;
+    try {
+      if(alias!==null){
+        const normalized=normalizeCommandAlias(alias),others=registered.filter(command=>command.id!==commandId);
+        let collision=others.some(command=>command.aliases.some(value=>normalizeCommandAlias(value)===normalized));
+        // Bound owner concurrency below the client's pending-request limit. No query enters storage.
+        for(let start=0;!collision && start<others.length;start+=32){
+          if(Date.now()>=preflightExpires)throw new Error('Alias check deadline.');
+          const chunk=others.slice(start,start+32);
+          const usage=await Promise.all(chunk.map(command=>actions.getUsage!(command.id)));
+          collision=usage.some((row,index)=>{
+            if(row && row.commandId!==chunk[index]!.id)throw new Error('Usage identity.');
+            return row?.alias!==null && row?.alias!==undefined && normalizeCommandAlias(row.alias)===normalized;
+          });
+        }
+        if(collision)return {ok:false,error:{code:'conflict',message:'Another command already uses this alias. Choose a different alias.',retryable:false}};
+      }
+      if(Date.now()>=preflightExpires)throw new Error('Alias check deadline.');
+      if(!active() || revision!==parsed.data.revision)return failure('invalid-request');
+      attempted=true;
+      const usage=await actions.setAlias(commandId,alias);
+      if(!active() || revision!==parsed.data.revision || !descriptors().some(command=>command.id===commandId))throw new Error('Registry changed during alias edit.');
+      if(usage.commandId!==commandId || usage.alias!==alias)throw new Error('Invalid saved alias.');
+      const reply=await snapshot(0,usage);
+      if(!reply.ok)throw new Error('Alias acknowledgement unavailable.');
+      return reply;
+    }catch{
+      return {ok:false,error:{code:attempted?'internal':'capability-unavailable',message:attempted?'The alias change could not be confirmed. Reload commands before trying again.':'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
+    }finally{busy=false;metadataPending=false;}
   });
   ipc.handle(LAUNCHER_CHANNELS.setPinned, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
@@ -120,7 +165,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!parsed.success || parsed.data.revision !== revision) return failure('invalid-request');
     if (!active() || busy) return failure('cancelled');
     if (!actions.setPinned || !descriptors().some(command => command.id === parsed.data.commandId)) return failure('permission-denied');
-    busy = true;
+    busy = true;metadataPending=true;metadataGeneration++;
     try {
       const usage = await actions.setPinned(parsed.data.commandId, parsed.data.pinned);
       if(revision!==parsed.data.revision || !active() || !descriptors().some(command=>command.id===parsed.data.commandId))throw new Error('Registry changed during pin.');
@@ -129,7 +174,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       return await snapshot(0,usage);
     } catch {
       return {ok:false,error:{code:'internal',message:'The pin change could not be confirmed. Reload commands before trying again.',retryable:false}};
-    } finally { busy = false; }
+    } finally { busy = false;metadataPending=false; }
   });
   ipc.handle(LAUNCHER_CHANNELS.execute, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherExecuteReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');

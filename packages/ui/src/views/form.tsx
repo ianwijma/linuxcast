@@ -38,7 +38,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
   };
   const submit = async () => {
     const action = view.actions?.find(item => item.id === view.submitActionId);
-    if (busy || !active || !action || action.disabledReason) return;
+    if (busy || view.loading || !active || !action || action.disabledReason) return;
     const invalid: Record<string, string> = Object.create(null) as Record<string, string>;
     for (const field of view.fields) {
       const value = valueOf(field);
@@ -83,17 +83,17 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
       const id = fieldId(field.id);
       const value = valueOf(field);
       const error = (Object.hasOwn(errors, field.id) ? errors[field.id] : undefined) || (drafts[field.id]?.revision !== view.revision ? field.error : undefined);
-      if (field.kind === 'text' || field.kind === 'secret' || field.kind === 'number') return <TextField key={field.id} id={id} label={field.title} type={field.kind === 'secret' ? 'password' : field.kind === 'number' ? 'number' : 'text'} required={field.required} disabled={busy} value={value === null ? '' : String(value)}
+      if (field.kind === 'text' || field.kind === 'secret' || field.kind === 'number') return <TextField key={field.id} id={id} label={field.title} type={field.kind === 'secret' ? 'password' : field.kind === 'number' ? 'number' : 'text'} required={field.required} disabled={busy || view.loading} value={value === null ? '' : String(value)}
         {...(field.description ? { hint: field.description } : {})} {...(error ? { error } : {})} autoComplete="off" maxLength={65536}
         {...(field.kind === 'number' ? { min: field.min, max: field.max, step: 'any' } : {})}
         onChange={event => change(field, field.kind === 'number' ? event.target.value === '' ? null : event.target.valueAsNumber : event.target.value)} />;
       const description = [field.description ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
       return <div className="lc-field" key={field.id}>
         <label className="lc-field-label" htmlFor={id}>{field.title}{field.required && ' (required)'}</label>
-        {field.kind === 'boolean' ? <input className="lc-focus" id={id} type="checkbox" disabled={busy} checked={value === true} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} onChange={event => change(field, event.target.checked)} /> :
-          field.kind === 'enum' ? <select className="lc-input lc-focus" id={id} disabled={busy} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} value={typeof value === 'string' ? value : ''} onChange={event => change(field, event.target.value || null)}><option value="">Choose an option</option>{field.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> :
-          field.kind === 'date' ? <input className="lc-input lc-focus" id={id} type="date" disabled={busy} min={field.min} max={field.max} value={typeof value === 'string' ? value : ''} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} onChange={event => change(field, event.target.value || null)} /> :
-            <Button id={id} aria-label={`${field.title}: ${value && typeof value === 'object' ? value.displayName : `Choose ${field.kind}`}`} aria-describedby={description} aria-invalid={Boolean(error)} disabled={busy || !host.pickReference} onClick={() => { void pick(field); }}>{value && typeof value === 'object' ? value.displayName : `Choose ${field.kind}`}</Button>}
+        {field.kind === 'boolean' ? <input className="lc-focus" id={id} type="checkbox" disabled={busy || view.loading} checked={value === true} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} onChange={event => change(field, event.target.checked)} /> :
+          field.kind === 'enum' ? <select className="lc-input lc-focus" id={id} disabled={busy || view.loading} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} value={typeof value === 'string' ? value : ''} onChange={event => change(field, event.target.value || null)}><option value="">Choose an option</option>{field.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> :
+          field.kind === 'date' ? <input className="lc-input lc-focus" id={id} type="date" disabled={busy || view.loading} min={field.min} max={field.max} value={typeof value === 'string' ? value : ''} required={field.required} aria-describedby={description} aria-invalid={Boolean(error)} onChange={event => change(field, event.target.value || null)} /> :
+            <Button id={id} aria-label={`${field.title}: ${value && typeof value === 'object' ? value.displayName : `Choose ${field.kind}`}`} aria-describedby={description} aria-invalid={Boolean(error)} disabled={busy || view.loading || !host.pickReference} onClick={() => { void pick(field); }}>{value && typeof value === 'object' ? value.displayName : `Choose ${field.kind}`}</Button>}
         {field.description && <p className="lc-field-hint" id={`${id}-hint`}>{field.description}</p>}
         {('file' === field.kind || 'directory' === field.kind || 'application' === field.kind) && !host.pickReference && <p className="lc-field-hint">Selection unavailable. Connect the host picker to choose a permitted resource.</p>}
         {error && <p className="lc-field-error" id={`${id}-error`}>{error}</p>}

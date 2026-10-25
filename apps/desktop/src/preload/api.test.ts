@@ -11,7 +11,7 @@ function fixture() {
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });
@@ -69,4 +69,16 @@ it('validates the named pin request and refuses extra fields or unregistered IDs
   expect(transport.invoke).not.toHaveBeenCalled();
   await api.setLauncherPinned({commandId:'linuxcast:hide',revision:1,pinned:true});
   expect(transport.invoke).toHaveBeenCalledExactlyOnceWith('launcher:set-pinned',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,pinned:true});
+});
+
+
+it('bounds alias metadata before IPC and exposes only the named alias operation',async()=>{
+  const {api,transport}=fixture();
+  for(const alias of ['', ' leading', 'trailing ', 'x'.repeat(65), 'public\nprivate', '\u0085', '😀'.repeat(65), '\ud800'])expect((await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias})).ok).toBe(false);
+  expect((await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:'valid',query:'SYNTHETIC_PRIVATE'} as never)).ok).toBe(false);
+  expect(transport.invoke).not.toHaveBeenCalled();
+  await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:'😀'.repeat(64)});
+  expect(transport.invoke).toHaveBeenLastCalledWith('launcher:set-alias',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'😀'.repeat(64)});
+  await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:null});
+  expect(transport.invoke).toHaveBeenLastCalledWith('launcher:set-alias',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:null});
 });

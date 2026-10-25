@@ -3,12 +3,16 @@ import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
 export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
-export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned'} as const;
+export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias'} as const;
+/** Alias changes are bounded metadata, never a new command or execution authority. */
+export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
+export const normalizeCommandAlias=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 export const launcherCommandsRequestSchema=z.strictObject({protocolVersion:z.literal(1),cursor:z.string().regex(/^[1-9][0-9]{0,15}:[0-9]{1,4}$/u).optional()});
 const launcherActionRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 const revision=z.number().int().positive().safe();
 export const launcherExecuteRequestSchema=launcherActionRequestSchema.extend({commandId:launcherCommandIdSchema,revision});
 export const launcherPinRequestSchema=launcherExecuteRequestSchema.extend({pinned:z.boolean()});
+export const launcherAliasRequestSchema=launcherExecuteRequestSchema.extend({alias:commandAliasSchema.nullable()});
 export const launcherCommandMetadataSchema=z.strictObject({
   id:launcherCommandIdSchema,provider:z.enum(['commands','applications']).optional(),title:z.string().min(1).max(256),subtitle:z.string().max(512).optional(),
   aliases:z.array(z.string().max(256)).max(16),keywords:z.array(z.string().max(128)).max(16),
@@ -25,6 +29,7 @@ export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSche
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
 export interface LauncherApi {
+  setLauncherAlias(request:Pick<z.infer<typeof launcherAliasRequestSchema>,'commandId'|'revision'|'alias'>):Promise<LauncherCommandsReply>;
   setLauncherPinned(request:Pick<z.infer<typeof launcherPinRequestSchema>,'commandId'|'revision'|'pinned'>):Promise<LauncherCommandsReply>;
   getLauncherCommands(request?:{cursor?:string}):Promise<LauncherCommandsReply>;
   executeLauncherCommand(request:Pick<z.infer<typeof launcherExecuteRequestSchema>,'commandId'|'revision'>):Promise<LauncherExecuteReply>;

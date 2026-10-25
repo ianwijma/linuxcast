@@ -11,7 +11,7 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
   const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openDataSettings:vi.fn(async()=>{}),
-    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
+    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setAlias:vi.fn(async(commandId:string,alias:string|null)=>({commandId,alias,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false})),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
   const execute=(commandId='linuxcast:open-local-data',revision=1)=>invoke(LAUNCHER_CHANNELS.execute,{protocolVersion:1,commandId,revision});
@@ -143,8 +143,84 @@ it('never acknowledges an empty pin after concurrent catalogue removal during th
   const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setPinned:()=>new Promise(resolve=>{finish=resolve;})});
   const first=await catalogue(f),id=first.commands.at(-1)!.id;
   const pending=f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:id,revision:first.revision,pinned:true});
-  records.pop();await catalogue(f);
+  records.pop();expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
   finish({commandId:id,pinned:true,useCount:0,lastUsedAt:null,alias:null});
   expect(await pending).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed')}});
   expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+
+
+it('alias edits validate sender/identity/revision and persist metadata without execution',async()=>{
+  const f=fixture(),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'my-hide'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const invalid of [{...payload,commandId:'unknown:command'},{...payload,revision:2},{...payload,alias:'bad\nvalue'},{...payload,alias:'x'.repeat(65)},{...payload,path:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,invalid)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(f.actions.setAlias).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:true,value:{updateOnly:true,nextCursor:null,commands:[{id:'linuxcast:hide',usage:{alias:'my-hide',pinned:false,useCount:4}}]}});
+  expect(f.actions.setAlias).toHaveBeenCalledExactlyOnceWith('linuxcast:hide','my-hide');
+  expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('rejects normalized collisions with declared and stored aliases while allowing own alias/removal',async()=>{
+  const f=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:quit'?'Public   Alias':'own'})});
+  const payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'ＱＵＩＴ'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'public alias'})).toMatchObject({ok:false,error:{code:'conflict'}});
+  expect(f.actions.setAlias).not.toHaveBeenCalled();
+  const own=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:hide'?'own':null})});
+  expect(await own.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'own'})).toMatchObject({ok:true});
+  expect(await own.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:null})).toMatchObject({ok:true,value:{commands:[{usage:{alias:null}}]}});
+});
+it('checks aliases beyond page100 and blocks concurrent effects until acknowledgement',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setAlias']>>>)=>void;
+  let collisionId='';const readIds:string[]=[];
+  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i)),getUsage:async commandId=>{readIds.push(commandId);return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId===collisionId?'existing':null};},setAlias:()=>new Promise(resolve=>{finish=resolve;})});
+  const first=await catalogue(f),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:first.revision,alias:'existing'};
+  const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
+  if(!second.ok)throw new Error('Second page unavailable.');collisionId=second.value.commands.at(-1)!.id;
+  expect(first.commands.some(command=>command.id===collisionId)).toBe(false);readIds.splice(0);
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});expect(readIds).toContain(collisionId);
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'new'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());
+  expect(await f.execute('linuxcast:hide',first.revision)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:'linuxcast:hide',revision:first.revision,pinned:true})).toMatchObject({ok:false});
+  finish({commandId:'linuxcast:hide',alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:true});
+});
+it('distinguishes pre-write storage unavailability from uncertain alias write and never replays',async()=>{
+  const before=fixture({getUsage:async()=>{throw new Error('SYNTHETIC_PRIVATE');}}),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'new'};
+  expect(await before.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'capability-unavailable'}});expect(before.actions.setAlias).not.toHaveBeenCalled();
+  const after=fixture({setAlias:async()=>{throw new Error('SYNTHETIC_PRIVATE');}});
+  const reply=await after.invoke(LAUNCHER_CHANNELS.setAlias,payload);expect(reply).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed'),retryable:false}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');
+});
+it('never acknowledges an alias for an application removed during the write',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setAlias']>>>)=>void;
+  const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setAlias:()=>new Promise(resolve=>{finish=resolve;})});
+  const first=await catalogue(f),id=first.commands.find(command=>command.provider==='applications')!.id;
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:id,revision:first.revision,alias:'new'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());records.splice(0);expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  finish({commandId:id,alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:false,error:{code:'internal'}});
+});
+
+it('does not write after a slow alias collision preflight reaches its deadline',async()=>{
+  const now=Date.now();const clock=vi.spyOn(Date,'now').mockReturnValue(now);
+  try{
+    const f=fixture({getUsage:async commandId=>{clock.mockReturnValue(now+2500);return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:null};}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+    expect(f.actions.setAlias).not.toHaveBeenCalled();
+  }finally{clock.mockRestore();}
+});
+
+it('does not let Reload confirm old metadata while an alias write is pending',async()=>{
+  let finish!:()=>void,saved:string|null=null;
+  const f=fixture({getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId==='linuxcast:hide'?saved:null}),setAlias:(commandId,alias)=>new Promise(resolve=>{finish=()=>{saved=alias;resolve({commandId,alias,useCount:0,lastUsedAt:null,pinned:false});};})});
+  const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'});
+  await vi.waitFor(()=>expect(finish).toBeDefined());
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  finish();expect(await pending).toMatchObject({ok:true});
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{commands:expect.arrayContaining([expect.objectContaining({id:'linuxcast:hide',usage:expect.objectContaining({alias:'public'})})])}});
+});
+it('rejects a catalogue read that started before a metadata edit, even if the edit already finished',async()=>{
+  let finish!:()=>void;const blocked=new Promise<void>(resolve=>{finish=resolve;});
+  const f=fixture({getUsage:async commandId=>{await blocked;return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:null};}});
+  const pending=f.invoke(LAUNCHER_CHANNELS.getCommands);
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:null})).toMatchObject({ok:true});
+  finish();expect(await pending).toMatchObject({ok:false,error:{code:'cancelled'}});
 });

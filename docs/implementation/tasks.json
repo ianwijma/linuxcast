@@ -1877,6 +1877,12 @@
               "outcome": "Pin/unpin uses acknowledged stored metadata, preserves selection/primary and usage/alias fields; empty-query favourites reorder after confirmation. Clearing usage retains pin. Full app restart and final owner reopen prove durable pin/unpin; failures/late replies do not replay, Reload remains available for unconfirmed edits.",
               "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below; Electron45.0.0/SQLite3.53.4 private Xvfb. Chromium component fixtures; no Debian/GNOME/KDE/Orca release claim.",
               "reference": "13e9dac/0890391; packages/storage/tests/command-pins.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/src/features/launcher/tests/"
+            },
+            {
+              "command": "bun run test:unit -- L1-01; bun run test:security -- L1-01; bun run test:integration -- L1-01; private-Xvfb bun run test:integration -- L1-02",
+              "outcome": "Alias Save/remove changes only the existing sole-owner alias field, preserves pins/usage, rejects normalized collisions across all registered pages, and exact local alias search finds the registered command. Real owner restart and actual production app6.29s prove persistence, alias-based Hide, usage clear preserving alias, removal and final owner reopen. Stale usage after ordinary Local data execution is accepted from the authoritative owner without counting another use; pending metadata writes cannot be falsely confirmed by Reload.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/GNOME/KDE/Orca/release claim.",
+              "reference": "b98c110/44c6eec/0b5a804/71e9d26/e22be78/145143c/cf43600; packages/storage/tests/command-aliases.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/evidence/alias-{dark,light}.png"
             }
           ]
         },
@@ -1886,7 +1892,14 @@
           "status": "pending",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:ui -- L1-01; private-Xvfb bun run test:integration -- L1-02; independent source and screenshot review",
+              "outcome": "23Chromium keyboard/axe cases and actual Electron form flow pass. Shared Form/Actions offers edit/prefill/save/empty removal, inline collision/invalid errors retaining draft, dirty cancel/back, disabled pending fields, explicit stale/unavailable/unknown Reload and no replay. Eight new component/actual dark/light alias screenshots inspected. Native assistive technology and full desktop/UI acceptance remain pending.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/GNOME/KDE/Orca/release claim.",
+              "reference": "b98c110/44c6eec/0b5a804/71e9d26/e22be78/145143c/cf43600; packages/storage/tests/command-aliases.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/evidence/alias-{dark,light}.png"
+            }
+          ]
         },
         {
           "id": "L1-01-PRIVACY",
@@ -1900,6 +1913,12 @@
               "outcome": "Only synthetic/public command names appear in fixtures and screenshots. Queries remain renderer-local, IPC contains only allowlisted command IDs/revision, usage projection omits paths/content/handlers, errors remain fixed. No generic repository, secret, shell or network interface reaches rendering.",
               "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "e8eb87c/5e61a3a/3f5b071; apps/desktop/evidence/shell-{dark,light}.png"
+            },
+            {
+              "command": "independent source/screenshot review; bun run test:security -- L1-01",
+              "outcome": "Alias fixtures and screenshots use public generated names only. Strict metadata IPC contains registered commandId/revision and bounded well-formed Unicode alias/null; query text stays local. No path, Exec, provider/credential, generic IPC/repository or remote query authority is exposed. Fixed errors omit private contents.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/GNOME/KDE/Orca/release claim.",
+              "reference": "b98c110/44c6eec/0b5a804/71e9d26/e22be78/145143c/cf43600; packages/storage/tests/command-aliases.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/evidence/alias-{dark,light}.png"
             }
           ]
         }
@@ -1915,12 +1934,14 @@
         "Next bounded application increment started25October2026 from merged PR26/e303fcd: command pin/unpin through existing launcher Actions and persistent usage, isolated author .worktrees/linuxcast-l1-01/codex/l1-01-command-pins; coordinator shared owner/API13e9dac. No new acceptance inferred. No research/proof expansion.",
         "Bounded pin/unpin increment25October2026: trusted API/atomic sole-owner update13e9dac; author3a50c48 integrated0890391. 25unit/controller,12security,6pin persistence/protocol checks and11browser keyboard/axe cases pass;43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin on Hide reorders results without moving selected ID or primary, does not execute/count a run, survives usage clearing, Hide/secondtoggle and full Quit/relaunch; keyboard Unpin persists across final owner reopen with count unchanged. Actual app dark/light screenshots inspected. Typecheck/lint/plan/diff pass. Independent owner/API and UI reviews clear after retaining Reload through an unconfirmed pin followed by successful primary action. No full L1/native/release completion claim.",
         "Pin controls integrated25October2026 in PR27 https://github.com/ianwijma/linuxcast/pull/27, merge1f13d1b54c643433a836e3481f9c08207f0b169a. Current reviewed head70e9a2e CI40188841305 passed; no requested reviews, comments or unresolved review threads at merge. Primary develop refreshed clean. Full L1-01 and native/release acceptance remain unfinished.",
-        "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Exact merged PR27 primary checkout was then rerun with verified Node24.22.1/Bun1.4.4: typecheck,25units,12security,6pin checks,43storage checks,11browser checks and actual production Electron pin/restart flow4.63s all passed. Browser discovery excluded nested sibling worktrees; Electron SQLite binding rebuilt before the successful app run. Original runs remain host-runtime evidence."
+        "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Exact merged PR27 primary checkout was then rerun with verified Node24.22.1/Bun1.4.4: typecheck,25units,12security,6pin checks,43storage checks,11browser checks and actual production Electron pin/restart flow4.63s all passed. Browser discovery excluded nested sibling worktrees; Electron SQLite binding rebuilt before the successful app run. Original runs remain host-runtime evidence.",
+        "Next bounded application increment25October2026 from merged PR28/f8e3b7f: edit/remove a per-command search alias through existing shared Form/Actions, persist with the sole SQLite owner, find actual registered commands by exact alias. Coordinator owns shared contracts/owner/main/preload/status; author isolated codex/l1-01-command-aliases. No infrastructure/proof expansion or new acceptance inferred.",
+        "Bounded search-alias increment25October2026: shared existing-field owner updateb98c110, trusted main/preload44c6eec, shared pending Form guard0b5a804, author1be6e2b integratede22be78, reviewfix71e9d26/145143c and usage-ackdfafaef integratedcf43600.80units +28security +11pin/alias owner persistence/protocol +23browser keyboard/axe and16shared D1units pass; actual production Electron45/SQLite3.53.4 private-Xvfb flow6.29s passes collision/draft/save/search/actual Hide/restart/prefill/remove/final owner reopen and stale usage after opening Local data. Typecheck/lint/plan/diff pass. Independent GPT-6.1 SOL high review clean after invalid Unicode, later-page regression, stale usage and pending Reload race fixes. Full task/native/release acceptance remains in-progress."
       ],
       "owner": "manifest_review",
-      "branch": "codex/l1-01-command-pins",
+      "branch": "codex/l1-01-command-aliases",
       "limitations": [
-        "Full L1-01 scope remains required: remaining search providers, explicit configured fallback/AI actions, command visibility/alias administration and remaining ranking controls are not implemented by the current three-command increment. Persistent pin/unpin and category usage reset are implemented.",
+        "Full L1-01 scope remains required: remaining search providers, explicit configured fallback/AI actions, command visibility administration and remaining ranking controls are not implemented by the current bounded increments. Persistent pin/unpin, edit/remove per-command search aliases and category usage reset are implemented.",
         "Existing shell/storage are integrated. Reviewed D1-02 source is being paired with this application flow; native assistive-technology/prerequisite acceptance remains pending. Neither dependent task nor full L1-01 can be marked complete from browser or private-Xvfb checks alone.",
         "Actual4.20s private-Xvfb application flow and seven browser/axe cases passed. GNOME/KDE Wayland/X11, native assistive technology and full UI/release matrix remain pending; native dialog choices in the Local data regression were instrumented."
       ]
@@ -2030,7 +2051,8 @@
       ],
       "evidence": [
         "Started25October2026 from merged launcher/pin PR27/1f13d1b. Coordinator isolated codex/application-launcher; owned application package/launcher/search author codex/l1-02-application-flow; native adapter in codex/l1-02-gio-native. Shared wire/paging/native-helper dispatch0df46b7, actual GIO sourceff5a942 integrated5b21f1c. Native4private-XDG fixture checks passed; independently reviewed clean. Actual full app integration remains in progress; no acceptance inferred from assignment or native-only tests.",
-        "Reviewed bounded application increment25October2026: actual installed primary GIO desktop applications appear through the existing launcher, local search/keyboard selection, Open and persistent Pin. Fixed native helper ships with production build; main owns catalogue revisions, identity/revalidation and trusted dispatch.42unit +43security +14browser +4native integration checks pass; actual full production Electron/private-Xvfb app flow5.31s passes with real process/argv marker and real SQLite owner export. Typecheck/lint pass. Independent reviews clean after selected-result cap retention and concurrent pin/catalogue-removal acknowledgement fixes. Full L1-02 remains in-progress; unfinished scope and desktop/release acceptance are explicit."
+        "Reviewed bounded application increment25October2026: actual installed primary GIO desktop applications appear through the existing launcher, local search/keyboard selection, Open and persistent Pin. Fixed native helper ships with production build; main owns catalogue revisions, identity/revalidation and trusted dispatch.42unit +43security +14browser +4native integration checks pass; actual full production Electron/private-Xvfb app flow5.31s passes with real process/argv marker and real SQLite owner export. Typecheck/lint pass. Independent reviews clean after selected-result cap retention and concurrent pin/catalogue-removal acknowledgement fixes. Full L1-02 remains in-progress; unfinished scope and desktop/release acceptance are explicit.",
+        "Integrated25October2026 in PR28 https://github.com/ianwijma/linuxcast/pull/28, mergef8e3b7fb509007760661739c1f662535668bd1d1 at12:08:17UTC. Exact reviewed head2de2f04 CI40191744487 passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge; primary develop fast-forwarded clean. Full task remains in-progress."
       ],
       "owner": "manifest_review",
       "branch": "codex/l1-02-application-flow",

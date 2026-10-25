@@ -24,7 +24,8 @@
     ],
     "L1-01": [
       "packages/search/tests/search.test.ts",
-      "apps/desktop/src/features/launcher/tests/controller.test.ts"
+      "apps/desktop/src/features/launcher/tests/controller.test.ts",
+      "apps/desktop/src/features/launcher/tests/catalogue.test.ts"
     ],
     "L1-02": [
       "packages/search/tests/search.test.ts",
@@ -105,7 +106,8 @@
       "packages/storage/tests/file-index.integration.test.ts"
     ],
     "L1-01": [
-      "packages/storage/tests/command-pins.integration.test.ts"
+      "packages/storage/tests/command-pins.integration.test.ts",
+      "packages/storage/tests/command-aliases.integration.test.ts"
     ],
     "L1-02": [
       "apps/desktop/tests/shell.integration.test.ts"

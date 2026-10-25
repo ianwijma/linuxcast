@@ -33,3 +33,14 @@ export function mergePinReply(current:Catalogue,value:LauncherCommandsSnapshot,c
   if(value.commands.length!==current.commands.length || current.commands.some(command=>!value.commands.some(next=>next.id===command.id)))throw new Error('Incomplete pin snapshot.');
   return {revision:value.revision,rankingAvailable:value.rankingAvailable,...(value.applicationState?{applicationState:value.applicationState}:{}),commands:value.commands};
 }
+/** Alias acknowledgement is a single metadata update, never a replacement page
+ * or authority to change command identity, availability or pinning. Usage totals
+ * are authoritative owner values: execution or settings may have changed them
+ * since the renderer loaded its catalogue. */
+export function mergeAliasReply(current:Catalogue,value:LauncherCommandsSnapshot,commandId:string,alias:string|null):Catalogue{
+  const before=current.commands.find(command=>command.id===commandId),after=value.commands[0];
+  if(!value.updateOnly || value.revision!==current.revision || value.commands.length!==1 || value.nextCursor!=null || !before || !after || after.id!==commandId || after.usage?.alias!==alias || value.rankingAvailable!==current.rankingAvailable || value.applicationState!==undefined && value.applicationState!==current.applicationState)throw new Error('Unconfirmed alias.');
+  const {usage:oldUsage,...oldMetadata}=before,{usage:newUsage,...newMetadata}=after;
+  if(JSON.stringify(oldMetadata)!==JSON.stringify(newMetadata) || (oldUsage?.pinned??false)!==newUsage?.pinned)throw new Error('Invalid alias update.');
+  return {...current,commands:current.commands.map(command=>command.id===commandId?after:command)};
+}

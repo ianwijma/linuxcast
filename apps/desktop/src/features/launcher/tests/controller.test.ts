@@ -9,7 +9,7 @@ const snapshot:LauncherCommandsSnapshot={revision:1,rankingAvailable:true,comman
 const controls:LauncherController[]=[];afterEach(()=>{for(const controller of controls.splice(0))controller.dispose();});
 function setup(overrides:Partial<LauncherApi>={}) {
   const saved=structuredClone(snapshot);
-  const api:LauncherApi={setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async request=>{const command=saved.commands.find(value=>value.id===request.commandId)!;command.usage={useCount:0,lastUsedAt:null,alias:null,...command.usage,pinned:request.pinned};return {ok:true,value:structuredClone(saved)};}),getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(saved)})),executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>({ok:true,value:{outcome:'completed'}})),...overrides};
+  const api:LauncherApi={setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async request=>{const command=saved.commands.find(value=>value.id===request.commandId)!;command.usage={useCount:0,lastUsedAt:null,pinned:false,...command.usage,alias:request.alias};return {ok:true,value:{...structuredClone(saved),commands:[structuredClone(command)],updateOnly:true,nextCursor:null}};}),setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async request=>{const command=saved.commands.find(value=>value.id===request.commandId)!;command.usage={useCount:0,lastUsedAt:null,alias:null,...command.usage,pinned:request.pinned};return {ok:true,value:structuredClone(saved)};}),getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(saved)})),executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>({ok:true,value:{outcome:'completed'}})),...overrides};
   const dismiss=vi.fn(async()=>({ok:true as const,value:null}));const controller=new LauncherController(api,dismiss);controls.push(controller);controller.setVisible(true);return {controller,api,dismiss};
 }
 const settled=()=>new Promise(resolve=>setTimeout(resolve,0));
@@ -109,3 +109,70 @@ describe('L1-01 launcher presentation controller',()=>{
 
 function pin(controller:LauncherController,pinned:boolean){const frame=controller.session.getSnapshot().frames[0]!;return controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:pinned?'launcher:pin':'launcher:unpin',itemId:frame.selection!});}
 function pinnedSnapshot(id:string,pinned:boolean):LauncherCommandsSnapshot{const value=structuredClone(snapshot);const command=value.commands.find(command=>command.id===id)!;command.usage={useCount:4,lastUsedAt:'2026-10-25T00:00:00Z',alias:'fixture-alias',pinned};return value;}
+
+function top(controller:LauncherController){return controller.session.getSnapshot().frames.at(-1)!;}
+function formAction(controller:LauncherController,actionId:string,alias?:unknown){const frame=top(controller);return controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId,...(alias===undefined?{}:{values:{alias} as never})});}
+async function openAlias(controller:LauncherController,id='linuxcast:hide'){controller.session.select('linuxcast-launcher',id);const frame=top(controller);await controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:'launcher:alias',itemId:id});}
+describe('L1-01 search alias editor',()=>{
+  it('prefills current alias, saves trimmed metadata, preserves root query/selection/primary and removes with empty value',async()=>{
+    const initial=structuredClone(snapshot);initial.commands[1]!.usage={alias:'conceal',pinned:true,useCount:4,lastUsedAt:'2026-10-25T00:00:00Z'};
+    const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:initial})),setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async request=>({ok:true,value:{...initial,updateOnly:true,commands:[{...initial.commands[1]!,usage:{...initial.commands[1]!.usage!,alias:request.alias}}]}}))});await settled();f.controller.session.setQuery('linuxcast-launcher','hide');f.controller.query('hide');await settled();await openAlias(f.controller);
+    expect(top(f.controller).view).toMatchObject({kind:'form',fields:[{value:'conceal'}]});await formAction(f.controller,'launcher:save-alias','  hush  ');
+    expect(f.api.setLauncherAlias).toHaveBeenCalledExactlyOnceWith({commandId:'linuxcast:hide',revision:1,alias:'hush'});expect(top(f.controller)).toMatchObject({query:'hide',selection:'linuxcast:hide',primaryAction:'linuxcast:hide'});expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+    f.controller.query('hush');await settled();expect(items(f.controller).map(x=>x.id)).toEqual(['linuxcast:hide']);await openAlias(f.controller);expect(top(f.controller).view).toMatchObject({fields:[{value:'hush'}]});await formAction(f.controller,'launcher:save-alias','   ');expect(f.api.setLauncherAlias).toHaveBeenLastCalledWith({commandId:'linuxcast:hide',revision:1,alias:null});f.controller.query('hush');await settled();expect(items(f.controller)).toEqual([]);
+  });
+  it('cancel and stack back preserve root identity/query without IPC, and stale root/form actions cannot submit',async()=>{
+    const f=setup();await settled();f.controller.session.setQuery('linuxcast-launcher','hide');f.controller.query('hide');await settled();const root=top(f.controller);await openAlias(f.controller);const old=top(f.controller);await f.controller.execute({viewId:root.view.viewId,revision:root.view.revision,actionId:'linuxcast:hide',itemId:'linuxcast:hide'});await formAction(f.controller,'launcher:cancel-alias');
+    expect(top(f.controller)).toMatchObject({query:'hide',selection:'linuxcast:hide'});await openAlias(f.controller);await f.controller.execute({viewId:old.view.viewId,revision:old.view.revision,actionId:'launcher:save-alias',values:{alias:'stale'}});f.controller.session.pop();expect(top(f.controller)).toMatchObject({query:'hide',selection:'linuxcast:hide'});expect(f.api.setLauncherAlias).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.dismiss).not.toHaveBeenCalled();
+  });
+  it.each(['x'.repeat(65),'😀'.repeat(65),'bad\u0007alias',42])('rejects invalid input locally and retains the submitted draft',async draft=>{
+    const f=setup();await settled();await openAlias(f.controller);await formAction(f.controller,'launcher:save-alias',draft);expect(top(f.controller).view).toMatchObject({kind:'form',fields:[{error:expect.any(String)}]});expect(f.api.setLauncherAlias).not.toHaveBeenCalled();
+  });
+  it.each(['conflict','invalid-request','capability-unavailable'] as const)('retains a %s draft with inline safe error and allows a corrected explicit submit',async code=>{
+    const f=setup();await settled();vi.mocked(f.api.setLauncherAlias).mockResolvedValueOnce({ok:false,error:{code,message:'synthetic private detail',retryable:false}});await openAlias(f.controller);await formAction(f.controller,'launcher:save-alias','occupied');expect(top(f.controller).view).toMatchObject({kind:'form',fields:[{value:'occupied',error:expect.any(String)}]});expect(JSON.stringify(top(f.controller).view)).not.toContain('synthetic private');await formAction(f.controller,'launcher:save-alias','available');expect(top(f.controller).view.kind).toBe('list');expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(2);
+  });
+  it('blocks repeat save, primary, pin and refresh while pending without optimistic metadata',async()=>{
+    let finish!:(reply:Awaited<ReturnType<LauncherApi['setLauncherAlias']>>)=>void;const f=setup({setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();await openAlias(f.controller);const pending=formAction(f.controller,'launcher:save-alias','hush');await formAction(f.controller,'launcher:save-alias','duplicate');await invoke(f.controller);await pin(f.controller,true);await f.controller.refresh();expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(1);expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(1);expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.api.setLauncherPinned).not.toHaveBeenCalled();
+    finish({ok:true,value:{...snapshot,updateOnly:true,commands:[{...snapshot.commands[1]!,usage:{useCount:0,lastUsedAt:null,pinned:false,alias:'hush'}}]}});await pending;f.controller.query('hush');await settled();expect(items(f.controller)[0]?.id).toBe('linuxcast:hide');
+  });
+  it('requires explicit Reload after uncertainty and retains it through cancel and successful primary action',async()=>{
+    const f=setup({setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async()=>{throw new Error('synthetic secret');})});await settled();await openAlias(f.controller);await formAction(f.controller,'launcher:save-alias','hush');expect(top(f.controller).view.status?.message).toContain('could not be confirmed');await formAction(f.controller,'launcher:save-alias','again');expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(1);await formAction(f.controller,'launcher:cancel-alias');await invoke(f.controller,'linuxcast:hide');expect(top(f.controller).view.actions).toContainEqual({id:'launcher:retry',title:'Reload commands',kind:'invoke',effect:'read'});await pin(f.controller,true);await openAlias(f.controller);expect(top(f.controller).view.kind).toBe('list');expect(f.api.setLauncherPinned).not.toHaveBeenCalled();await f.controller.refresh();await openAlias(f.controller);expect(top(f.controller).view.kind).toBe('form');
+  });
+  it.each(['back','cancel','hide','dispose'] as const)('discards a late acknowledgement after %s without replay or publication',async kind=>{
+    let finish!:(reply:Awaited<ReturnType<LauncherApi['setLauncherAlias']>>)=>void;const f=setup({setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();await openAlias(f.controller);const pending=formAction(f.controller,'launcher:save-alias','late');
+    if(kind==='back')f.controller.session.pop();if(kind==='cancel')await formAction(f.controller,'launcher:cancel-alias');if(kind==='hide')f.controller.setVisible(false);if(kind==='dispose')f.controller.dispose();
+    await pending;const before=f.controller.session.getSnapshot();finish({ok:true,value:{...snapshot,updateOnly:true,commands:[{...snapshot.commands[1]!,usage:{useCount:0,lastUsedAt:null,pinned:false,alias:'late'}}]}});await settled();expect(f.controller.session.getSnapshot()).toBe(before);expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(1);
+    if(kind==='back'||kind==='cancel'){expect(top(f.controller).view.actions?.some(value=>value.id==='launcher:retry')).toBe(true);await openAlias(f.controller);expect(top(f.controller).view.kind).toBe('list');}
+  });
+  it('retains paged applications after an alias acknowledgement and exact-searches the changed app',async()=>{
+    const apps=Array.from({length:110},(_,i)=>({id:`application:${i.toString(16).padStart(64,'0')}`,provider:'applications' as const,title:`Public App ${i}`,aliases:[],keywords:[],enabled:true,usage:null}));const all=[...snapshot.commands,...apps];const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async request=>({ok:true,value:{...snapshot,commands:request?.cursor?all.slice(100):all.slice(0,100),nextCursor:request?.cursor?null:'1:100'}})),setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async request=>({ok:true,value:{...snapshot,updateOnly:true,commands:[{...apps[109]!,usage:{pinned:false,useCount:0,lastUsedAt:null,alias:request.alias}}]}}))});await settled();f.controller.query('Public App 109');await settled();await openAlias(f.controller,apps[109]!.id);await formAction(f.controller,'launcher:save-alias','my app');f.controller.query('my app');await settled();expect(items(f.controller)[0]?.id).toBe(apps[109]!.id);f.controller.query('Public App 108');await settled();expect(items(f.controller)[0]?.id).toBe(apps[108]!.id);
+  });
+});
+
+it.each(['invalid-request','capability-unavailable'] as const)('L1-01 %s alias failure offers explicit Reload from retained Form without replay',async code=>{
+  const f=setup({setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async()=>({ok:false,error:{code,message:'synthetic private detail',retryable:false}}))});await settled();await openAlias(f.controller);await formAction(f.controller,'launcher:save-alias','retained');expect(top(f.controller).view).toMatchObject({kind:'form',fields:[{value:'retained',error:expect.any(String)}]});expect(top(f.controller).view.actions?.some(action=>action.id==='launcher:retry')).toBe(true);await formAction(f.controller,'launcher:retry');expect(top(f.controller).view.kind).toBe('list');expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(2);expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(1);
+});
+
+it.each(['recorded-use','cleared-usage'] as const)('L1-01 alias acknowledgement accepts current owner totals after %s without a refresh',async mode=>{
+  const owner=structuredClone(snapshot),command=owner.commands[0]!;
+  command.usage={useCount:4,lastUsedAt:'2026-10-25T00:00:00Z',pinned:true,alias:null};
+  const f=setup({
+    getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(owner)})),
+    executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>{
+      command.usage!.useCount++;command.usage!.lastUsedAt='2026-10-25T01:00:00Z';
+      return {ok:true,value:{outcome:'completed'}};
+    }),
+    setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async request=>{
+      command.usage!.alias=request.alias;
+      return {ok:true,value:{...structuredClone(owner),updateOnly:true,commands:[structuredClone(command)]}};
+    }),
+  });
+  await settled();
+  if(mode==='recorded-use')await invoke(f.controller,'linuxcast:open-local-data');
+  else {command.usage!.useCount=0;command.usage!.lastUsedAt=null;}
+  await openAlias(f.controller,'linuxcast:open-local-data');await formAction(f.controller,'launcher:save-alias','my-data');
+  expect(top(f.controller).view.kind).toBe('list');expect(top(f.controller).view.status).toBeUndefined();
+  f.controller.query('my-data');await settled();expect(items(f.controller)).toMatchObject([{id:'linuxcast:open-local-data',accessories:[{text:'Pinned'}]}]);
+  expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(1);expect(f.api.setLauncherAlias).toHaveBeenCalledExactlyOnceWith({commandId:'linuxcast:open-local-data',revision:1,alias:'my-data'});
+  expect(f.api.executeLauncherCommand).toHaveBeenCalledTimes(mode==='recorded-use'?1:0);expect(command.usage).toEqual({useCount:mode==='recorded-use'?5:0,lastUsedAt:mode==='recorded-use'?'2026-10-25T01:00:00Z':null,pinned:true,alias:'my-data'});
+});

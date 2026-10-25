@@ -95,13 +95,39 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
     const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
     return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
   })).toMatchObject({pinned:true,useCount:0,lastUsedAt:null});
+  // A search alias changes metadata only. Known collision leaves the draft editable.
+  await query.press('Control+k');
+  await page.getByRole('searchbox',{name:'Find an action'}).fill('Edit search alias');
+  await page.getByRole('searchbox',{name:'Find an action'}).press('Enter');
+  const aliasField=page.getByRole('textbox',{name:'Search alias',exact:true});
+  await aliasField.fill('quit');await page.getByRole('button',{name:'Save alias',exact:true}).click();
+  await expect.poll(()=>page.getByText('This alias is already used by another command. Choose another alias.').isVisible()).toBe(true);
+  expect(await aliasField.inputValue()).toBe('quit');
+  await aliasField.fill('public-hide');
+  const aliasEvidence=join(root,'apps/desktop/evidence');mkdirSync(aliasEvidence,{recursive:true});
+  for(const theme of ['dark','light'] as const){
+    await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
+    await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
+    await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
+    await page.screenshot({path:join(aliasEvidence,`alias-${theme}.png`)});
+    expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
+  }
+  await page.getByRole('button',{name:'Save alias',exact:true}).click();
+  await query.waitFor();
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
+  await expect.poll(()=>page.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
+  })).toMatchObject({alias:'public-hide',pinned:true,useCount:0,lastUsedAt:null});
+  await query.fill('public-hide');await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');await query.fill('');
   expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(profile);
   expect(await page.evaluate(() => {
     const windowApi = window as unknown as { require?: unknown; process?: unknown; linuxcast?: DesktopShellApi };
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime', 'setLauncherPinned'],
+    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherPinned'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -127,6 +153,17 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
   const data=await nextWindow;await data.waitForURL('linuxcast-app://shell/data-settings.html');
   await expect.poll(()=>data.getByRole('heading',{name:'Local data',exact:true}).isVisible()).toBe(true);
   await expect.poll(()=>data.getByRole('button',{name:'Export command usage'}).isEnabled()).toBe(true);
+  // Local data recorded a use after this renderer snapshot. Its valid owner ack
+  // must update that total without treating an ordinary alias save as uncertain.
+  await query.press('Control+k');
+  await page.getByRole('searchbox',{name:'Find an action'}).fill('Edit search alias');
+  await page.getByRole('searchbox',{name:'Find an action'}).press('Enter');
+  await page.getByRole('textbox',{name:'Search alias',exact:true}).fill('public-data');
+  await page.getByRole('button',{name:'Save alias',exact:true}).click();await query.waitFor();
+  await expect.poll(()=>page.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:open-local-data')?.usage:null;
+  })).toMatchObject({alias:'public-data',useCount:1});
   expect(await data.evaluate(()=>({require:typeof (window as unknown as {require?:unknown}).require,process:typeof (window as unknown as {process?:unknown}).process,
     shell:typeof (window as unknown as {linuxcast?:unknown}).linuxcast,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()})))
     .toEqual({require:'undefined',process:'undefined',shell:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance']});
@@ -150,14 +187,14 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
   expect(before.data.records.find((record:{commandId:string})=>record.commandId.startsWith('application:'))).toMatchObject({useCount:1});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
-  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null}));
+  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
   await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
   const afterFile=join(temporary,'usage-after.json');await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});},afterFile);
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}));
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
-  expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null}));
+  expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records.every((record:{useCount:number})=>record.useCount===0)).toBe(true);
   await data.getByRole('button',{name:'Close settings'}).click();await expect.poll(()=>data.isClosed()).toBe(true);
   expect(await app.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Linuxcast storage').length)).toBe(1);
@@ -211,7 +248,7 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
   expect(storage.reopened.sqliteVersion).toBe('3.53.4');
   expect(storage.reopened.value).toMatchObject({ id: 'ui.theme', value: 'dark', revision: 1 });
   const windowId = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.id);
-  await query.fill('hide');
+  await query.fill('public-hide');
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await query.press('Enter');
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
@@ -252,20 +289,28 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
     const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
     return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
   });
-  expect(savedUsage).toMatchObject({pinned:true,useCount:1});
+  expect(savedUsage).toMatchObject({pinned:true,useCount:1,alias:'public-hide'});
+  await reopenedQuery.fill('public-hide');await expect.poll(()=>reopened.getByRole('option').count()).toBe(1);
+  await reopenedQuery.press('Control+k');
+  await reopened.getByRole('searchbox',{name:'Find an action'}).fill('Edit search alias');
+  await reopened.getByRole('searchbox',{name:'Find an action'}).press('Enter');
+  const persistedAlias=reopened.getByRole('textbox',{name:'Search alias',exact:true});
+  expect(await persistedAlias.inputValue()).toBe('public-hide');await persistedAlias.fill('');
+  await reopened.getByRole('button',{name:'Save alias',exact:true}).click();await reopenedQuery.waitFor();
+  await reopenedQuery.fill('hide');await expect.poll(()=>reopened.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await reopenedQuery.press('Control+k');
   await reopened.getByRole('searchbox',{name:'Find an action'}).fill('Unpin command');
   await reopened.getByRole('searchbox',{name:'Find an action'}).press('Enter');
   await expect.poll(()=>reopened.evaluate(async()=>{
     const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
     return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
-  })).toMatchObject({pinned:false,useCount:1});
+  })).toMatchObject({pinned:false,useCount:1,alias:null});
   await reopenedQuery.fill('quit');
   await expect.poll(()=>reopened.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');
   const stopped=new Promise<number|null>(resolve=>restarted.process().once('exit',resolve));
   await reopenedQuery.press('Enter',{noWaitAfter:true});expect(await stopped).toBe(0);application=undefined;
   const persisted=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-pin-reopen'});
   try {
-    expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.getUsage',params:{commandId:'linuxcast:hide'}}).result).toMatchObject({pinned:false,useCount:1});
+    expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.getUsage',params:{commandId:'linuxcast:hide'}}).result).toMatchObject({pinned:false,useCount:1,alias:null});
   } finally {await persisted.close();}
 }, 60000);

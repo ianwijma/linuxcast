@@ -39,3 +39,8 @@ describe('L1-01 bounded registered command ranking',()=>{
   });
 
 });
+
+it('L1-01 saved Unicode aliases normalize exact queries without changing authority or usage',()=>{
+  const saved=make('linuxcast:hide','Hide Linuxcast',{usage:{alias:'Ｆｏｃｕｓ   Desk',pinned:false,useCount:7,lastUsedAt:new Date(now).toISOString()}}),title=make('linuxcast:quit','Focus desk',{usage:{alias:null,pinned:true,useCount:90,lastUsedAt:new Date(now).toISOString()}});
+  const before=structuredClone(saved);expect(rankCommands([title,saved],'  FOCUS desk  ',now).map(value=>value.id)).toEqual([saved.id,title.id]);expect(saved).toEqual(before);expect(rankCommands([{...saved,usage:{...saved.usage!,alias:null}}],'focus desk',now)).toEqual([]);
+});
