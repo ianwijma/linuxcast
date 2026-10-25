@@ -17,6 +17,10 @@
     "F1-02": [
       "apps/desktop/src/main/lifecycle.test.ts",
       "apps/desktop/src/main/shell.test.ts"
+    ],
+    "D1-02": [
+      "packages/ui/src/views/session.test.ts",
+      "packages/ui/src/views/form.test.tsx"
     ]
   },
   "contracts": {
@@ -57,6 +61,9 @@
     ],
     "D1-01": [
       "packages/ui/src/primitives/primitives.test.ts"
+    ],
+    "D1-02": [
+      "packages/ui/src/views/views.test.ts"
     ]
   },
   "integration": {

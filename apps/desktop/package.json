@@ -10,7 +10,8 @@
     "@linuxcast/contracts": "workspace:*",
     "@linuxcast/storage": "workspace:*",
     "@linuxcast/ui": "workspace:*",
-    "@linuxcast/data-controls": "workspace:*"
+    "@linuxcast/data-controls": "workspace:*",
+    "@linuxcast/search": "workspace:*"
   },
   "devDependencies": {
     "electron": "45.0.0",
