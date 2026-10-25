@@ -10,13 +10,13 @@ Latest explicit model instruction: all future subagents use **GPT-6.1 SOL, high 
 
 ## Integrated baseline and original requested sequencing
 
-Primary develop1f13d1b54c643433a836e3481f9c08207f0b169a, clean. PR25 F2 data controls merged9fe8976; PR26 actual Local data/Hide/Quit launcher merged e303fcd; PR27 persistent Pin/Unpin merged1f13d1b (all25October2026). Exact evidence/reviews/CI in task registry. Foundation PR23/24 already integrated. F2 bounded finish and redirect to useful launcher application work have both happened.
+Primary developf8e3b7fb509007760661739c1f662535668bd1d1, clean; PR28 application launch merged25October12:08:17UTC. PR25 F2 data controls merged9fe8976; PR26 actual Local data/Hide/Quit launcher merged e303fcd; PR27 persistent Pin/Unpin merged1f13d1b (all25October2026). Exact evidence/reviews/CI in task registry. Foundation PR23/24 already integrated. F2 bounded finish and redirect to useful launcher application work have both happened.
 
 F2-02 remains in-progress: main-only credential store/controllers and real local-data clear/export UI integrated.58mapped package/owner/export/preload checks and isolated Electron45/gnome_libsecret smoke passed. Missing credential setup/status and diagnostics host UI, packaged provider flow, native Debian/KDE/session/AT matrix and release acceptance remain explicit. Native picker/confirmation in app checks is instrumented; no physical desktop claim. Full encrypted portable backups remain F2-03.
 
 L1-01/D1-02 remain in-progress: actual registered builtins, local ranking/selection, trusted actions, real owner usage, persistent pins and restart integrated. Remaining providers/fallbacks/alias/visibility administration and native/UI prerequisite gates remain pending. F3 host permission approval/remediation UI pending. Original dependencies and complete release gates unchanged.
 
-## Ready-to-publish L1-02 primary application increment
+## Integrated L1-02 primary application increment
 
 Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/application-launcher`, base1f13d1b, current HEADd233946 plus uncommitted reviewed integration/evidence. Shared contract/manifests/pinned lock/native dispatch0df46b7; GIO sourceff5a942 integrated5b21f1c; main-only adapter/search/catalogue UIfe00866 integratedd9687f9; selected-app cap fix5db7bc3 integratedd233946. Root owns main/build/preload/shared integration/status. Author `.worktrees/linuxcast-l1-01` / `codex/l1-02-application-flow` clean5db7bc3; native author `.worktrees/linuxcast-l1-02-native` / `codex/l1-02-gio-native` cleanff5a942.
 
@@ -26,7 +26,9 @@ Final corrected-runtime checks PASS: typecheck/lint;42L1-02unit;43security;14bro
 
 Task L1-02 stays in-progress. Only primary desktop launch covered. Desktop Actions, typed URI/file/argv/shell, complete run-history administration, localization/DBus/terminal targets, Debian13 GNOME/KDE Wayland/X11/native AT, installed package/release remain required. User-authorized unfinished integration uses reviewed merged interfaces; no prerequisite/task completion inferred.
 
-Immediate next: commit integration/evidence, push focused PR, inspect current-head CI/configured reviews/comments/threads, normal exact-head merge, fast-forward primary, record PR/merge. Then take a small concrete typed application flow using existing shell/storage/UI; no research/proof expansion or task-choice question. Future agents only GPT-6.1 SOL high.
+PR28 https://github.com/ianwijma/linuxcast/pull/28 mergedf8e3b7f at12:08:17UTC after exact-head2de2f04 CI40191744487 passed and no requested reviews/comments/threads. Primary refreshed clean. The above working candidate is integrated.
+
+Next bounded L1-01 application flow: edit/remove a command search alias using existing shared Form/Actions and sole-owner persistence, exact alias search for registered commands, actual restart evidence. Coordinator now uses codex/command-alias-controls from mergedf8e3b7f. New author worktree linuxcast-l1-01 / codex/l1-01-command-aliases. Contracts/owner/main/preload/status remain coordinator-owned; future agents only GPT-6.1 SOL high. Alias does not execute, count usage, change pins or grant authority; stale/unknown writes require explicit reload. Complete provider/visibility/fallback/native acceptance remains pending.
 
 ## Runtime and verification correction
 
