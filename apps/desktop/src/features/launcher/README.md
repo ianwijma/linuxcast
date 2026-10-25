@@ -47,6 +47,39 @@ explicit reload before another pin edit; no mutation is replayed automatically.
 Reload remains available even if a later ordinary command succeeds. Hidden or
 cancelled replies are ignored; reopening fetches authoritative state again.
 
+## Edit a search alias
+
+The selected enabled command offers **Edit search alias** in Actions. It pushes
+one shared Form onto the existing ViewSession stack, prefills the saved alias,
+identifies the target command in the field hint and provides Save alias/Cancel.
+Saving trims the draft; an empty value requests removal with `alias: null`.
+The shared bounded alias schema rejects invalid/control text and more than 64
+Unicode scalars or 256 UTF-8 bytes. Known collision/invalid/unavailable replies
+show fixed inline errors and retain the draft for explicit correction. Stale or
+unavailable replies also expose an explicit Reload commands action in the Form. Main
+checks normalized collisions against declared and saved aliases; the renderer
+never treats a draft as execution authority.
+
+Only a same-revision, one-target `updateOnly` acknowledgement with the exact
+requested alias updates local metadata. Immutable command fields, use count,
+timestamp and pin must remain unchanged. Other paged commands retain their
+metadata. Saved aliases enter the existing local exact-alias ranking; removing
+one removes that match. Alias editing never invokes a command or records use.
+
+Root query, selection and primary action remain in the lower stack frame through
+save, cancel or back. Shared draft/discard handling and focus restoration apply.
+Pending saves disable fields/submission; stale form/root actions, hidden or
+closed views, duplicate submissions and late replies cannot publish results or
+replay mutations. An uncertain acknowledgement keeps the draft, disables further
+metadata edits and exposes **Reload commands** through Actions. This explicit
+reload reads stored state without repeating the write. Cancel/back from an
+in-flight save also retains Reload; later successful ordinary commands cannot
+clear the unconfirmed metadata flag. Hiding/reopening fetches fresh stored state.
+
+Design: Shell and navigation; Results and actions; List, grid, detail and form;
+States and motion; Accessibility; Review gate. No feature-specific CSS or new
+components, dependencies, execution permissions or storage interfaces are added.
+
 ## Application catalogue
 
 Main supplies pages of at most 100 metadata rows at one registry revision. The
@@ -69,10 +102,10 @@ identity or one that no longer matches the query is released normally.
 
 ## Evidence and limits
 
-- `packages/search/tests/search.test.ts`: nine bounded ranking/generation tests.
-- `tests/controller.test.ts`: 22 current registry/selection/action/failure tests, including pin acknowledgements.
-- `tests/catalogue.test.ts`: 11 atomic pagination and pin-merge checks.
-- `tests/launcher.ui.test.ts`: 14 Chromium component checks covering keyboard,
+- `packages/search/tests/search.test.ts`: ten bounded ranking/generation tests.
+- `tests/controller.test.ts`: 40 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/catalogue.test.ts`: 28 atomic pagination and pin/alias integrity checks.
+- `tests/launcher.ui.test.ts`: 23 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
@@ -80,7 +113,10 @@ identity or one that no longer matches the query is released normally.
   execute system operations or establish SQLite persistence. The pin increment
   includes dark/light pinned, unconfirmed and unavailable affected states. The
   application slice adds dark/light application lists, unavailable discovery and
-  unknown launch outcomes. These checks ran with Node 24.22.1/Bun 1.4.4.
+  unknown launch outcomes. The alias slice adds dark/light shared Form, inline
+  collision and unconfirmed states, keyboard save/remove/cancel and exact query
+  checks. Alias fixtures observe requests and keep synthetic metadata in memory;
+  they do not establish real persistence. These checks ran with Node 24.22.1/Bun 1.4.4.
 
 Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator

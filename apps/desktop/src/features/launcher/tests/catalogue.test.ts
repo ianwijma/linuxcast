@@ -1,5 +1,5 @@
 import { describe,expect,it,vi } from 'vitest';
-import { collectCatalogue,mergePinReply } from '../catalogue.ts';
+import { collectCatalogue,mergePinReply,mergeAliasReply } from '../catalogue.ts';
 import type { Catalogue } from '../catalogue.ts';
 import type { LauncherCommandsSnapshot,LauncherCommandMetadata } from '@linuxcast/contracts';
 export const application=(number:number):LauncherCommandMetadata=>({id:`application:${number.toString(16).padStart(64,'0')}`,provider:'applications',title:`Public Fixture ${number}`,aliases:[],keywords:['synthetic'],enabled:true,usage:null});
@@ -27,5 +27,41 @@ describe('L1-02 atomic renderer catalogue',()=>{
     const commands=Array.from({length:120},(_,i)=>application(i));const current:Catalogue={revision:1,rankingAvailable:true,applicationState:'available',commands};const changed={...commands[110]!,usage:{pinned:true,useCount:0,lastUsedAt:null,alias:null}};
     const merged=mergePinReply(current,{revision:1,rankingAvailable:true,updateOnly:true,nextCursor:null,commands:[changed]},changed.id,true);expect(merged.commands).toHaveLength(120);expect(merged.commands[110]?.usage?.pinned).toBe(true);expect(current.commands[110]?.usage).toBeNull();
     expect(()=>mergePinReply(current,{revision:1,rankingAvailable:true,commands:[changed]},changed.id,true)).toThrow('Incomplete');expect(()=>mergePinReply(current,{revision:2,rankingAvailable:true,updateOnly:true,commands:[changed]},changed.id,true)).toThrow();
+  });
+});
+
+
+describe('L1-01 alias acknowledgement integrity',()=>{
+  const fixture=()=>{
+    const commands=Array.from({length:120},(_,i)=>application(i));
+    commands[110]!.usage={alias:'previous',pinned:true,useCount:7,lastUsedAt:'2026-10-25T00:00:00Z'};
+    const current:Catalogue={revision:1,rankingAvailable:true,applicationState:'available',commands};
+    const target=structuredClone(commands[110]!);target.usage!.alias='new alias';
+    const reply:LauncherCommandsSnapshot={revision:1,rankingAvailable:true,applicationState:'available',updateOnly:true,nextCursor:null,commands:[target]};return {current,target,reply};
+  };
+  it('merges only the target and retains all paged objects and usage/pins',()=>{
+    const {current,target,reply}=fixture(),next=mergeAliasReply(current,reply,target.id,'new alias');
+    expect(next.commands).toHaveLength(120);expect(next.commands[109]).toBe(current.commands[109]);expect(next.commands[110]!.usage).toEqual({...current.commands[110]!.usage,alias:'new alias'});expect(current.commands[110]!.usage!.alias).toBe('previous');
+    target.usage!.alias=null;expect(mergeAliasReply(current,reply,target.id,null).commands[110]!.usage!.alias).toBeNull();
+  });
+  it.each(['revision','full','cursor','extra','id','alias','title','declared-alias','keywords','provider','enabled','usage','time','pin','ranking','application-state'] as const)('rejects a %s change rather than accepting unrelated metadata',mode=>{
+    const {current,target,reply}=fixture();
+    if(mode==='revision')reply.revision++;
+    if(mode==='full')delete reply.updateOnly;
+    if(mode==='cursor')reply.nextCursor='1:1';
+    if(mode==='extra')reply.commands.push(application(5));
+    if(mode==='id')target.id=application(119).id;
+    if(mode==='alias')target.usage!.alias='wrong alias';
+    if(mode==='title')target.title='Changed title';
+    if(mode==='declared-alias')target.aliases=['new declared alias'];
+    if(mode==='keywords')target.keywords=['changed'];
+    if(mode==='provider')target.provider='commands';
+    if(mode==='enabled')target.enabled=false;
+    if(mode==='usage')target.usage!.useCount++;
+    if(mode==='time')target.usage!.lastUsedAt=null;
+    if(mode==='pin')target.usage!.pinned=false;
+    if(mode==='ranking')reply.rankingAvailable=false;
+    if(mode==='application-state')reply.applicationState='unavailable';
+    expect(()=>mergeAliasReply(current,reply,current.commands[110]!.id,'new alias')).toThrow();
   });
 });
