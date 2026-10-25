@@ -2,6 +2,7 @@ import {
   SHELL_CHANNELS, desktopShellStateSchema, shellCommandReplySchema, shellStateReplySchema,
 } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellApi } from '../../../../packages/contracts/src/desktop-shell.ts';
+import { calculatorCopyRequestSchema,calculatorCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
 import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema } from '../../../../packages/contracts/src/launcher.ts';
 
 /** Private adapter, never exposed across contextBridge. No Electron event crosses it. */
@@ -22,6 +23,14 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    copyCalculatorResult:async(request:{revision:number;expression:string})=>{
+      try {
+        const parsed=calculatorCopyRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;
+        const value=await transport.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,parsed.data);
+        if(new TextEncoder().encode(JSON.stringify(value)).length>MAX_ENVELOPE_BYTES)return unavailable;
+        const result=calculatorCopyReplySchema.safeParse(value);return result.success?result.data:unavailable;
+      }catch{return unavailable;}
+    },
     openLauncherUrl: async (request:Parameters<DesktopShellApi['openLauncherUrl']>[0])=>{
       try {
         const parsed=launcherOpenUrlRequestSchema.safeParse({...request,protocolVersion:1});

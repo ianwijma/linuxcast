@@ -3,7 +3,7 @@ import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
 import { DataControls } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
-import { app } from 'electron';
+import { app,clipboard } from 'electron';
 import { isAbsolute, join } from 'node:path';
 import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
@@ -13,6 +13,13 @@ let dataSettings:ReturnType<typeof createDataSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
 let applications:ReturnType<typeof createApplications>|undefined;
 startResidentShell({ resourcesDirectory: __dirname,
+  async copyCalculatorResult(text){
+    const nativeSession=process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY;
+    if(!nativeSession)return 'unsupported';
+    await clipboard.writeText(text);
+    if(await clipboard.readText()!==text)throw new Error('Copy could not be confirmed.');
+    return 'written';
+  },
   async openUrl(url){if(!applications)throw new Error('Browser opening unavailable.');return applications.openUrl(url);},
   async listApplications(){if(!applications)throw new Error('Applications unavailable.');return applications.list();},
   async launchApplication(application){if(!applications)throw new Error('Applications unavailable.');return applications.launch(application);},

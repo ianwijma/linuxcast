@@ -1,0 +1,51 @@
+import { afterEach,expect,it } from 'vitest';
+import { _electron as electron } from '@playwright/test';
+import type { ElectronApplication,Page } from '@playwright/test';
+import type { DesktopShellApi } from '@linuxcast/contracts';
+import { StorageOwner } from '../../../packages/storage/src/owner.ts';
+import AxeBuilder from '@axe-core/playwright';
+import { execFileSync,spawn } from 'node:child_process';
+import { mkdtempSync,mkdirSync,writeFileSync,rmSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { randomUUID } from 'node:crypto';
+import { tmpdir } from 'node:os';
+import { dirname,join,resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../../..');
+const executable=createRequire(import.meta.url)('electron') as string;
+let application:ElectronApplication|undefined,temporary='';
+afterEach(async()=>{if(application)await application.close().catch(()=>{application?.process().kill('SIGKILL');});application=undefined;if(temporary)rmSync(temporary,{recursive:true,force:true});});
+async function action(page:Page,title:string){await page.keyboard.press('Control+k');const filter=page.getByRole('searchbox',{name:'Find an action',exact:true});await filter.fill(title);await filter.press('Enter');}
+it('evaluates through the production launcher and copies only an explicit numeric result to a private native clipboard',async()=>{
+  if(!process.env.DISPLAY||process.env.LINUXCAST_PRIVATE_DISPLAY!=='1')throw new Error('Requires an owned private Xvfb display; this is not native desktop acceptance.');
+  execFileSync(process.execPath,['apps/desktop/build.ts'],{cwd:root,timeout:60000,stdio:'pipe'});
+  temporary=mkdtempSync(join(tmpdir(),'linuxcast-calculator-app-'));
+  for(const directory of ['home','profile','config','data','cache','runtime','system'])mkdirSync(join(temporary,directory),{mode:0o700});
+  const wrapper=join(temporary,'entry.cjs');writeFileSync(wrapper,`const {app}=require('electron');process.argv=process.argv.filter(value=>value!=='--inspect=0'&&value!=='--remote-debugging-port=0');app.setPath('userData',${JSON.stringify(join(temporary,'profile'))});app.setPath('sessionData',${JSON.stringify(join(temporary,'profile'))});require(${JSON.stringify(join(root,'apps/desktop/dist/main.cjs'))});`,{mode:0o600});
+  const env:Record<string,string>={HOME:join(temporary,'home'),XDG_DATA_HOME:join(temporary,'data'),XDG_CONFIG_HOME:join(temporary,'config'),XDG_CACHE_HOME:join(temporary,'cache'),XDG_RUNTIME_DIR:join(temporary,'runtime'),XDG_DATA_DIRS:join(temporary,'system'),XDG_CONFIG_DIRS:join(temporary,'config'),XDG_SESSION_TYPE:'x11',DBUS_SESSION_BUS_ADDRESS:'unix:path=/nonexistent-linuxcast-calculator-bus'};
+  for(const key of ['DISPLAY','XAUTHORITY','PATH','LANG'])if(process.env[key])env[key]=process.env[key]!;
+  const clipboardText=()=>execFileSync('xclip',['-selection','clipboard','-out'],{env,encoding:'utf8',timeout:3000});
+  application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
+  const app=application,page=await app.firstWindow();await page.waitForURL('linuxcast-app://shell/index.html');
+  await app.evaluate(async({clipboard})=>{await clipboard.writeText('PUBLIC_CLIPBOARD_SENTINEL');});expect(clipboardText()).toBe('PUBLIC_CLIPBOARD_SENTINEL');
+  const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.waitFor();await query.fill('ordinary words about tomorrow');await expect.poll(()=>page.getByRole('option').count()).toBe(0);expect(clipboardText()).toBe('PUBLIC_CLIPBOARD_SENTINEL');
+  const open=async()=>{await query.fill('calculator');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Calculator');await query.press('Enter');await page.getByRole('textbox',{name:'Expression',exact:true}).waitFor();};
+  await open();const expression=page.getByRole('textbox',{name:'Expression',exact:true});await expression.fill('2 + 3 * 4');expect(clipboardText()).toBe('PUBLIC_CLIPBOARD_SENTINEL');
+  await page.getByRole('button',{name:'Evaluate',exact:true}).click();await page.getByRole('heading',{name:'Calculation',exact:true}).waitFor();await expect.poll(()=>page.getByText('14',{exact:true}).count()).toBe(1);expect(clipboardText()).toBe('PUBLIC_CLIPBOARD_SENTINEL');
+  const evidence=join(root,'packages/builtins/calculator/evidence');mkdirSync(evidence,{recursive:true});
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);await page.screenshot({path:join(evidence,`application-${theme}-result.png`)});expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);}
+  await action(page,'Copy result');await expect.poll(clipboardText).toBe('14');await expect.poll(()=>page.getByRole('status').textContent()).toBe('Result copied.');
+  await action(page,'Edit expression');expect(await expression.inputValue()).toBe('2 + 3 * 4');await expression.fill('process.exit()');await page.getByRole('button',{name:'Evaluate',exact:true}).click();await expect.poll(()=>expression.getAttribute('aria-invalid')).toBe('true');expect(clipboardText()).toBe('14');
+  await expression.fill('1 / 0');await page.getByRole('button',{name:'Evaluate',exact:true}).click();await expect.poll(()=>expression.getAttribute('aria-invalid')).toBe('true');expect(clipboardText()).toBe('14');
+  const secondExpression='sqrt(81) + 2^3^2';await expression.fill(secondExpression);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await page.getByRole('heading',{name:'Calculation',exact:true}).waitFor();await expect.poll(()=>page.getByText('521',{exact:true}).count()).toBe(1);
+  await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(page,'Copy result');await expect.poll(()=>page.getByRole('alert').textContent()).toContain('not copied');expect(clipboardText()).toBe('14');
+  await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe('14');await action(page,'Copy result');await expect.poll(clipboardText).toBe('521');
+  expect(await page.evaluate(async()=>{const api=(window as unknown as {linuxcast:DesktopShellApi}).linuxcast;const reply=await api.getLauncherCommands();return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:calculator')?.usage:null;})).toMatchObject({useCount:2});
+  expect(await page.evaluate(async()=>await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.hideLauncher())).toMatchObject({ok:true});
+  await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
+  await new Promise<void>((resolve,reject)=>{const child=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});const timer=setTimeout(()=>{child.kill('SIGKILL');reject(new Error('Reopen deadline.'));},10000);child.once('error',reject);child.once('exit',code=>{clearTimeout(timer);if(code===0)resolve();else reject(new Error('Reopen failed.'));});});
+  await query.waitFor();await expect.poll(()=>page.getByRole('textbox',{name:'Expression',exact:true}).count()).toBe(0);expect(clipboardText()).toBe('521');
+  await query.fill('quit');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');const exited=new Promise<number|null>(resolve=>app.process().once('exit',resolve));await query.press('Enter',{noWaitAfter:true});expect(await exited).toBe(0);application=undefined;
+  const owner=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-calculator-reopen'});
+  try{const exported=owner.request({schemaVersion:1,requestId:randomUUID(),method:'dataControls.export',params:{category:'command-usage'}});expect(exported.result).toMatchObject({records:expect.arrayContaining([expect.objectContaining({commandId:'linuxcast:calculator',useCount:2})])});const text=JSON.stringify(exported);for(const expression of ['2 + 3 * 4',secondExpression,'process.exit()','1 / 0'])expect(text).not.toContain(expression);}finally{await owner.close();}
+},60000);
