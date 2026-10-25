@@ -141,7 +141,7 @@ export class FileSearchController {
     const controller=new AbortController();this.#mutation=controller;this.#busy=true;this.#status=undefined;this.#cancelSearch();this.#publish();
     try{
       const pending=kind===CHOOSE?this.#api.chooseFolder():kind===INDEX?this.#api.startIndex(rootId!):kind===PAUSE?this.#api.pauseIndex(rootId!):this.#api.removeFolder(rootId!);
-      const reply=fileSearchActionReplySchema.parse(await bounded(pending,controller.signal,kind===CHOOSE?null:5000));
+      const reply=fileSearchActionReplySchema.parse(await bounded(pending,controller.signal,kind===CHOOSE||kind===REMOVE?null:5000));
       if(!this.#active || controller.signal.aborted || this.#mutation!==controller)return;
       if(!reply.ok){if(['invalid-request','capability-unavailable','permission-denied','conflict'].includes(reply.error.code)){this.#status={kind:'error',message:'The folder request was not accepted. Check folder access, or refresh folders to try again.'};return;}throw new Error();}
       if(reply.value.outcome==='cancelled')return;

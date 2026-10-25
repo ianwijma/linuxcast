@@ -50,7 +50,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching',state:'ready',generation:expect.any(String)}]});
   await search.fill('public');await expect.poll(()=>files.getByRole('option').count()).toBe(2);await search.press('ArrowDown');await search.press('Enter');
   await files.getByRole('heading',{name:'public-summary.txt',exact:true}).waitFor();await expect.poll(()=>files.getByText('public-summary.txt',{exact:true}).count()).toBeGreaterThan(0);
-  expect(await files.locator('body').textContent()).not.toContain('SYNTHETIC_CONTENT_SENTINEL');expect((await new AxeBuilder({page:files}).analyze()).violations).toEqual([]);
+  expect(await files.locator('body').textContent()).not.toContain('SYNTHETIC_CONTENT_SENTINEL');expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);
   const evidence=join(root,'packages/builtins/file-search/evidence');mkdirSync(evidence,{recursive:true});
   await app.evaluate(({nativeTheme})=>{nativeTheme.themeSource='dark';});await expect.poll(()=>files.locator('[data-lc-theme="dark"]').count()).toBeGreaterThan(0);await files.screenshot({path:join(evidence,'application-dark-details.png')});
   await app.evaluate(({nativeTheme})=>{nativeTheme.themeSource='light';});await expect.poll(()=>files.locator('[data-lc-theme="light"]').count()).toBeGreaterThan(0);await files.screenshot({path:join(evidence,'application-light-details.png')});
@@ -71,5 +71,6 @@ it('opens selected-folder search through the real launcher and preserves native 
   expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);await data.close();await files.getByRole('searchbox',{name:'Search files',exact:true}).press('Escape');
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(state).toMatchObject({roots:[]});expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);
+  await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},selected);
   await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('searchbox',{name:'Search files',exact:true}).waitFor();await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching'}]});await quit();
 },60000);

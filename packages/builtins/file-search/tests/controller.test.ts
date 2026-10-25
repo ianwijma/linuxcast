@@ -80,3 +80,13 @@ it('L2-02 retains selected stable ID when a new generation replaces invalidated 
 it('L2-02 Search all folders omits rootId and sends only the bounded local query',async()=>{
   const f=setup();await settled();await invoke(f.controller,'files:all');f.controller.query(top(f.controller).view.viewId,'public');await new Promise(resolve=>setTimeout(resolve,170));expect(f.api.search).toHaveBeenCalledExactlyOnceWith({query:'public'});expect(items(f.controller)).toHaveLength(2);expect(top(f.controller).view.kind==='list' && top(f.controller).view.title).toBe('Search files');
 });
+
+it.each(['cancelled','completed'] as const)('L2-02 waits for held native removal confirmation before a %s receipt',async outcome=>{
+  let finish!:(value:Awaited<ReturnType<FileSearchApi['removeFolder']>>)=>void;
+  const f=setup({removeFolder:vi.fn<FileSearchApi['removeFolder']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();vi.useFakeTimers();
+  const pending=invoke(f.controller,'files:remove',rootId);await vi.advanceTimersByTimeAsync(10000);
+  expect(top(f.controller).view.status?.message).toBe('Waiting for the folder request…');expect(f.api.getState).toHaveBeenCalledTimes(1);
+  if(outcome==='completed'){f.state.roots=[];f.state.revision++;}
+  finish({ok:true,value:{outcome}});await pending;expect(items(f.controller)).toHaveLength(outcome==='completed'?0:1);
+  expect(top(f.controller).view.status?.message).not.toContain('could not be confirmed');expect(f.api.removeFolder).toHaveBeenCalledTimes(1);
+});

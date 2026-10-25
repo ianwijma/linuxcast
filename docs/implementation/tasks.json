@@ -2359,13 +2359,18 @@
         "bun run typecheck",
         "bun run test:integration -- L2-02"
       ],
-      "evidence": [],
+      "evidence": [
+        "Bounded selected-folder metadata search increment26October2026: frozen shared contract/packagef0eac31; service author9ef6655 integratedac1d0ca; application author4f0934c integrated53af004; coordinator main/preload/window/launcher routing3529e6c and final review/integration evidence. All author/reviewer agents GPT-6.1 SOL high.",
+        "Pinned Node24.22.1/Bun1.4.4/Rust1.95/Electron45/SQLite3.53.4 checks PASS:41unit (26controller/15service),9main/preload security,2contracts,12Chromium keyboard/axe,3actual native/owner/production Electron integration;108launcher units and36launcher main/preload security regressions. Production file flow4.89s and existing app/URL/alias/pin/data/restart6.93s; durations are synthetic smoke results, not performance acceptance. Typecheck/lint/plan/diff pass. Exact task mappings in scripts/test-runner/suites.json; detailed evidence packages/builtins/file-search/README.md and SERVICE.md.",
+        "Actual private-Xvfb production flow covers native chooser cancellation/selection (dialogs instrumented), explicit Index, real filename query and navigation/readonly Details, hidden/symlink exclusion and no content-sentinel search, real rename watch, pause, resident workspace close/reopen, process restart paused, paused-root Local data clear proactively invalidating displayed results, cancel/confirm derived-metadata removal preserving originals, and Quit with active watcher. Actual dark/light Details and affected component screenshots inspected; no personal files or credentials used.",
+        "Independent GPT-6.1 SOL/high final source review clean after stale-owner Close, paused-index clear publication and human removal-confirmation deadline findings resolved. Added exact-owner deferred Close check and generation-fenced reads; two held10second removal confirmation tests verify both cancelled/completed receipts, no premature unknown gate and no replay. Storage shutdown waits for file jobs/data operations before closing sole owner."
+      ],
       "owner": "coordinator with manifest_review_sol and file_search_service_sol (GPT-6.1 SOL/high)",
       "branch": "codex/file-search-ui",
       "limitations": [
-        "Bounded filename/metadata search increment in development; not a completed L2-02 task. Existing accepted L2-01 index is reused; L1-01/D1-02 broader provider/UI/native acceptance remains pending under user-authorized unfinished incremental integration.",
-        "Content extraction with explicit per-root opt-in and MIME/size/time budgets, dedicated MIME/date filters/sorting/path navigation/recent files remain required. File actions are separate L2-03 scope; this view grants no file-open/read authority.",
-        "Production Electron integration, independent review, final checks and PR merge pending. Native dialogs in automated evidence are instrumented; Debian 13 GNOME/KDE Wayland/X11/native assistive-technology/installed-package/release acceptance remain outstanding."
+        "Reviewed filename/metadata application increment only; full L2-02 remains in-progress. Content extraction with explicit per-root opt-in, MIME/size/time budgets and cancellation, dedicated MIME/date filters/sorting/path navigation/recent files remain required. No content extractor is implemented; extraction acceptance stays pending.",
+        "File actions are separate L2-03 scope. This view exposes readonly indexed metadata and grants no file-open/read authority; opening/preview actions explicitly unavailable. Newly chosen and process-restarted roots stay paused until explicit Index folder.",
+        "Native dialogs in automated evidence are instrumented. Development-host private Xvfb/Chromium/Rust/SQLite evidence does not establish Debian13 GNOME/KDE Wayland/X11, native assistive-technology, installed package or release acceptance. Broader L1-01/D1-02 prerequisites remain unfinished under user-authorized incremental integration; no task or dependency completion inferred."
       ]
     },
     {

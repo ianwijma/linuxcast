@@ -45,8 +45,8 @@ usable root with an actionable error.
 Pending mutations block repeated actions and refresh races. A lost, malformed or
 unknown acknowledgement requires explicit **Refresh folders** before another
 mutation; later state events do not clear that gate and no request is replayed.
-Known denials show fixed safe remediation. Native chooser interaction has no
-short presentation deadline because it waits for human input; disposal still
+Known denials show fixed safe remediation. Native chooser and removal confirmation have no
+short presentation deadline because they wait for human input; disposal still
 invalidates its reply. Other IPC presentation work has a five-second bound.
 Validated equal-revision appearance changes update the scoped theme while
 preserving cached root metadata.
@@ -60,7 +60,7 @@ snapshot revisions.
 
 ## Development evidence and limits
 
-- `tests/controller.test.ts`: 24 focused checks for native-selection outcomes,
+- `tests/controller.test.ts`: 26 focused checks for native-selection outcomes,
   request guards, authoritative state, query limits/generations, stable selection,
   readonly details, index clear, appearance, disposal and explicit recovery.
 - `tests/file-search.ui.test.ts`: 12 Chromium keyboard/axe checks for dark/light
@@ -81,3 +81,33 @@ actions remain required future work. The coordinator owns actual service/main/
 preload integration and production Electron evidence. Debian GNOME/KDE Wayland/
 X11, native assistive technology and the full release matrix remain pending.
 The complete local 1.0 scope and outstanding prerequisite acceptance are unchanged.
+
+## Integrated application evidence
+
+The coordinator mapped L2-02 checks pass on Node24.22.1, Bun1.4.4,
+Electron45.0.0, SQLite3.53.4 and Rust1.95: 41 unit checks (26 presentation,
+15 service), 9 main/preload security checks, 2 contract checks, 12 Chromium
+keyboard/axe checks and 3 real integration checks. Typecheck/lint/plan/diff pass.
+The production Electron flow runs in a private Xvfb profile with generated
+folders and actual packaged Rust openat2/inotify and sole-owner SQLite. It
+verifies registered launcher opening, chooser cancellation/selection, explicit
+Index folder, real filename results, arrow navigation/Details, hidden/symlink
+exclusion, no content-token search, real rename watching, pause, workspace
+close/reopen, full process restart paused, and proactive clearing of visible
+results when a paused index is cleared through Local data. Removal cancellation
+and confirmation preserve original files; Quit closes an active watcher.
+
+Native chooser/confirmation choices alone are instrumented, including after
+restart. These checks do not establish native dialog, compositor, assistive
+technology or installed-package acceptance. The actual dark/light Details
+screenshots in evidence/application-*.png were inspected. The existing actual
+application/URL/alias/pin/data/restart regression also passes, alongside 108
+launcher unit checks and 36 launcher main/preload security checks. The latest
+application flow completed in4.89seconds and existing regression in6.93seconds;
+these synthetic smoke durations are not a performance acceptance claim.
+
+Independent GPT-6.1 SOL/high review covered service, UI, main/preload and lifecycle.
+Resolved findings include stale-window Close, paused-index clear publication,
+and native removal confirmation waiting longer than five seconds; two fake-time
+regressions verify ten-second waits followed by cancellation or confirmation.
+Unknown backend mutations still require explicit Refresh; no automatic replay.

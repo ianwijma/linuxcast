@@ -6,12 +6,13 @@ import type { LauncherCommandsReply } from '@linuxcast/contracts';
 import { APP_URL } from './assets.ts';
 import { registerLauncherIpc } from './launcher-ipc.ts';
 import type { LauncherActions } from './launcher-ipc.ts';
-function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
+function fixture(overrides: Partial<LauncherActions> = {}, localData = true, files = true) {
   const frame={url:APP_URL}, contents={mainFrame:frame,isDestroyed:()=>false,getURL:()=>APP_URL} as unknown as WebContents;
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
   const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openUrl:vi.fn(async()=>'dispatched' as const),openDataSettings:vi.fn(async()=>{}),openFileSearch:vi.fn(async()=>{}),
     getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setAlias:vi.fn(async(commandId:string,alias:string|null)=>({commandId,alias,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false})),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
+  const registered:LauncherActions=actions;if(!files)delete registered.openFileSearch;
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
   const execute=(commandId='linuxcast:open-local-data',revision=1)=>invoke(LAUNCHER_CHANNELS.execute,{protocolVersion:1,commandId,revision});
@@ -91,6 +92,12 @@ it('blocks overlapping mutations/execution and reports unconfirmed pin changes w
 });
 
 const applicationFixture=(index:number)=>({desktopId:`fixture-${String(index).padStart(3,'0')}.desktop`,title:`Fixture application ${index}`,description:'Public synthetic application',fingerprint:'a'.repeat(64)});
+it('opens File search through its registered command and records usage only after the workspace opens',async()=>{
+  let finish=()=>{};const f=fixture({openFileSearch:()=>new Promise<void>(resolve=>{finish=resolve;})});
+  const pending=f.execute('linuxcast:open-file-search');expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
+  finish();expect(await pending).toEqual({ok:true,value:{outcome:'completed'}});expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:open-file-search');expect(f.actions.hide).not.toHaveBeenCalled();
+  const unavailable=fixture({},true,false);expect(await unavailable.execute('linuxcast:open-file-search')).toMatchObject({ok:false,error:{code:'permission-denied'}});
+});
 async function catalogue(f:ReturnType<typeof fixture>){const value=await f.invoke(LAUNCHER_CHANNELS.getCommands) as LauncherCommandsReply;if(!value.ok)throw new Error();return value.value;}
 it('pages a complete registered application catalogue and rejects obsolete cursors/forged launch IDs',async()=>{
   const records=Array.from({length:130},(_,i)=>applicationFixture(i)),launchApplication=vi.fn(async()=>'dispatched' as const);
