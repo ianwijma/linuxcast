@@ -2,7 +2,7 @@ import {
   SHELL_CHANNELS, desktopShellStateSchema, shellCommandReplySchema, shellStateReplySchema,
 } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellApi } from '../../../../packages/contracts/src/desktop-shell.ts';
-import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema } from '../../../../packages/contracts/src/launcher.ts';
+import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherCommandsRequestSchema } from '../../../../packages/contracts/src/launcher.ts';
 
 /** Private adapter, never exposed across contextBridge. No Electron event crosses it. */
 export interface ShellTransport {
@@ -30,9 +30,11 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
         return result.success ? result.data : unavailable;
       } catch { return unavailable; }
     },
-    getLauncherCommands: async () => {
+    getLauncherCommands: async (request: Parameters<DesktopShellApi['getLauncherCommands']>[0]) => {
       try {
-        const result = launcherCommandsReplySchema.safeParse(await transport.invoke(LAUNCHER_CHANNELS.getCommands, { protocolVersion: 1 }));
+        const parsed = launcherCommandsRequestSchema.safeParse({...request,protocolVersion:1});
+        if (!parsed.success) return unavailable;
+        const result = launcherCommandsReplySchema.safeParse(await transport.invoke(LAUNCHER_CHANNELS.getCommands, parsed.data));
         return result.success ? result.data : unavailable;
       } catch { return unavailable; }
     },

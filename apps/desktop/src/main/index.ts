@@ -1,3 +1,4 @@
+import { createApplications } from '@linuxcast/applications';
 import { DataControls } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
 import { app } from 'electron';
@@ -7,7 +8,10 @@ import { startStorage } from '../services/storage.ts';
 
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
+let applications:ReturnType<typeof createApplications>|undefined;
 startResidentShell({ resourcesDirectory: __dirname,
+  async listApplications(){if(!applications)throw new Error('Applications unavailable.');return applications.list();},
+  async launchApplication(application){if(!applications)throw new Error('Applications unavailable.');return applications.launch(application);},
   async getCommandUsage(commandId) {
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.getUsage',{commandId},{timeoutMs:250});
@@ -23,6 +27,7 @@ startResidentShell({ resourcesDirectory: __dirname,
   openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
   const directory = join(dataHome && isAbsolute(dataHome) ? dataHome : join(app.getPath('home'), '.local/share'), 'linuxcast');
+  applications=createApplications({helperPath:join(__dirname,'platform')});
   const currentStorage = startStorage(__dirname, directory, app.getVersion());
   storage = currentStorage;
   app.once('browser-window-created', (_event, window) => {
@@ -40,5 +45,5 @@ startResidentShell({ resourcesDirectory: __dirname,
       if(result.outcome!=='completed')throw new Error('Local data action interrupted.');
     },
   });
-  return [currentStorage,dataSettings];
+  return [currentStorage,dataSettings,applications];
 } });

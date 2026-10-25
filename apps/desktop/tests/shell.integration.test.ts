@@ -31,7 +31,22 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   execFileSync(process.execPath, ['apps/desktop/build.ts'], { cwd: root, timeout: 30000, stdio: 'pipe' });
   temporary = mkdtempSync(join(tmpdir(), 'linuxcast-product-shell-'));
   const profile = join(temporary, 'profile'), wrapper = join(temporary, 'entry.cjs');
-  for (const name of ['profile', 'home', 'config', 'cache', 'data', 'runtime']) mkdirSync(join(temporary, name), { mode: 0o700 });
+  for (const name of ['profile', 'home', 'config', 'cache', 'data', 'runtime', 'system']) mkdirSync(join(temporary, name), { mode: 0o700 });
+  mkdirSync(join(temporary,'data/applications'),{recursive:true,mode:0o700});
+  const launchMarker=join(temporary,'application-launch.json'),applicationTarget=join(temporary,'fixture executable with spaces');
+  writeFileSync(applicationTarget,`#!/usr/bin/python3
+import json,sys
+with open(${JSON.stringify(launchMarker)},'w',encoding='utf-8') as output:
+ json.dump({'argv':sys.argv[1:],'stdin':sys.stdin.read()},output)
+print('SYNTHETIC_CHILD_STDOUT')
+print('SYNTHETIC_CHILD_STDERR',file=sys.stderr)
+`,{mode:0o700});
+  writeFileSync(join(temporary,'data/applications/public-fixture.desktop'),`[Desktop Entry]
+Type=Application
+Name=Public fixture app
+Comment=Public synthetic application
+Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
+`,{mode:0o600});
   const seed=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-data-settings'});
   seed.request({schemaVersion:1,requestId:randomUUID(),method:'commands.recordUse',params:{commandId:'builtin.public-fixture'}});
   await seed.confirmSuccessfulLaunch();await seed.close();
@@ -39,7 +54,7 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   writeFileSync(wrapper, `const { app } = require('electron');\nprocess.argv = process.argv.filter(value => value !== '--inspect=0' && value !== '--remote-debugging-port=0');\napp.setPath('userData', ${JSON.stringify(profile)});\napp.setPath('sessionData', ${JSON.stringify(profile)});\nrequire(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});\n`, { mode: 0o600 });
   const env: Record<string, string> = { HOME: join(temporary, 'home'), XDG_CONFIG_HOME: join(temporary, 'config'),
     XDG_CACHE_HOME: join(temporary, 'cache'), XDG_DATA_HOME: join(temporary, 'data'),
-    XDG_RUNTIME_DIR: join(temporary, 'runtime'), XDG_SESSION_TYPE: 'x11' };
+    XDG_RUNTIME_DIR: join(temporary, 'runtime'), XDG_SESSION_TYPE: 'x11',XDG_DATA_DIRS:join(temporary,'system'),XDG_CONFIG_DIRS:join(temporary,'config'),XDG_CURRENT_DESKTOP:'GNOME',DBUS_SESSION_BUS_ADDRESS:'unix:path=/nonexistent-linuxcast-app-fixture-bus' };
   for (const key of ['DISPLAY', 'XAUTHORITY', 'PATH', 'LANG'])
     if (process.env[key]) env[key] = process.env[key]!;
   application = await electron.launch({ executablePath: executable, args: [wrapper, '--show'],
@@ -48,8 +63,17 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   await page.waitForURL(appUrl);
   const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
   await query.waitFor({timeout:5000});
-  await expect.poll(()=>page.getByRole('option').count()).toBe(3);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
   await expect.poll(()=>query.evaluate(element=>element===document.activeElement)).toBe(true);
+  await query.fill('Public fixture app');
+  await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  await query.press('Enter');
+  await expect.poll(async()=>{try{return JSON.parse(await readFile(launchMarker,'utf8'));}catch{return null;}}).toEqual({argv:['two words','literal;$(no-shell)','Public fixture app','%'],stdin:''});
+  await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
+  expect(await new Promise<number>((resolve,reject)=>{const second=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});const timer=setTimeout(()=>{second.kill('SIGKILL');reject(new Error('Application reopen timed out.'));},10000);second.once('error',error=>{clearTimeout(timer);reject(error);});second.once('exit',code=>{clearTimeout(timer);resolve(code??1);});})).toBe(0);
+  await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
+  await query.fill('data');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');await query.fill('');
+  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
   await query.press('ArrowDown');
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await query.press('ArrowUp');
@@ -57,9 +81,10 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   await query.fill('no actual command');
   await expect.poll(()=>page.getByRole('heading',{name:'No matching results'}).isVisible()).toBe(true);
   await query.fill('');
-  await expect.poll(()=>page.getByRole('option').count()).toBe(3);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
   // Pinning is an explicit metadata edit, not a command execution.
-  await query.press('ArrowDown');
+  await query.fill('hide');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');await query.fill('');
+  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await query.press('Control+k');
   await page.getByRole('searchbox',{name:'Find an action'}).fill('Pin command');
@@ -123,6 +148,7 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   const before=JSON.parse(await readFile(exportFile,'utf8'));
   expect(before).toMatchObject({encrypted:false,data:{category:'command-usage'}});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
+  expect(before.data.records.find((record:{commandId:string})=>record.commandId.startsWith('application:'))).toMatchObject({useCount:1});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});

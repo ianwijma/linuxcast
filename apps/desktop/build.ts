@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { build } from 'esbuild';
 import { STORAGE_MIGRATION_ASSETS } from '../../packages/storage/src/schema-version.ts';
 import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
@@ -6,8 +7,10 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const output = join(root, 'apps/desktop/dist');
+execFileSync('cargo',['build','--locked','--release','-p','linuxcast-platform','--target-dir',join(root,'target')],{cwd:root,stdio:'inherit'});
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
+await cp(join(root,'target/release/linuxcast-platform'),join(output,'platform'));
 for (const entry of ['main', 'preload', 'data-preload']) {
   await build({ absWorkingDir: root, entryPoints: [`apps/desktop/src/${entry}/index.ts`],
     outfile: join(output, `${entry}.cjs`), platform: 'node', format: 'cjs', bundle: true,

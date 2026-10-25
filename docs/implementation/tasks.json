@@ -1278,7 +1278,7 @@
             {
               "command": "bun run test:security -- F2-02; private-Xvfb bun run test:integration -- F1-02",
               "outcome": "58mapped checks plus actual settings flow verify intended-category/selected-ID isolation, empty selection, preserved pins/aliases, bounded index pruning without source deletion, complete-or-fail exports, stopped index jobs and unknown-outcome/no-replay handling. Real files verify cancelled clear preserves usage and confirmed clear resets only usage.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
               "reference": "7594884/cc7384b/80beb75; packages/storage/tests/data-controls.integration.test.ts; packages/data-controls/tests/persistence.security.test.ts; apps/desktop/tests/shell.integration.test.ts"
             }
           ]
@@ -1301,7 +1301,7 @@
             {
               "command": "bun run test:security -- F2-02; independent package/application review; actual private keyring smoke",
               "outcome": "Generated synthetic fixtures and task-private HOME/XDG/D-Bus/keyring only. Opaque metadata, strict diagnostic fields and fixed errors; no credentials/grants in allowlisted category exports or screenshots. App renderer receives only named actions/outcomes/theme, no file path, record bodies, secret read or generic repository API.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
               "reference": "packages/secrets/README.md; packages/data-controls/README.md; apps/desktop/src/data-preload/api.ts; apps/desktop/evidence/data-settings-{dark,light}.png"
             }
           ]
@@ -1315,7 +1315,8 @@
         "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership.",
         "Coordinator shared implementation25October2026: strict secret metadata3acad5c, actual owner migration004/CRUD29f1ea2, category clear/export7594884. Independent source reviews clean;43F2 integration checks and8mappedF2-02 checks pass. Production Electron45/SQLite3.53.4 smoke passes with schema004 after setup-path correction. These do not complete the still-unintegrated SecretStore, controllers or UI.",
         "Bounded F2 increment25October2026: owned2c70e44/0f4c564/2404eef integrated62ba357/92a0810/cc7384b; actual data-settings workspace80beb75. 44package checks plus8owner checks and6export/preload checks =58mappedF2 security checks pass;44shell security checks pass. Actual Electron45/private-Xvfb app test passes (3.49s): separate settings window, exact preload boundary, category filtering, cancelled/confirmed clear, actual-owner exports and real private JSON files, keyboardHide/second-invocation/Quit. Native save/confirmation choices are test-instrumented, not physical desktop interaction. Settled dark/light screenshots inspected; axe same-page checks pass. Both application review findings resolved/re-reviewed; no new proof work assigned.",
-        "Integrated25October2026 in PR25 https://github.com/ianwijma/linuxcast/pull/25, merge9fe897698faf457a4625dd2c1ce78d5c6b791a67. Current-head CI40186678031 passed; independent package/application review findings resolved and re-reviewed. F2-02 remains in-progress with listed missing UI, native desktop and release acceptance. Author manifest_review reassigned only after merge to the bounded actual L1-01 launcher flow."
+        "Integrated25October2026 in PR25 https://github.com/ianwijma/linuxcast/pull/25, merge9fe897698faf457a4625dd2c1ce78d5c6b791a67. Current-head CI40186678031 passed; independent package/application review findings resolved and re-reviewed. F2-02 remains in-progress with listed missing UI, native desktop and release acceptance. Author manifest_review reassigned only after merge to the bounded actual L1-01 launcher flow.",
+        "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Exact merged PR27 primary checkout was rerun with verified Node24.22.1/Bun1.4.4:58mapped F2-02 security checks (including6actual child-owner persistence cases) passed. This rerun does not repeat or expand the isolated Electron/keyring backend smoke or establish native desktop acceptance."
       ],
       "owner": "coordinator",
       "branch": "codex/application-controls",
@@ -1582,7 +1583,7 @@
             {
               "command": "bun run test:unit -- D1-02; bun run test:ui -- D1-02; independent source review",
               "outcome": "Malformed, executable, oversized and unsupported models are refused; Markdown cannot inject scripts/images/external navigation; packaged images use the exact safe route.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "1bb3bd1/3f5b071; packages/ui/src/views/{session.test.ts,form.test.tsx,views.test.ts,README.md}"
             }
           ]
@@ -1597,7 +1598,7 @@
             {
               "command": "bun run test:unit -- D1-02; bun run test:ui -- D1-02; independent source review",
               "outcome": "Async snapshots retain selected ID and primary action; keyboard action filtering/navigation/forms and explicit discard/secret clearing pass.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "1bb3bd1/3f5b071; packages/ui/src/views/{session.test.ts,form.test.tsx,views.test.ts,README.md}"
             }
           ]
@@ -1620,7 +1621,7 @@
             {
               "command": "bun run test:unit -- D1-02; bun run test:ui -- D1-02; independent source review",
               "outcome": "Only generated public fixtures appear in screenshots. Synthetic transient credential test values are not captured or logged; action outputs omit field contents.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "1bb3bd1/3f5b071; packages/ui/src/views/{session.test.ts,form.test.tsx,views.test.ts,README.md}"
             }
           ]
@@ -1633,7 +1634,8 @@
       "evidence": [
         "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership.",
         "Reviewed author05dff01 restored1bb3bd1 and integrated with actual launcher3f5b071. Final mapped16unit +10browser cases pass, covering strict models, safe Markdown/images, stable ID selection/primary actions, navigation, forms/discard, keyboard/actions, dark/light/200% text/forced-colors/reduced-motion. Actual production launcher uses ViewRenderer with7additional L1 UI cases and private-Xvfb app flow. Four earlier review findings and bounded held-Enter integration finding fixed. NativeAT/prerequisite/full host adapters remain pending; task not complete.",
-        "Integrated25October2026 in PR26 https://github.com/ianwijma/linuxcast/pull/26, mergee303fcdc1ba2fa0b6b74b31eb4dadb48d5a5d7a4. Current-head19ac94f CI40187790232 passed; no requested GitHub reviews, review comments or unresolved threads at merge. Focused independent source reviews covered this implementation; normal merge with exact head match. Full task remains in-progress."
+        "Integrated25October2026 in PR26 https://github.com/ianwijma/linuxcast/pull/26, mergee303fcdc1ba2fa0b6b74b31eb4dadb48d5a5d7a4. Current-head19ac94f CI40187790232 passed; no requested GitHub reviews, review comments or unresolved threads at merge. Focused independent source reviews covered this implementation; normal merge with exact head match. Full task remains in-progress.",
+        "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Explicit Node24.22.1/Bun1.4.4 rerun of unchanged D1 source passed16unit and10browser checks. Original runs remain host-runtime evidence; native desktop/AT gates are unchanged."
       ],
       "owner": "reading_review",
       "branch": "codex/d1-02-view-renderer",
@@ -1852,7 +1854,7 @@
             {
               "command": "bun run test:unit -- L1-01",
               "outcome": "Selected identity survives reordered/delayed metadata snapshots; obsolete refresh/query completions are rejected. This is bounded controller evidence; the complete multi-provider merge remains unimplemented.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "e8eb87c; apps/desktop/src/features/launcher/tests/controller.test.ts"
             }
           ]
@@ -1867,13 +1869,13 @@
             {
               "command": "bun run test:unit -- L1-01; bun run test:security -- L1-01; private-Xvfb bun run test:integration -- F1-02",
               "outcome": "Empty-query, unavailable command, zeroed ranking and stale query/load cancellation fixtures pass. Actual owner export after UI clear proves useCount=0/lastUsedAt=null; pins/aliases remain preserved by existing owner semantics. No cancelled action is automatically replayed.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "e8eb87c/5e61a3a/3f5b071; packages/search/tests/search.test.ts; apps/desktop/tests/shell.integration.test.ts"
             },
             {
               "command": "bun run test:unit -- L1-01; bun run test:security -- L1-01; bun run test:integration -- L1-01; private-Xvfb bun run test:integration -- F1-02",
               "outcome": "Pin/unpin uses acknowledged stored metadata, preserves selection/primary and usage/alias fields; empty-query favourites reorder after confirmation. Clearing usage retains pin. Full app restart and final owner reopen prove durable pin/unpin; failures/late replies do not replay, Reload remains available for unconfirmed edits.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4; Electron45.0.0/SQLite3.53.4 private Xvfb. Chromium component fixtures; no Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below; Electron45.0.0/SQLite3.53.4 private Xvfb. Chromium component fixtures; no Debian/GNOME/KDE/Orca release claim.",
               "reference": "13e9dac/0890391; packages/storage/tests/command-pins.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/src/features/launcher/tests/"
             }
           ]
@@ -1896,7 +1898,7 @@
             {
               "command": "independent UI/main review; bun run test:security -- L1-01; bun run test:ui -- L1-01",
               "outcome": "Only synthetic/public command names appear in fixtures and screenshots. Queries remain renderer-local, IPC contains only allowlisted command IDs/revision, usage projection omits paths/content/handlers, errors remain fixed. No generic repository, secret, shell or network interface reaches rendering.",
-              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; original coordinator runtime Node26.11.1/Bun1.3.9 (previously mislabeled pinned); corrected Node24.22.1/Bun1.4.4 rerun recorded below, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "e8eb87c/5e61a3a/3f5b071; apps/desktop/evidence/shell-{dark,light}.png"
             }
           ]
@@ -1911,7 +1913,9 @@
         "Bounded integrated candidate e8eb87c/5e61a3a/3f5b071: actual registered Local data/Hide/Quit, local bounded query/ranking, stable keyboard selection, trusted action execution and real SQLite-owner usage. 17unit/controller +9security +7browser UI checks pass; actual production Electron app flow passes4.20s. Query/arrows/Enter opens settings; actual exports prove usage recording, cancellation and clear/reset; Hide/secondtoggle preserves resident window; Quit exits0. Dark/light actual application screenshots inspected; same-page axe passes. Independent main/preload and UI reviews clear after held-Enter fix. Typecheck/lint/plan/diff pass. Full task remains in-progress.",
         "Integrated25October2026 in PR26 https://github.com/ianwijma/linuxcast/pull/26, mergee303fcdc1ba2fa0b6b74b31eb4dadb48d5a5d7a4. Current-head19ac94f CI40187790232 passed; no requested GitHub reviews, review comments or unresolved threads at merge. Focused independent source reviews covered this implementation; normal merge with exact head match. Full task remains in-progress.",
         "Next bounded application increment started25October2026 from merged PR26/e303fcd: command pin/unpin through existing launcher Actions and persistent usage, isolated author .worktrees/linuxcast-l1-01/codex/l1-01-command-pins; coordinator shared owner/API13e9dac. No new acceptance inferred. No research/proof expansion.",
-        "Bounded pin/unpin increment25October2026: trusted API/atomic sole-owner update13e9dac; author3a50c48 integrated0890391. 25unit/controller,12security,6pin persistence/protocol checks and11browser keyboard/axe cases pass;43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin on Hide reorders results without moving selected ID or primary, does not execute/count a run, survives usage clearing, Hide/secondtoggle and full Quit/relaunch; keyboard Unpin persists across final owner reopen with count unchanged. Actual app dark/light screenshots inspected. Typecheck/lint/plan/diff pass. Independent owner/API and UI reviews clear after retaining Reload through an unconfirmed pin followed by successful primary action. No full L1/native/release completion claim."
+        "Bounded pin/unpin increment25October2026: trusted API/atomic sole-owner update13e9dac; author3a50c48 integrated0890391. 25unit/controller,12security,6pin persistence/protocol checks and11browser keyboard/axe cases pass;43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin on Hide reorders results without moving selected ID or primary, does not execute/count a run, survives usage clearing, Hide/secondtoggle and full Quit/relaunch; keyboard Unpin persists across final owner reopen with count unchanged. Actual app dark/light screenshots inspected. Typecheck/lint/plan/diff pass. Independent owner/API and UI reviews clear after retaining Reload through an unconfirmed pin followed by successful primary action. No full L1/native/release completion claim.",
+        "Pin controls integrated25October2026 in PR27 https://github.com/ianwijma/linuxcast/pull/27, merge1f13d1b54c643433a836e3481f9c08207f0b169a. Current reviewed head70e9a2e CI40188841305 passed; no requested reviews, comments or unresolved review threads at merge. Primary develop refreshed clean. Full L1-01 and native/release acceptance remain unfinished.",
+        "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Exact merged PR27 primary checkout was then rerun with verified Node24.22.1/Bun1.4.4: typecheck,25units,12security,6pin checks,43storage checks,11browser checks and actual production Electron pin/restart flow4.63s all passed. Browser discovery excluded nested sibling worktrees; Electron SQLite binding rebuilt before the successful app run. Original runs remain host-runtime evidence."
       ],
       "owner": "manifest_review",
       "branch": "codex/l1-01-command-pins",
@@ -1924,7 +1928,7 @@
     {
       "id": "L1-02",
       "title": "Discover applications and typed launch actions",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L1",
       "dependsOn": [
@@ -1965,7 +1969,14 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:unit -- L1-02; bun run test:security -- L1-02; bun run test:ui -- L1-02; bun run test:integration -- L1-02; cargo test --locked -p linuxcast-platform --test applications; independent source review",
+              "outcome": "Native GIO Exec fixture preserves spaces, literal shell-looking text and field codes without a shell; malformed/bounded protocol fails closed. Renderer receives opaque command IDs only. URI/file/argv/shell entry remains unimplemented, so criterion stays pending.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Rust1.95, GIO2.72.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/session/AT/release claim.",
+              "reference": "0df46b7/5b21f1c/d9687f9/d233946 plus coordinator application integration; apps/desktop/tests/shell.integration.test.ts; packages/builtins/applications/; native/platform/tests/applications.rs"
+            }
+          ]
         },
         {
           "id": "L1-02-AC02",
@@ -1973,7 +1984,14 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:unit -- L1-02; bun run test:security -- L1-02; bun run test:ui -- L1-02; bun run test:integration -- L1-02; cargo test --locked -p linuxcast-platform --test applications; independent source review",
+              "outcome": "Actual private desktop entry launches a real fixture executable with spaces and exact argv/stdin marker from the production Electron launcher. Hidden/deleted/missing executable and changed fingerprint are refused; unknown post-dispatch outcomes are explicit and never replayed. DBus/terminal/localization and supported desktop matrix remain pending.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Rust1.95, GIO2.72.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/session/AT/release claim.",
+              "reference": "0df46b7/5b21f1c/d9687f9/d233946 plus coordinator application integration; apps/desktop/tests/shell.integration.test.ts; packages/builtins/applications/; native/platform/tests/applications.rs"
+            }
+          ]
         },
         {
           "id": "L1-02-UI",
@@ -1981,25 +1999,46 @@
           "status": "pending",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:unit -- L1-02; bun run test:security -- L1-02; bun run test:ui -- L1-02; bun run test:integration -- L1-02; cargo test --locked -p linuxcast-platform --test applications; independent source review",
+              "outcome": "42unit/search/catalogue/controller,43security/main/preload,14browser cases pass; actual production Electron flow5.31s passes search/Enter\u2192GIO process marker\u2192Hide/reopen, pin/restart and real owner export. Selection crossing top20 stays selected. Dark/light and error/unavailable/unconfirmed pin images inspected; browser axe passes. Native AT and desktop matrix remain pending.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Rust1.95, GIO2.72.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/session/AT/release claim.",
+              "reference": "0df46b7/5b21f1c/d9687f9/d233946 plus coordinator application integration; apps/desktop/tests/shell.integration.test.ts; packages/builtins/applications/; native/platform/tests/applications.rs"
+            }
+          ]
         },
         {
           "id": "L1-02-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run typecheck; bun run lint; bun run test:unit -- L1-02; bun run test:security -- L1-02; bun run test:ui -- L1-02; bun run test:integration -- L1-02; cargo test --locked -p linuxcast-platform --test applications; independent source review",
+              "outcome": "Only generated public desktop-entry/application names and private temporary fixture targets enter tests; screenshots contain public fixture labels. Query stays local; no renderer Exec/path/credential interface, raw helper errors or inherited provider/loader environment. Independent source reviews clean.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; verified Node24.22.1/Bun1.4.4, Rust1.95, GIO2.72.4, Electron45/SQLite3.53.4 private Xvfb; Chromium fixtures. No Debian/session/AT/release claim.",
+              "reference": "0df46b7/5b21f1c/d9687f9/d233946 plus coordinator application integration; apps/desktop/tests/shell.integration.test.ts; packages/builtins/applications/; native/platform/tests/applications.rs"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:integration -- L1-02"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Started25October2026 from merged launcher/pin PR27/1f13d1b. Coordinator isolated codex/application-launcher; owned application package/launcher/search author codex/l1-02-application-flow; native adapter in codex/l1-02-gio-native. Shared wire/paging/native-helper dispatch0df46b7, actual GIO sourceff5a942 integrated5b21f1c. Native4private-XDG fixture checks passed; independently reviewed clean. Actual full app integration remains in progress; no acceptance inferred from assignment or native-only tests.",
+        "Reviewed bounded application increment25October2026: actual installed primary GIO desktop applications appear through the existing launcher, local search/keyboard selection, Open and persistent Pin. Fixed native helper ships with production build; main owns catalogue revisions, identity/revalidation and trusted dispatch.42unit +43security +14browser +4native integration checks pass; actual full production Electron/private-Xvfb app flow5.31s passes with real process/argv marker and real SQLite owner export. Typecheck/lint pass. Independent reviews clean after selected-result cap retention and concurrent pin/catalogue-removal acknowledgement fixes. Full L1-02 remains in-progress; unfinished scope and desktop/release acceptance are explicit."
+      ],
+      "owner": "manifest_review",
+      "branch": "codex/l1-02-application-flow",
+      "limitations": [
+        "Development uses reviewed merged L1-01/F3 interfaces; broader provider/fallback/host permission UI and their native acceptance remain pending. User authorized unfinished application increments, not completion claims; all original prerequisites remain required for task/release completion.",
+        "Current bounded increment covers registered primary GIO desktop application discovery/launch. Desktop Actions, typed URI/file/argv/shell entry and complete run-history administration remain required future L1-02 work. No shell parser or arbitrary renderer execution is substituted.",
+        "Private-XDG fixtures on GLib/GIO2.72.4 development host do not establish Debian13 GNOME/KDE Wayland/X11, localization, DBus/terminal target activation, packaged installation or release acceptance."
+      ]
     },
     {
       "id": "L1-03",

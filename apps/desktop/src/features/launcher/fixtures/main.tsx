@@ -11,19 +11,22 @@ const snapshot:LauncherCommandsSnapshot={revision:1,rankingAvailable:mode!=='ran
   {id:'linuxcast:hide',title:'Hide Linuxcast',subtitle:'Keep Linuxcast running in the background',aliases:['hide'],keywords:['dismiss'],enabled:true,usage:null},
   {id:'linuxcast:quit',title:'Quit Linuxcast',subtitle:'Close Linuxcast and stop background work',aliases:['quit'],keywords:['exit'],enabled:true,usage:null},
 ]};
+const applicationMode=mode==='applications'||mode==='application-unknown';
+if(applicationMode){snapshot.applicationState='available';snapshot.commands.push(...['Public Notes','Public Calculator'].map((title,index)=>({id:`application:${String(index+1).repeat(64)}`,provider:'applications' as const,title,subtitle:'Synthetic application fixture',aliases:[],keywords:['public'],enabled:true,usage:null})));}
+if(mode==='applications-unavailable')snapshot.applicationState='unavailable';
 function Fixture(){
   const [requested,setRequested]=useState('No command requested.');
   const [api]=useState<LauncherApi>(()=>{
     const saved=structuredClone(snapshot);
-    return {getLauncherCommands:async()=>{if(mode==='loading')return new Promise(()=>{});if(mode==='error')throw new Error('synthetic fixture error');return {ok:true,value:structuredClone(saved)};},
-      executeLauncherCommand:async request=>{setRequested(`Requested ${request.commandId}.`);if(mode==='execution-error')throw new Error('synthetic fixture error');return {ok:true,value:{outcome:'dispatched'}};},
+    return {getLauncherCommands:async request=>{if(mode==='loading')return new Promise(()=>{});if(mode==='error')throw new Error('synthetic fixture error');return {ok:true,value:structuredClone(applicationMode?{...saved,commands:request?.cursor?saved.commands.slice(3):saved.commands.slice(0,3),nextCursor:request?.cursor?null:'1:3'}:saved)};},
+      executeLauncherCommand:async request=>{setRequested(`Requested ${request.commandId}.`);if(mode==='application-unknown')return {ok:false,error:{code:'deadline-exceeded',message:'Synthetic private detail',retryable:false}};if(mode==='execution-error')throw new Error('synthetic fixture error');return {ok:true,value:{outcome:'dispatched'}};},
       setLauncherPinned:async request=>{
         setRequested(`Requested ${request.pinned?'pin':'unpin'} for ${request.commandId}.`);
         if(mode==='pin-failed')throw new Error('synthetic pin error');
         if(mode==='pin-pending')await new Promise(resolve=>setTimeout(resolve,600));
         const command=saved.commands.find(value=>value.id===request.commandId)!;
         command.usage={useCount:0,lastUsedAt:null,alias:null,...command.usage,pinned:request.pinned};
-        return {ok:true,value:structuredClone(saved)};
+        return {ok:true,value:structuredClone(applicationMode?{...saved,commands:[command],updateOnly:true,nextCursor:null}:saved)};
       }};
   });
   return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><main className="launcher-fixture"><Launcher api={api} visible onDismiss={async()=>{setRequested('Requested Hide.');return {ok:true,value:null};}}/><output aria-live="polite">{requested}</output><p className="lc-muted">Component fixture · command requests are observed, not executed.</p></main></ThemeProvider>;

@@ -29,9 +29,13 @@ describe('L1-01 bounded registered command ranking',()=>{
   });
   it('bounds results, registry size and query length and rejects duplicate identities',()=>{
     expect(rankCommands(Array.from({length:100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'',now)).toHaveLength(20);
-    expect(()=>rankCommands(Array.from({length:101},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
+    expect(()=>rankCommands(Array.from({length:4100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
   });
   it('cancels old queries and rejects late completion after replacement, hide or disconnect',()=>{
     const generations=new QueryGenerations(),first=generations.begin('data'),second=generations.begin('hide');expect(first.signal.aborted).toBe(true);expect(generations.current(first.generation)).toBe(false);expect(generations.current(second.generation)).toBe(true);generations.cancel();expect(second.signal.aborted).toBe(true);expect(generations.current(second.generation)).toBe(false);
   });
+  it('takes the first 20 results per provider and merges bounded application and command results',()=>{
+    const commands=Array.from({length:40},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`,{provider:'commands'}));const apps=Array.from({length:60},(_,i)=>make(`application:${i.toString(16).padStart(64,'0')}`,`Fixture App ${i}`,{provider:'applications'}));const result=rankCommands([...commands,...apps],'',now);expect(result).toHaveLength(40);expect(result.filter(value=>value.provider==='applications')).toHaveLength(20);
+  });
+
 });

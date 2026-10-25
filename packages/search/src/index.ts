@@ -1,11 +1,11 @@
 /** Pure local ranking. Entries come only from the trusted command registry;
  * matching a name or alias never creates an executable command. */
 export interface SearchCommand {
-  id:string;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
+  id:string;provider?:'commands'|'applications'|undefined;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
   usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
 }
 export const MAX_QUERY_LENGTH=512;
-export const MAX_COMMANDS=100;
+export const MAX_COMMANDS=4099;
 export const MAX_COMMAND_RESULTS=20;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 function subsequence(query:string,text:string):boolean {let cursor=0;for(const character of text)if(character===query[cursor])cursor++;return cursor===query.length;}
@@ -26,13 +26,24 @@ function frecency(command:SearchCommand,now:number):number {
   const age=Math.max(0,now-at)/86_400_000;
   return Math.log2(1+usage.useCount)/(1+age/7);
 }
-export function rankCommands<T extends SearchCommand>(commands:readonly T[],query:string,now=Date.now()):T[] {
+export function rankCommands<T extends SearchCommand>(commands:readonly T[],query:string,now=Date.now(),selectedId:string|null=null):T[] {
   if(query.length>MAX_QUERY_LENGTH || commands.length>MAX_COMMANDS || !Number.isFinite(now))throw new Error('Search limit exceeded.');
   if(new Set(commands.map(command=>command.id)).size!==commands.length)throw new Error('Duplicate command identity.');
   const normalized=normalize(query);
-  return commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
+  const ranked=commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
     .sort((a,b)=>a.tier-b.tier || Number(Boolean(b.command.usage?.pinned))-Number(Boolean(a.command.usage?.pinned)) || frecency(b.command,now)-frecency(a.command,now) || (!normalized?a.index-b.index:a.command.title.localeCompare(b.command.title,'en')) || a.command.id.localeCompare(b.command.id,'en'))
-    .slice(0,MAX_COMMAND_RESULTS).map(entry=>entry.command);
+    .map(entry=>entry.command);
+  const counts=new Map<string,number>();
+  const providerOf=(command:T)=>command.provider??(command.id.startsWith('application:')?'applications':'commands');
+  const projected=ranked.filter(command=>{const provider=providerOf(command);const count=counts.get(provider)??0;if(count>=MAX_COMMAND_RESULTS)return false;counts.set(provider,count+1);return true;}).slice(0,100);
+  const selected=selectedId?ranked.find(command=>command.id===selectedId):undefined;
+  if(selected && !projected.some(command=>command.id===selected.id)){
+    // Preserve a still-matching selection without exceeding the provider cap.
+    const index=projected.findLastIndex(command=>providerOf(command)===providerOf(selected));
+    if(index>=0)projected[index]=selected;
+  }
+  const positions=new Map(ranked.map((command,index)=>[command.id,index]));
+  return projected.sort((a,b)=>positions.get(a.id)!-positions.get(b.id)!);
 }
 export function preserveSelection(commands:readonly SearchCommand[],selectedId:string|null):string|null {
   return commands.some(command=>command.id===selectedId)?selectedId:commands.find(command=>command.enabled)?.id??commands[0]?.id??null;
