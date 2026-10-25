@@ -64,7 +64,7 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime'],
+    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime', 'setLauncherPinned'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
