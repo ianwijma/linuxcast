@@ -125,12 +125,14 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!actions.setAlias || !actions.getUsage)return {ok:false,error:{code:'capability-unavailable',message:'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
     busy=true;
     let attempted=false;
+    const preflightExpires=Date.now()+2000;
     try {
       if(alias!==null){
         const normalized=normalizeCommandAlias(alias),others=registered.filter(command=>command.id!==commandId);
         let collision=others.some(command=>command.aliases.some(value=>normalizeCommandAlias(value)===normalized));
         // Bound owner concurrency below the client's pending-request limit. No query enters storage.
         for(let start=0;!collision && start<others.length;start+=32){
+          if(Date.now()>=preflightExpires)throw new Error('Alias check deadline.');
           const chunk=others.slice(start,start+32);
           const usage=await Promise.all(chunk.map(command=>actions.getUsage!(command.id)));
           collision=usage.some((row,index)=>{
@@ -140,6 +142,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
         }
         if(collision)return {ok:false,error:{code:'conflict',message:'Another command already uses this alias. Choose a different alias.',retryable:false}};
       }
+      if(Date.now()>=preflightExpires)throw new Error('Alias check deadline.');
       if(!active() || revision!==parsed.data.revision)return failure('invalid-request');
       attempted=true;
       const usage=await actions.setAlias(commandId,alias);

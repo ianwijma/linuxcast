@@ -74,7 +74,7 @@ it('validates the named pin request and refuses extra fields or unregistered IDs
 
 it('bounds alias metadata before IPC and exposes only the named alias operation',async()=>{
   const {api,transport}=fixture();
-  for(const alias of ['', ' leading', 'trailing ', 'x'.repeat(65), 'public\nprivate', '\u0085', '😀'.repeat(65)])expect((await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias})).ok).toBe(false);
+  for(const alias of ['', ' leading', 'trailing ', 'x'.repeat(65), 'public\nprivate', '\u0085', '😀'.repeat(65), '\ud800'])expect((await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias})).ok).toBe(false);
   expect((await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:'valid',query:'SYNTHETIC_PRIVATE'} as never)).ok).toBe(false);
   expect(transport.invoke).not.toHaveBeenCalled();
   await api.setLauncherAlias({commandId:'linuxcast:hide',revision:1,alias:'😀'.repeat(64)});

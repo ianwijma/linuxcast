@@ -171,9 +171,13 @@ it('rejects normalized collisions with declared and stored aliases while allowin
 });
 it('checks aliases beyond page100 and blocks concurrent effects until acknowledgement',async()=>{
   let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setAlias']>>>)=>void;
-  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i)),getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId.startsWith('application:')?'existing':null}),setAlias:()=>new Promise(resolve=>{finish=resolve;})});
+  let collisionId='';const readIds:string[]=[];
+  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i)),getUsage:async commandId=>{readIds.push(commandId);return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:commandId===collisionId?'existing':null};},setAlias:()=>new Promise(resolve=>{finish=resolve;})});
   const first=await catalogue(f),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:first.revision,alias:'existing'};
-  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});
+  const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
+  if(!second.ok)throw new Error('Second page unavailable.');collisionId=second.value.commands.at(-1)!.id;
+  expect(first.commands.some(command=>command.id===collisionId)).toBe(false);readIds.splice(0);
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,payload)).toMatchObject({ok:false,error:{code:'conflict'}});expect(readIds).toContain(collisionId);
   const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{...payload,alias:'new'});
   await vi.waitFor(()=>expect(finish).toBeDefined());
   expect(await f.execute('linuxcast:hide',first.revision)).toMatchObject({ok:false,error:{code:'cancelled'}});
@@ -193,4 +197,13 @@ it('never acknowledges an alias for an application removed during the write',asy
   const pending=f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:id,revision:first.revision,alias:'new'});
   await vi.waitFor(()=>expect(finish).toBeDefined());records.splice(0);await catalogue(f);
   finish({commandId:id,alias:'new',pinned:false,useCount:0,lastUsedAt:null});expect(await pending).toMatchObject({ok:false,error:{code:'internal'}});
+});
+
+it('does not write after a slow alias collision preflight reaches its deadline',async()=>{
+  const now=Date.now();const clock=vi.spyOn(Date,'now').mockReturnValue(now);
+  try{
+    const f=fixture({getUsage:async commandId=>{clock.mockReturnValue(now+2500);return {commandId,useCount:0,lastUsedAt:null,pinned:false,alias:null};}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+    expect(f.actions.setAlias).not.toHaveBeenCalled();
+  }finally{clock.mockRestore();}
 });

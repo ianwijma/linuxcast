@@ -5,7 +5,7 @@ import { uiTextSchema } from './scalars.ts';
 export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
 export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
-export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/\p{Cc}/u.test(value) && new TextEncoder().encode(value).length<=256);
+export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
 export const normalizeCommandAlias=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 export const launcherCommandsRequestSchema=z.strictObject({protocolVersion:z.literal(1),cursor:z.string().regex(/^[1-9][0-9]{0,15}:[0-9]{1,4}$/u).optional()});
 const launcherActionRequestSchema=z.strictObject({protocolVersion:z.literal(1)});

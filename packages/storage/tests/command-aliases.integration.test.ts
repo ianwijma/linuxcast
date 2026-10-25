@@ -26,7 +26,7 @@ it('preserves pins/usage and other commands; usage clearing retains alias',async
   expect(request(owner,'commands.getUsage',{commandId:'linuxcast:quit'})).toMatchObject({alias:'public quit',useCount:0});
 });
 it('refuses oversized/control/untrimmed/extra-field alias changes before writing',async()=>{
-  const {owner}=await open();for(const alias of ['', ' leading','trailing ','x'.repeat(65),'private\ntext','\u0085','😀'.repeat(65)])expect(()=>request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias})).toThrow();
+  const {owner}=await open();for(const alias of ['', ' leading','trailing ','x'.repeat(65),'private\ntext','\u0085','😀'.repeat(65), '\ud800'])expect(()=>request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias})).toThrow();
   expect(()=>request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias:'valid',pinned:true})).toThrow();
   expect(request(owner,'commands.getUsage',{commandId:'linuxcast:hide'})).toBeNull();
   expect(request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias:'😀'.repeat(64)})).toMatchObject({alias:'😀'.repeat(64)});
