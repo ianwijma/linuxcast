@@ -6,6 +6,7 @@ import type { DesktopShellState, ShellCommandReply, ShellStateReply } from '../.
 import { APP_URL } from './assets.ts';
 
 type ShellReply = ShellCommandReply | ShellStateReply;
+type ShellResult = ShellReply | Promise<ShellReply>;
 export interface ShellActions {
   contents(): WebContents | undefined;
   state(): DesktopShellState;
@@ -13,6 +14,7 @@ export interface ShellActions {
   resize(height: number): void;
   quit(): void;
   quitting(): boolean;
+  openDataSettings?(): void | Promise<void>;
 }
 
 function failure(code: 'invalid-request' | 'permission-denied' | 'cancelled' | 'internal'): ShellCommandReply {
@@ -23,17 +25,22 @@ function failure(code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
   return { ok: false, error: { code, message, retryable: false } };
 }
 
-export function trustedShellSender(event: IpcMainInvokeEvent, contents: WebContents | undefined): boolean {
+export function trustedAppSender(event: IpcMainInvokeEvent, contents: WebContents | undefined, expectedUrl: string): boolean {
   try {
     return !!contents && !contents.isDestroyed() && event.sender === contents &&
-      event.senderFrame === contents.mainFrame && event.senderFrame?.url === APP_URL && contents.getURL() === APP_URL;
+      event.senderFrame === contents.mainFrame && event.senderFrame?.url === expectedUrl && contents.getURL() === expectedUrl;
   } catch { return false; }
 }
 
+export function trustedShellSender(event: IpcMainInvokeEvent, contents: WebContents | undefined): boolean {
+  return trustedAppSender(event, contents, APP_URL);
+}
+
 export function registerShellIpc(ipc: Pick<IpcMain, 'handle' | 'removeHandler'>, actions: ShellActions): () => void {
-  const handlers: Array<[string, (event: IpcMainInvokeEvent, payload: unknown) => ShellReply]> = [];
-  const operations: Array<[string, () => ShellReply]> = [
+  const handlers: Array<[string, (event: IpcMainInvokeEvent, payload: unknown) => ShellResult]> = [];
+  const operations: Array<[string, () => ShellResult]> = [
     [SHELL_CHANNELS.getState, () => ({ ok: true, value: actions.state() })],
+    [SHELL_CHANNELS.openDataSettings, () => { if (!actions.openDataSettings) return failure('internal'); return Promise.resolve().then(() => actions.openDataSettings!()).then(() => ({ok:true as const,value:null}), () => failure('internal')); }],
     [SHELL_CHANNELS.hide, () => { actions.hide(); return { ok: true, value: null }; }],
     // Reply before asynchronous teardown closes the sender's window.
     [SHELL_CHANNELS.quit, () => { setImmediate(() => actions.quit()); return { ok: true, value: null }; }],

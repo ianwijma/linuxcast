@@ -1271,10 +1271,17 @@
         {
           "id": "F2-02-AC02",
           "text": "Clear/export/delete controls operate on intended categories only.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F2-02; private-Xvfb bun run test:integration -- F1-02",
+              "outcome": "58mapped checks plus actual settings flow verify intended-category/selected-ID isolation, empty selection, preserved pins/aliases, bounded index pruning without source deletion, complete-or-fail exports, stopped index jobs and unknown-outcome/no-replay handling. Real files verify cancelled clear preserves usage and confirmed clear resets only usage.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
+              "reference": "7594884/cc7384b/80beb75; packages/storage/tests/data-controls.integration.test.ts; packages/data-controls/tests/persistence.security.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            }
+          ]
         },
         {
           "id": "F2-02-UI",
@@ -1287,10 +1294,17 @@
         {
           "id": "F2-02-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F2-02; independent package/application review; actual private keyring smoke",
+              "outcome": "Generated synthetic fixtures and task-private HOME/XDG/D-Bus/keyring only. Opaque metadata, strict diagnostic fields and fixed errors; no credentials/grants in allowlisted category exports or screenshots. App renderer receives only named actions/outcomes/theme, no file path, record bodies, secret read or generic repository API.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0, SQLite3.53.4. Private Xvfb; native dialog choices instrumented. No Debian/KDE/Orca or release claim.",
+              "reference": "packages/secrets/README.md; packages/data-controls/README.md; apps/desktop/src/data-preload/api.ts; apps/desktop/evidence/data-settings-{dark,light}.png"
+            }
+          ]
         }
       ],
       "validation": [
@@ -1298,11 +1312,18 @@
         "bun run test:security -- F2-02"
       ],
       "evidence": [
-        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership."
+        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership.",
+        "Coordinator shared implementation25October2026: strict secret metadata3acad5c, actual owner migration004/CRUD29f1ea2, category clear/export7594884. Independent source reviews clean;43F2 integration checks and8mappedF2-02 checks pass. Production Electron45/SQLite3.53.4 smoke passes with schema004 after setup-path correction. These do not complete the still-unintegrated SecretStore, controllers or UI.",
+        "Bounded F2 increment25October2026: owned2c70e44/0f4c564/2404eef integrated62ba357/92a0810/cc7384b; actual data-settings workspace80beb75. 44package checks plus8owner checks and6export/preload checks =58mappedF2 security checks pass;44shell security checks pass. Actual Electron45/private-Xvfb app test passes (3.49s): separate settings window, exact preload boundary, category filtering, cancelled/confirmed clear, actual-owner exports and real private JSON files, keyboardHide/second-invocation/Quit. Native save/confirmation choices are test-instrumented, not physical desktop interaction. Settled dark/light screenshots inspected; axe same-page checks pass. Both application review findings resolved/re-reviewed; no new proof work assigned."
       ],
-      "owner": "manifest_review",
-      "branch": "codex/f2-02-secrets",
-      "limitations": []
+      "owner": "coordinator",
+      "branch": "codex/application-controls",
+      "limitations": [
+        "F2-02 remains in-progress. Credential setup/status and diagnostics management are not yet presented in the host UI; service checks do not establish those missing user flows.",
+        "Actual OS-keyring smoke passed only isolated Electron45/gnome_libsecret on Pop!_OS22.04/GNOME-keyring40.0. Full packaged credential/provider flow, Debian13/KDE/session backend matrix and release acceptance remain outstanding.",
+        "Local-data screen has actual private-Xvfb keyboard/filter/action and dark/light/axe evidence. Native picker/confirmation responses were instrumented; physical desktop, Orca, high-contrast/reduced-motion and complete UI acceptance remain pending.",
+        "Category exports are bounded complete snapshots and explicitly fail when oversized. Full encrypted portable backups remain F2-03. Deletion is logical; prior backups may retain content."
+      ]
     },
     {
       "id": "F3-01",
@@ -1395,7 +1416,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
-        "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained."
+        "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained.",
+        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending."
       ],
       "owner": "manifest_review",
       "branch": "codex/application-services",
@@ -2100,7 +2122,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
-        "24October2026: source415291b/7ca47fd integrated7f3e45c/b9d3c0a; sole-owner migration003/client/recovery integration7ea48fe. Final mapped L2 suite14/14 passes, including100k actual files and actual utility-owner migration/reopen; F2 regression35/35, native tests2/2, Clippy warnings denied, typecheck/lint and bundled Electron/schema003 smoke pass. Independent review resolved native cleanup on storage failure and verified final integration."
+        "24October2026: source415291b/7ca47fd integrated7f3e45c/b9d3c0a; sole-owner migration003/client/recovery integration7ea48fe. Final mapped L2 suite14/14 passes, including100k actual files and actual utility-owner migration/reopen; F2 regression35/35, native tests2/2, Clippy warnings denied, typecheck/lint and bundled Electron/schema003 smoke pass. Independent review resolved native cleanup on storage failure and verified final integration.",
+        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending."
       ],
       "owner": "reading_review",
       "branch": "codex/application-services",

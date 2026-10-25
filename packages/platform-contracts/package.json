@@ -6,7 +6,9 @@
   "license": "GPL-3.0-only",
   "exports": {
     ".": "./src/index.ts",
-    "./permissions": "./src/permissions.ts"
+    "./permissions": "./src/permissions.ts",
+    "./secrets": "./src/secrets.ts",
+    "./data-controls": "./src/data-controls.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",

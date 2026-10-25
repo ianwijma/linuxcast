@@ -1,7 +1,11 @@
 import { afterEach, expect, it } from 'vitest';
 import { _electron as electron } from '@playwright/test';
 import type { ElectronApplication } from '@playwright/test';
-import type { DesktopShellApi } from '@linuxcast/contracts';
+import type { DesktopShellApi, DataSettingsApi } from '@linuxcast/contracts';
+import { StorageOwner } from '../../../packages/storage/src/owner.ts';
+import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import AxeBuilder from '@axe-core/playwright';
 import { execFileSync, spawn } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -28,6 +32,9 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   temporary = mkdtempSync(join(tmpdir(), 'linuxcast-product-shell-'));
   const profile = join(temporary, 'profile'), wrapper = join(temporary, 'entry.cjs');
   for (const name of ['profile', 'home', 'config', 'cache', 'data', 'runtime']) mkdirSync(join(temporary, name), { mode: 0o700 });
+  const seed=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-data-settings'});
+  seed.request({schemaVersion:1,requestId:randomUUID(),method:'commands.recordUse',params:{commandId:'builtin.public-fixture'}});
+  await seed.confirmSuccessfulLaunch();await seed.close();
   // Wrapper owns the test profile and strips only Playwright instrumentation flags; all app bundles are production.
   writeFileSync(wrapper, `const { app } = require('electron');\nprocess.argv = process.argv.filter(value => value !== '--inspect=0' && value !== '--remote-debugging-port=0');\napp.setPath('userData', ${JSON.stringify(profile)});\napp.setPath('sessionData', ${JSON.stringify(profile)});\nrequire(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});\n`, { mode: 0o600 });
   const env: Record<string, string> = { HOME: join(temporary, 'home'), XDG_CONFIG_HOME: join(temporary, 'config'),
@@ -46,7 +53,7 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['getState', 'hideLauncher', 'onState', 'quit', 'reportContentHeight', 'runtime'],
+    methods: ['getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -61,9 +68,41 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   for (const theme of ['dark', 'light'] as const) {
     await app.evaluate(({ nativeTheme }, value) => { nativeTheme.themeSource = value; }, theme);
     await expect.poll(() => page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(async () => { await document.fonts.ready; await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {}))); });
     await page.screenshot({ path: join(evidence, `shell-${theme}.png`) });
   }
+  const nextWindow=app.waitForEvent('window');
+  await page.getByRole('button',{name:'Local data',exact:true}).click();
+  const data=await nextWindow;await data.waitForURL('linuxcast-app://shell/data-settings.html');
+  await expect.poll(()=>data.getByRole('heading',{name:'Local data',exact:true}).isVisible()).toBe(true);
+  await expect.poll(()=>data.getByRole('button',{name:'Export command usage'}).isEnabled()).toBe(true);
+  expect(await data.evaluate(()=>({require:typeof (window as unknown as {require?:unknown}).require,process:typeof (window as unknown as {process?:unknown}).process,
+    shell:typeof (window as unknown as {linuxcast?:unknown}).linuxcast,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()})))
+    .toEqual({require:'undefined',process:'undefined',shell:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance']});
+  expect(await data.evaluate(()=>(window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData.clearCategory('permissions' as never))).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  for(const theme of ['dark','light'] as const){
+    await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
+    await expect.poll(()=>data.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
+    await data.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
+    await data.screenshot({path:join(evidence,`data-settings-${theme}.png`)});
+    expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
+  }
+  const search=data.getByRole('searchbox',{name:'Search data categories'});await search.fill('no matching fixture');
+  await expect.poll(()=>data.getByRole('heading',{name:'No matching categories'}).isVisible()).toBe(true);await search.fill('');
+  // Native choices are instrumented; storage, renderer IPC and saved files are actual production paths.
+  const exportFile=join(temporary,'usage-before.json');
+  await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});},exportFile);
+  await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Action cancelled.');
+  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
+  expect(JSON.parse(await readFile(exportFile,'utf8'))).toMatchObject({encrypted:false,data:{category:'command-usage',records:[{commandId:'builtin.public-fixture',useCount:1}]}});
+  await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
+  await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
+  const afterFile=join(temporary,'usage-after.json');await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});},afterFile);
+  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
+  expect(JSON.parse(await readFile(afterFile,'utf8'))).toMatchObject({data:{records:[{commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}]}});
+  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
+  expect(JSON.parse(await readFile(afterFile,'utf8'))).toMatchObject({data:{records:[{useCount:0}]}});
+  await data.getByRole('button',{name:'Close settings'}).click();await expect.poll(()=>data.isClosed()).toBe(true);
   expect(await app.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Linuxcast storage').length)).toBe(1);
   expect(await app.evaluate(async ({ utilityProcess }, options) => new Promise<boolean>((resolve, reject) => {
     const child = utilityProcess.fork(options.entry, [], { env: {}, stdio: 'ignore' });
@@ -115,7 +154,8 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   expect(storage.reopened.sqliteVersion).toBe('3.53.4');
   expect(storage.reopened.value).toMatchObject({ id: 'ui.theme', value: 'dark', revision: 1 });
   const windowId = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.id);
-  await page.getByRole('button', { name: 'Hide', exact: true }).click({ timeout: 5000 });
+  await page.getByRole('button', { name: 'Hide', exact: true }).focus();
+  await page.getByRole('button', { name: 'Hide', exact: true }).press('Enter');
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
   const secondCode = await new Promise<number>((resolve, reject) => {
     const second = spawn(executable, [wrapper, '--toggle'], { env, stdio: 'ignore' });

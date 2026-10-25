@@ -1,3 +1,7 @@
+import { STORAGE_REASONS } from './errors.ts';
+import type { StorageReason } from './errors.ts';
+import type { DataExportResult } from '@linuxcast/platform-contracts/data-controls';
+import type { SecretReferenceRecord } from '@linuxcast/platform-contracts/secrets';
 import { rootConfigSchema } from '@linuxcast/file-index/contracts';
 import type { RootState, FileCandidate } from '@linuxcast/file-index/contracts';
 import { createHash, randomUUID } from 'node:crypto';
@@ -11,8 +15,9 @@ export interface ClientPort { send(value: unknown): void; onMessage(listener: (v
 export class StorageRequestError extends Error {
   readonly effectOutcome: 'not-dispatched' | 'unknown';
   readonly automaticReplay = false;
-  constructor(effectOutcome: 'not-dispatched' | 'unknown', reason: string) {
-    super(reason); this.name = 'StorageRequestError'; this.effectOutcome = effectOutcome;
+  readonly reasonCode: StorageReason | undefined;
+  constructor(effectOutcome: 'not-dispatched' | 'unknown', reason: string, reasonCode?: StorageReason) {
+    super(reason); this.name = 'StorageRequestError'; this.effectOutcome = effectOutcome; this.reasonCode = reasonCode;
   }
 }
 
@@ -20,7 +25,29 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if (method === 'files.roots.put') {
+  if (method === 'dataControls.clear') valid = row.category === params.category;
+  else if (method === 'dataControls.export') {
+    const exported = result as DataExportResult, ids = params.ids as string[] | undefined;
+    valid = exported.category === params.category;
+    if (exported.category === 'ai-conversations') {
+      const selected = new Set(exported.conversations.map(record=>record.id));
+      valid &&= selected.size === exported.conversations.length && exported.conversations.every(record=>!ids||ids.includes(record.id)) &&
+        exported.messageRevisions.every(record=>selected.has(record.conversationId));
+    } else {
+      const identities = exported.category === 'settings' ? exported.records.map(record=>record.id) : exported.records.map(record=>record.commandId);
+      valid &&= new Set(identities).size === identities.length && identities.every(id=>!ids||ids.includes(id));
+    }
+  } else if (method === 'secretRefs.get') valid = row.id === params.id;
+  else if (method === 'secretRefs.put') {
+    const expected = params.record as SecretReferenceRecord, actual = result as SecretReferenceRecord;
+    valid = actual.id === expected.id && actual.ownerKind === expected.ownerKind && actual.ownerId === expected.ownerId &&
+      actual.createdAt === expected.createdAt && actual.updatedAt === expected.updatedAt;
+  } else if (method === 'secretRefs.list') {
+    const page = result as {records: SecretReferenceRecord[]; nextCursor: string | null};
+    valid = page.records.length <= Number(params.limit) && page.records.every((record, index) =>
+      record.id > (index === 0 ? (params.afterId as string | undefined) ?? '' : page.records[index - 1]!.id)) &&
+      (page.nextCursor === null || page.nextCursor === page.records.at(-1)?.id);
+  } else if (method === 'files.roots.put') {
     valid = JSON.stringify(rootConfigSchema.parse((result as RootState).config)) === JSON.stringify(rootConfigSchema.parse(params.config));
   } else if (method === 'files.roots.list') {
     const roots = result as RootState[];
@@ -72,7 +99,9 @@ export function createStorageClient(port: ClientPort) {
       pending.delete(response.requestId); entry.cleanup();
       if (response.outcome === 'completed') entry.resolve(response.result);
       else entry.reject(new StorageRequestError(response.outcome === 'cancelled' ? response.effectOutcome : 'not-dispatched',
-        response.outcome === 'cancelled' ? 'Storage request cancelled.' : response.failure.message));
+        response.outcome === 'cancelled' ? 'Storage request cancelled.' : response.failure.message,
+        response.outcome === 'failed' && (STORAGE_REASONS as readonly unknown[]).includes(response.failure.details?.reasonCode)
+          ? response.failure.details!.reasonCode as StorageReason : undefined));
     } catch { disconnect(); }
   });
   function disconnect(): void {

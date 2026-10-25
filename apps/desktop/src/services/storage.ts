@@ -4,7 +4,7 @@ import { createStorageClient, STORAGE_SCHEMA_VERSION } from '@linuxcast/storage'
 import type { ResidentService } from '../main/lifecycle.ts';
 
 /** A trusted main-owned child. No database path or generic repository API enters preload. */
-export function startStorage(resourcesDirectory: string, dataDirectory: string, applicationBuild: string): ResidentService & { confirmLaunch(): void } {
+export function startStorage(resourcesDirectory: string, dataDirectory: string, applicationBuild: string): ResidentService & { confirmLaunch(): void; repository: ReturnType<typeof createStorageClient>; isReady(): boolean } {
   const child = utilityProcess.fork(join(resourcesDirectory, 'storage.cjs'), [], {
     serviceName: 'Linuxcast storage', stdio: 'ignore',
     // Storage does not inherit provider keys, loader injection or desktop bus handles.
@@ -48,6 +48,8 @@ export function startStorage(resourcesDirectory: string, dataDirectory: string, 
       nativeBinding: join(resourcesDirectory, 'sqlite/better_sqlite3.node') });
   });
   return {
+    repository: client,
+    isReady: () => ready && !ended && !stopping,
     confirmLaunch() { launched = true; confirm(); },
     async stop() {
       stopping = true; client.disconnect();

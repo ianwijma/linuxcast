@@ -37,6 +37,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/data-controls": "workspace:*",
         "@linuxcast/storage": "workspace:*",
         "@linuxcast/ui": "workspace:*",
         "react": "19.3.1",
@@ -52,6 +53,16 @@
       "name": "@linuxcast/contracts",
       "version": "0.1.0",
       "dependencies": {
+        "zod": "4.6.7",
+      },
+    },
+    "packages/data-controls": {
+      "name": "@linuxcast/data-controls",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/platform-contracts": "workspace:*",
+        "@linuxcast/storage": "workspace:*",
         "zod": "4.6.7",
       },
     },
@@ -78,6 +89,16 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+        "zod": "4.6.7",
+      },
+    },
+    "packages/secrets": {
+      "name": "@linuxcast/secrets",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/platform-contracts": "workspace:*",
+        "@linuxcast/storage": "workspace:*",
         "zod": "4.6.7",
       },
     },
@@ -315,6 +336,8 @@
 
     "@linuxcast/contracts": ["@linuxcast/contracts@workspace:packages/contracts"],
 
+    "@linuxcast/data-controls": ["@linuxcast/data-controls@workspace:packages/data-controls"],
+
     "@linuxcast/desktop": ["@linuxcast/desktop@workspace:apps/desktop"],
 
     "@linuxcast/file-index": ["@linuxcast/file-index@workspace:packages/file-index"],
@@ -322,6 +345,8 @@
     "@linuxcast/permissions": ["@linuxcast/permissions@workspace:packages/permissions"],
 
     "@linuxcast/platform-contracts": ["@linuxcast/platform-contracts@workspace:packages/platform-contracts"],
+
+    "@linuxcast/secrets": ["@linuxcast/secrets@workspace:packages/secrets"],
 
     "@linuxcast/storage": ["@linuxcast/storage@workspace:packages/storage"],
 

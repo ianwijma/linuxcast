@@ -71,7 +71,9 @@
     ],
     "F2-01": [
       "packages/storage/tests/storage.integration.test.ts",
-      "packages/storage/tests/permissions.integration.test.ts"
+      "packages/storage/tests/permissions.integration.test.ts",
+      "packages/storage/tests/secrets.integration.test.ts",
+      "packages/storage/tests/data-controls.integration.test.ts"
     ],
     "F1-02": [
       "apps/desktop/tests/shell.integration.test.ts"
@@ -106,6 +108,17 @@
       "packages/permissions/tests/broker.security.test.ts",
       "packages/permissions/tests/pagination.security.test.ts",
       "packages/permissions/tests/persistence.security.test.ts"
+    ],
+    "F2-02": [
+      "packages/storage/tests/secrets.integration.test.ts",
+      "packages/storage/tests/data-controls.integration.test.ts",
+      "apps/desktop/src/main/data-export.test.ts",
+      "apps/desktop/src/data-preload/api.test.ts",
+      "packages/secrets/tests/secrets.security.test.ts",
+      "packages/secrets/tests/persistence.security.test.ts",
+      "packages/data-controls/tests/controls.security.test.ts",
+      "packages/data-controls/tests/controller.security.test.ts",
+      "packages/data-controls/tests/persistence.security.test.ts"
     ]
   },
   "perf": {}

@@ -1,7 +1,7 @@
 {
   "scope": "F1-01 development dependencies, not the packaged 1.0 SBOM. Missing platform or non-registry manifest metadata has null licenses; re-inventory shipped contents at R1-03.",
   "lockfileSha256": {
-    "bun.lock": "d6e185d5e02479b8cc67b997a53067b8ee2f03106fe2f6bab8fde8bdb811ce2f",
+    "bun.lock": "2f3bcdc12551e3bd9d73725ec0a101c179b7b48ff18b37364add14dd3c6c551b",
     "Cargo.lock": "07693a75d13e9d180b86583aee18c5946fe9eedfc67eb74ba52fe1c8b8fe3031",
     "rust-toolchain.toml": "24ef3b9d3edbd850aa386cb0a98e10450b0030991a4537cb359f54d49dbbb33a"
   },
@@ -728,6 +728,13 @@
       "license": null
     },
     {
+      "key": "@linuxcast/data-controls",
+      "resolved": "@linuxcast/data-controls@workspace:packages/data-controls",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
       "key": "@linuxcast/desktop",
       "resolved": "@linuxcast/desktop@workspace:apps/desktop",
       "integrity": null,
@@ -751,6 +758,13 @@
     {
       "key": "@linuxcast/platform-contracts",
       "resolved": "@linuxcast/platform-contracts@workspace:packages/platform-contracts",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/secrets",
+      "resolved": "@linuxcast/secrets@workspace:packages/secrets",
       "integrity": null,
       "manifestMetadataPresent": false,
       "license": null

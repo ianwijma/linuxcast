@@ -1,3 +1,5 @@
+import { dataControlContracts } from '@linuxcast/platform-contracts/data-controls';
+import { secretReferenceContracts } from '@linuxcast/platform-contracts/secrets';
 import { fileIndexContracts } from '@linuxcast/file-index/contracts';
 import * as z from 'zod';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
@@ -16,12 +18,14 @@ const validSetting = (v: {id:string;value:string|boolean}) => {
   }
 };
 const setting = z.strictObject({id:settingId,revision:revision.min(1),value:settingValue,modifiedAt:z.iso.datetime()}).refine(validSetting);
-const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datetime(),pinned:z.boolean(),alias:uiTextSchema.nullable()});
+const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datetime().nullable(),pinned:z.boolean(),alias:uiTextSchema.nullable()});
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...createAiRepositoryContracts(),
   ...permissionRepositoryContracts,
   ...fileIndexContracts,
+  ...secretReferenceContracts,
+  ...dataControlContracts,
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],

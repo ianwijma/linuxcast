@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { SHELL_APP_ID, SHELL_CHANNELS } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellState } from '../../../../packages/contracts/src/desktop-shell.ts';
 import { APP_URL } from './assets.ts';
-import { registerShellIpc } from './ipc.ts';
+import { registerShellIpc, trustedAppSender } from './ipc.ts';
 
 const state: DesktopShellState = { protocolVersion: 1, identity: SHELL_APP_ID, visible: true, focused: false,
   appearance: 'dark', activation: { id: 'launcher.activate', state: 'temporarily-unavailable', backend: null, generation: 0 } };
@@ -20,9 +20,9 @@ function fixture() {
 }
 
 describe('renderer to main boundary', () => {
-  it('registers only four fixed methods and dispatches validated own-frame requests', () => {
+  it('registers only fixed named methods and dispatches validated own-frame requests', () => {
     const f = fixture();
-    expect([...f.handlers.keys()].sort()).toEqual([SHELL_CHANNELS.getState, SHELL_CHANNELS.hide, SHELL_CHANNELS.contentHeight, SHELL_CHANNELS.quit].sort());
+    expect([...f.handlers.keys()].sort()).toEqual([SHELL_CHANNELS.getState, SHELL_CHANNELS.openDataSettings, SHELL_CHANNELS.hide, SHELL_CHANNELS.contentHeight, SHELL_CHANNELS.quit].sort());
     expect(f.invoke(SHELL_CHANNELS.getState)).toEqual({ ok: true, value: state });
     expect(f.invoke(SHELL_CHANNELS.hide)).toEqual({ ok: true, value: null }); expect(f.actions.hide).toHaveBeenCalledOnce();
     expect(f.invoke(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 400 })).toEqual({ ok: true, value: null });
@@ -68,4 +68,22 @@ describe('renderer to main boundary', () => {
     expect(f.actions.quit).not.toHaveBeenCalled();
     await new Promise<void>(resolve => setImmediate(resolve)); expect(f.actions.quit).toHaveBeenCalledOnce();
   });
+});
+
+it('binds each data workspace to its exact contents, main frame and packaged document',()=>{
+  const url='linuxcast-app://shell/data-settings.html',frame={url},contents={isDestroyed:()=>false,getURL:()=>url,mainFrame:frame};
+  const event={sender:contents,senderFrame:frame};
+  expect(trustedAppSender(event as unknown as IpcMainInvokeEvent,contents as unknown as WebContents,url)).toBe(true);
+  for(const bad of [{...event,sender:{}},{...event,senderFrame:{url}},{...event,senderFrame:{url:'linuxcast-app://shell/index.html'}}])
+    expect(trustedAppSender(bad as unknown as IpcMainInvokeEvent,contents as unknown as WebContents,url)).toBe(false);
+  expect(trustedAppSender(event as unknown as IpcMainInvokeEvent,contents as unknown as WebContents,'linuxcast-app://shell/index.html')).toBe(false);
+});
+
+it('awaits workspace opening and reports its rejection without exposing exception content',async()=>{
+  const f=fixture();
+  // Re-register with the same trusted sender and one failing native-window opener.
+  f.remove();
+  const remove=registerShellIpc({handle:(channel,handler)=>{f.handlers.set(channel,handler as never);},removeHandler:channel=>{f.handlers.delete(channel);}},
+    {...f.actions,openDataSettings:async()=>{throw new Error('Synthetic private path');}});
+  expect(await f.invoke(SHELL_CHANNELS.openDataSettings)).toMatchObject({ok:false,error:{code:'internal',message:'Shell operation unavailable.'}});remove();
 });

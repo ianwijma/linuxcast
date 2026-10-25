@@ -11,7 +11,7 @@ function fixture() {
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['getState', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });

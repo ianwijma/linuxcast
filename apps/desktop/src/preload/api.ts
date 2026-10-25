@@ -27,6 +27,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
         return result.success ? result.data : unavailable;
       } catch { return unavailable; }
     },
+    openDataSettings: () => command(SHELL_CHANNELS.openDataSettings, { protocolVersion: 1 }),
     hideLauncher: () => command(SHELL_CHANNELS.hide, { protocolVersion: 1 }),
     reportContentHeight: (height: number) => command(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height }),
     quit: () => command(SHELL_CHANNELS.quit, { protocolVersion: 1 }),
