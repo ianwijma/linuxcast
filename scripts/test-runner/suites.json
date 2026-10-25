@@ -21,6 +21,10 @@
     "D1-02": [
       "packages/ui/src/views/session.test.ts",
       "packages/ui/src/views/form.test.tsx"
+    ],
+    "L1-01": [
+      "packages/search/tests/search.test.ts",
+      "apps/desktop/src/features/launcher/tests/controller.test.ts"
     ]
   },
   "contracts": {
@@ -64,6 +68,9 @@
     ],
     "D1-02": [
       "packages/ui/src/views/views.test.ts"
+    ],
+    "L1-01": [
+      "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
     ]
   },
   "integration": {

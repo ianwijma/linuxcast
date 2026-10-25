@@ -6,3 +6,8 @@ html, body, #root { margin: 0; min-inline-size: 0; }
 .shell-content { padding: var(--lc-space-16); }
 .shell-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--lc-space-12); min-block-size: var(--lc-footer-height); padding: var(--lc-space-8) var(--lc-space-16); border-block-start: 1px solid var(--lc-border); background: var(--lc-surface); }
 .shell-actions { display: flex; flex-wrap: wrap; gap: var(--lc-space-8); }
+/* The resident window sizes to content; viewport subtraction here would feed
+   each smaller resize back into the next content measurement. */
+.shell-launcher .lc-view { max-block-size: var(--lc-launcher-max-height); }
+.shell-launcher .lc-view-shell { border: 0; border-radius: 0; }
+.shell-launcher > p { padding-inline: var(--lc-space-16); }

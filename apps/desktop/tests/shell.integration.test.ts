@@ -46,14 +46,25 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
     chromiumSandbox: true, env, timeout: 20000 });
   const app = application, page = await app.firstWindow();
   await page.waitForURL(appUrl);
-  await page.getByRole('heading', { name: 'Search is not available yet' }).waitFor({ timeout: 5000 });
+  const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
+  await query.waitFor({timeout:5000});
+  await expect.poll(()=>page.getByRole('option').count()).toBe(3);
+  await expect.poll(()=>query.evaluate(element=>element===document.activeElement)).toBe(true);
+  await query.press('ArrowDown');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
+  await query.press('ArrowUp');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
+  await query.fill('no actual command');
+  await expect.poll(()=>page.getByRole('heading',{name:'No matching results'}).isVisible()).toBe(true);
+  await query.fill('');
+  await expect.poll(()=>page.getByRole('option').count()).toBe(3);
   expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(profile);
   expect(await page.evaluate(() => {
     const windowApi = window as unknown as { require?: unknown; process?: unknown; linuxcast?: DesktopShellApi };
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime'],
+    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -71,8 +82,11 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
     await page.evaluate(async () => { await document.fonts.ready; await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {}))); });
     await page.screenshot({ path: join(evidence, `shell-${theme}.png`) });
   }
+  expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
   const nextWindow=app.waitForEvent('window');
-  await page.getByRole('button',{name:'Local data',exact:true}).click();
+  await query.fill('settings');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
+  await query.press('Enter');
   const data=await nextWindow;await data.waitForURL('linuxcast-app://shell/data-settings.html');
   await expect.poll(()=>data.getByRole('heading',{name:'Local data',exact:true}).isVisible()).toBe(true);
   await expect.poll(()=>data.getByRole('button',{name:'Export command usage'}).isEnabled()).toBe(true);
@@ -94,14 +108,17 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});},exportFile);
   await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Action cancelled.');
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
-  expect(JSON.parse(await readFile(exportFile,'utf8'))).toMatchObject({encrypted:false,data:{category:'command-usage',records:[{commandId:'builtin.public-fixture',useCount:1}]}});
+  const before=JSON.parse(await readFile(exportFile,'utf8'));
+  expect(before).toMatchObject({encrypted:false,data:{category:'command-usage'}});
+  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
+  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
   await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
   const afterFile=join(temporary,'usage-after.json');await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});},afterFile);
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
-  expect(JSON.parse(await readFile(afterFile,'utf8'))).toMatchObject({data:{records:[{commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}]}});
+  expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}));
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
-  expect(JSON.parse(await readFile(afterFile,'utf8'))).toMatchObject({data:{records:[{useCount:0}]}});
+  expect(JSON.parse(await readFile(afterFile,'utf8')).data.records.every((record:{useCount:number})=>record.useCount===0)).toBe(true);
   await data.getByRole('button',{name:'Close settings'}).click();await expect.poll(()=>data.isClosed()).toBe(true);
   expect(await app.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Linuxcast storage').length)).toBe(1);
   expect(await app.evaluate(async ({ utilityProcess }, options) => new Promise<boolean>((resolve, reject) => {
@@ -154,8 +171,9 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   expect(storage.reopened.sqliteVersion).toBe('3.53.4');
   expect(storage.reopened.value).toMatchObject({ id: 'ui.theme', value: 'dark', revision: 1 });
   const windowId = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.id);
-  await page.getByRole('button', { name: 'Hide', exact: true }).focus();
-  await page.getByRole('button', { name: 'Hide', exact: true }).press('Enter');
+  await query.fill('hide');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
+  await query.press('Enter');
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
   const secondCode = await new Promise<number>((resolve, reject) => {
     const second = spawn(executable, [wrapper, '--toggle'], { env, stdio: 'ignore' });
@@ -166,6 +184,9 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   expect(secondCode).toBe(0);
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().map(window => window.id))).toEqual([windowId]);
+  await query.fill('quit');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');
+  await query.focus();
   expect(await app.evaluate(async ({ BrowserWindow }) => {
     const contents = BrowserWindow.getAllWindows()[0]!.webContents;
     const blocked = new Promise<boolean>(resolve => contents.once('will-frame-navigate', event => resolve(event.defaultPrevented)));
@@ -177,9 +198,8 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)).toBe(1);
   const child = app.process();
   const exited = new Promise<number | null>(resolve => child.once('exit', resolve));
-  // Renderer navigation denial leaves Playwright's locator navigation wait pending.
-  // Invoke the same DOM button directly after asserting the denial.
-  await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent === 'Quit Linuxcast')!.click());
+  // Actual keyboard dispatch; no locator navigation auto-wait after the denied navigation.
+  await page.keyboard.press('Enter');
   expect(await exited).toBe(0);
   application = undefined;
 }, 60000);
