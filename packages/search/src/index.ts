@@ -1,0 +1,51 @@
+/** Pure local ranking. Entries come only from the trusted command registry;
+ * matching a name or alias never creates an executable command. */
+export interface SearchCommand {
+  id:string;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
+  usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
+}
+export const MAX_QUERY_LENGTH=512;
+export const MAX_COMMANDS=100;
+export const MAX_COMMAND_RESULTS=20;
+const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
+function subsequence(query:string,text:string):boolean {let cursor=0;for(const character of text)if(character===query[cursor])cursor++;return cursor===query.length;}
+function match(command:SearchCommand,query:string):number|null {
+  if(!query)return 0;
+  const aliases=[...command.aliases,...(command.usage?.alias?[command.usage.alias]:[])].map(normalize);
+  if(aliases.includes(query))return 0;
+  const title=normalize(command.title),keywords=command.keywords.map(normalize);
+  if(title===query)return 1;
+  if(title.startsWith(query))return 2;
+  if(title.includes(query))return 3;
+  if(query.split(' ').every(token=>[title,...keywords,...aliases].some(value=>value.includes(token))))return 4;
+  return subsequence(query,title)?5:null;
+}
+function frecency(command:SearchCommand,now:number):number {
+  const usage=command.usage;if(!usage || usage.useCount===0 || !usage.lastUsedAt)return 0;
+  const at=Date.parse(usage.lastUsedAt);if(!Number.isFinite(at))return 0;
+  const age=Math.max(0,now-at)/86_400_000;
+  return Math.log2(1+usage.useCount)/(1+age/7);
+}
+export function rankCommands<T extends SearchCommand>(commands:readonly T[],query:string,now=Date.now()):T[] {
+  if(query.length>MAX_QUERY_LENGTH || commands.length>MAX_COMMANDS || !Number.isFinite(now))throw new Error('Search limit exceeded.');
+  if(new Set(commands.map(command=>command.id)).size!==commands.length)throw new Error('Duplicate command identity.');
+  const normalized=normalize(query);
+  return commands.map((command,index)=>({command,index,tier:match(command,normalized)})).filter((entry):entry is {command:T;index:number;tier:number}=>entry.tier!==null)
+    .sort((a,b)=>a.tier-b.tier || Number(Boolean(b.command.usage?.pinned))-Number(Boolean(a.command.usage?.pinned)) || frecency(b.command,now)-frecency(a.command,now) || (!normalized?a.index-b.index:a.command.title.localeCompare(b.command.title,'en')) || a.command.id.localeCompare(b.command.id,'en'))
+    .slice(0,MAX_COMMAND_RESULTS).map(entry=>entry.command);
+}
+export function preserveSelection(commands:readonly SearchCommand[],selectedId:string|null):string|null {
+  return commands.some(command=>command.id===selectedId)?selectedId:commands.find(command=>command.enabled)?.id??commands[0]?.id??null;
+}
+/** A query generation is local state, not execution authority. Cancellation
+ * invalidates older completions even when an asynchronous producer ignores it. */
+export class QueryGenerations {
+  #generation=0;#controller:AbortController|null=null;
+  begin(query:string) {
+    if(query.length>MAX_QUERY_LENGTH)throw new Error('Search limit exceeded.');
+    this.#controller?.abort();const controller=new AbortController();this.#controller=controller;
+    return {generation:++this.#generation,query,signal:controller.signal};
+  }
+  current(generation:number):boolean{return generation===this.#generation && this.#controller!==null && !this.#controller.signal.aborted;}
+  cancel(){this.#controller?.abort();this.#controller=null;}
+}
