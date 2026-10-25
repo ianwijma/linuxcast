@@ -3,7 +3,7 @@ import { secretReferenceContracts } from '@linuxcast/platform-contracts/secrets'
 import { fileIndexContracts } from '@linuxcast/file-index/contracts';
 import * as z from 'zod';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
-import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema } from '../../contracts/src/index.ts';
+import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
@@ -29,6 +29,7 @@ export const storageContracts: RepositoryContracts = new Map([
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
   ['commands.setPinned',{params:z.strictObject({commandId,pinned:z.boolean()}),result:usage}],
+  ['commands.setAlias',{params:z.strictObject({commandId,alias:commandAliasSchema.nullable()}),result:usage}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],
   ['commands.getUsage',{params:z.strictObject({commandId}),result:usage.nullable()}],
   ['ai.conversations.put',{params:z.strictObject({record:conversationRecordSchema,expectedRevision:revision}),result:conversationRecordSchema}],

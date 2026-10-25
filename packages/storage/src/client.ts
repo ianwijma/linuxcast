@@ -73,6 +73,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
       actual.updatedAt === expected.updatedAt;
   } else if (method.startsWith('settings.')) valid = row.id === params.id;
   else if (method === 'commands.setPinned') valid = row.commandId === params.commandId && row.pinned === params.pinned;
+  else if (method === 'commands.setAlias') valid = row.commandId === params.commandId && row.alias === params.alias;
   else if (method.startsWith('commands.')) valid = row.commandId === params.commandId;
   else if (method === 'ai.conversations.get') valid = row.id === params.id;
   else if (method === 'ai.messages.list') valid = (result as {conversationId:string}[]).every(r => r.conversationId === params.conversationId);

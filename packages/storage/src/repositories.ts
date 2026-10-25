@@ -31,6 +31,7 @@ export interface StorageMethods extends FileIndexMethods {
   'settings.get': { params: {id: SettingId}; result: Setting | null };
   'settings.set': { params: {id: SettingId; expectedRevision: number; value: string | boolean}; result: Setting };
   'commands.setPinned': { params: {commandId: string; pinned: boolean}; result: CommandUsage };
+  'commands.setAlias': { params: {commandId: string; alias: string | null}; result: CommandUsage };
   'commands.recordUse': { params: {commandId: string}; result: CommandUsage };
   'commands.getUsage': { params: {commandId: string}; result: CommandUsage | null };
   'ai.conversations.get': { params: {id: string}; result: Conversation | null };
@@ -39,7 +40,7 @@ export interface StorageMethods extends FileIndexMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -126,6 +127,13 @@ export class Repositories {
         if (typeof p.pinned !== 'boolean') throw new StorageError('invalid-request');
         db.prepare('INSERT INTO command_usage(command_id,use_count,last_used_at,pinned,alias) VALUES(?,0,NULL,?,NULL) ON CONFLICT(command_id) DO UPDATE SET pinned=excluded.pinned')
           .run(commandId, Number(p.pinned));
+        return this.getUsage(commandId);
+      }
+      case 'commands.setAlias': {
+        // The full schema is validated before dispatch; update only alias atomically.
+        const {commandId,alias}=input as StorageMethods['commands.setAlias']['params'];
+        db.prepare('INSERT INTO command_usage(command_id,use_count,last_used_at,pinned,alias) VALUES(?,0,NULL,0,?) ON CONFLICT(command_id) DO UPDATE SET alias=excluded.alias')
+          .run(commandId,alias);
         return this.getUsage(commandId);
       }
       case 'commands.recordUse': {
