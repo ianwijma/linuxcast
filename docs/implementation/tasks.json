@@ -1298,11 +1298,15 @@
         "bun run test:security -- F2-02"
       ],
       "evidence": [
-        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership."
+        "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership.",
+        "Coordinator shared implementation25October2026: strict secret metadata3acad5c, actual owner migration004/CRUD29f1ea2, category clear/export7594884. Independent source reviews clean;43F2 integration checks and8mappedF2-02 checks pass. Production Electron45/SQLite3.53.4 smoke passes with schema004 after setup-path correction. These do not complete the still-unintegrated SecretStore, controllers or UI."
       ],
       "owner": "manifest_review",
       "branch": "codex/f2-02-secrets",
-      "limitations": []
+      "limitations": [
+        "Host credential/data-control UI and keyboard/accessibility evidence remain pending. Backend primitives do not close the UI criterion.",
+        "Private OS-keyring smoke isolation correction and full SecretStore plus actual-owner/controller integration remain outstanding; no host-keyring success is inferred from mocks or memory metadata fixtures."
+      ]
     },
     {
       "id": "F3-01",
