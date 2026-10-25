@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import AxeBuilder from '@axe-core/playwright';
 import { execFileSync, spawn } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -47,6 +47,24 @@ Name=Public fixture app
 Comment=Public synthetic application
 Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
 `,{mode:0o600});
+  const urlMarker=join(temporary,'url-handoff.json'),urlTarget=join(temporary,'public browser handler with spaces');
+  writeFileSync(urlTarget,`#!/usr/bin/python3
+import json,sys
+with open(${JSON.stringify(urlMarker)},'w',encoding='utf-8') as output:
+ json.dump({'argv':sys.argv[1:],'stdin':sys.stdin.read()},output)
+print('SYNTHETIC_BROWSER_STDOUT')
+print('SYNTHETIC_BROWSER_STDERR',file=sys.stderr)
+`,{mode:0o700});
+  const browserEntry=join(temporary,'data/applications/public-web.desktop');
+  const browserDesktop=`[Desktop Entry]
+Type=Application
+Name=Public browser fixture
+NoDisplay=true
+Exec="${urlTarget}" %u
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+`;
+  writeFileSync(browserEntry,browserDesktop,{mode:0o600});
+  writeFileSync(join(temporary,'config/mimeapps.list'),'[Default Applications]\nx-scheme-handler/http=public-web.desktop;\nx-scheme-handler/https=public-web.desktop;\n',{mode:0o600});
   const seed=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-data-settings'});
   seed.request({schemaVersion:1,requestId:randomUUID(),method:'commands.recordUse',params:{commandId:'builtin.public-fixture'}});
   await seed.confirmSuccessfulLaunch();await seed.close();
@@ -57,23 +75,61 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
     XDG_RUNTIME_DIR: join(temporary, 'runtime'), XDG_SESSION_TYPE: 'x11',XDG_DATA_DIRS:join(temporary,'system'),XDG_CONFIG_DIRS:join(temporary,'config'),XDG_CURRENT_DESKTOP:'GNOME',DBUS_SESSION_BUS_ADDRESS:'unix:path=/nonexistent-linuxcast-app-fixture-bus' };
   for (const key of ['DISPLAY', 'XAUTHORITY', 'PATH', 'LANG'])
     if (process.env[key]) env[key] = process.env[key]!;
+  const showExisting=async()=>await new Promise<number>((resolve,reject)=>{
+    const second=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});
+    const timer=setTimeout(()=>{second.kill('SIGKILL');reject(new Error('Application reopen timed out.'));},10000);
+    second.once('error',error=>{clearTimeout(timer);reject(error);});second.once('exit',code=>{clearTimeout(timer);resolve(code??1);});
+  });
   application = await electron.launch({ executablePath: executable, args: [wrapper, '--show'],
     chromiumSandbox: true, env, timeout: 20000 });
   const app = application, page = await app.firstWindow();
   await page.waitForURL(appUrl);
   const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
   await query.waitFor({timeout:5000});
-  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(5);
   await expect.poll(()=>query.evaluate(element=>element===document.activeElement)).toBe(true);
   await query.fill('Public fixture app');
   await expect.poll(()=>page.getByRole('option').count()).toBe(1);
   await query.press('Enter');
   await expect.poll(async()=>{try{return JSON.parse(await readFile(launchMarker,'utf8'));}catch{return null;}}).toEqual({argv:['two words','literal;$(no-shell)','Public fixture app','%'],stdin:''});
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
-  expect(await new Promise<number>((resolve,reject)=>{const second=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});const timer=setTimeout(()=>{second.kill('SIGKILL');reject(new Error('Application reopen timed out.'));},10000);second.once('error',error=>{clearTimeout(timer);reject(error);});second.once('exit',code=>{clearTimeout(timer);resolve(code??1);});})).toBe(0);
+  expect(await showExisting()).toBe(0);
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
+  // A URL query offers a local command. Only explicit Form submission reaches GIO.
+  const publicUrl='https://example.invalid/search?q=%24%28touch%20NO_SHELL%29%3B%20%22two%20words%22#public';
+  await query.fill(publicUrl);await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Open URL');
+  expect(existsSync(urlMarker)).toBe(false);await query.press('Enter');
+  const urlField=page.getByRole('textbox',{name:/^URL/});await urlField.waitFor();
+  expect(await urlField.inputValue()).toBe(publicUrl);expect(existsSync(urlMarker)).toBe(false);
+  await page.getByRole('button',{name:'Cancel',exact:true}).click();await query.waitFor();expect(existsSync(urlMarker)).toBe(false);
+  await query.press('Enter');await urlField.waitFor();await urlField.fill('javascript:alert(1)');
+  await page.getByRole('button',{name:'Open URL',exact:true}).click();
+  await expect.poll(()=>urlField.getAttribute('aria-invalid')).toBe('true');expect(existsSync(urlMarker)).toBe(false);
+  await urlField.fill(publicUrl);
+  const urlEvidence=join(root,'apps/desktop/evidence');mkdirSync(urlEvidence,{recursive:true});
+  for(const theme of ['dark','light'] as const){
+    await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
+    await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
+    await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
+    await page.screenshot({path:join(urlEvidence,`open-url-${theme}.png`)});
+    expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
+  }
+  // Missing native default is real, not an instrumented browser-success response.
+  rmSync(browserEntry);await page.getByRole('button',{name:'Open URL',exact:true}).click();
+  await expect.poll(()=>page.getByRole('alert').textContent()).toContain('Browser handoff is unavailable');
+  expect(await urlField.inputValue()).toBe(publicUrl);expect(await urlField.getAttribute('aria-invalid')).not.toBe('true');expect(existsSync(urlMarker)).toBe(false);
+  writeFileSync(browserEntry,browserDesktop,{mode:0o600});
+  await page.getByRole('button',{name:'Open URL',exact:true}).click();
+  await expect.poll(async()=>{try{return JSON.parse(await readFile(urlMarker,'utf8'));}catch{return null;}}).toEqual({argv:[publicUrl],stdin:''});
+  await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
+  expect(await showExisting()).toBe(0);await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
+  await expect.poll(()=>page.evaluate(async()=>{
+    const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();
+    return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:open-url')?.usage:null;
+  })).toMatchObject({useCount:1});
   await query.fill('data');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');await query.fill('');
-  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(5);
   await query.press('ArrowDown');
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await query.press('ArrowUp');
@@ -81,10 +137,10 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
   await query.fill('no actual command');
   await expect.poll(()=>page.getByRole('heading',{name:'No matching results'}).isVisible()).toBe(true);
   await query.fill('');
-  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(5);
   // Pinning is an explicit metadata edit, not a command execution.
   await query.fill('hide');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');await query.fill('');
-  await expect.poll(()=>page.getByRole('option').count()).toBe(4);
+  await expect.poll(()=>page.getByRole('option').count()).toBe(5);
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Hide Linuxcast');
   await query.press('Control+k');
   await page.getByRole('searchbox',{name:'Find an action'}).fill('Pin command');
@@ -127,7 +183,7 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherPinned'],
+    methods: ['executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherPinned'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -187,6 +243,8 @@ Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
   expect(before.data.records.find((record:{commandId:string})=>record.commandId.startsWith('application:'))).toMatchObject({useCount:1});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
+  expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-url',useCount:1}));
+  expect(JSON.stringify(before)).not.toContain(publicUrl);
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
   await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
