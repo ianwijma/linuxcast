@@ -21,7 +21,9 @@ the reviewed SQL migration into `apps/desktop/dist`; it fails if the rebuilt
 addon is absent. No runtime code download or developer Node process is used by
 the launched application. Debian package installation remains F1-03 work.
 
-The window's Hide button and Escape dismiss it while services remain resident.
+The launcher searches three trusted registered commands: Local data, Hide Linuxcast and Quit Linuxcast. Exact aliases, local title/keyword matching, saved usage and stable keyboard selection are implemented. Enter executes the selected action; Ctrl+K opens actions; Escape closes actions before dismissing the launcher. Queries remain local and never enter IPC. No other provider or unavailable system action is simulated.
+
+Hide and Escape dismiss it while services remain resident.
 A second invocation toggles the existing window. `--show`, `--toggle`, `--quit`,
 and exact `linuxcast://launcher/show` / `linuxcast://launcher/toggle` links are
 accepted. Quit closes storage and verifies child exit; failures produce a
@@ -33,8 +35,7 @@ Its fixed private directory is `$XDG_DATA_HOME/linuxcast`, falling back to
 `$HOME/.local/share/linuxcast` when the XDG value is absent or relative. The addon
 path and migration assets are trusted packaged resources. Storage failures use
 fixed diagnostic codes and disable that child without replay or crash looping.
-Storage recovery UI is not yet wired; no content feature currently reports a
-save or success through this preview. Renderer load plus a ready storage owner
+Storage recovery UI is not yet wired. Local data has category clearing and explicitly unencrypted JSON exports through a separate narrow preload. Successful launcher actions record usage through the actual owner; unavailable ranking does not block recovery commands. Renderer load plus a ready storage owner
 confirms a successful launch for migration snapshot retention.
 
 All renderer resources are built locally, enumerated in `assets.json`, and served
@@ -45,7 +46,7 @@ and review gate in `docs/design/DESIGN.md`. Fonts and controls come from
 `@linuxcast/ui`; no separate visual system is introduced.
 
 Evidence under `evidence/` is synthetic application content. Private-Xvfb
-Electron checks establish bundled renderer isolation and lifecycle only, not
+Electron checks establish actual query/selection/action execution, Local data clear/export, bundled renderer isolation and lifecycle, not
 GNOME/KDE, Wayland focus, Orca or the full release desktop matrix. Shared UI
 component screenshots and browser evidence are recorded in
 `packages/ui/src/primitives/README.md`.

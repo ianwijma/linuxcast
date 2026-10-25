@@ -8,6 +8,8 @@ import { APP_SCHEME, APP_URL, createAssetHandler, parseAssetManifest } from './a
 import { parseArguments, parseDeepLink, parseInstanceRequest } from './commands.ts';
 import type { ShellCommand } from './commands.ts';
 import { registerShellIpc } from './ipc.ts';
+import { registerLauncherIpc } from './launcher-ipc.ts';
+import type { LauncherActions } from './launcher-ipc.ts';
 import { ResidentLifecycle } from './lifecycle.ts';
 import type { ResidentService } from './lifecycle.ts';
 import { restrictContents, restrictSession, securePreferences } from './security.ts';
@@ -17,6 +19,8 @@ export interface ResidentShellOptions {
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
   openDataSettings?: () => Promise<void>;
+  getCommandUsage?: LauncherActions['getUsage'];
+  recordCommandUse?: LauncherActions['recordUse'];
 }
 
 /** Called once, synchronously before Electron readiness, by the packaged entry. */
@@ -40,6 +44,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
   let window: BrowserWindow | undefined;
   let generation = 0;
   let removeIpc = () => {};
+  let removeLauncherIpc = () => {};
   const services: ResidentService[] = [];
   let shutdownFinished = false;
   const snapshot = (): DesktopShellState => {
@@ -108,6 +113,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
   }, services, code => {
     shutdownFinished = true;
     removeIpc();
+    removeLauncherIpc();
     nativeTheme.removeListener('updated', updateAppearance);
     app.exit(code);
   }, () => console.error('SHELL_LIFECYCLE_UNAVAILABLE'));
@@ -120,6 +126,13 @@ export function startResidentShell(options: ResidentShellOptions): void {
     await shellSession.protocol.handle(APP_SCHEME, await createAssetHandler(join(options.resourcesDirectory, 'renderer'), assets));
     if (lifecycle.quitting) return;
     services.push(...(options.createServices?.() ?? []));
+    removeLauncherIpc = registerLauncherIpc(ipcMain, {
+      contents: () => window?.webContents, quitting: () => lifecycle.quitting,
+      hide: () => lifecycle.hide(), quit: () => { void lifecycle.quit(); },
+      ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
+      ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
+      ...(options.recordCommandUse ? {recordUse: options.recordCommandUse} : {}),
+    });
     removeIpc = registerShellIpc(ipcMain, {
       contents: () => window?.webContents, state: snapshot, hide: () => lifecycle.hide(),
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),

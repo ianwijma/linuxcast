@@ -6,15 +6,26 @@ import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
 
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
-startResidentShell({ resourcesDirectory: __dirname, openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
+let storage:ReturnType<typeof startStorage>|undefined;
+startResidentShell({ resourcesDirectory: __dirname,
+  async getCommandUsage(commandId) {
+    if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
+    return storage.repository.request('commands.getUsage',{commandId},{timeoutMs:250});
+  },
+  async recordCommandUse(commandId) {
+    if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
+    return storage.repository.request('commands.recordUse',{commandId},{timeoutMs:250});
+  },
+  openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
   const directory = join(dataHome && isAbsolute(dataHome) ? dataHome : join(app.getPath('home'), '.local/share'), 'linuxcast');
-  const storage = startStorage(__dirname, directory, app.getVersion());
+  const currentStorage = startStorage(__dirname, directory, app.getVersion());
+  storage = currentStorage;
   app.once('browser-window-created', (_event, window) => {
-    window.webContents.once('did-finish-load', () => storage.confirmLaunch());
+    window.webContents.once('did-finish-load', () => currentStorage.confirmLaunch());
   });
-  const controls=new DataControls(storage.repository);
-  dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:storage.isReady,
+  const controls=new DataControls(currentStorage.repository);
+  dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
     async exportCategory(category,signal){
       const result=await controls.export({category},{signal});
       if(result.outcome!=='exported')throw {reasonCode:result.reason};
@@ -25,5 +36,5 @@ startResidentShell({ resourcesDirectory: __dirname, openDataSettings:async()=>{i
       if(result.outcome!=='completed')throw new Error('Local data action interrupted.');
     },
   });
-  return [storage,dataSettings];
+  return [currentStorage,dataSettings];
 } });

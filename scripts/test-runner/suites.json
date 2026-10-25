@@ -17,6 +17,14 @@
     "F1-02": [
       "apps/desktop/src/main/lifecycle.test.ts",
       "apps/desktop/src/main/shell.test.ts"
+    ],
+    "D1-02": [
+      "packages/ui/src/views/session.test.ts",
+      "packages/ui/src/views/form.test.tsx"
+    ],
+    "L1-01": [
+      "packages/search/tests/search.test.ts",
+      "apps/desktop/src/features/launcher/tests/controller.test.ts"
     ]
   },
   "contracts": {
@@ -57,6 +65,12 @@
     ],
     "D1-01": [
       "packages/ui/src/primitives/primitives.test.ts"
+    ],
+    "D1-02": [
+      "packages/ui/src/views/views.test.ts"
+    ],
+    "L1-01": [
+      "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
     ]
   },
   "integration": {
@@ -119,6 +133,10 @@
       "packages/data-controls/tests/controls.security.test.ts",
       "packages/data-controls/tests/controller.security.test.ts",
       "packages/data-controls/tests/persistence.security.test.ts"
+    ],
+    "L1-01": [
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/preload/api.test.ts"
     ]
   },
   "perf": {}

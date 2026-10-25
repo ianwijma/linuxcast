@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Button, ErrorState, Keycap, LoadingState, ThemeProvider, UnavailableState } from '@linuxcast/ui';
+import { Button, ErrorState, Keycap, LoadingState, ThemeProvider } from '@linuxcast/ui';
 import type { DesktopShellApi, DesktopShellState } from '@linuxcast/contracts';
 import '@linuxcast/ui/styles.css';
 import './shell.css';
+import { Launcher } from '../features/launcher/index.tsx';
 
 
 
@@ -38,7 +39,7 @@ function Shell() {
     observer.observe(content.current);
     return () => observer.disconnect();
   }, [api]);
-  useEffect(() => { if (state?.visible) hide.current?.focus(); }, [state?.visible]);
+  useEffect(() => { if (state?.visible && error) hide.current?.focus(); }, [state?.visible, error]);
   const command = async (kind: 'hide' | 'quit') => {
     if (!api || busy) return;
     setBusy(true);
@@ -48,25 +49,24 @@ function Shell() {
   };
   return <ThemeProvider appearance={state?.appearance ?? 'system'}>
     <main ref={content} className="shell" onKeyDown={event => {
-      if (event.key === 'Escape' && !event.nativeEvent.isComposing && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      if (!event.defaultPrevented && event.key === 'Escape' && !event.nativeEvent.isComposing && !event.altKey && !event.ctrlKey && !event.metaKey) {
         event.preventDefault(); void command('hide');
       }
     }}>
-      <header className="shell-header"><h1>Linuxcast</h1><span className="lc-muted">Application preview</span></header>
-      <div className="shell-content">
+      <div className={state && api && !error ? "shell-launcher" : "shell-content"}>
         {error ? <ErrorState title="Linuxcast could not connect" description="Quit and reopen Linuxcast to try again." announce />
           : !state ? <LoadingState label="Opening Linuxcast…" />
-          : <UnavailableState title="Search is not available yet" description="The application is taking shape. You can hide this window and reopen it with Linuxcast, or quit below." />}
+          : api ? <Launcher api={api} visible={state.visible} onDismiss={() => api.hideLauncher()} /> : null}
         {state && !state.focused && <p className="lc-muted">Select the Linuxcast window to use the keyboard.</p>}
       </div>
-      <footer className="shell-footer">
+      {(!state || error || !api) && <footer className="shell-footer">
         <span className="lc-muted"><Keycap>Esc</Keycap> Hide window</span>
         <div className="shell-actions">
           <Button busy={busy} disabled={!api} onClick={() => { void api?.openDataSettings().then(reply => { if (!reply.ok) setError(true); }); }}>Local data</Button>
           <Button ref={hide} busy={busy} disabled={!api} onClick={() => { void command('hide'); }}>Hide</Button>
           <Button busy={busy} disabled={!api} onClick={() => { void command('quit'); }}>Quit Linuxcast</Button>
         </div>
-      </footer>
+      </footer>}
     </main>
   </ThemeProvider>;
 }

@@ -10,13 +10,13 @@ User previously authorized unfinished proof merges with explicit gaps. PR13/15/1
 
 ## Integrated baseline
 
-Primary develop:17b7c3a (PR24). PR23 foundation6601c1c supplies runnable isolated Electron shell, one SQLite owner, shared UI primitives. PR24 adds reviewed permission brokers and accepted selected-root metadata index. F3 host approval/remediation UI remains pending. F1-02/D1-01 native-session/AT UI gaps remain pending. Source/task cards retain exact evidence.
+Primary develop:9fe8976 (PR25 merged25October10:55UTC). PR23 foundation6601c1c supplies runnable isolated Electron shell, one SQLite owner, shared UI primitives. PR24 adds reviewed permission brokers and accepted selected-root metadata index. F3 host approval/remediation UI remains pending. F1-02/D1-01 native-session/AT UI gaps remain pending. Source/task cards retain exact evidence.
 
 Normal1Password signing works; preserve configuration. Tools `.worktrees/tools`: Node24.22.1/Bun1.4.4/Rust1.95. Use BUN_TMPDIR=/tmp for installs. Explicit Electron45 SQLite rebuild/nativeBinding required; setup-sqlite path correctionf264236 is tested. Never use insecure signing/sandbox fallbacks.
 
 ## Current focused F2 increment
 
-Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/application-controls`, based17b7c3a; application integration80beb75 is committed. No PR yet at this checkpoint. Main/renderer use a separate Local data window with shared primitives/tokens, category search, native-confirmed clearing and native-selected exclusive private JSON export. Renderer has no paths, record bodies, credentials or generic repository API.
+PR25 https://github.com/ianwijma/linuxcast/pull/25 merged9fe8976 after current-head CI40186678031 and clean final independent reviews. Application integration80beb75 and registrya196b1a are now on develop. Author worktree remains clean at2404eef; no F2 processes remain. Main/renderer use a separate Local data window with shared primitives/tokens, category search, native-confirmed clearing and native-selected exclusive private JSON export. Renderer has no paths, record bodies, credentials or generic repository API.
 
 Owned author commits2c70e44/0f4c564/2404eef integrated62ba357/92a0810/cc7384b. Shared contracts3acad5c, owner migration004/CRUD29f1ea2, category clear/export7594884. The credential store, diagnostics, retention and main-only DataControls controller are complete for this increment. Index clear stops registered jobs, blocks admission and repeats bounded512-row transactions. Clear semantics preserve pins/aliases, unrelated categories, selected roots and original files. Exports exclude credentials/grants and fail explicitly if oversized.
 
@@ -26,18 +26,15 @@ Private actual Electron45/gnome_libsecret smoke passed with task-private HOME/XD
 
 F2-02 remains in-progress. Credential setup/status and diagnostics management host UI, full packaged provider/credential flow, complete AT/desktop/backend matrix and release acceptance remain pending. Data UI has bounded evidence only; AC02/privacy recorded, AC01/UI remain pending. Full encrypted backups remain F2-03.
 
-## Kept out of this PR
+## Active bounded launcher increment
 
-D1-02 source05dff01 exists in clean `.worktrees/linuxcast-d1-02` / `codex/d1-02-view-renderer`. It passed16unit/10browser checks and has19public screenshots. Four findings fixed: packaged image origin, actual draft/secret discard, whitespace-safe DOM IDs, action-panel focus/Enter consistency. Root reviewed representative dark/light/200% screenshots. NativeAT and prerequisite D1-01 gates remain pending.
+Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/launcher-integration`, base9fe8976. Reviewed D1 renderer restored1bb3bd1; shared manifest/contracts/exports6b0222b; trusted main/preload/storage usage5e61a3a; author L1 source d9d2bf9 integratede8eb87c; actual app renderer/test3f5b071. No open-ended infrastructure or proof assignment.
 
-To keep F2 focused, root source98a4008 was reverted by7538093; views exports/react-markdown dependency and D1 mappings removed from this branch. Preserve/reuse05dff01 in the next launcher-flow increment. Existing fixed dependency is react-markdown10.1.0/MIT if that renderer is used. No new UI framework or research needed.
+L1 author manifest_review finished the bounded actual three-command flow in clean `.worktrees/linuxcast-l1-01`, branch `codex/l1-01-launcher-flow`. It owns search/controller/UI only; root supplies shared interfaces and trusted effects. Query stays local, stale work is discarded, selection preserves ID, Enter executes actual Local data/Hide/Quit. Registry progress now records the actual application evidence; full providers/fallbacks/administration and nativeAT/desktop gates remain pending. Neither L1-01 nor D1-02 is done.
 
-## Immediate next actions and agents
+Validation:17L1 unit/controller +9launcher security +7L1 browser checks pass. Reused D1 renderer16unit/10browser pass. Actual production Electron45/SQLite3.53.4 private-Xvfb application passes4.20s: query/arrows/Enter→actual settings; real owner export proves command usage; cancelled/confirmed clear and export; Hide→secondtoggle→same window; keyboard Quit exits0. Native dialog choices instrumented, not physical desktop evidence. Actual app dark/light screenshots inspected; axe passes. Typecheck/lint/plan/diff pass. Main/preload reviewer launcher_reading clean; UI reviewer reading_review clean after repeat-Enter propagation regression; current root wiring reviewed. No test processes remain.
 
-1. Publish focused F2 PR, inspect current-head CI/requested reviews/comments and merge normally after checks. Attach PR. Record merge and fast-forward develop.
-2. manifest_review has completed its current bounded F2 assignment; no processes active and no more F2 research/proof. After merge, create isolated `codex/l1-01-launcher-flow` worktree and give exact L1-01 task/norm/owned-path assignment. First increment: real registered built-ins for Local data, Hide and Quit; actual query/result selection/Enter dispatch, existing storage usage, keyboard and app evidence. Keep full L1 scope/unfinished providers/fallbacks explicit; do not claim task completion.
-3. Root owns shared search manifest/contracts/main/preload/integration routing. Reuse D1 source if needed in the launcher increment; do not silently change dependencies or mark pending nativeAT gates passed.
-4. launcher_reading final F2 package review clean. reading_review final app-fix review clean. Reuse them for bounded independent reviews, not duplicate broad runs.
+Next: push/open focused launcher PR, inspect current-head CI/reviews/comments, merge normally and fast-forward develop. Then continue a concrete application increment from integrated shell/storage/UI; no task-choice question or new broad proof work. Keep full local1.0 scope and all missing desktop/release gates explicit. F2 remaining credential/diagnostics UI is backlog, not assigned back to manifest_review.
 
 ## Retained proof state
 
