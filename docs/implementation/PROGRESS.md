@@ -6,7 +6,7 @@ Updated25October2026. Goal ACTIVE: all97 agreed local1.0 tasks through R1-03. Ob
 
 Finish and merge small reviewed application increments promptly; record unfinished UI/desktop/release acceptance. No more open-ended infrastructure/research/proof work for manifest_review. User authorized unfinished increments, not whole-task completion or bypassing security/reviews. Keep complete1.0 scope. No physical-input/device permission.
 
-Latest explicit model instruction: all future subagents use **GPT-6.1 SOL, high reasoning**. Do not reactivate the older agents with inherited Astra settings. At this checkpoint launcher_reading, manifest_review and reading_review have completed; no subagent or test process is running. New delegation must use model gpt-6.1-sol, reasoning_effort high, fork_turns none with complete bounded context.
+Latest explicit model instruction, reaffirmed by user this turn: **all subagents from now on use GPT-6.1 SOL, high reasoning**. Do not reactivate the older agents with inherited Astra settings. At this checkpoint launcher_reading, manifest_review and reading_review have completed; no subagent or test process is running. New delegation must use model gpt-6.1-sol, reasoning_effort high, fork_turns none with complete bounded context.
 
 ## Integrated baseline and original requested sequencing
 
@@ -39,3 +39,13 @@ Earlier coordinator checks selected host Node26.11.1/Bun1.3.9 despite pinned-ver
 ## Retained proof state
 
 Private `.worktrees/private-lab` is0700. Container linuxcast-native-lab-v4 was confirmed stopped24October11:36:13UTC, exit0/pid0. Keys, seeds, raw logs and disks stay private. Latest published S0-01 AT evidence is c6e1ecf/default-nine-help-event-incomplete; latest private native run failed at resident-close. Neither closes missing release gates. Exact historical provenance/results are in S0 task cards, spikes/launcher/evidence and prior checkpoint history. No guest reservation or new proof run scheduled.
+
+## Ready-to-publish L1-01 search-alias increment
+
+Coordinator `.worktrees/linuxcast-application-controls` / `codex/command-alias-controls`, base mergedPR28/f8e3b7f. Shared alias/ownerb98c110, main/preload44c6eec, shared pendingForm guard0b5a804, Unicode/deadline/laterpagefix71e9d26. New application author manifest_review_sol explicitly GPT-6.1SOL/high/forknone, `.worktrees/linuxcast-l1-01` / `codex/l1-01-command-aliases`, clean dfafaef. Owned formflow1be6e2b integratede22be78; authoritative usageackfixdfafaef integratedcf43600. Root pendingmetadataRead generationguard145143c; productiontest/README/evidence finalcommit forthcoming.
+
+Final checks PASS:80L1unit,28security (independently rerun by alias_review_sol GPT-6.1SOL high),11real owner pin/alias persistence/protocol,23Chromium keyboard/axe,16D1unit, typecheck/lint/plan/diff. Actual production Electron45/SQLite3.53.4 private-Xvfb full flow6.29s: collision retainsdraft, save changesaliasonly, exactlocalquery, actualHide throughalias, clearusagepreservesalias, fullrestartprefills, emptyremoval/finalownerreopen; Localdata execute followedbyaliasedit correctlyacceptscurrentownercount1. Newactualdark/light Form PNGsinspected; author inspectedaffectedcomponentstates. Nativepicker/confirmation choices instrumented; no native desktop/AT/release claim.
+
+Independent finalsource review CLEAN after four bounded fixes: malformed Unicode cannot transform duringSQLitebinding; laterpage collisionfixture reachesonlylastpage; valid ownertotalsafterordinaryuse/clear accepted; Reload cannotconfirmoldmetadata whilependingwrite orwritebegan duringread. SharedForm fieldsdisabled duringhostpending topreventdroppingnewunsentdraft. No test/subagentprocess remains. Original appauthor/reviewer oldAstra agents notreactivated; only newSOLhigh agentsused.
+
+Next immediate: commit finalproductionintegration/evidence, pushfocusedPR, inspectcurrent-headCI/configuredreviews/comments/threads, normalexact-headmerge, refreshprimaryandcheckpoint. L1-01/L1-02 and complete97taskgoal remainunfinished; remainingprovider/visibility/fallback, typedURI/file/argv/shell/DesktopActions, prerequisiteUI/nativeAT/session/package/releasegates unchanged. Next smallapplicationflow can be explicit OpenURL usingtypedvalidateduserintent; readfullL1-02/security beforecode, no infrastructure/proofexpansion.
