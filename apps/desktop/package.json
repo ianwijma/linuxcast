@@ -11,7 +11,8 @@
     "@linuxcast/storage": "workspace:*",
     "@linuxcast/ui": "workspace:*",
     "@linuxcast/data-controls": "workspace:*",
-    "@linuxcast/search": "workspace:*"
+    "@linuxcast/search": "workspace:*",
+    "@linuxcast/applications": "workspace:*"
   },
   "devDependencies": {
     "electron": "45.0.0",

@@ -54,7 +54,8 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "packages/builtins/*"
   ],
   "trustedDependencies": [
     "esbuild"

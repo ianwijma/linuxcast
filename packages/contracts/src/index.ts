@@ -27,3 +27,4 @@ export * from './registry-descriptors.ts';
 export * from './desktop-shell.ts';
 export * from './data-settings.ts';
 export * from './launcher.ts';
+export * from './applications.ts';
