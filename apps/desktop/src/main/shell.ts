@@ -19,6 +19,7 @@ export interface ResidentShellOptions {
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
   openDataSettings?: () => Promise<void>;
+  openUrl?: LauncherActions['openUrl'];
   getCommandUsage?: LauncherActions['getUsage'];
   recordCommandUse?: LauncherActions['recordUse'];
   setCommandPinned?: LauncherActions['setPinned'];
@@ -134,6 +135,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       contents: () => window?.webContents, quitting: () => lifecycle.quitting,
       hide: () => lifecycle.hide(), quit: () => { void lifecycle.quit(); },
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
+      ...(options.openUrl ? {openUrl:options.openUrl} : {}),
       ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
       ...(options.listApplications ? {listApplications: options.listApplications} : {}),
       ...(options.launchApplication ? {launchApplication: options.launchApplication} : {}),

@@ -6,9 +6,9 @@ import type { NativeApplication } from '../../../../packages/contracts/src/appli
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias,
+  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias, launcherOpenUrlRequestSchema,
 } from '../../../../packages/contracts/src/launcher.ts';
-import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply } from '../../../../packages/contracts/src/launcher.ts';
+import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply, LauncherOpenUrlReply } from '../../../../packages/contracts/src/launcher.ts';
 import type { CommandUsage } from '@linuxcast/storage';
 import { trustedShellSender } from './ipc.ts';
 
@@ -18,6 +18,7 @@ export interface LauncherActions {
   hide(): void;
   quit(): void;
   openDataSettings?: () => Promise<void>;
+  openUrl?: (url:string) => Promise<'dispatched'>;
   getUsage?: (commandId: string) => Promise<CommandUsage | null>;
   recordUse?: (commandId: string) => Promise<unknown>;
   listApplications?: () => Promise<NativeApplication[]>;
@@ -38,7 +39,7 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
 /** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
-  let metadataPending=false,metadataGeneration=0;
+  let metadataPending=false,metadataGeneration=0,urlPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
@@ -49,6 +50,8 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       ...(!actions.openDataSettings ? {unavailableReason:'Local data settings are unavailable. Reopen Linuxcast to try again.'} : {})},
     {id:'linuxcast:hide', title:'Hide Linuxcast', subtitle:'Keep Linuxcast running and close the launcher', aliases:['hide'], keywords:['close','dismiss'], enabled:true},
     {id:'linuxcast:quit', title:'Quit Linuxcast', subtitle:'Stop Linuxcast and its application services', aliases:['quit','exit'], keywords:['stop','close'], enabled:true},
+    {id:'linuxcast:open-url',title:'Open URL',subtitle:'Open an HTTP or HTTPS address in your default browser',aliases:['url','open url'],keywords:['web','browser','address','link'],enabled:!!actions.openUrl,
+      ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   const recordUse = async (id: string) => {
@@ -115,9 +118,28 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       if(version!==revision||!Number.isSafeInteger(offset)||offset<1||offset>=descriptors().length)return failure('invalid-request');
       start=offset;
     }else await refreshApplications();
-    if(metadataPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
+    if(metadataPending || urlPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
-    return metadataPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+    return metadataPending || urlPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+  });
+  ipc.handle(LAUNCHER_CHANNELS.openUrl, async (event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherOpenUrlReply>=>{
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+    const parsed=launcherOpenUrlRequestSchema.safeParse(payload);
+    if(!parsed.success || parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active() || busy)return failure('cancelled');
+    if(!actions.openUrl)return {ok:false,error:{code:'capability-unavailable',message:'Browser opening is unavailable. Set a default web browser and try again.',retryable:false}};
+    busy=true;urlPending=true;
+    try {
+      const outcome=await actions.openUrl(parsed.data.url);
+      if(outcome!=='dispatched')throw new Error('Invalid browser handoff receipt.');
+      await recordUse('linuxcast:open-url');
+      // The renderer dismisses only after validating this receipt. Browser focus,
+      // navigation and page completion cannot be inferred from native dispatch.
+      return {ok:true,value:{outcome}};
+    }catch(error){
+      const known=error instanceof ApplicationsUnavailable && error.effectOutcome==='not-dispatched';
+      return {ok:false,error:{code:known?'capability-unavailable':'deadline-exceeded',message:known?'No web browser is available. Set a default browser, then try Open URL again.':'The browser handoff could not be confirmed. Check your browser before trying again.',retryable:false}};
+    }finally{busy=false;urlPending=false;}
   });
   ipc.handle(LAUNCHER_CHANNELS.setAlias, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
@@ -183,6 +205,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
+    if(command.id==='linuxcast:open-url')return failure('invalid-request');
     busy = true;
     try {
       if (command.id === 'linuxcast:quit') {

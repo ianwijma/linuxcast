@@ -10,7 +10,7 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   const frame={url:APP_URL}, contents={mainFrame:frame,isDestroyed:()=>false,getURL:()=>APP_URL} as unknown as WebContents;
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
-  const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openDataSettings:vi.fn(async()=>{}),
+  const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openUrl:vi.fn(async()=>'dispatched' as const),openDataSettings:vi.fn(async()=>{}),
     getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setAlias:vi.fn(async(commandId:string,alias:string|null)=>({commandId,alias,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false})),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
@@ -18,11 +18,11 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   return {actions,frame,event,handlers,remove,invoke,execute};
 }
 describe('trusted launcher registry and action dispatch',()=>{
-  it('projects only the three actual fixed commands and allowlisted usage, with no query IPC',async()=>{
+  it('projects only registered fixed commands and allowlisted usage, with no query IPC',async()=>{
     const f=fixture();
     expect([...f.handlers.keys()].sort()).toEqual(Object.values(LAUNCHER_CHANNELS).sort());
     const reply=await f.invoke(LAUNCHER_CHANNELS.getCommands);
-    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'}]}});
+    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'}]}});
     expect(JSON.stringify(reply)).not.toContain('commandId');
     expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,query:'SYNTHETIC_PRIVATE'})).toMatchObject({ok:false,error:{code:'invalid-request'}});
     f.remove();expect(f.handlers.size).toBe(0);
@@ -59,7 +59,7 @@ describe('trusted launcher registry and action dispatch',()=>{
   });
   it('reports unavailable commands and rejects execution during shutdown',async()=>{
     const f=fixture({},false);
-    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true}]}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true}]}});
     expect(await f.execute('linuxcast:open-local-data',2)).toMatchObject({ok:false,error:{code:'permission-denied'}});
     const stopped=fixture({quitting:()=>true});
     expect(await stopped.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
@@ -97,7 +97,7 @@ it('pages a complete registered application catalogue and rejects obsolete curso
   const f=fixture({listApplications:async()=>records,launchApplication}),first=await catalogue(f);
   expect(first.commands).toHaveLength(100);expect(first.nextCursor).toBe(`${first.revision}:100`);
   const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
-  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(33);
+  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(34);
   const selected=first.commands.find(command=>command.provider==='applications')!;
   expect(await f.execute(`application:${'f'.repeat(64)}`,first.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
   expect(await f.execute(selected.id,first.revision)).toEqual({ok:true,value:{outcome:'dispatched'}});
@@ -223,4 +223,41 @@ it('rejects a catalogue read that started before a metadata edit, even if the ed
   const pending=f.invoke(LAUNCHER_CHANNELS.getCommands);
   expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:null})).toMatchObject({ok:true});
   finish();expect(await pending).toMatchObject({ok:false,error:{code:'cancelled'}});
+});
+
+
+it('opens only an explicitly submitted canonical HTTP URL from the own current shell frame',async()=>{
+  const f=fixture(),payload={protocolVersion:1,revision:1,url:'HTTPS://EXAMPLE.invalid:443/路径?public=%24%28literal%29'};
+  expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const invalid of [{...payload,revision:2},{...payload,url:'file:///private'},{...payload,url:'https://user:pass@example.invalid'},{...payload,commandId:'linuxcast:hide'},{...payload,query:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,invalid)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(f.actions.openUrl).not.toHaveBeenCalled();
+  expect(await f.execute('linuxcast:open-url')).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(f.actions.hide).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,payload)).toEqual({ok:true,value:{outcome:'dispatched'}});
+  expect(f.actions.openUrl).toHaveBeenCalledExactlyOnceWith('https://example.invalid/%E8%B7%AF%E5%BE%84?public=%24%28literal%29');
+  expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:open-url');
+  expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('does not confirm a pending URL handoff through Reload or overlap browser/metadata effects',async()=>{
+  let finish!:(value:'dispatched')=>void;const openUrl=vi.fn(()=>new Promise<'dispatched'>(resolve=>{finish=resolve;}));
+  const f=fixture({openUrl}),payload={protocolVersion:1,revision:1,url:'http://example.invalid/'};
+  const pending=f.invoke(LAUNCHER_CHANNELS.openUrl,payload);
+  expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,payload)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.execute('linuxcast:hide')).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setAlias,{protocolVersion:1,commandId:'linuxcast:hide',revision:1,alias:'public'})).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(f.actions.recordUse).not.toHaveBeenCalled();finish('dispatched');
+  expect(await pending).toMatchObject({ok:true});expect(openUrl).toHaveBeenCalledTimes(1);
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true});
+});
+it.each([['unavailable','not-dispatched','capability-unavailable'],['launch-failed','unknown','deadline-exceeded'],['invalid-reply','unknown','deadline-exceeded']] as const)('reports browser %s honestly without storing the URL or replaying',async(reason,effectOutcome,code)=>{
+  const f=fixture({openUrl:async()=>{throw new ApplicationsUnavailable(reason,effectOutcome);}});
+  const reply=await f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision:1,url:'https://example.invalid/?public=fixture'});
+  expect(reply).toMatchObject({ok:false,error:{code,retryable:false}});expect(JSON.stringify(reply)).not.toContain('example.invalid');expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('keeps browser capability visibly unavailable while other commands remain usable',async()=>{
+  const f=fixture({openUrl:undefined});
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{commands:expect.arrayContaining([expect.objectContaining({id:'linuxcast:open-url',enabled:false,unavailableReason:expect.any(String)})])}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision:1,url:'https://example.invalid/'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  expect(await f.execute('linuxcast:hide')).toMatchObject({ok:true});
 });
