@@ -1,3 +1,4 @@
+import { secretReferenceContracts } from '@linuxcast/platform-contracts/secrets';
 import { fileIndexContracts } from '@linuxcast/file-index/contracts';
 import * as z from 'zod';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
@@ -22,6 +23,7 @@ export const storageContracts: RepositoryContracts = new Map([
   ...createAiRepositoryContracts(),
   ...permissionRepositoryContracts,
   ...fileIndexContracts,
+  ...secretReferenceContracts,
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],

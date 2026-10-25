@@ -1,3 +1,5 @@
+import { getSecretReference, putSecretReference, listSecretReferences } from './secrets.ts';
+import type { SecretReferenceRecord } from '@linuxcast/platform-contracts/secrets';
 import { FILE_INDEX_METHODS } from '@linuxcast/file-index/contracts';
 import type { FileIndexMethod, FileIndexMethods } from '@linuxcast/file-index/contracts';
 import { dispatchFileIndex, FileIndexRepositoryError } from '@linuxcast/file-index/repository';
@@ -15,6 +17,10 @@ export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string; pinned: boolean; alias: string | null }
 export interface StorageMethods extends FileIndexMethods {
+  'secretRefs.get': {params: {id: string}; result: SecretReferenceRecord | null};
+  'secretRefs.put': {params: {record: SecretReferenceRecord}; result: SecretReferenceRecord};
+  'secretRefs.delete': {params: {id: string}; result: boolean};
+  'secretRefs.list': {params: {afterId?: string; limit: number}; result: {records: SecretReferenceRecord[]; nextCursor: string | null}};
   'permissions.list': { params: {principalKey: string; afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string | null} };
   'permissions.put': { params: {record: DecisionRecord}; result: DecisionRecord };
   'permissions.revoke': { params: {id: string}; result: boolean };
@@ -28,7 +34,7 @@ export interface StorageMethods extends FileIndexMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -83,6 +89,10 @@ export class Repositories {
       catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }
     }
     switch (method) {
+      case 'secretRefs.get': return getSecretReference(db, (input as StorageMethods['secretRefs.get']['params']).id);
+      case 'secretRefs.put': return putSecretReference(db, (input as StorageMethods['secretRefs.put']['params']).record);
+      case 'secretRefs.delete': return db.prepare('DELETE FROM secret_references WHERE id=?').run((input as StorageMethods['secretRefs.delete']['params']).id).changes !== 0;
+      case 'secretRefs.list': return listSecretReferences(db, input as StorageMethods['secretRefs.list']['params']);
       case 'permissions.list': return listPermissionDecisions(db, input as StorageMethods['permissions.list']['params']);
       case 'permissions.put': return putPermissionDecision(db, (input as StorageMethods['permissions.put']['params']).record);
       case 'permissions.revoke': return revokePermissionDecision(db, (input as StorageMethods['permissions.revoke']['params']).id);

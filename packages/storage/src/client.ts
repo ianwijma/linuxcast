@@ -1,3 +1,4 @@
+import type { SecretReferenceRecord } from '@linuxcast/platform-contracts/secrets';
 import { rootConfigSchema } from '@linuxcast/file-index/contracts';
 import type { RootState, FileCandidate } from '@linuxcast/file-index/contracts';
 import { createHash, randomUUID } from 'node:crypto';
@@ -20,7 +21,17 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if (method === 'files.roots.put') {
+  if (method === 'secretRefs.get') valid = row.id === params.id;
+  else if (method === 'secretRefs.put') {
+    const expected = params.record as SecretReferenceRecord, actual = result as SecretReferenceRecord;
+    valid = actual.id === expected.id && actual.ownerKind === expected.ownerKind && actual.ownerId === expected.ownerId &&
+      actual.createdAt === expected.createdAt && actual.updatedAt === expected.updatedAt;
+  } else if (method === 'secretRefs.list') {
+    const page = result as {records: SecretReferenceRecord[]; nextCursor: string | null};
+    valid = page.records.length <= Number(params.limit) && page.records.every((record, index) =>
+      record.id > (index === 0 ? (params.afterId as string | undefined) ?? '' : page.records[index - 1]!.id)) &&
+      (page.nextCursor === null || page.nextCursor === page.records.at(-1)?.id);
+  } else if (method === 'files.roots.put') {
     valid = JSON.stringify(rootConfigSchema.parse((result as RootState).config)) === JSON.stringify(rootConfigSchema.parse(params.config));
   } else if (method === 'files.roots.list') {
     const roots = result as RootState[];

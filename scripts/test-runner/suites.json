@@ -71,7 +71,8 @@
     ],
     "F2-01": [
       "packages/storage/tests/storage.integration.test.ts",
-      "packages/storage/tests/permissions.integration.test.ts"
+      "packages/storage/tests/permissions.integration.test.ts",
+      "packages/storage/tests/secrets.integration.test.ts"
     ],
     "F1-02": [
       "apps/desktop/tests/shell.integration.test.ts"
@@ -106,6 +107,9 @@
       "packages/permissions/tests/broker.security.test.ts",
       "packages/permissions/tests/pagination.security.test.ts",
       "packages/permissions/tests/persistence.security.test.ts"
+    ],
+    "F2-02": [
+      "packages/storage/tests/secrets.integration.test.ts"
     ]
   },
   "perf": {}
