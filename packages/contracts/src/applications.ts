@@ -1,6 +1,6 @@
 import * as z from 'zod';
 /** Native application operations are distinct from URI/file/argv/shell operations. */
-export const desktopApplicationIdSchema=z.string().min(9).max(512).refine(value=>value.endsWith('.desktop') && !/[\\/\u0000-\u001f\u007f]/u.test(value) && new TextEncoder().encode(value).length<=512);
+export const desktopApplicationIdSchema=z.string().min(9).max(512).refine(value=>value.endsWith('.desktop') && !/[\\/\p{Cc}]/u.test(value) && new TextEncoder().encode(value).length<=512);
 export const applicationFingerprintSchema=z.string().regex(/^[a-f0-9]{64}$/u);
 export const nativeApplicationSchema=z.strictObject({desktopId:desktopApplicationIdSchema,title:z.string().min(1).max(256),description:z.string().max(512),fingerprint:applicationFingerprintSchema});
 export const nativeApplicationRequestSchema=z.discriminatedUnion('operation',[

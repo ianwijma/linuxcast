@@ -25,6 +25,11 @@
     "L1-01": [
       "packages/search/tests/search.test.ts",
       "apps/desktop/src/features/launcher/tests/controller.test.ts"
+    ],
+    "L1-02": [
+      "packages/search/tests/search.test.ts",
+      "apps/desktop/src/features/launcher/tests/controller.test.ts",
+      "apps/desktop/src/features/launcher/tests/catalogue.test.ts"
     ]
   },
   "contracts": {
@@ -71,6 +76,9 @@
     ],
     "L1-01": [
       "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
+    ],
+    "L1-02": [
+      "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
     ]
   },
   "integration": {
@@ -98,6 +106,9 @@
     ],
     "L1-01": [
       "packages/storage/tests/command-pins.integration.test.ts"
+    ],
+    "L1-02": [
+      "apps/desktop/tests/shell.integration.test.ts"
     ]
   },
   "security": {
@@ -138,6 +149,11 @@
       "packages/data-controls/tests/persistence.security.test.ts"
     ],
     "L1-01": [
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/preload/api.test.ts"
+    ],
+    "L1-02": [
+      "packages/builtins/applications/tests/transport.test.ts",
       "apps/desktop/src/main/launcher-ipc.test.ts",
       "apps/desktop/src/preload/api.test.ts"
     ]

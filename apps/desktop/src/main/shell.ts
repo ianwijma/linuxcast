@@ -22,6 +22,8 @@ export interface ResidentShellOptions {
   getCommandUsage?: LauncherActions['getUsage'];
   recordCommandUse?: LauncherActions['recordUse'];
   setCommandPinned?: LauncherActions['setPinned'];
+  listApplications?: LauncherActions['listApplications'];
+  launchApplication?: LauncherActions['launchApplication'];
 }
 
 /** Called once, synchronously before Electron readiness, by the packaged entry. */
@@ -132,6 +134,8 @@ export function startResidentShell(options: ResidentShellOptions): void {
       hide: () => lifecycle.hide(), quit: () => { void lifecycle.quit(); },
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
       ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
+      ...(options.listApplications ? {listApplications: options.listApplications} : {}),
+      ...(options.launchApplication ? {launchApplication: options.launchApplication} : {}),
       ...(options.setCommandPinned ? {setPinned: options.setCommandPinned} : {}),
       ...(options.recordCommandUse ? {recordUse: options.recordCommandUse} : {}),
     });

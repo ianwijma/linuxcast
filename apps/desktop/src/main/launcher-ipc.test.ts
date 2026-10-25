@@ -1,6 +1,8 @@
 import type { IpcMainInvokeEvent, WebContents } from 'electron';
 import { describe, expect, it, vi } from 'vitest';
+import { ApplicationsUnavailable } from '@linuxcast/applications';
 import { LAUNCHER_CHANNELS } from '../../../../packages/contracts/src/launcher.ts';
+import type { LauncherCommandsReply } from '@linuxcast/contracts';
 import { APP_URL } from './assets.ts';
 import { registerLauncherIpc } from './launcher-ipc.ts';
 import type { LauncherActions } from './launcher-ipc.ts';
@@ -70,7 +72,7 @@ it('pin writes require the own frame, schema and current revision and never exec
   expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
   for(const request of [{...payload,revision:2},{...payload,commandId:'unknown:command'},{...payload,pinned:1},{...payload,query:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,request)).toMatchObject({ok:false,error:{code:'invalid-request'}});
   expect(f.actions.setPinned).not.toHaveBeenCalled();
-  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload)).toMatchObject({ok:true,value:{commands:[{id:'linuxcast:open-local-data'},{id:'linuxcast:hide',usage:{pinned:true,useCount:4}},{id:'linuxcast:quit'}]}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload)).toMatchObject({ok:true,value:{updateOnly:true,commands:[{id:'linuxcast:hide',usage:{pinned:true,useCount:4}}]}});
   expect(f.actions.setPinned).toHaveBeenCalledExactlyOnceWith('linuxcast:hide',true);
   expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.quit).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
 });
@@ -86,4 +88,63 @@ it('blocks overlapping mutations/execution and reports unconfirmed pin changes w
   const reply=await f.invoke(LAUNCHER_CHANNELS.setPinned,payload);
   expect(reply).toMatchObject({ok:false,error:{code:'internal',retryable:false,message:expect.stringContaining('could not be confirmed')}});
   expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(setPinned).toHaveBeenCalledTimes(2);
+});
+
+const applicationFixture=(index:number)=>({desktopId:`fixture-${String(index).padStart(3,'0')}.desktop`,title:`Fixture application ${index}`,description:'Public synthetic application',fingerprint:'a'.repeat(64)});
+async function catalogue(f:ReturnType<typeof fixture>){const value=await f.invoke(LAUNCHER_CHANNELS.getCommands) as LauncherCommandsReply;if(!value.ok)throw new Error();return value.value;}
+it('pages a complete registered application catalogue and rejects obsolete cursors/forged launch IDs',async()=>{
+  const records=Array.from({length:130},(_,i)=>applicationFixture(i)),launchApplication=vi.fn(async()=>'dispatched' as const);
+  const f=fixture({listApplications:async()=>records,launchApplication}),first=await catalogue(f);
+  expect(first.commands).toHaveLength(100);expect(first.nextCursor).toBe(`${first.revision}:100`);
+  const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
+  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(33);
+  const selected=first.commands.find(command=>command.provider==='applications')!;
+  expect(await f.execute(`application:${'f'.repeat(64)}`,first.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  expect(await f.execute(selected.id,first.revision)).toEqual({ok:true,value:{outcome:'dispatched'}});
+  expect(launchApplication).toHaveBeenCalledExactlyOnceWith({desktopId:records[0]!.desktopId,fingerprint:records[0]!.fingerprint});
+  expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith(selected.id);
+  records.pop();await catalogue(f);
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+});
+it('caps public page bytes and keeps paginating large saved aliases without dropping commands',async()=>{
+  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i)),getUsage:async commandId=>({commandId,useCount:0,lastUsedAt:null,pinned:false,alias:'x'.repeat(15000)})});
+  let page=await catalogue(f);const ids:string[]=[];
+  for(let index=0;index<5;index++){
+    expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThan(1024*1024);ids.push(...page.commands.map(command=>command.id));
+    if(!page.nextCursor)break;
+    const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:page.nextCursor}) as LauncherCommandsReply;
+    if(!next.ok)throw new Error();page=next.value;
+  }
+  expect(ids).toHaveLength(133);expect(new Set(ids).size).toBe(133);
+});
+it('returns a one-command authoritative pin acknowledgement for an application beyond page one',async()=>{
+  const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),first=await catalogue(f);
+  const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;if(!next.ok)throw new Error();
+  const id=next.value.commands.at(-1)!.id;
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:id,revision:first.revision,pinned:true})).toMatchObject({ok:true,value:{updateOnly:true,nextCursor:null,commands:[{id,usage:{pinned:true}}]}});
+  expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('keeps built-in recovery usable when application discovery fails and disables stale cached app entries',async()=>{
+  const listApplications=vi.fn(async()=>[applicationFixture(0)]),f=fixture({listApplications});const first=await catalogue(f);
+  listApplications.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE'));const failed=await catalogue(f);
+  expect(failed.applicationState).toBe('unavailable');expect(failed.commands.find(command=>command.provider==='applications')).toMatchObject({enabled:false,unavailableReason:expect.stringContaining('Reload')});
+  expect(await f.execute('linuxcast:hide',failed.revision)).toEqual({ok:true,value:{outcome:'completed'}});
+  expect(await f.execute(first.commands.at(-1)!.id,failed.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+});
+
+it.each([['stale-application','not-dispatched','conflict'],['launch-failed','unknown','deadline-exceeded']] as const)('preserves %s launch outcome without reporting completion or recording usage',async(reason,outcome,code)=>{
+  const f=fixture({listApplications:async()=>[applicationFixture(0)],launchApplication:async()=>{throw new ApplicationsUnavailable(reason,outcome);}}),value=await catalogue(f);
+  expect(await f.execute(value.commands.at(-1)!.id,value.revision)).toMatchObject({ok:false,error:{code,retryable:false}});
+  expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
+});
+
+it('never acknowledges an empty pin after concurrent catalogue removal during the storage write',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setPinned']>>>)=>void;
+  const records=[applicationFixture(0)],f=fixture({listApplications:async()=>records,setPinned:()=>new Promise(resolve=>{finish=resolve;})});
+  const first=await catalogue(f),id=first.commands.at(-1)!.id;
+  const pending=f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,commandId:id,revision:first.revision,pinned:true});
+  records.pop();await catalogue(f);
+  finish({commandId:id,pinned:true,useCount:0,lastUsedAt:null,alias:null});
+  expect(await pending).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed')}});
+  expect(f.actions.recordUse).not.toHaveBeenCalled();
 });

@@ -16,12 +16,12 @@ bun run start:desktop
 ```
 
 `setup:sqlite` requires the normal Linux native build prerequisites and rebuilds
-better-sqlite3 for the pinned Electron version. The build copies that addon and
-the reviewed SQL migration into `apps/desktop/dist`; it fails if the rebuilt
+better-sqlite3 for the pinned Electron version. The build also compiles the existing Rust platform helper against system GLib/GIO (development headers required), then copies that packaged executable, the addon and
+the reviewed SQL migrations into `apps/desktop/dist`; it fails if the rebuilt
 addon is absent. No runtime code download or developer Node process is used by
 the launched application. Debian package installation remains F1-03 work.
 
-The launcher searches three trusted registered commands: Local data, Hide Linuxcast and Quit Linuxcast. Exact aliases, local title/keyword matching, saved usage and stable keyboard selection are implemented. Enter executes the selected action; Ctrl+K opens actions; Escape closes actions before dismissing the launcher. Queries remain local and never enter IPC. No other provider or unavailable system action is simulated.
+The launcher searches installed applications discovered through native GIO alongside Local data, Hide Linuxcast and Quit Linuxcast. Exact aliases, local title/keyword matching, saved usage and stable keyboard selection are implemented. Enter executes the selected action; Ctrl+K opens actions; Escape closes actions before dismissing the launcher. Queries remain local and never enter IPC. Application metadata is loaded in bounded pages and ranked locally; no other provider or unavailable system action is simulated. Main maps opaque IDs to its own desktop identities and fingerprints, rechecks through GIO, and reports a dispatch receipt rather than focus/completion. Applications that change or become unavailable require Reload commands. Successful dispatch hides the launcher and records clearable usage.
 
 Actions also exposes Pin command/Unpin command for the selected result. Pinning is saved through the sole SQLite owner without executing the command or increasing usage. A visible Pinned label identifies saved favourites; empty-query ordering respects them while preserving selection. An unconfirmed save requires Reload commands before another pin change; it is never replayed automatically.
 
@@ -52,3 +52,5 @@ Electron checks establish actual query/selection/action execution, Local data cl
 GNOME/KDE, Wayland focus, Orca or the full release desktop matrix. Shared UI
 component screenshots and browser evidence are recorded in
 `packages/ui/src/primitives/README.md`.
+
+L1-02 primary application launch is a bounded increment. Native desktop Actions, typed URI/file/argv/shell entry, complete run-history administration, native session/assistive-technology and package-release acceptance remain unfinished. The actual GIO test target is a private generated executable that records arguments; this is real process dispatch, not proof of GTK/Qt/terminal rendering or focus.
