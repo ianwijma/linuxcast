@@ -10,7 +10,7 @@ User previously authorized unfinished proof merges with explicit gaps. PR13/15/1
 
 ## Integrated baseline
 
-Primary develop:9fe8976 (PR25 merged25October10:55UTC). PR23 foundation6601c1c supplies runnable isolated Electron shell, one SQLite owner, shared UI primitives. PR24 adds reviewed permission brokers and accepted selected-root metadata index. F3 host approval/remediation UI remains pending. F1-02/D1-01 native-session/AT UI gaps remain pending. Source/task cards retain exact evidence.
+Primary develop:e303fcd (PR26 merged25October11:12:29UTC). PR25 F2 merged9fe8976 at10:55UTC; PR26 actual launcher mergee303fcd. PR23 foundation6601c1c supplies runnable isolated Electron shell, one SQLite owner, shared UI primitives. PR24 adds reviewed permission brokers and accepted selected-root metadata index. F3 host approval/remediation UI remains pending. F1-02/D1-01 native-session/AT UI gaps remain pending. Source/task cards retain exact evidence.
 
 Normal1Password signing works; preserve configuration. Tools `.worktrees/tools`: Node24.22.1/Bun1.4.4/Rust1.95. Use BUN_TMPDIR=/tmp for installs. Explicit Electron45 SQLite rebuild/nativeBinding required; setup-sqlite path correctionf264236 is tested. Never use insecure signing/sandbox fallbacks.
 
@@ -26,15 +26,25 @@ Private actual Electron45/gnome_libsecret smoke passed with task-private HOME/XD
 
 F2-02 remains in-progress. Credential setup/status and diagnostics management host UI, full packaged provider/credential flow, complete AT/desktop/backend matrix and release acceptance remain pending. Data UI has bounded evidence only; AC02/privacy recorded, AC01/UI remain pending. Full encrypted backups remain F2-03.
 
-## Active bounded launcher increment
+## Integrated bounded launcher increment
 
-Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/launcher-integration`, base9fe8976. Reviewed D1 renderer restored1bb3bd1; shared manifest/contracts/exports6b0222b; trusted main/preload/storage usage5e61a3a; author L1 source d9d2bf9 integratede8eb87c; actual app renderer/test3f5b071. No open-ended infrastructure or proof assignment.
+PR26 https://github.com/ianwijma/linuxcast/pull/26 merged e303fcd after current-head19ac94f CI40187790232 and clear independent reviews. No requested GitHub reviews/comments/unresolved threads at merge. Primary develop fast-forwarded clean. Coordinator now reuses `.worktrees/linuxcast-application-controls`, branch `codex/launcher-follow-up`, basee303fcd, for the next bounded increment. Reviewed D1 renderer restored1bb3bd1; shared manifest/contracts/exports6b0222b; trusted main/preload/storage usage5e61a3a; author L1 source d9d2bf9 integratede8eb87c; actual app renderer/test3f5b071. No open-ended infrastructure or proof assignment.
 
 L1 author manifest_review finished the bounded actual three-command flow in clean `.worktrees/linuxcast-l1-01`, branch `codex/l1-01-launcher-flow`. It owns search/controller/UI only; root supplies shared interfaces and trusted effects. Query stays local, stale work is discarded, selection preserves ID, Enter executes actual Local data/Hide/Quit. Registry progress now records the actual application evidence; full providers/fallbacks/administration and nativeAT/desktop gates remain pending. Neither L1-01 nor D1-02 is done.
 
 Validation:17L1 unit/controller +9launcher security +7L1 browser checks pass. Reused D1 renderer16unit/10browser pass. Actual production Electron45/SQLite3.53.4 private-Xvfb application passes4.20s: query/arrows/Enter→actual settings; real owner export proves command usage; cancelled/confirmed clear and export; Hide→secondtoggle→same window; keyboard Quit exits0. Native dialog choices instrumented, not physical desktop evidence. Actual app dark/light screenshots inspected; axe passes. Typecheck/lint/plan/diff pass. Main/preload reviewer launcher_reading clean; UI reviewer reading_review clean after repeat-Enter propagation regression; current root wiring reviewed. No test processes remain.
 
-Next: push/open focused launcher PR, inspect current-head CI/reviews/comments, merge normally and fast-forward develop. Then continue a concrete application increment from integrated shell/storage/UI; no task-choice question or new broad proof work. Keep full local1.0 scope and all missing desktop/release gates explicit. F2 remaining credential/diagnostics UI is backlog, not assigned back to manifest_review.
+Current user sequencing is complete: F2 bounded increment merged first; manifest_review was then redirected to actual launcher application code, which is now also merged. Both author and reviewer agents finished; none has another infrastructure/proof assignment.
+
+## Current L1-01 pin increment
+
+Coordinator `.worktrees/linuxcast-application-controls` / `codex/launcher-follow-up`, basee303fcd. Shared actual persistence/API13e9dac; author3a50c48 integrated0890391. UI uses existing Actions and visible Pinned accessory; original primary and selected identity survive reordering. Main validates exact sender/frame/revision/ID/boolean, serializes effects, and returns acknowledged metadata. Owner atomically changes only pinned, preserves usage/alias and never executes/records use. No migration, dependency or new framework. Unconfirmed pin changes require explicit Reload, including after another successful command.
+
+Validation:25L1 units/controller,12security,6pin checks (4actual owner+2malformed-ack protocol),11browser cases and43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin reorders while preserving selection/primary and useCount0; usage clear retains pin; Hide/secondtoggle/Quit/relaunch preserves favourite; keyboard Unpin persists through final owner reopen with count unchanged. Actual dark/light app screenshots inspected; component affected-state screenshots/axe checked. Typecheck/lint/plan/diff pass. Initial sandbox-limited owner run failed before DB open because local abstract sockets were denied; permitted actual-owner rerun passed. No desktop/Orca/release claim.
+
+Independent owner/API reviewer launcher_reading clean; UI reviewer reading_review clean after one focused recovery fix/regression. manifest_review source is committed and has no process active, same `.worktrees/linuxcast-l1-01` / `codex/l1-01-command-pins`. No F2 infrastructure/research/proof or VM/device work assigned.
+
+Next: publish focused pin PR, inspect current-head CI/reviews/comments, merge normally and refresh develop. Then prioritize the actual installed-application catalogue/launch flow (L1-02) using native GIO plus the existing launcher/storage/UI, with a small typed interface and explicit unavailable states. Keep provider/alias/visibility/fallback and nativeAT/desktop/release gaps recorded. Complete local1.0 scope remains unchanged; no whole L1 or dependent-task completion inferred.
 
 ## Retained proof state
 

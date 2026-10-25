@@ -3,10 +3,11 @@ import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 /** First application-flow increment: only actual, trusted, already implemented built-ins. */
 export const launcherCommandIdSchema=z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit']);
-export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute'} as const;
+export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned'} as const;
 export const launcherCommandsRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 const revision=z.number().int().positive().safe();
 export const launcherExecuteRequestSchema=launcherCommandsRequestSchema.extend({commandId:launcherCommandIdSchema,revision});
+export const launcherPinRequestSchema=launcherExecuteRequestSchema.extend({pinned:z.boolean()});
 export const launcherCommandMetadataSchema=z.strictObject({
   id:launcherCommandIdSchema,title:z.string().min(1).max(256),subtitle:z.string().max(512).optional(),
   aliases:z.array(z.string().max(256)).max(16),keywords:z.array(z.string().max(128)).max(16),
@@ -23,6 +24,7 @@ export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSche
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
 export interface LauncherApi {
+  setLauncherPinned(request:Pick<z.infer<typeof launcherPinRequestSchema>,'commandId'|'revision'|'pinned'>):Promise<LauncherCommandsReply>;
   getLauncherCommands():Promise<LauncherCommandsReply>;
   executeLauncherCommand(request:Pick<z.infer<typeof launcherExecuteRequestSchema>,'commandId'|'revision'>):Promise<LauncherExecuteReply>;
 }

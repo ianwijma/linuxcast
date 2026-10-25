@@ -1632,7 +1632,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 in isolated worktree from merged application foundation6601c1c. No acceptance or completion inferred from starting; coordinator retains shared contracts/manifests/migrations/status ownership.",
-        "Reviewed author05dff01 restored1bb3bd1 and integrated with actual launcher3f5b071. Final mapped16unit +10browser cases pass, covering strict models, safe Markdown/images, stable ID selection/primary actions, navigation, forms/discard, keyboard/actions, dark/light/200% text/forced-colors/reduced-motion. Actual production launcher uses ViewRenderer with7additional L1 UI cases and private-Xvfb app flow. Four earlier review findings and bounded held-Enter integration finding fixed. NativeAT/prerequisite/full host adapters remain pending; task not complete."
+        "Reviewed author05dff01 restored1bb3bd1 and integrated with actual launcher3f5b071. Final mapped16unit +10browser cases pass, covering strict models, safe Markdown/images, stable ID selection/primary actions, navigation, forms/discard, keyboard/actions, dark/light/200% text/forced-colors/reduced-motion. Actual production launcher uses ViewRenderer with7additional L1 UI cases and private-Xvfb app flow. Four earlier review findings and bounded held-Enter integration finding fixed. NativeAT/prerequisite/full host adapters remain pending; task not complete.",
+        "Integrated25October2026 in PR26 https://github.com/ianwijma/linuxcast/pull/26, mergee303fcdc1ba2fa0b6b74b31eb4dadb48d5a5d7a4. Current-head19ac94f CI40187790232 passed; no requested GitHub reviews, review comments or unresolved threads at merge. Focused independent source reviews covered this implementation; normal merge with exact head match. Full task remains in-progress."
       ],
       "owner": "reading_review",
       "branch": "codex/d1-02-view-renderer",
@@ -1868,6 +1869,12 @@
               "outcome": "Empty-query, unavailable command, zeroed ranking and stale query/load cancellation fixtures pass. Actual owner export after UI clear proves useCount=0/lastUsedAt=null; pins/aliases remain preserved by existing owner semantics. No cancelled action is automatically replayed.",
               "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4 private Xvfb; Chromium browser fixtures. No Debian/GNOME/KDE/Orca release claim.",
               "reference": "e8eb87c/5e61a3a/3f5b071; packages/search/tests/search.test.ts; apps/desktop/tests/shell.integration.test.ts"
+            },
+            {
+              "command": "bun run test:unit -- L1-01; bun run test:security -- L1-01; bun run test:integration -- L1-01; private-Xvfb bun run test:integration -- F1-02",
+              "outcome": "Pin/unpin uses acknowledged stored metadata, preserves selection/primary and usage/alias fields; empty-query favourites reorder after confirmation. Clearing usage retains pin. Full app restart and final owner reopen prove durable pin/unpin; failures/late replies do not replay, Reload remains available for unconfirmed edits.",
+              "platform": "Pop!_OS/Ubuntu-based amd64 development host; Node24.22.1/Bun1.4.4; Electron45.0.0/SQLite3.53.4 private Xvfb. Chromium component fixtures; no Debian/GNOME/KDE/Orca release claim.",
+              "reference": "13e9dac/0890391; packages/storage/tests/command-pins.integration.test.ts; apps/desktop/tests/shell.integration.test.ts; apps/desktop/src/features/launcher/tests/"
             }
           ]
         },
@@ -1901,12 +1908,15 @@
       ],
       "evidence": [
         "Started25October2026 after F2 PR25 integrated9fe8976. Isolated .worktrees/linuxcast-l1-01, branchcodex/l1-01-launcher-flow. Bounded first flow uses existing resident shell/storage/UI: real Local data/Hide/Quit registered commands, local query/ranking, stable keyboard selection and trusted execution. Coordinator owns shared contracts/manifests/main/preload/status. No acceptance inferred from assignment.",
-        "Bounded integrated candidate e8eb87c/5e61a3a/3f5b071: actual registered Local data/Hide/Quit, local bounded query/ranking, stable keyboard selection, trusted action execution and real SQLite-owner usage. 17unit/controller +9security +7browser UI checks pass; actual production Electron app flow passes4.20s. Query/arrows/Enter opens settings; actual exports prove usage recording, cancellation and clear/reset; Hide/secondtoggle preserves resident window; Quit exits0. Dark/light actual application screenshots inspected; same-page axe passes. Independent main/preload and UI reviews clear after held-Enter fix. Typecheck/lint/plan/diff pass. Full task remains in-progress."
+        "Bounded integrated candidate e8eb87c/5e61a3a/3f5b071: actual registered Local data/Hide/Quit, local bounded query/ranking, stable keyboard selection, trusted action execution and real SQLite-owner usage. 17unit/controller +9security +7browser UI checks pass; actual production Electron app flow passes4.20s. Query/arrows/Enter opens settings; actual exports prove usage recording, cancellation and clear/reset; Hide/secondtoggle preserves resident window; Quit exits0. Dark/light actual application screenshots inspected; same-page axe passes. Independent main/preload and UI reviews clear after held-Enter fix. Typecheck/lint/plan/diff pass. Full task remains in-progress.",
+        "Integrated25October2026 in PR26 https://github.com/ianwijma/linuxcast/pull/26, mergee303fcdc1ba2fa0b6b74b31eb4dadb48d5a5d7a4. Current-head19ac94f CI40187790232 passed; no requested GitHub reviews, review comments or unresolved threads at merge. Focused independent source reviews covered this implementation; normal merge with exact head match. Full task remains in-progress.",
+        "Next bounded application increment started25October2026 from merged PR26/e303fcd: command pin/unpin through existing launcher Actions and persistent usage, isolated author .worktrees/linuxcast-l1-01/codex/l1-01-command-pins; coordinator shared owner/API13e9dac. No new acceptance inferred. No research/proof expansion.",
+        "Bounded pin/unpin increment25October2026: trusted API/atomic sole-owner update13e9dac; author3a50c48 integrated0890391. 25unit/controller,12security,6pin persistence/protocol checks and11browser keyboard/axe cases pass;43storage regression cases pass. Actual production Electron45/SQLite3.53.4 private-Xvfb app passes4.81s: keyboard Pin on Hide reorders results without moving selected ID or primary, does not execute/count a run, survives usage clearing, Hide/secondtoggle and full Quit/relaunch; keyboard Unpin persists across final owner reopen with count unchanged. Actual app dark/light screenshots inspected. Typecheck/lint/plan/diff pass. Independent owner/API and UI reviews clear after retaining Reload through an unconfirmed pin followed by successful primary action. No full L1/native/release completion claim."
       ],
       "owner": "manifest_review",
-      "branch": "codex/l1-01-launcher-flow",
+      "branch": "codex/l1-01-command-pins",
       "limitations": [
-        "Full L1-01 scope remains required: remaining search providers, explicit configured fallback/AI actions, command visibility and ranking/alias administration are not implemented by this first three-command increment.",
+        "Full L1-01 scope remains required: remaining search providers, explicit configured fallback/AI actions, command visibility/alias administration and remaining ranking controls are not implemented by the current three-command increment. Persistent pin/unpin and category usage reset are implemented.",
         "Existing shell/storage are integrated. Reviewed D1-02 source is being paired with this application flow; native assistive-technology/prerequisite acceptance remains pending. Neither dependent task nor full L1-01 can be marked complete from browser or private-Xvfb checks alone.",
         "Actual4.20s private-Xvfb application flow and seven browser/axe cases passed. GNOME/KDE Wayland/X11, native assistive technology and full UI/release matrix remain pending; native dialog choices in the Local data regression were instrumented."
       ]

@@ -95,6 +95,9 @@
     "L2-01": [
       "packages/file-index/tests/index.integration.test.ts",
       "packages/storage/tests/file-index.integration.test.ts"
+    ],
+    "L1-01": [
+      "packages/storage/tests/command-pins.integration.test.ts"
     ]
   },
   "security": {

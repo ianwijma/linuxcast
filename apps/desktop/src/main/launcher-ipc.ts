@@ -1,7 +1,7 @@
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema,
+  launcherCommandsReplySchema, launcherPinRequestSchema,
 } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply } from '../../../../packages/contracts/src/launcher.ts';
 import type { CommandUsage } from '@linuxcast/storage';
@@ -15,6 +15,7 @@ export interface LauncherActions {
   openDataSettings?: () => Promise<void>;
   getUsage?: (commandId: string) => Promise<CommandUsage | null>;
   recordUse?: (commandId: string) => Promise<unknown>;
+  setPinned?: (commandId: string, pinned: boolean) => Promise<CommandUsage>;
 }
 
 const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | 'internal'): Extract<LauncherExecuteReply,{ok:false}> => ({
@@ -41,15 +42,12 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     // Usage failure must never replay an action or prevent recovery through Hide/Quit.
     try { await actions.recordUse?.(id); } catch { /* Explicitly best-effort local ranking only. */ }
   };
-  ipc.handle(LAUNCHER_CHANNELS.getCommands, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
-    if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
-    if (!launcherCommandsRequestSchema.safeParse(payload).success) return failure('invalid-request');
-    if (!active()) return failure('cancelled');
+  const snapshot = async (changed?: CommandUsage): Promise<LauncherCommandsReply> => {
     try {
       let rankingAvailable = !!actions.getUsage;
       const commands = await Promise.all(descriptors.map(async command => {
         let usage: CommandUsage | null = null;
-        try { usage = await actions.getUsage?.(command.id) ?? null; }
+        try { usage = changed?.commandId === command.id ? changed : await actions.getUsage?.(command.id) ?? null; }
         catch { rankingAvailable = false; }
         return {...command, usage: usage ? {useCount:usage.useCount,lastUsedAt:usage.lastUsedAt,pinned:usage.pinned,alias:usage.alias} : null};
       }));
@@ -57,6 +55,28 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       const value = launcherCommandsReplySchema.parse({ok:true,value:{revision,commands,rankingAvailable}});
       return value;
     } catch { return failure('internal'); }
+  };
+  ipc.handle(LAUNCHER_CHANNELS.getCommands, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
+    if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
+    if (!launcherCommandsRequestSchema.safeParse(payload).success) return failure('invalid-request');
+    if (!active()) return failure('cancelled');
+    return snapshot();
+  });
+  ipc.handle(LAUNCHER_CHANNELS.setPinned, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
+    if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
+    const parsed = launcherPinRequestSchema.safeParse(payload);
+    if (!parsed.success || parsed.data.revision !== revision) return failure('invalid-request');
+    if (!active() || busy) return failure('cancelled');
+    if (!actions.setPinned || !descriptors.some(command => command.id === parsed.data.commandId)) return failure('permission-denied');
+    busy = true;
+    try {
+      const usage = await actions.setPinned(parsed.data.commandId, parsed.data.pinned);
+      if (usage.commandId !== parsed.data.commandId || usage.pinned !== parsed.data.pinned) throw new Error('Invalid saved pin.');
+      // The mutation result is the acknowledgement. No success is inferred from a UI toggle.
+      return await snapshot(usage);
+    } catch {
+      return {ok:false,error:{code:'internal',message:'The pin change could not be confirmed. Reload commands before trying again.',retryable:false}};
+    } finally { busy = false; }
   });
   ipc.handle(LAUNCHER_CHANNELS.execute, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherExecuteReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');

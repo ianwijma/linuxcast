@@ -25,15 +25,37 @@ reasons. Reopening focuses the query. A failed Hide restores the view instead of
 leaving an empty window. Shared fonts, colours, spacing and opaque surfaces are
 unchanged; this feature introduces no second visual system.
 
+## Pin and unpin commands
+
+The selected enabled command has an explicit secondary **Pin command** or
+**Unpin command** action. The original Open/Hide/Quit remains primary. Pin state
+uses the existing accessible Pinned accessory and star icon. A pending change
+blocks pin/execute duplicates and refresh races; it does not change the badge or
+claim saved state. Only a validated authoritative reply from
+`setLauncherPinned({commandId, revision, pinned})` changes the metadata. It must
+contain the matching command and requested saved value at a current revision.
+Ranking then updates while the shared view preserves selected identity and the
+primary action.
+
+Pinning never executes a command or records use. The coordinator's single owner
+updates only the pinned field, preserving count, timestamp and alias. Unavailable
+ranking storage disables this edit and offers Reload commands. A rejected,
+malformed or uncertain acknowledgement retains prior metadata and requires an
+explicit reload before another pin edit; no mutation is replayed automatically.
+Reload remains available even if a later ordinary command succeeds. Hidden or
+cancelled replies are ignored; reopening fetches authoritative state again.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: eight bounded ranking/generation tests.
-- `tests/controller.test.ts`: nine current registry/selection/action/failure tests.
-- `tests/launcher.ui.test.ts`: seven Chromium component checks covering keyboard,
+- `tests/controller.test.ts`: 17 current registry/selection/action/failure tests, including pin acknowledgements.
+- `tests/launcher.ui.test.ts`: 11 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names with an explicitly
-  labelled request-observing API fixture. They do not execute system operations.
+  labelled request-observing API fixture and in-memory pin metadata. They do not
+  execute system operations or establish SQLite persistence. The pin increment
+  includes dark/light pinned, unconfirmed and unavailable affected states.
 
 Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator

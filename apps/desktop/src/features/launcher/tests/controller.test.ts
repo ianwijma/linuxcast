@@ -8,7 +8,8 @@ const snapshot:LauncherCommandsSnapshot={revision:1,rankingAvailable:true,comman
 ]};
 const controls:LauncherController[]=[];afterEach(()=>{for(const controller of controls.splice(0))controller.dispose();});
 function setup(overrides:Partial<LauncherApi>={}) {
-  const api:LauncherApi={getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(snapshot)})),executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>({ok:true,value:{outcome:'completed'}})),...overrides};
+  const saved=structuredClone(snapshot);
+  const api:LauncherApi={setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async request=>{const command=saved.commands.find(value=>value.id===request.commandId)!;command.usage={useCount:0,lastUsedAt:null,alias:null,...command.usage,pinned:request.pinned};return {ok:true,value:structuredClone(saved)};}),getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(saved)})),executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>({ok:true,value:{outcome:'completed'}})),...overrides};
   const dismiss=vi.fn(async()=>({ok:true as const,value:null}));const controller=new LauncherController(api,dismiss);controls.push(controller);controller.setVisible(true);return {controller,api,dismiss};
 }
 const settled=()=>new Promise(resolve=>setTimeout(resolve,0));
@@ -44,4 +45,44 @@ describe('L1-01 launcher presentation controller',()=>{
   it('bounds queries and cancels pending load when the launcher hides',async()=>{
     let finish!:(value:Awaited<ReturnType<LauncherApi['getLauncherCommands']>>)=>void;const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(()=>new Promise(resolve=>{finish=resolve;}))});f.controller.setVisible(false);finish({ok:true,value:snapshot});await settled();expect(items(f.controller)).toEqual([]);vi.mocked(f.api.getLauncherCommands).mockResolvedValue({ok:true,value:snapshot});f.controller.setVisible(true);await settled();f.controller.query('x'.repeat(513));expect(items(f.controller)).toEqual([]);expect(f.controller.session.getSnapshot().frames[0]!.view.status?.kind).toBe('warning');
   });
+  it('pins and unpins through metadata only while preserving selected ID and primary action across reorder',async()=>{
+    const f=setup();await settled();f.controller.session.select('linuxcast-launcher','linuxcast:hide');
+    await pin(f.controller,true);expect(f.api.setLauncherPinned).toHaveBeenCalledExactlyOnceWith({commandId:'linuxcast:hide',revision:1,pinned:true});
+    expect(items(f.controller)[0]?.id).toBe('linuxcast:hide');expect(items(f.controller)[0]?.accessories?.[0]?.text).toBe('Pinned');
+    expect(f.controller.session.getSnapshot().frames[0]).toMatchObject({selection:'linuxcast:hide',primaryAction:'linuxcast:hide'});
+    await pin(f.controller,false);expect(items(f.controller)[0]?.id).toBe('linuxcast:open-local-data');expect(items(f.controller).find(value=>value.id==='linuxcast:hide')?.accessories).toBeUndefined();
+    expect(f.controller.session.getSnapshot().frames[0]).toMatchObject({selection:'linuxcast:hide',primaryAction:'linuxcast:hide'});expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+  });
+  it('waits for confirmed pin metadata and blocks duplicate pin, execute and refresh while pending',async()=>{
+    let finish!:(value:Awaited<ReturnType<LauncherApi['setLauncherPinned']>>)=>void;
+    const f=setup({setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();
+    const pending=pin(f.controller,true);expect(items(f.controller)[0]?.accessories).toBeUndefined();await pin(f.controller,true);await invoke(f.controller);await f.controller.refresh();
+    expect(f.api.setLauncherPinned).toHaveBeenCalledTimes(1);expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(1);
+    finish({ok:true,value:pinnedSnapshot('linuxcast:open-local-data',true)});await pending;expect(items(f.controller)[0]?.accessories?.[0]?.text).toBe('Pinned');
+  });
+  it('disables pin edits with reload remediation when ranking storage is unavailable, while primary still works',async()=>{
+    const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:{...snapshot,rankingAvailable:false}}))});await settled();
+    expect(items(f.controller)[0]?.actions?.[1]).toMatchObject({title:'Pin command',disabledReason:'Pinning is unavailable. Reload commands to reconnect to storage.'});await pin(f.controller,true);expect(f.api.setLauncherPinned).not.toHaveBeenCalled();await invoke(f.controller);expect(f.api.executeLauncherCommand).toHaveBeenCalledTimes(1);
+  });
+  it('requires an explicit reload after an unconfirmed mutation and never automatically replays it',async()=>{
+    const f=setup({setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async()=>{throw new Error('synthetic private error');})});await settled();await pin(f.controller,true);
+    expect(items(f.controller)[0]?.accessories).toBeUndefined();expect(f.controller.session.getSnapshot().frames[0]!.view.status).toEqual({kind:'error',message:'The pin change could not be confirmed. Reload commands before trying again.'});
+    await pin(f.controller,true);expect(f.api.setLauncherPinned).toHaveBeenCalledTimes(1);
+    await invoke(f.controller);expect(f.controller.session.getSnapshot().frames[0]!.view.actions).toContainEqual({id:'launcher:retry',title:'Reload commands',kind:'invoke',effect:'read'});
+    expect(items(f.controller)[0]?.actions?.[1]?.disabledReason).toContain('Reload commands');
+    vi.mocked(f.api.getLauncherCommands).mockResolvedValue({ok:true,value:pinnedSnapshot('linuxcast:open-local-data',true)});await f.controller.refresh();expect(items(f.controller)[0]?.actions?.[1]).toMatchObject({title:'Unpin command'});expect(f.api.setLauncherPinned).toHaveBeenCalledTimes(1);
+  });
+  it('ignores a hidden mutation completion after a fresh visible snapshot',async()=>{
+    let finish!:(value:Awaited<ReturnType<LauncherApi['setLauncherPinned']>>)=>void;const f=setup({setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();const pending=pin(f.controller,true);
+    f.controller.setVisible(false);await pending;f.controller.setVisible(true);await settled();finish({ok:true,value:pinnedSnapshot('linuxcast:open-local-data',true)});await settled();expect(items(f.controller)[0]?.accessories).toBeUndefined();expect(f.api.setLauncherPinned).toHaveBeenCalledTimes(1);
+  });
+  it.each(['old-revision','wrong-pin','missing-command'] as const)('rejects %s pin acknowledgements without claiming saved state',async kind=>{
+    const start={...snapshot,revision:2};const reply=pinnedSnapshot('linuxcast:open-local-data',kind!=='wrong-pin');reply.revision=kind==='old-revision'?1:2;if(kind==='missing-command')reply.commands=reply.commands.filter(command=>command.id!=='linuxcast:open-local-data');
+    const f=setup({getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:start})),setLauncherPinned:vi.fn<LauncherApi['setLauncherPinned']>(async()=>({ok:true,value:reply}))});await settled();await pin(f.controller,true);
+    expect(items(f.controller)[0]?.accessories).toBeUndefined();expect(f.controller.session.getSnapshot().frames[0]!.view.status?.message).toContain('could not be confirmed');expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+  });
+
 });
+
+function pin(controller:LauncherController,pinned:boolean){const frame=controller.session.getSnapshot().frames[0]!;return controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:pinned?'launcher:pin':'launcher:unpin',itemId:frame.selection!});}
+function pinnedSnapshot(id:string,pinned:boolean):LauncherCommandsSnapshot{const value=structuredClone(snapshot);const command=value.commands.find(command=>command.id===id)!;command.usage={useCount:4,lastUsedAt:'2026-10-25T00:00:00Z',alias:'fixture-alias',pinned};return value;}

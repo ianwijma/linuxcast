@@ -9,7 +9,7 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
   const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openDataSettings:vi.fn(async()=>{}),
-    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),...overrides};
+    getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
   const execute=(commandId='linuxcast:open-local-data',revision=1)=>invoke(LAUNCHER_CHANNELS.execute,{protocolVersion:1,commandId,revision});
@@ -62,4 +62,28 @@ describe('trusted launcher registry and action dispatch',()=>{
     const stopped=fixture({quitting:()=>true});
     expect(await stopped.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
   });
+});
+
+
+it('pin writes require the own frame, schema and current revision and never execute the command',async()=>{
+  const f=fixture(), payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,pinned:true};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const request of [{...payload,revision:2},{...payload,commandId:'unknown:command'},{...payload,pinned:1},{...payload,query:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,request)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(f.actions.setPinned).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload)).toMatchObject({ok:true,value:{commands:[{id:'linuxcast:open-local-data'},{id:'linuxcast:hide',usage:{pinned:true,useCount:4}},{id:'linuxcast:quit'}]}});
+  expect(f.actions.setPinned).toHaveBeenCalledExactlyOnceWith('linuxcast:hide',true);
+  expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.quit).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('blocks overlapping mutations/execution and reports unconfirmed pin changes without replay',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<LauncherActions['setPinned']>>>)=>void;
+  const setPinned=vi.fn(()=>new Promise<Awaited<ReturnType<NonNullable<LauncherActions['setPinned']>>>>(resolve=>{finish=resolve;}));
+  const f=fixture({setPinned}),payload={protocolVersion:1,commandId:'linuxcast:hide',revision:1,pinned:true};
+  const pending=f.invoke(LAUNCHER_CHANNELS.setPinned,payload);
+  expect(await f.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,payload)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  finish({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:null});expect((await pending as {ok:boolean}).ok).toBe(true);
+  setPinned.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE'));
+  const reply=await f.invoke(LAUNCHER_CHANNELS.setPinned,payload);
+  expect(reply).toMatchObject({ok:false,error:{code:'internal',retryable:false,message:expect.stringContaining('could not be confirmed')}});
+  expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(setPinned).toHaveBeenCalledTimes(2);
 });

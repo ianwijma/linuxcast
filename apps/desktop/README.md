@@ -23,6 +23,8 @@ the launched application. Debian package installation remains F1-03 work.
 
 The launcher searches three trusted registered commands: Local data, Hide Linuxcast and Quit Linuxcast. Exact aliases, local title/keyword matching, saved usage and stable keyboard selection are implemented. Enter executes the selected action; Ctrl+K opens actions; Escape closes actions before dismissing the launcher. Queries remain local and never enter IPC. No other provider or unavailable system action is simulated.
 
+Actions also exposes Pin command/Unpin command for the selected result. Pinning is saved through the sole SQLite owner without executing the command or increasing usage. A visible Pinned label identifies saved favourites; empty-query ordering respects them while preserving selection. An unconfirmed save requires Reload commands before another pin change; it is never replayed automatically.
+
 Hide and Escape dismiss it while services remain resident.
 A second invocation toggles the existing window. `--show`, `--toggle`, `--quit`,
 and exact `linuxcast://launcher/show` / `linuxcast://launcher/toggle` links are

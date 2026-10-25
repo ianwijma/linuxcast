@@ -28,6 +28,7 @@ export const storageContracts: RepositoryContracts = new Map([
   ...dataControlContracts,
   ['settings.get',{params:z.strictObject({id:settingId}),result:setting.nullable()}],
   ['settings.set',{params:z.strictObject({id:settingId,expectedRevision:revision,value:settingValue}).refine(validSetting),result:setting}],
+  ['commands.setPinned',{params:z.strictObject({commandId,pinned:z.boolean()}),result:usage}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],
   ['commands.getUsage',{params:z.strictObject({commandId}),result:usage.nullable()}],
   ['ai.conversations.put',{params:z.strictObject({record:conversationRecordSchema,expectedRevision:revision}),result:conversationRecordSchema}],

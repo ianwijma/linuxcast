@@ -11,7 +11,7 @@ function fixture() {
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });
@@ -58,4 +58,15 @@ describe('launcher preload boundary', () => {
     expect(JSON.stringify(await api.executeLauncherCommand({commandId:'linuxcast:hide',revision:1}))).not.toContain('SYNTHETIC_PRIVATE');
     expect((await api.getLauncherCommands()).ok).toBe(false);
   });
+});
+
+
+it('validates the named pin request and refuses extra fields or unregistered IDs',async()=>{
+  const {api,transport}=fixture();
+  for(const request of [{commandId:'arbitrary:command',revision:1,pinned:true},{commandId:'linuxcast:hide',revision:0,pinned:true},{commandId:'linuxcast:hide',revision:1,pinned:1},{commandId:'linuxcast:hide',revision:1,pinned:true,private:'SYNTHETIC_PRIVATE'}]) {
+    expect((await api.setLauncherPinned(request as never)).ok).toBe(false);
+  }
+  expect(transport.invoke).not.toHaveBeenCalled();
+  await api.setLauncherPinned({commandId:'linuxcast:hide',revision:1,pinned:true});
+  expect(transport.invoke).toHaveBeenCalledExactlyOnceWith('launcher:set-pinned',{protocolVersion:1,commandId:'linuxcast:hide',revision:1,pinned:true});
 });

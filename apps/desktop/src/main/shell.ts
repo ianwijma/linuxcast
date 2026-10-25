@@ -21,6 +21,7 @@ export interface ResidentShellOptions {
   openDataSettings?: () => Promise<void>;
   getCommandUsage?: LauncherActions['getUsage'];
   recordCommandUse?: LauncherActions['recordUse'];
+  setCommandPinned?: LauncherActions['setPinned'];
 }
 
 /** Called once, synchronously before Electron readiness, by the packaged entry. */
@@ -131,6 +132,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       hide: () => lifecycle.hide(), quit: () => { void lifecycle.quit(); },
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
       ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
+      ...(options.setCommandPinned ? {setPinned: options.setCommandPinned} : {}),
       ...(options.recordCommandUse ? {recordUse: options.recordCommandUse} : {}),
     });
     removeIpc = registerShellIpc(ipcMain, {
