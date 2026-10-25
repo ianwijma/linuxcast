@@ -11,7 +11,7 @@ function fixture() {
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });
@@ -40,5 +40,22 @@ describe('sandboxed preload API', () => {
     expect(transport.removeListener).toHaveBeenCalledWith(SHELL_CHANNELS.state, receive);
     receive(privateEvent, state); expect(listener).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(listener.mock.calls)).not.toContain('SYNTHETIC_PRIVATE');
+  });
+});
+
+
+describe('launcher preload boundary', () => {
+  it('allows only registered command IDs with a current positive revision and validates reply shape', async () => {
+    const {api,transport}=fixture();
+    for(const request of [{commandId:'arbitrary:exec',revision:1},{commandId:'linuxcast:quit',revision:0},{commandId:'linuxcast:quit',revision:1,private:'SYNTHETIC_PRIVATE'}]) {
+      expect((await api.executeLauncherCommand(request as never)).ok).toBe(false);
+    }
+    expect(transport.invoke).not.toHaveBeenCalled();
+    transport.invoke.mockResolvedValue({ok:true,value:{outcome:'dispatched'}});
+    expect(await api.executeLauncherCommand({commandId:'linuxcast:quit',revision:1})).toEqual({ok:true,value:{outcome:'dispatched'}});
+    expect(transport.invoke).toHaveBeenLastCalledWith('launcher:execute',{protocolVersion:1,commandId:'linuxcast:quit',revision:1});
+    transport.invoke.mockResolvedValue({ok:true,value:{outcome:'completed',private:'SYNTHETIC_PRIVATE'}});
+    expect(JSON.stringify(await api.executeLauncherCommand({commandId:'linuxcast:hide',revision:1}))).not.toContain('SYNTHETIC_PRIVATE');
+    expect((await api.getLauncherCommands()).ok).toBe(false);
   });
 });
