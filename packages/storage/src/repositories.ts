@@ -1,3 +1,5 @@
+import { clearLocalData, exportLocalData } from './data-controls.ts';
+import type { DataClearParams, DataClearResult, DataExportParams, DataExportResult } from '@linuxcast/platform-contracts/data-controls';
 import { getSecretReference, putSecretReference, listSecretReferences } from './secrets.ts';
 import type { SecretReferenceRecord } from '@linuxcast/platform-contracts/secrets';
 import { FILE_INDEX_METHODS } from '@linuxcast/file-index/contracts';
@@ -15,8 +17,10 @@ import { StorageError } from './errors.ts';
 type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
 export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
-export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string; pinned: boolean; alias: string | null }
+export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface StorageMethods extends FileIndexMethods {
+  'dataControls.clear': {params: DataClearParams; result: DataClearResult};
+  'dataControls.export': {params: DataExportParams; result: DataExportResult};
   'secretRefs.get': {params: {id: string}; result: SecretReferenceRecord | null};
   'secretRefs.put': {params: {record: SecretReferenceRecord}; result: SecretReferenceRecord};
   'secretRefs.delete': {params: {id: string}; result: boolean};
@@ -34,7 +38,7 @@ export interface StorageMethods extends FileIndexMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -89,6 +93,8 @@ export class Repositories {
       catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }
     }
     switch (method) {
+      case 'dataControls.clear': return clearLocalData(db, input as DataClearParams);
+      case 'dataControls.export': return exportLocalData(db, input as DataExportParams);
       case 'secretRefs.get': return getSecretReference(db, (input as StorageMethods['secretRefs.get']['params']).id);
       case 'secretRefs.put': return putSecretReference(db, (input as StorageMethods['secretRefs.put']['params']).record);
       case 'secretRefs.delete': return db.prepare('DELETE FROM secret_references WHERE id=?').run((input as StorageMethods['secretRefs.delete']['params']).id).changes !== 0;
@@ -183,7 +189,7 @@ export class Repositories {
   }
   private getUsage(commandId: string): CommandUsage | null {
     const row = this.db.prepare('SELECT use_count,last_used_at,pinned,alias FROM command_usage WHERE command_id=?').get(commandId) as
-      {use_count:number;last_used_at:string;pinned:number;alias:string|null}|undefined;
+      {use_count:number;last_used_at:string|null;pinned:number;alias:string|null}|undefined;
     return row ? { commandId, useCount: row.use_count, lastUsedAt: row.last_used_at, pinned: row.pinned === 1,
       alias: row.alias === null ? null : parseContract(uiTextSchema, row.alias) } : null;
   }

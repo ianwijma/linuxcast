@@ -36,7 +36,7 @@ export function serveStorage(port: StoragePort): { close(): Promise<void> } {
           catch (error) {
             const reason = error instanceof StorageError ? error.reason : 'storage-unavailable';
             terminal(request, { outcome: 'failed', failure: { code: reason === 'conflict' ? 'conflict' : 'invalid-request',
-              message: 'Storage request could not be completed.', retryable: false, details: { reasonCode: reason } } });
+              message: reason === 'export-too-large' ? 'Export is too large. Select fewer records.' : 'Storage request could not be completed.', retryable: false, details: { reasonCode: reason } } });
           }
         }
       } finally { processing = false; if (queue.length) drain(); }
