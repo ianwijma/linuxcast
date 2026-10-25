@@ -27,7 +27,7 @@ export class LauncherController {
   }
   #view():ViewModel {
     const tooLong=this.#query.length>MAX_QUERY_LENGTH;
-    const commands=this.#snapshot && !tooLong?rankCommands(this.#snapshot.commands,this.#query):[];
+    const commands=this.#snapshot && !tooLong?rankCommands(this.#snapshot.commands,this.#query,Date.now(),this.#priorSelection):[];
     const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#status;
     return {protocolVersion:1,viewId:VIEW_ID,revision:++this.#viewRevision,kind:'list',title:'Search commands',loading:this.#loading,
       search:{query:this.#query,placeholder:'Search commands…',mode:'extension'},

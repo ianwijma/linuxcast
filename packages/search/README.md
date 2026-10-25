@@ -16,6 +16,7 @@ commands. Bounds are 512 query code units, 4,099 registered metadata records,
 
 Query generations abort the previous token and reject stale completions even if
 a producer ignores cancellation. Selection belongs to a stable result identity,
-not a row index. Further providers, provider discovery, ranking
+not a row index. A still-matching selected ID remains in its provider projection
+within the existing result limit; mismatched or removed identities are released. Further providers, provider discovery, ranking
 administration, argument flows and configured fallback/AI actions remain later
 L1-01 work; this slice does not redefine the task or the local 1.0 scope.

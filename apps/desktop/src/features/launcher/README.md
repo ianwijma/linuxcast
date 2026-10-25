@@ -62,12 +62,15 @@ Application pins use the same explicit metadata actions. A validated one-row
 `updateOnly` acknowledgement merges the matching target without losing other
 pages; a partial full-snapshot reply rejects. Unavailable application discovery
 keeps built-ins usable and offers Reload commands. Selection remains a stable ID
-across query results and pin reordering.
+across query results and pin reordering. A still-matching selected application
+remains visible across a refresh even when ranking would push it past the provider
+cap: it replaces the lowest unselected result within that same bound. A removed
+identity or one that no longer matches the query is released normally.
 
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: nine bounded ranking/generation tests.
-- `tests/controller.test.ts`: 21 current registry/selection/action/failure tests, including pin acknowledgements.
+- `tests/controller.test.ts`: 22 current registry/selection/action/failure tests, including pin acknowledgements.
 - `tests/catalogue.test.ts`: 11 atomic pagination and pin-merge checks.
 - `tests/launcher.ui.test.ts`: 14 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
