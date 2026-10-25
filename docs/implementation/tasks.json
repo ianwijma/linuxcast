@@ -2285,7 +2285,7 @@
     {
       "id": "L2-02",
       "title": "Add file search UI and content extractors",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -2360,9 +2360,13 @@
         "bun run test:integration -- L2-02"
       ],
       "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "owner": "coordinator with manifest_review_sol and file_search_service_sol (GPT-6.1 SOL/high)",
+      "branch": "codex/file-search-ui",
+      "limitations": [
+        "Bounded filename/metadata search increment in development; not a completed L2-02 task. Existing accepted L2-01 index is reused; L1-01/D1-02 broader provider/UI/native acceptance remains pending under user-authorized unfinished incremental integration.",
+        "Content extraction with explicit per-root opt-in and MIME/size/time budgets, dedicated MIME/date filters/sorting/path navigation/recent files remain required. File actions are separate L2-03 scope; this view grants no file-open/read authority.",
+        "Production Electron integration, independent review, final checks and PR merge pending. Native dialogs in automated evidence are instrumented; Debian 13 GNOME/KDE Wayland/X11/native assistive-technology/installed-package/release acceptance remain outstanding."
+      ]
     },
     {
       "id": "L2-03",

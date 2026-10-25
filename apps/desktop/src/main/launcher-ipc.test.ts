@@ -10,7 +10,7 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true) {
   const frame={url:APP_URL}, contents={mainFrame:frame,isDestroyed:()=>false,getURL:()=>APP_URL} as unknown as WebContents;
   const event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
   const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
-  const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openUrl:vi.fn(async()=>'dispatched' as const),openDataSettings:vi.fn(async()=>{}),
+  const actions={contents:()=>contents,quitting:()=>false,hide:vi.fn(),quit:vi.fn(),openUrl:vi.fn(async()=>'dispatched' as const),openDataSettings:vi.fn(async()=>{}),openFileSearch:vi.fn(async()=>{}),
     getUsage:vi.fn(async(commandId:string)=>({commandId,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false,alias:null})),recordUse:vi.fn(async()=>{}),setAlias:vi.fn(async(commandId:string,alias:string|null)=>({commandId,alias,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',pinned:false})),setPinned:vi.fn(async(commandId:string,pinned:boolean)=>({commandId,pinned,useCount:4,lastUsedAt:'2026-10-25T00:00:00.000Z',alias:null})),...overrides};
   const remove=registerLauncherIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},localData ? actions : (({openDataSettings,...rest})=>{void openDataSettings;return rest;})(actions));
   const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
@@ -22,7 +22,7 @@ describe('trusted launcher registry and action dispatch',()=>{
     const f=fixture();
     expect([...f.handlers.keys()].sort()).toEqual(Object.values(LAUNCHER_CHANNELS).sort());
     const reply=await f.invoke(LAUNCHER_CHANNELS.getCommands);
-    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'}]}});
+    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'},{id:'linuxcast:open-file-search'}]}});
     expect(JSON.stringify(reply)).not.toContain('commandId');
     expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,query:'SYNTHETIC_PRIVATE'})).toMatchObject({ok:false,error:{code:'invalid-request'}});
     f.remove();expect(f.handlers.size).toBe(0);
@@ -59,7 +59,7 @@ describe('trusted launcher registry and action dispatch',()=>{
   });
   it('reports unavailable commands and rejects execution during shutdown',async()=>{
     const f=fixture({},false);
-    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true}]}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true},{enabled:true}]}});
     expect(await f.execute('linuxcast:open-local-data',2)).toMatchObject({ok:false,error:{code:'permission-denied'}});
     const stopped=fixture({quitting:()=>true});
     expect(await stopped.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
@@ -97,7 +97,7 @@ it('pages a complete registered application catalogue and rejects obsolete curso
   const f=fixture({listApplications:async()=>records,launchApplication}),first=await catalogue(f);
   expect(first.commands).toHaveLength(100);expect(first.nextCursor).toBe(`${first.revision}:100`);
   const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
-  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(34);
+  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(35);
   const selected=first.commands.find(command=>command.provider==='applications')!;
   expect(await f.execute(`application:${'f'.repeat(64)}`,first.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
   expect(await f.execute(selected.id,first.revision)).toEqual({ok:true,value:{outcome:'dispatched'}});
@@ -115,7 +115,7 @@ it('caps public page bytes and keeps paginating large saved aliases without drop
     const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:page.nextCursor}) as LauncherCommandsReply;
     if(!next.ok)throw new Error();page=next.value;
   }
-  expect(ids).toHaveLength(134);expect(new Set(ids).size).toBe(134);
+  expect(ids).toHaveLength(135);expect(new Set(ids).size).toBe(135);
 });
 it('returns a one-command authoritative pin acknowledgement for an application beyond page one',async()=>{
   const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),first=await catalogue(f);
