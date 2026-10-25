@@ -152,3 +152,27 @@ describe('L1-01 search alias editor',()=>{
 it.each(['invalid-request','capability-unavailable'] as const)('L1-01 %s alias failure offers explicit Reload from retained Form without replay',async code=>{
   const f=setup({setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async()=>({ok:false,error:{code,message:'synthetic private detail',retryable:false}}))});await settled();await openAlias(f.controller);await formAction(f.controller,'launcher:save-alias','retained');expect(top(f.controller).view).toMatchObject({kind:'form',fields:[{value:'retained',error:expect.any(String)}]});expect(top(f.controller).view.actions?.some(action=>action.id==='launcher:retry')).toBe(true);await formAction(f.controller,'launcher:retry');expect(top(f.controller).view.kind).toBe('list');expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(2);expect(f.api.setLauncherAlias).toHaveBeenCalledTimes(1);
 });
+
+it.each(['recorded-use','cleared-usage'] as const)('L1-01 alias acknowledgement accepts current owner totals after %s without a refresh',async mode=>{
+  const owner=structuredClone(snapshot),command=owner.commands[0]!;
+  command.usage={useCount:4,lastUsedAt:'2026-10-25T00:00:00Z',pinned:true,alias:null};
+  const f=setup({
+    getLauncherCommands:vi.fn<LauncherApi['getLauncherCommands']>(async()=>({ok:true,value:structuredClone(owner)})),
+    executeLauncherCommand:vi.fn<LauncherApi['executeLauncherCommand']>(async()=>{
+      command.usage!.useCount++;command.usage!.lastUsedAt='2026-10-25T01:00:00Z';
+      return {ok:true,value:{outcome:'completed'}};
+    }),
+    setLauncherAlias:vi.fn<LauncherApi['setLauncherAlias']>(async request=>{
+      command.usage!.alias=request.alias;
+      return {ok:true,value:{...structuredClone(owner),updateOnly:true,commands:[structuredClone(command)]}};
+    }),
+  });
+  await settled();
+  if(mode==='recorded-use')await invoke(f.controller,'linuxcast:open-local-data');
+  else {command.usage!.useCount=0;command.usage!.lastUsedAt=null;}
+  await openAlias(f.controller,'linuxcast:open-local-data');await formAction(f.controller,'launcher:save-alias','my-data');
+  expect(top(f.controller).view.kind).toBe('list');expect(top(f.controller).view.status).toBeUndefined();
+  f.controller.query('my-data');await settled();expect(items(f.controller)).toMatchObject([{id:'linuxcast:open-local-data',accessories:[{text:'Pinned'}]}]);
+  expect(f.api.getLauncherCommands).toHaveBeenCalledTimes(1);expect(f.api.setLauncherAlias).toHaveBeenCalledExactlyOnceWith({commandId:'linuxcast:open-local-data',revision:1,alias:'my-data'});
+  expect(f.api.executeLauncherCommand).toHaveBeenCalledTimes(mode==='recorded-use'?1:0);expect(command.usage).toEqual({useCount:mode==='recorded-use'?5:0,lastUsedAt:mode==='recorded-use'?'2026-10-25T01:00:00Z':null,pinned:true,alias:'my-data'});
+});

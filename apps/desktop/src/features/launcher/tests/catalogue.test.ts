@@ -44,7 +44,14 @@ describe('L1-01 alias acknowledgement integrity',()=>{
     expect(next.commands).toHaveLength(120);expect(next.commands[109]).toBe(current.commands[109]);expect(next.commands[110]!.usage).toEqual({...current.commands[110]!.usage,alias:'new alias'});expect(current.commands[110]!.usage!.alias).toBe('previous');
     target.usage!.alias=null;expect(mergeAliasReply(current,reply,target.id,null).commands[110]!.usage!.alias).toBeNull();
   });
-  it.each(['revision','full','cursor','extra','id','alias','title','declared-alias','keywords','provider','enabled','usage','time','pin','ranking','application-state'] as const)('rejects a %s change rather than accepting unrelated metadata',mode=>{
+  it.each(['recorded-use','cleared-usage'] as const)('accepts authoritative %s totals while preserving target pin and other pages',mode=>{
+    const {current,target,reply}=fixture();
+    target.usage!.useCount=mode==='recorded-use'?8:0;
+    target.usage!.lastUsedAt=mode==='recorded-use'?'2026-10-25T01:00:00Z':null;
+    const merged=mergeAliasReply(current,reply,target.id,'new alias');
+    expect(merged.commands[110]!.usage).toEqual(target.usage);expect(merged.commands[110]!.usage!.pinned).toBe(true);expect(merged.commands[109]).toBe(current.commands[109]);expect(current.commands[110]!.usage!.useCount).toBe(7);
+  });
+  it.each(['revision','full','cursor','extra','id','alias','title','declared-alias','keywords','provider','enabled','pin','ranking','application-state'] as const)('rejects a %s change rather than accepting unrelated metadata',mode=>{
     const {current,target,reply}=fixture();
     if(mode==='revision')reply.revision++;
     if(mode==='full')delete reply.updateOnly;
@@ -57,8 +64,6 @@ describe('L1-01 alias acknowledgement integrity',()=>{
     if(mode==='keywords')target.keywords=['changed'];
     if(mode==='provider')target.provider='commands';
     if(mode==='enabled')target.enabled=false;
-    if(mode==='usage')target.usage!.useCount++;
-    if(mode==='time')target.usage!.lastUsedAt=null;
     if(mode==='pin')target.usage!.pinned=false;
     if(mode==='ranking')reply.rankingAvailable=false;
     if(mode==='application-state')reply.applicationState='unavailable';

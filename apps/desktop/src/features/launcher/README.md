@@ -61,9 +61,11 @@ checks normalized collisions against declared and saved aliases; the renderer
 never treats a draft as execution authority.
 
 Only a same-revision, one-target `updateOnly` acknowledgement with the exact
-requested alias updates local metadata. Immutable command fields, use count,
-timestamp and pin must remain unchanged. Other paged commands retain their
-metadata. Saved aliases enter the existing local exact-alias ranking; removing
+requested alias updates local metadata. Immutable command fields and pin must
+remain unchanged. Current usage count and timestamp come from the trusted owner;
+execution or settings may have changed them since the renderer loaded its
+catalogue. The sole owner changes only the alias field during an alias write.
+Other paged commands retain their metadata. Saved aliases enter the existing local exact-alias ranking; removing
 one removes that match. Alias editing never invokes a command or records use.
 
 Root query, selection and primary action remain in the lower stack frame through
@@ -103,7 +105,7 @@ identity or one that no longer matches the query is released normally.
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: ten bounded ranking/generation tests.
-- `tests/controller.test.ts`: 40 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/controller.test.ts`: 42 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: 28 atomic pagination and pin/alias integrity checks.
 - `tests/launcher.ui.test.ts`: 23 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
