@@ -115,7 +115,7 @@ it('caps public page bytes and keeps paginating large saved aliases without drop
     const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:page.nextCursor}) as LauncherCommandsReply;
     if(!next.ok)throw new Error();page=next.value;
   }
-  expect(ids).toHaveLength(133);expect(new Set(ids).size).toBe(133);
+  expect(ids).toHaveLength(134);expect(new Set(ids).size).toBe(134);
 });
 it('returns a one-command authoritative pin acknowledgement for an application beyond page one',async()=>{
   const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),first=await catalogue(f);
@@ -256,7 +256,7 @@ it.each([['unavailable','not-dispatched','capability-unavailable'],['launch-fail
   expect(reply).toMatchObject({ok:false,error:{code,retryable:false}});expect(JSON.stringify(reply)).not.toContain('example.invalid');expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
 });
 it('keeps browser capability visibly unavailable while other commands remain usable',async()=>{
-  const f=fixture({openUrl:undefined});
+  const f=fixture({openUrl:undefined} as unknown as Partial<LauncherActions>);
   expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{commands:expect.arrayContaining([expect.objectContaining({id:'linuxcast:open-url',enabled:false,unavailableReason:expect.any(String)})])}});
   expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision:1,url:'https://example.invalid/'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
   expect(await f.execute('linuxcast:hide')).toMatchObject({ok:true});

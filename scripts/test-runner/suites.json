@@ -63,6 +63,9 @@
     "S0-05": [
       "spikes/ai/provider.contract.test.ts",
       "spikes/ai/oauth.contract.test.ts"
+    ],
+    "L1-02": [
+      "packages/contracts/tests/open-url.contract.test.ts"
     ]
   },
   "ui": {
