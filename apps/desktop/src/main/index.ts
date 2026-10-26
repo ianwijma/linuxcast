@@ -4,6 +4,7 @@ import { createFileSearchWorkspace } from './file-search.ts';
 import { DataControls } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
 import { app,clipboard } from 'electron';
+import { createClipboardWriter } from './clipboard-write.ts';
 import { isAbsolute, join } from 'node:path';
 import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
@@ -12,14 +13,9 @@ let fileSearch:ReturnType<typeof createFileSearchWorkspace>|undefined;
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
 let applications:ReturnType<typeof createApplications>|undefined;
+const copyText=createClipboardWriter(clipboard,()=>process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY);
 startResidentShell({ resourcesDirectory: __dirname,
-  async copyCalculatorResult(text){
-    const nativeSession=process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY;
-    if(!nativeSession)return 'unsupported';
-    await clipboard.writeText(text);
-    if(await clipboard.readText()!==text)throw new Error('Copy could not be confirmed.');
-    return 'written';
-  },
+  copyCalculatorResult:copyText,
   async openUrl(url){if(!applications)throw new Error('Browser opening unavailable.');return applications.openUrl(url);},
   async listApplications(){if(!applications)throw new Error('Applications unavailable.');return applications.list();},
   async launchApplication(application){if(!applications)throw new Error('Applications unavailable.');return applications.launch(application);},
@@ -54,7 +50,7 @@ startResidentShell({ resourcesDirectory: __dirname,
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
     controls,executable:join(__dirname,'platform'),
   });
-  fileSearch=createFileSearchWorkspace({resourcesDirectory:__dirname,service:fileService,isReady:currentStorage.isReady});
+  fileSearch=createFileSearchWorkspace({resourcesDirectory:__dirname,service:fileService,isReady:currentStorage.isReady,copyPath:copyText});
   const currentFiles=fileSearch;
   dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
     async exportCategory(category,signal){

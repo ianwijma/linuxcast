@@ -35,9 +35,10 @@ and resident jobs are service-owned; closing/disposal of this window does not
 call Pause indexing or stop jobs.
 
 The selected result's **Show details** action opens a read-only shared Detail.
-Its Markdown is static; root name, relative path, kind, byte size and UTC modified
-time are plain metadata fields. Filenames cannot create links, markup or file
-actions. Opening, previews and other file actions are explicitly unavailable.
+Its Markdown is static; root name, relative and indexed absolute path, kind, byte
+size and UTC modified time are plain metadata fields. Filenames cannot create links, markup or file
+actions. Explicit Copy path is available through the bounded L2-03 integration;
+opening, previews and other file actions remain unavailable.
 Escape/back returns Detail → Results → Folders, preserving query, selected ID and
 focus; Escape from Folders calls only the named close API. Failure restores a
 usable root with an actionable error.
@@ -111,3 +112,18 @@ Resolved findings include stale-window Close, paused-index clear publication,
 and native removal confirmation waiting longer than five seconds; two fake-time
 regressions verify ten-second waits followed by cancellation or confirmation.
 Unknown backend mutations still require explicit Refresh; no automatic replay.
+
+## Selected-result Copy path integration (L2-03)
+
+The Results list has Copy path after Show details; Details makes Copy path
+primary. Both use the shared `IndexedPathCopy` presentation from universal-actions,
+with exact current view/selection/root/generation checks and a main-derived
+indexed path receipt. Rendering, query/selection and Details opening never copy.
+The strict named API submits result identity only. Missing clipboard access is
+visible and actionable. Pending navigation/selection changes warn that copying
+may have occurred; late replies cannot show success for a different result.
+Main's metadata identity confers no file-open/read authority. Copying uses the
+index location without asserting that the source exists. Actual copy/restart/
+clear evidence and full remaining scope are in ../universal-actions/README.md.
+The full L2-02 content/filter/sort/path-navigation/recent-file acceptance remains
+unfinished alongside broader native/AT/package/release prerequisites.

@@ -1,5 +1,5 @@
-import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
-import type { FileSearchApi } from '@linuxcast/contracts';
+import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
+import type { FileSearchApi,IndexedPathSelection } from '@linuxcast/contracts';
 import type { ShellTransport } from '../preload/api.ts';
 export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
   const failed={ok:false as const,error:{code:'internal' as const,message:'File search is unavailable. Refresh folders before trying again.',retryable:false}};
@@ -19,6 +19,14 @@ export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
       try {
         const reply=fileSearchQueryReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.search,parsed.data)));
         if(reply.ok&&(reply.value.query!==parsed.data.query||reply.value.rootId!==(parsed.data.rootId??null)))return failed;
+        return reply;
+      }catch{return failed;}
+    },
+    async copyPath(selection:IndexedPathSelection){
+      const parsed=indexedPathCopyRequestSchema.safeParse({...selection,protocolVersion:1});if(!parsed.success)return failed;
+      try{
+        const reply=indexedPathCopyReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.copyPath,parsed.data)));
+        if(reply.ok&&(reply.value.resultId!==parsed.data.resultId||reply.value.rootId!==parsed.data.rootId||reply.value.generation!==parsed.data.generation))return failed;
         return reply;
       }catch{return failed;}
     },

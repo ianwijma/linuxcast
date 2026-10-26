@@ -4,7 +4,7 @@ import { createFileSearchApi } from './api.ts';
 const rootId='11111111-1111-4111-8111-111111111111';
 it('exposes only named metadata actions and validates root/query inputs before crossing IPC',async()=>{
   const invoke=vi.fn(async()=>({ok:true,value:{outcome:'completed'}})),api=createFileSearchApi({invoke,on:vi.fn(),removeListener:vi.fn()});
-  expect(Object.isFrozen(api)).toBe(true);expect(Object.keys(api).sort()).toEqual(['chooseFolder','close','getState','onState','pauseIndex','removeFolder','search','startIndex']);
+  expect(Object.isFrozen(api)).toBe(true);expect(Object.keys(api).sort()).toEqual(['chooseFolder','close','copyPath','getState','onState','pauseIndex','removeFolder','search','startIndex']);
   await api.chooseFolder();expect(invoke).toHaveBeenLastCalledWith(C.choose,{protocolVersion:1});
   await api.startIndex(rootId);expect(invoke).toHaveBeenLastCalledWith(C.start,{protocolVersion:1,rootId});
   invoke.mockClear();await api.startIndex('/private');await api.search({query:'x'.repeat(513)});await api.search({query:'public',path:'/private'} as never);expect(invoke).not.toHaveBeenCalled();
@@ -22,4 +22,12 @@ it('delivers only validated state without Electron events and unsubscribes once'
   receive!({private:'SYNTHETIC_PRIVATE'},snapshot);expect(listener).toHaveBeenCalledExactlyOnceWith(snapshot);
   receive!({},null);receive!({},{...snapshot,secret:'private'});expect(listener).toHaveBeenCalledTimes(1);
   unsubscribe();unsubscribe();receive!({},snapshot);expect(listener).toHaveBeenCalledTimes(1);expect(removeListener).toHaveBeenCalledOnce();
+});
+
+it('sends only indexed identity for Copy path and rejects mismatched or malformed copied receipts',async()=>{
+  const generation='22222222-2222-4222-8222-222222222222',selection={resultId:rootId+':public.txt',rootId,generation};
+  const value={...selection,outcome:'copied',path:'/synthetic/public.txt'},invoke=vi.fn(async()=>({ok:true,value}));const api=createFileSearchApi({invoke,on:vi.fn(),removeListener:vi.fn()});
+  expect(await api.copyPath!(selection)).toEqual({ok:true,value});expect(invoke).toHaveBeenCalledExactlyOnceWith(C.copyPath,{...selection,protocolVersion:1});
+  invoke.mockClear();await api.copyPath!({...selection,path:'/private'} as never);expect(invoke).not.toHaveBeenCalled();
+  for(const reply of [{ok:true,value:{...value,resultId:'other'}},{ok:true,value:{...value,path:'/a/../b'}},{ok:true,value:{...value,rootId:generation}}]){invoke.mockResolvedValueOnce(reply);expect(await api.copyPath!(selection)).toMatchObject({ok:false,error:{code:'internal'}});}
 });

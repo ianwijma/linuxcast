@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema } from '../src/file-search.ts';
+import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema } from '../src/file-search.ts';
 const rootId='11111111-1111-4111-8111-111111111111',generation='22222222-2222-4222-8222-222222222222';
 const result={id:`${rootId}:public.txt`,rootId,generation,path:'public.txt',kind:'file',size:4,modifiedMs:1};
 it('accepts bounded metadata identities and rejects traversal, content and scope confusion',()=>{
@@ -15,4 +15,11 @@ it('bounds UTF8 queries and root sets without introducing renderer path authorit
   const selected={id:rootId,name:'Public',displayPath:'/synthetic/public',state:'idle',activity:'paused',generation:null,progress:null};
   expect(fileSearchStateSchema.safeParse({revision:1,appearance:'dark',roots:[selected]}).success).toBe(true);
   expect(fileSearchStateSchema.safeParse({revision:1,appearance:'dark',roots:[selected,selected]}).success).toBe(false);
+});
+
+it('limits copy authority to a single indexed identity and canonical bounded receipt path',()=>{
+  const selection={resultId:result.id,rootId,generation};expect(indexedPathCopyRequestSchema.safeParse({...selection,protocolVersion:1}).success).toBe(true);
+  for(const payload of [{...selection,protocolVersion:1,path:'/private'},{...selection,protocolVersion:1,text:'private'},[selection]])expect(indexedPathCopyRequestSchema.safeParse(payload).success).toBe(false);
+  const reply={ok:true,value:{...selection,outcome:'copied',path:'/synthetic/public/public.txt'}};expect(indexedPathCopyReplySchema.safeParse(reply).success).toBe(true);
+  for(const path of ['relative','/a/../b','/a//b','/a/./b','/a\0b','/a\ud800','/'+ 'x'.repeat(8193)])expect(indexedPathCopyReplySchema.safeParse({...reply,value:{...reply.value,path}}).success).toBe(false);
 });

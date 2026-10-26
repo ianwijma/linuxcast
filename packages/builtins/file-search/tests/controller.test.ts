@@ -57,7 +57,7 @@ describe('L2-02 selected-folder presentation',()=>{
     const f=setup();await settled();await search(f);f.state.roots=[];f.push();await settled();expect(items(f.controller)).toEqual([]);expect(top(f.controller).view.status?.message).toContain('removed');expect(f.api.search).toHaveBeenCalledTimes(1);
   });
   it('renders readonly metadata with static Markdown and pops Detail→Results→Folders before named Close',async()=>{
-    const path='<script>public</script>.txt',row={...rows[0]!,id:`${rootId}:${path}`,path};const f=setup({search:vi.fn<FileSearchApi['search']>(async request=>({ok:true,value:{query:request.query,rootId,results:[row]}}))});await settled();await search(f);await invoke(f.controller,'files:details',row.id);expect(top(f.controller).view).toMatchObject({kind:'detail',markdown:'Indexed metadata only. File opening, previews and other file actions are unavailable in this view.',metadata:expect.arrayContaining([{label:'Relative path',value:path}]),actions:[]});f.controller.session.pop();expect(top(f.controller)).toMatchObject({query:'public'});f.controller.session.pop();expect(top(f.controller).view.title).toBe('Folders');expect(f.api.close).not.toHaveBeenCalled();f.controller.session.pop();await settled();expect(f.api.close).toHaveBeenCalledTimes(1);expect(top(f.controller).view.title).toBe('Folders');
+    const path='<script>public</script>.txt',row={...rows[0]!,id:`${rootId}:${path}`,path};const f=setup({search:vi.fn<FileSearchApi['search']>(async request=>({ok:true,value:{query:request.query,rootId,results:[row]}}))});await settled();await search(f);await invoke(f.controller,'files:details',row.id);expect(top(f.controller).view).toMatchObject({kind:'detail',markdown:expect.stringContaining('does not open the file'),metadata:expect.arrayContaining([{label:'Relative path',value:path}]),actions:[{id:'files:copy-path',disabledReason:expect.stringContaining('unavailable')}]});f.controller.session.pop();expect(top(f.controller)).toMatchObject({query:'public'});f.controller.session.pop();expect(top(f.controller).view.title).toBe('Folders');expect(f.api.close).not.toHaveBeenCalled();f.controller.session.pop();await settled();expect(f.api.close).toHaveBeenCalledTimes(1);expect(top(f.controller).view.title).toBe('Folders');
   });
   it('rejects stale actions and disposed replies, unsubscribes without stopping resident jobs',async()=>{
     let finish!:(value:Awaited<ReturnType<FileSearchApi['chooseFolder']>>)=>void;const f=setup({chooseFolder:vi.fn<FileSearchApi['chooseFolder']>(()=>new Promise(resolve=>{finish=resolve;}))});await settled();await f.controller.execute({viewId:'file-search-folders',revision:0,actionId:'files:remove',itemId:rootId});expect(f.api.removeFolder).not.toHaveBeenCalled();const pending=invoke(f.controller,'files:choose');f.controller.dispose();await pending;const snapshot=f.controller.session.getSnapshot();finish({ok:true,value:{outcome:'selected',rootId}});f.push();await settled();expect(f.controller.session.getSnapshot()).toBe(snapshot);expect(f.unsubscribe).toHaveBeenCalledTimes(1);expect(f.api.pauseIndex).not.toHaveBeenCalled();expect(f.api.close).not.toHaveBeenCalled();
@@ -89,4 +89,38 @@ it.each(['cancelled','completed'] as const)('L2-02 waits for held native removal
   if(outcome==='completed'){f.state.roots=[];f.state.revision++;}
   finish({ok:true,value:{outcome}});await pending;expect(items(f.controller)).toHaveLength(outcome==='completed'?0:1);
   expect(top(f.controller).view.status?.message).not.toContain('could not be confirmed');expect(f.api.removeFolder).toHaveBeenCalledTimes(1);
+});
+
+it('offers explicit single-result Copy path from list and Detail without copying during search/navigation',async()=>{
+  const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>(async selection=>({ok:true,value:{...selection,outcome:'copied',path:root.displayPath+'/'+rows[0]!.path}}));
+  const f=setup({copyPath});await settled();await search(f);expect(copyPath).not.toHaveBeenCalled();
+  expect(items(f.controller)[0]!.actions?.find(action=>action.id==='files:copy-path')?.disabledReason).toBeUndefined();
+  await invoke(f.controller,'files:copy-path',rows[0]!.id);expect(copyPath).toHaveBeenCalledExactlyOnceWith({resultId:rows[0]!.id,rootId,generation});expect(top(f.controller).view.status?.message).toBe('Path copied.');
+  await invoke(f.controller,'files:details',rows[0]!.id);expect(copyPath).toHaveBeenCalledTimes(1);expect(top(f.controller).view).toMatchObject({kind:'detail',actions:[{id:'files:copy-path',title:'Copy path'}]});expect(top(f.controller).view.actions?.[0]?.disabledReason).toBeUndefined();
+  await invoke(f.controller,'files:copy-path');expect(copyPath).toHaveBeenCalledTimes(2);expect(top(f.controller).view.status?.message).toBe('Path copied.');
+});
+it('rejects stale, unselected and value-bearing Copy path intents before sending IPC',async()=>{
+  const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>();const f=setup({copyPath});await settled();await search(f);const frame=top(f.controller);
+  for(const intent of [{viewId:frame.view.viewId,revision:frame.view.revision-1,actionId:'files:copy-path',itemId:rows[0]!.id},{viewId:frame.view.viewId,revision:frame.view.revision,actionId:'files:copy-path',itemId:rows[1]!.id},{viewId:frame.view.viewId,revision:frame.view.revision,actionId:'files:copy-path',itemId:rows[0]!.id,values:{path:'/private'}}])await f.controller.execute(intent);
+  expect(copyPath).not.toHaveBeenCalled();
+});
+it('warns on pending Back, ignores late receipt and preserves warning through unrelated folder-state refresh',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<FileSearchApi['copyPath']>>>)=>void;
+  const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({copyPath});await settled();await search(f);await invoke(f.controller,'files:details',rows[0]!.id);
+  const pending=invoke(f.controller,'files:copy-path');expect(copyPath).toHaveBeenCalledOnce();f.controller.session.pop();await pending;
+  expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');f.push();expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');
+  finish({ok:true,value:{outcome:'copied',resultId:rows[0]!.id,rootId,generation,path:root.displayPath+'/'+rows[0]!.path}});await settled();expect(top(f.controller).view.status?.message).not.toBe('Path copied.');
+});
+it('does not assign an old copy receipt to the newly selected result',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<FileSearchApi['copyPath']>>>)=>void;
+  const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({copyPath});await settled();await search(f);const pending=invoke(f.controller,'files:copy-path',rows[0]!.id);
+  f.controller.session.select(top(f.controller).view.viewId,rows[1]!.id);f.controller.host.selectionChanged?.(top(f.controller).view.viewId,rows[1]!.id);
+  finish({ok:true,value:{outcome:'copied',resultId:rows[0]!.id,rootId,generation,path:root.displayPath+'/'+rows[0]!.path}});await pending;expect(top(f.controller).selection).toBe(rows[1]!.id);expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');
+});
+
+it('immediately publishes uncertainty when pending List copy returns to Folders without a state event',async()=>{
+  let finish!:(value:Awaited<ReturnType<NonNullable<FileSearchApi['copyPath']>>>)=>void;
+  const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({copyPath});await settled();await search(f);const pending=invoke(f.controller,'files:copy-path',rows[0]!.id);
+  f.controller.session.pop();await pending;expect(top(f.controller).view.title).toBe('Folders');expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');
+  finish({ok:true,value:{outcome:'copied',resultId:rows[0]!.id,rootId,generation,path:root.displayPath+'/'+rows[0]!.path}});await settled();expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');
 });
