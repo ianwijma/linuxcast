@@ -67,3 +67,33 @@ dates/timezones/DST, colours, configured currency/crypto adapters, timestamped
 fixture-backed cache and stale/offline rate behavior remain required. Debian
 GNOME/KDE Wayland/X11, native assistive technology and full release acceptance
 remain pending. The complete local 1.0 scope is unchanged.
+
+## Integrated application evidence
+
+Coordinator checks on Node24.22.1, Bun1.4.4, Electron45.0.0 and SQLite3.53.4
+pass:188calculator unit checks (157evaluator,29presentation,2launcherrouting),
+41main/preload security checks,2contract checks,10Chromium keyboard/axe checks,
+typecheck/lint/plan/diff. The existing108launcher unit checks pass.
+The production application check completes in2.39seconds using a private Xvfb
+profile, real packaged Electron/SQLite and a separate native xclip reader. It
+verifies that ordinary words do not select Calculator; typing and Evaluate do
+not change the clipboard; explicit Copy copies14and521 into the actual private
+CLIPBOARD; invalid expressions/division byzero do not copy; an unavailable
+session returns a known failure and only explicit retry after recovery writes.
+Hide removes both nested calculator views; real single-instance reopen shows
+the launcher and preserves the clipboard without replay. After Quit, the actual
+sole owner exports only aggregate calculator usage count2, without expressions
+or result history. The actual dark/light screenshots in evidence/application-
+{dark,light}-result.png were inspected and axe passes both themes. No clipboard
+operation uses the user's display or private content.
+
+Existing actual application/URL/alias/pin/data/restart regression passes7.18seconds.
+These synthetic smoke durations are not performance acceptance measurements.
+Independent GPT-6.1 SOL/high source review is clean across evaluator, contract,
+main/preload, presentation and launcher hide/back/stale-revision lifecycle. The
+clipboard action uses Electron45's async system clipboard promises, awaits
+write/readback, and retains an unresolved write's slot after its four-second
+unknown-outcome receipt so another copy cannot overtake it. Hide/Quit remain
+available. No automatic replay, paste, PRIMARY or clipboard-history read is
+added; native GNOME/KDE Wayland/X11, assistive-technology, installed package and
+release acceptance remain pending.
