@@ -92,22 +92,39 @@ Explicit action/native file chooser→fresh exact definition→existing exclusiv
 safe JSON writer. Plaintext interoperability file clearly labelled; no browser/
 copy/usage/definition mutation. One selected literal/search/recovered hidden row.
 No bulk/import/package execution/new dependency/migration/service/research/proof.
-This is development freeze only; no main/preload/actual export evidence yet.
+Root boundary signed edfef0f after freeze e652512: main strict selection-only
+channel, private native chooser ports, fresh exact definition/frame/revision/
+parent checks before chooser and again before existing safe0600/exclusive JSON
+writer. Separate exact exported/cancelled receipt; uncertain file publication
+redacted and no replay.70targeted5file contract/main/preload/writer checks, full
+typecheck/scopedlint pass. Independent boundary review clean.
 
-Next root implement main/preload/native chooser routing and actual private file
-checks; manifest_review_sol implements only existing Quicklinks Actions/status/
-controller/fixtures/tests/captures. Independent review, bounded checks, prompt
-small signed PR and normal merge. Complete local1.0 scope remains mandatory.
+Author required browser export case reproduced shared ActionPanel composing
+Enter invoking Export. Minimal root shared fix6dd38a6 returns while composing;
+17D1units/11D1Chromium regressions pass. Specific author regression rerunning
+against cherry-picked fix;198presentation units and37oldbrowser cases passed.
+Author running all44UI cases; nine export captures/README/final commit pending.
+
+Root apps/desktop/tests/quicklinks.integration.test.ts has UNCOMMITTED prepared
+actual cancel/export/existing-file/IME/private0600/hidden/search payload checks
+and four new affected capture requests; cannot run until authorUI integrated.
+No actual export evidence/acceptance yet. Root currently no live test handles.
+Next finish author source/captures, independent closure, cherry-pick only UI,
+actual production flow, bounded mapped checks/type/lint/plan, accurate evidence,
+small signed PR and prompt normal merge. Complete local1.0 scope mandatory.
 
 ## Agents
 
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-export-ui` (next assignment) from current shared freeze.
-  Prior signed5669223 integratedb58fcc4 in merged PR47; clean. Prior signed a43b0a7/1f8f77a integrated in PR46.
-- alias_review_sol: exact-tree source/test and nine component/six actual captures
-  reviewed clean; P2 reentrant Save finding closed.
+  `codex/l2-05-quicklink-export-ui` from e652512, root edfef0f cherry-picked as
+  0fda0ce and shared6dd38a6 as52be188; owned source/tests/captures in progress.
+  Prior signed5669223 integratedb58fcc4 in merged PR47. Prior signed a43b0a7/1f8f77a integrated in PR46.
+- alias_review_sol: current export UI draft + shared IME guard reviewed clean;
+  awaiting author final commit/nine captures. Prior root-entry exact trees and
+  affected six component/two actual captures clean.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
-  boundary independently reviewed clean; root saved-entry/search boundary clean after two fixes.
+  boundary and saved-entry/search clean; current export edfef0f reviewed clean.
+  No new task assigned.
 
 ## Acceptance and runtime
 
