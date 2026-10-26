@@ -116,14 +116,23 @@ Agents all SOL/high:
   Owns only quicklinks presentation/fixtures/tests/UI/evidence/README. Shared
   Form Tags field, local search/display/prefill/clear, canonical receipts and
   persistent unknown recovery; controller/keyboard/axe/dark-light evidence.
+  Signed75bcdcc/c3a6bfd integratedec0da28/62cc997; clean, bounded UI finish complete.
   No infrastructure/research/proof or extra dependencies.
-- `file_search_service_sol`: read-only bounded root tags boundary review running.
-- `alias_review_sol`: completed exact-head PR44 reconciliation clean.
+- `file_search_service_sol`: completed bounded root tags boundary review clean.
+- `alias_review_sol`: PR44 exact-head and tags UI/12captures clean; pending Cancel P2 closed.
 
-Next: finish actual tag UI integration and production tag→search→native Open→
-edit/clear→restart/export tests, close review, small signed tested PR and prompt
-normal merge. Keep full placeholder/browser/open-with/pin/hide/export/native/
-AT/release scope and dependencies explicit. Do not mark L2-05 done.
+Current root tag source/evidence complete on signed62cc997 (UIec0da28 author
+75bcdcc, sharedFormd00f8f4, final authoredc3a6bfd). Independent boundary/UI reviews
+clean; pending Save clipping P2 closed with corrected capture and full bounds/
+heldEnter/no-focus/no-duplicate regression. Author/integrated ownedtrees exact.
+PASS187units/11contracts/29security/36L2integration(actual5.77s),43F2storage,
+17D1units/11D1UI; author32tagUI+6focused followup cases. Six actual/12component
+captures inspected. Full typecheck/scopedlint/plan/diff pass. Actual reducedmotion
+captures avoid transient theme-animation pixels. Evidence
+`apps/desktop/evidence/quicklink-tags-application.md`. No current live test handles.
+Next: sign evidence/docs, publish focused PR, inspect exact-head CI/configured
+reviews/threads, normal merge promptly, primary frozen install/build and record
+merge. All broader L2-05/native/session/AT/release requirements remain pending.
 
 ## Complete scope / runtime
 
