@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { quicklinkSaveSchema,quicklinkRecordSchema,quicklinkSummarySchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,quicklinkOpenReplySchema,quicklinkWebSearchSchema,webSearchQuerySchema,WEB_SEARCH_TEMPLATE,quicklinkListSchema,MAX_ENVELOPE_BYTES } from '../src/index.ts';
+import { quicklinkSaveSchema,quicklinkRecordSchema,quicklinkSummarySchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,quicklinkOpenReplySchema,quicklinkWebSearchSchema,webSearchQuerySchema,WEB_SEARCH_TEMPLATE,quicklinkListSchema,MAX_ENVELOPE_BYTES,quicklinkPathArgumentSchema,PATH_ARGUMENT_TEMPLATE } from '../src/index.ts';
 const id='00000000-0000-4000-8000-000000000001',config={queryParameter:'q',template:WEB_SEARCH_TEMPLATE},save={expectedRevision:0,name:'Public search',url:'https://example.invalid/search',webSearch:config};
 it('keeps literal compatibility and accepts only a fixed named-query component definition',()=>{
   expect(quicklinkSaveSchema.parse(save)).toEqual(save);expect(quicklinkSaveRequestSchema.parse({protocolVersion:1,...save})).toEqual({protocolVersion:1,...save});
@@ -28,4 +28,11 @@ it('allows a strict transient exact search receipt and still forbids completed-p
   const value={id,revision:1,outcome:'dispatched',webSearch:{query:'public & literal',url:'https://example.invalid/search?q=public+%26+literal'}};
   expect(quicklinkOpenReplySchema.parse({ok:true,value})).toEqual({ok:true,value});
   for(const bad of [{...value,outcome:'completed'},{...value,webSearch:{...value.webSearch,history:true}},{...value,webSearch:{...value.webSearch,url:'file:///private'}},{...value,webSearch:{...value.webSearch,query:''}}])expect(quicklinkOpenReplySchema.safeParse({ok:true,value:bad}).success).toBe(false);
+});
+
+it('adds a mutually exclusive typed path component without widening template, target or receipt authority',()=>{
+ const pathArgument={component:'path-segment',template:PATH_ARGUMENT_TEMPLATE},literal={expectedRevision:0,name:'Public path link',url:save.url};expect(quicklinkSaveSchema.parse({...literal,pathArgument})).toEqual({...literal,pathArgument});expect(quicklinkSaveRequestSchema.safeParse({protocolVersion:1,...literal,pathArgument}).success).toBe(true);expect(quicklinkSaveSchema.safeParse({...save,pathArgument}).success).toBe(false);
+ for(const bad of [{...pathArgument,component:'host'},{...pathArgument,template:'{{context.clipboard}}'},{...pathArgument,argument:'private'},{...pathArgument,path:'/other'}])expect(quicklinkPathArgumentSchema.safeParse(bad).success).toBe(false);
+ expect(quicklinkSummarySchema.safeParse({id,revision:1,name:literal.name,host:'example.invalid',pathArgument:true}).success).toBe(true);expect(quicklinkSummarySchema.safeParse({id,revision:1,name:literal.name,host:'example.invalid',pathArgument:true,webSearch:true}).success).toBe(false);
+ const value={id,revision:1,outcome:'dispatched',pathArgument:{query:'public / 路径',url:'https://example.invalid/base/public%20%2F%20%E8%B7%AF%E5%BE%84'}};expect(quicklinkOpenReplySchema.parse({ok:true,value})).toEqual({ok:true,value});expect(quicklinkOpenReplySchema.safeParse({ok:true,value:{...value,webSearch:value.pathArgument}}).success).toBe(false);
 });

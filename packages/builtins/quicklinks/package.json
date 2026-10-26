@@ -7,7 +7,8 @@
   "exports": {
     "./presentation": "./src/presentation.ts",
     "./repository": "./src/repository.ts",
-    "./web-search": "./src/web-search.ts"
+    "./web-search": "./src/web-search.ts",
+    "./path-argument": "./src/path-argument.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",
