@@ -23,14 +23,20 @@ export const fileSearchOptionsSchema=z.strictObject({sort:z.enum(['relevance','n
 export type FileSearchOptions=z.infer<typeof fileSearchOptionsSchema>;
 export function fileSearchOptionsKey(options?:FileSearchOptions):string{return JSON.stringify(fileSearchOptionsSchema.parse(options??{sort:'relevance'}));}
 export function fileSearchMatchesOptions(row:{kind:'file'|'directory';modifiedMs:number},options?:FileSearchOptions):boolean{return (options?.kind===undefined||row.kind===options.kind)&&(options?.modifiedFromMs===undefined||row.modifiedMs>=options.modifiedFromMs)&&(options?.modifiedBeforeMs===undefined||row.modifiedMs<options.modifiedBeforeMs);}
-export const fileSearchQueryRequestSchema=fileSearchRequestSchema.extend({query:text(512),rootId:z.uuid().optional(),options:fileSearchOptionsSchema.optional()});
+/** Indexed relative directory only; empty string means the selected root's
+ * direct children. This is display/query scope, never filesystem authority. */
+export const fileSearchDirectorySchema=text(4096).refine(value=>value===''||(!value.startsWith('/')&&!value.includes('\0')&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..')));
+export function fileSearchMatchesDirectory(row:{path:string},directory?:string):boolean{return directory===undefined||row.path.slice(0,Math.max(0,row.path.lastIndexOf('/')))===directory;}
+export const fileSearchQueryInputSchema=z.strictObject({query:text(512),rootId:z.uuid().optional(),options:fileSearchOptionsSchema.optional(),directory:fileSearchDirectorySchema.optional()})
+  .refine(value=>value.directory===undefined||value.rootId!==undefined);
+export const fileSearchQueryRequestSchema=fileSearchQueryInputSchema.safeExtend({protocolVersion:z.literal(1)});
 const failure=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const fileSearchStateReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:fileSearchStateSchema}),failure]);
 export const fileSearchActionReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.discriminatedUnion('outcome',[
   z.strictObject({outcome:z.literal('selected'),rootId:z.uuid()}),z.strictObject({outcome:z.literal('cancelled')}),z.strictObject({outcome:z.literal('completed')}),
 ])}),failure]);
-export const fileSearchQueryReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({query:text(512),rootId:z.uuid().nullable(),options:fileSearchOptionsSchema.optional(),results:z.array(fileSearchResultSchema).max(100)})
-  .refine(value=>new Set(value.results.map(result=>result.id)).size===value.results.length && value.results.every(result=>value.rootId===null || result.rootId===value.rootId))}),failure]);
+export const fileSearchQueryReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({query:text(512),rootId:z.uuid().nullable(),options:fileSearchOptionsSchema.optional(),directory:fileSearchDirectorySchema.optional(),results:z.array(fileSearchResultSchema).max(100)})
+  .refine(value=>(value.directory===undefined||value.rootId!==null)&&value.results.every(row=>fileSearchMatchesDirectory(row,value.directory))&&new Set(value.results.map(result=>result.id)).size===value.results.length && value.results.every(result=>value.rootId===null || result.rootId===value.rootId))}),failure]);
 /** One admitted indexed result only. No path, clipboard text or file-open authority. */
 export const indexedPathSelectionSchema=z.strictObject({resultId:text(4200).min(1),rootId:z.uuid(),generation:z.uuid()});
 export const indexedPathCopyRequestSchema=indexedPathSelectionSchema.extend({protocolVersion:z.literal(1)});
@@ -50,7 +56,7 @@ export interface FileSearchApi {
   startIndex(rootId:string):Promise<FileSearchActionReply>;
   pauseIndex(rootId:string):Promise<FileSearchActionReply>;
   removeFolder(rootId:string):Promise<FileSearchActionReply>;
-  search(request:{query:string;rootId?:string;options?:FileSearchOptions}):Promise<FileSearchQueryReply>;
+  search(request:{query:string;rootId?:string;options?:FileSearchOptions;directory?:string}):Promise<FileSearchQueryReply>;
   copyPath?(selection:IndexedPathSelection):Promise<IndexedPathCopyReply>;
   close():Promise<FileSearchActionReply>;
   onState(listener:(state:FileSearchState)=>void):()=>void;

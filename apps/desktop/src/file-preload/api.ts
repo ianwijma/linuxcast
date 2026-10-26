@@ -18,7 +18,7 @@ export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
       const parsed=fileSearchQueryRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return failed;
       try {
         const reply=fileSearchQueryReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.search,parsed.data)));
-        if(reply.ok&&(reply.value.query!==parsed.data.query||reply.value.rootId!==(parsed.data.rootId??null)||fileSearchOptionsKey(reply.value.options)!==fileSearchOptionsKey(parsed.data.options)||reply.value.results.some(row=>!fileSearchMatchesOptions(row,parsed.data.options))))return failed;
+        if(reply.ok&&(reply.value.query!==parsed.data.query||reply.value.directory!==parsed.data.directory||reply.value.rootId!==(parsed.data.rootId??null)||fileSearchOptionsKey(reply.value.options)!==fileSearchOptionsKey(parsed.data.options)||reply.value.results.some(row=>!fileSearchMatchesOptions(row,parsed.data.options))))return failed;
         return reply;
       }catch{return failed;}
     },

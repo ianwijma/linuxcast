@@ -1,15 +1,15 @@
 import { IndexedPathCopy,COPY_INDEXED_PATH } from '@linuxcast/universal-actions';
 import type { IndexedPathContext } from '@linuxcast/universal-actions';
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
-import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions } from '@linuxcast/contracts';
+import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory } from '@linuxcast/contracts';
 import type { ActionModel,FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult,FileSearchOptions,ViewModel } from '@linuxcast/contracts';
 import { defaultOptionsKey,optionsDraft,optionsSummary,parseOptionsDraft,parseUtcDate } from './options.ts';
 import type { OptionsDraft,OptionsErrors } from './options.ts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
-const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options';
+const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options',BROWSE='files:browse',BROWSE_ROOT='files:browse-root',PARENT='files:parent',RETURN='files:return-scope';
 type Status={kind:'info'|'warning'|'error';message:string};
-type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;options?:FileSearchOptions;status?:Status;retainSelection?:string};
+type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;options?:FileSearchOptions;directory?:string;origin?:{rootId:string|null;query:string;selection:string|null};status?:Status;retainSelection?:string};
 const action=(id:string,title:string,effect:ActionModel['effect']='read',disabledReason?:string):ActionModel=>({id,title,kind:'invoke',effect,...(disabledReason?{disabledReason}:{})});
 /** Presentation only: paths are display metadata, never file-open authority.
  * The resident main service owns indexing, native selection and SQLite access. */
@@ -73,11 +73,11 @@ export class FileSearchController {
     return undefined;
   }
   #resultsView():ViewModel{
-    const results=this.#results!,root=results.rootId?this.#root(results.rootId):undefined,status=this.#resultsStatus(),summary=optionsSummary(results.options);
-    return {protocolVersion:1,viewId:results.viewId,revision:++this.#revision,kind:'list',title:'Search files',loading:results.loading,search:{query:results.query,placeholder:'Search indexed filenames and paths…',mode:'extension'},
-      sections:[{id:'results',title:[root?.name??(results.rootId?'Removed folder':'All selected folders'),summary].filter(Boolean).join(' · '),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action]}))}],
-      empty:{title:results.query.trim()?'No matching files':'Search selected folders',description:[results.query.trim()?'Try another filename or path. Check whether indexing is paused or incomplete.':'Enter a filename or path to search indexed metadata. No file content is searched.',summary?`Applied: ${summary}.`:undefined].filter(Boolean).join(' ')},...(status?{status}:{}),
-      actions:[action(FILTER,'Filter and sort'),action(RESET,'Reset filters and sort','read',fileSearchOptionsKey(results.options)===defaultOptionsKey?'Filters and sort are already at their defaults.':undefined),...(root?this.#rootActions(root):[]),...this.#globalActions()]};
+    const results=this.#results!,root=results.rootId?this.#root(results.rootId):undefined,status=this.#resultsStatus(),summary=optionsSummary(results.options),browsing=results.directory!==undefined,scope=[root?.name??(results.rootId?'Removed folder':'All selected folders'),browsing?`Indexed folder: ${results.directory||'(root)'}`:undefined].filter(Boolean).join(' · ');
+    return {protocolVersion:1,viewId:results.viewId,revision:++this.#revision,kind:'list',title:'Search files',loading:results.loading,search:{query:results.query,placeholder:browsing?'Search this indexed folder’s direct children…':'Search indexed filenames and paths…',mode:'extension'},
+      sections:[{id:'results',title:[scope,summary].filter(Boolean).join(' · '),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[...(row.kind==='directory'?[action(BROWSE,'Browse folder','read',results.loading?'Updating search results.':undefined)]:[]),action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action]}))}],
+      empty:{title:results.query.trim()?'No matching files':browsing?'No indexed children':'Search selected folders',description:[browsing?`${scope}. Browsing direct indexed children only; no file is opened or read.`:undefined,results.query.trim()?'Try another filename or path. Check whether indexing is paused or incomplete.':browsing?'This scope has no matching indexed children. Check filters or whether indexing is paused or incomplete.':'Enter a filename or path to search indexed metadata. No file content is searched.',summary?`Applied: ${summary}.`:undefined].filter(Boolean).join(' ')},...(status?{status}:{}),
+      actions:[...(root?[action(BROWSE_ROOT,'Browse root folder','read',results.directory===''?'Already browsing this root folder.':undefined)]:[]),...(browsing?[action(PARENT,'Parent folder','read',results.directory===''?'Already at the selected root folder.':undefined),action(RETURN,'Return to search scope')]:[]),action(FILTER,'Filter and sort'),action(RESET,'Reset filters and sort','read',fileSearchOptionsKey(results.options)===defaultOptionsKey?'Filters and sort are already at their defaults.':undefined),...(root?this.#rootActions(root):[]),...this.#globalActions()]};
   }
   #filtersView():ViewModel{
     const filters=this.#filters!,field=(id:keyof OptionsDraft)=>({id,value:filters.draft[id],...(filters.errors[id]?{error:filters.errors[id]}:{})});
@@ -93,6 +93,20 @@ export class FileSearchController {
     const selected=this.session.getSnapshot().frames.find(frame=>frame.view.viewId===results.viewId)?.selection;if(selected)results.retainSelection=selected;
     if(fileSearchOptionsKey(options)===defaultOptionsKey)delete results.options;else results.options={...options!};
     if(this.#filters)this.session.pop();this.#queueSearch(0);
+  }
+  #browse(rootId:string,directory:string){
+    const results=this.#results!,frame=this.session.getSnapshot().frames.find(value=>value.view.viewId===results.viewId);
+    if(results.directory===undefined)results.origin={rootId:results.rootId,query:results.query,selection:frame?.selection??null};
+    const priorDirectory=results.directory;
+    this.#invalidateCopy();this.#cancelSearch();this.#status=undefined;delete results.status;delete results.retainSelection;
+    if(priorDirectory && priorDirectory.slice(0,Math.max(0,priorDirectory.lastIndexOf('/')))===directory && results.rootId===rootId)results.retainSelection=`${rootId}:${priorDirectory}`;
+    results.rootId=rootId;results.directory=directory;results.query='';results.rows=[];this.session.setQuery(results.viewId,'');this.#queueSearch(0);
+  }
+  #returnScope(){
+    const results=this.#results!,origin=results.origin;if(!origin)return;
+    this.#invalidateCopy();this.#cancelSearch();this.#status=undefined;delete results.status;delete results.retainSelection;
+    results.rootId=origin.rootId;results.query=origin.query;results.rows=[];delete results.directory;delete results.origin;
+    if(origin.selection)results.retainSelection=origin.selection;this.session.setQuery(results.viewId,origin.query);this.#queueSearch(0);
   }
   #detailView():ViewModel{
     const detail=this.#detail!,row=detail.row,copy=this.#copyModel(row,detail.viewId);
@@ -148,19 +162,19 @@ export class FileSearchController {
   #cancelSearch(){clearTimeout(this.#timer);this.#timer=undefined;this.#search?.abort();this.#search=null;this.#queryGeneration++;}
   #queueSearch(delay=150){
     this.#cancelSearch();const results=this.#results;if(!results)return;
-    if(!results.query.trim()){delete results.retainSelection;results.rows=[];results.loading=false;this.#publish();return;}
-    if(!fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:results.query,...(results.rootId?{rootId:results.rootId}:{}),...(results.options?{options:results.options}:{})}).success){results.rows=[];results.loading=false;results.status={kind:'warning',message:'Keep searches to 512 UTF-8 bytes or fewer.'};this.#publish();return;}
+    if(!results.query.trim() && results.directory===undefined){delete results.retainSelection;results.rows=[];results.loading=false;this.#publish();return;}
+    if(!fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:results.query,...(results.rootId?{rootId:results.rootId}:{}),...(results.options?{options:results.options}:{}),...(results.directory!==undefined?{directory:results.directory}:{})}).success){results.rows=[];results.loading=false;results.status={kind:'warning',message:'Keep searches to 512 UTF-8 bytes or fewer.'};this.#publish();return;}
     if(results.rootId && !this.#root(results.rootId)){results.rows=[];results.loading=false;this.#publish();return;}
     results.loading=true;this.#publish();if(this.#busy)return;const generation=this.#queryGeneration;
     this.#timer=setTimeout(()=>{void this.#runSearch(results,generation);},delay);
   }
   async #runSearch(results:Results,generation:number){
     const controller=new AbortController();this.#search=controller;
-    const query=results.query,rootId=results.rootId,options=results.options?{...results.options}:undefined,optionsKey=fileSearchOptionsKey(options);
+    const query=results.query,rootId=results.rootId,options=results.options?{...results.options}:undefined,optionsKey=fileSearchOptionsKey(options),directory=results.directory;
     try{
-      const reply=fileSearchQueryReplySchema.parse(await bounded(this.#api.search({query,...(rootId?{rootId}:{}),...(options?{options}:{})}),controller.signal));
-      if(!this.#active || controller.signal.aborted || generation!==this.#queryGeneration || this.#results!==results || fileSearchOptionsKey(results.options)!==optionsKey)return;
-      if(!reply.ok || reply.value.query!==query || reply.value.rootId!==rootId || fileSearchOptionsKey(reply.value.options)!==optionsKey || reply.value.results.some(row=>this.#root(row.rootId)?.generation!==row.generation||!fileSearchMatchesOptions(row,options)))throw new Error();
+      const reply=fileSearchQueryReplySchema.parse(await bounded(this.#api.search({query,...(rootId?{rootId}:{}),...(options?{options}:{}),...(directory!==undefined?{directory}:{})}),controller.signal));
+      if(!this.#active || controller.signal.aborted || generation!==this.#queryGeneration || this.#results!==results || fileSearchOptionsKey(results.options)!==optionsKey || results.directory!==directory)return;
+      if(!reply.ok || reply.value.query!==query || reply.value.rootId!==rootId || reply.value.directory!==directory || fileSearchOptionsKey(reply.value.options)!==optionsKey || reply.value.results.some(row=>this.#root(row.rootId)?.generation!==row.generation||!fileSearchMatchesOptions(row,options)||!fileSearchMatchesDirectory(row,directory)))throw new Error();
       results.rows=reply.value.results;delete results.status;
     }catch{if(!controller.signal.aborted && this.#results===results){results.rows=[];results.status={kind:'error',message:'Files could not be searched. Refresh folders or change the search to try again.'};}}
     finally{if(!controller.signal.aborted && this.#results===results && generation===this.#queryGeneration){results.loading=false;this.#publish();if(results.retainSelection){if(results.rows.some(row=>row.id===results.retainSelection))this.session.select(results.viewId,results.retainSelection);delete results.retainSelection;this.#publish();}}}
@@ -179,6 +193,15 @@ export class FileSearchController {
       if(intent.actionId!==APPLY)return;
       const parsed=parseOptionsDraft(intent.values);if(!parsed.ok){if(parsed.draft){const draft=parsed.draft,prior=this.#filters.draft;this.#filters.draft={sort:parsed.errors.sort?prior.sort:draft.sort,kind:parsed.errors.kind?prior.kind:draft.kind,modifiedFrom:!draft.modifiedFrom?null:parseUtcDate(draft.modifiedFrom)===null?prior.modifiedFrom:draft.modifiedFrom,modifiedThrough:!draft.modifiedThrough?null:parseUtcDate(draft.modifiedThrough)===null?prior.modifiedThrough:draft.modifiedThrough};}this.#filters.errors=parsed.errors;this.#publish();return;}
       this.#applyOptions(parsed.options);return;
+    }
+    if([BROWSE,BROWSE_ROOT,PARENT,RETURN].includes(intent.actionId)){
+      const results=this.#results;
+      if(!results||this.#detail||top.view.viewId!==results.viewId||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||intent.itemId!==undefined&&intent.itemId!==top.selection)return;
+      if(intent.actionId===RETURN){if(results.directory!==undefined)this.#returnScope();return;}
+      if(intent.actionId===PARENT){if(results.directory && results.rootId && this.#root(results.rootId))this.#browse(results.rootId,results.directory.slice(0,Math.max(0,results.directory.lastIndexOf('/'))));return;}
+      if(intent.actionId===BROWSE_ROOT){if(results.rootId&&this.#root(results.rootId)&&results.directory!=='')this.#browse(results.rootId,'');return;}
+      if(results.loading||intent.itemId!==top.selection)return;
+      const row=results.rows.find(value=>value.id===intent.itemId);if(row?.kind==='directory'&&this.#root(row.rootId)?.generation===row.generation)this.#browse(row.rootId,row.path);return;
     }
     if([FILTER,RESET].includes(intent.actionId)){
       if(!this.#results||this.#detail||top.view.viewId!==this.#results.viewId||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||intent.itemId!==undefined&&intent.itemId!==top.selection)return;

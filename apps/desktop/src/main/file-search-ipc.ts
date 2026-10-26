@@ -1,7 +1,7 @@
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
 import type { ClipboardWriteOutcome } from './clipboard-write.ts';
 import type { IpcMain,IpcMainInvokeEvent,WebContents } from 'electron';
-import { FILE_SEARCH_CHANNELS,fileSearchRequestSchema,fileSearchRootRequestSchema,fileSearchQueryRequestSchema,fileSearchStateReplySchema,fileSearchQueryReplySchema,fileSearchActionReplySchema,fileSearchStateSchema,indexedPathCopyRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
+import { FILE_SEARCH_CHANNELS,fileSearchRequestSchema,fileSearchRootRequestSchema,fileSearchQueryRequestSchema,fileSearchStateReplySchema,fileSearchQueryReplySchema,fileSearchActionReplySchema,fileSearchStateSchema,indexedPathCopyRequestSchema,fileSearchOptionsKey,fileSearchMatchesDirectory,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
 import type { FileSearchState,FileSearchActionReply,FileSearchQueryReply,FileSearchResult,FileSearchRoot,IndexedPathCopyReply,FileSearchApi } from '@linuxcast/contracts';
 import { trustedAppSender } from './ipc.ts';
 import { FILE_SEARCH_URL } from './assets.ts';
@@ -70,9 +70,9 @@ export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       try {
         if(channel===FILE_SEARCH_CHANNELS.state){const value=await actions.getState();return current()?validate({ok:true,value},fileSearchStateReplySchema):failed('cancelled','Folder state changed. Refresh folders again.');}
         const request=fileSearchQueryRequestSchema.parse(payload);
-        const value=await actions.search({query:request.query,...(request.rootId?{rootId:request.rootId}:{}),...(request.options?{options:request.options}:{})});
+        const value=await actions.search({query:request.query,...(request.rootId?{rootId:request.rootId}:{}),...(request.options?{options:request.options}:{}),...(request.directory===undefined?{}:{directory:request.directory})});
         if(!current())return failed('cancelled','Folder state changed. Search again.');
-        if(value.query!==request.query||value.rootId!==(request.rootId??null)||fileSearchOptionsKey(value.options)!==fileSearchOptionsKey(request.options))throw new Error('Search identity.');
+        if(value.query!==request.query||value.directory!==request.directory||value.rootId!==(request.rootId??null)||fileSearchOptionsKey(value.options)!==fileSearchOptionsKey(request.options))throw new Error('Search identity.');
         const reply=validate({ok:true,value},fileSearchQueryReplySchema);
         if(!reply.ok)return reply;
         const state=validate(await actions.getState(),fileSearchStateSchema);
@@ -80,7 +80,7 @@ export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         const next=new Map<string,{row:FileSearchResult;root:FileSearchRoot}>();
         for(const row of reply.value.results){
           const root=state.roots.find(value=>value.id===row.rootId);
-          if(!fileSearchMatchesOptions(row,request.options)||!root||root.generation!==row.generation||root.state==='idle'||root.state==='unavailable'||root.activity==='unavailable')throw new Error('Search scope changed.');
+          if(!fileSearchMatchesOptions(row,request.options)||!fileSearchMatchesDirectory(row,request.directory)||!root||root.generation!==row.generation||root.state==='idle'||root.state==='unavailable'||root.activity==='unavailable')throw new Error('Search scope changed.');
           // Snapshot only the bounded validated main-owned metadata, never caller paths.
           next.set(row.id,{row:structuredClone(row),root:structuredClone(root)});
         }

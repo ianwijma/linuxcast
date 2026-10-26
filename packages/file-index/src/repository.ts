@@ -110,24 +110,26 @@ export function dispatchFileIndex(db: Database.Database, method: FileIndexMethod
       case 'files.search': {
         // Quote every token: input cannot inject FTS operators or column filters.
         const words = (p.query as string).match(/[\p{L}\p{N}_]+/gu)?.slice(0,32) ?? [];
-        if (!words.length) return [];
+        if (!words.length && (p.directory===undefined || (p.query as string).trim())) return [];
         const query = words.map(word => `"${word}"*`).join(' AND ');
         const options=p.options as FileSearchOptions|undefined;
         // Only fixed fragments selected by the validated enum enter SQL.
-        let order='rank,e.path,e.root_id';
+        let order=words.length?'rank,e.path,e.root_id':'e.name COLLATE NOCASE,e.name,e.path,e.root_id';
         switch(options?.sort){
           case 'name':order='e.name COLLATE NOCASE,e.name,e.path,e.root_id';break;
           case 'modified-desc':order='e.modified_ms DESC,e.path,e.root_id';break;
           case 'size-desc':order='e.size DESC,e.path,e.root_id';break;
         }
-        const rows = db.prepare(`SELECT e.*,r.config FROM file_index_fts f JOIN file_index_entries e ON e.rowid=f.rowid
-          JOIN file_index_roots r ON r.id=e.root_id WHERE file_index_fts MATCH ?
+        const directory=p.directory as string|undefined,prefix=directory===undefined?null:directory===''?'':`${directory}/`;
+        const rows = db.prepare(`SELECT e.*,r.config FROM file_index_entries e ${words.length?'JOIN file_index_fts f ON e.rowid=f.rowid':''}
+          JOIN file_index_roots r ON r.id=e.root_id WHERE ${words.length?'file_index_fts MATCH ?':'1'}
           AND e.generation=r.generation AND (r.state IN ('ready','degraded') OR (r.state='scanning' AND r.previous_state IN ('ready','degraded')))
           AND (? IS NULL OR r.id=?) AND (? IS NULL OR e.kind=?)
           AND (? IS NULL OR e.modified_ms>=?) AND (? IS NULL OR e.modified_ms<?)
-          ORDER BY ${order} LIMIT ?`).all(query,p.rootId ?? null,p.rootId ?? null,
+          AND (? IS NULL OR (substr(e.path,1,length(?))=? AND instr(substr(e.path,length(?)+1),'/')=0))
+          ORDER BY ${order} LIMIT ?`).all(...(words.length?[query]:[]),p.rootId ?? null,p.rootId ?? null,
           options?.kind??null,options?.kind??null,options?.modifiedFromMs??null,options?.modifiedFromMs??null,
-          options?.modifiedBeforeMs??null,options?.modifiedBeforeMs??null,p.limit) as
+          options?.modifiedBeforeMs??null,options?.modifiedBeforeMs??null,prefix,prefix,prefix,prefix,p.limit) as
           (IndexEntry & {root_id:string;generation:string;config:string;modified_ms:number})[];
         const candidates=rows.map(row => ({rootId:row.root_id,rootPath:(JSON.parse(row.config) as RootConfig).path,
           id:`${row.root_id}:${row.path}`,generation:row.generation,path:row.path,kind:row.kind,size:row.size,

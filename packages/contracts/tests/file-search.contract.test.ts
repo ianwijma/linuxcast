@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions } from '../src/file-search.ts';
+import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory } from '../src/file-search.ts';
 const rootId='11111111-1111-4111-8111-111111111111',generation='22222222-2222-4222-8222-222222222222';
 const result={id:`${rootId}:public.txt`,rootId,generation,path:'public.txt',kind:'file',size:4,modifiedMs:1};
 it('accepts bounded metadata identities and rejects traversal, content and scope confusion',()=>{
@@ -31,4 +31,12 @@ it('validates closed options, canonical default identity and inclusive/exclusive
   const options={sort:'name' as const,kind:'file' as const,modifiedFromMs:0,modifiedBeforeMs:1};
   expect(fileSearchMatchesOptions({kind:'file',modifiedMs:0},options)).toBe(true);
   for(const row of [{kind:'directory' as const,modifiedMs:0},{kind:'file' as const,modifiedMs:-1},{kind:'file' as const,modifiedMs:1}])expect(fileSearchMatchesOptions(row,options)).toBe(false);
+});
+
+it('bounds indexed directory scope to a selected root and direct relative children',()=>{
+  for(const directory of ['', 'Public reports', 'a/b'])expect(fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:'',rootId,directory}).success).toBe(true);
+  for(const directory of ['/private','../private','a/../b','a//b','a/','a\0b'])expect(fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:'',rootId,directory}).success).toBe(false);
+  expect(fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:'',directory:''}).success).toBe(false);
+  expect(fileSearchMatchesDirectory({path:'a/b.txt'},'a')).toBe(true);expect(fileSearchMatchesDirectory({path:'a/b/c.txt'},'a')).toBe(false);expect(fileSearchMatchesDirectory({path:'ab/c.txt'},'a')).toBe(false);expect(fileSearchMatchesDirectory({path:'top.txt'},'')).toBe(true);
+  expect(fileSearchQueryReplySchema.safeParse({ok:true,value:{query:'',rootId,directory:'a',results:[result]}}).success).toBe(false);
 });

@@ -55,3 +55,19 @@ it('rejects completed storage replies outside requested kind/date constraints wi
     await expect(pending).rejects.toMatchObject({automaticReplay:false});expect(send).toHaveBeenCalledTimes(1);client.disconnect();
   }
 });
+
+it('browses actual indexed direct children before LIMIT without treating wildcard names as SQL or reading sources',async()=>{
+  const f=await fixture();
+  const generation=randomUUID(),paths=['match folder','match folder/child.txt','match folder/nested','match folder/nested/deep.txt','match folders/sibling.txt','literal%_quote"/match.txt'];
+  const entries=[...f.entries,...paths.map((path,i):IndexEntry=>({path,kind:path.includes('.')?'file':'directory',size:200+i,modifiedMs:100+i,device:'1',inode:String(500+i)}))];
+  request(f.owner,'files.scan.begin',{rootId:f.rootId,scanId:generation});request(f.owner,'files.scan.batch',{rootId:f.rootId,scanId:generation,entries});request(f.owner,'files.scan.finish',{rootId:f.rootId,scanId:generation,progress:progress(entries.length)});
+  const browse=(directory:string,query='',options:FileSearchOptions={sort:'name'})=>request(f.owner,'files.search',{rootId:f.rootId,directory,query,options,limit:100}) as FileCandidate[];
+  expect(browse('match folder').map(row=>row.path)).toEqual(['match folder/child.txt','match folder/nested']);
+  expect(browse('match folder','nested').map(row=>row.path)).toEqual(['match folder/nested']);
+  expect(browse('match folder/nested').map(row=>row.path)).toEqual(['match folder/nested/deep.txt']);
+  expect(browse('literal%_quote"').map(row=>row.path)).toEqual(['literal%_quote"/match.txt']);
+  expect(browse('missing')).toEqual([]);expect(browse('match folder','!!!')).toEqual([]);
+  const top=browse('','',{sort:'size-desc'});expect(top).toHaveLength(100);expect(top[0]?.path).toBe('match folder');expect(top.every(row=>!row.path.includes('/'))).toBe(true);
+  expect(browse('match folder','',{sort:'name',kind:'file',modifiedFromMs:101,modifiedBeforeMs:102}).map(row=>row.path)).toEqual(['match folder/child.txt']);
+  expect(()=>request(f.owner,'files.search',{query:'',directory:'',limit:100})).toThrow();
+});

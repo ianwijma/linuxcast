@@ -196,4 +196,80 @@ describe('L2-02 main-only file search service',()=>{
     }
   });
 
+  it('forwards empty-query root browsing only when the explicit empty directory is present',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id,original=candidate(h.roots[0]!);
+    h.results=[{...original,id:`${rootId}:z-folder`,path:'z-folder',kind:'directory'},original];
+    const options={sort:'name' as const};
+    for(const query of ['', '  ']) {
+      const reply=await h.service.search({query,rootId,directory:'',options});
+      expect(reply).toMatchObject({query,rootId,directory:'',options,results:[{path:'z-folder'},{path:'fixture.txt'}]});
+      expect(h.request).toHaveBeenLastCalledWith('files.roots.list',{});
+      expect(h.request).toHaveBeenCalledWith('files.search',{query,rootId,directory:'',options,limit:100});
+    }
+    h.request.mockClear();expect(await h.service.search({query:'',rootId})).toEqual({query:'',rootId,results:[]});
+    expect(h.request.mock.calls.some(([method])=>method==='files.search')).toBe(false);
+  });
+  it('forwards and echoes canonical directory scope without treating literal path characters as prefixes',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id,original=candidate(h.roots[0]!);
+    for(const directory of ['folder','folder/deeper','space folder','folder_%']) {
+      const path=`${directory}/child.txt`;h.results=[{...original,id:`${rootId}:${path}`,path}];
+      const reply=await h.service.search({query:'child',rootId,directory,options:{sort:'relevance',kind:'file'}});
+      expect(reply).toMatchObject({query:'child',rootId,directory,results:[{path}]});
+      expect(h.request).toHaveBeenCalledWith('files.search',{query:'child',rootId,directory,options:{sort:'relevance',kind:'file'},limit:100});
+    }
+    h.results=[];expect(await h.service.search({query:'',rootId,directory:'missing-in-index'})).toEqual({query:'',rootId,directory:'missing-in-index',results:[]});
+    const plain=await h.service.search({query:'child'});expect(plain).not.toHaveProperty('directory');
+  });
+  it('rejects malformed directory scope and missing root identity before contacting storage',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id;
+    for(const directory of [null,[],1,'/absolute','../outside','folder/..','folder/.','./folder','folder//child','folder/','nul\0path','a'.repeat(4097),'界'.repeat(1366)]) {
+      await expect(h.service.search({query:'',rootId,directory} as Parameters<FileSearchService['search']>[0])).rejects.toMatchObject({reason:'invalid-request'});
+    }
+    for(const directory of ['', 'folder'])await expect(h.service.search({query:'',directory})).rejects.toMatchObject({reason:'invalid-request'});
+    await expect(h.service.search({query:'',rootId:'forged',directory:''})).rejects.toMatchObject({reason:'invalid-request'});
+    expect(h.request).not.toHaveBeenCalled();
+  });
+  it('snapshots directory, root, query and options before waiting for owner state',async()=>{
+    const h=harness([root('/synthetic/one'),root('/synthetic/two')]),rootId=h.roots[0]!.config.id,gate=deferred<RootState[]>();
+    const path='folder/child.txt';h.results=[{...candidate(h.roots[0]!),id:`${rootId}:${path}`,path}];
+    const original=h.request.getMockImplementation()!;let first=true;
+    h.request.mockImplementation(async(method,params)=>{if(method==='files.roots.list'&&first){first=false;return gate.promise;}return original(method,params);});
+    const input={query:'child',rootId,directory:'folder',options:{sort:'name' as const,kind:'file' as const}};
+    const pending=h.service.search(input);input.directory='';input.rootId=h.roots[1]!.config.id;input.query='changed';delete (input.options as Partial<FileSearchOptions>).kind;
+    await vi.waitFor(()=>expect(first).toBe(false));gate.resolve(structuredClone(h.roots));
+    expect(await pending).toMatchObject({query:'child',rootId,directory:'folder',options:{sort:'name',kind:'file'},results:[{path}]});
+    expect(h.request).toHaveBeenCalledWith('files.search',{query:'child',rootId,directory:'folder',options:{sort:'name',kind:'file'},limit:100});
+  });
+  it('rejects a whole directory page for descendants, parent rows or prefix siblings',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id,original=candidate(h.roots[0]!);
+    for(const {directory,valid,bad} of [
+      {directory:'',valid:'root.txt',bad:'folder/nested.txt'},
+      {directory:'folder',valid:'folder/child.txt',bad:'folder/deeper/child.txt'},
+      {directory:'folder',valid:'folder/child.txt',bad:'folder2/child.txt'},
+      {directory:'folder',valid:'folder/child.txt',bad:'folder'},
+      {directory:'folder',valid:'folder/child.txt',bad:'root.txt'},
+      {directory:'folder_%',valid:'folder_%/child.txt',bad:'folder_other/child.txt'},
+    ]) {
+      h.results=[valid,bad].map(path=>({...original,id:`${rootId}:${path}`,path}));
+      await expect(h.service.search({query:'',rootId,directory})).rejects.toMatchObject({reason:'storage-unavailable',message:'File search unavailable: storage-unavailable.'});
+    }
+  });
+  it('keeps separate directory snapshots when concurrent owner searches settle out of order',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id,first=deferred<FileCandidate[]>(),second=deferred<FileCandidate[]>(),original=h.request.getMockImplementation()!;
+    h.request.mockImplementation(async(method,params)=>method==='files.search'?(params.directory==='one'?first.promise:second.promise):original(method,params));
+    const one=h.service.search({query:'',rootId,directory:'one'}),two=h.service.search({query:'',rootId,directory:'two'});
+    await vi.waitFor(()=>expect(h.request.mock.calls.filter(([method])=>method==='files.search')).toHaveLength(2));
+    const entry=candidate(h.roots[0]!);second.resolve([{...entry,id:`${rootId}:two/child.txt`,path:'two/child.txt'}]);
+    expect(await two).toMatchObject({query:'',rootId,directory:'two',results:[{path:'two/child.txt'}]});
+    first.resolve([{...entry,id:`${rootId}:one/child.txt`,path:'one/child.txt'}]);
+    expect(await one).toMatchObject({query:'',rootId,directory:'one',results:[{path:'one/child.txt'}]});
+  });
+  it('retains generation fencing while a directory query waits for the owner',async()=>{
+    const h=harness(),rootId=h.roots[0]!.config.id,read=deferred<FileCandidate[]>(),original=h.request.getMockImplementation()!;
+    h.request.mockImplementation(async(method,params)=>method==='files.search'?read.promise:original(method,params));
+    const entry=candidate(h.roots[0]!);const pending=h.service.search({query:'',rootId,directory:''});
+    await vi.waitFor(()=>expect(h.request).toHaveBeenCalledWith('files.search',{query:'',rootId,directory:'',limit:100}));
+    h.roots=[{...h.roots[0]!,generation:randomUUID()}];read.resolve([entry]);await expect(pending).rejects.toMatchObject({reason:'busy'});
+  });
+
 });

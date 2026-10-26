@@ -11,14 +11,13 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary remains clean `develop` at f55ae06 (PR34); previous frozen install/build passed.
-Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/file-search-filters`, source head **2b34229**. Reviewed/tested L2-02 metadata filter/sort increment ready for PR/CI/normal merge. No live exec or author process remains at this checkpoint; all three SOL agents completed. Previous goal turn made concrete implementation/test progress.
+Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/file-search-navigation**, sourcehead **ba092e3**. No uncommitted implementation or live testprocess at this checkpoint; all three SOL agents completed.
 
-Registry: done8 / in-progress12 / planned77. L2-02 privacy now passed with public fixture/source/screenshot evidence; full UI/extraction acceptance stays pending. Broader L1-01/D1-02 prerequisites remain incomplete under user-authorized unfinished increments.
+Reviewed/tested L2-02 directory increment ready for focused PR/CI/normalmerge.117units/5contracts/22security/8actualintegration/35browser, fulltypecheck/lint pass. Production Electron/private-Xvfb actualflow11.48s; twoapplication+fourcomponent directory/emptycaptures inspected, axe passes. Final SOLhigh review clean through sourcee03e7e8 and productiontestba092e3 (same reviewed draft). Full task/nativeAT/session/release unfinished.
 
-Current verification:99units/4contracts/20security/7actualintegration;17shared units;39browser checks; full typecheck/lint. Actual production Electron/private-Xvfb flow8.56s. Independent SOL-high review clean. Four application and six component filter/range captures inspected. Fixed shared extension empty-description rendering and corrected-error revival across appearance/status changes.
+Prior goal turn made verified progress: PR35 filters merged31ce46b; current turn integrated navigation and verified its actualapplication flow. Registry done8/inprogress12/planned77,50passed/331pending/8NA. L2-02UI stillpending with partialevidence; privacy passed. Broader L1-01/D1-02 prerequisites unfinished under user-authorized increments.
 
-Next: commit evidence and validate plan, push/open focused filter PR (attach), inspect exact-head CI and requested reviews/comments/threads, normal merge when all applicable checks/reviews pass, refresh primary frozen install/build and record merge. Then select the next concrete application increment; do not add proof/infra to manifest agent. Keep all unimplemented task scope explicit.
+Next: commit evidence/plan validation, push/open directory PR (attach), exacthead CI and requestedreview/comment/thread inspection, normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete application increment without asking the user. No infrastructure/proof expansion for manifest.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -34,17 +33,27 @@ Frozen request/formatter2e2aaaa; workspace linksb5704ad; shared-host pending key
 
 L2-03 stays **in-progress**. Current privacy criterion passed; full cardinality/deletion, preview/cache and UI criteria pending. Full typed actions, ordered multi-file buffer, open/open-with/reveal/move/rename/trash/conflicts/terminal, previews/large text and extension entry points still required. Indexed path copying does not verify source existence or grant file-open/read authority. Native desktop/session/AT, installed-package and release acceptance remain pending.
 
+## Current indexed navigation increment
+
+Frozen765ee03: optional canonical relative `directory` (`''`rootchildren) requires `rootId`; exactreplyecho/direct-parent helper. Root95951fd binds prefix and remaining-slash constraint beforeLIMIT; blankquery bypassesFTS only for explicitbrowse, relevancefallbackname. Service9ed350c→5f39ed3; UI24e4c0a→e03e7e8; actualappba092e3. All source independently reviewed clean.
+
+Directory primaryBrowse, secondaryDetails/Copy; fileprimaryDetails/Copy unchanged. Root/Parent/Return replaceResults in place, preserve currentfilters, clearbrowsequery, restore original scope/query/selectedID onReturn when available. Exactdirectoryidentity, generation/copy fences, clear/removal/remediation retained. No filesystemread/open authority or history added.
+
+Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. No PR yet at checkpoint; fullMIME/recents/extractors/nativeAT/session/release pending.
+
+Reusable completed SOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-02-directory-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-02-directory-service; read-only alias_review_sol. Verifyclean/switchbase for next assignment. Never reactivate Astra agents.
+
 ## Current L2-02 filter/sort integration
 
 Read `docs/implementation/tasks/L2-02.md`, data/security/builtins/testing refs and DESIGN/tokens. Kind any/file/directory, optional inclusive UTC from/through dates (through translates to exclusive next UTC midnight), relevance/name/newest/largest sorting. Apply/Reset use shared Form/Actions and preserve query/root/selection/copy guards. SQL options apply before LIMIT100; no renderer top100 filtering/sorting, no new source reads or persistence.
 
 Commits:fd8a7a4 frozen contract; c04bd7d service;643c59a UI;b45b475 evidence;d04566f shared empty guidance;76ae034 main/preload tests;2b34229 owner/client/main/preload/shared Form/production integration.
 
-Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. No PR yet at this checkpoint.
+Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. Integrated in PR35/31ce46b; exact-head validation and primary build pass.
 
 Reusable completed SOL-high agents: `manifest_review_sol` in `.worktrees/linuxcast-l1-01` / `codex/l2-02-filter-ui`; `file_search_service_sol` in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-filter-service`; read-only `alias_review_sol`. Verify clean and switch base before assigning next bounded work. Do not reactivate Astra agents.
 
-Full L2-02 remains in-progress: MIME filters, path navigation/recent files and opt-in budgeted/cancellable extractors absent. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
+Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/cancellable extractors absent. Indexed direct-child navigation now implemented in the current increment. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
 
 ## Integrated application history and outstanding scope
 
@@ -60,6 +69,7 @@ Full L2-02 remains in-progress: MIME filters, path navigation/recent files and o
 |32|708a3d6|Bounded local arithmetic/functions and explicit native copy|
 |33|851f6f2|92canonical unit conversions, help, exact numeric/unit copy|
 |34|f55ae06|Selected indexed result Copy path|
+|35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
 
 PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
 

@@ -7,7 +7,7 @@ import type { RootState, FileCandidate } from '@linuxcast/file-index/contracts';
 import { createHash, randomUUID } from 'node:crypto';
 import { principalKeyMaterial, scopeKeyMaterial } from '@linuxcast/platform-contracts/permissions';
 import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
-import { fileSearchOptionsSchema,fileSearchMatchesOptions } from '../../contracts/src/file-search.ts';
+import { fileSearchOptionsSchema,fileSearchMatchesDirectory,fileSearchMatchesOptions } from '../../contracts/src/file-search.ts';
 import { MAX_ENVELOPE_BYTES, parseRepositoryResponse } from '../../contracts/src/index.ts';
 import { storageContracts } from './method-contracts.ts';
 import type { StorageMethod, StorageMethods } from './repositories.ts';
@@ -59,7 +59,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   } else if (method === 'files.search') {
     const candidates = result as FileCandidate[],options=params.options===undefined?undefined:fileSearchOptionsSchema.parse(params.options);
     valid = candidates.length <= Number(params.limit) && candidates.every(candidate =>
-      (params.rootId === undefined || candidate.rootId === params.rootId) && candidate.id === `${candidate.rootId}:${candidate.path}`&&fileSearchMatchesOptions(candidate,options));
+      (params.rootId === undefined || candidate.rootId === params.rootId) && candidate.id === `${candidate.rootId}:${candidate.path}`&&fileSearchMatchesOptions(candidate,options)&&fileSearchMatchesDirectory(candidate,params.directory as string|undefined));
   } else if (method === 'permissions.list') {
     const page = result as {records: DecisionRecord[]; nextCursor: string | null};
     valid = page.records.every(record => createHash('sha256').update(principalKeyMaterial(record.principal)).digest('hex') === params.principalKey) &&
