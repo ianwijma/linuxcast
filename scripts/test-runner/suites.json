@@ -93,6 +93,9 @@
     ],
     "L2-03": [
       "packages/contracts/tests/file-search.contract.test.ts"
+    ],
+    "L1-01": [
+      "packages/contracts/tests/launcher-visibility.contract.test.ts"
     ]
   },
   "ui": {
