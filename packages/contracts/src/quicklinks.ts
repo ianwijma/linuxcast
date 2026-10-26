@@ -17,12 +17,15 @@ export const webSearchQuerySchema=z.string().min(1).max(2048).refine(value=>valu
 export const quicklinkWebSearchSchema=z.strictObject({queryParameter:webSearchParameterSchema,template:z.literal(WEB_SEARCH_TEMPLATE)});
 export type QuicklinkWebSearch=z.infer<typeof quicklinkWebSearchSchema>;
 export const normalizeQuicklinkName=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
+/** Explicit user labels only: canonical Unicode/trim, no delimiter or controls. */
+export const quicklinkTagSchema=z.string().max(128).transform(value=>value.normalize('NFKC').trim()).pipe(z.string().min(1).max(32).refine(value=>new TextEncoder().encode(value).length<=64&&!/[\p{Cc}\p{Cs},]/u.test(value)));
+export const quicklinkTagsSchema=z.array(quicklinkTagSchema).max(8).refine(values=>new Set(values.map(normalizeQuicklinkName)).size===values.length);
 export const quicklinkSelectionSchema=z.strictObject({id:z.uuid(),revision});
-export const quicklinkSaveSchema=z.strictObject({id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional()})
+export const quicklinkSaveSchema=z.strictObject({id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,tags:quicklinkTagsSchema.optional(),webSearch:quicklinkWebSearchSchema.optional()})
   .refine(value=>value.id===undefined?value.expectedRevision===0:value.expectedRevision>0);
-export const quicklinkRecordSchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional(),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()})
+export const quicklinkRecordSchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,url:quicklinkUrlSchema,tags:quicklinkTagsSchema.optional(),webSearch:quicklinkWebSearchSchema.optional(),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()})
   .refine(value=>Date.parse(value.createdAt)<=Date.parse(value.updatedAt));
-export const quicklinkSummarySchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,host:z.string().min(1).max(320).regex(/^[!-~]+$/u),webSearch:z.literal(true).optional()});
+export const quicklinkSummarySchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,host:z.string().min(1).max(320).regex(/^[!-~]+$/u),tags:quicklinkTagsSchema.optional(),webSearch:z.literal(true).optional()});
 export const quicklinkListSchema=z.array(quicklinkSummarySchema).max(MAX_QUICKLINKS).refine(records=>records.every((record,index)=>index===0||records[index-1]!.id<record.id));
 export type QuicklinkRecord=z.infer<typeof quicklinkRecordSchema>;
 export type QuicklinkSummary=z.infer<typeof quicklinkSummarySchema>;
@@ -46,7 +49,7 @@ export const QUICKLINK_CHANNELS={list:'quicklinks:list',get:'quicklinks:get',sav
 const protocol={protocolVersion:z.literal(1)},failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const quicklinkListRequestSchema=z.strictObject(protocol);
 export const quicklinkGetRequestSchema=quicklinkSelectionSchema.extend(protocol);
-export const quicklinkSaveRequestSchema=z.strictObject({...protocol,id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional()})
+export const quicklinkSaveRequestSchema=z.strictObject({...protocol,id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,tags:quicklinkTagsSchema.optional(),webSearch:quicklinkWebSearchSchema.optional()})
   .refine(value=>value.id===undefined?value.expectedRevision===0:value.expectedRevision>0);
 export const quicklinkOpenRequestSchema=quicklinkSelectionSchema.extend({...protocol,launcherRevision:revision,query:webSearchQuerySchema.optional()});
 export const quicklinkListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({records:quicklinkListSchema})}),failed]);
