@@ -41,6 +41,40 @@ complete stored summaries (and an edited record's current version), keeps an
 open draft, then permits a later deliberate action. Failed Reload preserves the
 gate. A removed edited definition retains its draft with Cancel/New remediation.
 
+## Saved web searches
+
+New/Edit includes Type (Literal link or Web search) and Query parameter. All four
+submitted fields are validated together. A web search stores only the fixed
+`{{vars.query}}` configuration and its base URL; changing Type back to literal
+requires clearing the parameter and removes the configuration. Search markers
+in complete summaries distinguish the primary **Open web search** action. Save
+receipts check exact optional configuration and the refreshed summary marker.
+
+Opening a search fresh-loads its exact ID/version/configuration into a depth-three
+**Search web** Form. Typing has no effect. Explicit **Review search** validates
+the captured query and calls the real shared domain builder locally, using its
+fixed scalar snapshot and URL query-component encoder. The same view ID changes
+at a higher revision to **Review search** Detail, with Query and Target URL as
+plain metadata and no navigable link. **Edit query** restores the exact draft in
+the same frame. There is no fourth frame or automatic browser operation.
+
+Only explicit **Open search** sends the captured query alongside saved identity
+and launcher revision; it sends no expanded URL/configuration authority. The
+receipt must match ID, version, exact query and canonical preview URL. Missing,
+wrong or malformed search receipts gate Open and retain check-browser/Reload
+recovery. Literal requests reject unexpected search receipts. Explicit Reload
+retains the query, obtains fresh configuration, discards the old preview and
+requires Review again. Closing/disposal clears transient query/preview state;
+only the existing uncertainty flags survive reopening. No query is added to a
+saved definition, fixture history or usage aggregate.
+
+The shared renderer's repeat guard prevents held Enter from approving Open when
+Review changes Form to Detail; IME composition retains native behavior. The
+fixture has no outer repeat guard masking this boundary. A new deliberate press
+is required after keyup. Root kind-change focus handling places focus on the
+Query input or read-only preview article, and shared dirty handling remains in
+use. Known default-browser failures and separately failed Hide remain truthful.
+
 Design sections: Shell/navigation; Results/actions; List/Grid/Detail/Form;
 States/motion; Accessibility; Review gate. Existing tokens, fonts, neutral rows,
 focus, disabled reasons and action affordances are reused. Fixture CSS changes
@@ -48,37 +82,49 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 54 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 90 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
-- `tests/quicklinks.ui.test.ts`: 14 real Chromium keyboard/axe cases, including
+- `tests/quicklinks.ui.test.ts`: 25 real Chromium keyboard/axe cases, including
   dirty cancel/focus, CRUD request observation, pending/late replies, explicit
-  recovery, later identities and unavailable capabilities.
+  recovery, later identities, unavailable capabilities, typed definitions, local
+  previews, exact argument/configuration receipts and held Enter. The 54 original
+  presentation and 14 original browser cases are retained.
 - `evidence/`: dark/light List, Form, invalid-input and unknown-opening captures,
-  plus pending Save, loading, unavailable and separate Hide-failure states.
+  plus pending Save, loading, unavailable and separate Hide-failure states. Twelve
+  new web-search captures cover dark/light definitions, Query/Review, invalid and
+  unknown query states, pending opening and a long Unicode preview at 200% root
+  text scaling (720×1200 CSS pixels). The focused regression verifies both footer
+  controls remain inside the shell after the shared footer fix; the refreshed
+  capture was inspected. Definition captures use 800×800 with keyboard focus on
+  Save; normal query/preview captures use 800×650. These are component observations, not native
+  desktop or assistive-technology acceptance.
 - Typecheck, scoped ESLint, plan validation and diff checks pass. Tests use
-  the mapped `bun run test:unit -- L2-05` and `bun run test:ui -- L2-05` suites.
-  Shared List query-focus fix 74b9954 is a separate prerequisite.
+  the mapped L2-05 suites after coordinator integration. Real domain 9c009e9 and shared kind/repeat fixes from b9a1130, 128b48d
+  and 0a084c4, plus footer fix 453f194, are separate prerequisites; they are not duplicated in the UI commit.
 
-Coordinator integration also passes five strict contract tests, 21 main/preload
-security checks, 11 domain SQLite and five owner/client migration/persistence
-checks, three root routing checks and the actual bundled Electron45/GIO2.72.4
-flow on an owned private Xvfb X11 display (SQLite3.53.4). The latter creates,
-locally searches, edits and explicitly opens a saved URL through a real private
-browser-handler process with exact argv/empty stdin; it checks native-choice
-cancel/confirm deletion, usage clear, complete restart and a URL-free aggregate
-usage export. Only native dialog choices are instrumented. This is actual
-process/persistence evidence, not supported desktop/session or browser page
-completion acceptance. Production captures are in `apps/desktop/evidence/`
-with the `quicklinks-application-` prefix.
+The integrated coordinator passes 157 mapped units, 10 contract tests, 27
+main/preload security checks and 29 integration checks (20 domain SQLite, eight
+owner/client and one actual bundled Electron flow). The actual Electron45 /
+SQLite3.53.4 / GIO2.72.4 flow uses an owned private Xvfb X11 display and private
+browser-handler process. It creates a search, reviews a Unicode/metacharacter
+query, proves held Enter cannot approve opening, and dispatches only the exact
+reviewed URL as argv with empty stdin. Restart preserves the definition but
+starts with an empty query; usage clear and aggregate export retain no query,
+base URL or expanded target. Literal CRUD and native-choice cancel/confirm
+removal remain covered. Only native dialog choices are instrumented. Six actual
+dark/light Form/List/Review captures were inspected and axe passes. This is real
+process/persistence evidence, not supported desktop/session, assistive technology
+or browser-page completion acceptance. Production captures are in
+`apps/desktop/evidence/` with the `quicklinks-application-` prefix.
 
 Fixtures are labelled, public synthetic in-memory data and request observers.
 They perform no native confirmation, actual browser handoff, SQLite write or
 network request. These checks provide partial L2-05 AC01 input/authority,
 AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establish
-placeholder execution. Actual coordinator persistence/dispatch evidence is
-separately described above. Full snapshot placeholders,
-named arguments, nonrecursive snippets, typed URL component builders, browser/
+the complete placeholder feature. Actual coordinator persistence/dispatch evidence
+is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
+typed URL components, browser/
 open-with/file/registered-URI targets, tags/pin/hide and native export remain
 required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
 technology and release acceptance remain pending. This slice does not complete

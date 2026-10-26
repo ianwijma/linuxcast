@@ -52,7 +52,9 @@
     ],
     "L2-05": [
       "packages/builtins/quicklinks/tests/presentation.test.ts",
-      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
+      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
+      "packages/templates/tests/templates.test.ts",
+      "packages/builtins/quicklinks/tests/web-search.test.ts"
     ]
   },
   "contracts": {
@@ -103,7 +105,8 @@
       "packages/contracts/tests/launcher-visibility.contract.test.ts"
     ],
     "L2-05": [
-      "packages/contracts/tests/quicklinks.contract.test.ts"
+      "packages/contracts/tests/quicklinks.contract.test.ts",
+      "packages/contracts/tests/web-search.contract.test.ts"
     ]
   },
   "ui": {
@@ -180,6 +183,7 @@
     "L2-05": [
       "packages/builtins/quicklinks/tests/repository.integration.test.ts",
       "packages/storage/tests/quicklinks.integration.test.ts",
+      "packages/storage/tests/web-search.integration.test.ts",
       "apps/desktop/tests/quicklinks.integration.test.ts"
     ]
   },

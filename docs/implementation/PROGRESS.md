@@ -1,94 +1,51 @@
 # Coordinator checkpoint
 
-Updated 27 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Objective: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`. Read it before continuing. No scope reduction or intermediate completion claim.
+Updated 27 October 2026. **Goal ACTIVE**: implement all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Read `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md` before continuing. An increment does not complete this goal.
 
-## User instructions and execution boundaries
+## User instructions
 
-- All subagents must use **GPT-6.1 SOL / high reasoning**, explicitly reaffirmed by the user. Reuse only the existing SOL agents below; never reactivate older Astra agents. New agents require model `gpt-6.1-sol`, effort `high`, fork `none` and full bounded context.
-- Finish small reviewed/tested application increments and merge promptly. Record unfinished UI, desktop and release acceptance. No open-ended infrastructure, research or proof work for manifest_review. No physical-input/device authorization.
-- User authorized unfinished increments; this does not waive security, requested GitHub reviews, full dependencies or release gates. Keep the full 1.0 scope. Do not ask the user to choose the next task.
-- Preserve normal 1Password Git signing; user unlocked it and signing works. Some signing calls need a few seconds: poll the live handle before assuming a lock problem.
+- **Every subagent must use GPT-6.1 SOL / high reasoning.** Reuse the existing SOL agents below. Never reactivate older Astra agents. Any new agent requires model `gpt-6.1-sol`, effort `high`, fork `none` and a complete bounded assignment.
+- Merge small reviewed/tested application increments promptly; explicitly record unfinished UI, desktop and release acceptance. No more infrastructure/research/proof work for manifest_review. Do not ask the user to choose tasks.
+- User approved unfinished increments, preserving complete scope, security, requested GitHub reviews, dependencies and release gates. No physical-input/device authorization; only owned private Xvfb displays.
+- Preserve normal 1Password Git signing. User unlocked it; signing works and sometimes needs a few seconds. Poll live handles before assuming a signing failure.
 
-## Authoritative current state
+## Current integration
 
-Updated27October2026. **PR39 merged** [registered application Desktop Actions](https://github.com/ianwijma/linuxcast/pull/39), merge **47fd2ef2b9824b90f5255dd7486d48ccc5bb4742**,26October14:35:20UTC. Exacthead2e89dd9298eeb63aae2441a183789b6d9b251a27/CI40340598685 passed; no requestedreviews/comments/unresolvedthreads; normal exactheadmerge. Primary clean develop47fd2ef, frozeninstall/build63rendererassets pass.
+Primary checkout `/home/ian/Projects/ianwijma/linuxcast` is clean develop **7687f9866afa3a4d583daec6fef5b1e4ba3e07d2**, merged [PR40](https://github.com/ianwijma/linuxcast/pull/40), literal Quicklinks. Frozen install and desktop build (63 renderer assets) passed. PR39 Desktop Actions and earlier application increments are integrated; historical evidence is in tasks.json/cards, package READMEs and Git.
 
-DesktopActions source frozen81759cd/4545eff; maina251db4; nativead82d13(author923092d); UI5df3a99(author38fb7b5); final wiring/menu fix/actualevidencea537abe; registry2e89dd9.210units/139security/5contracts/53launcherUI/10sharedUI and fulltype/lint/plan/diff PASS. Nativeauthor11actualprivate-XDG tests and Rustfmt pass on identical source. Actual bundled Electron45/SQLite3.53.4/nativeGIO2.72.4/private-XvfbX11 PASS11.23s: actionExec-only stale refusal/no marker→explicitReload→actual distinct updated literal argv/empty stdin; validatedrequestedreceipt→UIHide/reopen; aggregatecount2/noactionIDargs inexport; retained clear/visibility/restart/finalowner checks. Ninecomponent+twoactual+fourshared/scaled captures inspected. Compact menu clipping fixed with token cap/space8 padding and actual scrollHeight<=clientHeight assertion. Independent SOLhigh fullsource/finaldelta/visual reviews clean. Full typedlaunch/history/DBus/terminal/localization/nativeAT/session/release acceptance remainsunfinished.
+Coordinator worktree `.worktrees/linuxcast-application-controls`, branch **codex/quicklinks-web-search-flow** from7687f98. Current bounded **L2-05 saved web searches** is implemented and locally verified, awaiting final evidence commit/PR/CI/merge. Source head **a13da1a** integrates signed author4d40479. Frozen contractb9a1130; pure parser/buildercc214b7(author9c009e9); repository843e02a(authora11115a); main/preload/owner2c2501c. Shared focus/repeat/IME/footer fixes b9a1130/128b48d/0a084c4/453f194. Read `packages/builtins/quicklinks/WEB-SEARCHES.md` for exact frozen bounds.
 
-Current reviewed increment: **L2-05 saved web Quicklinks**, coordinator `.worktrees/linuxcast-application-controls`, branch **codex/quicklinks-application-flow** from47fd2ef. Ready to publish after final evidence commit; PR/CI/merge pending. Frozen11af106, repositoryf681529(authorceaa5ef), shared focus74b9954, coordinator4fa3078, UI49ead21(author0134083). Independent SOL6.1/high freeze/main/storage/final lifecycle reviews clean after host-bound and stale-native-prompt fixes. Actual create/search/explicitOpen/edit/cancel+confirmdelete/clear/restart passes; no foundation/research/proof expansion.
+Users create/edit a named web search, enter a query, review the encoded target, and explicitly Open search through existing GIO. Main fresh-loads stored identity/config and derives the URL; renderer supplies no URL authority. Queries/expanded targets never persist. Unknown operations retain no-replay gates and explicit Reload recovery. Only the configured query component changes; fixed vars.query snapshots are scalar, bounded and never recursively evaluated. Shared held-Enter guard prevents Review→Open approval; IME composition remains native. Long 200%-text footer now remains inside the shell.
 
-PASS57units(54presentation+3rootrouting)/5contracts/21security/17integration(11domain+5owner-client+1actualapp), author14Chromium keyboard/axe and12captures. Actual Electron45/SQLite3.53.4/GIO2.72.4/privateXvfb X11 flow4.27s: actual defaultbrowser-handler exact URL argv/empty stdin; no implicitOpen; native dialog choices only instrumented; usageclear retains definitions; fullQuit/restart/finalowner persistence/export excludes names/URLs/queries. Four actual Quicklinks+two affected root captures inspected. Regressions210launcherunits/139security/19storage/10sharedUI and actualproduction shell9.56s pass. Fulltype/lint/plan/diff pass. Smoke observations are not performance/native-session acceptance.
+Validation on Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/GIO2.72.4:
 
-All authors/reviewer **GPT-6.1 SOL/high**. Completed reusable agents: manifest_review_sol `.worktrees/linuxcast-l1-01` clean0134083, branchcodex/l2-05-quicklinks-ui (includes sharedfocuscherry8252fc2); file_search_service_sol `.worktrees/linuxcast-l1-02-native` cleanceaa5ef/codex/l2-05-quicklinks-repository; readonlyalias_review_sol finalreviewclean. One transient SOLcapacity error retried SAME model, no switch. No live test/exec handles. Do not reactivate olderAstraagents or give manifest infrastructure/research/proof work.
+- PASS157 mapped units (90 presentation,3 routing,39 templates,25 builder),10 contracts,27 main/preload security,29 integration (20 domain SQLite,8 owner/client,1 actual production app).
+- Actual production flow passed5.58s on owned private Xvfb X11/private XDG/browser-handler: literal CRUD plus saved search creation, Unicode/metacharacter query, exact preview, focused held-Enter refusal, explicit real process argv/empty stdin, Hide/reopen, usage clear, complete restart, retained definition/empty fresh query, query/base/target-free aggregate export. Only native-dialog choices instrumented. Six affected actual dark/light Form/List/Review captures inspected; axe passed. Durations are smoke observations, not performance acceptance.
+- Author90presentation/25Chromium keyboard+axe cases passed, including final footer geometry/capture regression; final source/200%-text visual review by alias_review_sol clean at a13da1a. Root final integrated browser run also passed all25cases in23.5s.
+- Regressions43F2-01storage,70L1-01main/preload and11D1-02shared UI passed. Real version6→7 consistent snapshot/reopen, clear preservation and literal/search conversion passed. Full typecheck/lint/plan/diff pass.
 
-L2-05 remainsinprogress. Literal targets explicitly reject raw braces/templates; full placeholders/snapshots/arguments/nonrecursive snippets/typedbuilders/browser/open-with/fileURI/tags/pin/hide/export remain mandatory. L1/F3 full dependencies, nativeAT/desktopmatrix/installedpackage/release gates remainunfinished under user-approved small increments. Privacycriterionpassed with actual synthetic/export evidence; otherL2-05criteria pending. GoalACTIVE8done/13inprogress/76planned,51passed/330pending/8NA. No scope reduction or physical-input/device authorization.
+L2-05 stays **in-progress**: AC01/AC02/UI pending; privacy passed with extended query-free actual evidence. Full snapshot context acquisition, cursor/missing/recursive remediation, snippet inclusion, other typed components/arguments, browser/open-with/file/registered URI, tags/pin/hide/export, prerequisites/nativeAT/session/release requirements remain mandatory. Review pending final evidence/PR state before merge. No PR existed at initial audit; develop unprotected, no open PRs then. Do not assume current CI/reviews without checking.
 
-Next: final evidence commit, focusedPR/currentheadCI/requestedreview audit/normalmerge, refresh primary/frozeninstall/build, then select the next bounded application flow without asking task choices. Keep complete97task1.0scope and all releasegates.
+## Agent ownership
 
-PR38 commandvisibility d1ac477 merged26October13:54:29UTC exacthead6a5c77f/CI40334362130;178units/2contracts/58security/19owner/43storage/43browser and actual11.81s pass; no requestedreviews/comments/unresolvedthreads. PR37colours493653a/CI40290318465 merged26October08:11:24UTC. Full L1providers/fallback/AI and calculatorcalendar/DST/rates/nativeAT/release remain required. Historical evidence remains in registry/cards/Git.
+All are existing **GPT-6.1 SOL/high**:
 
-## Latest integrated application increment: L2-03 Copy path
+- `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branchcodex/l2-05-web-search-ui, clean signed4d40479. Bounded concrete UI done; no infrastructure/research/proof reassignment.
+- `file_search_service_sol`: `.worktrees/linuxcast-l1-02-native`, branchcodex/l2-05-web-search-domain, clean authora11115a. Domain commits9c009e9/a11115a integrated.
+- `alias_review_sol`: read-only independent review; final source/200% visual clean at coordinatora13da1a. Final production/evidence reconciliation remains to request.
 
-[PR34](https://github.com/ianwijma/linuxcast/pull/34) merged **f55ae06** at 26 October 06:49:29 UTC. Exact reviewed head **957230062e9ad3db2118b4a51fd9a5dc03f5beaf**, CI **40282015549** passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge.
+After this increment is merged, select the next bounded application work without asking. W1-01 is the sole fully dependency-ready task (F0-01/F2-01 done). W2-01 accessible workflow editor can pair with W1-01 graph validation under the approved unfinished UI prerequisite increment policy, using existing contracts/shell/storage/shared UI. Read full cards and workflow/security/design references, freeze a small usable editing interface, then delegate disjoint owned paths. No next-task implementation is underway yet.
 
-Frozen request/formatter2e2aaaa; workspace linksb5704ad; shared-host pending keyboard fix0744dae; UI author342929f integratedaa9b567; main/preload/controller9c62d92; final source/tests/evidence9572300. Independent SOL-high source review clean after resolved return-type erasure and two UI publication findings. Final selection-change warning delta reviewed too.
+## Complete scope and acceptance
 
-- Explicit Copy path is secondary after Show details in Results and primary in Detail. No copy on query, selection, opening or navigation. Main derives the indexed absolute location from its own latest bounded100-result cache and fresh selected-root metadata; request contains result/root/generation identity only. Exact copied identity/path receipt required.
-- Query, service, root, mutation and window invalidation fence stale work. Main copy deadline4s retains the actual backend slot; UI5s bounds receipt waiting. Back/selection changes warn a copy may have occurred; late receipts cannot show success for another context. Close stays available; no replay.
-- Main-only clipboard writer is shared with Calculator. It rejects concurrent effects rather than queuing and awaits Electron45 async write/readback. Renderer gets no generic clipboard API. No source stat/read/open/mutation, symlink resolution, file authority, path-copy history, network, paste or PRIMARY operation.
-- PASS63 mapped units (29presentation/31file-search-controller/3native-writer),18security,3contracts,10new keyboard/axe browser tests. Regressions:12file-search/10shared/19calculator browser,16shared units and43calculator security. Full typecheck/lint/frozeninstall/plan/diff pass.
-- Actual packaged Electron45/SQLite3.53.4/Rust/private-Xvfb/X11 + separate native xclip flow **5.50s** passes: registered launcher→folder/index→query/arrows/Details; no implicit copy; real full paths copied from Detail/List; known unavailable session/manual retry; rename/watch; close/reopen; full restart paused/fresh copy; paused index clear rejects saved old selection without writing; originals survive clear/removal; Quit while watching. Only native chooser/confirmation choices instrumented. Actual dark/light indexed-path captures inspected and axe passes. Existing actual calculator flow **5.52s** passes. Durations are smoke observations, not performance acceptance.
+Registry: **8done/13in-progress/76planned;51passed/330pending/8not-applicable**. Never infer task acceptance from documentation or an integrated slice. Render cards from tasks.json and run validate_plan/plan_status after registry changes.
 
-L2-03 stays **in-progress**. Current privacy criterion passed; full cardinality/deletion, preview/cache and UI criteria pending. Full typed actions, ordered multi-file buffer, open/open-with/reveal/move/rename/trash/conflicts/terminal, previews/large text and extension entry points still required. Indexed path copying does not verify source existence or grant file-open/read authority. Native desktop/session/AT, installed-package and release acceptance remain pending.
+F2-02 core credentials/data controls and Local data clear/export are integrated (PR25); credential setup/status/diagnostics host UI, provider/package/nativeAT/release acceptance remain. L1-01/L1-02/D1-02 shell/registered commands/pins/aliases/visibility/applications/DesktopActions are increments; providers/fallback/permission administration/history/full typed launch/native/session acceptance remain. L2-01/02 indexed metadata search/filter/sort/folder navigation and L2-03 Copy path are integrated increments; MIME/recent/extractors, ordered multi-file buffer/full typed actions/preview/cache still required. L2-04 arithmetic/92 units/sRGB colours are integrated; calendar/timezones/DST/rates/cache and native acceptance remain. All remaining task-card scope, R1-01/R1-02/R1-03 and release artifacts remain required.
 
-## Current indexed navigation increment
+## Runtime and checks
 
-Frozen765ee03: optional canonical relative `directory` (`''`rootchildren) requires `rootId`; exactreplyecho/direct-parent helper. Root95951fd binds prefix and remaining-slash constraint beforeLIMIT; blankquery bypassesFTS only for explicitbrowse, relevancefallbackname. Service9ed350c→5f39ed3; UI24e4c0a→e03e7e8; actualappba092e3. All source independently reviewed clean.
+Use `export PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH` and `BUN_TMPDIR=/tmp`. Node24.22.1/Bun1.4.4/Rust1.95 are pinned; do not use older system binaries. Normal sandbox escalation is required for Bun temporary/network/socket work, Git metadata/sign/push and isolated actual app checks. Preserve signing configuration.
 
-Directory primaryBrowse, secondaryDetails/Copy; fileprimaryDetails/Copy unchanged. Root/Parent/Return replaceResults in place, preserve currentfilters, clearbrowsequery, restore original scope/query/selectedID onReturn when available. Exactdirectoryidentity, generation/copy fences, clear/removal/remediation retained. No filesystemread/open authority or history added.
+Mapped suite runner validates all mapped file paths. Map files only once they exist. Targeted Vitest uses `LINUXCAST_TEST_FILES='["path"]' node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts`. Actual app uses `LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- L2-05`. Serialize actual production tests sharing dist. Do not use --no-sandbox or the user's display.
 
-Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. IntegratedPR36/aac0a3d; currentprimarybuildpass. FullMIME/recents/extractors/nativeAT/session/release pending.
-
-Reusable completed SOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-02-directory-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-02-directory-service; read-only alias_review_sol. Verifyclean/switchbase for next assignment. Never reactivate Astra agents.
-
-## Current L2-02 filter/sort integration
-
-Read `docs/implementation/tasks/L2-02.md`, data/security/builtins/testing refs and DESIGN/tokens. Kind any/file/directory, optional inclusive UTC from/through dates (through translates to exclusive next UTC midnight), relevance/name/newest/largest sorting. Apply/Reset use shared Form/Actions and preserve query/root/selection/copy guards. SQL options apply before LIMIT100; no renderer top100 filtering/sorting, no new source reads or persistence.
-
-Commits:fd8a7a4 frozen contract; c04bd7d service;643c59a UI;b45b475 evidence;d04566f shared empty guidance;76ae034 main/preload tests;2b34229 owner/client/main/preload/shared Form/production integration.
-
-Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. Integrated in PR35/31ce46b; exact-head validation and primary build pass.
-
-Reusable completed SOL-high agents: `manifest_review_sol` in `.worktrees/linuxcast-l1-01` / `codex/l2-02-filter-ui`; `file_search_service_sol` in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-filter-service`; read-only `alias_review_sol`. Verify clean and switch base before assigning next bounded work. Do not reactivate Astra agents.
-
-Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/cancellable extractors absent. Indexed direct-child navigation now implemented in the current increment. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
-
-## Integrated application history and outstanding scope
-
-| PR | Merge | Behavior |
-| --- | --- | --- |
-|25|9fe8976|F2 credential/data core and Local data clear/export increment|
-|26|e303fcd|Registered builtins, Local data/Hide/Quit launcher|
-|27|1f13d1b|Persistent Pin/Unpin and restart|
-|28|f8e3b7f|GIO application discovery/actual launch|
-|29|524755d|Persistent command aliases and exact local search|
-|30|daa24b9|Explicit validated web URL Form/native GIO dispatch|
-|31|0e0b4c4|Selected-folder metadata index/query/watch/paused restart UI|
-|32|708a3d6|Bounded local arithmetic/functions and explicit native copy|
-|33|851f6f2|92canonical unit conversions, help, exact numeric/unit copy|
-|34|f55ae06|Selected indexed result Copy path|
-|35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
-|36|aac0a3d|Indexed folder Browse/Parent/root/Return|
-|37|493653a|Local sRGB HEX/RGB/HSL colour conversion and explicit Copy|
-
-PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
-
-F2-02 remains in-progress: main-only credential store/data controllers and real local-data clear/export integrated. Credential setup/status and diagnostics host UI, packaged provider flows, full native/session/AT and release acceptance still required; portable encrypted backups remain F2-03. L1-01/L1-02/D1-02 remain in-progress: provider/fallback/visibility administration, Desktop Actions/other typed launch actions/full history/native prerequisites still missing. F3 permission approval/remediation UI unfinished. L2-04 remains in-progress: arithmetic/92units done as increments; calendar dates/durations/timezones/DST, colours, opt-in configured currency/crypto adapter, timestamped cache/stale/offline UI and full native acceptance still required. Never replace the complete97-task goal with these delivered increments.
-
-## Runtime and retained native proof state
-
-Pinned PATH: `/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH` (node and bun are binaries inside tools, not directories). Node24.22.1, Bun1.4.4, Rust1.95, Electron45, SQLite3.53.4. Use BUN_TMPDIR=/tmp. Sandbox Bun temporary-directory EROFS is resolved through the authorized normal escalation; Git metadata/sign/push similarly needs escalation. Preserve normal signing setup.
-
-Earlier Node26/Bun1.3.9 provenance was explicitly corrected and merged baseline rerun on pinned binaries; registry records the distinction. Do not label newer checks with assumed versions. Context7 tools are not connected; current Electron45 clipboard Promise APIs were verified in installed electron.d.ts. Existing skill-library/context7 guidance read; no new external dependencies introduced here.
-
-Private native lab `.worktrees/private-lab` is0700. Last verified container linuxcast-native-lab-v4 was stopped24October11:36:13UTC (exit0/pid0); this is historical evidence, not a new status check. Private keys/disks/raw logs remain private. Latest S0-01 AT evidence c6e1ecf/default-nine-help-event-incomplete, latest private native run failed resident-close. Native placement/input/security/AT and all four supported desktop/session gates remain outstanding. No new VM/device/proof work is scheduled and no physical input authorization exists.
+Prior native lab is historical, no new VM/device/proof work scheduled. Private lab `.worktrees/private-lab` remains private; last recorded container stopped24October11:36UTC. S0-01 native resident-close/AT and all four Debian GNOME/KDE Wayland/X11 session gates remain outstanding. Chromium/private-Xvfb evidence does not satisfy them. Skill-library gateway/frontend-design instructions read; canonical repo DESIGN/tokens take precedence. Query service unavailable, local catalog read; no new external dependency added.

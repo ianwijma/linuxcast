@@ -16,13 +16,14 @@ const input={expectedRevision:0,name:'Public docs',url:'HTTPS://EXAMPLE.invalid:
 it('migrates a real version5 owner to6 using a consistent recovery snapshot and retains definitions through clear/restart',async()=>{
   const migrations=await foundationMigrations(),{owner,dir}=await open(undefined,migrations.slice(0,5));
   request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias:'public alias'});await owner.confirmSuccessfulLaunch();await owner.close();
-  const next=(await open(dir)).owner;expect(next.version).toBe(6);expect(request(next,'commands.getUsage',{commandId:'linuxcast:hide'})).toMatchObject({alias:'public alias'});
+  const next=(await open(dir,migrations.slice(0,6))).owner;expect(next.version).toBe(6);expect(request(next,'commands.getUsage',{commandId:'linuxcast:hide'})).toMatchObject({alias:'public alias'});
   const backupDir=join(dir,'backups'),journals=await Promise.all((await readdir(backupDir)).filter(name=>name.endsWith('.json')).map(async name=>JSON.parse(await readFile(join(backupDir,name),'utf8')) as {id:string;fromVersion:number;toVersion:number;state:string}));
   const journal=journals.find(value=>value.fromVersion===5&&value.toVersion===6)!;expect(journal.state).toBe('awaiting-confirmation');const snapshot=new Database(join(backupDir,`${journal.id}.db`),{readonly:true});
   try{expect(snapshot.pragma('user_version',{simple:true})).toBe(5);expect(snapshot.prepare("SELECT name FROM sqlite_master WHERE name='quicklinks'").get()).toBeUndefined();}finally{snapshot.close();}
-  const record=request(next,'quicklinks.save',input);expect(record).toMatchObject({revision:1,name:input.name,url:'https://example.invalid/docs'});
-  request(next,'commands.recordUse',{commandId:'linuxcast:open-quicklinks'});request(next,'dataControls.clear',{category:'command-usage'});request(next,'dataControls.clear',{category:'file-index'});
-  await next.confirmSuccessfulLaunch();await next.close();const final=(await open(dir)).owner;
+  await next.confirmSuccessfulLaunch();await next.close();const current=(await open(dir)).owner;
+  const record=request(current,'quicklinks.save',input);expect(record).toMatchObject({revision:1,name:input.name,url:'https://example.invalid/docs'});
+  request(current,'commands.recordUse',{commandId:'linuxcast:open-quicklinks'});request(current,'dataControls.clear',{category:'command-usage'});request(current,'dataControls.clear',{category:'file-index'});
+  await current.confirmSuccessfulLaunch();await current.close();const final=(await open(dir)).owner;
   expect(request(final,'quicklinks.get',{id:record.id,revision:1})).toEqual(record);expect(request(final,'quicklinks.list',{})).toEqual([{id:record.id,revision:1,name:record.name,host:'example.invalid'}]);
   const updated=request(final,'quicklinks.save',{...input,id:record.id,expectedRevision:1,name:'Public updated'});expect(updated).toMatchObject({id:record.id,revision:2,createdAt:record.createdAt});
   expect(()=>request(final,'quicklinks.remove',{id:record.id,revision:1})).toThrow('conflict');expect(request(final,'quicklinks.remove',{id:record.id,revision:2})).toEqual({id:record.id,revision:2});expect(request(final,'quicklinks.list',{})).toEqual([]);

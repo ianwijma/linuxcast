@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
 import type Database from 'better-sqlite3';
-import { ContractError,MAX_QUICKLINKS,parseContract,quicklinkRepositoryContracts } from '@linuxcast/contracts';
+import { ContractError,MAX_QUICKLINKS,parseContract,quicklinkRepositoryContracts,WEB_SEARCH_TEMPLATE } from '@linuxcast/contracts';
 import type { QuicklinkRecord,QuicklinkStorageMethod,QuicklinkStorageMethods } from '@linuxcast/contracts';
 import { dispatchQuicklinks,QuicklinkRepositoryError } from '../src/repository.ts';
 
@@ -16,7 +16,7 @@ afterEach(async()=>{vi.restoreAllMocks();for(const db of databases.splice(0))if(
 function request<M extends QuicklinkStorageMethod>(db:Database.Database,method:M,input:unknown):QuicklinkStorageMethods[M]['result'] {
   return db.transaction(()=>parseContract(quicklinkRepositoryContracts.get(method)!.result,dispatchQuicklinks(db,method,input))).immediate() as QuicklinkStorageMethods[M]['result'];
 }
-async function fixture(){
+async function fixture(version:6|7=7){
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-quicklinks-repository-'));directories.push(directory);
   const path=join(directory,'data.db'),db=new Sqlite(path);databases.push(db);
   db.pragma('foreign_keys=ON');db.pragma('journal_mode=WAL');db.pragma('trusted_schema=OFF');
@@ -24,9 +24,11 @@ async function fixture(){
   expect(db.prepare("SELECT name FROM sqlite_master WHERE name='quicklinks'").get()).toBeUndefined();
   db.prepare('INSERT INTO command_usage(command_id,use_count,last_used_at,pinned,alias) VALUES(?,3,NULL,1,?)').run('linuxcast:calculator','public calc');
   db.transaction(()=>db.exec(schema)).immediate();
+  if(version===7)db.transaction(()=>db.exec(webSearchMigration)).immediate();
   return {db,path};
 }
 const schema=await readFile(new URL('../../../storage/src/migrations/006-quicklinks.sql',import.meta.url),'utf8');
+const webSearchMigration=await readFile(new URL('../../../storage/src/migrations/007-quicklink-web-searches.sql',import.meta.url),'utf8');
 const create=(db:Database.Database,name='Public Link',url='https://example.com/public')=>request(db,'quicklinks.save',{expectedRevision:0,name,url});
 const selection=(value:QuicklinkRecord)=>({id:value.id,revision:value.revision});
 
@@ -108,4 +110,61 @@ it('rejects overflowing revision and overfilled catalogues; owner transaction ro
   const insert=db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,1,?,?,?,?,?)');
   db.transaction(()=>{for(let n=0;n<500;n++)insert.run(randomUUID(),`Excess ${n}`,`excess ${n}`,saved.url,saved.createdAt,saved.updatedAt);}).immediate();
   expect(()=>request(db,'quicklinks.list',{})).toThrow(ContractError);
+});
+
+
+it('upgrades actual literal schema6 rows without changing identity/version/base/timestamps and persists optional search configuration after reopen',async()=>{
+  const {db,path}=await fixture(6),literal={id:randomUUID(),revision:4,name:'Existing Literal',url:'https://example.org/public?q=literal',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-02-01T00:00:00.000Z'};
+  db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(literal.id,literal.revision,literal.name,'existing literal',literal.url,literal.createdAt,literal.updatedAt);
+  db.transaction(()=>db.exec(webSearchMigration)).immediate();
+  expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
+  expect(db.prepare('SELECT web_search FROM quicklinks').get()).toEqual({web_search:null});
+  expect(request(db,'quicklinks.list',{})).toEqual([{id:literal.id,revision:4,name:literal.name,host:'example.org'}]);
+  const config={queryParameter:'q',template:WEB_SEARCH_TEMPLATE},saved=request(db,'quicklinks.save',{id:literal.id,expectedRevision:4,name:literal.name,url:literal.url,webSearch:config});
+  expect(saved).toMatchObject({...literal,updatedAt:saved.updatedAt,revision:5,webSearch:config});expect(saved.createdAt).toBe(literal.createdAt);expect(Date.parse(saved.updatedAt)).toBeGreaterThanOrEqual(Date.parse(literal.updatedAt));
+  const serialized=db.prepare('SELECT web_search FROM quicklinks WHERE id=?').pluck().get(literal.id);
+  expect(serialized).toBe(JSON.stringify(config));
+  db.close();const next=new Sqlite(path);databases.push(next);
+  expect(request(next,'quicklinks.get',selection(saved))).toEqual(saved);
+  expect(request(next,'quicklinks.list',{})).toEqual([{id:literal.id,revision:5,name:literal.name,host:'example.org',webSearch:true}]);
+});
+it('replaces query configuration or removes it on absence while preserving literal records and enforcing CAS',async()=>{
+  const {db}=await fixture(),literal=create(db,'Independent Literal'),config={queryParameter:'q',template:WEB_SEARCH_TEMPLATE};
+  const search=request(db,'quicklinks.save',{expectedRevision:0,name:'Public Search',url:'https://example.org/search?keep=public',webSearch:config});
+  expect(search.webSearch).toEqual(config);
+  expect(()=>request(db,'quicklinks.save',{id:search.id,expectedRevision:2,name:search.name,url:search.url})).toThrowError(expect.objectContaining({reason:'conflict'}));
+  const next=request(db,'quicklinks.save',{id:search.id,expectedRevision:1,name:search.name,url:search.url,webSearch:{...config,queryParameter:'Search.Query'}});
+  expect(next.revision).toBe(2);expect(next.createdAt).toBe(search.createdAt);expect(next.webSearch?.queryParameter).toBe('Search.Query');
+  const changed=request(db,'quicklinks.save',{id:search.id,expectedRevision:2,name:search.name,url:search.url});
+  expect(changed.revision).toBe(3);expect(changed).not.toHaveProperty('webSearch');
+  expect(db.prepare('SELECT web_search FROM quicklinks WHERE id=?').pluck().get(changed.id)).toBeNull();
+  expect(request(db,'quicklinks.list',{}).find(row=>row.id===changed.id)).not.toHaveProperty('webSearch');
+  expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
+  request(db,'quicklinks.remove',selection(changed));expect(request(db,'quicklinks.list',{})).toHaveLength(1);
+});
+it('uses the same name uniqueness and capacity rules for searches and never accepts query or preview history fields',async()=>{
+  const {db}=await fixture(),config={queryParameter:'q',template:WEB_SEARCH_TEMPLATE},base={expectedRevision:0,name:'Public Search',url:'https://example.org/search',webSearch:config};
+  const saved=request(db,'quicklinks.save',base);
+  expect(()=>create(db,'ＰＵＢＬＩＣ SEARCH')).toThrowError(expect.objectContaining({reason:'quicklink-name-conflict'}));
+  for(const extra of [{query:'transient argument'},{preview:'https://example.org/?q=transient'},{webSearch:{...config,query:'transient'}},{webSearch:{...config,template:'{{context.clipboard}}'}},{webSearch:{...config,queryParameter:'q&other'}},{webSearch:null}])expect(()=>request(db,'quicklinks.save',{...base,...extra})).toThrow(ContractError);
+  expect(request(db,'quicklinks.get',selection(saved))).toEqual(saved);
+  const inserted=db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,1,?,?,?,?,?)');
+  db.transaction(()=>{for(let n=1;n<MAX_QUICKLINKS;n++)inserted.run(randomUUID(),`Capacity ${n}`,`capacity ${n}`,saved.url,saved.createdAt,saved.updatedAt);}).immediate();
+  expect(()=>request(db,'quicklinks.save',{...base,name:'One Too Many'})).toThrowError(expect.objectContaining({reason:'quicklink-limit-reached'}));
+  const updated=request(db,'quicklinks.save',{...base,id:saved.id,expectedRevision:1,webSearch:{...config,queryParameter:'term'}});
+  expect(updated.revision).toBe(2);expect(request(db,'quicklinks.list',{})).toHaveLength(500);
+});
+it.each(['{','null','{}','{"queryParameter":"q","template":"{{context.clipboard}}"}','{"queryParameter":"q","template":"{{vars.query}}","query":"public"}'])('rejects corrupt stored configuration %# without raw JSON diagnostics or partial collections',async configuration=>{
+  const {db}=await fixture(),first=create(db,'Independent'),saved=create(db,'Corruptible');
+  db.prepare('UPDATE quicklinks SET web_search=? WHERE id=?').run(configuration,saved.id);
+  for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'No Partial Write',url:saved.url})])expect(operation).toThrowError(expect.objectContaining({message:'Invalid protocol message.'}));
+  expect(request(db,'quicklinks.get',selection(first))).toEqual(first);
+  expect(db.prepare('SELECT revision,name FROM quicklinks WHERE id=?').get(saved.id)).toEqual({revision:1,name:saved.name});
+});
+it('rolls back writes when a stored result contains invalid configuration',async()=>{
+  const {db}=await fixture(),saved=create(db);
+  db.exec("CREATE TRIGGER synthetic_bad_web_search AFTER UPDATE ON quicklinks BEGIN UPDATE quicklinks SET web_search='{}' WHERE id=NEW.id; END");
+  expect(()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Rollback Search',url:saved.url,webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE}})).toThrow(ContractError);
+  expect(request(db,'quicklinks.get',selection(saved))).toEqual(saved);
+  expect(db.prepare('SELECT web_search FROM quicklinks WHERE id=?').pluck().get(saved.id)).toBeNull();
 });

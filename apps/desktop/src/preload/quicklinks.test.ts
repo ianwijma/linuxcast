@@ -1,5 +1,5 @@
 import { expect,it,vi } from 'vitest';
-import { QUICKLINK_CHANNELS } from '@linuxcast/contracts';
+import { QUICKLINK_CHANNELS,WEB_SEARCH_TEMPLATE } from '@linuxcast/contracts';
 import { createQuicklinkApi } from './quicklinks.ts';
 const id='00000000-0000-4000-8000-000000000001',selection={id,revision:1};
 const save={expectedRevision:0,name:'Public docs',url:'HTTPS://EXAMPLE.invalid:443/docs'};
@@ -29,4 +29,15 @@ it('bounds complete sorted summaries and strips malformed, oversized and private
   invoke.mockResolvedValue({ok:true,value:{records:[summary]}});expect(await api.listQuicklinks()).toEqual({ok:true,value:{records:[summary]}});
   for(const value of [{ok:true,value:{records:[{...summary,url:record.url}]}},{ok:true,value:{records:[summary,summary]}},{ok:true,value:{records:'x'.repeat(1048577)}}]){invoke.mockResolvedValue(value);expect(await api.listQuicklinks()).toMatchObject({ok:false});}
   invoke.mockRejectedValue(new Error('SYNTHETIC_PRIVATE'));expect(JSON.stringify(await api.listQuicklinks())).not.toContain('SYNTHETIC_PRIVATE');
+});
+it('requires exact saved configuration rather than accepting a changed component or silently converting a search to a literal',async()=>{
+  const {api,invoke}=fixture(),webSearch={queryParameter:'q',template:WEB_SEARCH_TEMPLATE};
+  for(const reply of [record,{...record,webSearch:{...webSearch,queryParameter:'other'}}]){invoke.mockResolvedValue({ok:true,value:{record:reply}});expect(await api.saveQuicklink({...save,webSearch})).toMatchObject({ok:false});}
+  invoke.mockResolvedValue({ok:true,value:{record:{...record,webSearch}}});expect(await api.saveQuicklink({...save,webSearch})).toMatchObject({ok:true});expect(await api.saveQuicklink(save)).toMatchObject({ok:false});
+});
+it('validates exact transient query receipts and forbids extra argument echoes for literal opening',async()=>{
+  const {api,invoke}=fixture(),query='public & literal',url='https://example.invalid/?q=public+%26+literal',request={...selection,launcherRevision:1,query};
+  invoke.mockResolvedValue({ok:true,value:{...selection,outcome:'dispatched',webSearch:{query,url}}});expect(await api.openQuicklink(request)).toMatchObject({ok:true,value:{webSearch:{query,url}}});expect(invoke).toHaveBeenLastCalledWith(QUICKLINK_CHANNELS.open,{protocolVersion:1,...request});
+  expect(await api.openQuicklink({...selection,launcherRevision:1})).toMatchObject({ok:false});
+  for(const webSearch of [undefined,{query:'different',url}]){invoke.mockResolvedValue({ok:true,value:{...selection,outcome:'dispatched',...(webSearch?{webSearch}:{})}});expect(await api.openQuicklink(request)).toMatchObject({ok:false});}
 });

@@ -1,6 +1,6 @@
 import { expect,it,vi } from 'vitest';
 import type { IpcMainInvokeEvent,WebContents } from 'electron';
-import { LAUNCHER_CHANNELS,QUICKLINK_CHANNELS } from '@linuxcast/contracts';
+import { LAUNCHER_CHANNELS,QUICKLINK_CHANNELS,WEB_SEARCH_TEMPLATE } from '@linuxcast/contracts';
 import type { LauncherCommandsReply,QuicklinkRecord } from '@linuxcast/contracts';
 import { StorageRequestError } from '@linuxcast/storage';
 import { ApplicationsUnavailable } from '@linuxcast/applications';
@@ -102,4 +102,28 @@ it('retains the slot until an actual Open settles and returns truthful known/unk
   expect(await f.invoke(QUICKLINK_CHANNELS.list)).toMatchObject({ok:false,error:{code:'cancelled'}});expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision})).toMatchObject({ok:false,error:{code:'cancelled'}});pending.resolve('dispatched');expect(await work).toMatchObject({ok:true});expect(openUrl).toHaveBeenCalledTimes(1);
   openUrl.mockRejectedValueOnce(new ApplicationsUnavailable('unavailable'));expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
   openUrl.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE'));const reply=await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision});expect(reply).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(openUrl).toHaveBeenCalledTimes(3);expect(f.actions.recordUse).toHaveBeenCalledTimes(1);
+});
+const webSearch={queryParameter:'q',template:WEB_SEARCH_TEMPLATE};
+it('builds a fresh saved search query component only on explicit Open and returns the exact transient query/target receipt',async()=>{
+  const f=fixture(),launcherRevision=await f.version(),query='public & other=literal / 路径 #frag {{context.clipboard}}';
+  const saved={...record,url:'https://example.invalid/search?lang=en&q=old&q=duplicate#public',webSearch};f.backend.get.mockResolvedValue(saved);
+  const url='https://example.invalid/search?lang=en&q=public+%26+other%3Dliteral+%2F+%E8%B7%AF%E5%BE%84+%23frag+%7B%7Bcontext.clipboard%7D%7D#public';
+  expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,query})).toEqual({ok:true,value:{...selection,outcome:'dispatched',webSearch:{query,url}}});
+  expect(f.actions.openUrl).toHaveBeenCalledExactlyOnceWith(url);expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:open-quicklinks');expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('rejects missing search arguments, arguments for literal links and changed definition kinds before browser dispatch',async()=>{
+  const f=fixture(),launcherRevision=await f.version();f.backend.get.mockResolvedValueOnce({...record,webSearch});
+  expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,query:'public'})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('rejects overlong constructed targets with a known non-dispatch failure, without logging argument content',async()=>{
+  const f=fixture(),launcherRevision=await f.version(),query='PRIVATE_QUERY_NOT_LOGGED';f.backend.get.mockResolvedValue({...record,url:'https://example.invalid/'+'x'.repeat(8192-'https://example.invalid/'.length),webSearch});
+  const reply=await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,query});expect(reply).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(JSON.stringify(reply)).not.toContain(query);expect(f.actions.openUrl).not.toHaveBeenCalled();
+});
+it('requires exact saved search configuration, including explicit removal when converting back to a literal',async()=>{
+  const f=fixture();await f.version();const request={protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,webSearch};
+  expect(await f.invoke(QUICKLINK_CHANNELS.save,request)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+  f.backend.save.mockResolvedValueOnce({...record,webSearch});expect(await f.invoke(QUICKLINK_CHANNELS.save,request)).toMatchObject({ok:true,value:{record:{webSearch}}});
+  f.backend.save.mockResolvedValueOnce({...record,webSearch});const {webSearch:unused,...literal}=request;void unused;
+  expect(await f.invoke(QUICKLINK_CHANNELS.save,literal)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.actions.openUrl).not.toHaveBeenCalled();
 });

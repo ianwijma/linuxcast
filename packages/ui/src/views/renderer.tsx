@@ -110,11 +110,12 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
       // input before its header Back button when the saved control is gone.
       const formTarget = view.kind === 'form' ? root.current?.querySelector<HTMLElement>('form input:not(:disabled), form textarea:not(:disabled), form select:not(:disabled), form button:not(:disabled)') : null;
       const queryTarget = collection ? root.current?.querySelector<HTMLElement>('input[data-view-query]') : null;
-      const target = previousFocus.current?.isConnected ? previousFocus.current : formTarget ?? queryTarget ?? root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article');
+      const detailTarget = view.kind === 'detail' ? root.current?.querySelector<HTMLElement>('article') : null;
+      const target = previousFocus.current?.isConnected ? previousFocus.current : formTarget ?? queryTarget ?? detailTarget ?? root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article');
       target?.focus();
     }
     else setPanel(false);
-  }, [active, frame.view.viewId]); // Revisions never steal focus.
+  }, [active, frame.view.viewId, view.kind]); // Ordinary revisions never steal focus.
   const select = (id: string) => { session.select(view.viewId, id); host.selectionChanged?.(view.viewId, id); };
   const invoke = (id: string) => {
     // Re-read current state at the user event, not the action panel's opening revision.
@@ -180,5 +181,9 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
 }
 export function ViewRenderer({ session, host }: { session: ViewSession; host: ViewHost }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getSnapshot);
-  return <div className="lc-view-shell">{state.error && <ErrorState title="This view could not be displayed" description="The view data is invalid. Return to the command and try again." />}{state.frames.map((frame, index) => <ViewContent key={`${frame.view.viewId}:${frame.view.kind}`} frame={frame} session={session} host={host} active={index === state.frames.length - 1} canBack={index > 0} />)}</div>;
+  return <div className="lc-view-shell" onKeyDownCapture={event=>{
+    // A held Review/Submit key must not activate the next view's primary effect.
+    // Multiline editors retain their ordinary repeated-newline behavior.
+    if(event.key==='Enter'&&event.repeat&&!event.nativeEvent.isComposing&&!(event.target instanceof HTMLTextAreaElement)&&!(event.target instanceof HTMLElement&&event.target.isContentEditable)){event.preventDefault();event.stopPropagation();}
+  }}>{state.error && <ErrorState title="This view could not be displayed" description="The view data is invalid. Return to the command and try again." />}{state.frames.map((frame, index) => <ViewContent key={`${frame.view.viewId}:${frame.view.kind}`} frame={frame} session={session} host={host} active={index === state.frames.length - 1} canBack={index > 0} />)}</div>;
 }
