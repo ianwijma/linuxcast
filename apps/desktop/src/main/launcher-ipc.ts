@@ -88,7 +88,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   };
   const descriptors = (): Omit<LauncherCommandMetadata,'usage'>[] => ([
     ...builtins,
-    ...quicklinkCommands.map(command=>({...command,...(quicklinkState==='unavailable'?{enabled:false,unavailableReason:'Saved Quicklinks are unavailable. Open Quicklinks or Reload commands to reconnect.'}:hiddenIds.has('linuxcast:open-quicklinks')?{enabled:false,unavailableReason:'Quicklinks is hidden. Show Quicklinks in Manage commands before opening saved entries.'}:{})})),
+    ...quicklinkCommands.map(command=>({...command,...(quicklinkState==='unavailable'?{enabled:false,unavailableReason:'Saved Quicklinks are unavailable. Open Quicklinks or Reload commands to reconnect.'}:{})})),
     ...workflowCommands.map(command=>({...command.metadata,...(workflowState==='unavailable'?{enabled:false,unavailableReason:'Saved workflow commands are unavailable. Reload commands to reconnect.'}:{})})),
     ...[...applicationRecords].map(([id,application])=>({id,provider:'applications' as const,title:application.title,
       subtitle:application.description||'Installed application',aliases:[],keywords:[],enabled:applicationState==='available',
