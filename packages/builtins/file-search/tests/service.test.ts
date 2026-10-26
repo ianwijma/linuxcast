@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {RootIndexer} from '@linuxcast/file-index';
 import type {FileCandidate,IndexStorage,IndexUpdate,RootState} from '@linuxcast/file-index';
 import {DataControls} from '@linuxcast/data-controls';
+import type {FileSearchOptions} from '@linuxcast/contracts';
 import {createFileSearchService,FileSearchUnavailable} from '../src/service.ts';
 import type {FileSearchService} from '../src/service.ts';
 const services:FileSearchService[]=[],directories:string[]=[];
@@ -123,4 +124,76 @@ describe('L2-02 main-only file search service',()=>{
     const h=harness();h.roots=[h.roots[0]!,h.roots[0]!];await expect(h.service.getState()).rejects.toMatchObject({reason:'storage-unavailable'});h.roots=[root()];h.roots[0]!.config.path='/bad/../path';await expect(h.service.getState()).rejects.toMatchObject({reason:'storage-unavailable'});
     h.roots=[root()];const creating=deferred<RootIndexer>(),fake=indexer();vi.spyOn(RootIndexer,'create').mockReturnValue(creating.promise);await h.service.startIndex(h.roots[0]!.config.id);const stopped=h.service.stop();expect(h.service.terminate()).toBe(stopped);creating.resolve(fake.job);await stopped;expect(fake.stop).toHaveBeenCalledOnce();expect(fake.startWatching).not.toHaveBeenCalled();await expect(h.service.getState()).rejects.toMatchObject({reason:'stopped'});
   });
+  it.each(['relevance','name','modified-desc','size-desc'] as const)('forwards and echoes validated options for %s without changing the default shape',async sort=>{
+    const h=harness(),id=h.roots[0]!.config.id;h.results=[candidate(h.roots[0]!)];
+    const options:FileSearchOptions={sort,kind:'file',modifiedFromMs:0,modifiedBeforeMs:10};
+    const reply=await h.service.search({query:'fixture',rootId:id,options});
+    expect(h.request).toHaveBeenCalledWith('files.search',{query:'fixture',rootId:id,limit:100,options});
+    expect(reply).toMatchObject({query:'fixture',rootId:id,options,results:[{modifiedMs:1}]});expect(reply.options).not.toBe(options);
+    h.request.mockClear();expect(await h.service.search({query:'',options})).toEqual({query:'',rootId:null,options,results:[]});
+    expect(h.request.mock.calls.some(([method])=>method==='files.search')).toBe(false);
+    const plain=await h.service.search({query:'fixture'});expect(plain).not.toHaveProperty('options');
+    expect(h.request).toHaveBeenCalledWith('files.search',{query:'fixture',limit:100});
+  });
+  it('owns the query, root and nested options before its first await',async()=>{
+    const h=harness(),id=h.roots[0]!.config.id,gate=deferred<RootState[]>();h.results=[candidate(h.roots[0]!)];
+    const original=h.request.getMockImplementation()!;let first=true;
+    h.request.mockImplementation(async(method,params)=>{if(method==='files.roots.list'&&first){first=false;return gate.promise;}return original(method,params);});
+    const options:FileSearchOptions={sort:'size-desc',kind:'file',modifiedFromMs:0,modifiedBeforeMs:10};
+    const input:{query:string;rootId:string;options:FileSearchOptions}={query:'fixture',rootId:id,options};
+    const pending=h.service.search(input);
+    options.sort='name';options.kind='directory';options.modifiedFromMs=20;delete options.modifiedBeforeMs;
+    input.query='changed';input.rootId=randomUUID();input.options={sort:'modified-desc',kind:'directory'};
+    await vi.waitFor(()=>expect(first).toBe(false));gate.resolve(structuredClone(h.roots));
+    const expected={sort:'size-desc',kind:'file',modifiedFromMs:0,modifiedBeforeMs:10};
+    expect((await pending).options).toEqual(expected);
+    expect(h.request).toHaveBeenCalledWith('files.search',{query:'fixture',rootId:id,limit:100,options:expected});
+  });
+  it('rejects malformed options and unknown request keys before contacting storage',async()=>{
+    const h=harness();
+    const invalid=[null,[],false,'name',{}, {sort:'unknown'}, {sort:'name',extra:true}, {sort:'name',kind:'symlink'},
+      {sort:'name',modifiedFromMs:0.5},{sort:'name',modifiedBeforeMs:Infinity},{sort:'name',modifiedBeforeMs:NaN},
+      {sort:'name',modifiedFromMs:Number.MIN_SAFE_INTEGER-1},{sort:'name',modifiedBeforeMs:Number.MAX_SAFE_INTEGER+1},
+      {sort:'name',modifiedFromMs:0,modifiedBeforeMs:0},{sort:'name',modifiedFromMs:2,modifiedBeforeMs:1}];
+    for(const options of invalid)await expect(h.service.search({query:'fixture',options} as Parameters<FileSearchService['search']>[0])).rejects.toMatchObject({reason:'invalid-request'});
+    await expect(h.service.search({query:'fixture',extra:true} as Parameters<FileSearchService['search']>[0])).rejects.toMatchObject({reason:'invalid-request'});
+    expect(h.request).not.toHaveBeenCalled();
+  });
+  it('rejects an entire owner page when any result violates kind or modified bounds',async()=>{
+    const h=harness(),good=candidate(h.roots[0]!);
+    const cases:{options:FileSearchOptions;patch:Partial<FileCandidate>}[]=[
+      {options:{sort:'relevance',kind:'file'},patch:{kind:'directory'}},
+      {options:{sort:'name',kind:'directory'},patch:{kind:'file'}},
+      {options:{sort:'modified-desc',modifiedFromMs:0,modifiedBeforeMs:10},patch:{modifiedMs:-1}},
+      {options:{sort:'modified-desc',modifiedFromMs:0,modifiedBeforeMs:10},patch:{modifiedMs:10}},
+      {options:{sort:'size-desc',modifiedFromMs:-10,modifiedBeforeMs:0},patch:{modifiedMs:-11}},
+      {options:{sort:'size-desc',modifiedFromMs:-10,modifiedBeforeMs:0},patch:{modifiedMs:0}},
+      {options:{sort:'relevance'},patch:{modifiedMs:0.5}},
+    ];
+    for(const {options,patch} of cases) {
+      const valid={...good,kind:options.kind??'file',modifiedMs:options.modifiedFromMs??1};
+      h.results=[valid,{...valid,...patch,path:'outside.txt',id:`${good.rootId}:outside.txt`}];
+      await expect(h.service.search({query:'fixture',options})).rejects.toMatchObject({reason:'storage-unavailable',message:'File search unavailable: storage-unavailable.'});
+    }
+  });
+  it('accepts inclusive from and exclusive before bounds including epoch zero and negative instants',async()=>{
+    const h=harness(),original=candidate(h.roots[0]!);
+    for(const {options,times} of [
+      {options:{sort:'modified-desc' as const,modifiedFromMs:0,modifiedBeforeMs:10},times:[9,0]},
+      {options:{sort:'modified-desc' as const,modifiedFromMs:-10,modifiedBeforeMs:0},times:[-1,-10]},
+      {options:{sort:'modified-desc' as const,modifiedFromMs:Number.MIN_SAFE_INTEGER,modifiedBeforeMs:Number.MAX_SAFE_INTEGER},times:[Number.MAX_SAFE_INTEGER-1,Number.MIN_SAFE_INTEGER]},
+    ]) {
+      h.results=times.map((modifiedMs,index)=>({...original,id:`${original.rootId}:time${index}.txt`,path:`time${index}.txt`,modifiedMs}));
+      expect((await h.service.search({query:'fixture',options})).results.map(row=>row.modifiedMs)).toEqual(times);
+    }
+  });
+  it('preserves the owner result order without locally sorting an already limited page',async()=>{
+    const h=harness(),original=candidate(h.roots[0]!);const paths=['z-last.txt','a-first.txt','m-middle.txt'];
+    h.results=paths.map((path,index)=>({...original,path,id:`${original.rootId}:${path}`,size:30-index,modifiedMs:10-index}));
+    for(const sort of ['relevance','name','modified-desc','size-desc'] as const) {
+      const reply=await h.service.search({query:'fixture',options:{sort}});expect(reply.results.map(row=>row.path)).toEqual(paths);
+      expect(h.request).toHaveBeenCalledWith('files.search',{query:'fixture',limit:100,options:{sort}});
+    }
+  });
+
 });
