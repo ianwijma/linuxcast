@@ -62,7 +62,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false,quicklinksPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
-  let quicklinkState:'available'|'unavailable'|undefined,quicklinkCommands:Omit<LauncherCommandMetadata,'usage'>[]=[],quicklinkRefreshing:Promise<void>|undefined;
+  let quicklinkState:'available'|'unavailable'|undefined,quicklinkCommands:Omit<LauncherCommandMetadata,'usage'>[]=[],quicklinkRefreshing:Promise<void>|undefined,quicklinkRefreshGeneration=-1;
   let workflowState:'available'|'unavailable'|undefined,workflowCommands:WorkflowCommand[]=[],workflowRefreshing:Promise<void>|undefined;
   let applications: NativeApplication[] = [];
   let refreshing: Promise<void>|undefined;
@@ -159,13 +159,20 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   };
   const refreshQuicklinks=async(generation:number)=>{
     if(!actions.quicklinks)return;
-    if(!quicklinkRefreshing)quicklinkRefreshing=(async()=>{
+    // A new-generation Reload cannot inherit the discarded result of an older
+    // read. Await that slot, then perform its own authoritative list.
+    if(quicklinkRefreshing&&quicklinkRefreshGeneration!==generation){
+      await quicklinkRefreshing;
+      if(active()&&!metadataPending&&!quicklinksPending&&generation===metadataGeneration)await refreshQuicklinks(generation);
+      return;
+    }
+    if(!quicklinkRefreshing){quicklinkRefreshGeneration=generation;quicklinkRefreshing=(async()=>{
       try{const next=compileQuicklinkCommands(await actions.quicklinks!.list(),!!actions.openUrl);
         if(!active()||metadataPending||quicklinksPending||generation!==metadataGeneration)return;
         if(quicklinkState!=='available'||JSON.stringify(next)!==JSON.stringify(quicklinkCommands))revision++;
         quicklinkCommands=next;quicklinkState='available';
       }catch{if(active()&&!metadataPending&&!quicklinksPending&&generation===metadataGeneration){if(quicklinkState!=='unavailable')revision++;quicklinkState='unavailable';}}
-    })().finally(()=>{quicklinkRefreshing=undefined;});
+    })().finally(()=>{quicklinkRefreshing=undefined;});}
     await quicklinkRefreshing;
   };
   const snapshot = async (start=0,changed?: CommandUsage): Promise<LauncherCommandsReply> => {
