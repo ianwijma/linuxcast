@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated27October2026. **Goal BLOCKED on external 1Password signing**, after three consecutive blocked turns. Complete all97
+Updated27October2026. **Goal unfinished; work resumed after user unlock confirmation.** Complete all97
 agreed local1.0 tasks through R1-03/all release gates. Read the objective at
 `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
 An increment is not goal completion.
@@ -83,26 +83,12 @@ Coordinator `.worktrees/linuxcast-application-controls`, branch
 UI signed9e083d0 (author signed cf26299). Source complete; reviewed/tested;
 PR publication/CI/configured review/normal exact-head merge next.
 
-Publication blocker this turn: normal `git commit -S` and one TTY retry both
-ended128 with `1Password: failed to fill whole buffer`; no commit object written.
-Both handles6036/58711 are closed. Existing 1Password signing settings unchanged.
-An asynchronous user request asks to approve its signing prompt/unlock if it
-relocked; no reply yet. All source/tests/evidence are staged; HEAD remains9e083d0.
-No live test handles. Do not rerun successful tests or retry signing repeatedly
-without changed external state. On confirmation, sign staged increment normally,
-push/create+attach focused PR, inspect exact-head CI/reviews/threads, merge into
-develop normally, refresh primary frozen install/build and record merge evidence.
-Blocked audit3: previous turn was no progress (authoritative remote check only),
-not a verified wait. Current HEAD is still9e083d0, all37 implementation/evidence
-files remain staged and cached diff checks pass; only this checkpoint changed.
-No live op-ssh-sign/ssh-keygen/git process remains and no new signing confirmation
-has arrived. Same external failure has recurred across three consecutive turns.
-No useful next work is available within the user's merge-first sequence; do not
-expand foundational work or redirect manifest_review before this increment is
-integrated. Mark goal blocked to stop automatic no-progress continuations.
-Resume on user confirmation that the existing 1Password signer is ready; stage
-this checkpoint, sign normally, then publish/review/merge and continue full1.0.
-No signing configuration changes, unsigned workaround or task completion claim.
+User confirmed Unlocked; existing normal 1Password signer now works. Signed
+implementation **2d22304** preserves all reviewed source/tests/evidence. Prior
+buffer failure is resolved; no signing configuration change. Publish focused
+PR, inspect exact-head CI/configured reviews/threads, then normal merge and
+primary frozen install/build. Controller still reports blocked from the earlier
+three-turn audit; this user reply authorizes resumed work, not goal completion.
 
 Final independent staged-delta reconciliation clean: duplicate IDs rejected
 before publication; long-name real engine/owner execution+recovery and debugger
