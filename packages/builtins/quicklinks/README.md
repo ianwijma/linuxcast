@@ -108,7 +108,12 @@ Commands: `LINUXCAST_TEST_FILES='["packages/builtins/quicklinks/tests/presentati
 and the corresponding `tests/quicklinks.ui.test.ts` selection with
 `bun x playwright test --config scripts/test-runner/playwright.config.ts`.
 Full typecheck, scoped ESLint, plan and diff checks pass. The shared raw-control
-schema hardening dbfabde is a separate prerequisite, not duplicated here.
+schema hardening dbfabde is a separate prerequisite, not duplicated here. The
+shared pending-Form scroll fix d00f8f4 keeps Save and enabled Cancel entirely
+inside the scroll viewport without moving focus. The existing pending Save case
+checks all four control bounds, holds Enter to reject duplicate Save/accidental
+Cancel, and inspects the corrected pending capture. Focused pending, held-Enter,
+IME and 200%-text regressions pass; the shared fix is a separate prerequisite.
 This supplies partial L2-05 UI/PRIVACY evidence; existing AC01/AC02 encoding and
 unsupported-placeholder behavior remains covered by regressions, with no new
 placeholder capability. Actual tag SQLite migration/persistence and native
