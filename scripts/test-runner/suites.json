@@ -63,6 +63,12 @@
     "W2-01": [
       "apps/desktop/src/features/workflows/canvas/tests/controller.test.ts",
       "apps/desktop/src/main/quit-preflight.test.ts"
+    ],
+    "W1-02": [
+      "packages/workflows/src/engine/tests/engine.test.ts"
+    ],
+    "W2-03": [
+      "apps/desktop/src/features/workflows/debugger/tests/controller.test.ts"
     ]
   },
   "contracts": {
@@ -121,6 +127,9 @@
     ],
     "W2-01": [
       "packages/contracts/tests/workflow-editor.contract.test.ts"
+    ],
+    "W1-02": [
+      "packages/contracts/tests/workflow-run.contract.test.ts"
     ]
   },
   "ui": {
@@ -153,6 +162,9 @@
     ],
     "W2-01": [
       "apps/desktop/src/features/workflows/canvas/tests/editor.ui.test.ts"
+    ],
+    "W2-03": [
+      "apps/desktop/src/features/workflows/debugger/tests/run-panel.ui.test.ts"
     ]
   },
   "integration": {
@@ -206,6 +218,11 @@
     "W2-01": [
       "packages/storage/tests/workflow-editor.integration.test.ts",
       "apps/desktop/tests/workflow-editor.integration.test.ts"
+    ],
+    "W1-03": [
+      "packages/storage/tests/workflow-journal.integration.test.ts",
+      "apps/desktop/src/main/workflow-run.test.ts",
+      "apps/desktop/tests/workflow-run.integration.test.ts"
     ]
   },
   "security": {
@@ -274,6 +291,10 @@
     "W2-01": [
       "apps/desktop/src/main/workflow-editor-ipc.test.ts",
       "apps/desktop/src/workflow-preload/api.test.ts"
+    ],
+    "W1-02": [
+      "apps/desktop/src/main/workflow-run-ipc.test.ts",
+      "apps/desktop/src/workflow-preload/run-api.test.ts"
     ]
   },
   "perf": {}

@@ -29,7 +29,9 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if(method==='workflows.editor.write')valid=row.revision===Number(params.expectedRevision)+1&&(params.action==='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(params.draft))&&(params.action!=='save'||stableWorkflowJson(row.saved)===stableWorkflowJson(params.draft))&&(params.action!=='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(row.saved??createWorkflowDraft()));
+  if(method==='workflows.runs.put'||method==='workflows.steps.put')valid=stableWorkflowJson(row)===stableWorkflowJson(params.record);
+  else if(method==='workflows.runs.recover')valid=true;
+  else if(method==='workflows.editor.write')valid=row.revision===Number(params.expectedRevision)+1&&(params.action==='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(params.draft))&&(params.action!=='save'||stableWorkflowJson(row.saved)===stableWorkflowJson(params.draft))&&(params.action!=='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(row.saved??createWorkflowDraft()));
   else if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
   else if(method==='quicklinks.save'){
     const expected=quicklinkSaveSchema.parse(params);

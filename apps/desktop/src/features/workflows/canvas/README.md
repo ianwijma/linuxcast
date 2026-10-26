@@ -90,3 +90,12 @@ settings/bindings/notes/copy-paste, execution/debugger and all ten examples rema
 required. Supported GNOME/KDE Wayland/X11, physical-device, assistive-technology,
 high-contrast/native text scaling and release acceptance remain pending, as do
 broader D1-02/L1 prerequisites. The complete local1.0 scope is unchanged.
+
+## Saved text-run integration
+
+The production workspace now supplies the named WorkflowRunApi and enables Run
+for its last explicitly saved version. Save notices no longer claim execution
+is unavailable; Copy inspector explains the separate approval step. The optional
+component fixture without a run API continues to show explicit unavailable state.
+See ../debugger/README.md and desktop/evidence/workflow-run-application.md for
+actual worker/clipboard evidence and unfinished full-scope acceptance.

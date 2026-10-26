@@ -1,3 +1,9 @@
+import { createWorkflowRuns } from './workflow-run.ts';
+import { registerWorkflowRunIpc } from './workflow-run-ipc.ts';
+import { workflowFork } from '../services/workflow-worker.ts';
+import { WORKFLOW_RUN_UPDATED } from '../../../../packages/contracts/src/workflow-run.ts';
+import type { createStorageClient } from '@linuxcast/storage';
+import type { ClipboardWriteOutcome } from './clipboard-write.ts';
 import { BrowserWindow, ipcMain, nativeTheme, screen, session } from 'electron';
 import { join } from 'node:path';
 import { WORKFLOW_EDITOR_CLOSE_REQUESTED, WORKFLOW_EDITOR_APPEARANCE, WORKFLOW_EDITOR_CLOSE_FINISHED, workflowEditorCloseFinishedSchema,
@@ -11,6 +17,7 @@ import type { ResidentService } from './lifecycle.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
 export interface WorkflowEditorOptions {
   resourcesDirectory:string; isReady():boolean;
+  repository:ReturnType<typeof createStorageClient>;copyText(text:string):Promise<ClipboardWriteOutcome>;
   load():Promise<WorkflowEditorRecord|null>;
   write(input:WorkflowEditorWrite):Promise<WorkflowEditorRecord>;
 }
@@ -22,15 +29,18 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
   const finishAttempt=(value:boolean)=>{const pending=attempt;attempt=undefined;pending?.resolve(value);};
   const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
   const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
+  const runs=createWorkflowRuns({repository:options.repository,fork:workflowFork(options.resourcesDirectory),copyText:options.copyText,ready:options.isReady,publish(state){if(window&&!window.isDestroyed()&&window.webContents.getURL()===WORKFLOW_EDITOR_URL)window.webContents.send(WORKFLOW_RUN_UPDATED,state);}});
+  const removeRunIpc=registerWorkflowRunIpc(ipcMain,runs,()=>window?.webContents);
   const ipc=registerWorkflowEditorIpc(ipcMain,{
     contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,
-    appearance,load:options.load,write:options.write,
-    close(){if(window&&!window.isDestroyed()){approvedClose=true;window.close();}},
+    appearance,load:options.load,write:async input=>{runs.cancelCurrent();return options.write(input);},
+    close(){if(window&&!window.isDestroyed()){runs.cancelCurrent();approvedClose=true;window.close();}},
   });
   const updated=()=>{if(window&&!window.isDestroyed()){window.setBackgroundColor(tokens.themes[appearance()].background);if(window.webContents.getURL()===WORKFLOW_EDITOR_URL)window.webContents.send(WORKFLOW_EDITOR_APPEARANCE,appearance());}};
   nativeTheme.on('updated',updated);
-  const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);ipc.remove();ipcMain.removeHandler(WORKFLOW_EDITOR_CLOSE_FINISHED);finishAttempt(false);};
+  const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);ipc.remove();removeRunIpc();ipcMain.removeHandler(WORKFLOW_EDITOR_CLOSE_FINISHED);finishAttempt(false);};
   const requestClose=():Promise<boolean>=>{
+    runs.cancelCurrent();
     const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);
     if(attempt?.owner===owner)return attempt.promise;
     if(owner.webContents.getURL()!==WORKFLOW_EDITOR_URL)return Promise.resolve(false);
@@ -64,8 +74,8 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
     },
     prepareClose:requestClose,
     stop(){
-      return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Workflow editor close preflight is incomplete.');await ipc.drain();dispose();})();
+      return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Workflow editor close preflight is incomplete.');await runs.stop();await ipc.drain();dispose();})();
     },
-    async terminate(){dispose();if(window&&!window.isDestroyed())window.destroy();await ipc.drain();},
+    async terminate(){await runs.terminate();dispose();if(window&&!window.isDestroyed())window.destroy();await ipc.drain();},
   };
 }

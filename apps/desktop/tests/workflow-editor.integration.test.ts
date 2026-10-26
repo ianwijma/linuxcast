@@ -24,7 +24,7 @@ it('opens the real workflow editor, saves a keyboard-built graph and recovers dr
   for(const key of ['DISPLAY','XAUTHORITY','PATH','LANG'])if(process.env[key])env[key]=process.env[key]!;
   const launch=async()=>{application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});const page=await application.firstWindow();await page.waitForURL('linuxcast-app://shell/index.html');return {app:application,page};};
   let {app,page}=await launch();
-  const open=async()=>{const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('workflow');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Workflow draft');const ready=app.waitForEvent('window');await query.press('Enter');const editor=await ready;await editor.waitForURL('linuxcast-app://shell/workflow-editor.html');await editor.getByRole('heading',{name:'Workflow editor',exact:true}).waitFor();return editor;};
+  const open=async()=>{const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('workflow');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Workflow draft');const ready=app.waitForEvent('window');await query.press('Enter');const editor=await ready;await editor.waitForURL('linuxcast-app://shell/workflow-editor.html');await editor.emulateMedia({reducedMotion:'reduce'});await editor.getByRole('heading',{name:'Workflow editor',exact:true}).waitFor();return editor;};
   let editor=await open();await editor.getByRole('button',{name:'New workflow',exact:true}).click();
   await editor.getByRole('textbox',{name:'Workflow name',exact:true}).fill('Public text workflow');
   for(const title of ['Add Keyword','Add Transform text','Add Copy text'])await editor.getByRole('button',{name:new RegExp(`^${title}`)}).click();
@@ -33,7 +33,7 @@ it('opens the real workflow editor, saves a keyboard-built graph and recovers dr
   for(const [from,to] of [[keyword.id,transform.id],[transform.id,copy.id]]){await editor.getByLabel('Connection source',{exact:true}).selectOption(from!);await editor.getByLabel('Output port',{exact:true}).selectOption('out');await editor.getByLabel('Connection target',{exact:true}).selectOption(to!);await editor.getByRole('button',{name:'Connect nodes',exact:true}).click();}
   await editor.getByRole('button',{name:'Save workflow',exact:true}).click();await expect.poll(async()=>(await loaded(editor))?.saved?.edges.length).toBe(2);
   expect((await loaded(editor))?.saved).toMatchObject({name:'Public text workflow',permissions:[{id:'clipboard.write',reason:expect.any(String)}]});
-  const run=editor.getByRole('button',{name:/^Run/});expect(await run.isDisabled()).toBe(true);
+  const run=editor.getByRole('button',{name:/^Run/});expect(await run.isDisabled()).toBe(false);
   const evidence=join(root,'apps/desktop/evidence');mkdirSync(evidence,{recursive:true});
   for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},theme)=>{nativeTheme.themeSource=theme;},theme);await expect.poll(()=>editor.locator('[data-lc-theme]').first().getAttribute('data-lc-theme')).toBe(theme);await editor.screenshot({path:join(evidence,`workflow-editor-application-${theme}-saved.png`)});expect((await new AxeBuilder({page:editor}).setLegacyMode().analyze()).violations).toEqual([]);}
   // Native window-close must flush an edit made before its500ms autosave timer.

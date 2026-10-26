@@ -1,3 +1,4 @@
+import type { WorkflowRunApi } from './workflow-run.ts';
 import * as z from 'zod';
 import { workflowDefinitionSchema } from './workflow-graph.ts';
 import { MAX_ENVELOPE_BYTES } from './protocol.ts';
@@ -49,3 +50,6 @@ export type WorkflowWorkspaceApi = WorkflowEditorApi & {
 export const WORKFLOW_EDITOR_CLOSE_FINISHED = 'workflow-editor:close-finished';
 export const workflowEditorCloseAttemptSchema = z.strictObject({protocolVersion:z.literal(1),attemptId:z.number().int().positive().safe()});
 export const workflowEditorCloseFinishedSchema = workflowEditorCloseAttemptSchema.extend({allowClose:z.boolean()});
+
+/** Production workspace exposes only these two named, validated surfaces. */
+export type WorkflowRunWorkspaceApi=WorkflowWorkspaceApi&WorkflowRunApi;

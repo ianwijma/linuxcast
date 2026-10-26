@@ -1,3 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { createWorkflowEditorApi } from './api.ts';
-contextBridge.exposeInMainWorld('linuxcastWorkflow',createWorkflowEditorApi({invoke:(channel,payload)=>ipcRenderer.invoke(channel,payload),on:(channel,listener)=>ipcRenderer.on(channel,listener),removeListener:(channel,listener)=>ipcRenderer.removeListener(channel,listener)}));
+import { createWorkflowRunApi } from './run-api.ts';
+const transport={invoke:(channel:string,payload:unknown)=>ipcRenderer.invoke(channel,payload),on:(channel:string,listener:(_event:unknown,value:unknown)=>void)=>ipcRenderer.on(channel,listener),removeListener:(channel:string,listener:(_event:unknown,value:unknown)=>void)=>ipcRenderer.removeListener(channel,listener)};
+contextBridge.exposeInMainWorld('linuxcastWorkflow',Object.freeze({...createWorkflowEditorApi(transport),...createWorkflowRunApi(transport)}));

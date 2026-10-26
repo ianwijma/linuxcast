@@ -6,6 +6,8 @@ import { Button, EmptyState, ErrorState, LoadingState, TextField, UnavailableSta
 import '@linuxcast/ui/styles.css';
 import type { WorkflowEditorApi, WorkflowDefinition } from '@linuxcast/contracts';
 import { EDITOR_NODE_REGISTRY, EDITOR_NODE_TYPES } from '@linuxcast/workflows/registry';
+import type { WorkflowRunApi } from '@linuxcast/contracts';
+import { WorkflowRunPanel } from '../debugger/index.tsx';
 import { WorkflowEditorController } from './controller.ts';
 import './editor.css';
 
@@ -31,9 +33,11 @@ function Confirmation({ title, message, confirm, onConfirm, onCancel }: { title:
     if (event.key === 'Tab') { const buttons = [...(ref.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])]; const first = buttons[0], last = buttons.at(-1); if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } }
   }}><h2 id={id}>{title}</h2><p id={description}>{message}</p><div className="wf-actions"><Button onClick={onCancel}>Keep editing</Button><Button variant="danger" onClick={onConfirm}>{confirm}</Button></div></div></div>;
 }
-export function WorkflowEditor({ api }: { api: WorkflowEditorApi }) {
+export function WorkflowEditor({ api, runApi }: { api: WorkflowEditorApi;runApi?:WorkflowRunApi }) {
   const [controller] = useState(() => new WorkflowEditorController(api));
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
+  const [runOpen,setRunOpen]=useState(false);
+  const runButton=useRef<HTMLButtonElement>(null);
   const [palette, setPalette] = useState(''), [from, setFrom] = useState(''), [port, setPort] = useState('out'), [to, setTo] = useState('');
   const [confirm, setConfirm] = useState<'reload' | 'revert' | 'discard' | null>(null);
   const [viewport, setViewport] = useState({ x: 32, y: 32, zoom: 0.8 });
@@ -56,20 +60,21 @@ export function WorkflowEditor({ api }: { api: WorkflowEditorApi }) {
     ariaLabel: `Connection ${edge.from.nodeId} ${edge.from.port} to ${edge.to.nodeId} in` }));
   const source = draft?.nodes.find(node => node.id === from);
   let ports: string[] = []; try { ports = source ? [...(EDITOR_NODE_REGISTRY.get(source.type)?.outputPorts(source.config) ?? [])] : []; } catch { /* Same fixed editable invalid state. */ }
+  if(runOpen&&runApi&&state.record?.saved)return <main><h1 className="wf-run-workspace-title">Workflow editor</h1><WorkflowRunPanel api={runApi} editorRevision={state.record.revision} savedDefinition={state.record.saved} onClose={()=>{setRunOpen(false);requestAnimationFrame(()=>runButton.current?.focus());}}/></main>;
   return <main className="wf-editor" onKeyDown={event => {
     if (event.nativeEvent.isComposing || confirm) return;
     if (event.repeat) { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') event.preventDefault(); return; }
     if (event.key === 'Escape') { event.preventDefault(); void controller.requestClose(); }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); if (!state.busy && !locked) void controller.write('save'); }
   }}>
-    <header className="wf-header"><div><p className="wf-caption">LOCAL WORKFLOW</p><h1>Workflow editor</h1><p className="lc-muted">One recoverable draft · execution unavailable</p></div><div className="wf-actions">
+    <header className="wf-header"><div><p className="wf-caption">LOCAL WORKFLOW</p><h1>Workflow editor</h1><p className="lc-muted">{runApi?'One recoverable draft · saved text workflows':'One recoverable draft · execution unavailable'}</p></div><div className="wf-actions">
       <Button disabled={!draft || state.blocked || state.loading || state.closing} busy={state.busy} variant="primary" onClick={() => { void controller.write('save'); }}>Save workflow</Button>
       <Button disabled={!draft || state.blocked || state.loading || state.closing} busy={state.busy} onClick={() => confirmAction('revert')}>Revert</Button>
       <Button disabled={state.loading || state.closing} aria-disabled={state.busy} onClick={() => confirmAction('reload')}>Reload</Button>
-      <Button disabled title="Workflow execution is not available yet" aria-describedby="wf-run-reason">Run unavailable</Button>
+      <Button ref={runButton} disabled={!runApi||!state.record?.saved||state.blocked||state.busy||state.dirty||locked} aria-describedby="wf-run-reason" onClick={()=>setRunOpen(true)}>{runApi?'Run saved workflow':'Run unavailable'}</Button>
       <Button disabled={locked} onClick={() => { void controller.requestClose(); }}>Close editor</Button>
     </div></header>
-    <p id="wf-run-reason" className="wf-caption">Run cannot execute this graph. Permission declarations are descriptions, not grants.</p>
+    <p id="wf-run-reason" className="wf-caption">{runApi?'Run uses the last explicitly saved version; newer draft changes are excluded. Clipboard access requires broker approval.':'Run cannot execute this graph. Permission declarations are descriptions, not grants.'}</p>
     <div role="status" aria-live="polite" className="wf-save-state">{state.blocked ? 'Reload required before writing again' : state.busy ? 'Writing local draft…' : state.dirty ? 'Unsaved local changes' : state.record ? 'Draft stored locally' : 'No stored workflow'}</div>
     {state.message && <div role="alert" className="wf-notice">{state.message}</div>}
     {state.connectionError && <div role="alert" className="wf-notice">{state.connectionError}</div>}
@@ -94,7 +99,7 @@ export function WorkflowEditor({ api }: { api: WorkflowEditorApi }) {
         </section>
         <aside className="wf-panel" aria-label="Node inspector"><h2>Node inspector</h2>{current ? <div className="wf-inspector" key={current.id}>
           <p className="wf-caption">{current.id} · {current.type}</p><TextField ref={labelRef} label="Node label" value={current.label ?? ''} maxLength={128} disabled={locked} onChange={event => controller.configure(current.id, event.target.value, current.config)} />
-          {current.type === 'input.keyword' ? <><TextField label="Keyword" value={String(current.config.keyword ?? '')} maxLength={64} disabled={locked} {...(!EDITOR_NODE_REGISTRY.get(current.type)?.config.safeParse(current.config).success ? {error: 'Use a keyword without spaces or control characters.'} : {})} onChange={event => update({ ...current.config, keyword: event.target.value })} /><Select label="Argument" value={String(current.config.argument)} disabled={locked} onChange={argument => update({ ...current.config, argument })}><option value="required">Required</option><option value="optional">Optional</option><option value="none">None</option></Select><label className="wf-check"><input type="checkbox" checked={current.config.trimQuery === true} disabled={locked} onChange={event => update({ ...current.config, trimQuery: event.target.checked })} />Trim query</label></> : current.type === 'utility.transform' ? <><Select label="Text operation" value={String(current.config.operation)} disabled={locked} onChange={operation => update({ ...current.config, operation })}>{['trim', 'upper', 'lower', 'title', 'normalize'].map(operation => <option key={operation} value={operation}>{operation}</option>)}</Select><TextField label="Locale (optional)" value={String(current.config.locale ?? '')} maxLength={64} disabled={locked} onChange={event => { const { locale: _locale, ...config } = current.config; void _locale; update(event.target.value ? { ...config, locale: event.target.value } : config); }} /><p className="wf-caption">Source is fixed to input#/0. Other bindings are not available yet.</p></> : current.type === 'output.clipboard' ? <UnavailableState title="Clipboard execution unavailable" description="Text is fixed to input#/0. Paste is off; clipboard history is excluded. The clipboard.write declaration does not grant permission or copy anything." /> : <UnavailableState title="Node configuration unavailable" description="This node is not in the current editing palette." />}
+          {current.type === 'input.keyword' ? <><TextField label="Keyword" value={String(current.config.keyword ?? '')} maxLength={64} disabled={locked} {...(!EDITOR_NODE_REGISTRY.get(current.type)?.config.safeParse(current.config).success ? {error: 'Use a keyword without spaces or control characters.'} : {})} onChange={event => update({ ...current.config, keyword: event.target.value })} /><Select label="Argument" value={String(current.config.argument)} disabled={locked} onChange={argument => update({ ...current.config, argument })}><option value="required">Required</option><option value="optional">Optional</option><option value="none">None</option></Select><label className="wf-check"><input type="checkbox" checked={current.config.trimQuery === true} disabled={locked} onChange={event => update({ ...current.config, trimQuery: event.target.checked })} />Trim query</label></> : current.type === 'utility.transform' ? <><Select label="Text operation" value={String(current.config.operation)} disabled={locked} onChange={operation => update({ ...current.config, operation })}>{['trim', 'upper', 'lower', 'title', 'normalize'].map(operation => <option key={operation} value={operation}>{operation}</option>)}</Select><TextField label="Locale (optional)" value={String(current.config.locale ?? '')} maxLength={64} disabled={locked} onChange={event => { const { locale: _locale, ...config } = current.config; void _locale; update(event.target.value ? { ...config, locale: event.target.value } : config); }} /><p className="wf-caption">Source is fixed to input#/0. Other bindings are not available yet.</p></> : current.type === 'output.clipboard' ? runApi ? <div><h3>Clipboard approval required</h3><p className="lc-muted">Text is fixed to input#/0. Run the saved version to review and approve copying. Paste is off; clipboard history is excluded. A declaration grants no permission.</p></div> : <UnavailableState title="Clipboard execution unavailable" description="Text is fixed to input#/0. Paste is off; clipboard history is excluded. The clipboard.write declaration does not grant permission or copy anything." /> : <UnavailableState title="Node configuration unavailable" description="This node is not in the current editing palette." />}
           <div className="wf-actions"><Button variant="danger" disabled={locked} onClick={() => { controller.remove(current.id); requestAnimationFrame(() => nameRef.current?.focus()); }}>Delete node</Button></div>
         </div> : <p className="lc-muted">Select a node on the canvas or in the structured list to configure it.</p>}</aside>
       </div>

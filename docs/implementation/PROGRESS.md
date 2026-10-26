@@ -1,62 +1,108 @@
 # Coordinator checkpoint
 
-Updated 27 October 2026. **Goal ACTIVE** (resumed and confirmed by controller on27October2026). Objective remains to complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Read `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md` before continuing. An increment does not complete the goal.
+Updated27October2026. **Goal ACTIVE**, confirmed by controller. Complete all97
+agreed local1.0 tasks through R1-03/all release gates. Read the objective at
+`/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
+An increment is not goal completion.
 
-## User constraints
+## Constraints
 
-- **All subagents: GPT-6.1 SOL / high reasoning.** Reuse only the existing SOL agents below. Never reactivate older Astra agents. A new agent requires explicit model `gpt-6.1-sol`, effort `high`, fork `none` and a full bounded assignment.
-- Merge small reviewed/tested application increments promptly. Record unfinished UI, desktop and release acceptance. No infrastructure/research/proof work for manifest_review; no task-choice questions.
-- User approved unfinished increments, preserving complete scope, security, dependencies, requested GitHub reviews and release gates. No physical-input/device authorization. Only owned private Xvfb displays for current application checks.
-- Preserve normal 1Password Git signing. It is unlocked and works; poll a live signing handle before assuming failure.
+- **All subagents GPT-6.1 SOL/high.** Reuse only existing SOL agents. No Astra.
+- Small reviewed/tested application increments, prompt normal merges; explicitly
+  unfinished acceptance. No infrastructure/research/proof work for manifest_review.
+- Full scope/security/dependencies/native and release gates unchanged. User
+  authorized unfinished application increments; no task-choice questions.
+- Normal 1Password signing unlocked/working. No signing downgrade. No physical
+  input/device authorization. Actual app checks use only owned private Xvfb.
 
-## Integrated state
+## Integrated base
 
-Primary `/home/ian/Projects/ianwijma/linuxcast` is clean develop **c8be683c1825640cfd8dccb63d7b8af9dad5faf3**, merged [PR42](https://github.com/ianwijma/linuxcast/pull/42) at26October16:43:56UTC. Reviewed headfcbc50f1bf4fb68e138136b9297b1a03667df55b; CI40361723068 passed11s. No requested GitHub reviews/submissions/comments/threads; normal exact-head merge. Frozen install and production build passed.
+Primary clean develop c8be683c1825640cfd8dccb63d7b8af9dad5faf3,
+[PR42](https://github.com/ianwijma/linuxcast/pull/42) workflow draft editor merged
+26October16:43:56UTC. Prior [PR41](https://github.com/ianwijma/linuxcast/pull/41)
+cc837ab saved web searches merged16:03:05UTC. Both reviewed/tested, CI passed,
+normal exact-head merges and primary frozen installs/production builds passed.
+Prior application increments and remaining scope are recorded in registry/Git.
 
-Prior [PR41](https://github.com/ianwijma/linuxcast/pull/41) mergedcc837ab at26October16:03:05UTC. Saved web searches now collect a transient query, review the exact encoded target and explicitly Open through GIO; no query/expanded target persistence. Exact independently reviewed head81cfe5a54cc3c982b8da84e0d99da3515ee6bba5, CI40355190474 passed13s. No requested GitHub reviewers/submissions/comments/threads; normal exact-head merge. Frozen install and production build63rendererassets passed. PR40 literal Quicklinks and prior application increments remain integrated; history is in registry/cards/READMEs/Git.
+## Current increment: actual saved text workflow run
 
-## Current bounded increment: W1-01 / W2-01 workflow draft editor
+Coordinator `.worktrees/linuxcast-application-controls`, **codex/workflow-text-run**
+fromc8be683. Freeze d9f6a09/4300656; exact-run Cancel fix1e96fe2. Engine e900235
+(author signed e7b1c7f); UI c3d53f9 (author signed a1e38dc), both integrated.
+Root worker/broker/journal/storage/build/preload/canvas integration and evidence
+ready for signed commit/PR/CI/final exact-head independent reconciliation.
 
-Coordinator `.worktrees/linuxcast-application-controls`, branch **codex/workflow-text-run** fromc8be683. This includes the signed administrative checkpoint f75c70a and next frozen text-run application interface. Previous goal turn was verified progress (PR41/42 merged and production builds passed). Frozen interface/ownership in `packages/workflows/EDITOR-INCREMENT.md`. Root owns shared registry/contracts/manifests/migrations, named sandbox workspace, launcher/build/preload/SQLite integration and registry status.
+Before: valid workflow could be saved; Run visibly unavailable. After: Run saved
+workflow→input→dedicated fixed Keyword/Transform/Copy worker→exact main broker
+approval→real clipboard/read receipt→status/plain result. Main fresh-loads saved
+revision/hash/identity; renderer cannot supply principal/grants/operation/text for
+copy. Last explicitly saved version runs; newer draft excluded visibly.
+Back/reopen retains run and pending approval; no mount/navigation/restart replay.
+Native Close/Quit cancels before final editor flush. Unknown requires review.
 
-Commits: freeze91a0f7e; shared exports/dependencies3a5504b; pure model89f6ee3(author dd5dc01); close callback886f556; UI07ff408(author5d289d1); sealed-Form handle fixbc251e8(author67396c1). Root application integration/tests/evidence/docs signedfcbc50f; exact-SHA independent source/evidence reconciliation clean, all checks passed and PR42 merged.
+Sole owner migration009 stores metadata only, no input/output/labels/raw errors/
+credentials/grants. Durable prepared/dispatched before native write; completion
+only after exact receipt/step ack. Recovery combines existing unknown/completed
+Copy evidence and dispatched steps, marks interrupted and never replays. Bounds
+30days/10kruns/10kactivations; startup prunes expired terminal metadata.
 
-Application behavior: registered Workflow draft opens a separate sandboxed workspace. One local draft, three typed nodes (Keyword/Transform text/Copy text), categorized searchable palette, controlled React Flow canvas plus equivalent structured keyboard editing/connect/delete, graph/layout undo/redo. Serialized500ms draft autosave with exact CAS receipts, explicit Save/Revert, dirty Reload/discard confirmation, unknown/conflict gates and final close flush. Invalid graphs can persist as drafts but cannot replace a saved valid version. Run is visibly unavailable; no execution/grant authority is exposed.
+Independent review resolved cancellation identity, crash aggregate/idle retention,
+urgent node-timeout→parent invocation cancellation, per-activation unknown after
+an earlier completed Copy, saved enabled/reachable node identity and receipt
+verification. Finishing/settled fences prevent new Start before terminal journal
+and make scoped reset wait for cancellation. Parent terminates worker only after
+final result acceptance; denial is explicitly permission-denied.
 
-Sole-owner migration008 stores draft and saved snapshot, no inputs/history/credentials/grants. Consistent version7→8 recovery snapshot preserves Quicklinks. Static graph validation handles cycle/dangling/type/global/subgraph16/single-entry constraints. Public snapshots/envelopes are detached and deeply frozen; getters/prototypes/oversized/deep JSON and both kind-tagged and actual sealed Form handles are rejected. These models are not an executor or run journal.
+PASS Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4 Linuxamd64:
+37 engine units,6 contracts,5 run IPC/preload security,29 run controller units,
+14 Chromium keyboard/axe cases;16 W1-03 integration (5 owner journal,10 controlled
+transport/backend using real engine+validating client+owner,1 actual production
+Electron6.72s). Actual isolated private Xvfb verifies registered launcher→editor
+create/connect/save→Run/input→deny/persistent deny/reset/once/persistent exact
+clipboard/read receipt, Back/reopen, native Close cancel, full restart and abrupt
+main crash interrupted/no replay. Child PID/minimal env and renderer isolation
+checked. Two actual dark/light full-page captures plus11 component captures
+inspected;200%/IME/heldEnter/bounded/unknown states covered by component checks.
+Evidence `apps/desktop/evidence/workflow-run-application.md` and journal README.
 
-Review fixes resolved: deferred Close revalidates exact sender/frame; Revert requires returned draft to equal saved snapshot or new empty draft; Quit performs editor close/flush preflight BEFORE5s resource teardown, false cancels Quit and releases launcher latch. Close acknowledgement uses exact owner+nonce and boolean callback; success waits for closed event. No human-response timeout can silently destroy an editable draft. Independent SOL/high source/domain/UI/200% visual review is clean throughbc251e8; final source/evidence/visual audit clean atfcbc50f.
+PASS43 F2storage,24 editor/Quit units,15 editor/preload security,8 existing editor
+integration including production Close/restart/Quit4.78s. Full typecheck/lint/plan/
+diff pass. Actual/component checks are not native Wayland/GNOME/KDE/AT acceptance.
+W1-02/W1-03/W2-03 remain in-progress; privacy passed only, all wider criteria pending.
 
-Validation (Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4, Linux amd64):
+## Agents / next action
 
-- PASS50 W1 units +21 graph contracts;24 W2 units (22 controller+2 Quit-preflight),5 editor contracts,15 main/preload security,13 integrated Chromium keyboard/axe cases. Nine component dark/light/empty/error/invalid-connection/200%-text captures inspected.
-- PASS8 actual W2 integration:7 owner/client +1 production Electron flow4.29s on owned private Xvfb X11/private XDG/profile. Registered launcher→editor→add/connect/save; immediate edit→native Close flush; reopen/restart preserves recovered draft and prior saved version; final immediate edit→application Quit flush before resource timer. Aggregate export excludes workflow names/content. Two production dark/light captures inspected; axe passes. No editor/storage/execution/native-choice mock. Smoke observations are not performance/native-session acceptance.
-- PASS43 F2storage,14 F1units,53 F1security,71 launcher/main/preload regressions;29 Quicklinks integration including actual5.43s flow. Full typecheck/lint/plan/diff pass.
-- Actual F1 shell regression passed9.40s after updating the fixture for the ninth registered root command. Native launch/actions, URL handoff, command metadata, clear/export, reopen/restart and safe Quit remain covered. Retain affected root captures only; restore unrelated generated screenshot churn.
+- `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branch
+  codex/w2-03-text-run-ui, clean signed a1e38dc; source/evidence integrated c3d53f9.
+  Current bounded application UI finish achieved; no infrastructure/proof/research.
+- `file_search_service_sol`: `.worktrees/linuxcast-l1-02-native`, branch
+  codex/w1-02-text-engine, clean signed e7b1c7f; integrated e900235. Domain and
+  root integration reviews clean through finishing/settled/denial/lifetime delta.
+- `alias_review_sol`: read-only reviewer; engine and metadata findings closed;
+  signed UI c3d53f9 exactly reconciled to reviewed a1e38dc/all11 captures, canvas
+  embed/Back focus clean. Final root SHA/evidence reconciliation still needed.
 
-W1-01/W2-01 remain **in-progress**; AC01/AC02/UI remain pending, privacy passed with explicit public fixture evidence. W1 prerequisites F0-01/F2-01 accepted. W2 uses current shared UI under user-approved unfinished increments; full prerequisite/native/session/AT/release acceptance remains mandatory. Initial scope is one draft/three nodes, not a reduced 1.0.
+Next: sign/push focused actual text-run PR, attach it, inspect configured/requested
+GitHub reviews/bots and CI for current head, normal exact-head merge promptly.
+Refresh primary frozen install/build and record merge. Then select the next
+concrete application flow (saved workflow Keyword registration/search/action from
+existing launcher, or bounded W2-02 editing gaps needed by that flow), read its
+cards/norms/freeze shared interface, and dispatch only SOL/high disjoint product
+work. Do not give manifest_review infrastructure/research/proof expansion.
 
-## Agents
+## Complete scope / runtime
 
-All existing **GPT-6.1 SOL/high**, no older agents:
+Registry8done/18in-progress/71planned;56passed/325pending/8not-applicable. Registry
+is authoritative; generated cards never hand edited. Full task/node families,
+settings/groups/packages/ten examples/debugger/history and all remaining1.0 scope
+remain required, including R1-01/R1-02/R1-03. F2credential setup/status/provider/
+package/nativeAT acceptance remains; launcher/providers/history/full native typed
+flows and file/calculator/Quicklinks full families also remain. No MVP downgrade.
 
-- `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branchcodex/w2-01-workflow-draft-ui, clean signed5d289d1. Actual application UI done; no more infrastructure/research/proof work.
-- `file_search_service_sol`: `.worktrees/linuxcast-l1-02-native`, branchcodex/w1-01-workflow-graph, clean signed67396c1 atopdd5dc01. Both integrated.
-- `alias_review_sol`: read-only bounded source/evidence reviewer. All four actionable findings above resolved; exact final coordinator-SHA/evidence review still needed.
-
-Goal resumed and controller ACTIVE. Current selected application flow is W1-02/W1-03/W2-03 actual saved text execution: Keyword/Transform through a dedicated trusted utility process, explicit broker clipboard approval, result/status UI, sole-owner metadata checkpoints and no replay. Frozen interface packages/workflows/TEXT-RUN-INCREMENT.md. Coordinator codex/workflow-text-run includes checkpoint f75c70a from prior merge. No new implementation evidence beyond interface tests yet; delegate disjoint engine/** and debugger/** work only after signing freeze. Root owns worker/broker/journal/IPC/build/storage integration. Full prerequisite/task/native/AT/release acceptance stays pending; no infrastructure/proof expansion for UI author.
-
-
-## Complete scope
-
-Registry **8done/18in-progress/71planned;53passed/328pending/8not-applicable**. Cards are generated from tasks.json. Run render_tasks/validate_plan/plan_status after registry changes. Never infer acceptance from documentation or an increment.
-
-F2-02 credential/data core + Local data clear/export are integrated; credential setup/status/diagnostics, provider/package/nativeAT/release acceptance remain. L1 shell/registered commands/pins/aliases/visibility/applications/DesktopActions are increments; providers/fallback/permission administration/history/full typed launch/session acceptance remain. File metadata index/search/filter/sort/navigation and Copy path are increments; MIME/recent/extractors, multi-file buffer/full typed actions/preview/cache remain. Calculator arithmetic/92units/colours are increments; calendar/timezones/DST/rates/cache remain. Quicklinks full contexts/cursor/snippets/other component builders/arguments/browser/open-with/file targets/tags/export remain. Workflows full palette/multiple workflows/packages/bindings/settings/notes/copy-paste/execution/debugger/ten examples remain. All other task-card scope and R1-01/R1-02/R1-03 remain required.
-
-## Runtime / retained limits
-
-Pinned PATH `/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH`; BUN_TMPDIR=/tmp. Node24.22.1/Bun1.4.4/Rust1.95. Normal escalation is needed for Git metadata/sign/push, Bun temporary/network/socket work and actual isolated apps; storage abstract Unix sockets fail in the ordinary sandbox. Do not label that as a source regression or change ownership architecture.
-
-Mapped runner accepts ONE task ID and validates all mapped file paths. Targeted tests: `LINUXCAST_TEST_FILES='["path"]' node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts`. Actual app: `LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- W2-01`. Serialize actual tests sharing dist. No --no-sandbox/user display.
-
-Historical native lab remains private; no new VM/device/proof work scheduled. Last recorded container stopped24October11:36UTC. S0-01 resident-close/nativeAT and Debian GNOME/KDE Wayland/X11 gates remain outstanding. Private Xvfb/Chromium is not evidence for those gates. Skill-library gateway/frontend-design and React checklist were read/applied within canonical DESIGN/tokens; no new external dependency added.
+PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp. Normal escalation for Git metadata/
+signing/network and actual isolated apps/local storage sockets. Abstract sockets
+fail EPERM in the ordinary sandbox; don't call it a regression/change ownership.
+Mapped runner takes ONE task ID and validates every path. Targeted checks use
+LINUXCAST_TEST_FILES JSON + vitest config. Serialize actual tests sharing dist.
+No --no-sandbox/user display. Historical native lab remains stopped/private;
+no new device/VM/proof work scheduled. No live test handles after final checks.
