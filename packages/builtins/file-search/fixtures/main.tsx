@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Button,ThemeProvider } from '@linuxcast/ui';
-import { fileSearchMatchesOptions } from '@linuxcast/contracts';
+import { fileSearchMatchesOptions,fileSearchMatchesDirectory } from '@linuxcast/contracts';
 import type { FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult } from '@linuxcast/contracts';
 import '@linuxcast/ui/styles.css';
 import { FileSearch } from '../src/index.tsx';
@@ -24,7 +24,7 @@ function Fixture(){
       pauseIndex:async id=>{setRequested(`Requested pause for ${id}.`);state.roots.find(value=>value.id===id)!.activity='paused';publish();return {ok:true,value:{outcome:'completed'}};},
       removeFolder:async id=>{setRequested(`Requested metadata removal for ${id}.`);if(mode==='remove-cancelled')return {ok:true,value:{outcome:'cancelled'}};state.roots=state.roots.filter(value=>value.id!==id);publish();return {ok:true,value:{outcome:'completed'}};},
       search:async request=>{
-        setRequested(`Requested local search: ${request.query}.${request.options?' Options: '+JSON.stringify(request.options):''}`);
+        setRequested(`Requested local search: ${request.query}.${request.options?' Options: '+JSON.stringify(request.options):''}${request.directory!==undefined?' Directory: '+JSON.stringify(request.directory):''}`);
         if(mode==='search-error')throw new Error('synthetic private detail');if(mode==='search-loading')await new Promise(resolve=>setTimeout(resolve,600));
         const available=state.roots.some(value=>value.generation===generation);
         const paths=mode==='no-matches'?[]:['projects/public-notes.txt','reports/public-notes-summary.txt'];
@@ -33,14 +33,17 @@ function Fixture(){
           ['projects/public-notes.txt','file',120,'2026-10-25'],['reports/public-notes-summary.txt','file',240,'2026-10-26'],['archive/public-folder','directory',0,'2026-10-25'],
           ['archive/public-older.txt','file',1000,'2026-10-24'],['archive/public-latest.txt','file',10,'2026-10-27'],['archive/public-tie.txt','file',240,'2026-10-26'],
         ].map(([path,kind,size,date])=>({id:`${rootId}:${path}`,rootId,generation,path:String(path),kind:kind as 'file'|'directory',size:Number(size),modifiedMs:Date.parse(`${date}T00:00:00Z`)}));
+        if(mode==='navigation'||mode==='navigation-copy-pending')metadata=[
+          ['projects','directory'],['projects/sub','directory'],['projects/empty','directory'],['projects/report.txt','file'],['projects/sub/deep.txt','file'],['root-public.txt','file'],['reports','directory'],
+        ].map(([path,kind],index)=>({id:`${rootId}:${path}`,rootId,generation,path:path!,kind:kind as 'file'|'directory',size:100+index,modifiedMs:1792886400000}));
         // Synthetic API-side metadata query: apply to the complete public fixture
         // before its100-row bound. The actual owner performs this in SQLite.
-        const matches=metadata.filter(row=>row.path.includes(request.query)&&fileSearchMatchesOptions(row,request.options));
+        const matches=metadata.filter(row=>row.path.includes(request.query)&&fileSearchMatchesOptions(row,request.options)&&fileSearchMatchesDirectory(row,request.directory));
         const compare=(a:string,b:string)=>a<b?-1:a>b?1:0;
         matches.sort((a,b)=>(request.options?.sort==='name'?compare(a.path,b.path):request.options?.sort==='modified-desc'?b.modifiedMs-a.modifiedMs:request.options?.sort==='size-desc'?b.size-a.size:0)||compare(a.id,b.id));
-        return {ok:true,value:{query:request.query,rootId:request.rootId??null,...(request.options?{options:request.options}:{}),results:available?matches.slice(0,100):[]}};
+        return {ok:true,value:{query:request.query,rootId:request.rootId??null,...(request.options?{options:request.options}:{}),...(request.directory!==undefined?{directory:request.directory}:{}),results:available?matches.slice(0,100):[]}};
       },
-      copyPath:async selection=>{setCopyObserved(`Requested Copy path for ${selection.resultId}.`);if(mode==='copy-pending')await new Promise(resolve=>setTimeout(resolve,700));return {ok:true,value:{...selection,outcome:'copied',path:root.displayPath+'/'+selection.resultId.slice(rootId.length+1)}};},
+      copyPath:async selection=>{setCopyObserved(`Requested Copy path for ${selection.resultId}.`);if(mode==='copy-pending'||mode==='navigation-copy-pending')await new Promise(resolve=>setTimeout(resolve,700));return {ok:true,value:{...selection,outcome:'copied',path:root.displayPath+'/'+selection.resultId.slice(rootId.length+1)}};},
       close:async()=>{setRequested('Requested Close file search.');return {ok:true,value:{outcome:'completed'}};},
     };
     return {api,clear:()=>{for(const value of state.roots){value.activity='paused';value.state='idle';value.generation=null;value.progress=null;}publish();}};

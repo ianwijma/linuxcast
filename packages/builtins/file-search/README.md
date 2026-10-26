@@ -17,10 +17,10 @@ folder affects derived index metadata; original files remain. A cancelled
 removal is respected. There is no optimistic indexed/saved success toast.
 
 Search folder enters a scoped **Search files** list. **Search all folders** uses
-the same list with no root ID. An empty query shows instructions rather than
-invented recent files. Queries debounce for 150 ms and are bounded to 512 UTF-8
+the same list with no root ID. Outside explicit folder browsing, an empty query
+shows instructions rather than invented recent files. Queries debounce for 150 ms and are bounded to 512 UTF-8
 bytes before reaching the local main/SQLite search API. No remote requests or
-query logging are added. Replies must match the current query/scope/options and contain
+query logging are added. Replies must match the current query/scope/options/directory and contain
 only current root generations; malformed, stale, hidden or disposed completions
 cannot publish. A newer query cancels prior presentation work even though the
 underlying API has no request-cancellation method.
@@ -59,6 +59,40 @@ feature adds no CSS; `fixtures/preview.css` only lays out the labelled fixture.
 Newly entered list views focus their query once, without focus changes on ordinary
 snapshot revisions.
 
+## Indexed folder navigation
+
+Directory results make **Browse folder** primary, with Show details and Copy path
+as separate actions. File results retain Show details as primary. Browsing uses
+only current indexed metadata; it never opens, resolves, reads or grants access
+to an original directory. A scoped Results list also offers **Browse root folder**
+to query the selected root's top-level indexed children explicitly.
+
+Browse replaces the current Results scope in place, clears its query and keeps
+applied filters/sort. It sends the selected root ID and indexed relative directory;
+an empty directory means that root's direct children. Empty queries send a search
+only in this explicit browsing mode. Text searches within a browsed folder match
+its direct children, with the same owner-side filters/order before the100-row
+limit. The root/folder scope remains visible with empty-result remediation and
+paused/unavailable/copy-warning status. Missing metadata does not prove that an
+original directory is empty or exists.
+
+**Parent folder** moves one indexed path component up, clears the query and keeps
+options. It selects the directory just left if that row is returned. At the root
+it is disabled. **Return to search scope** restores the root/all-folders scope,
+query and selected ID captured by the first Browse. It keeps the currently
+applied options; a missing or newly filtered-out ID uses the owner's first
+remaining result, if any. An originally empty search returns to instructions without fake
+recent files. Starting a new Results scope resets navigation; no history is
+persisted.
+
+Browsing adds no frames. Escape/Back still returns Form/Details → Results →
+Folders; it does not act as Parent. Filter Apply/Reset retain the directory.
+Every navigation fences prior query/copy presentation. Replies must echo the
+exact directory, including the distinction between omitted and empty, and every
+row must be an immediate child in the current root generation. Late same-query
+responses from another folder cannot publish or carry copy success. Index clear
+and root removal preserve the existing freshness/paused/error behavior.
+
 ## Metadata filters and deterministic sort
 
 Results offers **Filter and sort**, a read-only shared Form. It is unavailable
@@ -79,7 +113,7 @@ snapshots the options, invalidates pending copy presentation with its existing
 warning, fences prior search generations, pops the Form and immediately requeries
 the same text/root. Reset filters and sort preserves query/root and sends the
 default omitted-options request; it is disabled when already at defaults. Empty
-queries remain instructional and send no search. New Results scopes reset these
+queries remain instructional outside explicit directory browsing. New Results scopes reset these
 ephemeral options; no filter/date/query history is persisted.
 
 The API passes closed sort names, optional kind and inclusive/exclusive UTC bounds
@@ -99,35 +133,34 @@ checks cover a larger matching dataset and the packaged application separately.
 
 ## Development evidence and limits
 
-- `tests/controller.test.ts`: 44 focused checks for native-selection outcomes,
+- `tests/controller.test.ts`: 55 focused checks for native-selection outcomes,
   request guards, authoritative state, query limits/generations, stable selection,
   readonly details, index clear, appearance, disposal and explicit recovery.
 - `tests/options.test.ts`: 31 strict UTC/calendar/draft/summary checks, also passing
   under UTC and America/New_York host timezones.
-- `tests/file-search.ui.test.ts`: 19 passing Chromium keyboard/axe checks for dark/light
+- `tests/file-search.ui.test.ts`: 25 passing Chromium keyboard/axe checks for dark/light
   Folders, Results and Details, native chooser cancellation, empty/indexing,
   pending/unknown/unavailable/error states, index clear and cancelled removal.
-- `evidence/`: 17 component screenshots from the explicitly labelled request-observing
+- `evidence/`: 21 component screenshots from the explicitly labelled request-observing
   component fixture. Representative dark Folders/Details/unknown and light Results
   were visually inspected. Fixture paths/names are public generated metadata;
   no user files, content or credentials enter screenshots or diagnostics. New dark
   Form/range-error and light filtered-results screenshots were visually inspected.
+  All four new dark/light indexed-folder/empty-folder screenshots were inspected.
 - Verified development runtime: Node 24.22.1 and Bun 1.4.4. Typecheck and lint
   pass. Browser checks require a local fixture server and real Chromium processes.
   These are component checks, not native chooser/indexing or desktop proof.
 
-After coordinator shared-renderer fix `d04566f`, all19 File search browser cases
-and10 Copy path browser regressions pass. Nonempty extension queries now preserve
-the supplied empty-result description, including the applied filter/sort summary.
-The retained regression verifies the summary after index clear and unsent-Form
-cancellation, alongside paused-state remediation. All75 controller/options checks,
-typecheck, scoped lint, plan and diff checks also pass. These remain component
-checks; actual SQLite ordering/filtering and native clipboard evidence belong to
-the coordinator's integration checks.
+All86 controller/options checks and25 File search browser checks pass, preserving
+the prior44 controller/19 browser cases and adding directory navigation, exact
+scope/stale replies, direct-child search/copy, Parent/Return, options/depth and
+empty-folder coverage. Typecheck, scoped lint, plan and diff checks pass. The
+fixtures are labelled request observers over public metadata; actual SQLite and
+packaged native clipboard/navigation evidence remain coordinator-owned.
 
 This increment contributes bounded UI/privacy evidence to L2-02; it does not
 complete the task's content-extraction acceptance criteria. MIME filters,
-path navigation, recent files, opt-in content extractors and remaining file
+recent files, opt-in content extractors and remaining file
 actions remain required future work. The coordinator owns actual service/main/
 preload integration and production Electron evidence. Debian GNOME/KDE Wayland/
 X11, native assistive technology and the full release matrix remain pending.
@@ -175,7 +208,7 @@ may have occurred; late replies cannot show success for a different result.
 Main's metadata identity confers no file-open/read authority. Copying uses the
 index location without asserting that the source exists. Actual copy/restart/
 clear evidence and full remaining scope are in ../universal-actions/README.md.
-The full L2-02 content/MIME/path-navigation/recent-file acceptance remains
+The full L2-02 content/MIME/recent-file acceptance remains
 unfinished alongside broader native/AT/package/release prerequisites.
 
 ## Integrated owner and application evidence (26 October 2026)
