@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Objective: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`. Read it before continuing. No scope reduction or intermediate completion claim.
+Updated 27 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Objective: `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`. Read it before continuing. No scope reduction or intermediate completion claim.
 
 ## User instructions and execution boundaries
 
@@ -11,13 +11,15 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary clean `develop` at **aac0a3db5d6643472d8d2f56671f9debbc0983d8** (PR36); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/calculator-colours**, sourcehead **fc32887**. No uncommitted implementation or live testprocess; all three SOLhigh agents completed.
+Primary clean `develop` at **493653aec052ead0ee50a1f4a71bbbc540f85b0d** (PR37). Frozen install unchanged and current productionbuild63assets pass. Coordinator `.worktrees/linuxcast-application-controls` atsame merge, abouttoswitchfromintegrated `codex/calculator-colours` to `codex/command-visibility`. No live test/authorprocess remains.
 
-L2-04 colour increment reviewed/tested and ready for focused PR/CI/normalmerge.594units/4contracts/45security/29browser/1actualproduction integration, fulltypecheck/lint pass. Real Electron/private-Xvfb/native xclip flow6.65s and fourapplication+sixcomponent dark/lightcolour/help/errorcaptures inspected; axe passes. Final source review clean. Full dates/DST/rates/nativeAT/session/package/release remainunfinished; L2-04inprogress.
+[PR37](https://github.com/ianwijma/linuxcast/pull/37) merged26October08:11:24UTC. Exact reviewed head35d12ca0c34df4b6c2c5015d402ad88f35cebc52, CI40290318465 passed; no requested reviews/comments/unresolved threads. Normal exact-head merge. Prior goal turn made verified implementation/test/merge progress; no blocker.
 
-This goal turn made verified colourimplementation/test progress after priorPR36navigationmerge. Registry8done/12inprogress/77planned;50passed/331pending/8NA. AC02/UI remainpending withpartialcolour evidence; AC01/privacy remainpassed withnewregressionevidence. BroaderL1-01dependency/nativegates stillunfinished underuserauthorizedincrements.
+Colour checks594units/4contracts/45security/29browser/1actualproduction flow6.65s pass; fulltypecheck/lint/plan/diff and inspected4application+6component shots; finalSOLhigh reviewclean. FullL2-04calendar/DST/rates/nativeAT/session/package/release remainsinprogress. Registry8done/12inprogress/77planned;50passed/331pending/8NA.
 
-Next: commit evidence, validateplan, push/open/attachcolourPR; exactheadCI/reviewrequest/comment/thread checks; normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete applicationincrement; noinfra/proof expansion for manifest. Full97task1.0goalactive.
+Next concrete application increment **L1-01 command visibility**: Hide a registered command from root search, persist via soleowner, restore via alwaysavailable global Manage commands action. Hide/Quit recovery commands remain visible and cannotbehidden; managementview explains why. Queries remainlocal; no backgroundexecution/history. Coordinator freezes narrowmetadata/API/repositoryschema/migration andowns main/preload/integration/status. Puresearchranking and sharedmanagementUI canbeassigneddisjointly toexistingSOLhigh agents afterfreeze. No newcontract/assignment exists yet.
+
+Read L1-01card andoverview/builtins/testingrelease refs plusmandatorysecurity/data/DESIGN/tokens beforebehaviorchanges. ExistingF2-01storageaccepted; broaderF1-02/D1-02/nativegatesunfinished underuserauthorizedincrements. Fullrootproviders/fallback/AI/ranking remainrequired. No research/proof/infra expansion for manifest.
 
 ## Current L2-04 colour integration
 
@@ -25,7 +27,7 @@ Frozen5069131+333e913 defines closedcolourkind/text/receipt and exactgrammarCOLO
 
 Explicit `<colour> to hex|rgb|hsl`, #RGB/A or6/8hex and closedrgb/rgba/hsl/hsla numeric/percentage/alpha grammar; encoded-sRGB, finite/range/hue/resourcebounds, sixfractioncanonicaloutput/nearestbytehex, alpha preservedwithoutcompositing. NoDOM/CSSparser/eval/dependency/I/O/network/persistence. Main recomputes beforeactualcopy; UIcomparestext+colour+unit andkeepspending/unknown/Back/Hide/noreplay guards. Existing sharedForm/Detail/Actions, helpfromFormonly, maxdepth3, drafts/focuspreserved.
 
-Actualflow writes8deliberatecopies total (5oldarithmetic/unit+3colour); no writeontyping/Evaluate/help/errors; separatexclip confirmsactualbytes; Hidefromcolourhelp/singleinstancereopen; realpostQuitownerexport aggregatecount8 andnoexpressions/results. Fullchecks594unit/4contracts/45security/29browser/1integration,type/lint/plan/diff. Fourapplication+sixcomponentshots inspected. NoPRyetatcheckpoint; fulltasknative/releaseunclaimed.
+Actualflow writes8deliberatecopies total (5oldarithmetic/unit+3colour); no writeontyping/Evaluate/help/errors; separatexclip confirmsactualbytes; Hidefromcolourhelp/singleinstancereopen; realpostQuitownerexport aggregatecount8 andnoexpressions/results. Fullchecks594unit/4contracts/45security/29browser/1integration,type/lint/plan/diff. Fourapplication+sixcomponentshots inspected. IntegratedPR37/493653a, currentprimarybuildpass; fulltasknative/releaseunclaimed.
 
 ReusablecompletedSOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-04-colour-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-04-colour-engine; readonlyalias_review_sol. Verifyclean/switchbase fornextboundedassignment. Never reactivateAstra.
 
@@ -83,6 +85,7 @@ Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/c
 |34|f55ae06|Selected indexed result Copy path|
 |35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
 |36|aac0a3d|Indexed folder Browse/Parent/root/Return|
+|37|493653a|Local sRGB HEX/RGB/HSL colour conversion and explicit Copy|
 
 PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
 
