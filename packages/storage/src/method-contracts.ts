@@ -1,3 +1,4 @@
+import { workflowEditorRecordSchema, workflowEditorWriteSchema } from '../../contracts/src/workflow-editor.ts';
 import { dataControlContracts } from '@linuxcast/platform-contracts/data-controls';
 import { secretReferenceContracts } from '@linuxcast/platform-contracts/secrets';
 import { fileIndexContracts } from '@linuxcast/file-index/contracts';
@@ -28,6 +29,8 @@ export const hiddenCommandIdsSchema = z.array(visibilityId).max(4102).refine(ids
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...quicklinkRepositoryContracts,
+  ['workflows.editor.get',{params:z.strictObject({}),result:workflowEditorRecordSchema.nullable()}],
+  ['workflows.editor.write',{params:workflowEditorWriteSchema,result:workflowEditorRecordSchema}],
   ...createAiRepositoryContracts(),
   ...permissionRepositoryContracts,
   ...fileIndexContracts,

@@ -24,8 +24,9 @@ export interface LauncherActions {
   contents(): WebContents | undefined;
   quitting(): boolean;
   hide(): void;
-  quit(): void;
+  quit(): void | Promise<boolean>;
   copyCalculatorResult?: (text:string) => Promise<'written'|'unsupported'|'busy'>;
+  openWorkflowEditor?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
@@ -71,6 +72,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic or convert units locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert'],enabled:true},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
+  if(actions.openWorkflowEditor)builtins.push({id:'linuxcast:open-workflow-editor',title:'Workflow draft',subtitle:'Build and save a local workflow draft',aliases:['workflow','workflows'],keywords:['graph','editor','automation','draft'],enabled:true});
   if(actions.quicklinks)builtins.push({id:'linuxcast:open-quicklinks',title:'Quicklinks',subtitle:'Create, find and open saved web links',aliases:['quicklinks','saved links'],keywords:['web','browser','bookmark','link'],enabled:!!actions.openUrl,...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})});
   const recordUse = async (id: string) => {
     // Usage failure must never replay an action or prevent recovery through Hide/Quit.
@@ -353,7 +355,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       if (command.id === 'linuxcast:quit') {
         quitDispatched = true;
         // A dispatch receipt, not a claim that service teardown completed.
-        setImmediate(() => { void recordUse(command.id).finally(() => actions.quit()); });
+        setImmediate(() => { void(async()=>{try{await recordUse(command.id);if(await actions.quit()===false)quitDispatched=false;}catch{quitDispatched=false;}})(); });
         return {ok:true,value:{outcome:'dispatched'}};
       }
       if (command.provider === 'applications') {
@@ -364,7 +366,8 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
         await recordUse(command.id);
         return {ok:true,value:{outcome}};
       }
-      if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
+      if(command.id==='linuxcast:open-workflow-editor')await actions.openWorkflowEditor!();
+      else if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
       else if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
       else actions.hide();
       await recordUse(command.id);

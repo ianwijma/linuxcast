@@ -67,6 +67,20 @@ node node_modules/eslint/bin/eslint.js apps/desktop/src/features/workflows/canva
 python3 scripts/validate_plan.py
 ```
 
+Coordinator integration now passes the mapped W2-01 suites: 24 units (22
+controller and two Quit-preflight), five contracts, 15 main/preload security,
+eight integration and 13 Chromium cases. The actual production Electron45 /
+SQLite3.53.4 flow uses private XDG/profile directories and an owned Xvfb X11
+display. It opens the registered editor, adds/connects/saves three nodes, flushes
+an immediate edit on native Close, reopens/restarts with recovered draft and
+prior saved version, then flushes another edit on application Quit. No storage,
+editor or execution mock is involved. Version7→8 recovery snapshots, stale CAS,
+invalid/oversized Save rollback and clear preservation pass. Aggregate export
+contains no workflow names/content. Two actual dark/light captures in
+`apps/desktop/evidence/workflow-editor-application-*-saved.png` were inspected;
+axe passes. These are process/persistence observations, not native-session or
+assistive-technology acceptance. Execution remains unavailable.
+
 Partial W2-01-AC01 evidence covers the bounded three-node non-drag path; partial
 AC02 covers inert layout and graph undo. UI/privacy evidence uses shared controls
 and public fixtures, with no content in diagnostics or execution calls. No whole

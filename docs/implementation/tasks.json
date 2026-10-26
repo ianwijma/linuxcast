@@ -1093,7 +1093,8 @@
       ],
       "evidence": [
         "Implementation started24October2026 against integrated reviewed contract baseline PR19 under the user-approved foundation sequencing decision. No task acceptance or completed dependent-feature claim; F0-01 final acceptance and this task’s checks remain required.",
-        "Application foundation24October2026 adds reviewed production implementation and bounded actual runtime evidence. Applicable design: tokens, shell/navigation, states/motion, accessibility and review gate. Native desktop matrix and full assistive-technology paths remain outstanding; task stays in-progress despite passing individual checks."
+        "Application foundation24October2026 adds reviewed production implementation and bounded actual runtime evidence. Applicable design: tokens, shell/navigation, states/motion, accessibility and review gate. Native desktop matrix and full assistive-technology paths remain outstanding; task stays in-progress despite passing individual checks.",
+        "Workflow draft integration adds a close/flush preflight before bounded resource teardown. Failed/cancelled preflight leaves the resident app and editable draft alive; overlapping requests coalesce, exact owner/frame/attempt nonce gates acknowledgements, and cancelled launcher Quit releases its dispatch latch. Held-response and failing-preflight units, launcher retry regression, 14 F1 units, 53 F1 security and 71 launcher/main/preload checks pass. Actual workflow native Close and Quit flush before restart; complete desktop/session/AT release acceptance remains pending."
       ],
       "owner": "Assigned application implementation lane; coordinator owns shared integration",
       "branch": "codex/application-foundation",
@@ -4309,10 +4310,17 @@
         {
           "id": "W1-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- W1-01; bun run test:contracts -- W1-01; independent source review",
+              "outcome": "50 static graph/run tests and 21 shared graph contract cases pass. Descriptor-first copying rejects getters, custom prototypes, cycles, oversized/deep JSON and both synthetic kind-tagged and actual sealed-Form secret-handle shapes. Fixtures use public synthetic data and fixed safe errors; no secrets, input content or grant authority are exposed.",
+              "platform": "Linux amd64 host, pinned Node 24.22.1/Bun 1.4.4, Electron 45, SQLite 3.53.4; production runs use owned private Xvfb X11 and private XDG/profile directories. This is not supported desktop-session or native assistive-technology acceptance.",
+              "reference": "89f6ee3 (author dd5dc01), bc251e8 (author 67396c1); packages/workflows/src/{graph,run}/tests/"
+            }
+          ]
         }
       ],
       "validation": [
@@ -4320,12 +4328,13 @@
         "bun run test:contracts -- W1-01"
       ],
       "evidence": [
-        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory."
+        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory.",
+        "Reviewed static application model: 89f6ee3 (author dd5dc01) validates schema/registry configuration, ordinary cycles, dangling ports, typed edges, global limits and acyclic single-entry subgraph call depth <=16. Public run snapshots and branch envelopes are detached and deeply frozen; edits cannot change captured configuration/grants. bc251e8 (author 67396c1) resolves actual sealed-Form handle rejection. 50 unit and 21 contract checks pass. This is partial AC01/AC02 evidence; no executor, scheduler, broker or run journal is implemented or claimed."
       ],
       "owner": "file_search_service_sol",
       "branch": "codex/workflow-draft-editor",
       "limitations": [
-        "Initial increment is limited to one recoverable local draft and three editable node types. Execution is unavailable and must be explicit; multiple workflows, full registry/palette/bindings/settings, execution/debugger/packages and native/session/AT/release acceptance remain mandatory. No task or criterion completion is claimed."
+        "This bounded increment supports one recoverable local draft and three editable node types. Run is visibly unavailable. Multiple workflows, the full node registry/palette/bindings/settings, execution/debugger/packages, all ten examples and native/session/AT/release acceptance remain mandatory. The task and other acceptance criteria stay in-progress/pending."
       ]
     },
     {
@@ -4549,10 +4558,17 @@
         {
           "id": "W2-01-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "Mapped W2-01 unit/contracts/security/integration/UI checks; production export assertions and screenshot review",
+              "outcome": "Public synthetic workflow names/configuration only. No execution, generic IPC, filesystem path, secret or permission-grant API reaches the editor. Real owner preserves draft/saved snapshots across clear/restart; aggregate usage export omits workflow names/content. Nine component and two production dark/light captures inspected.",
+              "platform": "Linux amd64 host, pinned Node 24.22.1/Bun 1.4.4, Electron 45, SQLite 3.53.4; production runs use owned private Xvfb X11 and private XDG/profile directories. This is not supported desktop-session or native assistive-technology acceptance.",
+              "reference": "07ff408 (author 5d289d1); apps/desktop/src/features/workflows/canvas/{README.md,tests/,evidence/}; apps/desktop/tests/workflow-editor.integration.test.ts; apps/desktop/evidence/workflow-editor-application-{dark,light}-saved.png"
+            }
+          ]
         }
       ],
       "validation": [
@@ -4560,12 +4576,15 @@
         "bun run test:ui -- W2-01"
       ],
       "evidence": [
-        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory."
+        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory.",
+        "Reviewed application UI 07ff408 (author 5d289d1) adds a real controlled React Flow canvas and equivalent keyboard node/configuration/connection/delete controls, searchable categorized palette, graph/layout undo/redo, serialized 500ms draft autosave, exact CAS receipts, Save/Revert, dirty Reload/discard confirmation and close flushing. Same application registry/validator as owner; no simulated execution. 22 controller +2 Quit-preflight units, 5 contract, 15 main/preload security and 13 integrated Chromium keyboard/axe cases pass. Nine component dark/light/empty/error/invalid-connection/200%-text captures inspected. Full UI/native AT criteria remain pending.",
+        "Actual production W2-01 integration passes 8 checks: 7 real owner/client cases and one Electron application flow (4.29s smoke observation). Registered launcher opens the separate sandboxed workflow editor; user adds Keyword/Transform/Copy nodes, connects and explicitly saves a valid graph. Native window Close flushes an edit before autosave; reopen/restart preserves newer draft and previous saved version. Application Quit also flushes the final new edit before timed teardown. Real version7→8 migration snapshot preserves prior Quicklinks; stale CAS, invalid/oversized Save rollback, clear retention and exact mismatched acknowledgements pass. Two actual dark/light captures and axe inspected clean. No native choices, storage, editor or execution are mocked; private Xvfb is not GNOME/KDE/Wayland/native AT acceptance.",
+        "Final regressions: 43 sole-owner/credential/data-control storage, 14 F1 shell units, 53 F1 security, 71 launcher/main/preload and 29 Quicklinks integration checks pass. Actual production shell flow passed9.40s and Quicklinks5.43s; updated the shell fixture for the ninth registered command. Two affected root launcher dark/light captures inspected in addition to the two editor captures. Full typecheck/lint/plan/diff pass. Independent GPT-6.1 SOL/high review closed deferred-frame Close, preflight/latch, Revert-relationship and sealed-Form-handle findings. No new foundational scope or completed-task claim."
       ],
       "owner": "manifest_review_sol",
       "branch": "codex/workflow-draft-editor",
       "limitations": [
-        "Initial increment is limited to one recoverable local draft and three editable node types. Execution is unavailable and must be explicit; multiple workflows, full registry/palette/bindings/settings, execution/debugger/packages and native/session/AT/release acceptance remain mandatory. No task or criterion completion is claimed."
+        "This bounded increment supports one recoverable local draft and three editable node types. Run is visibly unavailable. Multiple workflows, the full node registry/palette/bindings/settings, execution/debugger/packages, all ten examples and native/session/AT/release acceptance remain mandatory. The task and other acceptance criteria stay in-progress/pending."
       ]
     },
     {

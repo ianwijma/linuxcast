@@ -4,6 +4,7 @@ import { extname, isAbsolute, relative, resolve } from 'node:path';
 export const APP_SCHEME = 'linuxcast-app';
 export const APP_ORIGIN = `${APP_SCHEME}://shell/`;
 export const FILE_SEARCH_URL = `${APP_ORIGIN}file-search.html`;
+export const WORKFLOW_EDITOR_URL = `${APP_ORIGIN}workflow-editor.html`;
 export const DATA_SETTINGS_URL = `${APP_ORIGIN}data-settings.html`;
 export const APP_URL = `${APP_ORIGIN}index.html`;
 export const CONTENT_SECURITY_POLICY = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; worker-src 'none'; frame-ancestors 'none'";
@@ -17,7 +18,7 @@ export function parseAssetManifest(value: unknown): ReadonlySet<string> {
   if (!Array.isArray(value) || value.length > 4096 || !value.includes('index.html') ||
       value.some(name => typeof name !== 'string' || name.length > 256 ||
         !/^[A-Za-z0-9_./-]+$/.test(name) || name.split('/').some(part => !part || part === '.' || part === '..') ||
-        !Object.hasOwn(mime, extname(name)) || (extname(name) === '.html' && !['index.html','data-settings.html','file-search.html'].includes(name))) ||
+        !Object.hasOwn(mime, extname(name)) || (extname(name) === '.html' && !['index.html','data-settings.html','file-search.html','workflow-editor.html'].includes(name))) ||
       new Set(value).size !== value.length)
     throw new Error('Invalid packaged resource manifest.');
   return new Set(value as string[]);
