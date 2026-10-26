@@ -63,6 +63,7 @@ let input='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>input+
   if(mode==='fixture:too-many'){const start=q.afterId?Number(q.afterId.slice(1,5))+1:0;const entries=Array.from({length:100},(_,i)=>app('x'+String(start+i).padStart(4,'0')+'.desktop'));return send({applications:entries,nextCursor:entries.at(-1).desktopId});}
   return send(q.afterId?{applications:[app('c.desktop')],nextCursor:null}:{applications:[app('a.desktop'),app('b.desktop')],nextCursor:'b.desktop'});
  }
+ if(q.operation==='launch-action')fs.appendFileSync(path.join(dir,'actions'),q.actionId+'\n');
  const mode=q.operation==='open-url'?process.env.XDG_CURRENT_DESKTOP.slice('fixture:url-'.length):q.desktopId.slice(0,-8);
  if(q.operation==='open-url')fs.appendFileSync(path.join(dir,'urls'),q.url+'\n');
  fs.writeFileSync(path.join(dir,(q.operation==='open-url'?'open-url':q.desktopId)+'.pid'),String(process.pid));
@@ -77,6 +78,7 @@ let input='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>input+
  if(mode==='extra')return send({outcome:'dispatched',private:'synthetic'});
  if(mode==='nonzero'){send({outcome:'dispatched'});process.exitCode=4;return;}
  if(mode==='detached'){const child=spawn('/bin/sleep',['10'],{detached:true,stdio:'ignore'});fs.writeFileSync(path.join(dir,'application.pid'),String(child.pid));child.unref();}
+ if(q.operation==='launch-action')return send({outcome:mode==='dispatched'?'dispatched':'requested',actionId:mode==='mismatch'?'Other':q.actionId});
  send({outcome:'dispatched'});
 });
 `;
@@ -102,4 +104,37 @@ describe('L1-02 explicit HTTP URL transport (request-observing helper only)',()=
   it('times out a silent URL helper without replay or a dispatched claim',async()=>{
     vi.stubEnv('XDG_CURRENT_DESKTOP','fixture:url-hang');const pending=service().openUrl('https://example.org/').catch(error=>error),child=await pid('open-url');expect(await pending).toMatchObject({reason:'deadline-exceeded',effectOutcome:'unknown'});expect(()=>process.kill(child,0)).toThrow();expect(await readFile(join(directory,'invocations'),'utf8')).toBe('open-url\n');
   },5000);
+});
+
+describe('L1-02 Desktop Action transport (request-observing helper only)',()=>{
+  const action=(id='normal.desktop')=>({...identity(id),actionId:'New.Window'});
+  it('forwards only the declared identity and accepts a matching requested receipt',async()=>{
+    expect(await service().launchAction(action())).toEqual({outcome:'requested',actionId:'New.Window'});
+    expect(await readFile(join(directory,'invocations'),'utf8')).toBe('launch-action\n');
+    expect(await readFile(join(directory,'actions'),'utf8')).toBe('New.Window\n');
+  });
+  it.each(['double','truncated','utf8','oversized','wrong-shape','wrong-version','extra','nonzero','mismatch','dispatched'])('rejects %s action receipts with unknown outcome and no replay',async mode=>{
+    await expect(service().launchAction(action(`${mode}.desktop`))).rejects.toMatchObject({effectOutcome:'unknown'});
+    expect(await readFile(join(directory,'invocations'),'utf8')).toBe('launch-action\n');
+  });
+  it.each(['invalid-request','stale-application','unavailable','launch-failed','catalogue-too-large'])('preserves action %s certainty without replay',async reason=>{
+    await expect(service().launchAction(action(`${reason}.desktop`))).rejects.toMatchObject({reason:reason==='catalogue-too-large'?'invalid-reply':reason,effectOutcome:['invalid-request','stale-application','unavailable'].includes(reason)?'not-dispatched':'unknown'});
+    expect(await readFile(join(directory,'invocations'),'utf8')).toBe('launch-action\n');
+  });
+  it('rejects malformed action IDs and extra effect fields before spawning',async()=>{
+    const api=service();
+    for(const value of [action('../bad.desktop'),{...action(),actionId:''},{...action(),actionId:'../New'},{...action(),actionId:'é'},{...action(),actionId:'a'.repeat(65)},{...action(),argv:[]},{...action(),operation:'launch'}])await expect(api.launchAction(value)).rejects.toMatchObject({reason:'invalid-request',effectOutcome:'not-dispatched'});
+    await expect(readFile(join(directory,'invocations'),'utf8')).rejects.toHaveProperty('code','ENOENT');
+  });
+  it('cancels an action helper with unknown outcome and drains it without replay',async()=>{
+    const api=service(),abort=new AbortController(),pending=api.launchAction(action('hang.desktop'),{signal:abort.signal}).catch(error=>error),child=await pid('hang.desktop');
+    abort.abort();expect(await pending).toMatchObject({reason:'cancelled',effectOutcome:'unknown'});expect(()=>process.kill(child,0)).toThrow();expect(await readFile(join(directory,'invocations'),'utf8')).toBe('launch-action\n');
+  });
+  it('times out an action helper with unknown outcome and no replay',async()=>{
+    const pending=service().launchAction(action('hang.desktop')).catch(error=>error),child=await pid('hang.desktop');
+    expect(await pending).toMatchObject({reason:'deadline-exceeded',effectOutcome:'unknown'});expect(()=>process.kill(child,0)).toThrow();expect(await readFile(join(directory,'invocations'),'utf8')).toBe('launch-action\n');
+  },5000);
+  it('rejects already cancelled actions before helper admission',async()=>{
+    const abort=new AbortController();abort.abort();await expect(service().launchAction(action(),{signal:abort.signal})).rejects.toMatchObject({reason:'cancelled',effectOutcome:'not-dispatched'});await expect(readFile(join(directory,'invocations'),'utf8')).rejects.toHaveProperty('code','ENOENT');
+  });
 });
