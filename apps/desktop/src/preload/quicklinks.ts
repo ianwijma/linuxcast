@@ -1,10 +1,16 @@
-import { MAX_ENVELOPE_BYTES,QUICKLINK_CHANNELS,quicklinkListRequestSchema,quicklinkGetRequestSchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,quicklinkListReplySchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema } from '@linuxcast/contracts';
+import { MAX_ENVELOPE_BYTES,QUICKLINK_CHANNELS,quicklinkListRequestSchema,quicklinkGetRequestSchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,quicklinkListReplySchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,quicklinkExportReplySchema } from '@linuxcast/contracts';
 import type { QuicklinkApi } from '@linuxcast/contracts';
 import type { ShellTransport } from './api.ts';
 const unavailable={ok:false as const,error:{code:'internal' as const,message:'Quicklinks operation could not be confirmed. Reload Quicklinks before trying again.',retryable:false}};
 const withinLimit=(value:unknown)=>new TextEncoder().encode(JSON.stringify(value)).length<=MAX_ENVELOPE_BYTES;
 /** Named methods only; no generic forwarding capability crosses the bridge. */
 export function createQuicklinkApi(transport:Pick<ShellTransport,'invoke'>):Required<QuicklinkApi>{return {
+  exportQuicklink:async request=>{
+    try{const parsed=quicklinkGetRequestSchema.parse({...request,protocolVersion:1}),value=await transport.invoke(QUICKLINK_CHANNELS.export,parsed);
+      if(!withinLimit(value))return unavailable;const result=quicklinkExportReplySchema.parse(value);
+      return !result.ok||result.value.id===parsed.id&&result.value.revision===parsed.revision?result:unavailable;
+    }catch{return unavailable;}
+  },
   listQuicklinks:async()=>{
     try{const value=await transport.invoke(QUICKLINK_CHANNELS.list,quicklinkListRequestSchema.parse({protocolVersion:1}));
       return withinLimit(value)?quicklinkListReplySchema.parse(value):unavailable;}catch{return unavailable;}

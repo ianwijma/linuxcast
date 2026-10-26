@@ -1,3 +1,4 @@
+import { saveDataExport } from './data-export.ts';
 import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
 import { createFileSearchService } from '@linuxcast/file-search/service';
@@ -21,6 +22,13 @@ startResidentShell({ resourcesDirectory: __dirname,
   prepareQuit:async()=>workflowEditor?workflowEditor.prepareClose():true,
   copyCalculatorResult:copyText,
   quicklinks:{
+    async chooseExport(record){
+      const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.webContents.getURL()===APP_URL);if(!owner)throw new Error('Export window unavailable.');
+      const choice=await dialog.showSaveDialog(owner,{title:'Export quicklink — unencrypted JSON',defaultPath:`linuxcast-quicklink-${record.id}.json`,buttonLabel:'Save unencrypted JSON',filters:[{name:'Linuxcast Quicklink JSON',extensions:['json']}],properties:['createDirectory']});
+      if(owner.isDestroyed()||owner.webContents.getURL()!==APP_URL)throw new Error('Export window changed.');
+      return choice.canceled||!choice.filePath?null:choice.filePath;
+    },
+    async writeExport(path,value,signal){await saveDataExport(path,value,signal);},
     async list(){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.list',{});},
     async get(selection){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.get',selection);},
     async save(input){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.save',input);},

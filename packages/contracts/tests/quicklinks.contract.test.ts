@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { quicklinkTagsSchema,MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema,launcherCommandMetadataSchema,MAX_LAUNCHER_COMMANDS } from '../src/index.ts';
+import { quicklinkTagsSchema,MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema,launcherCommandMetadataSchema,MAX_LAUNCHER_COMMANDS,quicklinkExportFileSchema,quicklinkExportReplySchema } from '../src/index.ts';
 const id='00000000-0000-4000-8000-000000000001';
 const save={expectedRevision:0,name:'Public docs',url:'https://example.invalid/docs'};
 it('validates literal credential-free web targets before canonicalizing and rejects unsupported template authority',()=>{
@@ -55,4 +55,10 @@ it('binds read-only launcher entries to exact saved selections without accepting
  const value={id:`quicklink:${id}`,quicklink:{id,revision:7},title:'Public saved link',aliases:[],keywords:['Work'],enabled:true,usage:null};expect(launcherCommandMetadataSchema.parse(value)).toEqual(value);expect(MAX_LAUNCHER_COMMANDS).toBe(5604);
  for(const patch of [{quicklink:undefined},{quicklink:{id:'00000000-0000-4000-8000-000000000002',revision:7}},{quicklink:{id,revision:0}},{quicklink:{id,revision:7,url:save.url}},{id:'linuxcast:open-quicklinks'},{applicationActions:{available:true,actions:[]}}])expect(launcherCommandMetadataSchema.safeParse({...value,...patch}).success).toBe(false);
  for(const commandId of ['quicklink:not-a-uuid','quicklink:../../public','quicklink:'+id+'x'])expect(launcherCommandIdSchema.safeParse(commandId).success).toBe(false);
+});
+
+it('exports one versioned saved definition without accepting queries, grants or false completion receipts',()=>{
+ const record={id,revision:1,name:save.name,url:save.url,createdAt:'2026-10-27T00:00:00.000Z',updatedAt:'2026-10-27T00:00:00.000Z'},file={format:'linuxcast.quicklinks',formatVersion:1,records:[record]};expect(quicklinkExportFileSchema.parse(file)).toEqual(file);
+ for(const patch of [{format:'other'},{formatVersion:2},{records:[]},{records:[record,record]},{query:'private'},{grants:[]}])expect(quicklinkExportFileSchema.safeParse({...file,...patch}).success).toBe(false);
+ for(const outcome of ['exported','cancelled'])expect(quicklinkExportReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(true);for(const outcome of ['completed','dispatched','opened'])expect(quicklinkExportReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(false);
 });

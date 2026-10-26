@@ -27,6 +27,8 @@ export const quicklinkRecordSchema=z.strictObject({id:z.uuid(),revision,name:qui
   .refine(value=>Date.parse(value.createdAt)<=Date.parse(value.updatedAt));
 export const quicklinkSummarySchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,host:z.string().min(1).max(320).regex(/^[!-~]+$/u),tags:quicklinkTagsSchema.optional(),pinned:z.boolean().optional(),hidden:z.boolean().optional(),webSearch:z.literal(true).optional()});
 export const quicklinkListSchema=z.array(quicklinkSummarySchema).max(MAX_QUICKLINKS).refine(records=>records.every((record,index)=>index===0||records[index-1]!.id<record.id));
+export const quicklinkExportFileSchema=z.strictObject({format:z.literal('linuxcast.quicklinks'),formatVersion:z.literal(1),records:z.array(quicklinkRecordSchema).length(1)});
+export type QuicklinkExportFile=z.infer<typeof quicklinkExportFileSchema>;
 export type QuicklinkRecord=z.infer<typeof quicklinkRecordSchema>;
 export type QuicklinkSummary=z.infer<typeof quicklinkSummarySchema>;
 export type QuicklinkSelection=z.infer<typeof quicklinkSelectionSchema>;

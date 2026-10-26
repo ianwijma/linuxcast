@@ -1,14 +1,16 @@
 import type { IpcMain,IpcMainInvokeEvent } from 'electron';
 import {
   QUICKLINK_CHANNELS,quicklinkListRequestSchema,quicklinkGetRequestSchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,
-  quicklinkListReplySchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,
+  quicklinkExportFileSchema,quicklinkExportReplySchema,quicklinkListReplySchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,
 } from '@linuxcast/contracts';
-import type { QuicklinkRecord,QuicklinkSummary,QuicklinkSave,QuicklinkSelection,ShellCommandReply } from '@linuxcast/contracts';
+import type { QuicklinkExportFile,QuicklinkRecord,QuicklinkSummary,QuicklinkSave,QuicklinkSelection,ShellCommandReply } from '@linuxcast/contracts';
 import { StorageRequestError } from '@linuxcast/storage';
 import { ApplicationsUnavailable } from '@linuxcast/applications';
 import { buildWebSearchUrl,WebSearchBuildError } from '@linuxcast/quicklinks/web-search';
 
 export interface QuicklinkBackend {
+  chooseExport?:(record:QuicklinkRecord)=>Promise<string|null>;
+  writeExport?:(path:string,value:QuicklinkExportFile,signal:AbortSignal)=>Promise<void>;
   list():Promise<QuicklinkSummary[]>;
   get(selection:QuicklinkSelection):Promise<QuicklinkRecord|null>;
   save(input:QuicklinkSave):Promise<QuicklinkRecord>;
@@ -77,6 +79,28 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       if(!record||record.id!==target.id||record.revision!==target.revision)return changed();
       // Validate the complete stored target even when a backend test port is used.
       const checked=quicklinkRecordReplySchema.parse({ok:true,value:{record}});if(!checked.ok)return unavailable();
+      if(operation==='export'){
+        if(!backend.chooseExport||!backend.writeExport)return failed('capability-unavailable','Quicklink export is unavailable. Reopen Linuxcast to reconnect.');
+        const current=()=>alive()&&gate.trusted(event)&&gate.revision()===expectedRevision;
+        if(!current())return running();
+        const beforeChoice=await gate.checkVisibility(event,expectedRevision);if(beforeChoice)return beforeChoice;
+        if(!current())return running();
+        const destination=await backend.chooseExport(checked.value.record);
+        if(destination===null)return quicklinkExportReplySchema.parse({ok:true,value:{...target,outcome:'cancelled'}});
+        if(!current())return running();
+        const blocked=await gate.checkVisibility(event,expectedRevision);if(blocked)return blocked;
+        const latest=await backend.get(target);if(!latest)return changed();
+        const fresh=quicklinkRecordReplySchema.parse({ok:true,value:{record:latest}});
+        if(!current())return running();
+        if(!fresh.ok||JSON.stringify(fresh.value.record)!==JSON.stringify(checked.value.record))return changed();
+        const again=await gate.checkVisibility(event,expectedRevision);if(again)return again;
+        if(!current())return running();
+        const value=quicklinkExportFileSchema.parse({format:'linuxcast.quicklinks',formatVersion:1,records:[fresh.value.record]}),controller=new AbortController();
+        const watcher=setInterval(()=>{if(!current())controller.abort();},25);
+        try{attempted=true;await backend.writeExport(destination,value,controller.signal);if(!current())throw new Error('Unconfirmed export.');}
+        finally{clearInterval(watcher);}
+        return quicklinkExportReplySchema.parse({ok:true,value:{...target,outcome:'exported'}});
+      }
       if(operation==='remove'){
         if(!gate.trusted(event))return denied();
         if(!alive()||gate.revision()!==expectedRevision)return running();
@@ -118,6 +142,7 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         return unavailable();
       }
       if(error instanceof ApplicationsUnavailable&&error.effectOutcome==='not-dispatched')return failed('capability-unavailable','No web browser is available. Set a default browser, then try Open again.');
+      if(attempted&&operation==='export')return failed('deadline-exceeded','The export may have completed. Check the selected file, then reload Quicklinks before exporting again.');
       return attempted?failed('deadline-exceeded','The Quicklink operation outcome is unknown. Check your browser if opening, then reload Quicklinks before trying again.'):unavailable();
     }finally{release();}
   });
