@@ -15,7 +15,11 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c, merged PR45:
+Primary clean develop e5da4f8566f906dd1b52eb5d2928ae8adc723e13, merged PR46.
+Normal exact-head236d305 merge, CI40418427340 validate passed15s; no requested
+GitHub reviews/submissions/comments/threads. Independent reviews clean; primary
+frozen install and production build66assets pass. Pin/hide evidence below.
+Prior merged PR45 a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c:
 https://github.com/ianwijma/linuxcast/pull/45 (26 October 22:47:36 UTC).
 Exact reviewed head3f05245, CI40415016605 validate passed12s; no requested reviews,
 submissions/comments/threads; normal exact-head merge. Primary frozen install and
@@ -52,19 +56,42 @@ query/selection/Back zero-write regressions; exact author/integrated trees match
 Independent root boundary and UI/actual review clean. Full task remains in progress.
 Evidence `apps/desktop/evidence/quicklink-preferences-application.md`.
 
-Next: sign evidence/registry, create+attach focused PR, inspect exact-head CI and
-GitHub reviews/threads, normal merge, refresh primary frozen install/build. Then
-select next bounded concrete launcher/application flow without foundation growth.
+PR46 https://github.com/ianwijma/linuxcast/pull/46 is merged as above.
+
+## Current bounded application increment: root saved-link entries
+
+Root reused worktree, branch `codex/quicklink-launcher-entry` from e5da4f8.
+Freeze dddcce3; main ea24f20, stale-generation read fix543bee9, local host search
+c52f1c5, exact parent visibility receipt fix0fba577; UIb58fcc4(author5669223),
+production60b40bb. Current source complete and independently reviewed clean.
+Main registers shown saved name/host/tags with exact ID/revision, no target.
+Root search/Arrow/Enter selects current saved entry; separate existing literal
+Open or Query→Review→Open performs native effect. Stale/deleted/hidden/missing
+entries withhold fallback rows and expose Reload/Back. Original root/list context,
+parent visibility, retained unknown state and full500/100 identity preserved.
+Root metadata editing denied; use dedicated Quicklinks actions.
+
+PASS245L2units/13contracts/39security/41integration(actual9.24s),214L1units/
+74L1security/2L1contracts/19ownerintegration. Author306focusedcontroller/routing,
+98Chromium keyboard+axe plus4final focused checks pass. Six component/twoactual
+new captures independently clean. Typecheck/scopedlint/plan/diff pass. Initial
+production run hit60s testdeadline; bounded5s locators+enabled-row readiness pass
+standalone9.08s/finalmapped9.24s. No broader cause inferred. Exact author/integrated
+UI trees reconcile. Evidence quicklink-launcher-application.md. No live handles.
+
+Next: sign evidence/registry, create+attach focused PR, exact-head CI/GitHub
+review/threads, normal merge, primary frozen install/build. Then next bounded
+application flow automatically; no foundation/research/proof expansion.
 
 ## Agents
 
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-presentation-ui`, signed a43b0a7/1f8f77a integrated above.
-  Bounded current UI assignment complete; await next concrete application flow.
+  `codex/l2-05-quicklink-launcher-ui`, signed5669223 integratedb58fcc4; clean,
+  bounded root-entry source assignment complete. Prior signed a43b0a7/1f8f77a integrated in PR46.
 - alias_review_sol: exact-tree source/test and nine component/six actual captures
   reviewed clean; P2 reentrant Save finding closed.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
-  boundary independently reviewed clean; idle.
+  boundary independently reviewed clean; root saved-entry/search boundary clean after two fixes.
 
 ## Acceptance and runtime
 

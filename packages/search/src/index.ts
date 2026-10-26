@@ -3,7 +3,7 @@ import { httpUrlSchema } from '@linuxcast/contracts';
 /** Pure local ranking. Entries come only from the trusted command registry;
  * matching a name or alias never creates an executable command. */
 export interface SearchCommand {
-  id:string;hidden?:boolean|undefined;provider?:'commands'|'applications'|undefined;title:string;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
+  id:string;hidden?:boolean|undefined;provider?:'commands'|'applications'|undefined;title:string;subtitle?:string|undefined;aliases:readonly string[];keywords:readonly string[];enabled:boolean;
   usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
 }
 export const MAX_QUERY_LENGTH=512;
@@ -16,7 +16,7 @@ function match(command:SearchCommand,query:string,urlQuery:boolean):number|null 
   if(urlQuery && command.id==='linuxcast:open-url')return 0;
   const aliases=[...command.aliases,...(command.usage?.alias?[command.usage.alias]:[])].map(normalize);
   if(aliases.includes(query))return 0;
-  const title=normalize(command.title),keywords=command.keywords.map(normalize);
+  const title=normalize(command.title),keywords=[...command.keywords,...(command.id.startsWith('quicklink:')&&command.subtitle?[command.subtitle]:[])].map(normalize);
   if(title===query)return 1;
   if(title.startsWith(query))return 2;
   if(title.includes(query))return 3;

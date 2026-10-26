@@ -29,7 +29,7 @@ describe('L1-01 bounded registered command ranking',()=>{
   });
   it('bounds results, registry size and query length and rejects duplicate identities',()=>{
     expect(rankCommands(Array.from({length:100},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'',now)).toHaveLength(20);
-    expect(()=>rankCommands(Array.from({length:5105},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
+    expect(()=>rankCommands(Array.from({length:5605},(_,i)=>make(`fixture:${i}`,`Command ${i}`)),'')).toThrow();expect(()=>rankCommands([],'x'.repeat(513))).toThrow();const command=make('linuxcast:hide','Hide');expect(()=>rankCommands([command,command],'')).toThrow();
   });
   it('cancels old queries and rejects late completion after replacement, hide or disconnect',()=>{
     const generations=new QueryGenerations(),first=generations.begin('data'),second=generations.begin('hide');expect(first.signal.aborted).toBe(true);expect(generations.current(first.generation)).toBe(false);expect(generations.current(second.generation)).toBe(true);generations.cancel();expect(second.signal.aborted).toBe(true);expect(generations.current(second.generation)).toBe(false);
@@ -51,8 +51,8 @@ it('L1-02 valid HTTP queries match only an already registered Open URL command w
   for(const query of ['example.org','file:///tmp/public','javascript:alert(1)','https://user@example.org/','https://example.org/white space'])expect(rankCommands([url],query,now)).toEqual([]);
   expect(rankCommands([], 'https://example.org/',now)).toEqual([]);expect(url).toEqual(before);
 });
-it('L1-02 admits eight builtins plus4096application and1000workflow identities and rejects5105records',()=>{
-  const commands=Array.from({length:5104},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
+it('L1-02 admits eight builtins plus4096application,1000workflow and500saved Quicklink identities and rejects5605records',()=>{
+  const commands=Array.from({length:5604},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
 });
 
 
@@ -95,10 +95,15 @@ describe('L1-01 hidden root commands and local management projection',()=>{
     expect(rankManagedCommands(rows,'no matches',rows[149]!.id)).toEqual([]);
     expect(rankManagedCommands(rows,'')).toEqual(rows.slice(0,100));
   });
-  it('uses the existing 5104-registry and 512-query limits for management and rejects duplicate IDs',()=>{
-    const rows=Array.from({length:5104},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));rows[4102]!.title='Later hidden target';rows[4102]!.hidden=true;
+  it('uses the existing 5604-registry and 512-query limits for management and rejects duplicate IDs',()=>{
+    const rows=Array.from({length:5604},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));rows[4102]!.title='Later hidden target';rows[4102]!.hidden=true;
     expect(rankManagedCommands(rows,'Later hidden target')).toEqual([rows[4102]]);
     expect(()=>rankManagedCommands([...rows,make('fixture:extra','Extra')],'')).toThrow('limit');
     expect(()=>rankManagedCommands([],'x'.repeat(513))).toThrow('limit');expect(()=>rankManagedCommands([rows[0]!,rows[0]!],'')).toThrow('Duplicate');
   });
+});
+
+it('matches a registered saved-link host and tags locally without widening unrelated subtitle search or changing selection identity',()=>{
+ const host='public.'+'x'.repeat(121)+'.example.invalid',saved=make('quicklink:00000000-0000-4000-8000-000000000001','Public docs',{subtitle:`Saved Quicklink · ${host} · Open saved entry`,keywords:['quicklink','Work','猫']}),other=make('fixture:other','Other',{subtitle:host}),before=structuredClone(saved);expect(rankCommands([other,saved],`${host} Work 猫`,now)).toEqual([saved]);expect(saved).toEqual(before);expect(rankCommands([saved],'no matching host',now)).toEqual([]);
+ const rows=Array.from({length:500},(_,i)=>make(`quicklink:${i}`,`Saved link ${i}`,{subtitle:`Saved Quicklink · host${i}.invalid · Open saved entry`}));expect(rankCommands(rows,'host499.invalid',now,rows[499]!.id)).toEqual([rows[499]]);expect(rankCommands([{...saved,hidden:true}],host,now)).toEqual([]);
 });
