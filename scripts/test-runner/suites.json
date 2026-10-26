@@ -93,6 +93,9 @@
     ],
     "L2-03": [
       "packages/contracts/tests/file-search.contract.test.ts"
+    ],
+    "L1-01": [
+      "packages/contracts/tests/launcher-visibility.contract.test.ts"
     ]
   },
   "ui": {
@@ -146,7 +149,8 @@
     ],
     "L1-01": [
       "packages/storage/tests/command-pins.integration.test.ts",
-      "packages/storage/tests/command-aliases.integration.test.ts"
+      "packages/storage/tests/command-aliases.integration.test.ts",
+      "packages/storage/tests/command-visibility.integration.test.ts"
     ],
     "L1-02": [
       "apps/desktop/tests/shell.integration.test.ts"

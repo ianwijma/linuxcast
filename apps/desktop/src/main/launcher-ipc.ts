@@ -10,10 +10,11 @@ import type { NativeApplication } from '../../../../packages/contracts/src/appli
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias, launcherOpenUrlRequestSchema,
+  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias, launcherOpenUrlRequestSchema, launcherVisibilityRequestSchema, isLauncherVisibilityProtected,
 } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply, LauncherOpenUrlReply } from '../../../../packages/contracts/src/launcher.ts';
-import type { CommandUsage } from '@linuxcast/storage';
+import { hiddenCommandIdsSchema } from '@linuxcast/storage';
+import type { CommandUsage, CommandVisibility } from '@linuxcast/storage';
 import { trustedShellSender } from './ipc.ts';
 
 export interface LauncherActions {
@@ -31,6 +32,8 @@ export interface LauncherActions {
   launchApplication?: (application: Pick<NativeApplication,'desktopId'|'fingerprint'>) => Promise<'dispatched'>;
   setPinned?: (commandId: string, pinned: boolean) => Promise<CommandUsage>;
   setAlias?: (commandId: string, alias: string | null) => Promise<CommandUsage>;
+  listHidden?: () => Promise<string[]>;
+  setHidden?: (commandId:string,hidden:boolean) => Promise<CommandVisibility>;
 }
 
 const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | 'internal'): Extract<LauncherExecuteReply,{ok:false}> => ({
@@ -50,6 +53,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
   let refreshing: Promise<void>|undefined;
+  let hiddenIds=new Set<string>(),visibilityAvailable:boolean|undefined;
   const applicationRecords = new Map<string,NativeApplication>();
   const builtins: Omit<LauncherCommandMetadata,'usage'>[] = [
     {id:'linuxcast:open-local-data', title:'Local data', subtitle:'Clear usage or export local application data', aliases:['data','settings'], keywords:['privacy','clear','export','history'], enabled:!!actions.openDataSettings,
@@ -67,13 +71,42 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     // Usage failure must never replay an action or prevent recovery through Hide/Quit.
     try { await actions.recordUse?.(id); } catch { /* Explicitly best-effort local ranking only. */ }
   };
-  const descriptors = (): Omit<LauncherCommandMetadata,'usage'>[] => [
+  const descriptors = (): Omit<LauncherCommandMetadata,'usage'>[] => ([
     ...builtins,
     ...[...applicationRecords].map(([id,application])=>({id,provider:'applications' as const,title:application.title,
       subtitle:application.description||'Installed application',aliases:[],keywords:[],enabled:applicationState==='available',
       ...(applicationState!=='available'?{unavailableReason:'Applications are unavailable. Reload commands to try again.'}:{}),
     })),
-  ];
+  ] as Omit<LauncherCommandMetadata,'usage'>[]).map(command=>({
+    ...command,
+    ...(visibilityAvailable===undefined?{}:{hidden:hiddenIds.has(command.id)}),
+    ...(visibilityAvailable===false&&!isLauncherVisibilityProtected(command.id)?{
+      enabled:false,unavailableReason:'Command visibility is unavailable. Reload commands to reconnect to storage.',
+    }:{}),
+  }));
+  const installVisibility=(ids:string[],available:boolean)=>{
+    if(visibilityAvailable!==available||JSON.stringify([...hiddenIds])!==JSON.stringify(ids))revision++;
+    hiddenIds=new Set(ids);visibilityAvailable=available;
+  };
+  const refreshVisibility=async(generation:number)=>{
+    if(!actions.listHidden)return;
+    try{
+      const ids=hiddenCommandIdsSchema.parse(await actions.listHidden());
+      if(active()&&!metadataPending&&generation===metadataGeneration)installVisibility(ids,true);
+    }catch{
+      if(active()&&!metadataPending&&generation===metadataGeneration)installVisibility([...hiddenIds],false);
+    }
+  };
+  const visibilityFailure=()=>({ok:false as const,error:{code:'capability-unavailable' as const,message:'Command visibility is unavailable. Reload commands to reconnect to storage.',retryable:false}});
+  const checkVisibility=async(event:IpcMainInvokeEvent,commandId:string,expectedRevision:number):Promise<Extract<LauncherExecuteReply,{ok:false}>|undefined>=>{
+    if(isLauncherVisibilityProtected(commandId)||!actions.listHidden)return;
+    await refreshVisibility(metadataGeneration);
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+    if(!active())return failure('cancelled');
+    if(visibilityAvailable!==true)return visibilityFailure();
+    if(revision!==expectedRevision)return failure('invalid-request');
+    if(hiddenIds.has(commandId))return failure('permission-denied');
+  };
   const refreshApplications = async () => {
     if (!actions.listApplications) return;
     if (!refreshing) refreshing=(async()=>{
@@ -110,6 +143,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       let bytes=commands.reduce((total,command)=>total+Buffer.byteLength(JSON.stringify(command))+1,0);
       while(bytes>MAX_ENVELOPE_BYTES-4096&&commands.length>1)bytes-=Buffer.byteLength(JSON.stringify(commands.pop()))+1;
       return launcherCommandsReplySchema.parse({ok:true,value:{revision,commands,rankingAvailable,
+        ...(visibilityAvailable===undefined?{}:{visibilityAvailable}),
         nextCursor:!changed&&start+commands.length<all.length?`${revision}:${start+commands.length}`:null,
         ...(applicationState?{applicationState}:{}),...(changed?{updateOnly:true}:{}),
       }});
@@ -126,7 +160,10 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       const [version=0,offset=-1]=parsed.data.cursor.split(':').map(Number);
       if(version!==revision||!Number.isSafeInteger(offset)||offset<1||offset>=descriptors().length)return failure('invalid-request');
       start=offset;
-    }else await refreshApplications();
+    }else{
+      await refreshApplications();
+      if(!metadataPending&&admittedMetadata===metadataGeneration)await refreshVisibility(admittedMetadata);
+    }
     if(metadataPending || urlPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
     return metadataPending || urlPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
@@ -143,11 +180,16 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     calculatorPending=true;
     // A timed-out write keeps its slot until the actual backend settles. Hide/Quit
     // remain usable, and no later copy can overtake an unresolved clipboard write.
-    const work=Promise.resolve().then(()=>{if(!active())throw new Error('Stopped.');return actions.copyCalculatorResult!(clipboardText);});
+    const work=Promise.resolve().then(async()=>{
+      if(!active())throw new Error('Stopped.');
+      if(actions.listHidden){const denied=await checkVisibility(event,'linuxcast:calculator',parsed.data.revision);if(denied)return denied;}
+      return actions.copyCalculatorResult!(clipboardText);
+    });
     void work.finally(()=>{calculatorPending=false;}).catch(()=>{});
     let timer:ReturnType<typeof setTimeout>|undefined;
     try {
       const outcome=await Promise.race([work,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error('Copy deadline.')),4000);})]);
+      if(typeof outcome==='object')return outcome;
       if(outcome==='busy')return failure('cancelled');
       if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
       if(outcome!=='written')throw new Error('Invalid copy receipt.');
@@ -164,6 +206,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!actions.openUrl)return {ok:false,error:{code:'capability-unavailable',message:'Browser opening is unavailable. Set a default web browser and try again.',retryable:false}};
     busy=true;urlPending=true;
     try {
+      if(actions.listHidden){const denied=await checkVisibility(event,'linuxcast:open-url',parsed.data.revision);if(denied)return denied;}
       const outcome=await actions.openUrl(parsed.data.url);
       if(outcome!=='dispatched')throw new Error('Invalid browser handoff receipt.');
       await recordUse('linuxcast:open-url');
@@ -174,6 +217,33 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       const known=error instanceof ApplicationsUnavailable && error.effectOutcome==='not-dispatched';
       return {ok:false,error:{code:known?'capability-unavailable':'deadline-exceeded',message:known?'No web browser is available. Set a default browser, then try Open URL again.':'The browser handoff could not be confirmed. Check your browser before trying again.',retryable:false}};
     }finally{busy=false;urlPending=false;}
+  });
+  ipc.handle(LAUNCHER_CHANNELS.setHidden,async(event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherCommandsReply>=>{
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+    const parsed=launcherVisibilityRequestSchema.safeParse(payload);
+    if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active()||busy||calculatorPending)return failure('cancelled');
+    const {commandId,hidden}=parsed.data;
+    if(!descriptors().some(command=>command.id===commandId))return failure('permission-denied');
+    if(!actions.setHidden||!actions.listHidden||visibilityAvailable!==true)return visibilityFailure();
+    busy=true;metadataPending=true;metadataGeneration++;
+    try{
+      const saved=await actions.setHidden(commandId,hidden);
+      if(saved.commandId!==commandId||saved.hidden!==hidden)throw new Error('Visibility receipt identity.');
+      const ids=hiddenCommandIdsSchema.parse(await actions.listHidden());
+      const expected=new Set(hiddenIds);if(hidden)expected.add(commandId);else expected.delete(commandId);
+      if(!active()||parsed.data.revision!==revision||!descriptors().some(command=>command.id===commandId)||
+        ids.includes(commandId)!==hidden||JSON.stringify(ids)!==JSON.stringify([...expected].sort()))throw new Error('Visibility state changed.');
+      // Full metadata at exactly the next revision, including targets past page1.
+      hiddenIds=new Set(ids);visibilityAvailable=true;revision++;
+      const reply=await snapshot();if(!reply.ok)throw new Error('Visibility acknowledgement unavailable.');
+      return reply;
+    }catch{
+      // The owner may have committed. Invalidate stale effects; only Reload can
+      // reconnect this catalogue to authoritative state. Never replay the write.
+      visibilityAvailable=false;revision++;
+      return {ok:false,error:{code:'internal',message:'The visibility change could not be confirmed. Reload commands before trying again.',retryable:false}};
+    }finally{busy=false;metadataPending=false;}
   });
   ipc.handle(LAUNCHER_CHANNELS.setAlias, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
@@ -242,6 +312,9 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator')return failure('invalid-request');
     busy = true;
     try {
+      if(actions.listHidden&&!isLauncherVisibilityProtected(command.id)){
+        const denied=await checkVisibility(event,command.id,parsed.data.revision);if(denied)return denied;
+      }
       if (command.id === 'linuxcast:quit') {
         quitDispatched = true;
         // A dispatch receipt, not a claim that service teardown completed.

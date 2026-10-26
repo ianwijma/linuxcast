@@ -92,6 +92,84 @@ it('blocks overlapping mutations/execution and reports unconfirmed pin changes w
 });
 
 const applicationFixture=(index:number)=>({desktopId:`fixture-${String(index).padStart(3,'0')}.desktop`,title:`Fixture application ${index}`,description:'Public synthetic application',fingerprint:'a'.repeat(64)});
+function visibilityFixture(overrides:Partial<LauncherActions>={}){
+  let hidden:string[]=[];
+  return fixture({listHidden:vi.fn(async()=>hidden),setHidden:vi.fn(async(commandId:string,value:boolean)=>{hidden=hidden.filter(id=>id!==commandId);if(value)hidden.push(commandId);hidden.sort();return {commandId,hidden:value};}),...overrides});
+}
+it('acknowledges only stored visibility at exactly the next revision with a full catalogue and no command use',async()=>{
+  const f=visibilityFixture(),before=await catalogue(f),commandId='linuxcast:open-local-data';
+  const reply=await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision:before.revision,commandId,hidden:true}) as LauncherCommandsReply;
+  expect(reply).toMatchObject({ok:true,value:{revision:before.revision+1,visibilityAvailable:true,nextCursor:null}});
+  if(!reply.ok)throw new Error('Missing acknowledgement.');expect(reply.value.updateOnly).toBeUndefined();expect(reply.value.commands).toHaveLength(6);
+  expect(reply.value.commands.find(row=>row.id===commandId)).toEqual({...before.commands.find(row=>row.id===commandId),hidden:true});
+  expect(f.actions.setHidden).toHaveBeenCalledExactlyOnceWith(commandId,true);expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.openDataSettings).not.toHaveBeenCalled();
+  expect(await f.execute(commandId,before.revision)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(await f.execute(commandId,reply.value.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  const shown=await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision:reply.value.revision,commandId,hidden:false}) as LauncherCommandsReply;
+  if(!shown.ok)throw new Error('Missing show acknowledgement.');expect(shown.value.revision).toBe(before.revision+2);
+  expect(await f.execute(commandId,shown.value.revision)).toMatchObject({ok:true});expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith(commandId);
+});
+it('bounds visibility writes to the own frame, current registered non-recovery IDs and strict boolean payload',async()=>{
+  const f=visibilityFixture(),{revision}=await catalogue(f),payload={protocolVersion:1,revision,commandId:'linuxcast:calculator',hidden:true};
+  expect(await f.invoke(LAUNCHER_CHANNELS.setHidden,payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const request of [{...payload,revision:0},{...payload,revision:revision+1},{...payload,commandId:'linuxcast:hide'},{...payload,commandId:'linuxcast:quit',hidden:false},{...payload,commandId:'arbitrary:run'},{...payload,hidden:1},{...payload,query:'SYNTHETIC_PRIVATE'}])expect(await f.invoke(LAUNCHER_CHANNELS.setHidden,request)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setHidden,{...payload,commandId:`application:${'f'.repeat(64)}`})).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  expect(f.actions.setHidden).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('returns all pages after a later-page mutation and invalidates every old cursor',async()=>{
+  const f=visibilityFixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),before=await catalogue(f);
+  const page2=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:before.nextCursor}) as LauncherCommandsReply;
+  if(!page2.ok)throw new Error('Expected page2.');const target=page2.value.commands.at(-1)!.id;
+  const changed=await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision:before.revision,commandId:target,hidden:true}) as LauncherCommandsReply;
+  if(!changed.ok)throw new Error('Expected acknowledgement.');expect(changed.value.revision).toBe(before.revision+1);expect(changed.value.commands).toHaveLength(100);expect(changed.value.updateOnly).toBeUndefined();
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:before.nextCursor})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  const final=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:changed.value.nextCursor}) as LauncherCommandsReply;
+  expect(final).toMatchObject({ok:true,value:{revision:changed.value.revision,visibilityAvailable:true,nextCursor:null}});
+  if(!final.ok)throw new Error('Expected final page.');expect(final.value.commands.find(row=>row.id===target)?.hidden).toBe(true);
+});
+it('does not allow visibility writes or metadata reload to overtake an unresolved write',async()=>{
+  let finish!:(value:{commandId:string;hidden:boolean})=>void;const commandId='linuxcast:calculator';let hidden:string[]=[];
+  const f=visibilityFixture({listHidden:async()=>hidden,setHidden:vi.fn(()=>new Promise<{commandId:string;hidden:boolean}>(resolve=>{finish=resolve;}))}),{revision}=await catalogue(f),payload={protocolVersion:1,revision,commandId,hidden:true};
+  const pending=f.invoke(LAUNCHER_CHANNELS.setHidden,payload);
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setHidden,payload)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.execute('linuxcast:open-local-data',revision)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  hidden=[commandId];finish({commandId,hidden:true});expect(await pending).toMatchObject({ok:true,value:{revision:revision+1}});expect(f.actions.setHidden).toHaveBeenCalledTimes(1);
+});
+it('discards registry changes and mismatched or unconfirmed visibility receipts without replay',async()=>{
+  for(const setHidden of [vi.fn(async()=>({commandId:'linuxcast:open-url',hidden:true})),vi.fn(async()=>({commandId:'linuxcast:calculator',hidden:false})),vi.fn(async()=>{throw new Error('SYNTHETIC_PRIVATE');})]){
+    const f=visibilityFixture({setHidden}),{revision}=await catalogue(f),reply=await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision,commandId:'linuxcast:calculator',hidden:true});
+    expect(reply).toMatchObject({ok:false,error:{code:'internal',message:expect.stringContaining('could not be confirmed'),retryable:false}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(setHidden).toHaveBeenCalledTimes(1);expect(f.actions.recordUse).not.toHaveBeenCalled();
+  }
+  let finish!:(value:{commandId:string;hidden:boolean})=>void,apps=[applicationFixture(0)];
+  const f=visibilityFixture({listApplications:async()=>apps,setHidden:()=>new Promise(resolve=>{finish=resolve;})}),{revision}=await catalogue(f),pending=f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision,commandId:'linuxcast:calculator',hidden:true});
+  apps=[];expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false});finish({commandId:'linuxcast:calculator',hidden:true});expect(await pending).toMatchObject({ok:false,error:{code:'internal'}});
+});
+it('keeps Hide and Quit available through preference-store failure while other effects remain unavailable',async()=>{
+  const f=visibilityFixture({listHidden:async()=>{throw new Error('SYNTHETIC_PRIVATE');}}),snapshot=await catalogue(f);
+  expect(snapshot.visibilityAvailable).toBe(false);expect(snapshot.rankingAvailable).toBe(true);
+  for(const row of snapshot.commands){expect(row.hidden).toBe(false);expect(row.enabled).toBe(['linuxcast:hide','linuxcast:quit'].includes(row.id));if(!row.enabled)expect(row.unavailableReason).toContain('Reload');}
+  expect(await f.execute('linuxcast:open-local-data',snapshot.revision)).toMatchObject({ok:false});expect(f.actions.openDataSettings).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision:snapshot.revision,commandId:'linuxcast:calculator',hidden:true})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  expect(await f.execute('linuxcast:hide',snapshot.revision)).toMatchObject({ok:true});expect(await f.execute('linuxcast:quit',snapshot.revision)).toMatchObject({ok:true});await vi.waitFor(()=>expect(f.actions.quit).toHaveBeenCalledOnce());
+});
+it.each(['linuxcast:calculator','linuxcast:open-url','linuxcast:open-local-data'])('freshly enforces hidden state before typed effects: %s',async commandId=>{
+  let hidden:string[]=[];const copy=vi.fn(async()=>'written' as const),f=visibilityFixture({listHidden:async()=>hidden,copyCalculatorResult:copy}),{revision}=await catalogue(f);
+  hidden=[commandId];
+  const invoke=()=>commandId==='linuxcast:calculator'?f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision,expression:'2+2'}):commandId==='linuxcast:open-url'?f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision,url:'https://example.invalid'}):f.execute(commandId,revision);
+  expect(await invoke()).toMatchObject({ok:false,error:{code:'invalid-request'}});const latest=await catalogue(f);
+  const payload={protocolVersion:1,revision:latest.revision};
+  const denied=commandId==='linuxcast:calculator'?await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{...payload,expression:'2+2'}):commandId==='linuxcast:open-url'?await f.invoke(LAUNCHER_CHANNELS.openUrl,{...payload,url:'https://example.invalid'}):await f.execute(commandId,latest.revision);
+  expect(denied).toMatchObject({ok:false,error:{code:'permission-denied'}});expect(copy).not.toHaveBeenCalled();expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.openDataSettings).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it.each(['linuxcast:calculator','linuxcast:open-url','linuxcast:open-local-data'])('rejects a replaced invoking frame after visibility preflight: %s',async commandId=>{
+  let finish!:(ids:string[])=>void;const listHidden=vi.fn(async()=>[] as string[]),copy=vi.fn(async()=>'written' as const),f=visibilityFixture({listHidden,copyCalculatorResult:copy}),{revision}=await catalogue(f);
+  listHidden.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+  const pending=commandId==='linuxcast:calculator'?f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision,expression:'2+2'}):commandId==='linuxcast:open-url'?f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision,url:'https://example.invalid'}):f.execute(commandId,revision);
+  await vi.waitFor(()=>expect(finish).toBeTypeOf('function'));
+  Object.assign(f.event.sender,{mainFrame:{url:APP_URL}});finish([]);
+  expect(await pending).toMatchObject({ok:false,error:{code:'permission-denied'}});expect(copy).not.toHaveBeenCalled();expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.openDataSettings).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
 it('recomputes numeric calculator text in main and records only a confirmed explicit copy',async()=>{
   const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult});
   expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'1 + 2 * 3'})).toEqual({ok:true,value:{outcome:'copied',text:'7'}});

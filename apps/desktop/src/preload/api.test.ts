@@ -9,6 +9,13 @@ function fixture() {
     on: vi.fn(), removeListener: vi.fn() };
   return { transport, api: createShellApi(transport) };
 }
+it('exposes only the strict named visibility method and rejects recovery, extra fields and malformed acknowledgements',async()=>{
+  const {api,transport}=fixture(),valid={commandId:'linuxcast:calculator' as const,revision:1,hidden:true};
+  for(const request of [{...valid,commandId:'linuxcast:hide'},{...valid,commandId:'linuxcast:quit',hidden:false},{...valid,hidden:'true'},{...valid,revision:0},{...valid,path:'/private'}])expect(await api.setLauncherHidden!(request as never)).toMatchObject({ok:false});
+  expect(transport.invoke).not.toHaveBeenCalled();transport.invoke.mockResolvedValue({ok:true,value:{revision:2,commands:[],rankingAvailable:true,visibilityAvailable:true,nextCursor:null}});
+  expect(await api.setLauncherHidden!(valid)).toMatchObject({ok:true,value:{visibilityAvailable:true}});expect(transport.invoke).toHaveBeenCalledExactlyOnceWith(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,...valid});
+  for(const value of [{ok:true,value:{revision:2,commands:[],rankingAvailable:true,visibilityAvailable:'true'}},{ok:true,value:{revision:2,commands:[],rankingAvailable:true,private:'SYNTHETIC_PRIVATE'}},{ok:true,value:'x'.repeat(1048577)}]){transport.invoke.mockResolvedValue(value);expect(await api.setLauncherHidden!(valid)).toMatchObject({ok:false});}
+});
 it('passes only validated calculator expressions and returns only bounded numeric-copy receipts',async()=>{
   const {api,transport}=fixture();
   transport.invoke.mockResolvedValue({ok:true,value:{outcome:'copied',text:'4'}});
@@ -26,7 +33,7 @@ it('keeps only a closed unit in calculator copy receipts',async()=>{
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['copyCalculatorResult', 'openLauncherUrl', 'setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['setLauncherHidden', 'copyCalculatorResult', 'openLauncherUrl', 'setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });

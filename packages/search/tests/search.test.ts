@@ -1,5 +1,5 @@
 import { describe,expect,it } from 'vitest';
-import { QueryGenerations,rankCommands,preserveSelection } from '../src/index.ts';
+import { QueryGenerations,rankCommands,rankManagedCommands,preserveSelection } from '../src/index.ts';
 import type { SearchCommand } from '../src/index.ts';
 const make=(id:string,title:string,patch:Partial<SearchCommand>={}):SearchCommand=>({id,title,aliases:[],keywords:[],enabled:true,usage:null,...patch});
 const now=Date.parse('2026-10-25T00:00:00Z');
@@ -53,4 +53,52 @@ it('L1-02 valid HTTP queries match only an already registered Open URL command w
 });
 it('L1-02 admits six builtins plus4096application identities and rejects4103records',()=>{
   const commands=Array.from({length:4102},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
+});
+
+
+describe('L1-01 hidden root commands and local management projection',()=>{
+  it('excludes hidden alias, favourite and high-frecency rows before any matching',()=>{
+    const hidden=make('fixture:hidden','Hidden',{hidden:true,aliases:['needle'],usage:{pinned:true,useCount:9999,lastUsedAt:new Date(now).toISOString(),alias:'saved'}});
+    const shown=make('fixture:shown','Needle shown');
+    for(const query of ['', 'needle','saved','Hidden'])expect(rankCommands([hidden,shown],query,now)).not.toContain(hidden);
+    expect(rankCommands([hidden,shown],'needle',now)).toEqual([shown]);
+    expect(rankCommands([hidden,{...shown,hidden:false}],'',now)).toEqual([{...shown,hidden:false}]);
+    expect(hidden.hidden).toBe(true);
+  });
+  it('excludes hidden rows before provider caps and never retains a hidden selected ID',()=>{
+    const hidden=Array.from({length:30},(_,i)=>make(`fixture:hidden${i}`,`Hidden ${i}`,{hidden:true,usage:{pinned:true,useCount:100,lastUsedAt:new Date(now).toISOString(),alias:null}}));
+    const shown=Array.from({length:25},(_,i)=>make(`fixture:shown${i}`,`Shown ${i}`));
+    const results=rankCommands([...hidden,...shown],'',now,hidden[29]!.id);expect(results).toEqual(shown.slice(0,20));
+    expect(preserveSelection([...hidden,...shown],hidden[0]!.id)).toBe(shown[0]!.id);
+    expect(preserveSelection(hidden,hidden[0]!.id)).toBeNull();
+    expect(rankCommands([make('linuxcast:open-url','Open URL',{hidden:true})],'https://example.org',now)).toEqual([]);
+  });
+  it('retains original hidden/unavailable metadata in management without frecency ordering',()=>{
+    const hidden=make('fixture:a','Alpha',{hidden:true,enabled:false,usage:{pinned:false,useCount:0,lastUsedAt:null,alias:null}});
+    const pinned=make('fixture:z','Zulu',{usage:{pinned:true,useCount:999,lastUsedAt:new Date(now).toISOString(),alias:null}});
+    const before=structuredClone([pinned,hidden]);
+    expect(rankManagedCommands([pinned,hidden],'')).toEqual([hidden,pinned]);
+    expect(rankManagedCommands([pinned,hidden],'')[0]).toBe(hidden);expect([pinned,hidden]).toEqual(before);
+    expect(rankManagedCommands([pinned,hidden],'Alpha')).toEqual([hidden]);
+  });
+  it('uses stable matching/title/id order without URL inference or command execution',()=>{
+    const a=make('fixture:a','Same'),b=make('fixture:b','Same'),alias=make('fixture:c','Zulu',{hidden:true,aliases:['same']});
+    expect(rankManagedCommands([b,a,alias],'same').map(row=>row.id)).toEqual([alias.id,a.id,b.id]);
+    const url=make('linuxcast:open-url','Open URL');expect(rankManagedCommands([url],'https://example.org')).toEqual([]);
+    expect(rankManagedCommands([url],'url')).toEqual([url]);
+  });
+  it('searches all collected rows before the management cap and retains only a matching selected ID',()=>{
+    const rows=Array.from({length:150},(_,i)=>make(`fixture:${i}`,`Fixture ${i.toString().padStart(3,'0')}`,{hidden:true,enabled:false}));
+    const capped=rankManagedCommands(rows,'Fixture',rows[149]!.id);expect(capped).toHaveLength(100);expect(capped[99]).toBe(rows[149]);
+    expect(capped.slice(0,99)).toEqual(rows.slice(0,99));
+    expect(rankManagedCommands(rows,'Fixture 149',rows[1]!.id)).toEqual([rows[149]]);
+    expect(rankManagedCommands(rows,'no matches',rows[149]!.id)).toEqual([]);
+    expect(rankManagedCommands(rows,'')).toEqual(rows.slice(0,100));
+  });
+  it('uses the existing 4102-registry and 512-query limits for management and rejects duplicate IDs',()=>{
+    const rows=Array.from({length:4102},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));rows[4101]!.title='Later hidden target';rows[4101]!.hidden=true;
+    expect(rankManagedCommands(rows,'Later hidden target')).toEqual([rows[4101]]);
+    expect(()=>rankManagedCommands([...rows,make('fixture:extra','Extra')],'')).toThrow('limit');
+    expect(()=>rankManagedCommands([],'x'.repeat(513))).toThrow('limit');expect(()=>rankManagedCommands([rows[0]!,rows[0]!],'')).toThrow('Duplicate');
+  });
 });

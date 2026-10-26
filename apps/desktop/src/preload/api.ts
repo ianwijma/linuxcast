@@ -3,7 +3,7 @@ import {
 } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellApi } from '../../../../packages/contracts/src/desktop-shell.ts';
 import { calculatorCopyRequestSchema,calculatorCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
-import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema } from '../../../../packages/contracts/src/launcher.ts';
+import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherVisibilityRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema } from '../../../../packages/contracts/src/launcher.ts';
 
 /** Private adapter, never exposed across contextBridge. No Electron event crosses it. */
 export interface ShellTransport {
@@ -23,6 +23,14 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    setLauncherHidden:async(request:Parameters<NonNullable<DesktopShellApi['setLauncherHidden']>>[0])=>{
+      try{
+        const parsed=launcherVisibilityRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;
+        const value=await transport.invoke(LAUNCHER_CHANNELS.setHidden,parsed.data);
+        if(new TextEncoder().encode(JSON.stringify(value)).length>MAX_ENVELOPE_BYTES)return unavailable;
+        const result=launcherCommandsReplySchema.safeParse(value);return result.success?result.data:unavailable;
+      }catch{return unavailable;}
+    },
     copyCalculatorResult:async(request:{revision:number;expression:string})=>{
       try {
         const parsed=calculatorCopyRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;

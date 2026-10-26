@@ -31,6 +31,14 @@ startResidentShell({ resourcesDirectory: __dirname,
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.setAlias',{commandId,alias},{timeoutMs:1000});
   },
+  async listHiddenCommands() {
+    if(!storage?.isReady())throw new Error('Command visibility unavailable.');
+    return storage.repository.request('commands.listHidden',{},{timeoutMs:1000});
+  },
+  async setCommandHidden(commandId,hidden) {
+    if(!storage?.isReady())throw new Error('Command visibility unavailable.');
+    return storage.repository.request('commands.setHidden',{commandId,hidden},{timeoutMs:1000});
+  },
   async recordCommandUse(commandId) {
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.recordUse',{commandId},{timeoutMs:250});
