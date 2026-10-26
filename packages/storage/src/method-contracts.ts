@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
+import { launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
 const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
@@ -19,6 +20,10 @@ const validSetting = (v: {id:string;value:string|boolean}) => {
 };
 const setting = z.strictObject({id:settingId,revision:revision.min(1),value:settingValue,modifiedAt:z.iso.datetime()}).refine(validSetting);
 const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datetime().nullable(),pinned:z.boolean(),alias:uiTextSchema.nullable()});
+const visibilityId = launcherCommandIdSchema.refine(id => !isLauncherVisibilityProtected(id));
+const visibility = z.strictObject({commandId:visibilityId,hidden:z.boolean()});
+export const hiddenCommandIdsSchema = z.array(visibilityId).max(4102).refine(ids =>
+  ids.every((id,index) => index === 0 || ids[index - 1]! < id));
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...createAiRepositoryContracts(),
@@ -32,6 +37,8 @@ export const storageContracts: RepositoryContracts = new Map([
   ['commands.setAlias',{params:z.strictObject({commandId,alias:commandAliasSchema.nullable()}),result:usage}],
   ['commands.recordUse',{params:z.strictObject({commandId}),result:usage}],
   ['commands.getUsage',{params:z.strictObject({commandId}),result:usage.nullable()}],
+  ['commands.listHidden',{params:z.strictObject({}),result:hiddenCommandIdsSchema}],
+  ['commands.setHidden',{params:visibility,result:visibility}],
   ['ai.conversations.put',{params:z.strictObject({record:conversationRecordSchema,expectedRevision:revision}),result:conversationRecordSchema}],
   ['ai.messages.list',{params:z.strictObject({conversationId:z.uuid(),afterId:z.uuid().optional(),limit:z.number().int().min(1).max(100)}),result:z.array(messageRevisionRecordSchema).max(100)}],
 ]);

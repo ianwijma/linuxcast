@@ -26,6 +26,8 @@ export interface ResidentShellOptions {
   recordCommandUse?: LauncherActions['recordUse'];
   setCommandPinned?: LauncherActions['setPinned'];
   setCommandAlias?: LauncherActions['setAlias'];
+  listHiddenCommands?: LauncherActions['listHidden'];
+  setCommandHidden?: LauncherActions['setHidden'];
   listApplications?: LauncherActions['listApplications'];
   launchApplication?: LauncherActions['launchApplication'];
 }
@@ -145,6 +147,8 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.launchApplication ? {launchApplication: options.launchApplication} : {}),
       ...(options.setCommandPinned ? {setPinned: options.setCommandPinned} : {}),
       ...(options.setCommandAlias ? {setAlias: options.setCommandAlias} : {}),
+      ...(options.listHiddenCommands ? {listHidden:options.listHiddenCommands} : {}),
+      ...(options.setCommandHidden ? {setHidden:options.setCommandHidden} : {}),
       ...(options.recordCommandUse ? {recordUse: options.recordCommandUse} : {}),
     });
     removeIpc = registerShellIpc(ipcMain, {

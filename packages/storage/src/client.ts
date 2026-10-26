@@ -11,7 +11,7 @@ import { fileSearchOptionsSchema,fileSearchMatchesDirectory,fileSearchMatchesOpt
 import { MAX_ENVELOPE_BYTES, parseRepositoryResponse } from '../../contracts/src/index.ts';
 import { storageContracts } from './method-contracts.ts';
 import type { StorageMethod, StorageMethods } from './repositories.ts';
-export type { StorageMethod, StorageMethods, Setting, SettingId, CommandUsage } from './repositories.ts';
+export type { StorageMethod, StorageMethods, Setting, SettingId, CommandUsage, CommandVisibility } from './repositories.ts';
 export interface ClientPort { send(value: unknown): void; onMessage(listener: (value: unknown) => void): () => void }
 export class StorageRequestError extends Error {
   readonly effectOutcome: 'not-dispatched' | 'unknown';
@@ -75,6 +75,8 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   } else if (method.startsWith('settings.')) valid = row.id === params.id;
   else if (method === 'commands.setPinned') valid = row.commandId === params.commandId && row.pinned === params.pinned;
   else if (method === 'commands.setAlias') valid = row.commandId === params.commandId && row.alias === params.alias;
+  else if (method === 'commands.setHidden') valid = row.commandId === params.commandId && row.hidden === params.hidden;
+  else if (method === 'commands.listHidden') valid = true; // Sorted unique identities are checked by the result schema.
   else if (method.startsWith('commands.')) valid = row.commandId === params.commandId;
   else if (method === 'ai.conversations.get') valid = row.id === params.id;
   else if (method === 'ai.messages.list') valid = (result as {conversationId:string}[]).every(r => r.conversationId === params.conversationId);

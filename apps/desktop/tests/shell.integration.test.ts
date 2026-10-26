@@ -183,7 +183,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['copyCalculatorResult', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherPinned'],
+    methods: ['copyCalculatorResult', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherHidden', 'setLauncherPinned'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -202,6 +202,25 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     await page.screenshot({ path: join(evidence, `shell-${theme}.png`) });
   }
   expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
+  const action=async(target:typeof page,title:string)=>{await target.keyboard.press('Control+k');const find=target.getByRole('searchbox',{name:'Find an action'});await find.fill(title);await find.press('Enter');};
+  // Actual metadata administration: hiding removes an already-used, pinned,
+  // aliased application from root search without running or uninstalling it.
+  await query.fill('Public fixture app');await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  await action(page,'Pin command');await action(page,'Edit search alias');
+  await page.getByRole('textbox',{name:'Search alias',exact:true}).fill('public-application');await page.getByRole('button',{name:'Save alias',exact:true}).click();await query.waitFor();
+  await query.fill('public-application');await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  const applicationMetadata=await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):undefined;});
+  expect(applicationMetadata?.usage).toMatchObject({pinned:true,alias:'public-application',useCount:1});
+  await action(page,'Hide command');await expect.poll(()=>page.getByRole('option').count()).toBe(0);
+  await action(page,'Manage commands');const managed=page.getByRole('searchbox',{name:'Manage commands',exact:true});await managed.fill('public-application');
+  await expect.poll(()=>page.getByRole('option').count()).toBe(1);await expect.poll(()=>page.getByRole('option').textContent()).toContain('Hidden');
+  expect(await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications')?.usage:null;})).toEqual(applicationMetadata?.usage);
+  for(const theme of ['dark','light'] as const){
+    await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
+    await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
+    await page.screenshot({path:join(evidence,`command-visibility-${theme}.png`)});expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
+  }
+  await page.keyboard.press('Escape');await query.waitFor();expect(await query.inputValue()).toBe('public-application');expect(await page.getByRole('option').count()).toBe(0);
   const nextWindow=app.waitForEvent('window');
   await query.fill('settings');
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
@@ -254,6 +273,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records.every((record:{useCount:number})=>record.useCount===0)).toBe(true);
+  expect(await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):null;})).toMatchObject({hidden:true,usage:{pinned:true,alias:'public-application',useCount:0,lastUsedAt:null}});
   await data.getByRole('button',{name:'Close settings'}).click();await expect.poll(()=>data.isClosed()).toBe(true);
   expect(await app.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Linuxcast storage').length)).toBe(1);
   expect(await app.evaluate(async ({ utilityProcess }, options) => new Promise<boolean>((resolve, reject) => {
@@ -348,6 +368,15 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:hide')?.usage:null;
   });
   expect(savedUsage).toMatchObject({pinned:true,useCount:1,alias:'public-hide'});
+  // Restart proves the root exclusion is durable. Show via the same management
+  // List, then execute the real registered GIO application again.
+  await reopenedQuery.fill('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(0);
+  await action(reopened,'Manage commands');const reopenedManaged=reopened.getByRole('searchbox',{name:'Manage commands',exact:true});await reopenedManaged.fill('public-application');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Hidden');
+  await action(reopened,'Show command');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Shown');
+  await reopened.keyboard.press('Escape');await reopenedQuery.waitFor();expect(await reopenedQuery.inputValue()).toBe('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(1);
+  expect(await reopened.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):null;})).toMatchObject({hidden:false,usage:{pinned:true,alias:'public-application',useCount:0,lastUsedAt:null}});
+  rmSync(launchMarker);await reopenedQuery.press('Enter');await expect.poll(()=>existsSync(launchMarker)).toBe(true);
+  expect(await showExisting()).toBe(0);await expect.poll(()=>restarted.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
   await reopenedQuery.fill('public-hide');await expect.poll(()=>reopened.getByRole('option').count()).toBe(1);
   await reopenedQuery.press('Control+k');
   await reopened.getByRole('searchbox',{name:'Find an action'}).fill('Edit search alias');
@@ -370,5 +399,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   const persisted=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-pin-reopen'});
   try {
     expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.getUsage',params:{commandId:'linuxcast:hide'}}).result).toMatchObject({pinned:false,useCount:1,alias:null});
+    expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.listHidden',params:{}}).result).toEqual([]);
+    expect(persisted.request({schemaVersion:1,requestId:randomUUID(),method:'commands.getUsage',params:{commandId:applicationMetadata!.id}}).result).toMatchObject({pinned:true,alias:'public-application',useCount:1});
   } finally {await persisted.close();}
 }, 60000);

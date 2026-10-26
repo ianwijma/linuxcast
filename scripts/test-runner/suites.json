@@ -149,7 +149,8 @@
     ],
     "L1-01": [
       "packages/storage/tests/command-pins.integration.test.ts",
-      "packages/storage/tests/command-aliases.integration.test.ts"
+      "packages/storage/tests/command-aliases.integration.test.ts",
+      "packages/storage/tests/command-visibility.integration.test.ts"
     ],
     "L1-02": [
       "apps/desktop/tests/shell.integration.test.ts"

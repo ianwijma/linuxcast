@@ -18,6 +18,7 @@ type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
 export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
+export interface CommandVisibility { commandId: string; hidden: boolean }
 export interface StorageMethods extends FileIndexMethods {
   'dataControls.clear': {params: DataClearParams; result: DataClearResult};
   'dataControls.export': {params: DataExportParams; result: DataExportResult};
@@ -34,13 +35,15 @@ export interface StorageMethods extends FileIndexMethods {
   'commands.setAlias': { params: {commandId: string; alias: string | null}; result: CommandUsage };
   'commands.recordUse': { params: {commandId: string}; result: CommandUsage };
   'commands.getUsage': { params: {commandId: string}; result: CommandUsage | null };
+  'commands.listHidden': { params: Record<string, never>; result: string[] };
+  'commands.setHidden': { params: CommandVisibility; result: CommandVisibility };
   'ai.conversations.get': { params: {id: string}; result: Conversation | null };
   'ai.conversations.put': { params: {record: Conversation; expectedRevision: number}; result: Conversation };
   'ai.messages.appendRevision': { params: {record: MessageRevisionRecord}; result: MessageRevisionRecord };
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -121,6 +124,17 @@ export class Repositories {
       }
       case 'commands.getUsage': {
         const p = object(input, ['commandId']); return this.getUsage(identifier(p.commandId));
+      }
+      case 'commands.listHidden': return (db.prepare('SELECT command_id FROM command_visibility ORDER BY command_id').all() as {command_id:string}[]).map(row => row.command_id);
+      case 'commands.setHidden': {
+        const {commandId,hidden}=input as CommandVisibility;
+        if(hidden){
+          const exists=db.prepare('SELECT 1 FROM command_visibility WHERE command_id=?').get(commandId);
+          const {count}=db.prepare('SELECT count(*) AS count FROM command_visibility').get() as {count:number};
+          if(!exists && count>=4102)throw new StorageError('conflict');
+          db.prepare('INSERT OR IGNORE INTO command_visibility(command_id) VALUES(?)').run(commandId);
+        }else db.prepare('DELETE FROM command_visibility WHERE command_id=?').run(commandId);
+        return {commandId,hidden};
       }
       case 'commands.setPinned': {
         const p = object(input, ['commandId', 'pinned']); const commandId = identifier(p.commandId);
