@@ -1,13 +1,17 @@
 import { CalculatorFlow } from '@linuxcast/calculator/presentation';
 import { collectCatalogue,mergePinReply,mergeAliasReply,mergeVisibilityCatalogue,parsePage } from './catalogue.ts';
 import type { Catalogue } from './catalogue.ts';
-import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema,isLauncherVisibilityProtected } from '@linuxcast/contracts';
+import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema,launcherApplicationActionReplySchema,isLauncherVisibilityProtected } from '@linuxcast/contracts';
 import type { LauncherApi,ViewModel,ShellCommandReply,LauncherCommandMetadata } from '@linuxcast/contracts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
 import { QueryGenerations,rankCommands,rankManagedCommands,MAX_QUERY_LENGTH } from '@linuxcast/search';
 const VIEW_ID='linuxcast-launcher';
 const RETRY='launcher:retry',MANAGE='launcher:manage',BACK_MANAGE='launcher:back-manage',HIDE_COMMAND='launcher:hide-command',SHOW_COMMAND='launcher:show-command';
+const APPLICATION_ACTION_PREFIX='launcher:application:',APPLICATION_ACTION_UNAVAILABLE='launcher:application-actions-unavailable';
+const APPLICATION_ACTION_UNKNOWN='The application action outcome is unknown. Check the application, then reload commands before trying again.';
+const APPLICATION_ACTION_UNAVAILABLE_REASON='Application actions are unavailable. Open the application to use its other actions.';
+type ApplicationActionPending={controller:AbortController;commandId:string;actionId:string;revision:number;query:string;frameQuery:string};
 const VISIBILITY_UNKNOWN='Visibility may have changed. Reload commands before trying again.';
 const PIN='launcher:pin',UNPIN='launcher:unpin';
 const OPEN_URL='linuxcast:open-url',SUBMIT_URL='launcher:submit-url',CANCEL_URL='launcher:cancel-url';
@@ -28,17 +32,18 @@ export class LauncherController {
   #calculator:CalculatorFlow|null=null;#calculatorSequence=0;
   #url:UrlEditor|null=null;#urlSequence=0;#urlUnconfirmed=false;
   #manager:{viewId:string;query:string;selectedId:string|null}|null=null;#managerSequence=0;#visibilityPending:{controller:AbortController;viewId:string}|null=null;#visibilityWarning:Status|undefined;
+  #applicationPending:ApplicationActionPending|null=null;#applicationNeedsReload=false;#applicationWarning:Status|undefined;
   #priorSelection:string|null=null;#alias:AliasEditor|null=null;#aliasSequence=0;
   constructor(api:LauncherApi,dismiss:()=>Promise<ShellCommandReply>) {
     this.#api=api;this.#dismiss=dismiss;
     this.session=new ViewSession(this.#view(),id=>{void this.#closeView(id);});
-    this.session.subscribe(()=>{const frame=this.session.getSnapshot().frames[0];if(frame)this.#priorSelection=frame.selection;});
+    this.session.subscribe(()=>{const frame=this.session.getSnapshot().frames[0];if(frame)this.#priorSelection=frame.selection;if(this.#applicationPending&&!this.#applicationContextCurrent(this.#applicationPending))this.#abortApplicationAction();});
     this.host={queryChanged:(id,query)=>{if(this.#manager?.viewId===id){this.#manager.query=query;this.#publish();}else if(id===VIEW_ID)this.query(query);},action:intent=>{void this.execute(intent);}};
   }
   #view():ViewModel {
     const tooLong=this.#query.length>MAX_QUERY_LENGTH;
     const commands=this.#snapshot && !tooLong?rankCommands(this.#snapshot.commands,this.#query,Date.now(),this.#priorSelection):[];
-    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#status??this.#visibilityWarning;
+    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#applicationPending?{kind:'info' as const,message:'Requesting application action…'}:this.#status??this.#applicationWarning??this.#visibilityWarning;
     return {protocolVersion:1,viewId:VIEW_ID,revision:++this.#viewRevision,kind:'list',title:'Search commands',loading:this.#loading,
       search:{query:this.#query,placeholder:'Search commands…',mode:'extension'},
       sections:[...new Set(commands.map(command=>command.provider??(command.id.startsWith('application:')?'applications':'commands')))].map(provider=>({id:provider,title:provider==='applications'?'Applications':'Linuxcast',items:commands.filter(command=>(command.provider??(command.id.startsWith('application:')?'applications':'commands'))===provider).map(command=>({id:command.id,title:command.title,...(command.subtitle?{subtitle:command.subtitle}:{}),icon:{kind:'builtin' as const,name:command.id==='linuxcast:open-local-data'?'settings':command.id===OPEN_URL?'link':'search'},
@@ -48,9 +53,44 @@ export class LauncherController {
           {id:command.usage?.pinned?UNPIN:PIN,title:command.usage?.pinned?'Unpin command':'Pin command',kind:'invoke' as const,effect:'write' as const,icon:{kind:'builtin' as const,name:'star'},
             ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Pinning is unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},
           {id:ALIAS,title:'Edit search alias',kind:'invoke' as const,effect:'read' as const,icon:{kind:'builtin' as const,name:'search'},
-            ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Aliases are unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},this.#visibilityAction(command)]}))})),
+            ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Aliases are unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},this.#visibilityAction(command),...this.#applicationActions(command)]}))})),
       empty:{title:this.#loading?'Loading commands…':'No commands available',description:this.#loading?'Getting commands from Linuxcast.':'Reload commands to try again.'},
-      ...(status?{status}:{}),actions:[{id:MANAGE,title:'Manage commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})},...((this.#status?.kind==='error' || this.#metadataUnconfirmed || this.#urlUnconfirmed || this.#snapshot && (!this.#snapshot.rankingAvailable || this.#snapshot.applicationState==='unavailable' || this.#snapshot.visibilityAvailable!==true)) && !this.#busy?[{id:RETRY,title:'Reload commands',kind:'invoke' as const,effect:'read' as const}]:[])]};
+      ...(status?{status}:{}),actions:[{id:MANAGE,title:'Manage commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})},...((this.#status?.kind==='error' || this.#metadataUnconfirmed || this.#applicationNeedsReload || this.#urlUnconfirmed || this.#snapshot && (!this.#snapshot.rankingAvailable || this.#snapshot.applicationState==='unavailable' || this.#snapshot.visibilityAvailable!==true)) && !this.#busy?[{id:RETRY,title:'Reload commands',kind:'invoke' as const,effect:'read' as const}]:[])]};
+  }
+  #applicationActions(command:LauncherCommandMetadata){
+    const metadata=command.applicationActions;if(!metadata)return [];
+    if(!metadata.available)return [{id:APPLICATION_ACTION_UNAVAILABLE,title:'Application actions',kind:'invoke' as const,effect:'write' as const,disabledReason:APPLICATION_ACTION_UNAVAILABLE_REASON}];
+    const disabledReason=this.#busy?'Wait for the current command to finish.':this.#loading?'Refreshing commands…':this.#applicationNeedsReload?'Check the application if needed, then reload commands before another application action.':!this.#api.executeApplicationAction?APPLICATION_ACTION_UNAVAILABLE_REASON:undefined;
+    return metadata.actions.map(action=>({id:`${APPLICATION_ACTION_PREFIX}${action.id}`,title:action.title,kind:'invoke' as const,effect:'write' as const,...(disabledReason?{disabledReason}:{})}));
+  }
+  #applicationContextCurrent(pending:ApplicationActionPending){
+    const frame=this.session.getSnapshot().frames.at(-1),command=this.#snapshot?.commands.find(value=>value.id===pending.commandId);
+    return this.#active&&frame?.view.viewId===VIEW_ID&&frame.selection===pending.commandId&&frame.query===pending.frameQuery&&this.#query===pending.query&&this.#snapshot?.revision===pending.revision&&command?.enabled&&!command.hidden&&command.applicationActions?.available&&command.applicationActions.actions.some(action=>action.id===pending.actionId);
+  }
+  #abortApplicationAction(){
+    const pending=this.#applicationPending;if(!pending)return;
+    this.#applicationPending=null;this.#applicationNeedsReload=true;this.#applicationWarning={kind:'error',message:APPLICATION_ACTION_UNKNOWN};this.#status=this.#applicationWarning;
+    pending.controller.abort();if(this.#execution===pending.controller)this.#busy=false;this.#publish();
+  }
+  async #executeApplicationAction(intent:ActionIntent){
+    const frame=this.session.getSnapshot().frames.at(-1),command=this.#snapshot?.commands.find(value=>value.id===intent.itemId),actionId=intent.actionId.slice(APPLICATION_ACTION_PREFIX.length);
+    if(!this.#api.executeApplicationAction||!frame||!command?.id.startsWith('application:')||!command.enabled||command.hidden||command.id!==frame.selection||!command.applicationActions?.available||!command.applicationActions.actions.some(action=>action.id===actionId)||this.#applicationNeedsReload||this.#query.length>MAX_QUERY_LENGTH||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
+    const controller=new AbortController(),pending:ApplicationActionPending={controller,commandId:command.id,actionId,revision:this.#snapshot!.revision,query:this.#query,frameQuery:frame.query};
+    this.#applicationPending=pending;this.#execution=controller;this.#busy=true;this.#status=undefined;this.#publish();
+    try{
+      const reply=launcherApplicationActionReplySchema.parse(await bounded(this.#api.executeApplicationAction({commandId:command.id,revision:pending.revision,actionId}),controller.signal));
+      if(controller.signal.aborted||this.#execution!==controller||this.#applicationPending!==pending)return;
+      if(!this.#applicationContextCurrent(pending)){this.#abortApplicationAction();return;}
+      if(!reply.ok){
+        this.#applicationNeedsReload=true;this.#applicationWarning={kind:'error',message:['invalid-request','capability-unavailable','permission-denied','conflict'].includes(reply.error.code)?'The application action was not requested. Open the application to use its other actions, or reload commands and try again.':APPLICATION_ACTION_UNKNOWN};this.#status=this.#applicationWarning;return;
+      }
+      if(reply.value.actionId!==actionId)throw new Error('Unconfirmed application action.');
+      // GIO confirms a request only. Hide is a separate operation after a current
+      // exact receipt; a failed Hide must not imply the action was cancelled.
+      this.#applicationPending=null;this.#applicationWarning=undefined;this.#status=catalogueStatus(this.#snapshot!);
+      await this.#hideWindow('The application action was requested, but Linuxcast could not hide this window. Try Hide again.');
+    }catch{if(!controller.signal.aborted){this.#applicationNeedsReload=true;this.#applicationWarning={kind:'error',message:APPLICATION_ACTION_UNKNOWN};this.#status=this.#applicationWarning;}}
+    finally{if(this.#execution===controller&&!controller.signal.aborted){this.#applicationPending=null;this.#busy=false;this.#publish();}}
   }
   #visibilityAction(command:LauncherCommandMetadata){
     const disabledReason=isLauncherVisibilityProtected(command.id)?'Always shown for recovery. Hide Linuxcast and Quit Linuxcast cannot be hidden.':this.#busy?'Wait for the current command to finish.':this.#loading?'Refreshing commands…':this.#metadataUnconfirmed?'Reload commands to check the last metadata change before trying again.':!this.#api.setLauncherHidden || this.#snapshot?.visibilityAvailable!==true?'Visibility editing is unavailable. Reload commands to reconnect to storage.':undefined;
@@ -59,7 +99,7 @@ export class LauncherController {
   #managedView():ViewModel{
     const manager=this.#manager!,tooLong=manager.query.length>MAX_QUERY_LENGTH,selected=this.session.getSnapshot().frames.find(frame=>frame.view.viewId===manager.viewId)?.selection??manager.selectedId;
     const commands=this.#snapshot&&!tooLong?rankManagedCommands(this.#snapshot.commands,manager.query,selected):[];
-    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#busy?{kind:'info' as const,message:'Changing command visibility…'}:this.#status??this.#visibilityWarning??(!this.#api.setLauncherHidden || this.#snapshot?.visibilityAvailable!==true?{kind:'warning' as const,message:'Visibility editing is unavailable. Reload commands to reconnect to storage.'}:{kind:'info' as const,message:'Manage visibility without running commands. Refine your search to find up to 100 matching commands.'});
+    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#busy?{kind:'info' as const,message:'Changing command visibility…'}:this.#status??this.#applicationWarning??this.#visibilityWarning??(!this.#api.setLauncherHidden || this.#snapshot?.visibilityAvailable!==true?{kind:'warning' as const,message:'Visibility editing is unavailable. Reload commands to reconnect to storage.'}:{kind:'info' as const,message:'Manage visibility without running commands. Refine your search to find up to 100 matching commands.'});
     return {protocolVersion:1,viewId:manager.viewId,revision:++this.#viewRevision,kind:'list',title:'Manage commands',loading:this.#busy||this.#loading,search:{query:manager.query,placeholder:'Find shown or hidden registered commands…',mode:'extension'},...(selected&&commands.some(command=>command.id===selected)?{selectedId:selected}:{}),
       sections:[{id:'managed',title:'Registered commands · Up to 100 matches',items:commands.map(command=>({id:command.id,title:command.title,...(command.subtitle?{subtitle:command.subtitle}:{}),icon:{kind:'builtin' as const,name:'search'},accessories:[{text:command.hidden?'Hidden':'Shown'},...(isLauncherVisibilityProtected(command.id)?[{text:'Always shown for recovery'}]:[]),...(!command.enabled?[{text:'Unavailable',tooltip:command.unavailableReason??'This command is unavailable.'}]:[])],actions:[this.#visibilityAction(command)]}))}],
       empty:{title:this.#loading?'Loading commands…':'No matching commands',description:'Search both shown and hidden registered commands. At most 100 matches are displayed; refine your search.'},status,
@@ -112,7 +152,7 @@ export class LauncherController {
   #publish(){if(!this.#active)return;this.session.update(VIEW_ID,{protocolVersion:1,kind:'snapshot',view:this.#view()});if(this.#alias)this.session.update(this.#alias.viewId,{protocolVersion:1,kind:'snapshot',view:this.#aliasView()});if(this.#manager)this.session.update(this.#manager.viewId,{protocolVersion:1,kind:'snapshot',view:this.#managedView()});if(this.#url)this.session.update(this.#url.viewId,{protocolVersion:1,kind:'snapshot',view:this.#urlView()});}
   query(query:string){
     if(this.#manager || this.#alias || this.#url || this.#calculator?.active)return;
-    this.#query=query;
+    if(query!==this.#query)this.#abortApplicationAction();this.#query=query;
     if(query.length>MAX_QUERY_LENGTH){this.#generations.cancel();this.#publish();return;}
     const token=this.#generations.begin(query);
     queueMicrotask(()=>{if(this.#active && this.#generations.current(token.generation))this.#publish();});
@@ -121,7 +161,7 @@ export class LauncherController {
     if(visible===this.#active)return;
     this.#active=visible;
     if(visible){void this.refresh(false);return;}
-    this.#abortVisibility();if(this.#manager)this.session.pop();
+    this.#abortApplicationAction();this.#abortVisibility();if(this.#manager)this.session.pop();
     if(this.#alias || this.#url)this.session.pop();
     for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
     this.#calculator?.dispose();this.#calculator=null;
@@ -135,7 +175,7 @@ export class LauncherController {
       const next=await collectCatalogue(cursor=>{if(controller.signal.aborted)throw new Error();return bounded(this.#api.getLauncherCommands(cursor?{cursor}:undefined),controller.signal);});
       if(!this.#active || controller.signal.aborted)return;
       if(this.#snapshot && next.revision<this.#snapshot.revision)throw new Error();
-      this.#snapshot=next;if(explicit){this.#metadataUnconfirmed=false;this.#visibilityWarning=undefined;}this.#status=this.#visibilityWarning??catalogueStatus(next);
+      this.#snapshot=next;if(explicit){this.#metadataUnconfirmed=false;this.#visibilityWarning=undefined;this.#applicationNeedsReload=false;this.#applicationWarning=undefined;}this.#status=this.#applicationWarning??this.#visibilityWarning??catalogueStatus(next);
     }catch{if(!controller.signal.aborted)this.#status={kind:'error',message:'Commands could not be loaded. Reload commands to try again.'};}
     finally{if(this.#load===controller && !controller.signal.aborted){this.#loading=false;this.#publish();}}
   }
@@ -152,6 +192,7 @@ export class LauncherController {
     if(this.#alias){await this.#editAlias(intent);return;}
     if(this.#url){await this.#submitUrl(intent);return;}
     if(intent.viewId!==VIEW_ID)return;
+    if(intent.actionId.startsWith(APPLICATION_ACTION_PREFIX)){await this.#executeApplicationAction(intent);return;}
     if(intent.actionId===MANAGE){if(intent.values===undefined)this.#openManager();return;}
     if(intent.actionId===HIDE_COMMAND){await this.#setHidden(intent);return;}
     if(intent.actionId===RETRY){this.#urlUnconfirmed=false;await this.refresh();return;}
@@ -270,19 +311,19 @@ export class LauncherController {
     }
     // The shared view pops its root on Escape. Restore the local presentation
     // before requesting Hide so a denied/failed hide never leaves a blank window.
-    this.#abortVisibility();const selection=this.#priorSelection;
+    this.#abortApplicationAction();this.#abortVisibility();const selection=this.#priorSelection;
     this.session.navigate({protocolVersion:1,kind:'push',fromViewId:null,view:this.#view()});
     if(selection)this.session.select(VIEW_ID,selection);
     await this.#hideWindow();
   }
-  async #hideWindow(){
+  async #hideWindow(failureMessage='Linuxcast could not hide this window. Try again.'){
     if(!this.#active || this.#dismissal)return;
     const controller=new AbortController();this.#dismissal=controller;
     try{const reply=shellCommandReplySchema.parse(await bounded(this.#dismiss(),controller.signal));if(!reply.ok)throw new Error();}
-    catch{if(!controller.signal.aborted){this.#status={kind:'error',message:'Linuxcast could not hide this window. Try again.'};this.#publish();}}
+    catch{if(!controller.signal.aborted){this.#status={kind:'error',message:failureMessage};this.#publish();}}
     finally{if(this.#dismissal===controller)this.#dismissal=null;}
   }
-  dispose(){this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
+  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
   return new Promise((resolve,reject)=>{

@@ -173,12 +173,53 @@ remains visible across a refresh even when ranking would push it past the provid
 cap: it replaces the lowest unselected result within that same bound. A removed
 identity or one that no longer matches the query is released normally.
 
+## Registered Desktop Actions
+
+A registered application's declared Desktop Actions appear after Open, pin,
+alias and visibility in the existing root Actions menu. Open remains primary.
+Declared labels are plain data; only the selected registered application ID,
+registry revision and declared action ID enter the optional named
+`executeApplicationAction` API. Query text, titles, desktop paths, Exec and
+arguments do not enter this request. Management never exposes or executes these
+actions. Omitted legacy metadata or an available empty list adds no actions.
+Unavailable metadata shows a disabled **Application actions** entry; a missing
+API disables declared actions. Both explain how to open the application for its
+other actions, while ordinary Open remains independent.
+
+Only explicit intent can request an action. Pending state blocks duplicates and
+shows a fixed status; typing, selection, navigation and rendering cannot request
+one. Five-second presentation bounds, current root/query/selected-identity and
+registry guards fence stale, hidden and disposed replies. Leaving a pending
+context warns that the outcome is unknown and cannot undo the native request.
+An exact strict `{outcome: 'requested', actionId}` receipt only acknowledges a GIO
+request; it does not prove launch, focus or completion. Only that receipt in the
+unchanged invocation context requests the existing named Hide. A Hide failure
+explicitly says the application action was requested and the launcher could not
+hide; it never relabels the action unknown or repeats it.
+
+Known preflight denial uses fixed not-requested/Open/Reload remediation. An
+unknown, malformed, mismatched, cancelled or lost receipt tells the user to
+check the application, then explicitly Reload before a deliberate new request.
+The action gate survives automatic Hide/reopen, refresh and ordinary command
+success. Only a complete explicit authoritative reload clears it; no action is
+queued or replayed. This gate is separate from preference editing and primary
+Open. Main owns current native metadata/fingerprints, sender/hidden checks,
+aggregate usage and dispatch; UI never increments use optimistically.
+
+Design: Shell/navigation, Results/actions, States/motion, Accessibility and Review
+gate. Shared List/Actions/status/focus and existing tokens/fonts are reused, with
+no feature CSS or added window. This provides bounded L1-02 AC01 identity/input,
+AC02 outcome/availability, UI and privacy evidence. The request-observing synthetic
+fixtures do not establish native process effects, persistence or stdio isolation.
+Those checks belong to the coordinator/native integration lane. Scoped file/URI/
+argv/shell/history and complete desktop/native-AT/release gates remain required.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
-- `tests/controller.test.ts`: 93 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
-- `tests/launcher.ui.test.ts`: 43 Chromium component checks covering keyboard,
+- `tests/launcher.ui.test.ts`: 53 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
@@ -195,8 +236,13 @@ identity or one that no longer matches the query is released normally.
   navigation or synthetic submit. Visibility adds dark/light management, hidden and
   empty states, plus unavailable, pending and uncertain screenshots. Its labelled
   fixture observes explicit requests and holds public metadata in memory; it does
-  not establish storage or desktop integration. The 93 controller cases include
-  26 visibility cases; all 33 earlier browser cases remain in the 43-case suite.
+  not establish storage or desktop integration. The visibility slice retains 26
+  controller and ten browser cases. Desktop Actions
+  adds 32 controller and ten browser cases, with nine dark/light/affected captures
+  for declared menus, pending, denial, unknown/mismatched, unavailable and separate
+  Hide failure. Its public synthetic requests are observed only, never executed.
+  All 43 earlier browser cases remain in the 53-case suite; mapped L1-02 unit
+  checks cover 210 cases across controller, catalogue and search.
   These checks ran with Node 24.22.1/Bun 1.4.4.
 
 Generated fixture data only; no user content, secret values, query logging or
@@ -204,5 +250,5 @@ remote requests. Unit/browser checks are development evidence. The coordinator
 owns the actual main/preload/storage/Electron flow and its validation. Debian
 GNOME/KDE Wayland/X11 and native assistive-technology acceptance remain pending,
 along with full L1 providers, ranking controls and explicit fallbacks. F1/D1
-native gates remain pending. Broader typed URI/file/argv/shell flows, desktop actions and URL/run-history controls remain
+native gates remain pending. Broader typed URI/file/argv/shell flows and URL/run-history controls remain
 outstanding in L1-02. This slice does not mark all L1-01 or L1-02 complete.
