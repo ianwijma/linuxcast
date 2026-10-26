@@ -34,7 +34,8 @@
     ],
     "L2-02": [
       "packages/builtins/file-search/tests/controller.test.ts",
-      "packages/builtins/file-search/tests/service.test.ts"
+      "packages/builtins/file-search/tests/service.test.ts",
+      "packages/builtins/file-search/tests/options.test.ts"
     ],
     "L2-04": [
       "packages/builtins/calculator/tests/evaluate.test.ts",
@@ -151,7 +152,8 @@
     ],
     "L2-02": [
       "packages/builtins/file-search/tests/service.integration.test.ts",
-      "apps/desktop/tests/file-search.integration.test.ts"
+      "apps/desktop/tests/file-search.integration.test.ts",
+      "packages/storage/tests/file-search-options.integration.test.ts"
     ],
     "L2-04": [
       "apps/desktop/tests/calculator.integration.test.ts"

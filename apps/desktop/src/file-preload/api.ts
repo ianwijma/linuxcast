@@ -1,4 +1,4 @@
-import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
+import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsKey,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
 import type { FileSearchApi,IndexedPathSelection } from '@linuxcast/contracts';
 import type { ShellTransport } from '../preload/api.ts';
 export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
@@ -14,11 +14,11 @@ export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
     startIndex:(rootId:string)=>rootAction(FILE_SEARCH_CHANNELS.start,rootId),
     pauseIndex:(rootId:string)=>rootAction(FILE_SEARCH_CHANNELS.pause,rootId),
     removeFolder:(rootId:string)=>rootAction(FILE_SEARCH_CHANNELS.remove,rootId),
-    async search(request:{query:string;rootId?:string}){
+    async search(request:Parameters<FileSearchApi['search']>[0]){
       const parsed=fileSearchQueryRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return failed;
       try {
         const reply=fileSearchQueryReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.search,parsed.data)));
-        if(reply.ok&&(reply.value.query!==parsed.data.query||reply.value.rootId!==(parsed.data.rootId??null)))return failed;
+        if(reply.ok&&(reply.value.query!==parsed.data.query||reply.value.rootId!==(parsed.data.rootId??null)||fileSearchOptionsKey(reply.value.options)!==fileSearchOptionsKey(parsed.data.options)||reply.value.results.some(row=>!fileSearchMatchesOptions(row,parsed.data.options))))return failed;
         return reply;
       }catch{return failed;}
     },
