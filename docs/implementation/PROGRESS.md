@@ -17,7 +17,7 @@ An increment is not goal completion.
 
 ## Integrated base
 
-Primary clean develop **e2dec5a8bc072eb291ca1c7e61f483ba45c071c9** (PR44; details below).
+Primary clean develop **a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c** (PR45; details below).
 Prior base **6feaf5831f7acaa3753083db5d79d2216599bed7**,
 [PR43](https://github.com/ianwijma/linuxcast/pull/43) merged26October19:39:18UTC.
 Exact reviewed head82c2a7dee76c29943ab88470a419d1a036635798, CI40388536916
@@ -130,9 +130,32 @@ PASS187units/11contracts/29security/36L2integration(actual5.77s),43F2storage,
 captures inspected. Full typecheck/scopedlint/plan/diff pass. Actual reducedmotion
 captures avoid transient theme-animation pixels. Evidence
 `apps/desktop/evidence/quicklink-tags-application.md`. No current live test handles.
-Next: sign evidence/docs, publish focused PR, inspect exact-head CI/configured
-reviews/threads, normal merge promptly, primary frozen install/build and record
-merge. All broader L2-05/native/session/AT/release requirements remain pending.
+PR45 https://github.com/ianwijma/linuxcast/pull/45 merged as
+**a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c** at26October22:47:36UTC.
+Exact signed reviewed/tested head3f05245f01716683df2c13116d3989e6bddb97a9,
+CI40415016605 validatePASS12s; no requested GitHub reviews/comments/threads.
+Normal exact-head merge. Primary clean develop nowa44bbe6; frozen install and
+production build66assets pass. No open PRs remain.
+
+## Next bounded application increment: Quicklink pin/hide
+
+Coordinator reused isolated `.worktrees/linuxcast-application-controls`, new
+branch **codex/quicklink-presentation** froma44bbe6. Contract-only optional
+pinned/hidden fields (absent=false), frozen
+`packages/builtins/quicklinks/PRESENTATION-INCREMENT.md`. Dedicated List uses
+existing500/100 metadata/search and explicit get→Save CAS for presentation
+flags; preserve tags/URL/search config. Pin order, reversible Hide/Show and
+reachable include-hidden toggle, no Open while hidden, no navigation/effect on
+metadata change. Root will own migration011/repository/main/preload/client,
+unknown receipt fences and actual app acceptance. Freeze/mocks do not establish
+persistence, native effects or acceptance; all implementation still pending.
+
+Next manifest_review_sol assignment will reuse its clean isolated worktree on
+**codex/l2-05-quicklink-presentation-ui** from the signed freeze. UI-owned paths
+only: presentation, fixtures/tests/evidence/README. No infrastructure/research/
+proof/new services/packages. Required tests/captures and limitations are in the
+freeze. Root actual integration and prompt reviewed/tested small merge next.
+All subagents remain GPT-6.1SOL/high. Do not reduce complete1.0 scope.
 
 ## Complete scope / runtime
 
