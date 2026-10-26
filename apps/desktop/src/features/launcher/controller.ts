@@ -1,8 +1,9 @@
 import { CalculatorFlow } from '@linuxcast/calculator/presentation';
+import { QuicklinksFlow,createQuicklinksFlowState } from '@linuxcast/quicklinks/presentation';
 import { collectCatalogue,mergePinReply,mergeAliasReply,mergeVisibilityCatalogue,parsePage } from './catalogue.ts';
 import type { Catalogue } from './catalogue.ts';
 import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema,launcherApplicationActionReplySchema,isLauncherVisibilityProtected } from '@linuxcast/contracts';
-import type { LauncherApi,ViewModel,ShellCommandReply,LauncherCommandMetadata } from '@linuxcast/contracts';
+import type { LauncherApi,QuicklinkApi,ViewModel,ShellCommandReply,LauncherCommandMetadata } from '@linuxcast/contracts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
 import { QueryGenerations,rankCommands,rankManagedCommands,MAX_QUERY_LENGTH } from '@linuxcast/search';
@@ -25,16 +26,17 @@ type Status={kind:'info'|'warning'|'error';message:string};
 export class LauncherController {
   readonly session:ViewSession;
   readonly host:ViewHost;
-  #api:LauncherApi;#dismiss:()=>Promise<ShellCommandReply>;
+  #api:LauncherApi&QuicklinkApi;#dismiss:()=>Promise<ShellCommandReply>;
   #snapshot:Catalogue|null=null;#query='';#viewRevision=0;
   #generations=new QueryGenerations();#load:AbortController|null=null;#execution:AbortController|null=null;#dismissal:AbortController|null=null;
   #active=false;#busy=false;#loading=true;#metadataUnconfirmed=false;#status:Status|undefined;
   #calculator:CalculatorFlow|null=null;#calculatorSequence=0;
+  #quicklinks:QuicklinksFlow|null=null;#quicklinksSequence=0;#quicklinksState=createQuicklinksFlowState();
   #url:UrlEditor|null=null;#urlSequence=0;#urlUnconfirmed=false;
   #manager:{viewId:string;query:string;selectedId:string|null}|null=null;#managerSequence=0;#visibilityPending:{controller:AbortController;viewId:string}|null=null;#visibilityWarning:Status|undefined;
   #applicationPending:ApplicationActionPending|null=null;#applicationNeedsReload=false;#applicationWarning:Status|undefined;
   #priorSelection:string|null=null;#alias:AliasEditor|null=null;#aliasSequence=0;
-  constructor(api:LauncherApi,dismiss:()=>Promise<ShellCommandReply>) {
+  constructor(api:LauncherApi&QuicklinkApi,dismiss:()=>Promise<ShellCommandReply>) {
     this.#api=api;this.#dismiss=dismiss;
     this.session=new ViewSession(this.#view(),id=>{void this.#closeView(id);});
     this.session.subscribe(()=>{const frame=this.session.getSnapshot().frames[0];if(frame)this.#priorSelection=frame.selection;if(this.#applicationPending&&!this.#applicationContextCurrent(this.#applicationPending))this.#abortApplicationAction();});
@@ -106,7 +108,7 @@ export class LauncherController {
       actions:[{id:BACK_MANAGE,title:'Back',kind:'invoke',effect:'read'},{id:RETRY,title:'Reload commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})}]};
   }
   #openManager(){
-    if(this.#manager || this.#alias || this.#url || this.#calculator?.active)return;
+    if(this.#manager || this.#alias || this.#url || this.#calculator?.active || this.#quicklinks?.active)return;
     this.#manager={viewId:`launcher-management-${++this.#managerSequence}`,query:'',selectedId:this.session.getSnapshot().frames[0]?.selection??null};
     this.session.navigate({protocolVersion:1,kind:'push',fromViewId:VIEW_ID,view:this.#managedView()});
   }
@@ -165,10 +167,12 @@ export class LauncherController {
     if(this.#alias || this.#url)this.session.pop();
     for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
     this.#calculator?.dispose();this.#calculator=null;
+    for(let depth=0;depth<2 && this.#quicklinks?.active;depth++)this.session.pop();
+    this.#quicklinks?.dispose();this.#quicklinks=null;
     this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;this.#busy=false;
   }
   async refresh(explicit=true){
-    if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active)return;
+    if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active || this.#quicklinks?.active)return;
     this.#load?.abort();const controller=new AbortController();this.#load=controller;
     this.#loading=true;this.#status=undefined;this.#publish();
     try{
@@ -183,6 +187,7 @@ export class LauncherController {
     const frame=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || this.#busy && !(this.#alias && intent.actionId===CANCEL_ALIAS || this.#url && intent.actionId===CANCEL_URL || this.#manager && intent.actionId===BACK_MANAGE) || this.#loading && !(this.#manager && intent.actionId===BACK_MANAGE) || !frame || intent.viewId!==frame.view.viewId || intent.revision!==frame.view.revision)return;
     if(this.#calculator?.active){if(this.#snapshot?.commands.find(command=>command.id==='linuxcast:calculator')?.hidden)return;await this.#calculator.handle(intent);return;}
+    if(this.#quicklinks?.active){if(this.#snapshot?.commands.find(command=>command.id==='linuxcast:open-quicklinks')?.hidden)return;await this.#quicklinks.handle(intent);return;}
     if(this.#manager){
       if(intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
       if(intent.actionId===BACK_MANAGE){this.session.pop();return;}
@@ -201,6 +206,10 @@ export class LauncherController {
     const command=this.#snapshot?.commands.find(command=>command.id===intent.actionId);
     if(!command || command.hidden || !command.enabled || intent.itemId!==frame.selection || command.id!==frame.selection || this.#query.length>MAX_QUERY_LENGTH)return;
     if(command.id===OPEN_URL){this.#openUrl();return;}
+    if(command.id==='linuxcast:open-quicklinks'){
+      this.#quicklinks?.dispose();this.#quicklinks=new QuicklinksFlow({session:this.session,api:this.#api,viewId:`launcher-quicklinks-${++this.#quicklinksSequence}`,revision:this.#snapshot!.revision,state:this.#quicklinksState,onDismiss:this.#dismiss});
+      this.#quicklinks.open(VIEW_ID);return;
+    }
     if(command.id==='linuxcast:calculator'){
       this.#calculator?.dispose();this.#calculator=new CalculatorFlow({session:this.session,api:this.#api,viewId:`launcher-calculator-${++this.#calculatorSequence}`,revision:this.#snapshot!.revision});
       this.#calculator.open(VIEW_ID);return;
@@ -296,6 +305,7 @@ export class LauncherController {
     finally{if(this.#execution===controller && !controller.signal.aborted){this.#busy=false;this.#publish();}}
   }
   async #closeView(viewId:string){
+    if(this.#quicklinks?.owns(viewId)){this.#quicklinks.close(viewId);if(!this.#quicklinks.active){this.#quicklinks.dispose();this.#quicklinks=null;void this.refresh(false);}return;}
     if(this.#calculator?.closed(viewId)){if(!this.#calculator.active){this.#calculator.dispose();this.#calculator=null;void this.refresh(false);}return;}
     if(this.#manager?.viewId===viewId){this.#abortVisibility();this.#manager=null;this.#publish();return;}
     if(viewId!==VIEW_ID){
@@ -323,7 +333,7 @@ export class LauncherController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:failureMessage};this.#publish();}}
     finally{if(this.#dismissal===controller)this.#dismissal=null;}
   }
-  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
+  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#quicklinks?.dispose();this.#quicklinks=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
   return new Promise((resolve,reject)=>{

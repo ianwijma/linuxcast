@@ -6,6 +6,9 @@ import { FILE_INDEX_METHODS } from '@linuxcast/file-index/contracts';
 import type { FileIndexMethod, FileIndexMethods } from '@linuxcast/file-index/contracts';
 import { dispatchFileIndex, FileIndexRepositoryError } from '@linuxcast/file-index/repository';
 import type Database from 'better-sqlite3';
+import { dispatchQuicklinks,QuicklinkRepositoryError } from '@linuxcast/quicklinks/repository';
+import { QUICKLINK_STORAGE_METHODS } from '../../contracts/src/quicklinks.ts';
+import type { QuicklinkStorageMethod,QuicklinkStorageMethods } from '../../contracts/src/quicklinks.ts';
 import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
 import { listPermissionDecisions, putPermissionDecision, revokePermissionDecision } from './permissions.ts';
 import { conversationRecordSchema, messageRevisionRecordSchema, parseContract, parseRepositoryRequest,
@@ -19,7 +22,7 @@ export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
-export interface StorageMethods extends FileIndexMethods {
+export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods {
   'dataControls.clear': {params: DataClearParams; result: DataClearResult};
   'dataControls.export': {params: DataExportParams; result: DataExportResult};
   'secretRefs.get': {params: {id: string}; result: SecretReferenceRecord | null};
@@ -43,7 +46,7 @@ export interface StorageMethods extends FileIndexMethods {
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -93,6 +96,10 @@ export class Repositories {
   }
   private execute(method: StorageMethod, input: unknown): unknown {
     const db = this.db;
+    if((QUICKLINK_STORAGE_METHODS as readonly string[]).includes(method)){
+      try{return dispatchQuicklinks(db,method as QuicklinkStorageMethod,input);}
+      catch(error){if(error instanceof QuicklinkRepositoryError)throw new StorageError(error.reason);throw error;}
+    }
     if ((FILE_INDEX_METHODS as readonly string[]).includes(method)) {
       try { return dispatchFileIndex(db, method as FileIndexMethod, input); }
       catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }

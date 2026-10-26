@@ -1,0 +1,115 @@
+import type { IpcMain,IpcMainInvokeEvent } from 'electron';
+import {
+  QUICKLINK_CHANNELS,quicklinkListRequestSchema,quicklinkGetRequestSchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,
+  quicklinkListReplySchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,
+} from '@linuxcast/contracts';
+import type { QuicklinkRecord,QuicklinkSummary,QuicklinkSave,QuicklinkSelection,ShellCommandReply } from '@linuxcast/contracts';
+import { StorageRequestError } from '@linuxcast/storage';
+import { ApplicationsUnavailable } from '@linuxcast/applications';
+
+export interface QuicklinkBackend {
+  list():Promise<QuicklinkSummary[]>;
+  get(selection:QuicklinkSelection):Promise<QuicklinkRecord|null>;
+  save(input:QuicklinkSave):Promise<QuicklinkRecord>;
+  remove(selection:QuicklinkSelection):Promise<QuicklinkSelection>;
+  confirmRemove(record:QuicklinkRecord):Promise<boolean>;
+}
+export interface QuicklinkGate {
+  trusted(event:IpcMainInvokeEvent):boolean;
+  active():boolean;
+  busy():boolean;
+  generation():number;
+  revision():number;
+  /** Same slot used by launcher effects, Calculator and metadata mutations. */
+  acquire():()=>void;
+  checkVisibility(event:IpcMainInvokeEvent,revision:number):Promise<Extract<ShellCommandReply,{ok:false}>|undefined>;
+  openUrl(url:string):Promise<'dispatched'>;
+  recordUse():Promise<void>;
+}
+const failed=(code:'permission-denied'|'invalid-request'|'cancelled'|'conflict'|'capability-unavailable'|'deadline-exceeded',message:string,reason?:'conflict'|'quicklink-name-conflict'|'quicklink-limit-reached'):Extract<ShellCommandReply,{ok:false}>=>({ok:false,error:{code,message,retryable:false,...(reason?{details:{reason}}:{})}});
+const denied=()=>failed('permission-denied','Quicklinks request denied.');
+const changed=()=>failed('conflict','This Quicklink changed or was removed. Reload Quicklinks before trying again.','conflict');
+const running=()=>failed('cancelled','Another launcher operation is still running. Wait, then reload Quicklinks.');
+const unavailable=()=>failed('capability-unavailable','Quicklinks storage is unavailable. Reload Quicklinks to reconnect.');
+
+/** Named trusted-shell operations only. Every external target comes from a
+ * fresh, exact owner record; renderer-provided URLs never enter Open. */
+export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,backend:QuicklinkBackend,gate:QuicklinkGate):()=>void {
+  let disposed=false;
+  const alive=()=>!disposed&&gate.active();
+  for(const [operation,channel] of Object.entries(QUICKLINK_CHANNELS))ipc.handle(channel,async(event,payload)=>{
+    if(!gate.trusted(event))return denied();
+    const schema=operation==='list'?quicklinkListRequestSchema:operation==='save'?quicklinkSaveRequestSchema:operation==='open'?quicklinkOpenRequestSchema:quicklinkGetRequestSchema;
+    const parsed=schema.safeParse(payload);
+    if(!parsed.success)return failed('invalid-request','Invalid Quicklinks request.');
+    if(!alive()||gate.busy())return running();
+    if(operation==='list'||operation==='get'){
+      const generation=gate.generation();
+      try{
+        const reply=operation==='list'
+          ?quicklinkListReplySchema.parse({ok:true,value:{records:await backend.list()}})
+          :await (async()=>{const selection=quicklinkGetRequestSchema.parse(payload),record=await backend.get({id:selection.id,revision:selection.revision});
+            if(!record||record.id!==selection.id||record.revision!==selection.revision)return changed();
+            return quicklinkRecordReplySchema.parse({ok:true,value:{record}});})();
+        if(!gate.trusted(event))return denied();
+        if(!alive()||gate.busy()||generation!==gate.generation())return running();
+        return reply;
+      }catch(error){return error instanceof StorageRequestError&&error.reasonCode==='conflict'?changed():unavailable();}
+    }
+    const release=gate.acquire();
+    let attempted=false;
+    try{
+      const expectedRevision=operation==='open'?quicklinkOpenRequestSchema.parse(payload).launcherRevision:gate.revision();
+      const blocked=await gate.checkVisibility(event,expectedRevision);if(blocked)return blocked;
+      if(!gate.trusted(event))return denied();
+      if(!alive())return running();
+      if(expectedRevision!==gate.revision())return changed();
+      if(operation==='save'){
+        const {protocolVersion,...input}=quicklinkSaveRequestSchema.parse(payload);void protocolVersion;
+        attempted=true;const record=await backend.save(input);
+        const reply=quicklinkRecordReplySchema.parse({ok:true,value:{record}});
+        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url)throw new Error('Mismatched save receipt.');
+        return reply;
+      }
+      const selection=quicklinkGetRequestSchema.parse(operation==='open'?{protocolVersion:1,id:(payload as QuicklinkSelection).id,revision:(payload as QuicklinkSelection).revision}:payload);
+      const target={id:selection.id,revision:selection.revision},record=await backend.get(target);
+      if(!record||record.id!==target.id||record.revision!==target.revision)return changed();
+      // Validate the complete stored target even when a backend test port is used.
+      const checked=quicklinkRecordReplySchema.parse({ok:true,value:{record}});if(!checked.ok)return unavailable();
+      if(operation==='remove'){
+        if(!gate.trusted(event))return denied();
+        if(!alive()||gate.revision()!==expectedRevision)return running();
+        const beforePrompt=await gate.checkVisibility(event,expectedRevision);if(beforePrompt)return beforePrompt;
+        if(!gate.trusted(event))return denied();
+        if(!alive()||gate.revision()!==expectedRevision)return running();
+        const confirmed=await backend.confirmRemove(checked.value.record);
+        if(!confirmed)return quicklinkRemoveReplySchema.parse({ok:true,value:{...target,outcome:'cancelled'}});
+        if(!gate.trusted(event))return denied();
+        if(!alive())return running();
+        const blocked=await gate.checkVisibility(event,expectedRevision);if(blocked)return blocked;
+        if(!gate.trusted(event))return denied();
+        if(!alive()||gate.revision()!==expectedRevision)return running();
+        attempted=true;const receipt=await backend.remove(target);
+        if(receipt.id!==target.id||receipt.revision!==target.revision)throw new Error('Mismatched deletion receipt.');
+        return quicklinkRemoveReplySchema.parse({ok:true,value:{...receipt,outcome:'removed'}});
+      }
+      // Awaiting the owner may have changed sender, registry or visibility.
+      const freshBlocked=await gate.checkVisibility(event,expectedRevision);if(freshBlocked)return freshBlocked;
+      if(!gate.trusted(event))return denied();
+      if(!alive()||gate.revision()!==expectedRevision)return running();
+      attempted=true;const outcome=await gate.openUrl(checked.value.record.url);
+      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome}});
+      await gate.recordUse();return reply;
+    }catch(error){
+      if(error instanceof StorageRequestError&&error.effectOutcome==='not-dispatched'){
+        if(error.reasonCode==='conflict')return changed();
+        if(error.reasonCode==='quicklink-name-conflict')return failed('conflict','Another Quicklink uses this name. Choose a different name.','quicklink-name-conflict');
+        if(error.reasonCode==='quicklink-limit-reached')return failed('conflict','Quicklinks is full (500 entries). Remove an entry before creating another.','quicklink-limit-reached');
+        return unavailable();
+      }
+      if(error instanceof ApplicationsUnavailable&&error.effectOutcome==='not-dispatched')return failed('capability-unavailable','No web browser is available. Set a default browser, then try Open again.');
+      return attempted?failed('deadline-exceeded','The Quicklink operation outcome is unknown. Check your browser if opening, then reload Quicklinks before trying again.'):unavailable();
+    }finally{release();}
+  });
+  return()=>{disposed=true;for(const channel of Object.values(QUICKLINK_CHANNELS))ipc.removeHandler(channel);};
+}

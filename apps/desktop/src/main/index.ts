@@ -3,11 +3,12 @@ import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
 import { DataControls } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
-import { app,clipboard } from 'electron';
+import { app,clipboard,dialog,BrowserWindow } from 'electron';
 import { createClipboardWriter } from './clipboard-write.ts';
 import { isAbsolute, join } from 'node:path';
 import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
+import { APP_URL } from './assets.ts';
 
 let fileSearch:ReturnType<typeof createFileSearchWorkspace>|undefined;
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
@@ -16,6 +17,17 @@ let applications:ReturnType<typeof createApplications>|undefined;
 const copyText=createClipboardWriter(clipboard,()=>process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY);
 startResidentShell({ resourcesDirectory: __dirname,
   copyCalculatorResult:copyText,
+  quicklinks:{
+    async list(){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.list',{});},
+    async get(selection){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.get',selection);},
+    async save(input){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.save',input);},
+    async remove(selection){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.remove',selection);},
+    async confirmRemove(record){
+      const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.webContents.getURL()===APP_URL);if(!owner)return false;
+      const choice=await dialog.showMessageBox(owner,{type:'warning',title:'Remove Quicklink?',message:`Remove “${record.name}”?`,detail:'This removes the saved definition. It does not close browser pages. Existing backups may still contain this entry.',buttons:['Cancel','Remove Quicklink'],defaultId:0,cancelId:0,noLink:true});
+      return choice.response===1&&!owner.isDestroyed();
+    },
+  },
   async openUrl(url){if(!applications)throw new Error('Browser opening unavailable.');return applications.openUrl(url);},
   async listApplications(){if(!applications)throw new Error('Applications unavailable.');return applications.list();},
   async launchApplication(application){if(!applications)throw new Error('Applications unavailable.');return applications.launch(application);},
