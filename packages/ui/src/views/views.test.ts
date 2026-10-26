@@ -96,3 +96,10 @@ test('confirmed Cancel clears drafts and secrets even when host intent does not 
   await expect(page.locator('output')).toHaveText('Requested cancel at revision 1.');
   await page.getByRole('button', { name: 'Cancel', exact: true }).click(); await expect(page.getByRole('dialog')).toHaveCount(0);
 });
+test('composing Enter repeats retain native IME behavior while ordinary repeats cannot invoke a new action',async({page})=>{
+  const query=page.getByRole('searchbox',{name:'Library',exact:true});await query.focus();
+  expect(await query.evaluate(element=>element.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',repeat:true,isComposing:true,bubbles:true,cancelable:true})))).toBe(true);
+  await expect(query).toBeVisible();await expect(page.locator('output')).toHaveText('No action requested.');
+  expect(await query.evaluate(element=>element.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',repeat:true,bubbles:true,cancelable:true})))).toBe(false);
+  await expect(query).toBeVisible();await expect(page.locator('output')).toHaveText('No action requested.');
+});
