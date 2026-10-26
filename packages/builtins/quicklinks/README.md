@@ -100,29 +100,30 @@ Validation on Node 24.22.1/Bun 1.4.4:
   Save; normal query/preview captures use 800×650. These are component observations, not native
   desktop or assistive-technology acceptance.
 - Typecheck, scoped ESLint, plan validation and diff checks pass. Tests use
-  explicit `LINUXCAST_TEST_FILES` for the two owned test files pending coordinator
-  mapping. Real domain 9c009e9 and shared kind/repeat fixes from b9a1130, 128b48d
+  the mapped L2-05 suites after coordinator integration. Real domain 9c009e9 and shared kind/repeat fixes from b9a1130, 128b48d
   and 0a084c4, plus footer fix 453f194, are separate prerequisites; they are not duplicated in the UI commit.
 
-The prior literal-link coordinator integration passes five strict contract tests, 21 main/preload
-security checks, 11 domain SQLite and five owner/client migration/persistence
-checks, three root routing checks and the actual bundled Electron45/GIO2.72.4
-flow on an owned private Xvfb X11 display (SQLite3.53.4). The latter creates,
-locally searches, edits and explicitly opens a saved URL through a real private
-browser-handler process with exact argv/empty stdin; it checks native-choice
-cancel/confirm deletion, usage clear, complete restart and a URL-free aggregate
-usage export. Only native dialog choices are instrumented. This is actual
-process/persistence evidence, not supported desktop/session or browser page
-completion acceptance. Production captures are in `apps/desktop/evidence/`
-with the `quicklinks-application-` prefix.
+The integrated coordinator passes 157 mapped units, 10 contract tests, 27
+main/preload security checks and 29 integration checks (20 domain SQLite, eight
+owner/client and one actual bundled Electron flow). The actual Electron45 /
+SQLite3.53.4 / GIO2.72.4 flow uses an owned private Xvfb X11 display and private
+browser-handler process. It creates a search, reviews a Unicode/metacharacter
+query, proves held Enter cannot approve opening, and dispatches only the exact
+reviewed URL as argv with empty stdin. Restart preserves the definition but
+starts with an empty query; usage clear and aggregate export retain no query,
+base URL or expanded target. Literal CRUD and native-choice cancel/confirm
+removal remain covered. Only native dialog choices are instrumented. Six actual
+dark/light Form/List/Review captures were inspected and axe passes. This is real
+process/persistence evidence, not supported desktop/session, assistive technology
+or browser-page completion acceptance. Production captures are in
+`apps/desktop/evidence/` with the `quicklinks-application-` prefix.
 
 Fixtures are labelled, public synthetic in-memory data and request observers.
 They perform no native confirmation, actual browser handoff, SQLite write or
 network request. These checks provide partial L2-05 AC01 input/authority,
 AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establish
-the complete placeholder feature or native web-search dispatch. Prior literal
-coordinator persistence/dispatch evidence is
-separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
+the complete placeholder feature. Actual coordinator persistence/dispatch evidence
+is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
 typed URL components, browser/
 open-with/file/registered-URI targets, tags/pin/hide and native export remain
 required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
