@@ -1,3 +1,4 @@
+import { buildPathArgumentUrl,PathArgumentBuildError } from '@linuxcast/quicklinks/path-argument';
 import type { IpcMain,IpcMainInvokeEvent } from 'electron';
 import {
   QUICKLINK_CHANNELS,quicklinkListRequestSchema,quicklinkGetRequestSchema,quicklinkSaveRequestSchema,quicklinkOpenRequestSchema,
@@ -71,7 +72,7 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         const {protocolVersion,...input}=quicklinkSaveRequestSchema.parse(payload);void protocolVersion;
         attempted=true;const record=await backend.save(input);
         const reply=quicklinkRecordReplySchema.parse({ok:true,value:{record}});
-        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch)||JSON.stringify(reply.value.record.tags??[])!==JSON.stringify(input.tags??[])||(reply.value.record.pinned??false)!==(input.pinned??false)||(reply.value.record.hidden??false)!==(input.hidden??false))throw new Error('Mismatched save receipt.');
+        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch)||JSON.stringify(reply.value.record.pathArgument)!==JSON.stringify(input.pathArgument)||JSON.stringify(reply.value.record.tags??[])!==JSON.stringify(input.tags??[])||(reply.value.record.pinned??false)!==(input.pinned??false)||(reply.value.record.hidden??false)!==(input.hidden??false))throw new Error('Mismatched save receipt.');
         return reply;
       }
       const selection=quicklinkGetRequestSchema.parse(operation==='open'?{protocolVersion:1,id:(payload as QuicklinkSelection).id,revision:(payload as QuicklinkSelection).revision}:payload);
@@ -120,20 +121,23 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       }
       const opening=quicklinkOpenRequestSchema.parse(payload),definition=checked.value.record;
       if(definition.hidden)return failed('permission-denied','Show this Quicklink before opening it. No browser request was sent.');
+      let pathArgument:{query:string;url:string}|undefined;
       let url=definition.url,webSearch:{query:string;url:string}|undefined;
       if(definition.webSearch){
         if(opening.query===undefined)return failed('invalid-request','Enter and review a query before opening this web search.');
         url=buildWebSearchUrl(definition.url,definition.webSearch,opening.query);
         webSearch={query:opening.query,url};
-      }else if(opening.query!==undefined)return failed('invalid-request','A literal Quicklink does not accept a search query. Reload Quicklinks.');
+      }else if(definition.pathArgument){if(opening.query===undefined)return failed('invalid-request','Enter and review a path argument before opening this link.');url=buildPathArgumentUrl(definition.url,definition.pathArgument,opening.query);pathArgument={query:opening.query,url};
+      }else if(opening.query!==undefined)return failed('invalid-request','A literal Quicklink does not accept an argument. Reload Quicklinks.');
       // Awaiting the owner may have changed sender, registry or visibility.
       const freshBlocked=await gate.checkVisibility(event,expectedRevision);if(freshBlocked)return freshBlocked;
       if(!gate.trusted(event))return denied();
       if(!alive()||gate.revision()!==expectedRevision)return running();
       attempted=true;const outcome=await gate.openUrl(url);
-      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome,...(webSearch?{webSearch}:{})}});
+      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome,...(webSearch?{webSearch}:{}),...(pathArgument?{pathArgument}:{})}});
       await gate.recordUse();return reply;
     }catch(error){
+      if(error instanceof PathArgumentBuildError)return failed('invalid-request','This path argument or target is invalid or too large. Use a non-empty argument other than . or .., or edit the saved link.');
       if(error instanceof WebSearchBuildError)return failed('invalid-request','This search target is invalid or too large. Edit the search or shorten the query, then review it again.');
       if(error instanceof StorageRequestError&&error.effectOutcome==='not-dispatched'){
         if(error.reasonCode==='conflict')return changed();

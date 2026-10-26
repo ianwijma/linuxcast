@@ -16,7 +16,7 @@ afterEach(async()=>{vi.restoreAllMocks();for(const db of databases.splice(0))if(
 function request<M extends QuicklinkStorageMethod>(db:Database.Database,method:M,input:unknown):QuicklinkStorageMethods[M]['result'] {
   return db.transaction(()=>parseContract(quicklinkRepositoryContracts.get(method)!.result,dispatchQuicklinks(db,method,input))).immediate() as QuicklinkStorageMethods[M]['result'];
 }
-async function fixture(version:6|7|10|11=11){
+async function fixture(version:6|7|10|11|12=12){
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-quicklinks-repository-'));directories.push(directory);
   const path=join(directory,'data.db'),db=new Sqlite(path);databases.push(db);
   db.pragma('foreign_keys=ON');db.pragma('journal_mode=WAL');db.pragma('trusted_schema=OFF');
@@ -27,12 +27,14 @@ async function fixture(version:6|7|10|11=11){
   if(version>=7)db.transaction(()=>db.exec(webSearchMigration)).immediate();
   if(version>=10)db.transaction(()=>db.exec(tagsMigration)).immediate();
   if(version>=11)db.transaction(()=>db.exec(presentationMigration)).immediate();
+  if(version>=12)db.transaction(()=>db.exec(pathMigration)).immediate();
   return {db,path};
 }
 const schema=await readFile(new URL('../../../storage/src/migrations/006-quicklinks.sql',import.meta.url),'utf8');
 const webSearchMigration=await readFile(new URL('../../../storage/src/migrations/007-quicklink-web-searches.sql',import.meta.url),'utf8');
 const tagsMigration=await readFile(new URL('../../../storage/src/migrations/010-quicklink-tags.sql',import.meta.url),'utf8');
 const presentationMigration=await readFile(new URL('../../../storage/src/migrations/011-quicklink-presentation.sql',import.meta.url),'utf8');
+const pathMigration=await readFile(new URL('../../../storage/src/migrations/012-quicklink-path-argument.sql',import.meta.url),'utf8');
 const create=(db:Database.Database,name='Public Link',url='https://example.com/public')=>request(db,'quicklinks.save',{expectedRevision:0,name,url});
 const selection=(value:QuicklinkRecord)=>({id:value.id,revision:value.revision});
 
@@ -120,7 +122,7 @@ it('rejects overflowing revision and overfilled catalogues; owner transaction ro
 it('upgrades actual literal schema6 rows without changing identity/version/base/timestamps and persists optional search configuration after reopen',async()=>{
   const {db,path}=await fixture(6),literal={id:randomUUID(),revision:4,name:'Existing Literal',url:'https://example.org/public?q=literal',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-02-01T00:00:00.000Z'};
   db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(literal.id,literal.revision,literal.name,'existing literal',literal.url,literal.createdAt,literal.updatedAt);
-  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);db.exec(presentationMigration);}).immediate();
+  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);db.exec(presentationMigration);db.exec(pathMigration);}).immediate();
   expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
   expect(db.prepare('SELECT web_search FROM quicklinks').get()).toEqual({web_search:null});
   expect(request(db,'quicklinks.list',{})).toEqual([{id:literal.id,revision:4,name:literal.name,host:'example.org'}]);
@@ -187,4 +189,13 @@ it('persists reversible pin/hide flags with CAS and preserves full saved definit
 });
 it('rejects nonboolean stored presentation flags without publishing or overwriting corrupt source',async()=>{
  const {db}=await fixture(),saved=create(db);db.pragma('ignore_check_constraints=ON');db.prepare('UPDATE quicklinks SET pinned=2 WHERE id=?').run(saved.id);for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Do not overwrite',url:saved.url})])expect(operation).toThrowError(expect.objectContaining({message:'Invalid protocol message.'}));expect(db.prepare('SELECT revision,pinned FROM quicklinks WHERE id=?').get(saved.id)).toEqual({revision:1,pinned:2});
+});
+
+const pathConfig={component:'path-segment' as const,template:WEB_SEARCH_TEMPLATE};
+it('persists typed path config, labels and preferences through reopen and explicit path/query/literal conversion with exact CAS',async()=>{
+ const {db,path}=await fixture(),saved=request(db,'quicklinks.save',{expectedRevision:0,name:'Public path',url:'https://example.invalid/base?fixed=yes#part',pathArgument:pathConfig,tags:['Work'],pinned:true,hidden:true});expect(saved.pathArgument).toEqual(pathConfig);expect(request(db,'quicklinks.list',{})).toEqual([{id:saved.id,revision:1,name:saved.name,host:'example.invalid',pathArgument:true,tags:['Work'],pinned:true,hidden:true}]);db.close();const next=new Sqlite(path);databases.push(next);expect(request(next,'quicklinks.get',selection(saved))).toEqual(saved);
+ const query=request(next,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url,webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE},tags:saved.tags,pinned:true,hidden:true});expect(query).not.toHaveProperty('pathArgument');expect(query).toMatchObject({id:saved.id,revision:2,createdAt:saved.createdAt,tags:['Work'],pinned:true,hidden:true});expect(()=>request(next,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url,pathArgument:pathConfig})).toThrow(QuicklinkRepositoryError);const literal=request(next,'quicklinks.save',{id:saved.id,expectedRevision:2,name:saved.name,url:saved.url,tags:saved.tags,pinned:true,hidden:true});expect(literal).not.toHaveProperty('webSearch');expect(literal).not.toHaveProperty('pathArgument');
+});
+it('rejects corrupt path configuration and dual stored kinds before publishing or overwriting source',async()=>{
+ const {db}=await fixture(),saved=create(db);db.prepare('UPDATE quicklinks SET path_argument=? WHERE id=?').run('{"component":"host","template":"{{vars.query}}"}',saved.id);for(const operation of [()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url})])expect(operation).toThrow(ContractError);db.prepare('UPDATE quicklinks SET path_argument=? WHERE id=?').run(JSON.stringify(pathConfig),saved.id);expect(()=>db.prepare('UPDATE quicklinks SET web_search=? WHERE id=?').run(JSON.stringify({queryParameter:'q',template:WEB_SEARCH_TEMPLATE}),saved.id)).toThrow();
 });

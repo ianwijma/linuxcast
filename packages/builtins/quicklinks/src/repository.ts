@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type Database from 'better-sqlite3';
-import { ContractError, MAX_QUICKLINKS, normalizeQuicklinkName, parseContract, quicklinkRecordSchema, quicklinkRepositoryContracts, quicklinkWebSearchSchema, quicklinkTagsSchema } from '@linuxcast/contracts';
+import { ContractError, MAX_QUICKLINKS, normalizeQuicklinkName, parseContract, quicklinkRecordSchema, quicklinkRepositoryContracts, quicklinkWebSearchSchema, quicklinkPathArgumentSchema, quicklinkTagsSchema } from '@linuxcast/contracts';
 import type { QuicklinkRecord, QuicklinkSave, QuicklinkSelection, QuicklinkStorageMethod } from '@linuxcast/contracts';
 
 export type QuicklinkRepositoryReason='conflict'|'quicklink-name-conflict'|'quicklink-limit-reached';
@@ -8,7 +8,7 @@ export class QuicklinkRepositoryError extends Error {
   readonly reason:QuicklinkRepositoryReason;
   constructor(reason:QuicklinkRepositoryReason){super(`Quicklink operation unavailable: ${reason}.`);this.name='QuicklinkRepositoryError';this.reason=reason;}
 }
-interface Row {id:string;revision:number;name:string;url:string;created_at:string;updated_at:string;web_search:string|null;tags_json:string;pinned:number;hidden:number}
+interface Row {id:string;revision:number;name:string;url:string;created_at:string;updated_at:string;web_search:string|null;path_argument:string|null;tags_json:string;pinned:number;hidden:number}
 function record(row:Row):QuicklinkRecord {
   if(![0,1].includes(row.pinned)||![0,1].includes(row.hidden))throw new ContractError('Invalid protocol message.');
   let tags;try{tags=parseContract(quicklinkTagsSchema,JSON.parse(row.tags_json));}catch{throw new ContractError('Invalid protocol message.');}
@@ -17,10 +17,11 @@ function record(row:Row):QuicklinkRecord {
     let decoded:unknown;try{decoded=JSON.parse(row.web_search);}catch{throw new ContractError('Invalid protocol message.');}
     webSearch=parseContract(quicklinkWebSearchSchema,decoded);
   }
-  return parseContract(quicklinkRecordSchema,{id:row.id,revision:row.revision,name:row.name,url:row.url,...(row.pinned===1?{pinned:true}:{}),...(row.hidden===1?{hidden:true}:{}),...(tags.length?{tags}:{}),...(webSearch?{webSearch}:{}),createdAt:row.created_at,updatedAt:row.updated_at});
+  let pathArgument;if(row.path_argument!==null){let decoded:unknown;try{decoded=JSON.parse(row.path_argument);}catch{throw new ContractError('Invalid protocol message.');}pathArgument=parseContract(quicklinkPathArgumentSchema,decoded);}
+  return parseContract(quicklinkRecordSchema,{id:row.id,revision:row.revision,name:row.name,url:row.url,...(row.pinned===1?{pinned:true}:{}),...(row.hidden===1?{hidden:true}:{}),...(tags.length?{tags}:{}),...(webSearch?{webSearch}:{}),...(pathArgument?{pathArgument}:{}),createdAt:row.created_at,updatedAt:row.updated_at});
 }
 function find(db:Database.Database,id:string):QuicklinkRecord|null {
-  const row=db.prepare('SELECT id,revision,name,url,created_at,updated_at,web_search,tags_json,pinned,hidden FROM quicklinks WHERE id=?').get(id) as Row|undefined;
+  const row=db.prepare('SELECT id,revision,name,url,created_at,updated_at,web_search,path_argument,tags_json,pinned,hidden FROM quicklinks WHERE id=?').get(id) as Row|undefined;
   return row?record(row):null;
 }
 /** Synchronous domain dispatch inside the sole owner's immediate transaction.
@@ -32,10 +33,10 @@ export function dispatchQuicklinks(db:Database.Database,method:QuicklinkStorageM
   const params=parseContract(contract.params,input);
   switch(method){
     case 'quicklinks.list': {
-      const rows=db.prepare('SELECT id,revision,name,url,created_at,updated_at,web_search,tags_json,pinned,hidden FROM quicklinks ORDER BY id COLLATE BINARY LIMIT ?').all(MAX_QUICKLINKS+1) as Row[];
+      const rows=db.prepare('SELECT id,revision,name,url,created_at,updated_at,web_search,path_argument,tags_json,pinned,hidden FROM quicklinks ORDER BY id COLLATE BINARY LIMIT ?').all(MAX_QUICKLINKS+1) as Row[];
       // Reading one excess row detects corrupt/externally overfilled storage;
       // never silently publish a truncated catalogue.
-      return parseContract(contract.result,rows.map(row=>{const value=record(row);return {id:value.id,revision:value.revision,name:value.name,host:new URL(value.url).host,...(value.pinned?{pinned:true}:{}),...(value.hidden?{hidden:true}:{}),...(value.tags?.length?{tags:value.tags}:{}),...(value.webSearch?{webSearch:true}:{})};}));
+      return parseContract(contract.result,rows.map(row=>{const value=record(row);return {id:value.id,revision:value.revision,name:value.name,host:new URL(value.url).host,...(value.pinned?{pinned:true}:{}),...(value.hidden?{hidden:true}:{}),...(value.tags?.length?{tags:value.tags}:{}),...(value.webSearch?{webSearch:true}:{}),...(value.pathArgument?{pathArgument:true}:{})};}));
     }
     case 'quicklinks.get': {
       const {id,revision}=params as QuicklinkSelection,current=find(db,id);
@@ -43,8 +44,8 @@ export function dispatchQuicklinks(db:Database.Database,method:QuicklinkStorageM
       return current;
     }
     case 'quicklinks.save': {
-      const {id,expectedRevision,name,url,webSearch,tags,pinned=false,hidden=false}=params as QuicklinkSave;
-      const configuration=webSearch===undefined?null:JSON.stringify(webSearch),labels=JSON.stringify(tags??[]);
+      const {id,expectedRevision,name,url,webSearch,pathArgument,tags,pinned=false,hidden=false}=params as QuicklinkSave;
+      const configuration=webSearch===undefined?null:JSON.stringify(webSearch),pathConfiguration=pathArgument===undefined?null:JSON.stringify(pathArgument),labels=JSON.stringify(tags??[]);
       const prior=id===undefined?null:find(db,id);
       if(id!==undefined && (!prior || prior.revision!==expectedRevision || prior.revision===Number.MAX_SAFE_INTEGER))throw new QuicklinkRepositoryError('conflict');
       const key=normalizeQuicklinkName(name);
@@ -53,10 +54,10 @@ export function dispatchQuicklinks(db:Database.Database,method:QuicklinkStorageM
       if(!prior && (db.prepare('SELECT count(*) AS count FROM quicklinks').get() as {count:number}).count>=MAX_QUICKLINKS)throw new QuicklinkRepositoryError('quicklink-limit-reached');
       const storedId=id??randomUUID(),now=new Date(Math.max(Date.now(),prior?Date.parse(prior.updatedAt):-Infinity)).toISOString();
       if(prior){
-        const result=db.prepare('UPDATE quicklinks SET revision=revision+1,name=?,name_key=?,url=?,updated_at=?,web_search=?,tags_json=?,pinned=?,hidden=? WHERE id=? AND revision=?').run(name,key,url,now,configuration,labels,Number(pinned),Number(hidden),storedId,expectedRevision);
+        const result=db.prepare('UPDATE quicklinks SET revision=revision+1,name=?,name_key=?,url=?,updated_at=?,web_search=?,path_argument=?,tags_json=?,pinned=?,hidden=? WHERE id=? AND revision=?').run(name,key,url,now,configuration,pathConfiguration,labels,Number(pinned),Number(hidden),storedId,expectedRevision);
         if(result.changes!==1)throw new QuicklinkRepositoryError('conflict');
       }else{
-        db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at,web_search,tags_json,pinned,hidden) VALUES(?,1,?,?,?,?,?,?,?,?,?)').run(storedId,name,key,url,now,now,configuration,labels,Number(pinned),Number(hidden));
+        db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at,web_search,path_argument,tags_json,pinned,hidden) VALUES(?,1,?,?,?,?,?,?,?,?,?,?)').run(storedId,name,key,url,now,now,configuration,pathConfiguration,labels,Number(pinned),Number(hidden));
       }
       const saved=find(db,storedId);
       if(!saved)throw new QuicklinkRepositoryError('conflict');
