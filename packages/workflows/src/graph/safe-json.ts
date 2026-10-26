@@ -40,7 +40,7 @@ export function copyPublicJson(value:unknown,code:WorkflowGraphErrorCode='invali
         if(!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor,'value'))fail();
         if(count++)charge(1);text(key);charge(1);result[key]=copy(descriptor.value,depth+1);
       }
-      if(result.kind==='secret-handle')fail();
+      if(result.kind==='secret-handle' || (Object.hasOwn(result,'secretHandle') && typeof result.secretHandle==='string'))fail();
       return result;
     }finally{ancestors.delete(value);}
   }

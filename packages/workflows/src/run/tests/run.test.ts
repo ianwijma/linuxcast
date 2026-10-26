@@ -52,3 +52,8 @@ it('accepts the approved grant count/UTF8 bound as immutable captured identifier
 it.each([{args:['public'],vars:{},context:{}},{...envelope(),context:{...envelope().context,callChain:Array(17).fill('public')}},{...envelope(),context:{...envelope().context,principal:'builtin'}},{...envelope(),args:[{kind:'secret-handle',handleId:'public'}]}])('rejects invalid envelope/context/secret values %#',value=>{
   expect(()=>forkEnvelope(value)).toThrowError(expect.objectContaining({code:'invalid-definition',message:'Invalid workflow definition.'}));
 });
+
+it.each([{secretHandle:'public-sealed-handle'},{nested:{secretHandle:'public-sealed-handle'}},{nested:[{secretHandle:'public-sealed-handle'}]}])('rejects actual sealed Form handles at any nesting level in public configuration and branch envelopes %#',value=>{
+  expect(()=>snapshot(value)).toThrowError(expect.objectContaining({code:'invalid-definition',message:'Invalid workflow definition.'}));
+  for(const branch of [{...envelope(),args:[value]},{...envelope(),vars:{public:value}}])expect(()=>forkEnvelope(branch)).toThrowError(expect.objectContaining({code:'invalid-definition',message:'Invalid workflow definition.'}));
+});
