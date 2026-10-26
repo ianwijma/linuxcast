@@ -4,13 +4,17 @@
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",
-  "exports": {".": "./src/index.tsx", "./service": "./src/service.ts"},
+  "exports": {
+    ".": "./src/index.tsx",
+    "./service": "./src/service.ts"
+  },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",
     "@linuxcast/ui": "workspace:*",
     "@linuxcast/file-index": "workspace:*",
     "@linuxcast/data-controls": "workspace:*",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "@linuxcast/universal-actions": "workspace:*"
   }
 }

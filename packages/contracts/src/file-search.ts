@@ -12,7 +12,7 @@ export const fileSearchStateSchema=z.strictObject({revision:integer.min(1),appea
   .refine(value=>new Set(value.roots.map(root=>root.id)).size===value.roots.length);
 export const fileSearchResultSchema=z.strictObject({id:text(4200).min(1),rootId:z.uuid(),generation:z.uuid(),path:text(4096).min(1),kind:z.enum(['file','directory']),size:integer,modifiedMs:z.number().int().safe()})
   .refine(value=>value.id===`${value.rootId}:${value.path}` && !value.path.startsWith('/') && value.path.split('/').every(part=>part!=='' && part!=='.' && part!=='..') && !value.path.includes('\0'));
-export const FILE_SEARCH_CHANNELS={state:'file-search:state',choose:'file-search:choose',start:'file-search:start',pause:'file-search:pause',remove:'file-search:remove',search:'file-search:search',close:'file-search:close'} as const;
+export const FILE_SEARCH_CHANNELS={state:'file-search:state',choose:'file-search:choose',start:'file-search:start',pause:'file-search:pause',remove:'file-search:remove',search:'file-search:search',close:'file-search:close',copyPath:'file-search:copy-path'} as const;
 export const FILE_SEARCH_CHANGED='file-search:changed';
 export const fileSearchRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 export const fileSearchRootRequestSchema=fileSearchRequestSchema.extend({rootId:z.uuid()});
@@ -24,6 +24,13 @@ export const fileSearchActionReplySchema=z.discriminatedUnion('ok',[z.strictObje
 ])}),failure]);
 export const fileSearchQueryReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({query:text(512),rootId:z.uuid().nullable(),results:z.array(fileSearchResultSchema).max(100)})
   .refine(value=>new Set(value.results.map(result=>result.id)).size===value.results.length && value.results.every(result=>value.rootId===null || result.rootId===value.rootId))}),failure]);
+/** One admitted indexed result only. No path, clipboard text or file-open authority. */
+export const indexedPathSelectionSchema=z.strictObject({resultId:text(4200).min(1),rootId:z.uuid(),generation:z.uuid()});
+export const indexedPathCopyRequestSchema=indexedPathSelectionSchema.extend({protocolVersion:z.literal(1)});
+export const indexedPathTextSchema=text(8193).min(1).refine(value=>value.startsWith('/')&&!value.includes('\0')&&!/[\p{Cs}]/u.test(value)&&(value==='/'||value.slice(1).split('/').every(part=>part!==''&&part!=='.'&&part!=='..')));
+export const indexedPathCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({outcome:z.literal('copied'),path:indexedPathTextSchema})}),failure]);
+export type IndexedPathSelection=z.infer<typeof indexedPathSelectionSchema>;
+export type IndexedPathCopyReply=z.infer<typeof indexedPathCopyReplySchema>;
 export type FileSearchRoot=z.infer<typeof fileSearchRootSchema>;
 export type FileSearchResult=z.infer<typeof fileSearchResultSchema>;
 export type FileSearchState=z.infer<typeof fileSearchStateSchema>;
@@ -37,6 +44,7 @@ export interface FileSearchApi {
   pauseIndex(rootId:string):Promise<FileSearchActionReply>;
   removeFolder(rootId:string):Promise<FileSearchActionReply>;
   search(request:{query:string;rootId?:string}):Promise<FileSearchQueryReply>;
+  copyPath?(selection:IndexedPathSelection):Promise<IndexedPathCopyReply>;
   close():Promise<FileSearchActionReply>;
   onState(listener:(state:FileSearchState)=>void):()=>void;
 }

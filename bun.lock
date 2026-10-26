@@ -44,6 +44,7 @@
         "@linuxcast/search": "workspace:*",
         "@linuxcast/storage": "workspace:*",
         "@linuxcast/ui": "workspace:*",
+        "@linuxcast/universal-actions": "workspace:*",
         "react": "19.3.1",
         "react-dom": "19.3.1",
       },
@@ -76,8 +77,16 @@
         "@linuxcast/data-controls": "workspace:*",
         "@linuxcast/file-index": "workspace:*",
         "@linuxcast/ui": "workspace:*",
+        "@linuxcast/universal-actions": "workspace:*",
         "react": "19.3.1",
         "react-dom": "19.3.1",
+      },
+    },
+    "packages/builtins/universal-actions": {
+      "name": "@linuxcast/universal-actions",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
       },
     },
     "packages/contracts": {
@@ -399,6 +408,8 @@
     "@linuxcast/storage": ["@linuxcast/storage@workspace:packages/storage"],
 
     "@linuxcast/ui": ["@linuxcast/ui@workspace:packages/ui"],
+
+    "@linuxcast/universal-actions": ["@linuxcast/universal-actions@workspace:packages/builtins/universal-actions"],
 
     "@listr2/prompt-adapter-inquirer": ["@listr2/prompt-adapter-inquirer@2.0.22", "", { "dependencies": { "@inquirer/type": "^1.5.5" }, "peerDependencies": { "@inquirer/prompts": ">= 3 < 8" } }, "sha512-hV36ZoY+xKL6pYOt1nPNnkciFkn89KZwqLhAFzJvYysAvL5uBQdiADZx/8bIDXIukzzwG0QlPYolgMzQUtKgpQ=="],
 
