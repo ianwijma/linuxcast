@@ -9,7 +9,7 @@ argument is exposed to renderers. `addFolder(path)` accepts native-picker output
 only and canonicalizes/stat-checks the directory; existing IDs are reused.
 
 The service implements `getState()`, `addFolder(path)`, `startIndex(rootId)`,
-`pauseIndex(rootId)`, `removeFolder(rootId)`, `search({query, rootId?, options?})`,
+`pauseIndex(rootId)`, `removeFolder(rootId)`, `search({query, rootId?, options?, directory?})`,
 `subscribe(listener)`, `stop()`, and `terminate()`. State omits appearance, which
 main adds. Failure reasons are fixed `invalid-request`, `root-unavailable`,
 `storage-unavailable`, `index-unavailable`, `busy`, or `stopped`; raw owner, native,
@@ -66,6 +66,27 @@ rejects the entire reply as fixed `storage-unavailable`; it is never silently
 removed to manufacture a successful filtered result. Options remain metadata
 queries, confer no filesystem authority, and add no source-file reads.
 
+Optional `directory` narrows a selected root to direct indexed children. Its empty
+string value means immediate children of the indexed root; nonempty values are
+canonical relative directory paths of at most 4096 UTF-8 bytes, with no absolute
+prefix, NUL, empty segment, `.` segment, or `..` segment. Any explicit directory,
+including `''`, requires `rootId`. The shared strict `fileSearchQueryInputSchema`
+validates the complete request, and directory joins the existing snapshot before
+the first await. Provided directory values are forwarded and echoed exactly;
+omitted values stay omitted.
+
+An empty or whitespace-only query with an explicit directory goes to the owner
+for indexed browsing. Without explicit directory it retains the existing empty
+result behavior. Directory scope is index metadata, never a live filesystem read,
+file-open handle, path-resolution grant, or assertion that a directory still
+exists. The service performs no new filesystem operation for directory browsing.
+The owner applies the direct-parent predicate before LIMIT 100 alongside existing
+root/generation/kind/date filters and sorting. The service preserves that order
+and rejects the entire page as fixed `storage-unavailable` if any result has a
+different immediate parent, is a deeper descendant, is the directory row itself,
+or belongs to a similarly prefixed sibling. It never trims a truncated page into
+an apparent successful directory result.
+
 Remove waits for job shutdown, removes the selected-root record through the owner,
 and prunes derived metadata in batches of at most 512, yielding between batches
 and capping the operation at 10,000 batches. It never deletes, modifies, or reads
@@ -77,15 +98,19 @@ may already have taken effect. This is not a promise of an atomic filesystem vie
 On the Linux amd64 development host, Node 24.22.1, Bun 1.4.4, Rust 1.95.0,
 and SQLite 3.53.4:
 
-- `tests/service.test.ts`: 24 controlled tests include the 15 existing admission,
-  lifecycle, and validation cases. They cover duplicate starts,
-  startup/clear/stop races, failed closure, watcher failure, result identity and
+- `tests/service.test.ts`: 31 controlled tests include the 24 existing option,
+  admission, lifecycle, and validation cases. The original 15 cover duplicate
+  starts, startup/clear/stop races, failed closure, watcher failure, result identity and
   generation checks, state publication races, bounds, owner failure, and pruning.
   Nine new cases cover all sort forwarding/echo variants, snapshot mutation races,
   invalid/extra options, complete-page rejection for wrong kind/time ranges,
   inclusive/exclusive/zero/negative time boundaries, unchanged absent-options
   behavior, and preservation of owner order. Controlled owner responses establish
-  service validation, not SQL filtering/sorting acceptance.
+  service validation, not SQL filtering/sorting acceptance. Seven directory
+  cases add explicit root/nested scope forwarding, empty-query browsing, strict
+  malformed/root-required rejection, before-await snapshots, whole-page rejection
+  of descendants/prefix siblings, out-of-order independent scopes, and generation
+  fencing. No new live directory traversal is introduced.
 - `tests/service.integration.test.ts`: two tests use the actual sole-owner utility
   process and Rust `linux-openat2-inotify` helper with small private synthetic
   folders. They exercise scan, denied/hidden files, rename/size update, pause,
@@ -95,14 +120,18 @@ and SQLite 3.53.4:
   socket permission. No personal folders or content appear in test output.
 
 This slice provides partial L2-02 implementation-step evidence for fixed metadata
-filter/sort option handling and preserves synthetic-fixture privacy boundaries.
+filter/sort option handling and indexed direct-child directory scope, preserving
+synthetic-fixture privacy boundaries.
 Coordinator-owned SQL must establish filtering and sorting before LIMIT, and
-application integration owns UI/IPC acceptance. The existing two actual native
-fixtures retain lifecycle regression coverage without claiming new SQL acceptance.
+application integration owns UI/IPC acceptance. The same ownership applies to
+new directory predicates, before-limit SQL evidence, and packaged navigation
+flow. The existing two actual native fixtures retain lifecycle regression
+coverage without claiming new SQL acceptance.
 
 This slice adds no extractors or source-content reader; content indexing remains
-unimplemented. It does not complete L2-02's MIME filters, path navigation, recent
-files, opt-in MIME extractors, extraction cancellation, or full
-UI/desktop acceptance. These development-host checks establish no Debian 13,
+unimplemented. Indexed direct-child scope is a bounded path-navigation service
+increment; complete navigation/UI acceptance remains integration work. This slice
+does not complete L2-02's MIME filters, recent files, opt-in MIME extractors,
+extraction cancellation, or full UI/desktop acceptance. These development-host checks establish no Debian 13,
 GNOME/KDE Wayland/X11, assistive-technology, native-picker, or packaged Electron
 acceptance, and repeat no 100,000-path/performance proof already owned by L2-01.
