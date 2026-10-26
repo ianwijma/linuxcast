@@ -4,6 +4,14 @@
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",
-  "exports": { "./registry": "./src/registry.ts", "./graph": "./src/graph/index.ts", "./run": "./src/run/index.ts" },
-  "dependencies": { "@linuxcast/contracts": "workspace:*", "zod": "4.6.7" }
+  "exports": {
+    "./registry": "./src/registry.ts",
+    "./graph": "./src/graph/index.ts",
+    "./run": "./src/run/index.ts",
+    "./engine": "./src/engine/index.ts"
+  },
+  "dependencies": {
+    "@linuxcast/contracts": "workspace:*",
+    "zod": "4.6.7"
+  }
 }

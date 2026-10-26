@@ -70,7 +70,7 @@ startResidentShell({ resourcesDirectory: __dirname,
   app.once('browser-window-created', (_event, window) => {
     window.webContents.once('did-finish-load', () => currentStorage.confirmLaunch());
   });
-  workflowEditor=createWorkflowEditorWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
+  workflowEditor=createWorkflowEditorWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,repository:currentStorage.repository,copyText,
     load:()=>currentStorage.repository.request('workflows.editor.get',{}),
     write:input=>currentStorage.repository.request('workflows.editor.write',input),
   });

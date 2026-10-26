@@ -29,7 +29,7 @@ export const EDITOR_NODE_REGISTRY: GraphNodeRegistry = new Map([
 export const EDITOR_NODE_TYPES = [
   { type: 'input.keyword', title: 'Keyword', category: 'Inputs', description: 'Start with a submitted text query.', config: { keyword: 'text', argument: 'required', trimQuery: false } },
   { type: 'utility.transform', title: 'Transform text', category: 'Utilities', description: 'Trim or change text using an explicit operation.', config: { operation: 'trim', source: { ref: 'input#/0' } } },
-  { type: 'output.clipboard', title: 'Copy text', category: 'Outputs', description: 'Describe an explicit clipboard output. Execution is not available yet.', config: { text: { ref: 'input#/0' }, paste: false, history: 'exclude' } },
+  { type: 'output.clipboard', title: 'Copy text', category: 'Outputs', description: 'Copy approved text from a saved workflow. No paste or history capture.', config: { text: { ref: 'input#/0' }, paste: false, history: 'exclude' } },
 ] as const;
 export function createWorkflowDraft(): WorkflowDefinition {
   return { schemaVersion: 1, id: 'org.linuxcast.user.draft', version: '1.0.0', name: 'Untitled workflow', description: '',

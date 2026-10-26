@@ -26,6 +26,7 @@ await build({ absWorkingDir: root, entryPoints: ['packages/storage/src/utility.t
   banner: { js: "const storageModuleUrl = require('node:url').pathToFileURL(__filename).href;" },
   define: { 'import.meta.url': 'storageModuleUrl' },
   legalComments: 'linked' });
+await build({absWorkingDir:root,entryPoints:['packages/workflows/src/utility.ts'],outfile:join(output,'workflow.cjs'),platform:'node',format:'cjs',bundle:true,target:'node24',legalComments:'linked'});
 await mkdir(join(output, 'migrations'), { recursive: true });
 for (const name of STORAGE_MIGRATION_ASSETS)
   await cp(join(root, 'packages/storage/src/migrations', name), join(output, 'migrations', name));

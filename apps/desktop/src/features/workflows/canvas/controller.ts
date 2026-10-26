@@ -126,7 +126,7 @@ export class WorkflowEditorController {
         this.#publish({ record: reply.value, draft: current, dirty: !same(current, reply.value.draft),
           validation: current ? graphError(current) : '', canUndo: this.#undo.length > 0, canRedo: this.#redo.length > 0,
           selected: current?.nodes.some(node => node.id === this.#state.selected) ? this.#state.selected : current?.nodes[0]?.id ?? null,
-          message: action === 'save' ? 'Workflow saved. Execution remains unavailable.' : action === 'revert' ? 'Restored the last saved workflow.' : '' }); return true;
+          message: action === 'save' ? 'Workflow saved.' : action === 'revert' ? 'Restored the last saved workflow.' : '' }); return true;
       } catch {
         if (!this.#disposed && epoch === this.#epoch) this.#publish({ blocked: true, message: 'The draft write could not be confirmed. Reload before writing again; review any local edits first.' }); return false;
       } finally {

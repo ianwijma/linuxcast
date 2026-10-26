@@ -38,3 +38,5 @@
 .wf-dialog { max-inline-size:32rem; }
 @media(max-width:1100px) { .wf-workspace { grid-template-columns:minmax(0,1fr) minmax(0,2fr); } .wf-workspace>aside:last-child { grid-column:1/-1; } }
 @media(max-width:720px) { .wf-workspace { grid-template-columns:minmax(0,1fr); } .wf-editor { padding:var(--lc-space-16); } .wf-name>.lc-field { max-inline-size:none; flex-basis:100%; } }
+
+.wf-run-workspace-title { margin:0; padding:var(--lc-space-24) var(--lc-space-24) 0; font-size:var(--lc-text-panel-title); }

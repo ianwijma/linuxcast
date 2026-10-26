@@ -1,0 +1,24 @@
+.wr-panel { padding:var(--lc-space-24); min-inline-size:0; }
+.wr-panel h2 { margin:0; font-size:var(--lc-text-workspace-title); }
+.wr-panel h3 { margin:0 0 var(--lc-space-12); font-size:var(--lc-text-emphasis); }
+.wr-panel p { overflow-wrap:anywhere; }
+.wr-panel select,.wr-panel textarea { font:inherit; }
+.wr-header { display:flex; justify-content:space-between; align-items:center; gap:var(--lc-space-16); flex-wrap:wrap; border-block-end:1px solid var(--lc-border); padding-block-end:var(--lc-space-16); }
+.wr-caption { color:var(--lc-muted); font-size:var(--lc-text-caption); }
+.wr-fields { display:grid; gap:var(--lc-space-16); margin-block:var(--lc-space-20); max-inline-size:48rem; }
+.wr-input { resize:vertical; min-block-size:6rem; }
+.wr-actions { display:flex; flex-wrap:wrap; gap:var(--lc-space-8); align-items:center; }
+.wr-status,.wr-approval,.wr-steps { margin-block:var(--lc-space-20); padding:var(--lc-space-16); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); background:var(--lc-surface); min-inline-size:0; }
+.wr-approval { border-inline-start:var(--lc-space-4) solid var(--lc-warning); }
+.wr-status dl { display:grid; gap:var(--lc-space-8); }
+.wr-status dl>div { display:flex; flex-wrap:wrap; gap:var(--lc-space-12); }
+.wr-status dt { color:var(--lc-muted); }
+.wr-status dd { margin:0; overflow-wrap:anywhere; }
+.wr-steps ol { padding-inline-start:var(--lc-space-24); max-block-size:24rem; overflow:auto; }
+.wr-steps li { padding:var(--lc-space-8); border-block-end:1px solid var(--lc-border); overflow-wrap:anywhere; }
+.wr-steps li>span { display:block; }
+.wr-steps li>span:last-child { color:var(--lc-muted); }
+.wr-text { max-block-size:18rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:var(--lc-space-16); background:var(--lc-raised); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); font:var(--lc-text-body)/1.5 var(--lc-font-mono); }
+.wr-text:focus-visible,.wr-status:focus-visible { outline:calc(var(--lc-space-4) / 2) solid var(--lc-focus); outline-offset:calc(var(--lc-space-4) / 2); }
+.wr-notice { padding:var(--lc-space-12); border-inline-start:var(--lc-space-4) solid var(--lc-border); }
+@media(max-width:720px) { .wr-panel { padding:var(--lc-space-16); } }

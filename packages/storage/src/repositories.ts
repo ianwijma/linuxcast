@@ -1,3 +1,6 @@
+import { JOURNAL_METHODS } from '../../workflows/src/journal/contracts.ts';
+import type { JournalMethods } from '../../workflows/src/journal/contracts.ts';
+import { dispatchWorkflowJournal } from './workflow-journal.ts';
 import { loadWorkflowEditor, writeWorkflowEditor } from './workflow-editor.ts';
 import type { WorkflowEditorWrite, WorkflowEditorRecord } from '../../contracts/src/workflow-editor.ts';
 import { clearLocalData, exportLocalData } from './data-controls.ts';
@@ -24,7 +27,7 @@ export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
-export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods {
+export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods,JournalMethods {
   'workflows.editor.get': {params: Record<string,never>; result: WorkflowEditorRecord|null};
   'workflows.editor.write': {params: WorkflowEditorWrite; result: WorkflowEditorRecord};
   'dataControls.clear': {params: DataClearParams; result: DataClearResult};
@@ -50,7 +53,7 @@ export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -100,6 +103,7 @@ export class Repositories {
   }
   private execute(method: StorageMethod, input: unknown): unknown {
     const db = this.db;
+    if((JOURNAL_METHODS as readonly string[]).includes(method))return dispatchWorkflowJournal(db,method as keyof JournalMethods,input);
     if((QUICKLINK_STORAGE_METHODS as readonly string[]).includes(method)){
       try{return dispatchQuicklinks(db,method as QuicklinkStorageMethod,input);}
       catch(error){if(error instanceof QuicklinkRepositoryError)throw new StorageError(error.reason);throw error;}
