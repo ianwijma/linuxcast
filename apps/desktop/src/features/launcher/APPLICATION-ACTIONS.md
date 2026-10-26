@@ -46,7 +46,11 @@ reason: open the application to use its other actions. No legacy/empty-action
 UI is invented. Known denial is actionable, unknown outcome tells users to
 check the application then Reload; no saved-success claim or replay. Back/Hide,
 selection/query change, stale late reply and disposal cannot dismiss another
-context or publish success. Main records command-use only after a matching
+context or publish success. Main does not hide for this action. After a matching
+requested receipt and unchanged context, UI invokes named Hide separately; Hide
+failure retains the truthful requested state and cannot replay/reclassify the
+action as unknown. Only explicit complete Reload clears action uncertainty;
+automatic reopen/Calculator-close refresh does not. Main records command-use only after a matching
 requested receipt, without storing action IDs, arguments or private content.
 
 Bounded checks: strict native/launcher contracts, native public private-XDG
