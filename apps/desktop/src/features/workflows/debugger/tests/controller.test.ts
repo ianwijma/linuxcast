@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import type { WorkflowRunApi, WorkflowRunReply } from '@linuxcast/contracts';
 import { WorkflowRunController } from '../controller.ts';
-import { createRunFixture, savedDefinition, snapshot, uuid } from '../fixtures/owner.ts';
+import { createRunFixture, savedDefinition, multipleEntryDefinition, snapshot, uuid } from '../fixtures/owner.ts';
 const live: WorkflowRunController[] = [];
 async function setup(mode = '', override: Partial<WorkflowRunApi> = {}) { const owner = createRunFixture(mode), controller = new WorkflowRunController({ ...owner.api, ...override }, 5, savedDefinition); live.push(controller); await controller.attach(); return { owner, c: controller }; }
 afterEach(() => { live.splice(0).forEach(c => c.dispose()); vi.useRealTimers(); });
@@ -29,3 +29,22 @@ it('no enabled entry or invalid saved metadata cannot start', async () => { cons
 it('known unavailable start retains input without an automatic retry', async () => { const { owner, c } = await setup('unavailable'); c.input('Retained'); expect(await c.start()).toBe(false); expect(c.getSnapshot().input).toBe('Retained'); expect(c.getSnapshot().unconfirmed).toBe(false); expect(owner.calls.starts).toHaveLength(1); });
 it('dispose unsubscribes and fences late reply and event presentation', async () => { let finish!: (reply: WorkflowRunReply) => void; const { owner, c } = await setup('attached', { decideWorkflowRun: () => new Promise(resolve => { finish = resolve; }) }); const pending = c.decide('once'); await Promise.resolve(); const before = c.getSnapshot(); c.dispose(); finish({ ok: true, value: snapshot({ sequence: 2 }) }); await pending; owner.emit(snapshot({ sequence: 3 })); expect(c.getSnapshot()).toBe(before); expect(owner.listenerCount).toBe(0); });
 it('64KiB result and last50 metadata remain bounded; malformed oversized event cannot render', async () => { const { owner, c } = await setup('attached'); const value = snapshot({ sequence: 2, output: 'P'.repeat(65536), steps: Array.from({ length: 50 }, (_, index) => ({ activationId: uuid(index + 100), nodeId: 'trim', nodeType: 'utility.transform' as const, state: 'succeeded' as const, durationMs: 1 })) }); owner.emit(value); expect(c.getSnapshot().snapshot?.output).toHaveLength(65536); expect(c.getSnapshot().snapshot?.steps).toHaveLength(50); owner.emit({ ...value, sequence: 3, output: 'P'.repeat(65537) }); expect(c.getSnapshot().snapshot?.sequence).toBe(2); expect(c.getSnapshot().unconfirmed).toBe(true); });
+
+it('launcher entry preselects the exact second enabled Keyword without starting until explicit Run', async () => {
+  const owner = createRunFixture(), c = new WorkflowRunController(owner.api, 5, multipleEntryDefinition, 'second'); live.push(c); await c.attach();
+  expect(c.getSnapshot().entry).toBe('second'); expect(c.requestedEntryUnavailable).toBe(false); expect(owner.calls.starts).toEqual([]); c.input('PUBLIC SECOND'); expect(await c.start()).toBe(true); expect(owner.calls.starts).toEqual([{editorRevision: 5, triggerNodeId: 'second', input: 'PUBLIC SECOND'}]);
+});
+for (const initialEntry of ['missing', 'disabled', 'trim', '']) it(`launcher intent ${JSON.stringify(initialEntry)} is unavailable and cannot fall back`, async () => {
+  const owner = createRunFixture(), c = new WorkflowRunController(owner.api, 5, multipleEntryDefinition, initialEntry); live.push(c); await c.attach();
+  expect(c.requestedEntryUnavailable).toBe(true); expect(c.getSnapshot().entry).toBe(initialEntry); c.entry('start'); c.input('PUBLIC'); expect(c.getSnapshot().entry).toBe(initialEntry); expect(await c.start()).toBe(false); expect(owner.calls.starts).toEqual([]); expect(owner.calls.decisions).toEqual([]);
+});
+it('changed launcher intent attaches to the active host run, cannot switch it, then explicitly starts the requested entry after terminal', async () => {
+  const owner = createRunFixture('attached'), first = new WorkflowRunController(owner.api, 5, multipleEntryDefinition); live.push(first); await first.attach(); first.dispose();
+  const next = new WorkflowRunController(owner.api, 5, multipleEntryDefinition, 'second'); live.push(next); await next.attach();
+  expect(next.getSnapshot().entry).toBe('second'); expect(next.getSnapshot().snapshot?.triggerNodeId).toBe('start'); expect(next.getSnapshot().snapshot?.prompt?.id).toBe(uuid(50)); next.entry('start'); expect(next.getSnapshot().entry).toBe('second'); expect(await next.start()).toBe(false); expect(owner.calls.starts).toEqual([]); expect(owner.calls.cancels).toEqual([]); expect(owner.calls.decisions).toEqual([]);
+  expect(await next.cancel()).toBe(true); next.input('PUBLIC NEW INVOCATION'); expect(await next.start()).toBe(true); expect(owner.calls.starts).toEqual([{editorRevision: 5, triggerNodeId: 'second', input: 'PUBLIC NEW INVOCATION'}]);
+});
+it('unavailable launcher intent retains actual approval for inspect/cancel and cannot run after it terminates', async () => {
+  const owner = createRunFixture('attached'), c = new WorkflowRunController(owner.api, 5, multipleEntryDefinition, 'disabled'); live.push(c); await c.attach();
+  expect(c.requestedEntryUnavailable).toBe(true); expect(c.getSnapshot().snapshot?.prompt?.text).toBe('PUBLIC TEXT'); expect(await c.start()).toBe(false); expect(owner.calls.starts).toEqual([]); expect(await c.cancel()).toBe(true); expect(owner.calls.cancels).toEqual([{runId: uuid(1)}]); expect(await c.start()).toBe(false); expect(owner.calls.decisions).toEqual([]);
+});

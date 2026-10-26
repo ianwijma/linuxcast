@@ -1,6 +1,6 @@
 # Saved text workflow run panel — bounded W2-03 increment
 
-`WorkflowRunPanel({api,editorRevision,savedDefinition,onClose})` attaches to the
+`WorkflowRunPanel({api,editorRevision,savedDefinition,initialEntry?,onClose})` attaches to the
 host's current run without executing anything. Definition props provide saved
 identity/entry metadata only; main fresh-loads and authorizes the exact revision.
 Only explicit Run submits entry/input. Approval submits the offered decision and
@@ -40,6 +40,24 @@ for embedding in the host main/h1 workspace. Existing shared Button/state contro
 input classes, fonts and tokens supply its appearance; CSS only arranges the
 workspace and bounded text/metadata regions.
 
+## Launcher-selected entry increment
+
+Optional `initialEntry` selects exactly that enabled saved Keyword. Undefined keeps
+its existing first-enabled default. A missing, disabled, wrong-type or empty ID
+is visibly unavailable, has no Run form and cannot fall back through controller
+entry changes. Refresh/Back remain reachable. Any actual host run/approval still
+renders independently for inspection and explicit cancellation.
+
+Changing this presentation intent replaces only the local controller/subscription,
+then gets the existing host state. It never starts, cancels, approves or replays.
+A valid requested entry remains selected while an older run is active (chooser
+locked); after terminal, a fresh explicit Run uses that entry. The seven added
+controller and six Chromium cases cover exact second-entry requests, unavailable
+IDs, no mount effects and intent changes during pending approval. Five public
+selected/unavailable/pending dark/light captures were inspected. These are
+component observations; new actual launcher registration, opaque command identity,
+fresh saved routing and production entry integration are coordinator-owned.
+
 ## Verification
 
 Node 24.22.1/Bun 1.4.4, Linux x86_64 and real Chromium with the reduced-motion
@@ -47,21 +65,21 @@ preference (stable captured states, no shared transition midpoint sampling). Fix
 public synthetic host snapshots/request observers. They run no worker, broker,
 clipboard, SQLite or native operation and are not desktop/effect acceptance.
 
-- 29 controller cases cover no mount/typing effects, exact request shape,
+- 36 controller cases (29 original plus seven entry-intent cases) cover no mount/typing effects, exact request shape,
   reattachment, read/event and run/sequence fencing, offered choices, wrong or
   malformed receipts, scoped cancellation/reset, unknown/deadline/manual recovery,
   duplicate submission, UTF8 limits, disposal, 64KiB output and last50 bounds.
-- 14 Chromium keyboard/axe cases cover dark/light ready, approval, result, denial
+- 20 Chromium keyboard/axe cases (14 original plus six entry-intent cases) cover dark/light ready, approval, result, denial
   and unknown states; Back/reopen, explicit choices, held Enter, pending/late
   replies, IME behavior, a large scrollable result and 200% text without horizontal
-  overflow. Eleven public captures in evidence/ were inspected.
+  overflow. The original eleven captures plus five affected entry-intent captures in evidence/ were inspected.
 - Full typecheck, scoped ESLint, plan and diff checks pass. Task mapping and actual packaged integration are coordinator-owned.
 
 Commands (prefix PATH with `.worktrees/tools`, BUN_TMPDIR=/tmp):
 
 ```sh
-LINUXCAST_TEST_FILES='["apps/desktop/src/features/workflows/debugger/tests/controller.test.ts"]' node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts
-LINUXCAST_TEST_FILES='["apps/desktop/src/features/workflows/debugger/tests/run-panel.ui.test.ts"]' node node_modules/@playwright/test/cli.js test --config scripts/test-runner/playwright.config.ts
+bun run test:unit -- W2-03
+bun run test:ui -- W2-03
 bun run typecheck
 node node_modules/eslint/bin/eslint.js apps/desktop/src/features/workflows/debugger --max-warnings 0
 python3 scripts/validate_plan.py
