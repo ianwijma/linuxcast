@@ -1,13 +1,14 @@
-# Local arithmetic and unit evaluator — bounded L2-04 increments
+# Local arithmetic, unit and colour evaluator — bounded L2-04 increments
 
 `evaluateExpression(input: string): Calculation` is a pure, synchronous local
 function shared by trusted main and the presentation layer. It returns either
-`{ok: true, value: number, text: string, unit?: CalculatorUnit}` or a fixed failure
-with code `invalid-expression`, `limit-exceeded`, `domain-error`,
-`unsupported-unit`, or `incompatible-units`. Invalid runtime types
+`{ok: true, value: number, text: string, unit?: CalculatorUnit}`, a disjoint colour
+success `{ok: true, kind: 'colour', colour: 'hex'|'rgb'|'hsl', text: string}`, or a
+fixed failure with code `invalid-expression`, `limit-exceeded`, `domain-error`,
+`unsupported-unit`, `incompatible-units`, or `invalid-colour`. Invalid runtime types
 are rejected without coercion. No expression or result is persisted, transmitted,
 or interpreted as JavaScript. The arithmetic parser imports only its fixed local
-unit implementation at runtime. There are no external runtime dependencies, I/O,
+unit and colour implementations at runtime. There are no external runtime dependencies, I/O,
 network requests, clock reads, randomness, or user-selected property access.
 
 ## Syntax
@@ -162,6 +163,45 @@ digits; `unit` is separate closed metadata. Existing `formatCalculationText`
 combines them as `<numeric text> <canonical unit>`, and trusted main recomputes
 before copying. No renderer-supplied result or unit becomes clipboard authority.
 
+## Explicit local colours
+
+The closed colour grammar and canonical policies are frozen in
+[COLOURS.md](COLOURS.md). `evaluateColourExpression(input)` returns a typed colour
+result or safe failure for a colour attempt, and `undefined` for non-colour
+expressions. `evaluateExpression` calls it after the existing type/512-byte/ASCII
+guards and before unit parsing. Inputs starting with `#` or an RGB/HSL functional
+form, or explicitly targeting `to hex`, `to rgb`, or `to hsl`, are colour attempts.
+Ordinary words, arithmetic, and unit conversions retain their existing evaluator;
+named colours are unsupported. A single explicit conversion suffix is required.
+
+Hex accepts 3/4/6/8 digits and either hex letter case. Lowercase `rgb`/`rgba` and
+`hsl`/`hsla` aliases accept either comma components with optional fourth alpha, or
+space components with optional `/ alpha`; mixing comma and slash is invalid.
+Function names immediately precede `(`. Numeric atoms are signed decimal or
+scientific literals only. RGB channels must all be numbers in 0..255 or all
+percentages in 0..100%; saturation/lightness require 0..100%. Hue is finite, with
+an optional adjacent `deg`, bounded to absolute 1e9 and wrapped modulo 360. Alpha
+is 0..1 or 0..100%. Out-of-range values are rejected before conversion. There is
+no arithmetic within atoms, nested function, named colour, CSS variable, DOM,
+canvas, external parser, URL, or wide-gamut colour space.
+
+The independent helpers operate on encoded sRGB triples, preserve alpha without
+compositing, and use stable saturation/chroma expressions near black and white.
+Canonical hex is lowercase with six digits or eight when a nonopaque alpha byte
+is present. RGB and alpha quantize to the nearest 8-bit byte for hex output.
+Functional output uses `rgb(R G B[ / A])` or `hsl(H S% L%[ / A])`, rounds to six
+fractional digits, strips trailing zeros, normalizes negative zero, and omits
+rounded alpha 1. Rounded hue 360 wraps to 0. Achromatic hue is 0, including after
+rounding: saturation rounded to 0 forces hue 0, and lightness rounded to 0 or 100
+forces both saturation and hue 0. These are approximate conversions with explicit
+output quantization, not colour-managed or full CSS parsing.
+
+Colour success has no numeric `value` or `unit`. Existing `formatCalculationText`
+validates the closed result and returns the exact canonical text; the coordinator
+owns main recomputation and actual clipboard receipt/UI acceptance. For example,
+`#336699 to hsl` returns `hsl(210 50% 40%)`, and
+`rgba(255,0,0,.5) to hex` returns `#ff000080`.
+
 ## Resource and failure boundaries
 
 Input is capped at 512 UTF-8 bytes. A length check rejects oversized strings
@@ -183,6 +223,7 @@ runtime error:
 - `domain-error`: “This calculation has no finite real result.”
 - `unsupported-unit`: “Use a supported, unambiguous unit identifier.”
 - `incompatible-units`: “Choose units with the same dimension.”
+- `invalid-colour`: “Use a supported hex, RGB or HSL colour conversion within the component ranges.”
 
 ## Evidence and unfinished scope
 
@@ -193,15 +234,20 @@ numeric clipboard-contract checks. Fixtures contain only synthetic expressions.
 The unit suite adds independent anchored definitions for all 92 identifiers, all
 12 dimensions, explicit suffix and scalar behavior, decimal/binary bit/byte
 distinctions, physical temperature boundaries, overflow, and immutable catalogue
-checks. The 157 baseline arithmetic tests and 214 unit cases pass together.
+checks. The 157 baseline arithmetic tests and 214 unit cases pass unchanged
+alongside 146 colour cases (517 total). Colour cases use independent primary,
+secondary, grey, alpha and nontrivial expected values; nearest-byte quantization,
+hue wrap, post-round canonicalization, signed/scientific numeric atoms, syntax,
+component/hue limits, hostile attempts, and byte/ASCII boundaries are covered.
+They validate output against the shared canonical schema and formatter.
 Typecheck, scoped lint, and planning validation pass. These are pure logic checks;
 no desktop behavior is established by them.
 
-The unit increment provides partial `L2-04-AC02` evidence for fixed unit fixtures
+The unit/colour increments provide partial `L2-04-AC02` evidence for fixed fixtures
 and preserves the reviewed `L2-04-AC01`/`L2-04-PRIVACY` parser boundaries (no
-execution/transmission, synthetic fixtures, fixed diagnostics). Unit UI/copy
+execution/transmission, synthetic fixtures, fixed diagnostics). Colour UI/copy
 integration and full acceptance remain coordinator-owned. Calendar dates,
-durations with civil/timezone/DST semantics, colours, and explicit opt-in
+durations with civil/timezone/DST semantics and explicit opt-in
 currency/crypto rate adapters with timestamped stale/offline states remain
 unimplemented here. `L2-04-AC02`, UI acceptance, and
 full Debian 13 GNOME/KDE Wayland/X11/native acceptance remain pending. This slice
