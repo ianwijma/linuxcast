@@ -30,7 +30,7 @@ only closed canonical text: lowercase6/8-digit hex; `rgb(R G B[ / A])`; or
 digits, no exponent/negative zero/trailing fractional zeros; hue0<=H<360,
 RGB0..255 and S/L0..100, A0..1. Alpha1 is omitted. Hex rounds RGB and alpha
 channels to nearest byte; omit alpha hex when rounded alpha byte255. Functional
-output rounds at6fractional digits; round hue360 back to0. Achromatic hue is0.
+output rounds at6fractional digits; round hue360 back to0. Achromatic hue is0; at lightness0or100, saturation is also0.
 Conversions use encoded sRGB, preserve alpha without compositing, and remain
 approximate floating-point values; hex intentionally quantizes to8bits/channel.
 
