@@ -9,6 +9,7 @@ const messages:Record<FailureCode,string>={
   'domain-error':'This calculation has no finite real result.',
   'unsupported-unit':'Use a supported, unambiguous unit identifier.',
   'incompatible-units':'Choose units with the same dimension.',
+  'invalid-colour':'Use a supported hex, RGB or HSL colour conversion within the component ranges.',
 };
 class EvaluationFailure extends Error {
   readonly code:FailureCode;

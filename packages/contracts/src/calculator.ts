@@ -6,8 +6,24 @@ export type CalculatorUnit=z.infer<typeof calculatorUnitSchema>;
 export const calculatorExpressionSchema=z.string().min(1).max(512).refine(value=>value.trim().length>0 && new TextEncoder().encode(value).length<=512 && !/[\p{Cc}\p{Cs}]/u.test(value));
 export const calculatorCopyRequestSchema=z.strictObject({protocolVersion:z.literal(1),revision:z.number().int().positive().safe(),expression:calculatorExpressionSchema});
 export const calculatorResultTextSchema=z.string().min(1).max(64).regex(/^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?$/u).refine(value=>Number.isFinite(Number(value)));
+/** Fixed local sRGB formats. Colour text is a bounded canonical value, never CSS source. */
+export const calculatorColourFormatSchema=z.enum(['hex','rgb','hsl']);
+export type CalculatorColourFormat=z.infer<typeof calculatorColourFormatSchema>;
+const colourComponent='(?:0|[1-9][0-9]{0,2})(?:\\.[0-9]{1,6})?';
+const colourAlpha='(?:0(?:\\.[0-9]{1,6})?|1)';
+const rgbText=new RegExp(`^rgb\\((${colourComponent}) (${colourComponent}) (${colourComponent})(?: / (${colourAlpha}))?\\)$`,'u');
+const hslText=new RegExp(`^hsl\\((${colourComponent}) (${colourComponent})% (${colourComponent})%(?: / (${colourAlpha}))?\\)$`,'u');
+function validColourText(colour:CalculatorColourFormat,text:string):boolean{
+  if(colour==='hex')return /^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/u.test(text);
+  const match=(colour==='rgb'?rgbText:hslText).exec(text);if(!match)return false;
+  const values=[Number(match[1]),Number(match[2]),Number(match[3])];
+  return values.every(value=>Number.isFinite(value))&&(colour==='rgb'?values.every(value=>value<=255):values[0]!<360&&values[1]!<=100&&values[2]!<=100);
+}
+export const calculatorColourValueSchema=z.strictObject({colour:calculatorColourFormatSchema,text:z.string().min(1).max(96),unit:z.never().optional()})
+  .refine(value=>validColourText(value.colour,value.text));
+export type CalculatorColourValue=z.infer<typeof calculatorColourValueSchema>;
 export const calculatorCopyReplySchema=z.discriminatedUnion('ok',[
-  z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('copied'),text:calculatorResultTextSchema,unit:calculatorUnitSchema.optional()})}),
+  z.strictObject({ok:z.literal(true),value:z.union([z.strictObject({outcome:z.literal('copied'),text:calculatorResultTextSchema,unit:calculatorUnitSchema.optional(),colour:z.never().optional()}),calculatorColourValueSchema.safeExtend({outcome:z.literal('copied')})])}),
   z.strictObject({ok:z.literal(false),error:rpcFailureSchema}),
 ]);
 export type CalculatorCopyReply=z.infer<typeof calculatorCopyReplySchema>;
