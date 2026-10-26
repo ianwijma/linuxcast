@@ -6,7 +6,7 @@ import {RootIndexer} from '@linuxcast/file-index';
 import type {IndexUpdate,IndexStorage,RootState,ScanProgress} from '@linuxcast/file-index';
 import {fileIndexSchemas,rootConfigSchema} from '@linuxcast/file-index/contracts';
 import type {DataControls} from '@linuxcast/data-controls';
-import {fileSearchMatchesOptions,fileSearchQueryRequestSchema,fileSearchResultSchema,fileSearchRootSchema} from '@linuxcast/contracts';
+import {fileSearchMatchesOptions,fileSearchQueryInputSchema,fileSearchResultSchema,fileSearchRootSchema} from '@linuxcast/contracts';
 import type {FileSearchOptions,FileSearchResult,FileSearchState} from '@linuxcast/contracts';
 
 export class FileSearchUnavailable extends Error {
@@ -22,7 +22,7 @@ export interface FileSearchServiceOptions {
 type Job={rootId:string;cancelled:boolean;phase:'indexing'|'watching'|'unavailable';progress:ScanProgress|null;watching?:boolean;
   ready?:Promise<RootIndexer|undefined>;stopPromise?:Promise<void>;unregister?:()=>void};
 type SearchRequest={query:string;rootId?:string;options?:FileSearchOptions};
-const searchRequestSchema=fileSearchQueryRequestSchema.omit({protocolVersion:true});
+const searchRequestSchema=fileSearchQueryInputSchema;
 const fail=(reason:FileSearchUnavailable['reason']):never=>{throw new FileSearchUnavailable(reason);};
 const bytes=(value:string)=>Buffer.byteLength(value,'utf8');
 const validId=(value:string)=>fileIndexSchemas['files.roots.remove'].params.safeParse({rootId:value}).success;
