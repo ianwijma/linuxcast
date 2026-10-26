@@ -16,7 +16,7 @@ afterEach(async()=>{vi.restoreAllMocks();for(const db of databases.splice(0))if(
 function request<M extends QuicklinkStorageMethod>(db:Database.Database,method:M,input:unknown):QuicklinkStorageMethods[M]['result'] {
   return db.transaction(()=>parseContract(quicklinkRepositoryContracts.get(method)!.result,dispatchQuicklinks(db,method,input))).immediate() as QuicklinkStorageMethods[M]['result'];
 }
-async function fixture(version:6|7=7){
+async function fixture(version:6|7|10=10){
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-quicklinks-repository-'));directories.push(directory);
   const path=join(directory,'data.db'),db=new Sqlite(path);databases.push(db);
   db.pragma('foreign_keys=ON');db.pragma('journal_mode=WAL');db.pragma('trusted_schema=OFF');
@@ -24,11 +24,13 @@ async function fixture(version:6|7=7){
   expect(db.prepare("SELECT name FROM sqlite_master WHERE name='quicklinks'").get()).toBeUndefined();
   db.prepare('INSERT INTO command_usage(command_id,use_count,last_used_at,pinned,alias) VALUES(?,3,NULL,1,?)').run('linuxcast:calculator','public calc');
   db.transaction(()=>db.exec(schema)).immediate();
-  if(version===7)db.transaction(()=>db.exec(webSearchMigration)).immediate();
+  if(version>=7)db.transaction(()=>db.exec(webSearchMigration)).immediate();
+  if(version>=10)db.transaction(()=>db.exec(tagsMigration)).immediate();
   return {db,path};
 }
 const schema=await readFile(new URL('../../../storage/src/migrations/006-quicklinks.sql',import.meta.url),'utf8');
 const webSearchMigration=await readFile(new URL('../../../storage/src/migrations/007-quicklink-web-searches.sql',import.meta.url),'utf8');
+const tagsMigration=await readFile(new URL('../../../storage/src/migrations/010-quicklink-tags.sql',import.meta.url),'utf8');
 const create=(db:Database.Database,name='Public Link',url='https://example.com/public')=>request(db,'quicklinks.save',{expectedRevision:0,name,url});
 const selection=(value:QuicklinkRecord)=>({id:value.id,revision:value.revision});
 
@@ -116,7 +118,7 @@ it('rejects overflowing revision and overfilled catalogues; owner transaction ro
 it('upgrades actual literal schema6 rows without changing identity/version/base/timestamps and persists optional search configuration after reopen',async()=>{
   const {db,path}=await fixture(6),literal={id:randomUUID(),revision:4,name:'Existing Literal',url:'https://example.org/public?q=literal',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-02-01T00:00:00.000Z'};
   db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(literal.id,literal.revision,literal.name,'existing literal',literal.url,literal.createdAt,literal.updatedAt);
-  db.transaction(()=>db.exec(webSearchMigration)).immediate();
+  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);}).immediate();
   expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
   expect(db.prepare('SELECT web_search FROM quicklinks').get()).toEqual({web_search:null});
   expect(request(db,'quicklinks.list',{})).toEqual([{id:literal.id,revision:4,name:literal.name,host:'example.org'}]);
@@ -167,4 +169,12 @@ it('rolls back writes when a stored result contains invalid configuration',async
   expect(()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Rollback Search',url:saved.url,webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE}})).toThrow(ContractError);
   expect(request(db,'quicklinks.get',selection(saved))).toEqual(saved);
   expect(db.prepare('SELECT web_search FROM quicklinks WHERE id=?').pluck().get(saved.id)).toBeNull();
+});
+
+it('stores canonical tag labels with exact versioning, summary projection, clear and reopen persistence',async()=>{
+ const {db,path}=await fixture(),saved=request(db,'quicklinks.save',{expectedRevision:0,name:'Tagged public docs',url:'https://example.org/docs',tags:[' Ｗｏｒｋ ','猫','two words']});expect(saved.tags).toEqual(['Work','猫','two words']);expect(request(db,'quicklinks.list',{})).toEqual([{id:saved.id,revision:1,name:saved.name,host:'example.org',tags:saved.tags}]);
+ const changed=request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url,tags:['Other']});expect(changed).toMatchObject({revision:2,tags:['Other'],createdAt:saved.createdAt});expect(()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url,tags:['Stale']})).toThrow(QuicklinkRepositoryError);db.close();const next=new Sqlite(path);databases.push(next);expect(request(next,'quicklinks.get',selection(changed))).toEqual(changed);const cleared=request(next,'quicklinks.save',{id:changed.id,expectedRevision:2,name:changed.name,url:changed.url,tags:[]});expect(cleared).not.toHaveProperty('tags');expect(next.prepare('SELECT tags_json FROM quicklinks WHERE id=?').pluck().get(saved.id)).toBe('[]');
+});
+it.each(['["Work","ｗｏｒｋ"]','["bad,tag"]','[1]','["bad\\nlabel"]'])('rejects corrupt stored tag labels without partial results or overwritten source: %s',async tags=>{
+ const {db}=await fixture(),saved=create(db);db.prepare('UPDATE quicklinks SET tags_json=? WHERE id=?').run(tags,saved.id);for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Do not overwrite',url:saved.url})])expect(operation).toThrowError(expect.objectContaining({message:'Invalid protocol message.'}));expect(db.prepare('SELECT revision,name FROM quicklinks WHERE id=?').get(saved.id)).toEqual({revision:1,name:saved.name});
 });

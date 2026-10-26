@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { applicationReferenceSchema, fileReferenceSchema, formFieldSchema, uiTextSchema, MAX_ENVELOPE_BYTES, type ViewModel } from '@linuxcast/contracts';
 import { Button, TextField } from '../primitives/index.ts';
 import type { DraftValue, Field, ViewHost } from './types.ts';
@@ -18,6 +18,9 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState(false);
+  // Loading/status rows shrink the viewport; keep Cancel reachable without
+  // moving focus onto an action that a held submit key could activate.
+  useLayoutEffect(() => { if(active&&(busy||view.loading))formElement.current?.querySelector<HTMLElement>('.lc-form-actions')?.scrollIntoView?.({block:'nearest'}); },[active,busy,view.loading]);
   const current = useRef({ view, active }); current.current = { view, active };
   const lifetime = useRef(new AbortController());
   useEffect(() => { const controller = new AbortController(); lifetime.current = controller; return () => controller.abort(); }, []);

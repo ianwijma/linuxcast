@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema } from '../src/index.ts';
+import { quicklinkTagsSchema,MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema } from '../src/index.ts';
 const id='00000000-0000-4000-8000-000000000001';
 const save={expectedRevision:0,name:'Public docs',url:'https://example.invalid/docs'};
 it('validates literal credential-free web targets before canonicalizing and rejects unsupported template authority',()=>{
@@ -37,4 +37,11 @@ it('requires truthful exact receipts and strict durable record timestamps',()=>{
   for(const outcome of ['removed','cancelled'])expect(quicklinkRemoveReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(true);
   expect(quicklinkOpenReplySchema.safeParse({ok:true,value:{id,revision:1,outcome:'dispatched'}}).success).toBe(true);
   for(const outcome of ['opened','completed','success'])expect(quicklinkOpenReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(false);
+});
+
+it('canonicalizes bounded saved tags, rejects ambiguous/control/delimiter input and keeps500 summaries bounded',()=>{
+ expect(quicklinkTagsSchema.parse(['  Ｗｏｒｋ  ','猫','two words'])).toEqual(['Work','猫','two words']);
+ for(const tags of [[''],['\nlabel'],['a,b'],['\ud800'],['x'.repeat(33)],['猫'.repeat(22)],['Work','ｗｏｒｋ'],Array.from({length:9},(_,i)=>`tag${i}`)])expect(quicklinkTagsSchema.safeParse(tags).success).toBe(false);
+ expect(quicklinkSaveSchema.parse({...save,tags:[' Work ']})).toEqual({...save,tags:['Work']});
+ const tags=Array.from({length:8},(_,i)=>'😀'.repeat(15)+i),records=Array.from({length:MAX_QUICKLINKS},(_,i)=>({id:`00000000-0000-4000-8000-${i.toString(16).padStart(12,'0')}`,revision:1,name:'😀'.repeat(64),host:'x'.repeat(320),tags}));expect(quicklinkListSchema.parse(records)).toHaveLength(500);expect(Buffer.byteLength(JSON.stringify({ok:true,value:{records}}))).toBeLessThan(MAX_ENVELOPE_BYTES-4096);
 });

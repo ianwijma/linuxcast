@@ -69,7 +69,7 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         const {protocolVersion,...input}=quicklinkSaveRequestSchema.parse(payload);void protocolVersion;
         attempted=true;const record=await backend.save(input);
         const reply=quicklinkRecordReplySchema.parse({ok:true,value:{record}});
-        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch))throw new Error('Mismatched save receipt.');
+        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch)||JSON.stringify(reply.value.record.tags??[])!==JSON.stringify(input.tags??[]))throw new Error('Mismatched save receipt.');
         return reply;
       }
       const selection=quicklinkGetRequestSchema.parse(operation==='open'?{protocolVersion:1,id:(payload as QuicklinkSelection).id,revision:(payload as QuicklinkSelection).revision}:payload);

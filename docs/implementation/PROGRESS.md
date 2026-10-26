@@ -17,7 +17,8 @@ An increment is not goal completion.
 
 ## Integrated base
 
-Primary clean develop **6feaf5831f7acaa3753083db5d79d2216599bed7**,
+Primary clean develop **e2dec5a8bc072eb291ca1c7e61f483ba45c071c9** (PR44; details below).
+Prior base **6feaf5831f7acaa3753083db5d79d2216599bed7**,
 [PR43](https://github.com/ianwijma/linuxcast/pull/43) merged26October19:39:18UTC.
 Exact reviewed head82c2a7dee76c29943ab88470a419d1a036635798, CI40388536916
 validate PASS10s; no requested GitHub reviewers/submissions/comments/threads.
@@ -76,53 +77,62 @@ integration including production Close/restart/Quit4.78s. Full typecheck/lint/pl
 diff pass. Actual/component checks are not native Wayland/GNOME/KDE/AT acceptance.
 W1-02/W1-03/W2-03 remain in-progress; privacy passed only, all wider criteria pending.
 
-## Current bounded saved-Keyword launcher increment
+## Integrated PR44 / current Quicklinks tags application increment
 
+PR44 https://github.com/ianwijma/linuxcast/pull/44 merged as
+**e2dec5a8bc072eb291ca1c7e61f483ba45c071c9** at26October22:26:34UTC.
+Exact independently reconciled signed headfc9c94147c92ed27c9cdf63b2c7e630c746b230d,
+implementation2d22304/UI9e083d0(authorcf26299), CI40412367124 validatePASS10s.
+No requested GitHub reviewers/reviews/comments/threads; normal exact-head merge.
+Primary clean develop now e2dec5a; frozen install/build66assets pass.
+Signer failure resolved by user Unlocked; normal1Password SSH signing works.
+Goal controller still reports blocked from earlier audit; user authorized resumed
+work. Do not claim goal complete or change its objective.
+
+Actual saved enabled Keywords are registered opaque launcher commands.
+Search/Arrow/Enter opens exact saved entry without Run/cancel/approval/replay.
+Main fresh saved revision/hash/frame checks, validated bounded metadata and
+builtin recovery; no renderer graph/grant authority. Actual private-Xvfb flow
+4.20s,321targeted/37debugger/20UI/2intentsecurity/7contracts/19workflowintegration/
+19commandowner/8editorintegration pass. Two actual and five component affected
+captures inspected. Evidence apps/desktop/evidence/workflow-launcher-application.md.
+Full task/native/session/AT/release gates remain pending.
+
+Next bounded required application feature is saved Quicklinks tags (L2-05),
+using existing registered command/shared List/Form/owner/browser backend.
 Coordinator `.worktrees/linuxcast-application-controls`, branch
-**codex/workflow-launcher-commands** atop6feaf583; freeze signed d504786,
-UI signed9e083d0 (author signed cf26299). Source complete; reviewed/tested;
-PR publication/CI/configured review/normal exact-head merge next.
+**codex/quicklink-tags** frome2dec5a. Frozen contract2881204, raw-control
+hardeningdbfabde. Shared optional tags:8labels,32UTF16/64UTF8 each, NFKC+trim,
+normalized case-insensitive unique, no raw controls/surrogates/comma. Labels
+never become templates, URL authority or grants. Migration010 adds local saved
+JSON labels; no query history. Root repository/main/preload/client exact receipts
+and real9→10 snapshot/reopen/clear tests implemented;70targeted +43existing
+storage integration, full typecheck/scoped lint pass; independent boundary review clean. Historical-schema tests inspect raw snapshots and do not run current
+repositories before latest migration. Actual/UI integration remains pending.
 
-User confirmed Unlocked; existing normal 1Password signer now works. Signed
-implementation **2d22304** preserves all reviewed source/tests/evidence. Prior
-buffer failure is resolved; no signing configuration change. Publish focused
-PR, inspect exact-head CI/configured reviews/threads, then normal merge and
-primary frozen install/build. Controller still reports blocked from the earlier
-three-turn audit; this user reply authorizes resumed work, not goal completion.
-
-Final independent staged-delta reconciliation clean: duplicate IDs rejected
-before publication; long-name real engine/owner execution+recovery and debugger
-receipt regressions sound. Native/full task/release acceptance remain pending.
-
-Actual saved enabled Keywords now appear as stable opaque launcher commands.
-Search/Arrow/Enter opens the exact saved entry; never Run/cancel/approval/replay.
-Fresh main saved revision/hash and original-frame checks fence stale requests.
-Main-only monotonic intent, read-only validated preload; canvas refuses dirty/
-stale fallback, preserves run/prompt. Bounded canonical-name display projection
-fix closes sole P2. Invalid lane metadata cannot remove builtin recovery.
-Shared catalogue/search/visibility capacity5104; no migration.
-
-PASS321 targeted;37 debugger units/20 Chromium keyboard+axe;2 intent security;
-7 run contracts;19 W1-03 integration (13 host+5 journal+actual6.50s),19 owner
-command storage,8 editor integration (actual4.50s); actual new launcher entry
-flow4.20s. Actual clipboard checks prove no action on open, uppercase original
-entry effect after approval, pending run/prompt survive another entry, stale
-Save rejects then explicit Reload recovers. Two actual dark/light and five
-component affected captures inspected; no renderer Node. Typecheck/scoped lint/
-plan/diff pass. Evidence `apps/desktop/evidence/workflow-launcher-application.md`.
-All native/session/AT/full task/release criteria remain pending.
-
-Agents all SOL/high, completed:
+Agents all SOL/high:
 - `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branch
-  codex/w2-03-launcher-entry-ui, clean signed cf26299; integrated9e083d0.
-  Bounded product UI finish achieved; no infrastructure/proof/research.
-- `alias_review_sol`: final current source review clean; oversized-name P2 closed.
-- `file_search_service_sol`: exact author/integrated UI and all five affected
-  captures clean; canvas dirty/stale gates reviewed.
+  **codex/l2-05-quicklink-tags-ui** from2881204; cherry-pick hardeningdbfabde.
+  Owns only quicklinks presentation/fixtures/tests/UI/evidence/README. Shared
+  Form Tags field, local search/display/prefill/clear, canonical receipts and
+  persistent unknown recovery; controller/keyboard/axe/dark-light evidence.
+  Signed75bcdcc/c3a6bfd integratedec0da28/62cc997; clean, bounded UI finish complete.
+  No infrastructure/research/proof or extra dependencies.
+- `file_search_service_sol`: completed bounded root tags boundary review clean.
+- `alias_review_sol`: PR44 exact-head and tags UI/12captures clean; pending Cancel P2 closed.
 
-After merge, reconcile current main/evidence and choose the next small concrete
-application flow using existing shell/storage/UI. Do not mark any whole task
-complete or expand foundational work to defer the merge.
+Current root tag source/evidence complete on signed62cc997 (UIec0da28 author
+75bcdcc, sharedFormd00f8f4, final authoredc3a6bfd). Independent boundary/UI reviews
+clean; pending Save clipping P2 closed with corrected capture and full bounds/
+heldEnter/no-focus/no-duplicate regression. Author/integrated ownedtrees exact.
+PASS187units/11contracts/29security/36L2integration(actual5.77s),43F2storage,
+17D1units/11D1UI; author32tagUI+6focused followup cases. Six actual/12component
+captures inspected. Full typecheck/scopedlint/plan/diff pass. Actual reducedmotion
+captures avoid transient theme-animation pixels. Evidence
+`apps/desktop/evidence/quicklink-tags-application.md`. No current live test handles.
+Next: sign evidence/docs, publish focused PR, inspect exact-head CI/configured
+reviews/threads, normal merge promptly, primary frozen install/build and record
+merge. All broader L2-05/native/session/AT/release requirements remain pending.
 
 ## Complete scope / runtime
 
