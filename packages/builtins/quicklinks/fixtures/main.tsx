@@ -1,0 +1,32 @@
+import { useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Button,ThemeProvider } from '@linuxcast/ui';
+import { ViewSession,ViewRenderer } from '@linuxcast/ui/views';
+import type { QuicklinkApi,QuicklinkRecord,ViewModel } from '@linuxcast/contracts';
+import type { ViewHost } from '@linuxcast/ui/views';
+import { QuicklinksFlow,createQuicklinksFlowState } from '../src/presentation.ts';
+import '@linuxcast/ui/styles.css';
+import '@linuxcast/ui/views.css';
+import './preview.css';
+const params=new URLSearchParams(location.search),mode=params.get('state'),time='2026-10-27T00:00:00.000Z';
+const id=(index:number)=>`00000000-0000-4000-8000-${String(index).padStart(12,'0')}`;
+const root:ViewModel={protocolVersion:1,viewId:'root',revision:1,kind:'list',title:'Search commands',search:{query:'',placeholder:'Search commands…',mode:'host'},sections:[{id:'commands',items:[{id:'quicklinks',title:'Quicklinks',actions:[{id:'quicklinks',title:'Open Quicklinks',kind:'invoke',effect:'read'}]}]}]};
+function Fixture(){
+  const [observed,setObserved]=useState('No request observed.');
+  const [connection]=useState(()=>{
+    const records:QuicklinkRecord[]=Array.from({length:mode==='empty'?0:mode==='many'?120:2},(_,index)=>({id:id(index+1),revision:1,name:index===0?'Public documentation':index===1?'Public reference':`Public Link ${index+1}`,url:`https://public${index+1}.example/docs`,createdAt:time,updatedAt:time}));let flow:QuicklinksFlow|null=null,sequence=0,mutations=0,opens=0;
+    const session=new ViewSession(root,viewId=>{flow?.close(viewId);});const state=createQuicklinksFlowState();
+    const summaries=()=>records.map(({id,revision,name,url})=>({id,revision,name,host:new URL(url).host})).sort((a,b)=>a.id<b.id?-1:1);
+    const api:QuicklinkApi={listQuicklinks:async()=>{if(mode==='loading')return new Promise(()=>{});if(mode==='load-error')throw new Error('synthetic private error');return {ok:true,value:{records:summaries()}};},getQuicklink:async request=>({ok:true,value:{record:structuredClone(records.find(record=>record.id===request.id)!)}}),
+      saveQuicklink:async request=>{setObserved(`Observed save ${++mutations}: ${request.name}.`);if(mode==='save-pending')await new Promise(resolve=>setTimeout(resolve,1500));if(mode==='save-unknown')throw new Error('synthetic private save detail');if(records.some(record=>record.id!==request.id&&record.name.toLowerCase()===request.name.toLowerCase()))return {ok:false,error:{code:'conflict',message:'synthetic private collision',retryable:false,details:{reason:'quicklink-name-conflict'}}};const before=records.find(record=>record.id===request.id),record:QuicklinkRecord={id:before?.id??id(501+mutations),revision:request.expectedRevision+1,name:request.name,url:request.url,createdAt:before?.createdAt??time,updatedAt:time};if(before)records[records.indexOf(before)]=record;else records.push(record);return {ok:true,value:{record:structuredClone(record)}};},
+      removeQuicklink:async request=>{setObserved(`Observed removal ${++mutations}.`);if(mode==='remove-pending')await new Promise(resolve=>setTimeout(resolve,1500));if(mode==='remove-unknown')throw new Error('synthetic private removal detail');if(mode==='remove-cancelled')return {ok:true,value:{...request,outcome:'cancelled'}};records.splice(records.findIndex(record=>record.id===request.id),1);return {ok:true,value:{...request,outcome:'removed'}};},
+      openQuicklink:async request=>{setObserved(`Observed browser handoff ${++opens}: saved ID/version only.`);if(mode==='open-pending')await new Promise(resolve=>setTimeout(resolve,1500));if(mode==='open-unknown')throw new Error('synthetic private browser detail');if(mode==='open-unavailable')return {ok:false,error:{code:'capability-unavailable',message:'synthetic private browser detail',retryable:false}};return {ok:true,value:{id:request.id,revision:request.revision,outcome:'dispatched'}};}};
+    if(mode==='missing-api'){delete api.listQuicklinks;delete api.saveQuicklink;}
+    const open=()=>{flow?.dispose();flow=new QuicklinksFlow({session,api,viewId:`fixture-links-${++sequence}`,revision:7,state,onDismiss:async()=>{if(mode==='hide-failed')return {ok:false,error:{code:'capability-unavailable',message:'synthetic private Hide detail',retryable:false}};hide();return {ok:true,value:null};}});flow.open('root');};
+    const hide=()=>{while(flow?.active&&session.getSnapshot().frames.length>1)session.pop();flow?.dispose();};
+    const host:ViewHost={action:intent=>{if(flow?.active){void flow.handle(intent);return;}if(intent.actionId==='quicklinks')open();}};
+    return {session,host,hide};
+  });
+  return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><main className="quicklinks-fixture" onKeyDownCapture={event=>{if(event.key==='Enter'&&event.repeat){event.preventDefault();event.stopPropagation();}}}><h1 className="lc-view-announcement">Quicklinks fixture</h1><ViewRenderer session={connection.session} host={connection.host}/><Button onClick={connection.hide}>Hide fixture flow</Button><output aria-live="polite">{observed}</output><p className="lc-muted">Component fixture · saved definitions are synthetic in-memory data; writes, native confirmation and browser handoffs are observed, not system operations.</p></main></ThemeProvider>;
+}
+createRoot(document.getElementById('root')!).render(<Fixture/>);
