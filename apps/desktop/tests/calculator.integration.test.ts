@@ -16,7 +16,7 @@ const executable=createRequire(import.meta.url)('electron') as string;
 let application:ElectronApplication|undefined,temporary='';
 afterEach(async()=>{if(application)await application.close().catch(()=>{application?.process().kill('SIGKILL');});application=undefined;if(temporary)rmSync(temporary,{recursive:true,force:true});});
 async function action(page:Page,title:string){await page.keyboard.press('Control+k');const filter=page.getByRole('searchbox',{name:'Find an action',exact:true});await filter.fill(title);await filter.press('Enter');}
-it('evaluates through the production launcher and copies only an explicit numeric result to a private native clipboard',async()=>{
+it('evaluates through the production launcher and copies only explicit arithmetic or canonical unit results to a private native clipboard',async()=>{
   if(!process.env.DISPLAY||process.env.LINUXCAST_PRIVATE_DISPLAY!=='1')throw new Error('Requires an owned private Xvfb display; this is not native desktop acceptance.');
   execFileSync(process.execPath,['apps/desktop/build.ts'],{cwd:root,timeout:60000,stdio:'pipe'});
   temporary=mkdtempSync(join(tmpdir(),'linuxcast-calculator-app-'));
@@ -40,12 +40,32 @@ it('evaluates through the production launcher and copies only an explicit numeri
   const secondExpression='sqrt(81) + 2^3^2';await expression.fill(secondExpression);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await page.getByRole('heading',{name:'Calculation',exact:true}).waitFor();await expect.poll(()=>page.getByText('521',{exact:true}).count()).toBe(1);
   await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(page,'Copy result');await expect.poll(()=>page.getByRole('alert').textContent()).toContain('not copied');expect(clipboardText()).toBe('14');
   await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe('14');await action(page,'Copy result');await expect.poll(clipboardText).toBe('521');
-  expect(await page.evaluate(async()=>{const api=(window as unknown as {linuxcast:DesktopShellApi}).linuxcast;const reply=await api.getLauncherCommands();return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:calculator')?.usage:null;})).toMatchObject({useCount:2});
+  // Real unit results cross the renderer/main boundary only on explicit Copy.
+  const conversions=[['(2 + 3) km to m','5000 m'],['32 degF to degC','0 degC'],['1 MiB to B','1048576 B']] as const;
+  let previousClipboard='521';
+  await action(page,'Edit expression');
+  await expression.fill(conversions[0][0]);
+  await action(page,'Supported units');await page.getByRole('heading',{name:'Supported units',exact:true}).waitFor();
+  expect(clipboardText()).toBe(previousClipboard);
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);await page.screenshot({path:join(evidence,`application-${theme}-units-help.png`)});expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);}
+  await page.getByRole('button',{name:'Back',exact:true}).click();expect(await expression.inputValue()).toBe(conversions[0][0]);await expect.poll(()=>expression.evaluate(element=>element===document.activeElement)).toBe(true);
+  for(const [input,output] of conversions){
+    await expression.fill(input);expect(clipboardText()).toBe(previousClipboard);
+    await page.getByRole('button',{name:'Evaluate',exact:true}).click();await page.getByRole('heading',{name:'Calculation',exact:true}).waitFor();await expect.poll(()=>page.getByText(output,{exact:true}).count()).toBe(1);expect(clipboardText()).toBe(previousClipboard);
+    if(input==='32 degF to degC')for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);await page.screenshot({path:join(evidence,`application-${theme}-unit-result.png`)});expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);}
+    await action(page,'Copy result');await expect.poll(clipboardText).toBe(output);await expect.poll(()=>page.getByRole('status').textContent()).toBe('Result copied.');previousClipboard=output;
+    await action(page,'Edit expression');
+  }
+  for(const input of ['1 m to kg','1 gal to L','1 KB to B','-1 K to degC']){await expression.fill(input);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await expect.poll(()=>expression.getAttribute('aria-invalid')).toBe('true');expect(clipboardText()).toBe(previousClipboard);}
+  expect(await page.evaluate(async()=>{const api=(window as unknown as {linuxcast:DesktopShellApi}).linuxcast;const reply=await api.getLauncherCommands();return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:calculator')?.usage:null;})).toMatchObject({useCount:5});
+  // Help has the same bounded depth as a result. Hide removes both nested frames.
+  await action(page,'Supported units');await page.getByRole('heading',{name:'Supported units',exact:true}).waitFor();
+
   expect(await page.evaluate(async()=>await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.hideLauncher())).toMatchObject({ok:true});
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
   await new Promise<void>((resolve,reject)=>{const child=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});const timer=setTimeout(()=>{child.kill('SIGKILL');reject(new Error('Reopen deadline.'));},10000);child.once('error',reject);child.once('exit',code=>{clearTimeout(timer);if(code===0)resolve();else reject(new Error('Reopen failed.'));});});
-  await query.waitFor();await expect.poll(()=>page.getByRole('textbox',{name:'Expression (required)',exact:true}).count()).toBe(0);expect(clipboardText()).toBe('521');
+  await query.waitFor();await expect.poll(()=>page.getByRole('textbox',{name:'Expression (required)',exact:true}).count()).toBe(0);expect(clipboardText()).toBe('1048576 B');
   await query.fill('quit');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');const exited=new Promise<number|null>(resolve=>app.process().once('exit',resolve));await query.press('Enter',{noWaitAfter:true});expect(await exited).toBe(0);application=undefined;
   const owner=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-calculator-reopen'});
-  try{const exported=owner.request({schemaVersion:1,requestId:randomUUID(),method:'dataControls.export',params:{category:'command-usage'}});expect(exported.result).toMatchObject({records:expect.arrayContaining([expect.objectContaining({commandId:'linuxcast:calculator',useCount:2})])});const text=JSON.stringify(exported);for(const expression of ['2 + 3 * 4',secondExpression,'process.exit()','1 / 0'])expect(text).not.toContain(expression);}finally{await owner.close();}
+  try{const exported=owner.request({schemaVersion:1,requestId:randomUUID(),method:'dataControls.export',params:{category:'command-usage'}});expect(exported.result).toMatchObject({records:expect.arrayContaining([expect.objectContaining({commandId:'linuxcast:calculator',useCount:5})])});const text=JSON.stringify(exported);for(const expression of ['2 + 3 * 4',secondExpression,'process.exit()','1 / 0',...conversions.flat(),'1 m to kg','1 gal to L','1 KB to B','-1 K to degC'])expect(text).not.toContain(expression);}finally{await owner.close();}
 },60000);

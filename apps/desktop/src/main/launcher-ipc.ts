@@ -1,3 +1,4 @@
+import { formatCalculationText } from '@linuxcast/calculator/result';
 import { evaluateExpression } from '@linuxcast/calculator/evaluate';
 import { calculatorCopyRequestSchema } from '@linuxcast/contracts';
 import type { CalculatorCopyReply } from '@linuxcast/contracts';
@@ -59,7 +60,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:open-file-search',title:'File search',subtitle:'Search filenames in folders you choose',aliases:['files','file search'],keywords:['folder','filename','index'],enabled:!!actions.openFileSearch,
       ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
-    {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate an expression locally and copy its numeric result',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate'],enabled:true},
+    {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic or convert units locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert'],enabled:true},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   const recordUse = async (id: string) => {
@@ -136,12 +137,13 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
     if(!active()||busy||calculatorPending)return failure('cancelled');
     const calculated=evaluateExpression(parsed.data.expression);
-    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported finite arithmetic expression, then evaluate it again.',retryable:false}};
+    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported expression with compatible units, then evaluate it again.',retryable:false}};
+    let clipboardText:string;try{clipboardText=formatCalculationText(calculated);}catch{return failure('invalid-request');}
     if(!actions.copyCalculatorResult)return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
     calculatorPending=true;
     // A timed-out write keeps its slot until the actual backend settles. Hide/Quit
     // remain usable, and no later copy can overtake an unresolved clipboard write.
-    const work=Promise.resolve().then(()=>{if(!active())throw new Error('Stopped.');return actions.copyCalculatorResult!(calculated.text);});
+    const work=Promise.resolve().then(()=>{if(!active())throw new Error('Stopped.');return actions.copyCalculatorResult!(clipboardText);});
     void work.finally(()=>{calculatorPending=false;}).catch(()=>{});
     let timer:ReturnType<typeof setTimeout>|undefined;
     try {
@@ -149,7 +151,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
       if(outcome!=='written')throw new Error('Invalid copy receipt.');
       await recordUse('linuxcast:calculator');
-      return {ok:true,value:{outcome:'copied',text:calculated.text}};
+      return {ok:true,value:{outcome:'copied',text:calculated.text,...(calculated.unit===undefined?{}:{unit:calculated.unit})}};
     }catch{return {ok:false,error:{code:'deadline-exceeded',message:'The copy outcome is unknown. Check your clipboard before choosing Copy result again.',retryable:false}};}
     finally{clearTimeout(timer);}
   });

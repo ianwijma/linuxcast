@@ -7,7 +7,9 @@
   "exports": {
     "./evaluate": "./src/evaluate.ts",
     "./presentation": "./src/presentation.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./result": "./src/result.ts",
+    "./units": "./src/units.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",

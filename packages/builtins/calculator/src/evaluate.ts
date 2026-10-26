@@ -1,4 +1,5 @@
 import type {Calculation} from './types.ts';
+import {convertUnitValue} from './units.ts';
 
 type FailureCode=Extract<Calculation,{ok:false}>['code'];
 type Token={kind:'number';value:number}|{kind:'name';value:string}|{kind:'+'|'-'|'*'|'/'|'^'|'%'|'('|')'|','|'end'};
@@ -6,6 +7,8 @@ const messages:Record<FailureCode,string>={
   'invalid-expression':'Enter a supported mathematical expression.',
   'limit-exceeded':'This expression exceeds the calculator limits.',
   'domain-error':'This calculation has no finite real result.',
+  'unsupported-unit':'Use a supported, unambiguous unit identifier.',
+  'incompatible-units':'Choose units with the same dimension.',
 };
 class EvaluationFailure extends Error {
   readonly code:FailureCode;
@@ -143,6 +146,22 @@ function format(value:number):string {
   return String(Object.is(display,-0)?0:display);
 }
 
+/** Only a single explicit top-level conversion suffix is supported. The scalar
+ * remains the existing arithmetic grammar, with its independent fixed bounds. */
+function conversion(input:string):{scalar:string;source:string;target:string}|undefined {
+  const delimiters=[...input.matchAll(/ +to +/gu)];
+  if(delimiters.length===0)return undefined;
+  if(delimiters.length!==1)return reject('invalid-expression');
+  const delimiter=delimiters[0]!;
+  const left=input.slice(0,delimiter.index).trimEnd();
+  const separator=left.lastIndexOf(' ');
+  if(separator===-1)return reject('invalid-expression');
+  const scalar=left.slice(0,separator).trimEnd(),source=left.slice(separator+1),target=input.slice(delimiter.index+delimiter[0].length).trim();
+  const identifier=/^[A-Za-z_][A-Za-z0-9_/]*$/u;
+  if(!scalar||!identifier.test(source)||!identifier.test(target))return reject('invalid-expression');
+  return {scalar,source,target};
+}
+
 /** Pure, bounded local calculator. Runtime-invalid input always yields a fixed
  * failure; input text is never executed, persisted, or transmitted. */
 export function evaluateExpression(input:string):Calculation {
@@ -152,8 +171,14 @@ export function evaluateExpression(input:string):Calculation {
     // ASCII space is the sole whitespace. This also rejects controls, DEL,
     // non-ASCII syntax and lone UTF-16 surrogates before tokenization.
     if(/[^\x20-\x7e]/u.test(input))return reject('invalid-expression');
-    const result=finite(new Parser(tokenize(input)).parse());
-    const value=Object.is(result,-0)?0:result;
+    const request=conversion(input);
+    const scalar=finite(new Parser(tokenize(request?.scalar??input)).parse());
+    if(request) {
+      const result=convertUnitValue(scalar,request.source,request.target);
+      if(!result.ok)return reject(result.code);
+      return {ok:true,value:result.value,text:format(result.value),unit:result.unit};
+    }
+    const value=Object.is(scalar,-0)?0:scalar;
     return {ok:true,value,text:format(value)};
   }catch(error) {
     const code=error instanceof EvaluationFailure?error.code:'invalid-expression';

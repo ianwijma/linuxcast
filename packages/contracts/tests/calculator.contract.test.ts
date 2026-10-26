@@ -10,3 +10,8 @@ it('accepts only finite bounded numeric copied text and strict receipts',()=>{
   for(const text of ['NaN','Infinity','1e999','<script>','arbitrary','1 2','+4'])expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',text}}).success).toBe(false);
   expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',text:'4',expression:'private'}}).success).toBe(false);
 });
+it('carries a closed canonical unit separately from numeric text without accepting arbitrary labels',()=>{
+  expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',text:'1000',unit:'m'}}).success).toBe(true);
+  for(const unit of ['metres<script>','constructor','KB','gal','m;rm',null])expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',text:'1',unit}}).success).toBe(false);
+  expect(calculatorCopyRequestSchema.safeParse({protocolVersion:1,revision:1,expression:'1 km to m',unit:'m'}).success).toBe(false);
+});
