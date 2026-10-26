@@ -104,8 +104,7 @@ checks cover a larger matching dataset and the packaged application separately.
   readonly details, index clear, appearance, disposal and explicit recovery.
 - `tests/options.test.ts`: 31 strict UTC/calendar/draft/summary checks, also passing
   under UTC and America/New_York host timezones.
-- `tests/file-search.ui.test.ts`: 19 Chromium keyboard/axe checks (18 pass; one
-  shared-renderer integration dependency remains below) for dark/light
+- `tests/file-search.ui.test.ts`: 19 passing Chromium keyboard/axe checks for dark/light
   Folders, Results and Details, native chooser cancellation, empty/indexing,
   pending/unknown/unavailable/error states, index clear and cancelled removal.
 - `evidence/`: 17 component screenshots from the explicitly labelled request-observing
@@ -117,14 +116,14 @@ checks cover a larger matching dataset and the packaged application separately.
   pass. Browser checks require a local fixture server and real Chromium processes.
   These are component checks, not native chooser/indexing or desktop proof.
 
-At this author commit, the empty filtered-results summary browser assertion is
-still failing: the shared renderer hides section captions without items and
-replaces a nonempty extension query's supplied empty description with generic
-text. The controller already supplies the applied summary in that description;
-the coordinator-owned renderer must honor it before this UI path passes. The
-regression is retained. All other18 browser cases,75 controller/options checks,
-typecheck, scoped lint, plan and diff checks pass. The shared renderer fix is
-requested from the coordinator and remains outside this lane's owned paths.
+After coordinator shared-renderer fix `d04566f`, all19 File search browser cases
+and10 Copy path browser regressions pass. Nonempty extension queries now preserve
+the supplied empty-result description, including the applied filter/sort summary.
+The retained regression verifies the summary after index clear and unsent-Form
+cancellation, alongside paused-state remediation. All75 controller/options checks,
+typecheck, scoped lint, plan and diff checks also pass. These remain component
+checks; actual SQLite ordering/filtering and native clipboard evidence belong to
+the coordinator's integration checks.
 
 This increment contributes bounded UI/privacy evidence to L2-02; it does not
 complete the task's content-extraction acceptance criteria. MIME filters,
