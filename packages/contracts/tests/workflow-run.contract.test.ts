@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunStateSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
+import { workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunSnapshotSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
 import { createWorkflowDraft } from '../../workflows/src/registry.ts';
 const runId='00000000-0000-4000-8000-000000000001',promptId='00000000-0000-4000-8000-000000000002';
 it('accepts only fresh editor identity, selected entry and transient input as run authority',()=>{
@@ -16,9 +16,9 @@ it('binds permission decisions to exact run/prompt IDs with no generic grant or 
 });
 it('cannot label unknown effects as unreviewed success or show an approval outside the waiting state',()=>{
   const value={runId,sequence:1,editorRevision:1,workflowName:'Public workflow',triggerNodeId:'node-1',state:'running',steps:[],effectOutcome:'not-dispatched',requiresReview:false};
-  expect(workflowRunStateSchema.parse(value)).toEqual(value);
-  expect(workflowRunStateSchema.safeParse({...value,effectOutcome:'unknown'}).success).toBe(false);
-  expect(workflowRunStateSchema.safeParse({...value,prompt:{id:promptId,permissionId:'clipboard.write',choices:['once'],text:'Public result'}}).success).toBe(false);
+  expect(workflowRunSnapshotSchema.parse(value)).toEqual(value);
+  expect(workflowRunSnapshotSchema.safeParse({...value,effectOutcome:'unknown'}).success).toBe(false);
+  expect(workflowRunSnapshotSchema.safeParse({...value,prompt:{id:promptId,permissionId:'clipboard.write',choices:['once'],text:'Public result'}}).success).toBe(false);
 });
 it('binds worker identity/context to the supplied immutable definition and rejects extra channels',()=>{
   const definition=createWorkflowDraft(),value={protocolVersion:1,type:'start',runId,definition,triggerNodeId:'node-1',input:'Public',context:{runId,workflowId:definition.id,workflowVersion:definition.version,triggerNodeId:'node-1',invocationTime:'2026-10-26T00:00:00.000Z',locale:'en',timezone:'UTC',callChain:[]}};

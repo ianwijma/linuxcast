@@ -9,7 +9,7 @@ const revision=z.number().int().positive().safe();
 const nodeId=z.string().min(1).max(200).refine(value=>bytes(value,200)&&!/[\p{Cc}\p{Cs}]/u.test(value));
 export const workflowRunErrorCodeSchema=z.enum(['invalid-workflow','unsupported-configuration','invalid-input','invalid-binding','limit-exceeded','deadline-exceeded','permission-denied','unavailable','storage-unavailable','unknown-outcome','cancelled']);
 export const workflowRunStepSchema=z.strictObject({activationId:z.uuid(),nodeId,nodeType:z.enum(['input.keyword','utility.transform','output.clipboard']),state:z.enum(['running','succeeded','failed','cancelled']),durationMs:z.number().int().nonnegative().safe().optional()});
-export const workflowRunStateSchema=z.strictObject({
+export const workflowRunSnapshotSchema=z.strictObject({
   runId:z.uuid(),sequence:revision,editorRevision:revision,workflowName:z.string().max(128),triggerNodeId:nodeId,
   state:z.enum(['queued','running','waiting-ui','cancelling','succeeded','failed','cancelled','interrupted']),
   steps:z.array(workflowRunStepSchema).max(50),output:workflowRunTextSchema.optional(),
@@ -22,10 +22,10 @@ export const workflowRunStartSchema=z.strictObject({editorRevision:revision,trig
 export const workflowRunDecisionSchema=z.strictObject({runId:z.uuid(),promptId:z.uuid(),decision:z.enum(['once','persistent','deny'])});
 export const workflowRunPermissionResetSchema=z.strictObject({editorRevision:revision});
 export const workflowRunReplySchema=z.union([
-  z.strictObject({ok:z.literal(true),value:workflowRunStateSchema.nullable()}),
+  z.strictObject({ok:z.literal(true),value:workflowRunSnapshotSchema.nullable()}),
   z.strictObject({ok:z.literal(false),error:z.strictObject({code:z.enum(['invalid-request','conflict','unavailable','unknown-outcome']),message:z.string().min(1).max(256)})}),
 ]);
-export type WorkflowRunState=z.infer<typeof workflowRunStateSchema>;
+export type WorkflowRunState=z.infer<typeof workflowRunSnapshotSchema>;
 export type WorkflowRunStep=z.infer<typeof workflowRunStepSchema>;
 export type WorkflowRunErrorCode=z.infer<typeof workflowRunErrorCodeSchema>;
 export type WorkflowRunReply=z.infer<typeof workflowRunReplySchema>;
