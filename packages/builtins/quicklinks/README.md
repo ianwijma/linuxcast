@@ -7,7 +7,7 @@ uses one depth-three Form. Back/Cancel follows the shared dirty-draft dialog and
 restores the List query/selected identity; closing the flow preserves the root
 query and selection. Disposal aborts presentation without popping other views.
 
-The complete list holds up to 500 validated summaries, with names and hosts but
+The complete list holds up to 500 validated summaries, with names, hosts and optional tags but
 no full URLs. Search is local and projects at most 100 matches, with refinement
 guidance and retained matching selection. New is reachable from empty/no-match
 results. Open is primary, Edit is read-only and Remove is destructive. Missing
@@ -43,7 +43,7 @@ gate. A removed edited definition retains its draft with Cancel/New remediation.
 
 ## Saved web searches
 
-New/Edit includes Type (Literal link or Web search) and Query parameter. All four
+New/Edit includes Type (Literal link or Web search) and Query parameter. All five
 submitted fields are validated together. A web search stores only the fixed
 `{{vars.query}}` configuration and its base URL; changing Type back to literal
 requires clearing the parameter and removes the configuration. Search markers
@@ -75,6 +75,45 @@ is required after keyup. Root kind-change focus handling places focus on the
 Query input or read-only preview article, and shared dirty handling remains in
 use. Known default-browser failures and separately failed Hide remain truthful.
 
+## Saved tags
+
+New/Edit includes an optional comma-separated **Tags** field. Shared validation
+normalizes NFKC and trims labels, preserves their order and case, rejects
+case-insensitive normalized duplicates, empty labels, raw controls and lone
+surrogates, and bounds tags to eight labels, each 32 UTF-16 units and 64 UTF-8
+bytes. Clearing the field omits tags on explicit Save. Edit prefills the actual
+saved labels. Tags appear as plain List accessories beside any Web search marker;
+every local query word matches across saved name, host and tags, including
+records beyond the first 100 visible matches. They never alter target authority.
+
+Get, Save and complete-summary checks compare canonical ordered tags exactly;
+empty and absent are equivalent for old definitions. Noncanonical/mismatched
+receipts cannot report a saved state. Unknown Save retains all five drafts,
+requires explicit authoritative Reload, and permits only a later deliberate Save.
+Tag entry, local searching, navigation, Save and Reload never open a browser.
+The existing literal and Query→Review→Open paths and uncertainty fences remain.
+
+The tag increment adds 30 controller cases to the prior 90 and seven Chromium
+keyboard/axe cases to the prior 25. Checks cover canonicalization, tagged literal
+and web-search definitions, prefill/clear, later matching IDs, strict fields,
+duplicate/invalid/overbound labels, exact read/save/summary receipts, pending and
+late Save, unknown-state Reload and retained drafts. Nine new public captures
+under `evidence/*-quicklinks-tags-*` show dark/light local results, Forms, inline
+errors and unconfirmed Save, plus an eight-tag Form at 200% root text. The existing
+pending and typed web-search captures are refreshed with tags. Captures were
+inspected; focused keyboard controls scroll into view using shared Form behavior.
+
+Validation uses Node24.22.1/Bun1.4.4 on Linux x64 and Chromium component fixtures.
+Commands: `LINUXCAST_TEST_FILES='["packages/builtins/quicklinks/tests/presentation.test.ts"]' bun x vitest run --config scripts/test-runner/vitest.config.ts`
+and the corresponding `tests/quicklinks.ui.test.ts` selection with
+`bun x playwright test --config scripts/test-runner/playwright.config.ts`.
+Full typecheck, scoped ESLint, plan and diff checks pass. The shared raw-control
+schema hardening dbfabde is a separate prerequisite, not duplicated here.
+This supplies partial L2-05 UI/PRIVACY evidence; existing AC01/AC02 encoding and
+unsupported-placeholder behavior remains covered by regressions, with no new
+placeholder capability. Actual tag SQLite migration/persistence and native
+browser dispatch are coordinator-owned checks, separate from these observers.
+
 Design sections: Shell/navigation; Results/actions; List/Grid/Detail/Form;
 States/motion; Accessibility; Review gate. Existing tokens, fonts, neutral rows,
 focus, disabled reasons and action affordances are reused. Fixture CSS changes
@@ -82,10 +121,10 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 90 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 120 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
-- `tests/quicklinks.ui.test.ts`: 25 real Chromium keyboard/axe cases, including
+- `tests/quicklinks.ui.test.ts`: 32 real Chromium keyboard/axe cases, including
   dirty cancel/focus, CRUD request observation, pending/late replies, explicit
   recovery, later identities, unavailable capabilities, typed definitions, local
   previews, exact argument/configuration receipts and held Enter. The 54 original
@@ -125,7 +164,7 @@ AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establi
 the complete placeholder feature. Actual coordinator persistence/dispatch evidence
 is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
 typed URL components, browser/
-open-with/file/registered-URI targets, tags/pin/hide and native export remain
+open-with/file/registered-URI targets, pin/hide and native export remain
 required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
 technology and release acceptance remain pending. This slice does not complete
 L2-05 or reduce the agreed 1.0 scope.
