@@ -7,7 +7,7 @@ uses the separate named URL API with only revision and a validated address. Main
 handlers, sender validation, current availability checks and usage persistence.
 No shell, provider, file or generic repository interface is added to rendering.
 
-The registry exposes Local data, Hide Linuxcast, Quit Linuxcast and Open URL. Cold
+The registry supplies registered built-ins and discovered applications. Cold
 empty-query ordering follows main's useful default order. Local saved favourites,
 usage and aliases are read through main, and query text stays in the renderer.
 New query generations invalidate old work; accepted refreshes preserve selected
@@ -83,6 +83,45 @@ Design: Shell and navigation; Results and actions; List, grid, detail and form;
 States and motion; Accessibility; Review gate. No feature-specific CSS or new
 components, dependencies, execution permissions or storage interfaces are added.
 
+## Command visibility
+
+**Manage commands** is a global root action, including when the root query has no
+matches. It opens one shared List with local search across both shown and hidden
+registered metadata. At most 100 matches are displayed; refining the query finds
+identities from any collected page. Shown/Hidden and Unavailable accessories stay
+visible. Management provides only Hide/Show, Back and Reload; it never invokes a
+registered command. Hidden, unavailable applications can still be shown again.
+Hide Linuxcast and Quit Linuxcast remain shown for recovery, with a disabled
+visibility action and explanation. Root rows append **Hide command** after pin
+and alias; their original primary action stays unchanged.
+
+Only an explicit selected action sends `setLauncherHidden({commandId, revision,
+hidden})`. Both the API and authoritative `visibilityAvailable: true` are
+required. A successful first page is recollected through every cursor before
+metadata changes. The strict merge checks revision +1, the exact identity set,
+requested visibility, immutable descriptors, pins and aliases. Usage totals are
+authoritative owner metadata; visibility itself never executes or records use.
+No optimistic removal or saved toast appears. Root ranking excludes hidden rows
+before caps and selection retention; direct hidden primary, URL, calculator,
+alias and pin entry points are also fenced.
+
+Back/Escape restores the root query and selected identity unless that identity
+was hidden and is consequently no longer eligible. Management query is ephemeral.
+Pending changes block duplicate/different-target requests. Leaving or hiding a
+pending view invalidates late presentation and warns that visibility may have
+changed; it cannot undo storage. Unknown/malformed/mismatched/lost replies and
+failed page collection require **Reload commands**. Known unavailable/stale
+failures offer fixed remediation. Only an explicit, complete authoritative
+reload clears the metadata gate; automatic Hide/reopen and ordinary execution
+cannot clear it or replay a write. The five-second presentation deadline also
+covers acknowledgement pagination.
+
+Design: Shell/navigation, Results/actions, List/detail/form, States/motion,
+Accessibility and Review gate. The shared List, Actions, status and focus behavior
+use existing tokens and fonts; no new visual system or registered management
+command is added. This is partial L1-01 command visibility and keyboard/privacy
+UI evidence, not full provider, fallback, AI, native or task acceptance.
+
 ## Explicit Open URL
 
 The registered **Open URL** command opens one shared Form, with a persistent URL
@@ -120,7 +159,7 @@ Main supplies pages of at most 100 metadata rows at one registry revision. The
 controller validates all pages, consistent availability, unique IDs, cursor
 revision/offset and bounded total count/bytes before replacing the live catalogue.
 Failed, stale or hidden refreshes do not publish a mixed partial snapshot. Search
-stays local over up to 4,100 rows, takes the first 20 per provider, and presents a
+stays local over up to 4,102 rows, takes the first 20 per provider, and presents a
 separate Applications section using existing shared list primitives. Application
 primary actions say Open; built-in Open/Hide/Quit retain their meaning. No desktop
 ID, executable path, shell command or native fingerprint reaches presentation.
@@ -136,10 +175,10 @@ identity or one that no longer matches the query is released normally.
 
 ## Evidence and limits
 
-- `packages/search/tests/search.test.ts`: 12 bounded ranking/generation/URL matching tests.
-- `tests/controller.test.ts`: 67 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
-- `tests/catalogue.test.ts`: 29 atomic pagination and pin/alias integrity checks.
-- `tests/launcher.ui.test.ts`: 33 Chromium component checks covering keyboard,
+- `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
+- `tests/controller.test.ts`: 93 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
+- `tests/launcher.ui.test.ts`: 43 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
@@ -153,7 +192,12 @@ identity or one that no longer matches the query is released normally.
   they do not establish real persistence. The URL slice adds dark/light Form,
   invalid and unknown outcomes plus unavailable handoff. Its fixture observes
   requests only, and browser checks verify no external requests on typing,
-  navigation or synthetic submit. These checks ran with Node 24.22.1/Bun 1.4.4.
+  navigation or synthetic submit. Visibility adds dark/light management, hidden and
+  empty states, plus unavailable, pending and uncertain screenshots. Its labelled
+  fixture observes explicit requests and holds public metadata in memory; it does
+  not establish storage or desktop integration. The 93 controller cases include
+  26 visibility cases; all 33 earlier browser cases remain in the 43-case suite.
+  These checks ran with Node 24.22.1/Bun 1.4.4.
 
 Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator
