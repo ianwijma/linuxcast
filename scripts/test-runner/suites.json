@@ -40,6 +40,7 @@
     "L2-04": [
       "packages/builtins/calculator/tests/evaluate.test.ts",
       "packages/builtins/calculator/tests/units.test.ts",
+      "packages/builtins/calculator/tests/colours.test.ts",
       "packages/builtins/calculator/tests/result.test.ts",
       "packages/builtins/calculator/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts"

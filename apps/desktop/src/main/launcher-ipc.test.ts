@@ -303,3 +303,13 @@ it('keeps browser capability visibly unavailable while other commands remain usa
   expect(await f.invoke(LAUNCHER_CHANNELS.openUrl,{protocolVersion:1,revision:1,url:'https://example.invalid/'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
   expect(await f.execute('linuxcast:hide')).toMatchObject({ok:true});
 });
+
+it('recomputes closed local colour results and rejects forged colour/text authority before native copying',async()=>{
+  const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult});
+  for(const [expression,text,colour] of [['#f00 to rgb','rgb(255 0 0)','rgb'],['rgb(255 128 0 / 50%) to hex','#ff800080','hex'],['hsl(210 100% 50%) to hsl','hsl(210 100% 50%)','hsl']]){
+    expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression})).toEqual({ok:true,value:{outcome:'copied',text,colour}});expect(copyCalculatorResult).toHaveBeenLastCalledWith(text);
+  }
+  for(const expression of ['rgb(256 0 0) to hex','hsl(0 101% 50%) to rgb','var(--private) to hex','#fff to url','rgba(1,2,3,4) to hex'])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  for(const extra of [{text:'url(private)'},{colour:'hex'},{unit:'m'}])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'#fff to rgb',...extra})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(copyCalculatorResult).toHaveBeenCalledTimes(3);expect(f.actions.recordUse).toHaveBeenCalledTimes(3);
+});
