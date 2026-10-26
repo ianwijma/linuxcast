@@ -16,7 +16,7 @@ const input={expectedRevision:0,name:'Public docs',url:'HTTPS://EXAMPLE.invalid:
 it('migrates a real version5 owner to6 using a consistent recovery snapshot and retains definitions through clear/restart',async()=>{
   const migrations=await foundationMigrations(),{owner,dir}=await open(undefined,migrations.slice(0,5));
   request(owner,'commands.setAlias',{commandId:'linuxcast:hide',alias:'public alias'});await owner.confirmSuccessfulLaunch();await owner.close();
-  const next=(await open(dir)).owner;expect(next.version).toBe(6);expect(request(next,'commands.getUsage',{commandId:'linuxcast:hide'})).toMatchObject({alias:'public alias'});
+  const next=(await open(dir,migrations.slice(0,6))).owner;expect(next.version).toBe(6);expect(request(next,'commands.getUsage',{commandId:'linuxcast:hide'})).toMatchObject({alias:'public alias'});
   const backupDir=join(dir,'backups'),journals=await Promise.all((await readdir(backupDir)).filter(name=>name.endsWith('.json')).map(async name=>JSON.parse(await readFile(join(backupDir,name),'utf8')) as {id:string;fromVersion:number;toVersion:number;state:string}));
   const journal=journals.find(value=>value.fromVersion===5&&value.toVersion===6)!;expect(journal.state).toBe('awaiting-confirmation');const snapshot=new Database(join(backupDir,`${journal.id}.db`),{readonly:true});
   try{expect(snapshot.pragma('user_version',{simple:true})).toBe(5);expect(snapshot.prepare("SELECT name FROM sqlite_master WHERE name='quicklinks'").get()).toBeUndefined();}finally{snapshot.close();}

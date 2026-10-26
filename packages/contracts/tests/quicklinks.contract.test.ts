@@ -20,7 +20,7 @@ it('separates create, exact-version update and selection-only open; renderer nev
   for(const input of [{...save,id},{...save,expectedRevision:1},{...save,argv:['public']},{...save,expectedRevision:-1}])expect(quicklinkSaveSchema.safeParse(input).success).toBe(false);
   expect(quicklinkSaveRequestSchema.safeParse({protocolVersion:1,...save}).success).toBe(true);
   expect(quicklinkOpenRequestSchema.safeParse({protocolVersion:1,id,revision:1,launcherRevision:1}).success).toBe(true);
-  for(const extra of [{url:save.url},{name:save.name},{argv:[]},{query:'public'}])expect(quicklinkOpenRequestSchema.safeParse({protocolVersion:1,id,revision:1,launcherRevision:1,...extra}).success).toBe(false);
+  for(const extra of [{url:save.url},{name:save.name},{argv:[]},{queries:['public']}])expect(quicklinkOpenRequestSchema.safeParse({protocolVersion:1,id,revision:1,launcherRevision:1,...extra}).success).toBe(false);
   expect(quicklinkGetRequestSchema.safeParse({protocolVersion:1,id,revision:0}).success).toBe(false);
   expect(launcherCommandIdSchema.parse('linuxcast:open-quicklinks')).toBe('linuxcast:open-quicklinks');
 });

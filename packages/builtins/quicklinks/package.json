@@ -6,10 +6,12 @@
   "license": "GPL-3.0-only",
   "exports": {
     "./presentation": "./src/presentation.ts",
-    "./repository": "./src/repository.ts"
+    "./repository": "./src/repository.ts",
+    "./web-search": "./src/web-search.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",
-    "@linuxcast/ui": "workspace:*"
+    "@linuxcast/ui": "workspace:*",
+    "@linuxcast/templates": "workspace:*"
   }
 }

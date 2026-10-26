@@ -110,11 +110,12 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
       // input before its header Back button when the saved control is gone.
       const formTarget = view.kind === 'form' ? root.current?.querySelector<HTMLElement>('form input:not(:disabled), form textarea:not(:disabled), form select:not(:disabled), form button:not(:disabled)') : null;
       const queryTarget = collection ? root.current?.querySelector<HTMLElement>('input[data-view-query]') : null;
-      const target = previousFocus.current?.isConnected ? previousFocus.current : formTarget ?? queryTarget ?? root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article');
+      const detailTarget = view.kind === 'detail' ? root.current?.querySelector<HTMLElement>('article') : null;
+      const target = previousFocus.current?.isConnected ? previousFocus.current : formTarget ?? queryTarget ?? detailTarget ?? root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article');
       target?.focus();
     }
     else setPanel(false);
-  }, [active, frame.view.viewId]); // Revisions never steal focus.
+  }, [active, frame.view.viewId, view.kind]); // Ordinary revisions never steal focus.
   const select = (id: string) => { session.select(view.viewId, id); host.selectionChanged?.(view.viewId, id); };
   const invoke = (id: string) => {
     // Re-read current state at the user event, not the action panel's opening revision.

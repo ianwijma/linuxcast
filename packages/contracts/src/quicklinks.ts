@@ -9,13 +9,20 @@ export const quicklinkNameSchema=z.string().min(1).max(128).refine(value=>value=
 /** This increment is literal web URLs. Reject template syntax before URL.href
  * can normalize it; percent-encoded literal braces never become placeholders. */
 export const quicklinkUrlSchema=z.string().refine(value=>!/[{}]/u.test(value)).pipe(httpUrlSchema).refine(value=>new URL(value).host.length<=320);
+export const WEB_SEARCH_TEMPLATE='{{vars.query}}' as const;
+export const webSearchParameterSchema=z.string().min(1).max(64).regex(/^[A-Za-z][A-Za-z0-9_.-]*$/u);
+export const webSearchQuerySchema=z.string().min(1).max(2048).refine(value=>value.trim().length>0&&!/[\p{Cc}\p{Cs}]/u.test(value)&&new TextEncoder().encode(value).length<=2048);
+/** One explicit query-component builder. Other template/context sources remain
+ * separate capabilities, never inferred from a saved string or root query. */
+export const quicklinkWebSearchSchema=z.strictObject({queryParameter:webSearchParameterSchema,template:z.literal(WEB_SEARCH_TEMPLATE)});
+export type QuicklinkWebSearch=z.infer<typeof quicklinkWebSearchSchema>;
 export const normalizeQuicklinkName=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 export const quicklinkSelectionSchema=z.strictObject({id:z.uuid(),revision});
-export const quicklinkSaveSchema=z.strictObject({id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema})
+export const quicklinkSaveSchema=z.strictObject({id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional()})
   .refine(value=>value.id===undefined?value.expectedRevision===0:value.expectedRevision>0);
-export const quicklinkRecordSchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,url:quicklinkUrlSchema,createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()})
+export const quicklinkRecordSchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional(),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()})
   .refine(value=>Date.parse(value.createdAt)<=Date.parse(value.updatedAt));
-export const quicklinkSummarySchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,host:z.string().min(1).max(320).regex(/^[!-~]+$/u)});
+export const quicklinkSummarySchema=z.strictObject({id:z.uuid(),revision,name:quicklinkNameSchema,host:z.string().min(1).max(320).regex(/^[!-~]+$/u),webSearch:z.literal(true).optional()});
 export const quicklinkListSchema=z.array(quicklinkSummarySchema).max(MAX_QUICKLINKS).refine(records=>records.every((record,index)=>index===0||records[index-1]!.id<record.id));
 export type QuicklinkRecord=z.infer<typeof quicklinkRecordSchema>;
 export type QuicklinkSummary=z.infer<typeof quicklinkSummarySchema>;
@@ -39,13 +46,13 @@ export const QUICKLINK_CHANNELS={list:'quicklinks:list',get:'quicklinks:get',sav
 const protocol={protocolVersion:z.literal(1)},failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const quicklinkListRequestSchema=z.strictObject(protocol);
 export const quicklinkGetRequestSchema=quicklinkSelectionSchema.extend(protocol);
-export const quicklinkSaveRequestSchema=z.strictObject({...protocol,id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema})
+export const quicklinkSaveRequestSchema=z.strictObject({...protocol,id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,webSearch:quicklinkWebSearchSchema.optional()})
   .refine(value=>value.id===undefined?value.expectedRevision===0:value.expectedRevision>0);
-export const quicklinkOpenRequestSchema=quicklinkSelectionSchema.extend({...protocol,launcherRevision:revision});
+export const quicklinkOpenRequestSchema=quicklinkSelectionSchema.extend({...protocol,launcherRevision:revision,query:webSearchQuerySchema.optional()});
 export const quicklinkListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({records:quicklinkListSchema})}),failed]);
 export const quicklinkRecordReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({record:quicklinkRecordSchema})}),failed]);
 export const quicklinkRemoveReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.enum(['removed','cancelled'])})}),failed]);
-export const quicklinkOpenReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.literal('dispatched')})}),failed]);
+export const quicklinkOpenReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.literal('dispatched'),webSearch:z.strictObject({query:webSearchQuerySchema,url:quicklinkUrlSchema}).optional()})}),failed]);
 export type QuicklinkListReply=z.infer<typeof quicklinkListReplySchema>;
 export type QuicklinkRecordReply=z.infer<typeof quicklinkRecordReplySchema>;
 export type QuicklinkRemoveReply=z.infer<typeof quicklinkRemoveReplySchema>;
@@ -55,5 +62,5 @@ export interface QuicklinkApi {
   getQuicklink?:(request:QuicklinkSelection)=>Promise<QuicklinkRecordReply>;
   saveQuicklink?:(request:QuicklinkSave)=>Promise<QuicklinkRecordReply>;
   removeQuicklink?:(request:QuicklinkSelection)=>Promise<QuicklinkRemoveReply>;
-  openQuicklink?:(request:QuicklinkSelection&{launcherRevision:number})=>Promise<QuicklinkOpenReply>;
+  openQuicklink?:(request:QuicklinkSelection&{launcherRevision:number;query?:string})=>Promise<QuicklinkOpenReply>;
 }
