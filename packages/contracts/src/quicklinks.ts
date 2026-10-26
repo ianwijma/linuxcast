@@ -45,7 +45,7 @@ export const quicklinkRepositoryContracts:RepositoryContracts=new Map([
   ['quicklinks.save',{params:quicklinkSaveSchema,result:quicklinkRecordSchema}],
   ['quicklinks.remove',{params:quicklinkSelectionSchema,result:quicklinkSelectionSchema}],
 ]);
-export const QUICKLINK_CHANNELS={list:'quicklinks:list',get:'quicklinks:get',save:'quicklinks:save',remove:'quicklinks:remove',open:'quicklinks:open'} as const;
+export const QUICKLINK_CHANNELS={list:'quicklinks:list',get:'quicklinks:get',save:'quicklinks:save',remove:'quicklinks:remove',open:'quicklinks:open',export:'quicklinks:export'} as const;
 const protocol={protocolVersion:z.literal(1)},failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const quicklinkListRequestSchema=z.strictObject(protocol);
 export const quicklinkGetRequestSchema=quicklinkSelectionSchema.extend(protocol);
@@ -55,12 +55,15 @@ export const quicklinkOpenRequestSchema=quicklinkSelectionSchema.extend({...prot
 export const quicklinkListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({records:quicklinkListSchema})}),failed]);
 export const quicklinkRecordReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({record:quicklinkRecordSchema})}),failed]);
 export const quicklinkRemoveReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.enum(['removed','cancelled'])})}),failed]);
+export const quicklinkExportReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.enum(['exported','cancelled'])})}),failed]);
 export const quicklinkOpenReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:quicklinkSelectionSchema.extend({outcome:z.literal('dispatched'),webSearch:z.strictObject({query:webSearchQuerySchema,url:quicklinkUrlSchema}).optional()})}),failed]);
 export type QuicklinkListReply=z.infer<typeof quicklinkListReplySchema>;
 export type QuicklinkRecordReply=z.infer<typeof quicklinkRecordReplySchema>;
 export type QuicklinkRemoveReply=z.infer<typeof quicklinkRemoveReplySchema>;
+export type QuicklinkExportReply=z.infer<typeof quicklinkExportReplySchema>;
 export type QuicklinkOpenReply=z.infer<typeof quicklinkOpenReplySchema>;
 export interface QuicklinkApi {
+  exportQuicklink?:(request:QuicklinkSelection)=>Promise<QuicklinkExportReply>;
   listQuicklinks?:()=>Promise<QuicklinkListReply>;
   getQuicklink?:(request:QuicklinkSelection)=>Promise<QuicklinkRecordReply>;
   saveQuicklink?:(request:QuicklinkSave)=>Promise<QuicklinkRecordReply>;

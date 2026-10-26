@@ -15,7 +15,10 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop e5da4f8566f906dd1b52eb5d2928ae8adc723e13, merged PR46.
+Primary clean develop3a42f931c71cac1bc92fe248ad97bf23c112c67d, merged PR47.
+Exact signed reviewed head820b812, CI40420425561 validate passed12s; no requested
+GitHub reviews/submissions/comments/threads. Normal exact-head merge, primary
+frozen install/build66assets pass. No open PRs remain. Prior PR46 e5da4f8:
 Normal exact-head236d305 merge, CI40418427340 validate passed15s; no requested
 GitHub reviews/submissions/comments/threads. Independent reviews clean; primary
 frozen install and production build66assets pass. Pin/hide evidence below.
@@ -77,17 +80,30 @@ PASS245L2units/13contracts/39security/41integration(actual9.24s),214L1units/
 new captures independently clean. Typecheck/scopedlint/plan/diff pass. Initial
 production run hit60s testdeadline; bounded5s locators+enabled-row readiness pass
 standalone9.08s/finalmapped9.24s. No broader cause inferred. Exact author/integrated
-UI trees reconcile. Evidence quicklink-launcher-application.md. No live handles.
+UI trees reconcile. Evidence quicklink-launcher-application.md. No live test handles.
 
-Next: sign evidence/registry, create+attach focused PR, exact-head CI/GitHub
-review/threads, normal merge, primary frozen install/build. Then next bounded
-application flow automatically; no foundation/research/proof expansion.
+PR47 https://github.com/ianwijma/linuxcast/pull/47 merged as above.
+
+## Current bounded application increment: selected Quicklink export
+
+Root reused worktree, branch `codex/quicklink-export` from3a42f93. Public optional
+exportQuicklink selection-only API and EXPORT-INCREMENT.md frozen for UI work.
+Explicit action/native file chooser→fresh exact definition→existing exclusive
+safe JSON writer. Plaintext interoperability file clearly labelled; no browser/
+copy/usage/definition mutation. One selected literal/search/recovered hidden row.
+No bulk/import/package execution/new dependency/migration/service/research/proof.
+This is development freeze only; no main/preload/actual export evidence yet.
+
+Next root implement main/preload/native chooser routing and actual private file
+checks; manifest_review_sol implements only existing Quicklinks Actions/status/
+controller/fixtures/tests/captures. Independent review, bounded checks, prompt
+small signed PR and normal merge. Complete local1.0 scope remains mandatory.
 
 ## Agents
 
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-launcher-ui`, signed5669223 integratedb58fcc4; clean,
-  bounded root-entry source assignment complete. Prior signed a43b0a7/1f8f77a integrated in PR46.
+  `codex/l2-05-quicklink-export-ui` (next assignment) from current shared freeze.
+  Prior signed5669223 integratedb58fcc4 in merged PR47; clean. Prior signed a43b0a7/1f8f77a integrated in PR46.
 - alias_review_sol: exact-tree source/test and nine component/six actual captures
   reviewed clean; P2 reentrant Save finding closed.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
