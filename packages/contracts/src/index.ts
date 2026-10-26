@@ -28,6 +28,7 @@ export * from './desktop-shell.ts';
 export * from './data-settings.ts';
 export * from './launcher.ts';
 export * from './applications.ts';
+export * from './quicklinks.ts';
 export * from './open-url.ts';
 export * from './file-search.ts';
 export * from './calculator.ts';

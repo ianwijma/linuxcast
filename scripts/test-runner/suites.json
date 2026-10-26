@@ -97,6 +97,9 @@
     ],
     "L1-01": [
       "packages/contracts/tests/launcher-visibility.contract.test.ts"
+    ],
+    "L2-05": [
+      "packages/contracts/tests/quicklinks.contract.test.ts"
     ]
   },
   "ui": {
