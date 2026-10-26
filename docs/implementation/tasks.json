@@ -2840,7 +2840,8 @@
         "Integrated PR40 https://github.com/ianwijma/linuxcast/pull/40 into develop7687f9866afa3a4d583daec6fef5b1e4ba3e07d2 at26October2026 15:23:24UTC. Exact independently reviewed heada2d0e07c3a6d9e025a5ccfe4a3675ded9b014c28; CI40348637656 passed17s. No requested GitHub reviews, submissions, comments or unresolved review threads; normal merge without bypass. Clean primary refreshed to7687f98; frozen install and packaged desktop build63rendererassets pass. Full L2-05 remains in-progress.",
         "Reviewed saved-web-search application increment27October2026 on codex/quicklinks-web-search-flow: frozen b9a1130, parser/builder cc214b7(author9c009e9), repository843e02a(authora11115a), owner/main/preload2c2501c, UIa13da1a(author4d40479), shared focus/repeat/IME/footer fixes b9a1130/128b48d/0a084c4/453f194. New/Edit stores a versioned named query parameter, opening fresh-loads its definition, Query→Review displays the exact encoded target, and only explicit Open search invokes existing native GIO. No raw URL interpolation or query history. Independent GPT6.1SOL/high final source and 200%-text visual review clean at a13da1a. The task remains in-progress.",
         "PASS157mapped units(90presentation+3routing+39template+25builder),10contracts,27main/preload security and29integration checks(20domainSQLite+5existingowner+3newowner/client+1actualproduction). Actual Electron45/SQLite3.53.4/GIO2.72.4/private-Xvfb X11 flow passed5.58s: literal CRUD plus create saved search, typed Unicode/metacharacters, exact preview, focused held-Enter refusal, explicit actual browser-handler argv/empty stdin, Hide/reopen, usageclear, complete restart, preserved definition and empty fresh query. Aggregate export excludes name/base/query/expanded URL; queries never persist. Only native-dialog choices instrumented. Six affected actual dark/light Form/List/search-preview captures inspected; axe passed. Smoke duration is not performance/session acceptance.",
-        "UI author90presentation/25Chromium keyboard+axe cases passed; final200%-text footer regression and inspected capture passed after flex-shrink correction. Regressions43F2-01storage,70L1-01main/preload and11D1-02shared UI passed. Real owner version6→7 consistent snapshot/reopen, usage/index-clear preservation and literal/search conversion tested. Full typecheck/lint pass. Broader placeholders/context/cursor/snippets/builders/arguments, nativeAT/session and release requirements remain pending."
+        "UI author90presentation/25Chromium keyboard+axe cases passed; final200%-text footer regression and inspected capture passed after flex-shrink correction. Regressions43F2-01storage,70L1-01main/preload and11D1-02shared UI passed. Real owner version6→7 consistent snapshot/reopen, usage/index-clear preservation and literal/search conversion tested. Full typecheck/lint pass. Broader placeholders/context/cursor/snippets/builders/arguments, nativeAT/session and release requirements remain pending.",
+        "Integrated PR41 https://github.com/ianwijma/linuxcast/pull/41 into developcc837ab10bd48a4a4e95599a2fff7acd956c1c66 at26October2026 16:03:05UTC. Exact independently reviewed head81cfe5a54cc3c982b8da84e0d99da3515ee6bba5; CI40355190474 passed13s. No requested GitHub reviewers, submissions, comments or review threads; normal exact-head merge. Clean primary refreshed; frozen install and production build63rendererassets passed. Full task remains in-progress."
       ],
       "owner": "manifest_review_sol",
       "branch": "codex/quicklinks-web-search-flow",
@@ -4247,7 +4248,7 @@
     {
       "id": "W1-01",
       "title": "Implement graph validation and run model",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "W1",
       "dependsOn": [
@@ -4318,10 +4319,14 @@
         "bun run typecheck",
         "bun run test:contracts -- W1-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory."
+      ],
+      "owner": "file_search_service_sol",
+      "branch": "codex/workflow-draft-editor",
+      "limitations": [
+        "Initial increment is limited to one recoverable local draft and three editable node types. Execution is unavailable and must be explicit; multiple workflows, full registry/palette/bindings/settings, execution/debugger/packages and native/session/AT/release acceptance remain mandatory. No task or criterion completion is claimed."
+      ]
     },
     {
       "id": "W1-02",
@@ -4484,7 +4489,7 @@
     {
       "id": "W2-01",
       "title": "Build workflow canvas and accessible graph editing",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "W2",
       "dependsOn": [
@@ -4554,10 +4559,14 @@
         "bun run typecheck",
         "bun run test:ui -- W2-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Selected27October2026 after merged PR41/cc837ab: bounded concrete saved workflow draft editor using existing contracts/shell/SQLite/shared UI/ReactFlow. Coordinator freezes registry and named editor interface; disjoint pure graph/run-model and actual canvas/keyboard authors. W1-01 prerequisites F0-01/F2-01 accepted; W2-01 uses current shared UI under approved unfinished increments, without claiming full D1-02 acceptance. Initial5strict editor contract tests and typecheck pass; no application/editor/native acceptance yet. See packages/workflows/EDITOR-INCREMENT.md. Full workflow scope remains mandatory."
+      ],
+      "owner": "manifest_review_sol",
+      "branch": "codex/workflow-draft-editor",
+      "limitations": [
+        "Initial increment is limited to one recoverable local draft and three editable node types. Execution is unavailable and must be explicit; multiple workflows, full registry/palette/bindings/settings, execution/debugger/packages and native/session/AT/release acceptance remain mandatory. No task or criterion completion is claimed."
+      ]
     },
     {
       "id": "W2-02",
