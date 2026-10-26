@@ -14,6 +14,7 @@
     "zod": "4.6.7",
     "@linuxcast/platform-contracts": "workspace:*",
     "@linuxcast/file-index": "workspace:*",
-    "@linuxcast/quicklinks": "workspace:*"
+    "@linuxcast/quicklinks": "workspace:*",
+    "@linuxcast/workflows": "workspace:*"
   }
 }

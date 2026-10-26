@@ -1,0 +1,40 @@
+.wf-editor { padding:var(--lc-space-24); min-inline-size:0; }
+.wf-editor select { font:inherit; }
+.wf-editor h1 { font-size:var(--lc-text-workspace-title); margin:0; }
+.wf-editor h2 { font-size:var(--lc-text-emphasis); margin:0 0 var(--lc-space-12); }
+.wf-editor h3 { font-size:var(--lc-text-body); margin:0 0 var(--lc-space-8); }
+.wf-editor p { margin-block:var(--lc-space-8); overflow-wrap:anywhere; }
+.wf-header,.wf-name,.wf-section-heading { display:flex; gap:var(--lc-space-16); justify-content:space-between; align-items:center; flex-wrap:wrap; }
+.wf-header { padding-block-end:var(--lc-space-16); border-block-end:1px solid var(--lc-border); }
+.wf-actions { display:flex; gap:var(--lc-space-8); flex-wrap:wrap; align-items:center; }
+.wf-caption { color:var(--lc-muted); font-size:var(--lc-text-caption); }
+.wf-save-state { color:var(--lc-muted); padding-block:var(--lc-space-8); }
+.wf-notice { border-inline-start:var(--lc-space-4) solid var(--lc-warning); padding:var(--lc-space-12); background:var(--lc-surface); margin-block:var(--lc-space-8); overflow-wrap:anywhere; }
+.wf-name { padding-block:var(--lc-space-16); }
+.wf-name>.lc-field { flex:1; max-inline-size:32rem; }
+.wf-workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2.5fr) minmax(0,1.2fr); gap:var(--lc-space-16); align-items:start; }
+.wf-panel { padding:var(--lc-space-16); background:var(--lc-surface); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); min-inline-size:0; }
+.wf-category { margin-block-start:var(--lc-space-20); }
+.wf-palette-item { inline-size:100%; justify-content:start; text-align:start; margin-block-end:var(--lc-space-8); }
+.wf-palette-item span,.wf-node { display:grid; gap:var(--lc-space-4); }
+.wf-center { min-inline-size:0; }
+.wf-canvas { block-size:24rem; border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); overflow:hidden; background:var(--lc-background); }
+.wf-node { padding:var(--lc-space-12); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); background:var(--lc-surface); color:var(--lc-text); inline-size:12rem; overflow-wrap:anywhere; }
+.wf-editor .react-flow__node.selected .wf-node { outline:calc(var(--lc-space-4) / 2) solid var(--lc-focus); background:var(--lc-selection); }
+.wf-editor .react-flow__handle { background:var(--lc-text); border-color:var(--lc-surface); }
+.wf-editor .react-flow__edge-path { stroke:var(--lc-muted); }
+.wf-editor .react-flow__controls-button { color:var(--lc-text); background:var(--lc-raised); border-color:var(--lc-border); }
+.wf-editor .react-flow__controls-button svg { fill:currentColor; }
+.wf-editor .react-flow__attribution { background:var(--lc-surface); }
+.wf-editor .react-flow__attribution a { color:var(--lc-muted); }
+.wf-editor .react-flow { --xy-background-color:var(--lc-background); --xy-edge-stroke:var(--lc-muted); --xy-node-color:var(--lc-text); }
+.wf-node-list,.wf-edge-list { list-style:none; padding:0; display:grid; gap:var(--lc-space-8); }
+.wf-node-list .lc-button { inline-size:100%; justify-content:start; }
+.wf-node-list [aria-pressed='true'] { background:var(--lc-selection); border-color:var(--lc-focus); }
+.wf-edge-list li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--lc-space-8); padding:var(--lc-space-8); border-block-end:1px solid var(--lc-border); overflow-wrap:anywhere; }
+.wf-inspector,.wf-connections { display:grid; gap:var(--lc-space-12); }
+.wf-check { display:flex; align-items:center; gap:var(--lc-space-8); }
+.wf-modal-backdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:var(--lc-background); padding:var(--lc-space-24); }
+.wf-dialog { max-inline-size:32rem; }
+@media(max-width:1100px) { .wf-workspace { grid-template-columns:minmax(0,1fr) minmax(0,2fr); } .wf-workspace>aside:last-child { grid-column:1/-1; } }
+@media(max-width:720px) { .wf-workspace { grid-template-columns:minmax(0,1fr); } .wf-editor { padding:var(--lc-space-16); } .wf-name>.lc-field { max-inline-size:none; flex-basis:100%; } }

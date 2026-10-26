@@ -1,3 +1,5 @@
+import { createWorkflowDraft } from '../../workflows/src/registry.ts';
+import { stableWorkflowJson } from './workflow-editor-json.ts';
 import { STORAGE_REASONS } from './errors.ts';
 import { quicklinkSaveSchema } from '../../contracts/src/quicklinks.ts';
 import type { StorageReason } from './errors.ts';
@@ -27,7 +29,8 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
+  if(method==='workflows.editor.write')valid=row.revision===Number(params.expectedRevision)+1&&(params.action==='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(params.draft))&&(params.action!=='save'||stableWorkflowJson(row.saved)===stableWorkflowJson(params.draft))&&(params.action!=='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(row.saved??createWorkflowDraft()));
+  else if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
   else if(method==='quicklinks.save'){
     const expected=quicklinkSaveSchema.parse(params);
     valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch);

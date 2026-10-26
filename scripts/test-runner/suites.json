@@ -55,6 +55,14 @@
       "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
       "packages/templates/tests/templates.test.ts",
       "packages/builtins/quicklinks/tests/web-search.test.ts"
+    ],
+    "W1-01": [
+      "packages/workflows/src/graph/tests/graph.test.ts",
+      "packages/workflows/src/run/tests/run.test.ts"
+    ],
+    "W2-01": [
+      "apps/desktop/src/features/workflows/canvas/tests/controller.test.ts",
+      "apps/desktop/src/main/quit-preflight.test.ts"
     ]
   },
   "contracts": {
@@ -107,6 +115,12 @@
     "L2-05": [
       "packages/contracts/tests/quicklinks.contract.test.ts",
       "packages/contracts/tests/web-search.contract.test.ts"
+    ],
+    "W1-01": [
+      "packages/contracts/tests/workflow-graph.contract.test.ts"
+    ],
+    "W2-01": [
+      "packages/contracts/tests/workflow-editor.contract.test.ts"
     ]
   },
   "ui": {
@@ -136,6 +150,9 @@
     ],
     "L2-05": [
       "packages/builtins/quicklinks/tests/quicklinks.ui.test.ts"
+    ],
+    "W2-01": [
+      "apps/desktop/src/features/workflows/canvas/tests/editor.ui.test.ts"
     ]
   },
   "integration": {
@@ -185,6 +202,10 @@
       "packages/storage/tests/quicklinks.integration.test.ts",
       "packages/storage/tests/web-search.integration.test.ts",
       "apps/desktop/tests/quicklinks.integration.test.ts"
+    ],
+    "W2-01": [
+      "packages/storage/tests/workflow-editor.integration.test.ts",
+      "apps/desktop/tests/workflow-editor.integration.test.ts"
     ]
   },
   "security": {
@@ -249,6 +270,10 @@
     "L2-05": [
       "apps/desktop/src/main/quicklinks-ipc.test.ts",
       "apps/desktop/src/preload/quicklinks.test.ts"
+    ],
+    "W2-01": [
+      "apps/desktop/src/main/workflow-editor-ipc.test.ts",
+      "apps/desktop/src/workflow-preload/api.test.ts"
     ]
   },
   "perf": {}

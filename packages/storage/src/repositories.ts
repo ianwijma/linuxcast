@@ -1,3 +1,5 @@
+import { loadWorkflowEditor, writeWorkflowEditor } from './workflow-editor.ts';
+import type { WorkflowEditorWrite, WorkflowEditorRecord } from '../../contracts/src/workflow-editor.ts';
 import { clearLocalData, exportLocalData } from './data-controls.ts';
 import type { DataClearParams, DataClearResult, DataExportParams, DataExportResult } from '@linuxcast/platform-contracts/data-controls';
 import { getSecretReference, putSecretReference, listSecretReferences } from './secrets.ts';
@@ -23,6 +25,8 @@ export interface Setting { id: SettingId; revision: number; value: string | bool
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
 export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods {
+  'workflows.editor.get': {params: Record<string,never>; result: WorkflowEditorRecord|null};
+  'workflows.editor.write': {params: WorkflowEditorWrite; result: WorkflowEditorRecord};
   'dataControls.clear': {params: DataClearParams; result: DataClearResult};
   'dataControls.export': {params: DataExportParams; result: DataExportResult};
   'secretRefs.get': {params: {id: string}; result: SecretReferenceRecord | null};
@@ -46,7 +50,7 @@ export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -105,6 +109,8 @@ export class Repositories {
       catch (error) { if (error instanceof FileIndexRepositoryError) throw new StorageError('conflict'); throw error; }
     }
     switch (method) {
+      case 'workflows.editor.get': return loadWorkflowEditor(db);
+      case 'workflows.editor.write': return writeWorkflowEditor(db,input);
       case 'dataControls.clear': return clearLocalData(db, input as DataClearParams);
       case 'dataControls.export': return exportLocalData(db, input as DataExportParams);
       case 'secretRefs.get': return getSecretReference(db, (input as StorageMethods['secretRefs.get']['params']).id);

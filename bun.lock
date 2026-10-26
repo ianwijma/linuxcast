@@ -46,6 +46,7 @@
         "@linuxcast/storage": "workspace:*",
         "@linuxcast/ui": "workspace:*",
         "@linuxcast/universal-actions": "workspace:*",
+        "@linuxcast/workflows": "workspace:*",
         "react": "19.3.1",
         "react-dom": "19.3.1",
       },
@@ -172,6 +173,7 @@
         "@linuxcast/file-index": "workspace:*",
         "@linuxcast/platform-contracts": "workspace:*",
         "@linuxcast/quicklinks": "workspace:*",
+        "@linuxcast/workflows": "workspace:*",
         "better-sqlite3": "13.0.3",
         "zod": "4.6.7",
       },
@@ -189,6 +191,14 @@
         "@linuxcast/contracts": "workspace:*",
         "react": "19.3.1",
         "react-markdown": "10.1.0",
+      },
+    },
+    "packages/workflows": {
+      "name": "@linuxcast/workflows",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "zod": "4.6.7",
       },
     },
   },
@@ -434,6 +444,8 @@
     "@linuxcast/ui": ["@linuxcast/ui@workspace:packages/ui"],
 
     "@linuxcast/universal-actions": ["@linuxcast/universal-actions@workspace:packages/builtins/universal-actions"],
+
+    "@linuxcast/workflows": ["@linuxcast/workflows@workspace:packages/workflows"],
 
     "@listr2/prompt-adapter-inquirer": ["@listr2/prompt-adapter-inquirer@2.0.22", "", { "dependencies": { "@inquirer/type": "^1.5.5" }, "peerDependencies": { "@inquirer/prompts": ">= 3 < 8" } }, "sha512-hV36ZoY+xKL6pYOt1nPNnkciFkn89KZwqLhAFzJvYysAvL5uBQdiADZx/8bIDXIukzzwG0QlPYolgMzQUtKgpQ=="],
 

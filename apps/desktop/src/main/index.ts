@@ -1,3 +1,4 @@
+import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
 import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
@@ -10,12 +11,14 @@ import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
 import { APP_URL } from './assets.ts';
 
+let workflowEditor:ReturnType<typeof createWorkflowEditorWorkspace>|undefined;
 let fileSearch:ReturnType<typeof createFileSearchWorkspace>|undefined;
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
 let applications:ReturnType<typeof createApplications>|undefined;
 const copyText=createClipboardWriter(clipboard,()=>process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY);
 startResidentShell({ resourcesDirectory: __dirname,
+  prepareQuit:async()=>workflowEditor?workflowEditor.prepareClose():true,
   copyCalculatorResult:copyText,
   quicklinks:{
     async list(){if(!storage?.isReady())throw new Error('Storage unavailable.');return storage.repository.request('quicklinks.list',{});},
@@ -56,6 +59,7 @@ startResidentShell({ resourcesDirectory: __dirname,
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.recordUse',{commandId},{timeoutMs:250});
   },
+  openWorkflowEditor:async()=>{if(!workflowEditor)throw new Error('Workflow editor unavailable.');await workflowEditor.open();},
   openFileSearch:async()=>{if(!fileSearch)throw new Error('File search unavailable.');await fileSearch.open();},
   openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
@@ -66,6 +70,11 @@ startResidentShell({ resourcesDirectory: __dirname,
   app.once('browser-window-created', (_event, window) => {
     window.webContents.once('did-finish-load', () => currentStorage.confirmLaunch());
   });
+  workflowEditor=createWorkflowEditorWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
+    load:()=>currentStorage.repository.request('workflows.editor.get',{}),
+    write:input=>currentStorage.repository.request('workflows.editor.write',input),
+  });
+  const currentWorkflow=workflowEditor;
   const controls=new DataControls(currentStorage.repository);
   const fileService=createFileSearchService({
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
@@ -91,7 +100,7 @@ startResidentShell({ resourcesDirectory: __dirname,
   });
   const currentSettings=dataSettings;
   // Index jobs and data operations must finish while their sole repository owner is still alive.
-  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop()]);await currentStorage.stop();},
-    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate()]);await currentStorage.terminate();}};
-  return [orderedStorage,currentFiles,dataSettings,applications];
+  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop()]);await currentStorage.stop();},
+    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate()]);await currentStorage.terminate();}};
+  return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow];
 } });

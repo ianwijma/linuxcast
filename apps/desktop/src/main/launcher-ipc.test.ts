@@ -466,3 +466,12 @@ it('recomputes closed local colour results and rejects forged colour/text author
   for(const extra of [{text:'url(private)'},{colour:'hex'},{unit:'m'}])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'#fff to rgb',...extra})).toMatchObject({ok:false,error:{code:'invalid-request'}});
   expect(copyCalculatorResult).toHaveBeenCalledTimes(3);expect(f.actions.recordUse).toHaveBeenCalledTimes(3);
 });
+
+it('releases the Quit dispatch latch after a cancelled editor preflight and permits later commands/Quit',async()=>{
+  const quit=vi.fn(async()=>false),f=fixture({quit});await f.invoke(LAUNCHER_CHANNELS.getCommands);
+  expect(await f.execute('linuxcast:quit')).toMatchObject({ok:true,value:{outcome:'dispatched'}});
+  await vi.waitFor(()=>expect(quit).toHaveBeenCalledTimes(1));await new Promise(resolve=>setImmediate(resolve));
+  expect(await f.execute('linuxcast:hide')).toMatchObject({ok:true});expect(f.actions.hide).toHaveBeenCalledTimes(1);
+  expect(await f.execute('linuxcast:quit')).toMatchObject({ok:true,value:{outcome:'dispatched'}});
+  await vi.waitFor(()=>expect(quit).toHaveBeenCalledTimes(2));
+});

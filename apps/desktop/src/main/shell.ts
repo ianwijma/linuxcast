@@ -1,3 +1,4 @@
+import { createQuitRequest } from './quit-preflight.ts';
 import { app, BrowserWindow, ipcMain, nativeTheme, protocol, screen, session } from 'electron';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -16,10 +17,12 @@ import { restrictContents, restrictSession, securePreferences } from './security
 
 export interface ResidentShellOptions {
   resourcesDirectory: string;
+  prepareQuit?:()=>Promise<boolean>;
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
   copyCalculatorResult?:LauncherActions['copyCalculatorResult'];
   quicklinks?:LauncherActions['quicklinks'];
+  openWorkflowEditor?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: LauncherActions['openUrl'];
@@ -129,6 +132,8 @@ export function startResidentShell(options: ResidentShellOptions): void {
     app.exit(code);
   }, () => console.error('SHELL_LIFECYCLE_UNAVAILABLE'));
 
+  const requestQuit=createQuitRequest(async()=>options.prepareQuit?options.prepareQuit():true,()=>lifecycle.quit());
+
   const ready = app.whenReady().then(async () => {
     if (lifecycle.quitting) return;
     const assets = parseAssetManifest(JSON.parse(await readFile(join(options.resourcesDirectory, 'assets.json'), 'utf8')));
@@ -139,8 +144,9 @@ export function startResidentShell(options: ResidentShellOptions): void {
     services.push(...(options.createServices?.() ?? []));
     removeLauncherIpc = registerLauncherIpc(ipcMain, {
       contents: () => window?.webContents, quitting: () => lifecycle.quitting,
-      hide: () => lifecycle.hide(), quit: () => { void lifecycle.quit(); },
+      hide: () => lifecycle.hide(), quit: () => requestQuit(),
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
+      ...(options.openWorkflowEditor ? {openWorkflowEditor:options.openWorkflowEditor} : {}),
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),
       ...(options.copyCalculatorResult ? {copyCalculatorResult:options.copyCalculatorResult} : {}),
       ...(options.openUrl ? {openUrl:options.openUrl} : {}),
@@ -165,12 +171,12 @@ export function startResidentShell(options: ResidentShellOptions): void {
         window.setSize(Math.max(1, Math.min(window.getSize()[0]!, area.width - 32)),
           Math.max(1, Math.min(height, tokens.layout.launcherMaxHeight, area.height - 32)));
       },
-      quit: () => { void lifecycle.quit(); }, quitting: () => lifecycle.quitting,
+      quit: () => requestQuit(), quitting: () => lifecycle.quitting,
     });
     nativeTheme.on('updated', updateAppearance);
   });
   const dispatch = (command: ShellCommand) => {
-    if (command === 'quit') { void lifecycle.quit(); return; }
+    if (command === 'quit') { void requestQuit(); return; }
     void ready.then(() => lifecycle.dispatch(command)).catch(() => {
       console.error('SHELL_START_FAILED'); void lifecycle.quit(1);
     });
@@ -186,7 +192,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
   app.on('activate', () => dispatch('show'));
   app.on('window-all-closed', () => { /* Hiding/closing the launcher keeps services resident. */ });
   app.on('before-quit', event => {
-    if (!shutdownFinished) { event.preventDefault(); void lifecycle.quit(); }
+    if (!shutdownFinished) { event.preventDefault(); void requestQuit(); }
   });
   dispatch(initial);
 }
