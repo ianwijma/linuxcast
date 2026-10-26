@@ -41,3 +41,7 @@ it('validates exact transient query receipts and forbids extra argument echoes f
   expect(await api.openQuicklink({...selection,launcherRevision:1})).toMatchObject({ok:false});
   for(const webSearch of [undefined,{query:'different',url}]){invoke.mockResolvedValue({ok:true,value:{...selection,outcome:'dispatched',...(webSearch?{webSearch}:{})}});expect(await api.openQuicklink(request)).toMatchObject({ok:false});}
 });
+
+it('sends canonical tag labels and rejects mismatched tag receipts without replay',async()=>{
+ const {api,invoke}=fixture();invoke.mockResolvedValueOnce({ok:true,value:{record:{...record,tags:['Work']}}});expect(await api.saveQuicklink({...save,tags:[' Ｗｏｒｋ ']})).toMatchObject({ok:true,value:{record:{tags:['Work']}}});expect(invoke).toHaveBeenLastCalledWith(QUICKLINK_CHANNELS.save,{protocolVersion:1,...save,url:record.url,tags:['Work']});invoke.mockResolvedValueOnce({ok:true,value:{record:{...record,tags:['Other']}}});expect(await api.saveQuicklink({...save,tags:['Work']})).toMatchObject({ok:false});invoke.mockClear();expect(await api.saveQuicklink({...save,tags:['Work','ｗｏｒｋ']})).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
+});

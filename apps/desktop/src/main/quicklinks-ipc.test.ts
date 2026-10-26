@@ -127,3 +127,9 @@ it('requires exact saved search configuration, including explicit removal when c
   f.backend.save.mockResolvedValueOnce({...record,webSearch});const {webSearch:unused,...literal}=request;void unused;
   expect(await f.invoke(QUICKLINK_CHANNELS.save,literal)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.actions.openUrl).not.toHaveBeenCalled();
 });
+
+it('canonicalizes tag labels at Save, preserves exact receipts and never treats labels as browser authority',async()=>{
+ const f=fixture();await f.version();f.backend.save.mockResolvedValueOnce({...record,tags:['Work','猫']});expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,tags:[' Ｗｏｒｋ ','猫']})).toMatchObject({ok:true,value:{record:{tags:['Work','猫']}}});expect(f.backend.save).toHaveBeenCalledExactlyOnceWith({expectedRevision:0,name:record.name,url:record.url,tags:['Work','猫']});expect(f.actions.openUrl).not.toHaveBeenCalled();
+ f.backend.save.mockResolvedValueOnce({...record,tags:['Other']});expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,tags:['Work']})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.backend.save).toHaveBeenCalledTimes(2);
+ for(const tags of [['Work','ｗｏｒｋ'],['bad,tag'],['\nlabel'],Array.from({length:9},(_,i)=>`tag${i}`)])expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,tags})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.backend.save).toHaveBeenCalledTimes(2);expect(f.actions.openUrl).not.toHaveBeenCalled();
+});
