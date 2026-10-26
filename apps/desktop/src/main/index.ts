@@ -19,6 +19,7 @@ startResidentShell({ resourcesDirectory: __dirname,
   async openUrl(url){if(!applications)throw new Error('Browser opening unavailable.');return applications.openUrl(url);},
   async listApplications(){if(!applications)throw new Error('Applications unavailable.');return applications.list();},
   async launchApplication(application){if(!applications)throw new Error('Applications unavailable.');return applications.launch(application);},
+  async launchApplicationAction(application){if(!applications)throw new Error('Application actions unavailable.');return applications.launchAction(application);},
   async getCommandUsage(commandId) {
     if(!storage?.isReady()) throw new Error('Local ranking unavailable.');
     return storage.repository.request('commands.getUsage',{commandId},{timeoutMs:250});

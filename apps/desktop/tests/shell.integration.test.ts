@@ -112,6 +112,10 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await query.press('Control+k');await appActions.fill('Reload commands');await appActions.press('Enter');
   await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Public fixture app');
   await query.press('Control+k');await appActions.fill('New window');
+  // A single filtered action must fit the compact production window without
+  // clipping its separate Close button inside the popup's scrollport.
+  const menuGeometry=await page.getByRole('dialog',{name:'Actions',exact:true}).evaluate(element=>({scroll:element.scrollHeight,client:element.clientHeight,height:element.getBoundingClientRect().height,viewport:window.innerHeight,list:element.querySelector('.lc-action-list')?.getBoundingClientRect().height,field:element.querySelector('.lc-field')?.getBoundingClientRect().height,close:element.querySelector('button:last-child')?.getBoundingClientRect().height}));
+  expect(menuGeometry.scroll,JSON.stringify(menuGeometry)).toBeLessThanOrEqual(menuGeometry.client);
   const actionEvidence=join(root,'apps/desktop/evidence');mkdirSync(actionEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
