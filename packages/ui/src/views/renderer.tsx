@@ -104,7 +104,14 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
     if (dirty) setDiscard(kind); else if (kind === 'back') close(); else cancelForm(true);
   };
   useEffect(() => {
-    if (active) { if (scroller.current) scroller.current.scrollTop = frame.scroll; const target = previousFocus.current?.isConnected ? previousFocus.current : root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article'); target?.focus(); }
+    if (active) {
+      if (scroller.current) scroller.current.scrollTop = frame.scroll;
+      // Action-panel controls unmount on navigation. Restore an editable Form
+      // control before its header Back button when the saved control is gone.
+      const formTarget = view.kind === 'form' ? root.current?.querySelector<HTMLElement>('form input:not(:disabled), form textarea:not(:disabled), form select:not(:disabled), form button:not(:disabled)') : null;
+      const target = previousFocus.current?.isConnected ? previousFocus.current : formTarget ?? root.current?.querySelector<HTMLElement>('input, textarea, select, [role="listbox"], button, article');
+      target?.focus();
+    }
     else setPanel(false);
   }, [active, frame.view.viewId]); // Revisions never steal focus.
   const select = (id: string) => { session.select(view.viewId, id); host.selectionChanged?.(view.viewId, id); };
