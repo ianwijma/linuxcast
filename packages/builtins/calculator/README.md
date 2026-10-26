@@ -201,3 +201,19 @@ fixtures remain separate from real private clipboard evidence. No operation uses
 the user's display. Unit fixtures are partial AC02 evidence; calendar
 DST/timezone/date behavior, colours, configured rate adapters/cache and full native
 desktop/AT/installed-package/release acceptance remain unfinished.
+
+## Integrated colour application evidence
+
+Coordinator `fc32887` verifies real production Electron45/private-Xvfb/X11 native
+xclip readback for RGB, alpha HEX and HSL, plus existing arithmetic/unit copies.
+Main recomputes expression-only requests; help/typing/Evaluate/invalid values do
+not copy. Help restores draft/focus, Hide/reopen never replays, and post-Quit real
+owner export has only aggregate calculatorcount8 without expressions or results.
+Four inspected application dark/light colour/help captures are
+`evidence/application-*-colour-result.png` and `application-*-colours-help.png`.
+
+PASS:594mapped units,4contracts,45security,29browser/axe,1actual integration, full
+typecheck/lint. The6.65s smoke does not establish performance or native desktop/AT
+acceptance. Independent SOLhigh review clean after canonical output validation
+was tightened. Dates/DST, configured cached rates and full native/release remain
+required; this does not complete L2-04.
