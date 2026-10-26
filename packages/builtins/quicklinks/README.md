@@ -161,6 +161,48 @@ coverage without adding placeholder authority. Root quicklink-provider ranking,
 frecency/shortcuts, native export, remaining templates/targets and supported
 desktop/AT/release gates are still required. Full L2-05 remains in progress.
 
+## Saved entries in root search
+
+Root search can expose coordinator-registered metadata for a saved quicklink.
+The row provides **Open** only; its Quicklink accessory directs preference changes
+to the dedicated List. Pin/alias/visibility command handlers reject these entries;
+management explains the dedicated actions. A hidden, unavailable or missing
+Quicklinks parent disables the saved entry and cannot be bypassed by a stale intent.
+
+`QuicklinksFlow.open(fromViewId, selection?)` validates the optional saved ID and
+revision, reads the complete authoritative summary list, and selects only an exact
+shown match. Selection remains visible even beyond the first 100 of 500 summaries.
+Stale, deleted, hidden, malformed or failed entries withhold fallback rows and
+show fixed **Reload quicklinks / Back** recovery. Explicit Reload may display the
+current list for manual choice, never automatically open another item. Pending
+entry reads fence origin root query/selection, local query, Back, Hide and disposal.
+
+Entering the List performs no generic command execution, browser handoff, copy or
+Hide. Root query and selected command return on Back; the root query is never
+copied into the List filter or a web-search argument. Literal Open and search
+Query→Review→Open still require separate deliberate actions. Existing persistent
+uncertainty flags survive routing and automatic reads; only explicit authoritative
+Reload clears them. Shared held-Enter and composition handling prevent entry
+navigation from silently approving a second action.
+
+Validation for this increment: 171 Quicklinks presentation cases, 10 launcher
+routing cases and 125 existing launcher-controller cases pass (306 total). The
+61 launcher and 37 dedicated Quicklinks Chromium keyboard/axe cases pass (98
+total), retaining existing literal/search/tag/preference and root controls.
+Six new inspected dark/light captures in
+`apps/desktop/src/features/launcher/evidence/*-quicklink-entry-{root,selected,stale}.png`
+show root metadata, exact selected List and unavailable-entry recovery. Fixtures
+use public synthetic saved definitions and observed API calls; they do not perform
+SQLite/native/browser operations. Typecheck, scoped ESLint, plan and diff checks
+pass with Node24.22.1/Bun1.4.4 on Linux x64. Coordinator owns actual registration,
+main/storage boundaries and production native integration.
+
+This supplies partial L1-01 selected-identity/UI/PRIVACY and L2-05 UI/PRIVACY
+routing evidence, retaining existing AC01/AC02 regression coverage. Full provider
+merge/fallback/AI, saved-entry frecency/shortcuts, remaining placeholder/target/
+export behavior, native desktop/AT and release acceptance remain pending. Neither
+full task is complete.
+
 Design sections: Shell/navigation; Results/actions; List/Grid/Detail/Form;
 States/motion; Accessibility; Review gate. Existing tokens, fonts, neutral rows,
 focus, disabled reasons and action affordances are reused. Fixture CSS changes
@@ -168,7 +210,7 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 153 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 171 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
 - `tests/quicklinks.ui.test.ts`: 37 real Chromium keyboard/axe cases, including

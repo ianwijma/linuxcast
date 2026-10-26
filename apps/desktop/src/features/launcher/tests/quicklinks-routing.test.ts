@@ -1,12 +1,12 @@
 import { afterEach,expect,it,vi } from 'vitest';
-import type { LauncherApi,QuicklinkApi,QuicklinkOpenReply } from '@linuxcast/contracts';
+import type { LauncherApi,QuicklinkApi,QuicklinkOpenReply,LauncherCommandMetadata } from '@linuxcast/contracts';
 import { LauncherController } from '../controller.ts';
 const controllers:LauncherController[]=[];afterEach(()=>{for(const controller of controllers.splice(0))controller.dispose();});
 const settle=()=>new Promise(resolve=>setTimeout(resolve,0)),id='00000000-0000-4000-8000-000000000001';
-function setup(){let revision=1;
-  const api:LauncherApi&Required<QuicklinkApi>={getLauncherCommands:vi.fn(async()=>({ok:true as const,value:{revision,rankingAvailable:true,commands:[{id:'linuxcast:open-quicklinks' as const,title:'Quicklinks',aliases:[],keywords:[],enabled:true,usage:null}]}})),executeLauncherCommand:vi.fn(),setLauncherPinned:vi.fn(),setLauncherAlias:vi.fn(),openLauncherUrl:vi.fn(),
+function setup(entries=false){let revision=1;const commands:LauncherCommandMetadata[]=[{id:'linuxcast:open-quicklinks',title:'Quicklinks',aliases:[],keywords:[],enabled:true,usage:null},...(entries?[{id:`quicklink:${id}`,title:'Public docs',subtitle:'example.invalid',aliases:[],keywords:['reading','example.invalid'],enabled:true,usage:null,quicklink:{id,revision:1}}]:[])];
+  const api:LauncherApi&Required<QuicklinkApi>={getLauncherCommands:vi.fn(async()=>({ok:true as const,value:{revision,rankingAvailable:true,commands:structuredClone(commands)}})),executeLauncherCommand:vi.fn(),setLauncherPinned:vi.fn(),setLauncherAlias:vi.fn(),openLauncherUrl:vi.fn(),
     listQuicklinks:vi.fn(async()=>({ok:true as const,value:{records:[{id,revision:1,name:'Public docs',host:'example.invalid'}]}})),getQuicklink:vi.fn(),saveQuicklink:vi.fn(),removeQuicklink:vi.fn(),openQuicklink:vi.fn(async()=>({ok:true as const,value:{id,revision:1,outcome:'dispatched' as const}}))};
-  const dismiss=vi.fn(async()=>({ok:true as const,value:null})),controller=new LauncherController(api,dismiss);controllers.push(controller);controller.setVisible(true);return {api,dismiss,controller,nextRevision:()=>{revision++;}};
+  const dismiss=vi.fn(async()=>({ok:true as const,value:null})),controller=new LauncherController(api,dismiss);controllers.push(controller);controller.setVisible(true);return {api,dismiss,controller,commands,nextRevision:()=>{revision++;}};
 }
 function query(f:ReturnType<typeof setup>,value:string){f.controller.session.setQuery('linuxcast-launcher',value);f.controller.query(value);}
 function top(f:ReturnType<typeof setup>){return f.controller.session.getSnapshot().frames.at(-1)!;}
@@ -26,4 +26,20 @@ it('retains unknown Open across Hide/reopen and rejects a late receipt until exp
 it('Back preserves root selection and query and never handles an action from a closed Quicklinks frame',async()=>{
   const f=setup();await settle();query(f,'Quicklinks');await settle();await open(f);const frame=top(f);await invoke(f,'quicklinks:back');await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);expect(top(f).selection).toBe('linuxcast:open-quicklinks');expect(top(f).query).toBe('Quicklinks');
   await f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:'quicklinks:open',itemId:id});expect(f.api.openQuicklink).not.toHaveBeenCalled();
+});
+
+it('root saved name/host/tag matching enters the exact saved List item without generic execution, GET-to-Open or browser effects',async()=>{
+  const f=setup(true);await settle();for(const text of ['Public docs','example.invalid','reading']){query(f,text);await settle();expect(top(f).selection).toBe(`quicklink:${id}`);}const frame=top(f);expect(frame.view.kind==='list'&&frame.view.sections.flatMap(section=>section.items)[0]?.actions).toEqual([{id:`quicklink:${id}`,title:'Open',kind:'invoke',effect:'read'}]);await invoke(f,`quicklink:${id}`,`quicklink:${id}`);await settle();expect(top(f)).toMatchObject({query:'',selection:id,view:{title:'Quicklinks'}});expect(f.api.getQuicklink).not.toHaveBeenCalled();expect(f.api.openQuicklink).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.dismiss).not.toHaveBeenCalled();await invoke(f,'quicklinks:back');await settle();expect(top(f)).toMatchObject({query:'reading',selection:`quicklink:${id}`});
+});
+it('root saved entries refuse root preference edits and management visibility changes',async()=>{
+  const f=setup(true);await settle();query(f,'reading');await settle();for(const action of ['launcher:pin','launcher:unpin','launcher:alias','launcher:hide-command'])await invoke(f,action,`quicklink:${id}`);expect(top(f).view.title).toBe('Search commands');expect(f.api.setLauncherPinned).not.toHaveBeenCalled();expect(f.api.setLauncherAlias).not.toHaveBeenCalled();await invoke(f,'launcher:manage');const view=top(f).view;if(view.kind!=='list')throw new Error();expect(view.sections.flatMap(section=>section.items).find(row=>row.id===`quicklink:${id}`)?.actions?.[0]?.disabledReason).toContain('Quicklinks list');expect(f.api.openQuicklink).not.toHaveBeenCalled();
+});
+it.each(['hidden','disabled','missing'] as const)('does not bypass a %s Quicklinks parent via a saved entry',async kind=>{
+  const f=setup(true);await settle();if(kind==='hidden')f.commands[0]!.hidden=true;else if(kind==='disabled'){f.commands[0]!.enabled=false;f.commands[0]!.unavailableReason='Unavailable fixture.';}else f.commands.shift();await f.controller.refresh();query(f,'reading');await settle();const view=top(f).view;if(view.kind!=='list')throw new Error();expect(view.sections[0]?.items[0]?.disabledReason).toContain('Quicklinks is unavailable or hidden');await invoke(f,`quicklink:${id}`,`quicklink:${id}`);expect(top(f).view.title).toBe('Search commands');expect(f.api.listQuicklinks).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+});
+it('rejects stale root intents, extra fields and unavailable saved commands before entry reads',async()=>{
+  const f=setup(true);await settle();query(f,'reading');await settle();const frame=top(f);await f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:`quicklink:${id}`,itemId:`quicklink:${id}`,values:{query:'forged'}});query(f,'docs');await settle();await f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:`quicklink:${id}`,itemId:`quicklink:${id}`});expect(f.api.listQuicklinks).not.toHaveBeenCalled();f.commands[1]!.enabled=false;f.commands[1]!.unavailableReason='Unavailable fixture.';await f.controller.refresh();await invoke(f,`quicklink:${id}`,`quicklink:${id}`);expect(f.api.listQuicklinks).not.toHaveBeenCalled();
+});
+it('hides a pending entry without reopening when its late summary arrives',async()=>{
+  const f=setup(true);await settle();query(f,'reading');await settle();let finish!:(reply:never)=>void;vi.mocked(f.api.listQuicklinks).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));await invoke(f,`quicklink:${id}`,`quicklink:${id}`);f.controller.setVisible(false);finish({ok:true,value:{records:[{id,revision:1,name:'Public docs',host:'example.invalid'}]}} as never);await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);expect(f.api.openQuicklink).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.dismiss).not.toHaveBeenCalled();
 });
