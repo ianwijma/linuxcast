@@ -18,7 +18,7 @@ export const quicklinkWebSearchSchema=z.strictObject({queryParameter:webSearchPa
 export type QuicklinkWebSearch=z.infer<typeof quicklinkWebSearchSchema>;
 export const normalizeQuicklinkName=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 /** Explicit user labels only: canonical Unicode/trim, no delimiter or controls. */
-export const quicklinkTagSchema=z.string().max(128).transform(value=>value.normalize('NFKC').trim()).pipe(z.string().min(1).max(32).refine(value=>new TextEncoder().encode(value).length<=64&&!/[\p{Cc}\p{Cs},]/u.test(value)));
+export const quicklinkTagSchema=z.string().max(128).refine(value=>!/[\p{Cc}\p{Cs},]/u.test(value)).transform(value=>value.normalize('NFKC').trim()).pipe(z.string().min(1).max(32).refine(value=>new TextEncoder().encode(value).length<=64&&!/[\p{Cc}\p{Cs},]/u.test(value)));
 export const quicklinkTagsSchema=z.array(quicklinkTagSchema).max(8).refine(values=>new Set(values.map(normalizeQuicklinkName)).size===values.length);
 export const quicklinkSelectionSchema=z.strictObject({id:z.uuid(),revision});
 export const quicklinkSaveSchema=z.strictObject({id:z.uuid().optional(),expectedRevision:z.number().int().nonnegative().safe(),name:quicklinkNameSchema,url:quicklinkUrlSchema,tags:quicklinkTagsSchema.optional(),webSearch:quicklinkWebSearchSchema.optional()})
