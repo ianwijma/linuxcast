@@ -13,7 +13,7 @@ function act(f:ReturnType<typeof setup>,actionId:string,values?:Record<string,st
 const evaluate=(f:ReturnType<typeof setup>,expression='(2 + 3) * 4')=>act(f,'calculator:evaluate',{expression});
 describe('L2-04 Calculator shared presentation',()=>{
   it('opens only a labelled shared Form and preserves root query/selection without any IPC',()=>{
-    const f=setup();expect(f.flow.active).toBe(true);expect(top(f).view).toMatchObject({kind:'form',title:'Calculator',fields:[{id:'expression',title:'Expression',value:''}],actions:[{title:'Evaluate',effect:'read'},{title:'Cancel'}]});expect(f.session.getSnapshot().frames[0]).toMatchObject({query:'calculator',selection:'calculator'});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();f.flow.open('root');expect(f.session.getSnapshot().frames).toHaveLength(2);
+    const f=setup();expect(f.flow.active).toBe(true);expect(top(f).view).toMatchObject({kind:'form',title:'Calculator',fields:[{id:'expression',title:'Expression',value:''}],actions:[{title:'Evaluate',effect:'read'},{title:'Cancel'},{title:'Supported units',effect:'read'}]});expect(f.session.getSnapshot().frames[0]).toMatchObject({query:'calculator',selection:'calculator'});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();f.flow.open('root');expect(f.session.getSnapshot().frames).toHaveLength(2);
   });
   it('evaluates only on submit and renders static readonly metadata with approximation/percent semantics',async()=>{
     const f=setup();await evaluate(f);expect(top(f).view).toMatchObject({kind:'detail',title:'Calculation',metadata:[{label:'Expression',value:'(2 + 3) * 4'},{label:'Result',value:'20'}],attachments:[],actions:[{title:'Copy result',effect:'write'},{title:'Edit expression',effect:'read'}]});const view=top(f).view;if(view.kind!=='detail')throw new Error();expect(view.markdown).toContain('15 significant digits');expect(view.markdown).toContain('divides the preceding value by 100');expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
@@ -58,5 +58,38 @@ describe('L2-04 Calculator shared presentation',()=>{
   });
   it('ignores hidden result actions and obsolete evaluation revisions after returning to the form',async()=>{
     const f=setup(),form=top(f);await evaluate(f);const detail=top(f);await f.flow.handle({viewId:form.view.viewId,revision:form.view.revision,actionId:'calculator:evaluate',values:{expression:'9+9'}});f.session.pop();await f.flow.handle({viewId:detail.view.viewId,revision:detail.view.revision,actionId:'calculator:copy'});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();expect(top(f).view).toMatchObject({fields:[{value:'(2 + 3) * 4'}]});
+  });
+});
+
+describe('L2-04 closed-unit presentation',()=>{
+  it.each([
+    ['(2+3) km to m','5000 m'],['sqrt(16) km to m','4000 m'],['32 degF to degC','0 degC'],['1 MiB to B','1048576 B'],['1 MB to B','1000000 B'],['8 bit to B','1 B'],
+  ])('shows canonical unit result for %s without implicit copy',async(expression,expected)=>{
+    const f=setup();await evaluate(f,expression);expect(top(f).view).toMatchObject({kind:'detail',metadata:[{label:'Expression',value:expression},{label:'Result',value:expected}]});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
+  });
+  it.each(['1 mb to B','1 gal to L','1 C to F'])('retains unsupported or ambiguous unit %s with case-sensitive help remediation',async expression=>{
+    const f=setup();await evaluate(f,expression);expect(top(f).view).toMatchObject({kind:'form',fields:[{value:expression,error:'Use a supported, case-sensitive unit symbol. Open Supported units in Actions for the list.'}]});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
+  });
+  it('retains incompatible units and invalid absolute temperature as fixed inline failures',async()=>{
+    const f=setup();await evaluate(f,'1 m to kg');expect(top(f).view).toMatchObject({fields:[{error:'Choose source and target units from the same category. See Supported units in Actions.'}]});await evaluate(f,'-1 K to degC');expect(top(f).view).toMatchObject({fields:[{error:'This expression has no finite real result. Check divisions, function inputs and absolute temperatures: K ≥ 0, degC ≥ -273.15, degF ≥ -459.67.'}]});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
+  });
+  it('opens readonly help only from Form, uses fixed public metadata and preserves the existing Form frame',async()=>{
+    const f=setup(),before=top(f);await act(f,'calculator:units');expect(f.flow.owns('test-calculator-units')).toBe(true);expect(top(f).view).toMatchObject({kind:'detail',title:'Supported units',attachments:[],actions:[{title:'Back to expression',effect:'read'}]});const help=top(f).view;if(help.kind!=='detail')throw new Error();expect(help.metadata).toHaveLength(12);expect(help.metadata.map(value=>value.label)).toEqual(expect.arrayContaining(['Length','Mass','Duration','Temperature','Angle','Data','Area','Volume','Speed','Energy','Power','Pressure']));expect(help.metadata.find(value=>value.label==='Data')?.value).toContain('MiB');expect(help.markdown).toContain('case-sensitive');expect(help.markdown).toContain('fixed durations');expect(help.markdown).toContain('absolute temperatures');expect(help.markdown).toContain('imperial');await act(f,'calculator:copy');await act(f,'calculator:evaluate',{expression:'2+2'});expect(top(f).view.title).toBe('Supported units');expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();await act(f,'calculator:edit');expect(top(f).view).toBe(before.view);expect(f.session.getSnapshot().frames).toHaveLength(2);await evaluate(f);await act(f,'calculator:units');expect(top(f).view.title).toBe('Calculation');expect(f.session.getSnapshot().frames).toHaveLength(3);
+  });
+  it('rejects stale help actions after reopening and disposes without a result or copy',async()=>{
+    const f=setup();await act(f,'calculator:units');const old=top(f);f.session.pop();await act(f,'calculator:units');await f.flow.handle({viewId:old.view.viewId,revision:old.view.revision,actionId:'calculator:edit'});expect(top(f).view.title).toBe('Supported units');f.session.pop();f.session.pop();expect(f.flow.active).toBe(false);f.flow.dispose();expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
+  });
+  it('accepts a unit copy receipt only when both numeric text and canonical unit match',async()=>{
+    const copy=vi.fn<NonNullable<LauncherApi['copyCalculatorResult']>>(async()=>({ok:true,value:{outcome:'copied',text:'5000',unit:'m'}}));const f=setup({copyCalculatorResult:copy});await evaluate(f,'(2+3) km to m');await act(f,'calculator:copy');expect(copy).toHaveBeenCalledExactlyOnceWith({revision:7,expression:'(2+3) km to m'});expect(top(f).view.status?.message).toBe('Result copied.');
+  });
+  it.each(['wrong-unit','missing-unit','unknown-unit','invalid-unit','wrong-number'] as const)('treats %s receipt as unknown rather than claiming a unit copy',async mode=>{
+    const reply={ok:true,value:{outcome:'copied',text:mode==='wrong-number'?'5':'5000',...(mode==='missing-unit'?{}:{unit:mode==='wrong-unit'?'km':mode==='unknown-unit'?'USD':mode==='invalid-unit'?null:'m'})}};
+    const copy=vi.fn<NonNullable<LauncherApi['copyCalculatorResult']>>(async()=>reply as never);const f=setup({copyCalculatorResult:copy});await evaluate(f,'(2+3) km to m');await act(f,'calculator:copy');expect(top(f).view.status?.message).toBe('The copy outcome is unknown. Check your clipboard before choosing Copy result again.');expect(copy).toHaveBeenCalledTimes(1);
+  });
+  it('rejects a unit-bearing receipt for a unitless arithmetic result',async()=>{
+    const f=setup({copyCalculatorResult:vi.fn<NonNullable<LauncherApi['copyCalculatorResult']>>(async()=>({ok:true,value:{outcome:'copied',text:'20',unit:'m'}}))});await evaluate(f);await act(f,'calculator:copy');expect(top(f).view.status?.message).toContain('Check your clipboard');
+  });
+  it('ignores a late unit receipt after editing and evaluating a different conversion',async()=>{
+    let finish!:(value:Awaited<ReturnType<NonNullable<LauncherApi['copyCalculatorResult']>>>)=>void;const copy=vi.fn<NonNullable<LauncherApi['copyCalculatorResult']>>(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({copyCalculatorResult:copy});await evaluate(f,'(2+3) km to m');const pending=act(f,'calculator:copy');await act(f,'calculator:edit');await evaluate(f,'1 MiB to B');await pending;const before=f.session.getSnapshot();finish({ok:true,value:{outcome:'copied',text:'5000',unit:'m'}});await Promise.resolve();expect(f.session.getSnapshot()).toBe(before);expect(top(f).view).toMatchObject({metadata:[{label:'Expression',value:'1 MiB to B'},{label:'Result',value:'1048576 B'}]});expect(top(f).view.status?.message).not.toBe('Result copied.');expect(copy).toHaveBeenCalledTimes(1);
   });
 });

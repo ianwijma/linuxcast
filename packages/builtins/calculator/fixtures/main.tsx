@@ -20,9 +20,12 @@ function Fixture(){
       if(mode==='pending')await new Promise(resolve=>setTimeout(resolve,600));
       if(mode==='unknown')throw new Error('synthetic private detail');
       if(mode==='unavailable')return {ok:false,error:{code:'capability-unavailable',message:'synthetic private detail',retryable:false}};
+      if(mode==='unit-mismatch')return {ok:true,value:{outcome:'copied',text:'5000',unit:'km'}};
+      if(mode==='unit-missing')return {ok:true,value:{outcome:'copied',text:'5000'}};
+      if(mode==='unit-unknown')return {ok:true,value:{outcome:'copied',text:'5000',unit:'not-a-unit'}} as never;
       if(mode==='mismatch')return {ok:true,value:{outcome:'copied',text:'999'}};
       const result=evaluateExpression(request.expression);if(!result.ok)return {ok:false,error:{code:'invalid-request',message:'synthetic private detail',retryable:false}};
-      return {ok:true,value:{outcome:'copied',text:result.text}};
+      return {ok:true,value:{outcome:'copied',text:result.text,...(result.unit?{unit:result.unit}:{})}};
     }};
     const flow=new CalculatorFlow({session,api,viewId:'fixture-calculator',revision:7});
     const host:ViewHost={action:intent=>{if(flow.active){void flow.handle(intent);return;}if(intent.actionId==='calculator')flow.open('root');}};
