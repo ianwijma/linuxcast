@@ -47,8 +47,7 @@ preferences. No transient argument/expanded URL, query/use history, grants,
 credentials or executable package content. Label plaintext; this is interoperability
 export, not the encrypted portable-backup feature. Reuse saveDataExport with
 private0600/exclusive atomic publication; existing files never silently replaced.
-Exporting never activates/imports/executes a definition. Bulk export/import remains
-separate required scope and is not added to this increment.
+Exporting never activates/imports/executes a definition. Bulk export/import is outside this increment; no import behaviour is implemented.
 
 ## Ownership and required evidence
 

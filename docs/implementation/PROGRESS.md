@@ -92,35 +92,35 @@ Explicit action/native file chooser→fresh exact definition→existing exclusiv
 safe JSON writer. Plaintext interoperability file clearly labelled; no browser/
 copy/usage/definition mutation. One selected literal/search/recovered hidden row.
 No bulk/import/package execution/new dependency/migration/service/research/proof.
-Root boundary signed edfef0f after freeze e652512: main strict selection-only
-channel, private native chooser ports, fresh exact definition/frame/revision/
-parent checks before chooser and again before existing safe0600/exclusive JSON
-writer. Separate exact exported/cancelled receipt; uncertain file publication
-redacted and no replay.70targeted5file contract/main/preload/writer checks, full
-typecheck/scopedlint pass. Independent boundary review clean.
+Root source complete and independently reviewed: boundary edfef0f, necessary
+shared composing-action guard6dd38a6, UI1066541(authorf390256), actualedbb00e.
+Explicit selection-only native chooser export, fresh full definition/frame/parent/
+revision rechecks, private0600/exclusive native JSON and exact receipt/unknown/
+manualReload. No browser/copy/Hide/definition/use effects. No new dependency,
+migration/process/research/proof; bulk/import not an added scope requirement.
 
-Author required browser export case reproduced shared ActionPanel composing
-Enter invoking Export. Minimal root shared fix6dd38a6 returns while composing;
-17D1units/11D1Chromium regressions pass. Specific author regression rerunning
-against cherry-picked fix;198presentation units and37oldbrowser cases passed.
-Author running all44UI cases; nine export captures/README/final commit pending.
+PASS272L2units/14contracts/45security/41integration(actual10.93s),70targeted
+boundary/preload/writer checks,17D1units/11D1Chromium. Author198presentation/
+44Chromium keyboard+axe pass including reproduced-then-fixed composing Export
+regression. Actual cancel/no file, exact JSON0600, existing-file refusal/unknown/
+Reload, hidden flags/tags and search transient-query exclusion pass. Ninecomponent/
+fouractual captures independently clean; type/scopedlint/plan/diff pass. UI code/
+tests/captures exactauthor; README onlyscopeclarification. No live test handles.
+Evidence apps/desktop/evidence/quicklink-export-application.md. Chooser choices
+instrumented; full task/nativeAT/session/performance/release remains pending.
 
-Root apps/desktop/tests/quicklinks.integration.test.ts has UNCOMMITTED prepared
-actual cancel/export/existing-file/IME/private0600/hidden/search payload checks
-and four new affected capture requests; cannot run until authorUI integrated.
-No actual export evidence/acceptance yet. Root currently no live test handles.
-Next finish author source/captures, independent closure, cherry-pick only UI,
-actual production flow, bounded mapped checks/type/lint/plan, accurate evidence,
-small signed PR and prompt normal merge. Complete local1.0 scope mandatory.
+Next sign final evidence, create+attach focused PR, inspect exact-head CI/reviews/
+threads, normal merge and primary frozen install/build; immediately select next
+bounded required application flow. Complete1.0 and security scope unchanged.
 
 ## Agents
 
-- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
+- manifest_review_sol: `.worktrees/linuxcast-l1-01`, branch
   `codex/l2-05-quicklink-export-ui` from e652512, root edfef0f cherry-picked as
-  0fda0ce and shared6dd38a6 as52be188; owned source/tests/captures in progress.
+  0fda0ce and shared6dd38a6 as52be188; signedf390256 integrated1066541, clean.
   Prior signed5669223 integratedb58fcc4 in merged PR47. Prior signed a43b0a7/1f8f77a integrated in PR46.
 - alias_review_sol: current export UI draft + shared IME guard reviewed clean;
-  awaiting author final commit/nine captures. Prior root-entry exact trees and
+  finalf390256/nine component/four actual captures independently clean. Prior root-entry exact trees and
   affected six component/two actual captures clean.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
   boundary and saved-entry/search clean; current export edfef0f reviewed clean.

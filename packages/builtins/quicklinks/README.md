@@ -301,7 +301,7 @@ AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establi
 the complete placeholder feature. Actual coordinator persistence/dispatch evidence
 is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
 typed URL components, browser/
-open-with/file/registered-URI targets and bulk export/import remain
-required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
+open-with/file/registered-URI targets remain required. Bulk export/import is
+outside this increment; no import behaviour is implemented. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
 technology and release acceptance remain pending. This slice does not complete
 L2-05 or reduce the agreed 1.0 scope.
