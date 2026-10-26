@@ -15,28 +15,23 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop3a42f931c71cac1bc92fe248ad97bf23c112c67d, merged PR47.
-Exact signed reviewed head820b812, CI40420425561 validate passed12s; no requested
+Primary clean develop64e9fdae03d27c0eb833eaaf66cba9da656ad972 (merged PR48).
+Exact signed reviewed heada1736de, CI40422104791 validate passed11s; no requested
 GitHub reviews/submissions/comments/threads. Normal exact-head merge, primary
-frozen install/build66assets pass. No open PRs remain. Prior PR46 e5da4f8:
-Normal exact-head236d305 merge, CI40418427340 validate passed15s; no requested
-GitHub reviews/submissions/comments/threads. Independent reviews clean; primary
-frozen install and production build66assets pass. Pin/hide evidence below.
-Prior merged PR45 a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c:
-https://github.com/ianwijma/linuxcast/pull/45 (26 October 22:47:36 UTC).
-Exact reviewed head3f05245, CI40415016605 validate passed12s; no requested reviews,
-submissions/comments/threads; normal exact-head merge. Primary frozen install and
-production build66assets passed. Saved Quicklinks tags/New/Edit/local search,
-strict receipts/migration010/native Open/restart are integrated. Evidence:
-`apps/desktop/evidence/quicklink-tags-application.md` and registry L2-05.
+frozen install and production build66assets pass. No open PRs remain.
 
-PR44 https://github.com/ianwijma/linuxcast/pull/44 merged e2dec5a8 at22:26:34UTC:
-actual saved Keyword commands registered in launcher; search/Arrow/Enter opens
-exact saved entry, Run remains explicit. CI40412367124 passed; normal merge,
-primary build passed. Evidence workflow-launcher-application.md/registry W2-03.
-PR43 e2 ancestor6feaf58→a44 has actual text workflow run/approval/clipboard and
-journal recovery; PR42 draft editor; PR41 saved web searches; PR40 literal links.
-Historical evidence/commit references are in tasks.json, generated cards and Git.
+Recent merged application increments:
+- PR48 https://github.com/ianwijma/linuxcast/pull/48: selected native JSON export,
+  explicit plaintext disclosure, real private file publication and shared IME fix.
+- PR47 https://github.com/ianwijma/linuxcast/pull/47: root saved-link name/host/tag
+  search, exact selected entry and separate explicit browser effect. Merge3a42f93,
+  exacthead820b812, CI40420425561 passed12s; primary build passed.
+- PR46 https://github.com/ianwijma/linuxcast/pull/46: persistent pin/hide and
+  empty-state recovery; mergee5da4f8, exacthead236d305, CI40418427340 passed15s.
+- PR45 a44bbe6 saved Quicklink tags; PR44 e2dec5a8 saved workflow Keyword launcher
+  commands; PR43 actual text workflow run/approval/copy/journal; PR42 draft editor;
+  PR41 saved web searches; PR40 literal saved links. Full evidence is in registry,
+  generated cards, evidence files and Git. All are explicitly unfinished increments.
 
 ## Current bounded increment: saved Quicklink pin/hide
 
@@ -109,29 +104,43 @@ tests/captures exactauthor; README onlyscopeclarification. No live test handles.
 Evidence apps/desktop/evidence/quicklink-export-application.md. Chooser choices
 instrumented; full task/nativeAT/session/performance/release remains pending.
 
-Next sign final evidence, create+attach focused PR, inspect exact-head CI/reviews/
-threads, normal merge and primary frozen install/build; immediately select next
-bounded required application flow. Complete1.0 and security scope unchanged.
+PR48 merged as above. Current export assignment integrated; no pending review,
+PR or signing blocker. Full task/native/AT/performance/release gates stay pending.
+
+## Next bounded application flow: explicit URL path argument
+
+Coordinator reused isolated `.worktrees/linuxcast-application-controls`, new
+branch `codex/quicklink-path-argument` from64e9fda. Required typed URL component
+builder/argument portion of L2-05: one explicit user-provided argument as a path
+component, existing saved Query→Review→Open, no raw string interpolation or
+implicit context. This is selection only, not implementation or acceptance.
+
+Next root read existing builder/parser/storage/configuration and task norms,
+freeze exact typed config/security/encoding/canonicalization/receipt boundaries,
+then give manifest_review_sol only the bounded existing UI implementation.
+Preserve literal/named-query saved searches, tags/preferences/export and all CAS/
+original-context/unknown/effect gates. Root owns contracts/migration/builder/main/
+preload/actual tests/registry; no infrastructure/research/proof/dependency/service.
+Required evidence includes Unicode/metacharacters/dot segments/authority/query/
+fragment isolation, explicit argument/review/native Open and real persistence;
+full context/other arguments/browser/file/URI/nativeAT/release remain mandatory.
 
 ## Agents
 
-- manifest_review_sol: `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-export-ui` from e652512, root edfef0f cherry-picked as
-  0fda0ce and shared6dd38a6 as52be188; signedf390256 integrated1066541, clean.
-  Prior signed5669223 integratedb58fcc4 in merged PR47. Prior signed a43b0a7/1f8f77a integrated in PR46.
-- alias_review_sol: current export UI draft + shared IME guard reviewed clean;
-  finalf390256/nine component/four actual captures independently clean. Prior root-entry exact trees and
-  affected six component/two actual captures clean.
-- file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
-  boundary and saved-entry/search clean; current export edfef0f reviewed clean.
-  No new task assigned.
+All GPT-6.1 SOL/high, no Astra. Currently completed/idle, no additional assignment:
+- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
+  `codex/l2-05-quicklink-export-ui`; signedf390256 integrated1066541 in PR48.
+  Root prerequisites edfef0f/6dd38a6 locally0fda0ce/52be188. No shared edits.
+- alias_review_sol: export source/nine component/four actual captures and exact
+  UI integration independently clean. Shared IME guard reviewed.
+- file_search_service_sol: root export edfef0f and earlier saved-entry/search/
+  receipt/persistence boundaries clean. No pending findings.
 
 ## Acceptance and runtime
 
 Registry 8done/18in-progress/71planned;56passed/325pending/8not-applicable. No
 fully accepted ready tasks. User-authorized unfinished application increments do
-not waive dependencies. Full L2-05 root provider/placeholders/context/arguments/
-typed targets/open-with/export, native sessions/AT/performance and release gates
+not waive dependencies. Full L2-05 placeholders/context/arguments/typed targets/open-with, native sessions/AT/performance and release gates
 remain mandatory. All other complete local1.0 families still required; no MVP.
 
 PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp; Node24.22.1/Bun1.4.4/Electron45/
