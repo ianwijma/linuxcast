@@ -177,3 +177,29 @@ index location without asserting that the source exists. Actual copy/restart/
 clear evidence and full remaining scope are in ../universal-actions/README.md.
 The full L2-02 content/MIME/path-navigation/recent-file acceptance remains
 unfinished alongside broader native/AT/package/release prerequisites.
+
+## Integrated owner and application evidence (26 October 2026)
+
+Coordinator integration `2b34229` applies fixed SQL ordering and bound kind/date
+constraints before LIMIT100 in the sole SQLite owner. Name uses deterministic
+SQLite NOCASE (ASCII folding), then raw name/path/root ties; it does not claim
+locale-aware collation. A130-row synthetic metadata fixture checks pre-limit
+ordering/filtering, root/current generation scope, epoch0/negative bounds and
+closed-option rejection. Main/preload reject options/row mismatch and fence stale
+same-query pages before Copy path admission.
+
+PASS:99mapped units,4contracts,20security,7integration;17shared Form/session units
+and39affected Chromium keyboard/axe checks. Full typecheck and lint pass.
+The actual production Electron45/private-Xvfb flow (8.56s smoke, not a performance
+gate) exercises invalid/corrected UTC dates across live appearance changes,
+actual kind/date/newest results, explicit native Copy path, directory filtering,
+Reset preserving query and existing watch/clear/removal/restart safety. Only
+native chooser/confirmation choices are instrumented. Four inspected application
+Form/results dark/light captures are `evidence/application-*-filter*.png`.
+
+The shared host preserves extension empty-result instructions and corrected
+validation across unrelated appearance/status revisions. New host values/errors
+still block submission; secure picker/credential/current-view guards remain.
+Independent GPT-6.1 SOL/high final source review is clean. All content/MIME/path
+navigation/recent-file, native/session/AT, dependency and release gaps above
+remain required; no complete L2-02 claim is made.

@@ -2349,10 +2349,17 @@
         {
           "id": "L2-02-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- L2-02; bun run test:contracts -- L2-02; bun run test:security -- L2-02; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- L2-02; affected browser suites and screenshot/source inspection",
+              "outcome": "All passed; public synthetic metadata/content sentinel only, private test profile paths never included in filter captures, no credentials, query history or content extraction. Component operations explicitly labelled observed fixtures. Full task acceptance remains pending.",
+              "platform": "Development host; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95/private Xvfb X11 and Chromium; not supported desktop/session or AT acceptance.",
+              "reference": "2b34229; packages/builtins/file-search/README.md; packages/builtins/file-search/evidence/; packages/storage/tests/file-search-options.integration.test.ts"
+            }
+          ]
         }
       ],
       "validation": [
@@ -2364,12 +2371,16 @@
         "Pinned Node24.22.1/Bun1.4.4/Rust1.95/Electron45/SQLite3.53.4 checks PASS:41unit (26controller/15service),9main/preload security,2contracts,12Chromium keyboard/axe,3actual native/owner/production Electron integration;108launcher units and36launcher main/preload security regressions. Production file flow4.89s and existing app/URL/alias/pin/data/restart6.93s; durations are synthetic smoke results, not performance acceptance. Typecheck/lint/plan/diff pass. Exact task mappings in scripts/test-runner/suites.json; detailed evidence packages/builtins/file-search/README.md and SERVICE.md.",
         "Actual private-Xvfb production flow covers native chooser cancellation/selection (dialogs instrumented), explicit Index, real filename query and navigation/readonly Details, hidden/symlink exclusion and no content-sentinel search, real rename watch, pause, resident workspace close/reopen, process restart paused, paused-root Local data clear proactively invalidating displayed results, cancel/confirm derived-metadata removal preserving originals, and Quit with active watcher. Actual dark/light Details and affected component screenshots inspected; no personal files or credentials used.",
         "Independent GPT-6.1 SOL/high final source review clean after stale-owner Close, paused-index clear publication and human removal-confirmation deadline findings resolved. Added exact-owner deferred Close check and generation-fenced reads; two held10second removal confirmation tests verify both cancelled/completed receipts, no premature unknown gate and no replay. Storage shutdown waits for file jobs/data operations before closing sole owner.",
-        "Integrated26October2026 local date in PR31 https://github.com/ianwijma/linuxcast/pull/31, merge0e0b4c4285adbe0f06762e9918a9a78b007f97ae at25October13:27:33UTC. Exact reviewed head8d7af2109cd32f8c529b9aedfc863d133f8a1cac CI40197619422 passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge; primary develop fast-forwarded clean. Full task, broader prerequisite/native UI and release acceptance remain unfinished."
+        "Integrated26October2026 local date in PR31 https://github.com/ianwijma/linuxcast/pull/31, merge0e0b4c4285adbe0f06762e9918a9a78b007f97ae at25October13:27:33UTC. Exact reviewed head8d7af2109cd32f8c529b9aedfc863d133f8a1cac CI40197619422 passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge; primary develop fast-forwarded clean. Full task, broader prerequisite/native UI and release acceptance remain unfinished.",
+        "Bounded metadata filters/sort increment26October2026: frozen optionsfd8a7a4; service authorf06911e integratedc04bd7d; UI authorc3f6ea9 integrated643c59a; UI evidenceb45b475; main/preload regression76ae034; coordinator SQL/storage/main/preload/shared Form/packaged application2b34229. All author/reviewer agents GPT-6.1 SOL/high. File/directory kind, inclusive UTC date range and fixed relevance/name/newest/largest ordering use the sole-owner SQL before LIMIT100. No source content or new filesystem authority.",
+        "Pinned Node24.22.1/Bun1.4.4/Rust1.95/Electron45/SQLite3.53.4 PASS:99 mapped L2-02 units (44controller/31UTCoptions/24service),4contracts,20main/preload security,7actual integration (4storage-options/2native-owner/1packaged Electron),17shared Form/session unit regressions and39Chromium keyboard/axe (19file-search/10Copy path/10shared views). Full typecheck/lint pass. Actual130-row synthetic metadata owner fixtures prove filtering and ordering before truncation, root/current-generation scope, epoch0/negative and strict injected-options rejection; fixtures do not claim source-file existence.",
+        "Actual private-Xvfb production Electron flow8.56s passes registered launcher\u2192File search\u2192native-selected/indexed public fixture\u2192invalid/corrected UTC Form across theme changes\u2192date/kind/newest ordering\u2192explicit selected Copy path\u2192directory filter\u2192Reset preserving query, then existing content sentinel exclusion, rename/watch, pause, resident reopen, process restart paused, Local data clear/current-copy rejection, derived removal preserving sources, Quit with watcher. Only native chooser/confirmation choices instrumented. Four application dark/light Form/results captures and six component filter/range captures inspected; axe passes. Duration is smoke evidence, not performance acceptance.",
+        "Independent SOL/high source reviews clean through2b34229, including all boundary/SQL/date/copy changes and shared Form validation fix. Resolved empty-results applied-summary rendering and corrected validation revived by unrelated appearance/status revisions; changed host values/errors still block, and credential/picker/current-view guards remain intact. Full L2-02/dependencies/native AT/session/release acceptance explicitly unfinished."
       ],
       "owner": "coordinator with manifest_review_sol and file_search_service_sol (GPT-6.1 SOL/high)",
-      "branch": "codex/file-search-ui",
+      "branch": "codex/file-search-filters",
       "limitations": [
-        "Reviewed filename/metadata application increment only; full L2-02 remains in-progress. Content extraction with explicit per-root opt-in, MIME/size/time budgets and cancellation, dedicated MIME/date filters/sorting/path navigation/recent files remain required. No content extractor is implemented; extraction acceptance stays pending.",
+        "Reviewed metadata application increments only; full L2-02 remains in-progress. Kind/date filters and deterministic sorting are implemented. Dedicated MIME filters, path navigation, recent files, and content extraction with explicit per-root opt-in, MIME/size/time budgets and cancellation remain required. No content extractor exists; extraction acceptance stays pending. Name order uses deterministic SQLite NOCASE (ASCII folding), not locale-aware collation.",
         "File actions are separate L2-03 scope. This view exposes readonly indexed metadata and grants no file-open/read authority; opening/preview actions explicitly unavailable. Newly chosen and process-restarted roots stay paused until explicit Index folder.",
         "Native dialogs in automated evidence are instrumented. Development-host private Xvfb/Chromium/Rust/SQLite evidence does not establish Debian13 GNOME/KDE Wayland/X11, native assistive-technology, installed package or release acceptance. Broader L1-01/D1-02 prerequisites remain unfinished under user-authorized incremental integration; no task or dependency completion inferred."
       ]

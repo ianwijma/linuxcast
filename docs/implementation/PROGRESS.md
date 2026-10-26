@@ -11,13 +11,14 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary `/home/ian/Projects/ianwijma/linuxcast`, clean `develop` at **f55ae0631d77fb8c9ba2e5fc0b9ea27840463748**. Frozen install and current production build pass (63 packaged renderer assets); no app started on the user's display.
+Primary remains clean `develop` at f55ae06 (PR34); previous frozen install/build passed.
+Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/file-search-filters`, source head **2b34229**. Reviewed/tested L2-02 metadata filter/sort increment ready for PR/CI/normal merge. No live exec or author process remains at this checkpoint; all three SOL agents completed. Previous goal turn made concrete implementation/test progress.
 
-Coordinator `.worktrees/linuxcast-application-controls`, branch **codex/file-search-filters**, from merged f55ae06; only the merge/next-task checkpoint follows it. No filter implementation, frozen options or new author assignment exists yet.
+Registry: done8 / in-progress12 / planned77. L2-02 privacy now passed with public fixture/source/screenshot evidence; full UI/extraction acceptance stays pending. Broader L1-01/D1-02 prerequisites remain incomplete under user-authorized unfinished increments.
 
-Registry: done8 / in-progress12 / planned77; acceptance passed49 / pending332 / not-applicable8. Only W1-01 is fully dependency-ready by status. Reviewed builtin shell/metadata/UI boundaries are being reused under user-authorized unfinished integration; never infer complete L1-01/F3-01/D1-02 acceptance from these increments. `tasks.json` and generated cards are authoritative for the remaining scope.
+Current verification:99units/4contracts/20security/7actualintegration;17shared units;39browser checks; full typecheck/lint. Actual production Electron/private-Xvfb flow8.56s. Independent SOL-high review clean. Four application and six component filter/range captures inspected. Fixed shared extension empty-description rendering and corrected-error revival across appearance/status changes.
 
-Previous goal turn made verified progress: **PR34 merged**, primary refreshed and updated production app built. It is not a wait/no-progress turn. No live test/exec process remains. Collaboration list confirms all three SOL agents completed.
+Next: commit evidence and validate plan, push/open focused filter PR (attach), inspect exact-head CI and requested reviews/comments/threads, normal merge when all applicable checks/reviews pass, refresh primary frozen install/build and record merge. Then select the next concrete application increment; do not add proof/infra to manifest agent. Keep all unimplemented task scope explicit.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -33,21 +34,17 @@ Frozen request/formatter2e2aaaa; workspace linksb5704ad; shared-host pending key
 
 L2-03 stays **in-progress**. Current privacy criterion passed; full cardinality/deletion, preview/cache and UI criteria pending. Full typed actions, ordered multi-file buffer, open/open-with/reveal/move/rename/trash/conflicts/terminal, previews/large text and extension entry points still required. Indexed path copying does not verify source existence or grant file-open/read authority. Native desktop/session/AT, installed-package and release acceptance remain pending.
 
-## Next selected application work: L2-02 filters and sorting
+## Current L2-02 filter/sort integration
 
-Use `docs/implementation/tasks/L2-02.md` (complete card read this turn), with its data/security/product/testing references and DESIGN.md/tokens. Re-read applicable references before changing behavior. L2-01 accepted; L1-01/D1-02 broader acceptance still pending.
+Read `docs/implementation/tasks/L2-02.md`, data/security/builtins/testing refs and DESIGN/tokens. Kind any/file/directory, optional inclusive UTC from/through dates (through translates to exclusive next UTC midnight), relevance/name/newest/largest sorting. Apply/Reset use shared Form/Actions and preserve query/root/selection/copy guards. SQL options apply before LIMIT100; no renderer top100 filtering/sorting, no new source reads or persistence.
 
-Bounded next increment: filter existing filename/metadata search by file/directory and UTC modified-date range, select a deterministic sort order, clear/change options through shared host Form/Actions, and preserve query/selection/copy safety. Apply filters and ordering in the **sole-owner SQL query before LIMIT**, not by sorting/filtering only the first100 returned rows. No new content extraction or filesystem reads. Full MIME filters, path navigation/recents, explicit opt-in extractors and all other L2-02 acceptance remain required.
+Commits:fd8a7a4 frozen contract; c04bd7d service;643c59a UI;b45b475 evidence;d04566f shared empty guidance;76ae034 main/preload tests;2b34229 owner/client/main/preload/shared Form/production integration.
 
-Source found: `packages/file-index/src/repository.ts:109` implements files.search with quoted FTS tokens, current-generation/root scope and ORDER BY rank,e.path,e.root_id LIMIT. Columns already include kind/size/modified_ms/name/path (`packages/storage/src/migrations/003-file-index.sql`). Contracts are `packages/file-index/src/contracts.ts`; reply constraints also live in `packages/storage/src/client.ts:58`. Coordinator owns these shared SQL/contracts/client/manifests/lockfiles/status and main/preload integration. Freeze options/echo/freshness rules first, then assign bounded UI/service lanes with disjoint paths. No new protocol/source/assignment yet; this is selection, not completion evidence.
+Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. No PR yet at this checkpoint.
 
-Keep the new Copy path cache/current-selection guarantees when options change. A copied indexed path remains metadata; future file opening requires its own trusted native/permission contract. Do not expand this increment into infrastructure, proof, native devices or open-ended research.
+Reusable completed SOL-high agents: `manifest_review_sol` in `.worktrees/linuxcast-l1-01` / `codex/l2-02-filter-ui`; `file_search_service_sol` in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-filter-service`; read-only `alias_review_sol`. Verify clean and switch base before assigning next bounded work. Do not reactivate Astra agents.
 
-## Reusable SOL agents and worktrees
-
-- `manifest_review_sol`: completed342929f; `.worktrees/linuxcast-l1-01` / `codex/l2-03-path-copy-ui`. Own next bounded application UI only after frozen contracts. Last report clean; verify before switching.
-- `file_search_service_sol`: completed8d5a8cb; `.worktrees/linuxcast-l1-02-native` / `codex/l2-04-units-engine`. Own service/pure feature paths only if assigned, never shared SQL/contracts. Last report clean; verify before switching.
-- `alias_review_sol`: completed final source closure; independent read-only review, GPT-6.1 SOL/high. Can be followed up once final source exists.
+Full L2-02 remains in-progress: MIME filters, path navigation/recent files and opt-in budgeted/cancellable extractors absent. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
 
 ## Integrated application history and outstanding scope
 
