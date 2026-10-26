@@ -92,7 +92,7 @@ unknown/mismatched/pending replies, back/dirty cancel/focus, stale/disposed acti
 and local readonly metadata. Unit cases add length/function-scalar, temperature, decimal/binary
 data, unsupported/ambiguous and incompatible units, help draft/focus navigation,
 and exact numeric-text/unit copy acknowledgement checks. `fixtures/` explicitly observes clipboard requests
-without touching the host clipboard. Public arithmetic expressions alone enter
+without touching the host clipboard. Public synthetic arithmetic and unit expressions enter
 test screenshots; no user content, secrets or external requests are used.
 Fifteen component screenshots cover dark/light Form, arithmetic and unit results,
 validation, Supported units help, plus unknown, unavailable and missing-copy
@@ -110,7 +110,7 @@ fixture-backed cache and stale/offline rate behavior remain required. Debian
 GNOME/KDE Wayland/X11, native assistive technology and full release acceptance
 remain pending. The complete local 1.0 scope is unchanged.
 
-## Integrated application evidence
+## Integrated arithmetic application evidence (PR32)
 
 Coordinator checks on Node24.22.1, Bun1.4.4, Electron45.0.0 and SQLite3.53.4
 pass:188calculator unit checks (157evaluator,29presentation,2launcherrouting),
@@ -139,3 +139,32 @@ unknown-outcome receipt so another copy cannot overtake it. Hide/Quit remain
 available. No automatic replay, paste, PRIMARY or clipboard-history read is
 added; native GNOME/KDE Wayland/X11, assistive-technology, installed package and
 release acceptance remain pending.
+
+## Unit conversion application evidence
+
+The integrated conversion increment passes424mapped calculator unit checks
+(157arithmetic,214conversion,49presentation,1formatter,3launcher-routing),
+43main/preload security checks and3contracts. Author19Chromium keyboard/axe
+checks pass with the real engine;16shared-view unit and10shared browser
+regressions pass after the reproduced help-return focus fix. Full typecheck,
+lint, frozen install and108launcher regression units pass. Independent
+GPT-6.1 SOL/high final integrated source review is clean.
+
+The actual production application check passes in6.41seconds using the existing
+private Xvfb/X11 profile, packaged Electron45/SQLite3.53.4 and independent native
+xclip reader. Explicit Copy writes `5000 m`, `0 degC` and `1048576 B`; typing,
+Evaluate, Supported units help, incompatible/ambiguous/case-mismatched units and
+below-absolute-zero inputs leave the clipboard unchanged. Returning from help
+preserves the unsent Form draft and focus. Hide from help removes both nested
+views; real single-instance reopen returns to root without replay. After Quit,
+the actual owner export contains only aggregate calculator use count5, with no
+arithmetic/conversion expressions or result strings. Arithmetic14/521 copying and
+known unavailable-session/manual-recovery paths remain covered. These smoke
+durations do not establish performance acceptance.
+
+`evidence/application-{dark,light}-{unit-result,units-help}.png` are actual packaged
+application captures with both themes inspected and axe passing. Component
+fixtures remain separate from real private clipboard evidence. No operation uses
+the user's display. Unit fixtures are partial AC02 evidence; calendar
+DST/timezone/date behavior, colours, configured rate adapters/cache and full native
+desktop/AT/installed-package/release acceptance remain unfinished.

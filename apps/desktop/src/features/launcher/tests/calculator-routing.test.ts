@@ -26,3 +26,13 @@ it('clears both calculator frames on Hide, ignores late copy receipts and reopen
   finish({ok:true,value:{outcome:'copied',text:'6'}});await settle();expect(top(f).view.kind).toBe('form');expect(top(f).view.status?.message??'').not.toContain('copied');
   await evaluate(f);await copy(f);expect(writer).toHaveBeenLastCalledWith({revision:2,expression:'3+3'});
 });
+
+it('clears Form-only unit help on Hide and rejects its stale action after reopen',async()=>{
+  const f=setup();await settle();await open(f);const form=top(f);
+  await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'calculator:units'});
+  const help=top(f);expect(help.view).toMatchObject({kind:'detail',title:'Supported units'});expect(f.controller.session.getSnapshot().frames).toHaveLength(3);
+  f.controller.setVisible(false);expect(f.controller.session.getSnapshot().frames).toHaveLength(1);
+  f.nextRevision();f.controller.setVisible(true);await settle();await open(f);
+  await f.controller.execute({viewId:help.view.viewId,revision:help.view.revision,actionId:'calculator:edit'});
+  expect(top(f).view).toMatchObject({kind:'form',fields:[{id:'expression',value:''}]});expect(f.api.copyCalculatorResult).not.toHaveBeenCalled();
+});
