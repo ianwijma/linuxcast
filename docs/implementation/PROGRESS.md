@@ -15,7 +15,11 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c, merged PR45:
+Primary clean develop e5da4f8566f906dd1b52eb5d2928ae8adc723e13, merged PR46.
+Normal exact-head236d305 merge, CI40418427340 validate passed15s; no requested
+GitHub reviews/submissions/comments/threads. Independent reviews clean; primary
+frozen install and production build66assets pass. Pin/hide evidence below.
+Prior merged PR45 a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c:
 https://github.com/ianwijma/linuxcast/pull/45 (26 October 22:47:36 UTC).
 Exact reviewed head3f05245, CI40415016605 validate passed12s; no requested reviews,
 submissions/comments/threads; normal exact-head merge. Primary frozen install and
@@ -52,19 +56,35 @@ query/selection/Back zero-write regressions; exact author/integrated trees match
 Independent root boundary and UI/actual review clean. Full task remains in progress.
 Evidence `apps/desktop/evidence/quicklink-preferences-application.md`.
 
-Next: sign evidence/registry, create+attach focused PR, inspect exact-head CI and
-GitHub reviews/threads, normal merge, refresh primary frozen install/build. Then
-select next bounded concrete launcher/application flow without foundation growth.
+PR46 https://github.com/ianwijma/linuxcast/pull/46 is merged as above.
+
+## Current bounded application increment: root saved-link entries
+
+Root reused worktree, new `codex/quicklink-launcher-entry` from e5da4f8. Freeze
+dddcce3 and packages/builtins/quicklinks/LAUNCHER-INCREMENT.md. Root metadata adds
+exact quicklink:UUID matching quicklink{id,revision}, catalogue5604 including
+existing500 saved bound. Current shown metadata name/host/tags only, no target;
+generic Execute/root pin/alias/hide rejects these IDs. Cached storage failure
+disables old entries and leaves parent recovery. Source99targeted checks across
+3files, typecheck/scopedlint pass. Root source tests currently uncommitted.
+
+manifest_review_sol has bounded UI assignment, isolated branch
+`codex/l2-05-quicklink-launcher-ui` from dddcce3. Open exact current ID/rev via
+fresh full list, no implicit effect/fallback; preserve root context and fences.
+UI/source/captures and production integration still pending. Reviewer
+file_search_service_sol auditing root source. Next finish bounded route, actual
+launcher search/Arrow/Enter/existing native action integration, independent
+review, small signed PR and prompt normal merge. No foundation expansion.
 
 ## Agents
 
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-presentation-ui`, signed a43b0a7/1f8f77a integrated above.
-  Bounded current UI assignment complete; await next concrete application flow.
+  `codex/l2-05-quicklink-launcher-ui` from dddcce3, concrete root-entry route in
+  progress. Prior signed a43b0a7/1f8f77a integrated in PR46.
 - alias_review_sol: exact-tree source/test and nine component/six actual captures
   reviewed clean; P2 reentrant Save finding closed.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
-  boundary independently reviewed clean; idle.
+  boundary independently reviewed clean; now auditing root saved-entry boundary.
 
 ## Acceptance and runtime
 

@@ -1,3 +1,4 @@
+import { compileQuicklinkCommands } from './quicklink-commands.ts';
 import { compileWorkflowCommands,matchWorkflowCommand,WorkflowCommandUnavailable } from './workflow-commands.ts';
 import type { WorkflowCommand,WorkflowCommandSelection } from './workflow-commands.ts';
 import type { WorkflowEditorRecord } from '../../../../packages/contracts/src/workflow-editor.ts';
@@ -61,6 +62,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false,quicklinksPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
+  let quicklinkState:'available'|'unavailable'|undefined,quicklinkCommands:Omit<LauncherCommandMetadata,'usage'>[]=[],quicklinkRefreshing:Promise<void>|undefined;
   let workflowState:'available'|'unavailable'|undefined,workflowCommands:WorkflowCommand[]=[],workflowRefreshing:Promise<void>|undefined;
   let applications: NativeApplication[] = [];
   let refreshing: Promise<void>|undefined;
@@ -86,6 +88,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   };
   const descriptors = (): Omit<LauncherCommandMetadata,'usage'>[] => ([
     ...builtins,
+    ...quicklinkCommands.map(command=>({...command,...(quicklinkState==='unavailable'?{enabled:false,unavailableReason:'Saved Quicklinks are unavailable. Open Quicklinks or Reload commands to reconnect.'}:hiddenIds.has('linuxcast:open-quicklinks')?{enabled:false,unavailableReason:'Quicklinks is hidden. Show Quicklinks in Manage commands before opening saved entries.'}:{})})),
     ...workflowCommands.map(command=>({...command.metadata,...(workflowState==='unavailable'?{enabled:false,unavailableReason:'Saved workflow commands are unavailable. Reload commands to reconnect.'}:{})})),
     ...[...applicationRecords].map(([id,application])=>({id,provider:'applications' as const,title:application.title,
       subtitle:application.description||'Installed application',aliases:[],keywords:[],enabled:applicationState==='available',
@@ -94,6 +97,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     })),
   ] as Omit<LauncherCommandMetadata,'usage'>[]).map(command=>({
     ...command,
+    ...(command.id==='linuxcast:open-quicklinks'&&quicklinkState==='unavailable'?{subtitle:'Saved links unavailable. Open Quicklinks to reload saved links.'}:{}),
     ...(command.id==='linuxcast:open-workflow-editor'&&workflowState==='unavailable'?{subtitle:'Saved commands unavailable. Open the editor or Reload commands to reconnect.'}:{}),
     ...(visibilityAvailable===undefined?{}:{hidden:hiddenIds.has(command.id)}),
     ...(visibilityAvailable===false&&!isLauncherVisibilityProtected(command.id)?{
@@ -153,6 +157,17 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     })().finally(()=>{workflowRefreshing=undefined;});
     await workflowRefreshing;
   };
+  const refreshQuicklinks=async(generation:number)=>{
+    if(!actions.quicklinks)return;
+    if(!quicklinkRefreshing)quicklinkRefreshing=(async()=>{
+      try{const next=compileQuicklinkCommands(await actions.quicklinks!.list(),!!actions.openUrl);
+        if(!active()||metadataPending||quicklinksPending||generation!==metadataGeneration)return;
+        if(quicklinkState!=='available'||JSON.stringify(next)!==JSON.stringify(quicklinkCommands))revision++;
+        quicklinkCommands=next;quicklinkState='available';
+      }catch{if(active()&&!metadataPending&&!quicklinksPending&&generation===metadataGeneration){if(quicklinkState!=='unavailable')revision++;quicklinkState='unavailable';}}
+    })().finally(()=>{quicklinkRefreshing=undefined;});
+    await quicklinkRefreshing;
+  };
   const snapshot = async (start=0,changed?: CommandUsage): Promise<LauncherCommandsReply> => {
     try {
       const expectedRevision=revision,all=descriptors(),selected=changed?all.filter(command=>command.id===changed.commandId):all.slice(start,start+100);
@@ -189,6 +204,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }else{
       await refreshApplications();
       await refreshWorkflows();
+      await refreshQuicklinks(admittedMetadata);
       if(!metadataPending&&admittedMetadata===metadataGeneration)await refreshVisibility(admittedMetadata);
     }
     if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
@@ -282,6 +298,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
     if(!active()||busy||calculatorPending)return failure('cancelled');
     const {commandId,hidden}=parsed.data;
+    if(commandId.startsWith('quicklink:'))return failure('permission-denied');
     if(!descriptors().some(command=>command.id===commandId))return failure('permission-denied');
     if(!actions.setHidden||!actions.listHidden||visibilityAvailable!==true)return visibilityFailure();
     busy=true;metadataPending=true;metadataGeneration++;
@@ -309,6 +326,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!parsed.success || parsed.data.revision!==revision)return failure('invalid-request');
     if(!active() || busy)return failure('cancelled');
     const {commandId,alias}=parsed.data,registered=descriptors();
+    if(commandId.startsWith('quicklink:'))return failure('permission-denied');
     if(!registered.some(command=>command.id===commandId))return failure('permission-denied');
     if(!actions.setAlias || !actions.getUsage)return {ok:false,error:{code:'capability-unavailable',message:'Alias editing is unavailable. Reload commands to reconnect to storage.',retryable:false}};
     busy=true;metadataPending=true;metadataGeneration++;
@@ -346,6 +364,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   ipc.handle(LAUNCHER_CHANNELS.setPinned, async (event: IpcMainInvokeEvent, payload: unknown): Promise<LauncherCommandsReply> => {
     if (!trustedShellSender(event,actions.contents())) return failure('permission-denied');
     const parsed = launcherPinRequestSchema.safeParse(payload);
+    if(parsed.success&&parsed.data.commandId.startsWith('quicklink:'))return failure('permission-denied');
     if (!parsed.success || parsed.data.revision !== revision) return failure('invalid-request');
     if (!active() || busy) return failure('cancelled');
     if (!actions.setPinned || !descriptors().some(command => command.id === parsed.data.commandId)) return failure('permission-denied');
@@ -367,7 +386,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
-    if(command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
+    if(command.id.startsWith('quicklink:')||command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
     busy = true;
     try {
       if(actions.listHidden&&!isLauncherVisibilityProtected(command.id)){

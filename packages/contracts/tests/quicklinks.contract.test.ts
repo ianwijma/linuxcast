@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { quicklinkTagsSchema,MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema } from '../src/index.ts';
+import { quicklinkTagsSchema,MAX_ENVELOPE_BYTES,MAX_QUICKLINKS,normalizeQuicklinkName,quicklinkNameSchema,quicklinkUrlSchema,quicklinkSaveSchema,quicklinkListSchema,quicklinkSaveRequestSchema,quicklinkGetRequestSchema,quicklinkOpenRequestSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,launcherCommandIdSchema,launcherCommandMetadataSchema,MAX_LAUNCHER_COMMANDS } from '../src/index.ts';
 const id='00000000-0000-4000-8000-000000000001';
 const save={expectedRevision:0,name:'Public docs',url:'https://example.invalid/docs'};
 it('validates literal credential-free web targets before canonicalizing and rejects unsupported template authority',()=>{
@@ -49,4 +49,10 @@ it('canonicalizes bounded saved tags, rejects ambiguous/control/delimiter input 
 it('accepts only boolean presentation preferences, with absent and false as ordinary defaults',()=>{
  for(const pinned of [undefined,false,true])for(const hidden of [undefined,false,true]){const prefs={...(pinned===undefined?{}:{pinned}),...(hidden===undefined?{}:{hidden})};expect(quicklinkSaveSchema.parse({...save,...prefs})).toEqual({...save,...prefs});}
  for(const patch of [{pinned:1},{hidden:'true'},{hidden:null},{pinned:{grant:'open'}}])expect(quicklinkSaveSchema.safeParse({...save,...patch}).success).toBe(false);
+});
+
+it('binds read-only launcher entries to exact saved selections without accepting executable targets',()=>{
+ const value={id:`quicklink:${id}`,quicklink:{id,revision:7},title:'Public saved link',aliases:[],keywords:['Work'],enabled:true,usage:null};expect(launcherCommandMetadataSchema.parse(value)).toEqual(value);expect(MAX_LAUNCHER_COMMANDS).toBe(5604);
+ for(const patch of [{quicklink:undefined},{quicklink:{id:'00000000-0000-4000-8000-000000000002',revision:7}},{quicklink:{id,revision:0}},{quicklink:{id,revision:7,url:save.url}},{id:'linuxcast:open-quicklinks'},{applicationActions:{available:true,actions:[]}}])expect(launcherCommandMetadataSchema.safeParse({...value,...patch}).success).toBe(false);
+ for(const commandId of ['quicklink:not-a-uuid','quicklink:../../public','quicklink:'+id+'x'])expect(launcherCommandIdSchema.safeParse(commandId).success).toBe(false);
 });
