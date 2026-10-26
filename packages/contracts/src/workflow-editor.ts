@@ -32,3 +32,17 @@ export type WorkflowEditorApi = {
   close(): Promise<void>;
   onCloseRequested(listener: () => void): () => void;
 };
+export const WORKFLOW_EDITOR_CHANNELS = {
+  load: 'workflow-editor:load', write: 'workflow-editor:write', close: 'workflow-editor:close',
+  appearance: 'workflow-editor:appearance',
+} as const;
+export const WORKFLOW_EDITOR_CLOSE_REQUESTED = 'workflow-editor:close-requested';
+export const WORKFLOW_EDITOR_APPEARANCE = 'workflow-editor:appearance-changed';
+export const workflowEditorRequestSchema = z.strictObject({protocolVersion:z.literal(1)});
+export const workflowEditorWriteRequestSchema = z.strictObject({protocolVersion:z.literal(1),input:workflowEditorWriteSchema});
+export const workflowEditorCloseReplySchema = z.strictObject({ok:z.literal(true)});
+export const workflowEditorAppearanceSchema = z.enum(['dark','light']);
+export type WorkflowWorkspaceApi = WorkflowEditorApi & {
+  getAppearance(): Promise<'dark'|'light'>;
+  onAppearance(listener: (appearance:'dark'|'light') => void): () => void;
+};

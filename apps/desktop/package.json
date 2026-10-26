@@ -16,7 +16,8 @@
     "@linuxcast/file-search": "workspace:*",
     "@linuxcast/calculator": "workspace:*",
     "@linuxcast/universal-actions": "workspace:*",
-    "@linuxcast/quicklinks": "workspace:*"
+    "@linuxcast/quicklinks": "workspace:*",
+    "@linuxcast/workflows": "workspace:*"
   },
   "devDependencies": {
     "electron": "45.0.0",
