@@ -60,3 +60,86 @@ it('does not close a replacement owner through a deferred Close from an old wind
   expect(await f.invoke(C.close)).toEqual({ok:true,value:{outcome:'completed'}});current=undefined;
   await new Promise(resolve=>setImmediate(resolve));expect(f.actions.close).not.toHaveBeenCalled();
 });
+
+const generation='22222222-2222-4222-8222-222222222222';
+const indexedRoot={id:rootId,name:'Synthetic folder',displayPath:'/synthetic',state:'ready' as const,activity:'paused' as const,generation,progress:null};
+const indexedState={...snapshot,roots:[indexedRoot]};
+const indexedRow={id:rootId+':public.txt',rootId,generation,path:'public.txt',kind:'file' as const,size:1,modifiedMs:0};
+const selection={protocolVersion:1,resultId:indexedRow.id,rootId,generation};
+
+it('forwards provided search options through main and admits only matching metadata',async()=>{
+  const options={sort:'size-desc' as const,kind:'file' as const,modifiedFromMs:0,modifiedBeforeMs:10};
+  const copyPath=vi.fn(async()=>'written' as const);
+  const search=vi.fn(async(request:Parameters<FileSearchActions['search']>[0])=>({...request,rootId:request.rootId??null,results:[indexedRow]}));
+  const f=fixture({getState:async()=>indexedState,search,copyPath});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options})).toEqual({ok:true,value:{query:'public',rootId,options,results:[indexedRow]}});
+  expect(search).toHaveBeenCalledExactlyOnceWith({query:'public',rootId,options});
+  expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:true,value:{path:'/synthetic/public.txt'}});
+  expect(copyPath).toHaveBeenCalledExactlyOnceWith('/synthetic/public.txt');
+});
+
+it('rejects malformed options before invoking the main search action',async()=>{
+  const f=fixture();
+  for(const options of [null,[],{}, {sort:'unknown'}, {sort:'name',kind:'symlink'}, {sort:'name',extra:'private'},
+    {sort:'name',modifiedFromMs:0.5}, {sort:'name',modifiedBeforeMs:Infinity}, {sort:'name',modifiedFromMs:Number.MIN_SAFE_INTEGER-1},
+    {sort:'name',modifiedFromMs:0,modifiedBeforeMs:0}, {sort:'name',modifiedFromMs:2,modifiedBeforeMs:1}]) {
+    expect(await f.invoke(C.search,{protocolVersion:1,query:'public',options})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  }
+  expect(f.actions.search).not.toHaveBeenCalled();expect(f.actions.getState).not.toHaveBeenCalled();
+});
+
+it('rejects mismatched echoed options and wrong-kind/date rows without admitting Copy path',async()=>{
+  const options={sort:'name' as const,kind:'file' as const,modifiedFromMs:0,modifiedBeforeMs:10};
+  const value={query:'public',rootId,options,results:[indexedRow]};
+  for(const reply of [{...value,options:undefined},{...value,options:{...options,sort:'modified-desc'}},
+    {...value,options:{...options,modifiedFromMs:1}},{...value,options:{...options,modifiedBeforeMs:11}},
+    {...value,results:[{...indexedRow,kind:'directory'}]}, {...value,results:[{...indexedRow,modifiedMs:-1}]},
+    {...value,results:[{...indexedRow,modifiedMs:10}]}]) {
+    const copyPath=vi.fn(async()=>'written' as const);
+    const f=fixture({getState:async()=>indexedState,search:(async()=>reply) as FileSearchActions['search'],copyPath});
+    expect(await f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+    expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:false,error:{code:'conflict'}});expect(copyPath).not.toHaveBeenCalled();
+  }
+});
+
+it('accepts omitted/default relevance equivalence and negative modified bounds',async()=>{
+  const copyPath=vi.fn(async()=>'written' as const);
+  const search=vi.fn<FileSearchActions['search']>(async request=>({query:request.query,rootId:null,options:{sort:'relevance'},results:[indexedRow]}));
+  const f=fixture({getState:async()=>indexedState,search,copyPath});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public'})).toMatchObject({ok:true});expect(search).toHaveBeenLastCalledWith({query:'public'});
+  search.mockResolvedValueOnce({query:'public',rootId:null,results:[indexedRow]});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public',options:{sort:'relevance'}})).toMatchObject({ok:true});
+  expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:true});
+  const options={sort:'modified-desc' as const,modifiedFromMs:-10,modifiedBeforeMs:0};
+  search.mockResolvedValueOnce({query:'public',rootId:null,options,results:[{...indexedRow,modifiedMs:-10}]});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public',options})).toMatchObject({ok:true});
+});
+
+it('clears admitted identities when the same query starts with different options and rejects an old echoed page',async()=>{
+  let finish!:(value:Awaited<ReturnType<FileSearchActions['search']>>)=>void;
+  const oldOptions={sort:'name' as const,kind:'file' as const},newOptions={sort:'size-desc' as const,kind:'directory' as const};
+  const oldValue={query:'public',rootId,options:oldOptions,results:[indexedRow]},copyPath=vi.fn(async()=>'written' as const);
+  const search=vi.fn<FileSearchActions['search']>().mockResolvedValueOnce(oldValue).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+  const f=fixture({getState:async()=>indexedState,search,copyPath});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options:oldOptions})).toMatchObject({ok:true});
+  const pending=f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options:newOptions});
+  expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:false,error:{code:'conflict'}});
+  finish(oldValue);expect(await pending).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:false,error:{code:'conflict'}});expect(copyPath).not.toHaveBeenCalled();
+});
+
+it('never lets a late same-query reply with earlier options overwrite the newer admitted page',async()=>{
+  let finish!:(value:Awaited<ReturnType<FileSearchActions['search']>>)=>void;
+  const oldOptions={sort:'name' as const,kind:'file' as const},newOptions={sort:'size-desc' as const,kind:'directory' as const};
+  const directory={...indexedRow,id:rootId+':public-folder',path:'public-folder',kind:'directory' as const};
+  const copyPath=vi.fn(async()=>'written' as const);
+  const search=vi.fn<FileSearchActions['search']>().mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}))
+    .mockResolvedValueOnce({query:'public',rootId,options:newOptions,results:[directory]});
+  const f=fixture({getState:async()=>indexedState,search,copyPath});
+  const old=f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options:oldOptions});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'public',rootId,options:newOptions})).toMatchObject({ok:true});
+  finish({query:'public',rootId,options:oldOptions,results:[indexedRow]});expect(await old).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(C.copyPath,selection)).toMatchObject({ok:false,error:{code:'conflict'}});expect(copyPath).not.toHaveBeenCalled();
+  expect(await f.invoke(C.copyPath,{...selection,resultId:directory.id})).toMatchObject({ok:true,value:{path:'/synthetic/public-folder'}});
+  expect(copyPath).toHaveBeenCalledExactlyOnceWith('/synthetic/public-folder');
+});

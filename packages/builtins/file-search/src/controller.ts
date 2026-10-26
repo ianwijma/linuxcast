@@ -1,13 +1,15 @@
 import { IndexedPathCopy,COPY_INDEXED_PATH } from '@linuxcast/universal-actions';
 import type { IndexedPathContext } from '@linuxcast/universal-actions';
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
-import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema } from '@linuxcast/contracts';
-import type { ActionModel,FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult,ViewModel } from '@linuxcast/contracts';
+import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions } from '@linuxcast/contracts';
+import type { ActionModel,FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult,FileSearchOptions,ViewModel } from '@linuxcast/contracts';
+import { defaultOptionsKey,optionsDraft,optionsSummary,parseOptionsDraft,parseUtcDate } from './options.ts';
+import type { OptionsDraft,OptionsErrors } from './options.ts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
-const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details';
+const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options';
 type Status={kind:'info'|'warning'|'error';message:string};
-type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;status?:Status;retainSelection?:string};
+type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;options?:FileSearchOptions;status?:Status;retainSelection?:string};
 const action=(id:string,title:string,effect:ActionModel['effect']='read',disabledReason?:string):ActionModel=>({id,title,kind:'invoke',effect,...(disabledReason?{disabledReason}:{})});
 /** Presentation only: paths are display metadata, never file-open authority.
  * The resident main service owns indexing, native selection and SQLite access. */
@@ -16,6 +18,7 @@ export class FileSearchController {
   #pathCopy:IndexedPathCopy;
   #api:FileSearchApi;#state:FileSearchState|null=null;#active=false;#disposed=false;#unsubscribe:(()=>void)|null=null;
   #revision=0;#sequence=0;#loading=true;#busy=false;#unconfirmed=false;#status:Status|undefined;#copyWarning:Status|undefined;
+  #filters:{viewId:string;draft:OptionsDraft;errors:OptionsErrors}|null=null;
   #results:Results|null=null;#detail:{viewId:string;row:FileSearchResult}|null=null;
   #load:AbortController|null=null;#mutation:AbortController|null=null;#search:AbortController|null=null;#closing:AbortController|null=null;
   #queryGeneration=0;#timer:ReturnType<typeof setTimeout>|undefined;
@@ -70,11 +73,26 @@ export class FileSearchController {
     return undefined;
   }
   #resultsView():ViewModel{
-    const results=this.#results!,root=results.rootId?this.#root(results.rootId):undefined,status=this.#resultsStatus();
+    const results=this.#results!,root=results.rootId?this.#root(results.rootId):undefined,status=this.#resultsStatus(),summary=optionsSummary(results.options);
     return {protocolVersion:1,viewId:results.viewId,revision:++this.#revision,kind:'list',title:'Search files',loading:results.loading,search:{query:results.query,placeholder:'Search indexed filenames and paths…',mode:'extension'},
-      sections:[{id:'results',title:root?.name??(results.rootId?'Removed folder':'All selected folders'),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action]}))}],
-      empty:{title:results.query.trim()?'No matching files':'Search selected folders',description:results.query.trim()?'Try another filename or path. Check whether indexing is paused or incomplete.':'Enter a filename or path to search indexed metadata. No file content is searched.'},...(status?{status}:{}),
-      actions:[...(root?this.#rootActions(root):[]),...this.#globalActions()]};
+      sections:[{id:'results',title:[root?.name??(results.rootId?'Removed folder':'All selected folders'),summary].filter(Boolean).join(' · '),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action]}))}],
+      empty:{title:results.query.trim()?'No matching files':'Search selected folders',description:[results.query.trim()?'Try another filename or path. Check whether indexing is paused or incomplete.':'Enter a filename or path to search indexed metadata. No file content is searched.',summary?`Applied: ${summary}.`:undefined].filter(Boolean).join(' ')},...(status?{status}:{}),
+      actions:[action(FILTER,'Filter and sort'),action(RESET,'Reset filters and sort','read',fileSearchOptionsKey(results.options)===defaultOptionsKey?'Filters and sort are already at their defaults.':undefined),...(root?this.#rootActions(root):[]),...this.#globalActions()]};
+  }
+  #filtersView():ViewModel{
+    const filters=this.#filters!,field=(id:keyof OptionsDraft)=>({id,value:filters.draft[id],...(filters.errors[id]?{error:filters.errors[id]}:{})});
+    return {protocolVersion:1,viewId:filters.viewId,revision:++this.#revision,kind:'form',title:'Filter and sort',fields:[
+      {...field('sort'),kind:'enum',title:'Sort',required:true,options:[{value:'relevance',label:'Relevance'},{value:'name',label:'Name A–Z'},{value:'modified-desc',label:'Newest first'},{value:'size-desc',label:'Largest first'}]},
+      {...field('kind'),kind:'enum',title:'Kind',required:true,options:[{value:'any',label:'Any'},{value:'file',label:'Files'},{value:'directory',label:'Folders'}]},
+      {...field('modifiedFrom'),kind:'date',required:false,title:'Modified from (UTC)',min:'0001-01-01',max:'9999-12-31',description:'Optional inclusive UTC date. Use YYYY-MM-DD; no local timezone or daylight-saving adjustment.'},
+      {...field('modifiedThrough'),kind:'date',required:false,title:'Modified through (UTC)',min:'0001-01-01',max:'9999-12-31',description:'Optional inclusive UTC date. Includes this entire UTC day; use YYYY-MM-DD.'}],
+      submitActionId:APPLY,cancelActionId:CANCEL,actions:[action(APPLY,'Apply filters and sort'),action(CANCEL,'Cancel')],...(this.#copyWarning?{status:this.#copyWarning}:{})};
+  }
+  #applyOptions(options?:FileSearchOptions){
+    const results=this.#results!;this.#invalidateCopy();this.#status=undefined;delete results.status;
+    const selected=this.session.getSnapshot().frames.find(frame=>frame.view.viewId===results.viewId)?.selection;if(selected)results.retainSelection=selected;
+    if(fileSearchOptionsKey(options)===defaultOptionsKey)delete results.options;else results.options={...options!};
+    if(this.#filters)this.session.pop();this.#queueSearch(0);
   }
   #detailView():ViewModel{
     const detail=this.#detail!,row=detail.row,copy=this.#copyModel(row,detail.viewId);
@@ -88,7 +106,7 @@ export class FileSearchController {
       const prior=selected();this.session.update(this.#results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
       // Initial and replacement snapshots can select a new first result.
       if(selected()!==prior)this.session.update(this.#results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
-    }if(this.#detail)this.session.update(this.#detail.viewId,{protocolVersion:1,kind:'snapshot',view:this.#detailView()});}
+    }if(this.#detail)this.session.update(this.#detail.viewId,{protocolVersion:1,kind:'snapshot',view:this.#detailView()});if(this.#filters)this.session.update(this.#filters.viewId,{protocolVersion:1,kind:'snapshot',view:this.#filtersView()});}
   #signature(state:FileSearchState|null,scope:string|null){return JSON.stringify((state?.roots??[]).filter(root=>scope===null||root.id===scope).map(root=>[root.id,root.generation,root.state,root.activity]).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))));}
   #acceptState(raw:unknown){
     const parsed=fileSearchStateSchema.safeParse(raw);if(!parsed.success){this.#status={kind:'error',message:'Folder state could not be read. Refresh folders to try again.'};this.#publish();return false;}
@@ -124,25 +142,25 @@ export class FileSearchController {
     finally{if(this.#load===controller && !controller.signal.aborted){this.#loading=false;this.#publish();}}
   }
   query(viewId:string,query:string){
-    if(!this.#active || this.#detail || this.#results?.viewId!==viewId)return;
+    if(!this.#active || this.#detail || this.#filters || this.#results?.viewId!==viewId)return;
     this.#invalidateCopy();this.#status=undefined;this.#results.query=query;delete this.#results.status;delete this.#results.retainSelection;this.#queueSearch();
   }
   #cancelSearch(){clearTimeout(this.#timer);this.#timer=undefined;this.#search?.abort();this.#search=null;this.#queryGeneration++;}
   #queueSearch(delay=150){
     this.#cancelSearch();const results=this.#results;if(!results)return;
-    if(!results.query.trim()){results.rows=[];results.loading=false;this.#publish();return;}
-    if(!fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:results.query,...(results.rootId?{rootId:results.rootId}:{})}).success){results.rows=[];results.loading=false;results.status={kind:'warning',message:'Keep searches to 512 UTF-8 bytes or fewer.'};this.#publish();return;}
+    if(!results.query.trim()){delete results.retainSelection;results.rows=[];results.loading=false;this.#publish();return;}
+    if(!fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:results.query,...(results.rootId?{rootId:results.rootId}:{}),...(results.options?{options:results.options}:{})}).success){results.rows=[];results.loading=false;results.status={kind:'warning',message:'Keep searches to 512 UTF-8 bytes or fewer.'};this.#publish();return;}
     if(results.rootId && !this.#root(results.rootId)){results.rows=[];results.loading=false;this.#publish();return;}
     results.loading=true;this.#publish();if(this.#busy)return;const generation=this.#queryGeneration;
     this.#timer=setTimeout(()=>{void this.#runSearch(results,generation);},delay);
   }
   async #runSearch(results:Results,generation:number){
     const controller=new AbortController();this.#search=controller;
-    const query=results.query,rootId=results.rootId;
+    const query=results.query,rootId=results.rootId,options=results.options?{...results.options}:undefined,optionsKey=fileSearchOptionsKey(options);
     try{
-      const reply=fileSearchQueryReplySchema.parse(await bounded(this.#api.search({query,...(rootId?{rootId}:{})}),controller.signal));
-      if(!this.#active || controller.signal.aborted || generation!==this.#queryGeneration || this.#results!==results)return;
-      if(!reply.ok || reply.value.query!==query || reply.value.rootId!==rootId || reply.value.results.some(row=>this.#root(row.rootId)?.generation!==row.generation))throw new Error();
+      const reply=fileSearchQueryReplySchema.parse(await bounded(this.#api.search({query,...(rootId?{rootId}:{}),...(options?{options}:{})}),controller.signal));
+      if(!this.#active || controller.signal.aborted || generation!==this.#queryGeneration || this.#results!==results || fileSearchOptionsKey(results.options)!==optionsKey)return;
+      if(!reply.ok || reply.value.query!==query || reply.value.rootId!==rootId || fileSearchOptionsKey(reply.value.options)!==optionsKey || reply.value.results.some(row=>this.#root(row.rootId)?.generation!==row.generation||!fileSearchMatchesOptions(row,options)))throw new Error();
       results.rows=reply.value.results;delete results.status;
     }catch{if(!controller.signal.aborted && this.#results===results){results.rows=[];results.status={kind:'error',message:'Files could not be searched. Refresh folders or change the search to try again.'};}}
     finally{if(!controller.signal.aborted && this.#results===results && generation===this.#queryGeneration){results.loading=false;this.#publish();if(results.retainSelection){if(results.rows.some(row=>row.id===results.retainSelection))this.session.select(results.viewId,results.retainSelection);delete results.retainSelection;this.#publish();}}}
@@ -155,6 +173,19 @@ export class FileSearchController {
   async execute(intent:ActionIntent){
     const top=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || !top || top.view.viewId!==intent.viewId || top.view.revision!==intent.revision || this.#busy || this.#loading)return;
+    if(this.#filters){
+      if(top.view.viewId!==this.#filters.viewId||intent.itemId!==undefined||top.selection!==null||Object.keys(intent).some(key=>!['viewId','revision','actionId','values'].includes(key)))return;
+      if(intent.actionId===CANCEL&&intent.values===undefined){this.session.pop();return;}
+      if(intent.actionId!==APPLY)return;
+      const parsed=parseOptionsDraft(intent.values);if(!parsed.ok){if(parsed.draft){const draft=parsed.draft,prior=this.#filters.draft;this.#filters.draft={sort:parsed.errors.sort?prior.sort:draft.sort,kind:parsed.errors.kind?prior.kind:draft.kind,modifiedFrom:!draft.modifiedFrom?null:parseUtcDate(draft.modifiedFrom)===null?prior.modifiedFrom:draft.modifiedFrom,modifiedThrough:!draft.modifiedThrough?null:parseUtcDate(draft.modifiedThrough)===null?prior.modifiedThrough:draft.modifiedThrough};}this.#filters.errors=parsed.errors;this.#publish();return;}
+      this.#applyOptions(parsed.options);return;
+    }
+    if([FILTER,RESET].includes(intent.actionId)){
+      if(!this.#results||this.#detail||top.view.viewId!==this.#results.viewId||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||intent.itemId!==undefined&&intent.itemId!==top.selection)return;
+      if(intent.actionId===RESET){if(fileSearchOptionsKey(this.#results.options)!==defaultOptionsKey)this.#applyOptions();return;}
+      this.#invalidateCopy();this.#filters={viewId:`file-search-options-${++this.#sequence}`,draft:optionsDraft(this.#results.options),errors:{}};
+      this.session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#results.viewId,view:this.#filtersView()});return;
+    }
     if(intent.actionId===COPY_INDEXED_PATH){
       if(intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
       const context=this.#selectedCopy();if(!context||!this.#currentCopy(context)||(this.#detail?.viewId===top.view.viewId?intent.itemId!==undefined:intent.itemId!==top.selection))return;
@@ -186,6 +217,7 @@ export class FileSearchController {
     finally{if(!controller.signal.aborted && this.#mutation===controller){this.#busy=false;this.#publish();if(this.#results?.loading)this.#queueSearch(0);}}
   }
   #closed(viewId:string){
+    if(viewId===this.#filters?.viewId){this.#filters=null;this.#publish();return;}
     if(viewId===this.#detail?.viewId){this.#invalidateCopy();this.#detail=null;this.#publish();return;}
     if(viewId===this.#results?.viewId){this.#invalidateCopy();this.#cancelSearch();this.#results=null;this.#publish();return;}
     if(viewId===FOLDERS){this.session.navigate({protocolVersion:1,kind:'push',fromViewId:null,view:this.#foldersView()});void this.#close();}

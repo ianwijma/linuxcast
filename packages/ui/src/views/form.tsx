@@ -14,7 +14,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
     return generated;
   };
   useEffect(() => { if (active) formElement.current?.querySelector<HTMLElement>('input, select, button')?.focus(); }, []);
-  const [drafts, setDrafts] = useState<Record<string, { kind: Field['kind']; value: DraftValue; revision: number }>>({});
+  const [drafts, setDrafts] = useState<Record<string, { kind: Field['kind']; value: DraftValue; revision: number; validation: string }>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState(false);
@@ -24,7 +24,10 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
   // Removed or retyped fields cannot retain a credential or incompatible value.
   useEffect(() => { setDrafts(previous => Object.fromEntries(Object.entries(previous).filter(([id, draft]) => view.fields.some(field => field.id === id && field.kind === draft.kind)))); }, [view.fields]);
   const valueOf = (field: Field) => drafts[field.id]?.kind === field.kind ? drafts[field.id]!.value : initial(field);
-  const change = (field: Field, value: DraftValue) => { setDrafts(previous => ({ ...previous, [field.id]: { kind: field.kind, value, revision: view.revision } })); setErrors(previous => ({ ...previous, [field.id]: '' })); onDirty(true); };
+  // Unrelated host revisions (appearance/progress/status) must not revive a
+  // validation error already corrected in this draft. New host values/errors do.
+  const hostError = (field: Field) => field.error && drafts[field.id]?.revision !== view.revision && drafts[field.id]?.validation !== JSON.stringify([initial(field),field.error]) ? field.error : undefined;
+  const change = (field: Field, value: DraftValue) => { setDrafts(previous => ({ ...previous, [field.id]: { kind: field.kind, value, revision: view.revision, validation: JSON.stringify([initial(field),field.error]) } })); setErrors(previous => ({ ...previous, [field.id]: '' })); onDirty(true); };
   const pick = async (field: Extract<Field, { kind: 'file' | 'directory' | 'application' }>) => {
     if (!host.pickReference) return;
     const revision = view.revision; setFailure(false);
@@ -44,7 +47,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
       const value = valueOf(field);
       if (!(field.kind === 'secret' ? uiTextSchema.safeParse(value) : formFieldSchema.safeParse({ ...field, value })).success) invalid[field.id] = 'Enter a valid value within the field limits.';
       if (field.required && (value === null || value === '' || (field.kind === 'boolean' && value === false))) invalid[field.id] = 'Complete this required field.';
-      if (field.error && drafts[field.id]?.revision !== view.revision) invalid[field.id] = field.error;
+      const hostValidation = hostError(field); if (hostValidation) invalid[field.id] = hostValidation;
       if (field.kind === 'number' && value !== null && (typeof value !== 'number' || !Number.isFinite(value) || (field.min !== undefined && value < field.min) || (field.max !== undefined && value > field.max))) invalid[field.id] = 'Enter a number within the allowed range.';
       if (field.kind === 'date' && value && (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || (field.min && value < field.min) || (field.max && value > field.max))) invalid[field.id] = 'Choose a date within the allowed range.';
       if (field.kind === 'enum' && value !== null && !field.options.some(option => option.value === value)) invalid[field.id] = 'Choose an available option.';
@@ -82,7 +85,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
     {view.fields.map(field => {
       const id = fieldId(field.id);
       const value = valueOf(field);
-      const error = (Object.hasOwn(errors, field.id) ? errors[field.id] : undefined) || (drafts[field.id]?.revision !== view.revision ? field.error : undefined);
+      const error = (Object.hasOwn(errors, field.id) ? errors[field.id] : undefined) || hostError(field);
       if (field.kind === 'text' || field.kind === 'secret' || field.kind === 'number') return <TextField key={field.id} id={id} label={field.title} type={field.kind === 'secret' ? 'password' : field.kind === 'number' ? 'number' : 'text'} required={field.required} disabled={busy || view.loading} value={value === null ? '' : String(value)}
         {...(field.description ? { hint: field.description } : {})} {...(error ? { error } : {})} autoComplete="off" maxLength={65536}
         {...(field.kind === 'number' ? { min: field.min, max: field.max, step: 'any' } : {})}

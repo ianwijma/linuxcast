@@ -4,7 +4,7 @@ import type { ElectronApplication,Page } from '@playwright/test';
 import type { FileSearchApi,DataSettingsApi } from '@linuxcast/contracts';
 import AxeBuilder from '@axe-core/playwright';
 import { execFileSync } from 'node:child_process';
-import { existsSync,mkdtempSync,mkdirSync,writeFileSync,symlinkSync,renameSync,rmSync } from 'node:fs';
+import { existsSync,mkdtempSync,mkdirSync,writeFileSync,symlinkSync,renameSync,rmSync,utimesSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname,join,resolve } from 'node:path';
@@ -24,6 +24,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   for(const directory of ['home','profile','config','data','cache','runtime','system','Public documents'])mkdirSync(join(temporary,directory),{mode:0o700});
   const selected=join(temporary,'Public documents'),notes=join(selected,'public-notes.txt');
   writeFileSync(notes,'SYNTHETIC_CONTENT_SENTINEL');writeFileSync(join(selected,'public-summary.txt'),'Public synthetic fixture');writeFileSync(join(selected,'.public-hidden.txt'),'Excluded hidden fixture');symlinkSync('/nonexistent/synthetic',join(selected,'public-link'));
+  utimesSync(notes,new Date('2024-01-01T12:00:00Z'),new Date('2024-01-01T12:00:00Z'));utimesSync(join(selected,'public-summary.txt'),new Date('2024-01-03T12:00:00Z'),new Date('2024-01-03T12:00:00Z'));
   const wrapper=join(temporary,'entry.cjs');
   writeFileSync(wrapper,`const {app}=require('electron');process.argv=process.argv.filter(value=>value!=='--inspect=0'&&value!=='--remote-debugging-port=0');app.setPath('userData',${JSON.stringify(join(temporary,'profile'))});app.setPath('sessionData',${JSON.stringify(join(temporary,'profile'))});require(${JSON.stringify(join(root,'apps/desktop/dist/main.cjs'))});`,{mode:0o600});
   const env:Record<string,string>={HOME:join(temporary,'home'),XDG_DATA_HOME:join(temporary,'data'),XDG_CONFIG_HOME:join(temporary,'config'),XDG_CACHE_HOME:join(temporary,'cache'),XDG_RUNTIME_DIR:join(temporary,'runtime'),XDG_DATA_DIRS:join(temporary,'system'),XDG_CONFIG_DIRS:join(temporary,'config'),XDG_SESSION_TYPE:'x11',DBUS_SESSION_BUS_ADDRESS:'unix:path=/nonexistent-linuxcast-files-bus'};
@@ -63,6 +64,24 @@ it('opens selected-folder search through the real launcher and preserves native 
   await action(files,'Copy path');await expect.poll(clipboardText).toBe(notes);await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
   // Known unsupported session does not write; recovery needs another explicit action.
   await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(files,'Copy path');await expect.poll(()=>files.getByRole('alert').textContent()).toContain('not copied');expect(clipboardText()).toBe(notes);await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe(notes);await action(files,'Copy path');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
+  // Filters use real indexed metadata and the production sole-owner query, never source contents.
+  const late=join(selected,'public-late.txt'),folder=join(selected,'public-folder');writeFileSync(late,'x'.repeat(100));mkdirSync(folder);
+  utimesSync(late,new Date('2024-01-04T12:00:00Z'),new Date('2024-01-04T12:00:00Z'));utimesSync(folder,new Date('2024-01-02T12:00:00Z'),new Date('2024-01-02T12:00:00Z'));
+  await search.fill('public');await expect.poll(()=>files.getByRole('option').count(),{timeout:10000}).toBe(4);
+  await action(files,'Filter and sort');await files.getByRole('heading',{name:'Filter and sort',exact:true}).waitFor();
+  await files.getByLabel('Sort (required)',{exact:true}).selectOption('modified-desc');await files.getByLabel('Kind (required)',{exact:true}).selectOption('file');
+  const from=files.getByLabel('Modified from (UTC)',{exact:true}),through=files.getByLabel('Modified through (UTC)',{exact:true});
+  await from.fill('2024-01-04');await through.fill('2024-01-02');await action(files,'Apply filters and sort');await files.getByText('Choose a through date on or after the from date. Both dates are inclusive UTC dates.',{exact:true}).waitFor();
+  await from.fill('2024-01-02');await through.fill('2024-01-04');
+  const filterEvidence=join(root,'packages/builtins/file-search/evidence');
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>files.locator(`[data-lc-theme="${theme}"]`).count()).toBeGreaterThan(0);expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);await files.screenshot({path:join(filterEvidence,`application-${theme}-filter-form.png`)});}
+  await action(files,'Apply filters and sort');await search.waitFor();await expect.poll(()=>files.getByRole('option').count()).toBe(2);
+  expect(await files.getByRole('option').allTextContents()).toEqual([expect.stringContaining('public-late.txt'),expect.stringContaining('public-summary.txt')]);expect(await search.inputValue()).toBe('public');expect(clipboardText()).toBe(notes);
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>files.locator(`[data-lc-theme="${theme}"]`).count()).toBeGreaterThan(0);expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);await files.screenshot({path:join(filterEvidence,`application-${theme}-filtered-results.png`)});}
+  // Selection remains stable when still present; deliberate copy is required after applying options.
+  await search.press('Home');await search.press('ArrowUp');await action(files,'Copy path');await expect.poll(clipboardText).toBe(late);
+  await action(files,'Filter and sort');await files.getByLabel('Kind (required)',{exact:true}).selectOption('directory');await action(files,'Apply filters and sort');await expect.poll(()=>files.getByRole('option').count()).toBe(1);expect(await files.getByRole('option').textContent()).toContain('public-folder');expect(clipboardText()).toBe(late);
+  await action(files,'Reset filters and sort');await expect.poll(()=>files.getByRole('option').count()).toBe(4);expect(await search.inputValue()).toBe('public');
   await search.fill('SYNTHETIC_CONTENT_SENTINEL');await expect.poll(()=>files.getByRole('option').count()).toBe(0);
   renameSync(notes,join(selected,'public-renamed.txt'));await search.fill('public renamed');await expect.poll(()=>files.getByRole('option').count(),{timeout:10000}).toBe(1);
   await action(files,'Pause indexing');await expect.poll(state).toMatchObject({roots:[{activity:'paused'}]});

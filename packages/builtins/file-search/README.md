@@ -20,7 +20,7 @@ Search folder enters a scoped **Search files** list. **Search all folders** uses
 the same list with no root ID. An empty query shows instructions rather than
 invented recent files. Queries debounce for 150 ms and are bounded to 512 UTF-8
 bytes before reaching the local main/SQLite search API. No remote requests or
-query logging are added. Replies must match the current query/scope and contain
+query logging are added. Replies must match the current query/scope/options and contain
 only current root generations; malformed, stale, hidden or disposed completions
 cannot publish. A newer query cancels prior presentation work even though the
 underlying API has no request-cancellation method.
@@ -59,25 +59,75 @@ feature adds no CSS; `fixtures/preview.css` only lays out the labelled fixture.
 Newly entered list views focus their query once, without focus changes on ordinary
 snapshot revisions.
 
+## Metadata filters and deterministic sort
+
+Results offers **Filter and sort**, a read-only shared Form. It is unavailable
+from Details, so navigation stays Folders → Results → either Form or Details.
+Four fields expose Sort (Relevance, Name A–Z, Newest first, Largest first), Kind
+(Any, Files, Folders), and optional inclusive Modified from/through UTC dates.
+Dates use the shared native date control with 0001-01-01 through 9999-12-31
+bounds. Pure helpers separately reject impossible Gregorian dates, malformed or
+extra values, and reversed ranges without locale parsing or normalization.
+Years below100 are handled explicitly. Through dates become the next UTC day
+exclusive; epoch zero is a valid bound. These are fixed UTC dates, with no local
+timezone or daylight-saving adjustment.
+
+Only **Apply filters and sort** changes applied options. Editing/opening/cancelling
+the Form sends no search, clipboard or remote request. Cancel/Back uses shared
+dirty-draft handling and preserves applied results, query and selection. Apply
+snapshots the options, invalidates pending copy presentation with its existing
+warning, fences prior search generations, pops the Form and immediately requeries
+the same text/root. Reset filters and sort preserves query/root and sends the
+default omitted-options request; it is disabled when already at defaults. Empty
+queries remain instructional and send no search. New Results scopes reset these
+ephemeral options; no filter/date/query history is persisted.
+
+The API passes closed sort names, optional kind and inclusive/exclusive UTC bounds
+to the sole owner. Filtering and deterministic ordering happen before its100-row
+limit. The renderer never filters or sorts an already truncated result set; it
+validates the canonical echoed options and every row's kind/date/root generation,
+and displays the owner's order. Old same-query replies with different options
+cannot publish. Stable selected IDs remain selected when present; only a missing
+ID yields the owner's first row. Concise applied summaries are separate from
+copy, error, paused and unavailable statuses. Index clearing/root changes still
+invalidate metadata and leave worker startup under explicit user control.
+
+The synthetic fixture applies matching/order to its complete public metadata
+before its100-row bound and accurately echoes options. This is labelled component
+evidence, not proof of actual SQLite behavior. Coordinator owner/integration
+checks cover a larger matching dataset and the packaged application separately.
+
 ## Development evidence and limits
 
-- `tests/controller.test.ts`: 26 focused checks for native-selection outcomes,
+- `tests/controller.test.ts`: 44 focused checks for native-selection outcomes,
   request guards, authoritative state, query limits/generations, stable selection,
   readonly details, index clear, appearance, disposal and explicit recovery.
-- `tests/file-search.ui.test.ts`: 12 Chromium keyboard/axe checks for dark/light
+- `tests/options.test.ts`: 31 strict UTC/calendar/draft/summary checks, also passing
+  under UTC and America/New_York host timezones.
+- `tests/file-search.ui.test.ts`: 19 passing Chromium keyboard/axe checks for dark/light
   Folders, Results and Details, native chooser cancellation, empty/indexing,
   pending/unknown/unavailable/error states, index clear and cancelled removal.
-- `evidence/`: 11 screenshots from the explicitly labelled request-observing
+- `evidence/`: 17 component screenshots from the explicitly labelled request-observing
   component fixture. Representative dark Folders/Details/unknown and light Results
   were visually inspected. Fixture paths/names are public generated metadata;
-  no user files, content or credentials enter screenshots or diagnostics.
+  no user files, content or credentials enter screenshots or diagnostics. New dark
+  Form/range-error and light filtered-results screenshots were visually inspected.
 - Verified development runtime: Node 24.22.1 and Bun 1.4.4. Typecheck and lint
   pass. Browser checks require a local fixture server and real Chromium processes.
   These are component checks, not native chooser/indexing or desktop proof.
 
+After coordinator shared-renderer fix `d04566f`, all19 File search browser cases
+and10 Copy path browser regressions pass. Nonempty extension queries now preserve
+the supplied empty-result description, including the applied filter/sort summary.
+The retained regression verifies the summary after index clear and unsent-Form
+cancellation, alongside paused-state remediation. All75 controller/options checks,
+typecheck, scoped lint, plan and diff checks also pass. These remain component
+checks; actual SQLite ordering/filtering and native clipboard evidence belong to
+the coordinator's integration checks.
+
 This increment contributes bounded UI/privacy evidence to L2-02; it does not
-complete the task's content-extraction acceptance criteria. MIME/date filters,
-full sorting/path navigation, recent files, opt-in content extractors and file
+complete the task's content-extraction acceptance criteria. MIME filters,
+path navigation, recent files, opt-in content extractors and remaining file
 actions remain required future work. The coordinator owns actual service/main/
 preload integration and production Electron evidence. Debian GNOME/KDE Wayland/
 X11, native assistive technology and the full release matrix remain pending.
@@ -125,5 +175,31 @@ may have occurred; late replies cannot show success for a different result.
 Main's metadata identity confers no file-open/read authority. Copying uses the
 index location without asserting that the source exists. Actual copy/restart/
 clear evidence and full remaining scope are in ../universal-actions/README.md.
-The full L2-02 content/filter/sort/path-navigation/recent-file acceptance remains
+The full L2-02 content/MIME/path-navigation/recent-file acceptance remains
 unfinished alongside broader native/AT/package/release prerequisites.
+
+## Integrated owner and application evidence (26 October 2026)
+
+Coordinator integration `2b34229` applies fixed SQL ordering and bound kind/date
+constraints before LIMIT100 in the sole SQLite owner. Name uses deterministic
+SQLite NOCASE (ASCII folding), then raw name/path/root ties; it does not claim
+locale-aware collation. A130-row synthetic metadata fixture checks pre-limit
+ordering/filtering, root/current generation scope, epoch0/negative bounds and
+closed-option rejection. Main/preload reject options/row mismatch and fence stale
+same-query pages before Copy path admission.
+
+PASS:99mapped units,4contracts,20security,7integration;17shared Form/session units
+and39affected Chromium keyboard/axe checks. Full typecheck and lint pass.
+The actual production Electron45/private-Xvfb flow (8.56s smoke, not a performance
+gate) exercises invalid/corrected UTC dates across live appearance changes,
+actual kind/date/newest results, explicit native Copy path, directory filtering,
+Reset preserving query and existing watch/clear/removal/restart safety. Only
+native chooser/confirmation choices are instrumented. Four inspected application
+Form/results dark/light captures are `evidence/application-*-filter*.png`.
+
+The shared host preserves extension empty-result instructions and corrected
+validation across unrelated appearance/status revisions. New host values/errors
+still block submission; secure picker/credential/current-view guards remain.
+Independent GPT-6.1 SOL/high final source review is clean. All content/MIME/path
+navigation/recent-file, native/session/AT, dependency and release gaps above
+remain required; no complete L2-02 claim is made.

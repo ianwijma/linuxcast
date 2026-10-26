@@ -1,4 +1,5 @@
 import type Database from 'better-sqlite3';
+import type { FileSearchOptions } from '../../contracts/src/file-search.ts';
 import { MAX_ENVELOPE_BYTES, parseContract } from '../../contracts/src/index.ts';
 import { fileIndexSchemas, rootStateSchema } from './contracts.ts';
 import type { FileIndexMethod, IndexEntry, RootConfig, RootState } from './contracts.ts';
@@ -111,10 +112,22 @@ export function dispatchFileIndex(db: Database.Database, method: FileIndexMethod
         const words = (p.query as string).match(/[\p{L}\p{N}_]+/gu)?.slice(0,32) ?? [];
         if (!words.length) return [];
         const query = words.map(word => `"${word}"*`).join(' AND ');
+        const options=p.options as FileSearchOptions|undefined;
+        // Only fixed fragments selected by the validated enum enter SQL.
+        let order='rank,e.path,e.root_id';
+        switch(options?.sort){
+          case 'name':order='e.name COLLATE NOCASE,e.name,e.path,e.root_id';break;
+          case 'modified-desc':order='e.modified_ms DESC,e.path,e.root_id';break;
+          case 'size-desc':order='e.size DESC,e.path,e.root_id';break;
+        }
         const rows = db.prepare(`SELECT e.*,r.config FROM file_index_fts f JOIN file_index_entries e ON e.rowid=f.rowid
           JOIN file_index_roots r ON r.id=e.root_id WHERE file_index_fts MATCH ?
           AND e.generation=r.generation AND (r.state IN ('ready','degraded') OR (r.state='scanning' AND r.previous_state IN ('ready','degraded')))
-          AND (? IS NULL OR r.id=?) ORDER BY rank,e.path,e.root_id LIMIT ?`).all(query,p.rootId ?? null,p.rootId ?? null,p.limit) as
+          AND (? IS NULL OR r.id=?) AND (? IS NULL OR e.kind=?)
+          AND (? IS NULL OR e.modified_ms>=?) AND (? IS NULL OR e.modified_ms<?)
+          ORDER BY ${order} LIMIT ?`).all(query,p.rootId ?? null,p.rootId ?? null,
+          options?.kind??null,options?.kind??null,options?.modifiedFromMs??null,options?.modifiedFromMs??null,
+          options?.modifiedBeforeMs??null,options?.modifiedBeforeMs??null,p.limit) as
           (IndexEntry & {root_id:string;generation:string;config:string;modified_ms:number})[];
         const candidates=rows.map(row => ({rootId:row.root_id,rootPath:(JSON.parse(row.config) as RootConfig).path,
           id:`${row.root_id}:${row.path}`,generation:row.generation,path:row.path,kind:row.kind,size:row.size,

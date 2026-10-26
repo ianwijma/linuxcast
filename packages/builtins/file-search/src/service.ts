@@ -6,8 +6,8 @@ import {RootIndexer} from '@linuxcast/file-index';
 import type {IndexUpdate,IndexStorage,RootState,ScanProgress} from '@linuxcast/file-index';
 import {fileIndexSchemas,rootConfigSchema} from '@linuxcast/file-index/contracts';
 import type {DataControls} from '@linuxcast/data-controls';
-import {fileSearchResultSchema,fileSearchRootSchema} from '@linuxcast/contracts';
-import type {FileSearchResult,FileSearchState} from '@linuxcast/contracts';
+import {fileSearchMatchesOptions,fileSearchQueryRequestSchema,fileSearchResultSchema,fileSearchRootSchema} from '@linuxcast/contracts';
+import type {FileSearchOptions,FileSearchResult,FileSearchState} from '@linuxcast/contracts';
 
 export class FileSearchUnavailable extends Error {
   readonly reason:'invalid-request'|'root-unavailable'|'storage-unavailable'|'index-unavailable'|'busy'|'stopped';
@@ -21,7 +21,8 @@ export interface FileSearchServiceOptions {
 }
 type Job={rootId:string;cancelled:boolean;phase:'indexing'|'watching'|'unavailable';progress:ScanProgress|null;watching?:boolean;
   ready?:Promise<RootIndexer|undefined>;stopPromise?:Promise<void>;unregister?:()=>void};
-type SearchRequest={query:string;rootId?:string};
+type SearchRequest={query:string;rootId?:string;options?:FileSearchOptions};
+const searchRequestSchema=fileSearchQueryRequestSchema.omit({protocolVersion:true});
 const fail=(reason:FileSearchUnavailable['reason']):never=>{throw new FileSearchUnavailable(reason);};
 const bytes=(value:string)=>Buffer.byteLength(value,'utf8');
 const validId=(value:string)=>fileIndexSchemas['files.roots.remove'].params.safeParse({rootId:value}).success;
@@ -174,18 +175,23 @@ export class FileSearchService {
       return fail('storage-unavailable');
     });
   }
-  async search(input:SearchRequest):Promise<{query:string;rootId:string|null;results:FileSearchResult[]}> {
+  async search(input:SearchRequest):Promise<{query:string;rootId:string|null;options?:FileSearchOptions;results:FileSearchResult[]}> {
     this.alive();
-    if(!input||typeof input!=='object'||Object.keys(input).some(key=>key!=='query'&&key!=='rootId')||typeof input.query!=='string'||bytes(input.query)>512||
-      (input.rootId!==undefined&&!validId(input.rootId)))fail('invalid-request');
-    const request={query:input.query,...(input.rootId===undefined?{}:{rootId:input.rootId})};
+    const parsed=searchRequestSchema.safeParse(input);
+    if(!parsed.success)return fail('invalid-request');
+    // Validate and own the complete request before yielding. Callers can keep
+    // editing their options without changing this operation or its echoed reply.
+    const snapshot=structuredClone(parsed.data);
+    const request={query:snapshot.query,...(snapshot.rootId===undefined?{}:{rootId:snapshot.rootId}),
+      ...(snapshot.options===undefined?{}:{options:snapshot.options})};
+    const reply={query:request.query,rootId:request.rootId??null,...(request.options===undefined?{}:{options:request.options})};
     if(this.searches>=2)fail('busy');
     this.searches++;
     const work=(async()=>{
       await this.tail;this.alive();const revision=this.revision;
       const before=await this.roots();
       if(request.rootId!==undefined&&!before.some(root=>root.config.id===request.rootId))fail('root-unavailable');
-      if(!request.query.trim())return {query:request.query,rootId:request.rootId??null,results:[]};
+      if(!request.query.trim())return {...reply,results:[]};
       const candidates=fileIndexSchemas['files.search'].result.parse(await this.options.repository.request('files.search',{...request,limit:100}));
       const after=await this.roots();this.alive();
       if(this.revision!==revision||JSON.stringify(before)!==JSON.stringify(after))fail('busy');
@@ -193,12 +199,15 @@ export class FileSearchService {
       const results=candidates.map(candidate=>{
         const root=selected.get(candidate.rootId);
         if(!root||candidate.rootPath!==root.config.path||candidate.generation!==root.generation||candidate.id!==`${candidate.rootId}:${candidate.path}`||
-          (request.rootId!==undefined&&request.rootId!==candidate.rootId)||identities.has(candidate.id)||root.state==='idle'||root.state==='unavailable')fail('storage-unavailable');
+          (request.rootId!==undefined&&request.rootId!==candidate.rootId)||identities.has(candidate.id)||root.state==='idle'||root.state==='unavailable'||
+          !fileSearchMatchesOptions(candidate,request.options))fail('storage-unavailable');
         identities.add(candidate.id);
         return fileSearchResultSchema.parse({id:candidate.id,rootId:candidate.rootId,generation:candidate.generation,path:candidate.path,
           kind:candidate.kind,size:candidate.size,modifiedMs:candidate.modifiedMs});
       });
-      return {query:request.query,rootId:request.rootId??null,results};
+      // The owner applies filters and fixed sorting before LIMIT 100. Preserve its
+      // order and reject mismatches; never filter/sort an already limited page.
+      return {...reply,results};
     })().catch(error=>{throw error instanceof FileSearchUnavailable?error:new FileSearchUnavailable('storage-unavailable');});
     // A timed-out owner request retains its concurrency slot until it settles.
     void work.finally(()=>{this.searches--;}).catch(()=>{});

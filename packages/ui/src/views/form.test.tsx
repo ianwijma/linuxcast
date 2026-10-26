@@ -44,6 +44,15 @@ describe('form lifecycle and trusted host boundary', () => {
     expect(screen.getByText('This name is already used.')).toBeTruthy(); submit(); expect(action).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText(/Name/), { target: { value: 'Another name' } }); submit(); await waitFor(() => expect(action).toHaveBeenCalledTimes(1));
   });
+  it('does not revive a corrected host error on an unrelated appearance/status revision', async () => {
+    const action=vi.fn(),host={action},errored={...simple,revision:2,fields:[{...fields[0],value:'Rejected',error:'This name is already used.'}]};
+    const result=render(<ViewForm view={errored} host={host} active onDirty={()=>{}} requestCancel={()=>{}} />);
+    fireEvent.change(screen.getByLabelText(/Name/),{target:{value:'Corrected'}});
+    result.rerender(<ViewForm view={{...errored,revision:3,status:{kind:'info',message:'Updated appearance.'}}} host={host} active onDirty={()=>{}} requestCancel={()=>{}} />);
+    expect(screen.queryByText('This name is already used.')).toBeNull();submit();await waitFor(()=>expect(action).toHaveBeenCalledTimes(1));
+    result.rerender(<ViewForm view={{...errored,revision:4,fields:[{...errored.fields[0]!,value:'Corrected',error:'This corrected name is also used.'}]}} host={host} active onDirty={()=>{}} requestCancel={()=>{}} />);
+    expect(screen.getByText('This corrected name is also used.')).toBeTruthy();submit();expect(action).toHaveBeenCalledTimes(1);
+  });
   it('missing secure storage refuses nonempty secrets without emitting an action', () => {
     const action = vi.fn(); render(<ViewForm view={simple} host={{ action }} active onDirty={() => {}} requestCancel={() => {}} />);
     fireEvent.change(screen.getByLabelText('Credential'), { target: { value: 'synthetic-only' } }); submit(); expect(action).not.toHaveBeenCalled(); expect(screen.getByText(/Secure credential entry is unavailable/)).toBeTruthy();
