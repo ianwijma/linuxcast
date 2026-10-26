@@ -19,6 +19,7 @@ export const workflowRunSnapshotSchema=z.strictObject({
 }).refine(value=>new TextEncoder().encode(JSON.stringify(value)).byteLength<MAX_ENVELOPE_BYTES-4096)
   .refine(value=>(value.effectOutcome!=='unknown'||value.requiresReview)&&(!value.prompt||value.state==='waiting-ui'));
 export const workflowRunStartSchema=z.strictObject({editorRevision:revision,triggerNodeId:nodeId,input:workflowRunInputSchema});
+export const workflowRunCancelSchema=z.strictObject({runId:z.uuid()});
 export const workflowRunDecisionSchema=z.strictObject({runId:z.uuid(),promptId:z.uuid(),decision:z.enum(['once','persistent','deny'])});
 export const workflowRunPermissionResetSchema=z.strictObject({editorRevision:revision});
 export const workflowRunReplySchema=z.union([
@@ -33,7 +34,7 @@ export interface WorkflowRunApi {
   getWorkflowRun():Promise<WorkflowRunReply>;
   startWorkflowRun(input:z.infer<typeof workflowRunStartSchema>):Promise<WorkflowRunReply>;
   decideWorkflowRun(input:z.infer<typeof workflowRunDecisionSchema>):Promise<WorkflowRunReply>;
-  cancelWorkflowRun():Promise<WorkflowRunReply>;
+  cancelWorkflowRun(input:z.infer<typeof workflowRunCancelSchema>):Promise<WorkflowRunReply>;
   resetWorkflowClipboardPermission(input:z.infer<typeof workflowRunPermissionResetSchema>):Promise<WorkflowRunReply>;
   onWorkflowRun(listener:(state:WorkflowRunState)=>void):()=>void;
 }

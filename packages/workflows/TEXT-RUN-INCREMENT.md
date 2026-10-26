@@ -77,7 +77,8 @@ Run, Cancel run, status, last50 step states/durations and a bounded scrollable
 plain-text result (max64KiB). Initial get+subscribe cannot start a run. Maintain
 runId/sequence identity, fence late reads/replies/disposal and never replay on
 mount/navigation. Returning to editor preserves the host run/approval; reopening
-reattaches through get. Native workspace close/Quit cancels the interactive run
+reattaches through get. Public Cancel carries strict {runId}; mismatches cannot cancel a newer run.
+Native workspace close/Quit uses a trusted main-only cancel-current and cancels the interactive run
 before flushing editor. New runs require an explicit action and no active job.
 
 Permission card shows workflow identity and clipboard text/replacement scope,

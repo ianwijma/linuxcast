@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunSnapshotSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
+import { workflowRunCancelSchema,workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunSnapshotSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
 import { createWorkflowDraft } from '../../workflows/src/registry.ts';
 const runId='00000000-0000-4000-8000-000000000001',promptId='00000000-0000-4000-8000-000000000002';
 it('accepts only fresh editor identity, selected entry and transient input as run authority',()=>{
@@ -24,4 +24,9 @@ it('binds worker identity/context to the supplied immutable definition and rejec
   const definition=createWorkflowDraft(),value={protocolVersion:1,type:'start',runId,definition,triggerNodeId:'node-1',input:'Public',context:{runId,workflowId:definition.id,workflowVersion:definition.version,triggerNodeId:'node-1',invocationTime:'2026-10-26T00:00:00.000Z',locale:'en',timezone:'UTC',callChain:[]}};
   expect(workflowWorkerStartSchema.parse(value)).toEqual(value);
   for(const extra of [{command:'eval'},{credentials:{}},{env:{HOME:'/other'}},{context:{...value.context,runId:promptId}}])expect(workflowWorkerStartSchema.safeParse({...value,...extra}).success).toBe(false);
+});
+
+it('requires exact cancellation run identity without current-run authority',()=>{
+  expect(workflowRunCancelSchema.parse({runId})).toEqual({runId});
+  for(const input of [{},{runId:'other'},{runId,all:true}])expect(workflowRunCancelSchema.safeParse(input).success).toBe(false);
 });
