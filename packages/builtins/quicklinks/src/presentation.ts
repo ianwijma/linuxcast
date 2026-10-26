@@ -1,20 +1,23 @@
 import { buildWebSearchUrl,WebSearchBuildError } from '@linuxcast/quicklinks/web-search';
-import { quicklinkSelectionSchema,quicklinkListReplySchema,quicklinkNameSchema,quicklinkTagsSchema,quicklinkUrlSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkOpenReplySchema,shellCommandReplySchema,webSearchParameterSchema,webSearchQuerySchema,WEB_SEARCH_TEMPLATE,MAX_QUICKLINKS } from '@linuxcast/contracts';
+import { quicklinkSelectionSchema,quicklinkListReplySchema,quicklinkNameSchema,quicklinkTagsSchema,quicklinkUrlSchema,quicklinkRecordReplySchema,quicklinkRemoveReplySchema,quicklinkExportReplySchema,quicklinkOpenReplySchema,shellCommandReplySchema,webSearchParameterSchema,webSearchQuerySchema,WEB_SEARCH_TEMPLATE,MAX_QUICKLINKS } from '@linuxcast/contracts';
 import type { QuicklinkSelection,QuicklinkApi,QuicklinkRecord,QuicklinkSummary,QuicklinkSave,QuicklinkWebSearch,ShellCommandReply,ViewModel } from '@linuxcast/contracts';
 import type { ActionIntent,ViewSession } from '@linuxcast/ui/views';
 
-export interface QuicklinksFlowState {metadataUnconfirmed:boolean;openUnconfirmed:boolean}
-export const createQuicklinksFlowState=():QuicklinksFlowState=>({metadataUnconfirmed:false,openUnconfirmed:false});
+export interface QuicklinksFlowState {metadataUnconfirmed:boolean;openUnconfirmed:boolean;exportUnconfirmed:boolean}
+export const createQuicklinksFlowState=():QuicklinksFlowState=>({metadataUnconfirmed:false,openUnconfirmed:false,exportUnconfirmed:false});
 const REVIEW='quicklinks:review-search',OPEN_SEARCH='quicklinks:open-search',EDIT_QUERY='quicklinks:edit-query';
+const EXPORT='quicklinks:export';
 const PIN='quicklinks:pin',UNPIN='quicklinks:unpin',HIDE='quicklinks:hide',SHOW='quicklinks:show',TOGGLE_HIDDEN='quicklinks:toggle-hidden';
 const OPEN='quicklinks:open',EDIT='quicklinks:edit',REMOVE='quicklinks:remove',NEW='quicklinks:new',RELOAD='quicklinks:reload',BACK='quicklinks:back',SAVE='quicklinks:save',CANCEL='quicklinks:cancel';
 const ENTRY_UNAVAILABLE='This saved quicklink changed or is unavailable. Reload quicklinks to choose a current item, or go Back.';
 const METADATA_UNKNOWN='A quicklink change may have happened. Reload quicklinks before saving, removing or opening another quicklink.';
+const EXPORT_DISCLOSURE='Export creates an unencrypted JSON file containing the saved name, full URL, tags and preferences.';
+const EXPORT_UNKNOWN='The export may have completed. Check your files, then reload quicklinks before exporting again.';
 const OPEN_UNKNOWN='The browser handoff outcome is unknown. Check your browser, then reload quicklinks before opening again.';
 type Status={kind:'info'|'warning'|'error';message:string};
 type Search={record:QuicklinkRecord;query:string;review:boolean;target?:string;error?:string;status?:Status;missing?:boolean};
 type Editor={name:string;url:string;type:string;parameter:string;tags:string;tagsError?:string;typeError?:string;parameterError?:string;record:QuicklinkRecord|null;nameError?:string;urlError?:string;status?:Status;needsReload?:boolean;missing?:boolean};
-type Pending={rootQuery:string;rootSelection:string|null;controller:AbortController;kind:'list'|'get'|'save'|'remove'|'open';viewId:string;query:string;selection:string|null;editor:Editor|null;search:Search|null;searchQuery:string|undefined;searchReview:boolean|undefined;searchTarget:string|undefined};
+type Pending={rootQuery:string;rootSelection:string|null;controller:AbortController;kind:'list'|'get'|'save'|'remove'|'open'|'export';viewId:string;query:string;selection:string|null;editor:Editor|null;search:Search|null;searchQuery:string|undefined;searchReview:boolean|undefined;searchTarget:string|undefined};
 /** Saved definitions are metadata; only explicit named API calls can write or
  * open. The retained state object fences unknown effects across Flow instances. */
 export class QuicklinksFlow {
@@ -33,7 +36,7 @@ export class QuicklinksFlow {
   get active(){return !this.#disposed&&this.#listOpen&&this.#session.getSnapshot().frames.some(frame=>frame.view.viewId===this.#listId);}
   owns(viewId:string){return viewId===this.#listId||viewId===this.#editorId||viewId===this.#searchId;}
   open(fromViewId:string,selection?:QuicklinkSelection){if(this.#disposed||this.active)return;const parsed=selection===undefined?null:quicklinkSelectionSchema.safeParse(selection);if(selection!==undefined){this.#records=[];this.#loaded=false;}this.#entry=parsed?.success?parsed.data:null;this.#entryFailed=parsed!==null&&!parsed.success;if(this.#entryFailed)this.#status={kind:'error',message:ENTRY_UNAVAILABLE};this.#showHidden=false;this.#listOpen=this.#session.navigate({protocolVersion:1,kind:'push',fromViewId,view:this.#list()});if(this.active&&!this.#entryFailed)void this.#reload(false);}
-  #warning():Status|undefined{return this.#state.metadataUnconfirmed?{kind:'error',message:METADATA_UNKNOWN}:this.#state.openUnconfirmed?{kind:'error',message:OPEN_UNKNOWN}:undefined;}
+  #warning():Status|undefined{return this.#state.metadataUnconfirmed?{kind:'error',message:METADATA_UNKNOWN}:this.#state.openUnconfirmed?{kind:'error',message:OPEN_UNKNOWN}:this.#state.exportUnconfirmed?{kind:'error',message:EXPORT_UNKNOWN}:undefined;}
   #busy(){return !!(this.#pending||this.#dismissal);}
   #disabled(method:keyof QuicklinkApi,effect:'read'|'write'|'open'){
     if(this.#busy())return 'Wait for the current request to finish.';
@@ -47,14 +50,15 @@ export class QuicklinksFlow {
     const query=this.#query.normalize('NFKC').toLocaleLowerCase('en-US').trim(),tooLong=this.#query.length>512;
     const matches=tooLong?[]:this.#records.filter(record=>(this.#showHidden||!record.hidden)&&query.split(/\s+/u).every(word=>`${record.name} ${record.host} ${(record.tags??[]).join(' ')}`.normalize('NFKC').toLocaleLowerCase('en-US').includes(word))).sort(presentationOrder);
     const rows=matches.slice(0,100),retained=matches.find(record=>record.id===selected);if(retained&&!rows.some(record=>record.id===retained.id))rows[rows.length-1]=retained;rows.sort(presentationOrder);
-    const pendingStatus=this.#pending?{kind:'info' as const,message:this.#pending.kind==='open'?'Handing quicklink to the browser…':this.#pending.kind==='remove'?'Waiting for removal confirmation…':this.#pending.kind==='save'?'Saving quicklink…':this.#pending.kind==='get'?'Loading quicklink…':'Loading quicklinks…'}:undefined;
-    const status=tooLong?{kind:'warning' as const,message:'Keep searches to 512 characters or fewer.'}:pendingStatus??this.#status??this.#warning()??(!this.#api.listQuicklinks?{kind:'error' as const,message:'Saved quicklinks are unavailable. Reopen Linuxcast to reconnect.'}:undefined);
+    const pendingStatus=this.#pending?{kind:'info' as const,message:this.#pending.kind==='open'?'Handing quicklink to the browser…':this.#pending.kind==='export'?'Exporting quicklink… Choose a file in the native dialog.':this.#pending.kind==='remove'?'Waiting for removal confirmation…':this.#pending.kind==='save'?'Saving quicklink…':this.#pending.kind==='get'?'Loading quicklink…':'Loading quicklinks…'}:undefined;
+    const status=tooLong?{kind:'warning' as const,message:'Keep searches to 512 characters or fewer.'}:pendingStatus??this.#status??this.#warning()??(!this.#api.listQuicklinks?{kind:'error' as const,message:'Saved quicklinks are unavailable. Reopen Linuxcast to reconnect.'}:rows.length?{kind:'info' as const,message:EXPORT_DISCLOSURE}:undefined);
     return {protocolVersion:1,viewId:this.#listId,revision:++this.#viewRevision,kind:'list',title:'Quicklinks',loading:this.#busy(),...(this.#entry&&rows.some(row=>row.id===this.#entry!.id)?{selectedId:this.#entry.id}:{}),search:{query:this.#query,placeholder:'Search saved names, hosts and tags…',mode:'extension'},
       sections:[{id:'saved',title:'Saved quicklinks · Up to 100 matches; refine your search',items:rows.map(record=>({id:record.id,title:record.name,subtitle:record.host,...((record.webSearch||record.tags?.length||record.pinned||record.hidden)?{accessories:[...(record.pinned?[{text:'Pinned'}]:[]),...(record.hidden?[{text:'Hidden'}]:[]),...(record.webSearch?[{text:'Web search'}]:[]),...(record.tags??[]).map(text=>({text}))]}:{}),icon:{kind:'builtin' as const,name:'link'},actions:[
         {id:OPEN,title:record.webSearch?'Open web search':'Open quicklink',kind:'invoke' as const,effect:record.webSearch?'read' as const:'write' as const,...reason(record.hidden?'Show this quicklink before opening it.':this.#disabled(record.webSearch?'getQuicklink':'openQuicklink','open'))},
         {id:EDIT,title:'Edit quicklink',kind:'invoke' as const,effect:'read' as const,...reason(this.#disabled('getQuicklink','read'))},
         {id:record.pinned?UNPIN:PIN,title:record.pinned?'Unpin quicklink':'Pin quicklink',kind:'invoke' as const,effect:'write' as const,...reason(this.#presentationDisabled())},
         {id:record.hidden?SHOW:HIDE,title:record.hidden?'Show quicklink':'Hide quicklink',kind:'invoke' as const,effect:'write' as const,...reason(this.#presentationDisabled())},
+        {id:EXPORT,title:'Export quicklink (unencrypted JSON)',kind:'invoke' as const,effect:'write' as const,...reason(this.#exportDisabled())},
         {id:REMOVE,title:'Remove quicklink',kind:'invoke' as const,effect:'destructive' as const,...reason(this.#disabled('removeQuicklink','write'))},
       ]}))}],empty:{title:this.#pending?'Loading quicklinks…':this.#loaded?'No quicklinks yet':'Quicklinks unavailable',description:this.#entryFailed?'Reload the saved list to choose an item manually, or go Back.':`Create a named HTTP or HTTPS quicklink. ${this.#showHidden?'Hidden quicklinks are included; show a link before opening it.':'Hidden quicklinks are excluded; use Show hidden Quicklinks in Actions to recover them.'} Search stays local; at most 100 matches are shown. Opening requires an explicit action.`},...(status?{status}:{}),
       actions:this.#entryFailed?[{id:RELOAD,title:'Reload quicklinks',kind:'invoke',effect:'read',...reason(this.#disabled('listQuicklinks','read'))},{id:BACK,title:'Back',kind:'invoke',effect:'read'}]:[{id:NEW,title:'New quicklink',kind:'invoke',effect:'read',...reason(this.#busy()?'Wait for the current request to finish.':!this.#api.saveQuicklink||!this.#api.listQuicklinks?'Saving quicklinks is unavailable. Reopen Linuxcast to reconnect.':this.#records.length>=MAX_QUICKLINKS?'500 quicklinks are saved. Remove one before creating another.':undefined)},
@@ -96,7 +100,7 @@ export class QuicklinksFlow {
   }
   #context(pending:Pending){const frames=this.#session.getSnapshot().frames,list=frames.find(frame=>frame.view.viewId===this.#listId);return this.active&&frames[0]?.query===pending.rootQuery&&frames[0]?.selection===pending.rootSelection&&frames.at(-1)?.view.viewId===pending.viewId&&list?.query===pending.query&&list.selection===pending.selection&&this.#editor===pending.editor&&this.#search===pending.search&&this.#search?.query===pending.searchQuery&&this.#search?.review===pending.searchReview&&this.#search?.target===pending.searchTarget;}
   #current(pending:Pending){return this.#pending===pending&&!pending.controller.signal.aborted&&this.#context(pending);}
-  #unknown(kind:Pending['kind']){if(kind==='save'||kind==='remove'){this.#state.metadataUnconfirmed=true;this.#status={kind:'error',message:METADATA_UNKNOWN};}else if(kind==='open'){this.#state.openUnconfirmed=true;this.#status={kind:'error',message:OPEN_UNKNOWN};}const warning=this.#warning();if(this.#editor&&warning)this.#editor.status=warning;if(this.#search&&warning)this.#search.status=warning;}
+  #unknown(kind:Pending['kind']){if(kind==='save'||kind==='remove'){this.#state.metadataUnconfirmed=true;this.#status={kind:'error',message:METADATA_UNKNOWN};}else if(kind==='open'){this.#state.openUnconfirmed=true;this.#status={kind:'error',message:OPEN_UNKNOWN};}else if(kind==='export'){this.#state.exportUnconfirmed=true;this.#status={kind:'error',message:EXPORT_UNKNOWN};}const warning=this.#warning();if(this.#editor&&warning)this.#editor.status=warning;if(this.#search&&warning)this.#search.status=warning;}
   #invalidate(){const pending=this.#pending;if(!pending)return;this.#pending=null;if(this.#entry){this.#entry=null;this.#entryFailed=true;this.#status={kind:'error',message:ENTRY_UNAVAILABLE};}this.#unknown(pending.kind);pending.controller.abort();this.#publish();}
   #finish(pending:Pending){if(this.#pending===pending){this.#pending=null;this.#publish();}}
   async #readList(pending:Pending){const raw=await bounded(this.#api.listQuicklinks!(),pending.controller.signal),reply=quicklinkListReplySchema.parse(raw);if(!reply.ok)throw new Error('Read unavailable.');if(reply.value.records.some((record,index)=>!sameTags(record.tags,(raw as {value:{records:QuicklinkSummary[]}}).value.records[index]?.tags)))throw new Error('Noncanonical tags.');return reply.value.records;}
@@ -106,7 +110,7 @@ export class QuicklinksFlow {
     try{const records=await this.#readList(pending);let fresh:QuicklinkRecord|null=null;const editor=this.#editor,search=this.#search,recordId=editor?.record?.id??search?.record.id,summary=recordId?records.find(record=>record.id===recordId):undefined;
       if(summary){if(!this.#api.getQuicklink)throw new Error();fresh=await this.#readRecord(pending,summary);}
       if(!this.#current(pending))return;if(this.#entry&&!records.some(record=>record.id===this.#entry!.id&&record.revision===this.#entry!.revision&&!record.hidden))throw new Error('Entry unavailable.');this.#pending=null;this.#records=records;this.#loaded=true;
-      if(explicit){this.#state.metadataUnconfirmed=false;this.#state.openUnconfirmed=false;this.#status=undefined;if(editor){editor.record=fresh??editor.record;editor.missing=!!editor.record&&!summary;delete editor.nameError;delete editor.urlError;delete editor.needsReload;delete editor.typeError;delete editor.parameterError;delete editor.tagsError;editor.status={kind:editor.missing?'error':'info',message:editor.missing?'This quicklink no longer exists. Cancel, then create a new quicklink.':'Stored quicklinks reloaded. Your draft is retained; review it before saving.'};}if(search){if(fresh)search.record=fresh;search.review=false;delete search.target;delete search.error;search.missing=!fresh?.webSearch;search.status={kind:search.missing?'error':'info',message:search.missing?'This definition is no longer a saved web search. Cancel and reopen it from Quicklinks.':'Stored definitions reloaded. Your query is retained; review it again before opening.'};}}
+      if(explicit){this.#state.metadataUnconfirmed=false;this.#state.openUnconfirmed=false;this.#state.exportUnconfirmed=false;this.#status=undefined;if(editor){editor.record=fresh??editor.record;editor.missing=!!editor.record&&!summary;delete editor.nameError;delete editor.urlError;delete editor.needsReload;delete editor.typeError;delete editor.parameterError;delete editor.tagsError;editor.status={kind:editor.missing?'error':'info',message:editor.missing?'This quicklink no longer exists. Cancel, then create a new quicklink.':'Stored quicklinks reloaded. Your draft is retained; review it before saving.'};}if(search){if(fresh)search.record=fresh;search.review=false;delete search.target;delete search.error;search.missing=!fresh?.webSearch;search.status={kind:search.missing?'error':'info',message:search.missing?'This definition is no longer a saved web search. Cancel and reopen it from Quicklinks.':'Stored definitions reloaded. Your query is retained; review it again before opening.'};}}
       this.#publish();this.#entry=null;
     }catch{if(this.#current(pending)){if(this.#entry){this.#entry=null;this.#entryFailed=true;this.#records=[];this.#loaded=false;}const status:Status={kind:'error',message:this.#entryFailed?ENTRY_UNAVAILABLE:'Quicklinks could not be loaded. Reload quicklinks or reopen Linuxcast to reconnect.'};if(this.#editor)this.#editor.status=status;else if(this.#search)this.#search.status=status;else this.#status=status;}}
     finally{this.#finish(pending);}
@@ -131,6 +135,7 @@ export class QuicklinksFlow {
     if(intent.actionId===EDIT&&this.#api.getQuicklink){await this.#edit(summary);return;}
     if(intent.actionId===OPEN&&!summary.hidden&&!this.#disabled(summary.webSearch?'getQuicklink':'openQuicklink','open')){if(summary.webSearch)await this.#edit(summary,true);else await this.#openLink(summary);return;}
     if((intent.actionId===(summary.pinned?UNPIN:PIN)||intent.actionId===(summary.hidden?SHOW:HIDE))&&!this.#presentationDisabled()){await this.#changePresentation(summary,intent.actionId===PIN||intent.actionId===UNPIN?'pinned':'hidden');return;}
+    if(intent.actionId===EXPORT&&!this.#exportDisabled()){await this.#export(summary);return;}
     if(intent.actionId===REMOVE&&!this.#disabled('removeQuicklink','write'))await this.#remove(summary);
   }
   async #edit(summary:QuicklinkSummary,forSearch=false){const pending=this.#begin('get');try{const record=await this.#readRecord(pending,summary);if(!this.#current(pending))return;this.#pending=null;if(forSearch){if(!record.webSearch)throw new Error();this.#search={record,query:'',review:false};this.#session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#listId,view:this.#searchView()});}else{this.#editor={name:record.name,url:record.url,type:record.webSearch?'search':'literal',parameter:record.webSearch?.queryParameter??'',tags:(record.tags??[]).join(', '),record};this.#session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#listId,view:this.#form()});}}catch{if(this.#current(pending))this.#status={kind:'error',message:'This quicklink could not be loaded. Reload quicklinks and select it again.'};}finally{this.#finish(pending);}}
@@ -173,6 +178,19 @@ export class QuicklinksFlow {
       const records=await this.#readList(pending);this.#checkAfterMutation(records,record);if(!this.#current(pending))return;
       this.#pending=null;this.#records=records;this.#loaded=true;this.#publish();
     }catch{if(this.#current(pending)){if(pending.kind==='save')this.#unknown('save');else this.#status={kind:'error',message:'This quicklink could not be loaded. Reload quicklinks and select it again.'};}}finally{this.#finish(pending);}
+  }
+  #exportDisabled(){return this.#disabled('exportQuicklink','write')??(!this.#api.getQuicklink?'This Quicklinks capability is unavailable. Reopen Linuxcast to reconnect.':this.#state.exportUnconfirmed?EXPORT_UNKNOWN:undefined);}
+  async #export(summary:QuicklinkSummary){
+    const pending=this.#begin('get');try{
+      const record=await this.#readRecord(pending,summary);if(!this.#current(pending))return;
+      pending.kind='export';this.#publish();if(!this.#current(pending))return;
+      // A native chooser may await human choice indefinitely. Back invalidates
+      // presentation; it cannot undo a publication already requested in main.
+      const reply=quicklinkExportReplySchema.parse(await bounded(this.#api.exportQuicklink!({id:record.id,revision:record.revision}),pending.controller.signal,false));if(!this.#current(pending))return;
+      if(!reply.ok){if(['conflict','invalid-request','capability-unavailable','permission-denied'].includes(reply.error.code)){this.#status={kind:'error',message:'The quicklink was not exported. Reload quicklinks to check its current version, or reopen Linuxcast to reconnect.'};return;}throw new Error();}
+      if(reply.value.id!==record.id||reply.value.revision!==record.revision)throw new Error('Unconfirmed export.');
+      this.#status={kind:'info',message:reply.value.outcome==='cancelled'?'Quicklink export cancelled.':'Quicklink exported as unencrypted JSON. The file contains its saved name, full URL, tags and preferences.'};
+    }catch{if(this.#current(pending)){if(pending.kind==='export')this.#unknown('export');else this.#status={kind:'error',message:'This quicklink could not be loaded. Reload quicklinks and select it again.'};}}finally{this.#finish(pending);}
   }
   async #remove(summary:QuicklinkSummary){const pending=this.#begin('remove');try{
       // Native confirmation awaits a human; navigation still invalidates this

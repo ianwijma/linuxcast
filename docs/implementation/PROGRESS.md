@@ -15,7 +15,10 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop e5da4f8566f906dd1b52eb5d2928ae8adc723e13, merged PR46.
+Primary clean develop3a42f931c71cac1bc92fe248ad97bf23c112c67d, merged PR47.
+Exact signed reviewed head820b812, CI40420425561 validate passed12s; no requested
+GitHub reviews/submissions/comments/threads. Normal exact-head merge, primary
+frozen install/build66assets pass. No open PRs remain. Prior PR46 e5da4f8:
 Normal exact-head236d305 merge, CI40418427340 validate passed15s; no requested
 GitHub reviews/submissions/comments/threads. Independent reviews clean; primary
 frozen install and production build66assets pass. Pin/hide evidence below.
@@ -77,21 +80,51 @@ PASS245L2units/13contracts/39security/41integration(actual9.24s),214L1units/
 new captures independently clean. Typecheck/scopedlint/plan/diff pass. Initial
 production run hit60s testdeadline; bounded5s locators+enabled-row readiness pass
 standalone9.08s/finalmapped9.24s. No broader cause inferred. Exact author/integrated
-UI trees reconcile. Evidence quicklink-launcher-application.md. No live handles.
+UI trees reconcile. Evidence quicklink-launcher-application.md. No live test handles.
 
-Next: sign evidence/registry, create+attach focused PR, exact-head CI/GitHub
-review/threads, normal merge, primary frozen install/build. Then next bounded
-application flow automatically; no foundation/research/proof expansion.
+PR47 https://github.com/ianwijma/linuxcast/pull/47 merged as above.
+
+## Current bounded application increment: selected Quicklink export
+
+Root reused worktree, branch `codex/quicklink-export` from3a42f93. Public optional
+exportQuicklink selection-only API and EXPORT-INCREMENT.md frozen for UI work.
+Explicit action/native file chooser→fresh exact definition→existing exclusive
+safe JSON writer. Plaintext interoperability file clearly labelled; no browser/
+copy/usage/definition mutation. One selected literal/search/recovered hidden row.
+No bulk/import/package execution/new dependency/migration/service/research/proof.
+Root source complete and independently reviewed: boundary edfef0f, necessary
+shared composing-action guard6dd38a6, UI1066541(authorf390256), actualedbb00e.
+Explicit selection-only native chooser export, fresh full definition/frame/parent/
+revision rechecks, private0600/exclusive native JSON and exact receipt/unknown/
+manualReload. No browser/copy/Hide/definition/use effects. No new dependency,
+migration/process/research/proof; bulk/import not an added scope requirement.
+
+PASS272L2units/14contracts/45security/41integration(actual10.93s),70targeted
+boundary/preload/writer checks,17D1units/11D1Chromium. Author198presentation/
+44Chromium keyboard+axe pass including reproduced-then-fixed composing Export
+regression. Actual cancel/no file, exact JSON0600, existing-file refusal/unknown/
+Reload, hidden flags/tags and search transient-query exclusion pass. Ninecomponent/
+fouractual captures independently clean; type/scopedlint/plan/diff pass. UI code/
+tests/captures exactauthor; README onlyscopeclarification. No live test handles.
+Evidence apps/desktop/evidence/quicklink-export-application.md. Chooser choices
+instrumented; full task/nativeAT/session/performance/release remains pending.
+
+Next sign final evidence, create+attach focused PR, inspect exact-head CI/reviews/
+threads, normal merge and primary frozen install/build; immediately select next
+bounded required application flow. Complete1.0 and security scope unchanged.
 
 ## Agents
 
-- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-launcher-ui`, signed5669223 integratedb58fcc4; clean,
-  bounded root-entry source assignment complete. Prior signed a43b0a7/1f8f77a integrated in PR46.
-- alias_review_sol: exact-tree source/test and nine component/six actual captures
-  reviewed clean; P2 reentrant Save finding closed.
+- manifest_review_sol: `.worktrees/linuxcast-l1-01`, branch
+  `codex/l2-05-quicklink-export-ui` from e652512, root edfef0f cherry-picked as
+  0fda0ce and shared6dd38a6 as52be188; signedf390256 integrated1066541, clean.
+  Prior signed5669223 integratedb58fcc4 in merged PR47. Prior signed a43b0a7/1f8f77a integrated in PR46.
+- alias_review_sol: current export UI draft + shared IME guard reviewed clean;
+  finalf390256/nine component/four actual captures independently clean. Prior root-entry exact trees and
+  affected six component/two actual captures clean.
 - file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
-  boundary independently reviewed clean; root saved-entry/search boundary clean after two fixes.
+  boundary and saved-entry/search clean; current export edfef0f reviewed clean.
+  No new task assigned.
 
 ## Acceptance and runtime
 

@@ -48,6 +48,7 @@ function ActionPanel({ actions, invoke, close, host }: { actions: ActionModel[];
     position(); window.addEventListener('resize', position); return () => window.removeEventListener('resize', position);
   }, [query]);
   const keys = (event: KeyboardEvent) => {
+    if (event.nativeEvent.isComposing) return;
     event.stopPropagation();
     if (event.key === 'Escape') { event.preventDefault(); close(); return; }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

@@ -203,6 +203,54 @@ merge/fallback/AI, saved-entry frecency/shortcuts, remaining placeholder/target/
 export behavior, native desktop/AT and release acceptance remain pending. Neither
 full task is complete.
 
+## Export one selected Quicklink
+
+The dedicated List provides **Export quicklink (unencrypted JSON)** with an
+accessible plain disclosure: the file contains the saved name, full URL, tags
+and preferences and is not encrypted. Only an explicit selected-row action
+fresh-loads the exact definition and calls optional `exportQuicklink` with its
+ID/revision. Shown literal/search definitions and recovered hidden rows can be
+exported; exporting never opens them or invokes a search argument form. Root
+saved entries remain Open-only.
+
+Only an exact identity/version and `exported` receipt shows a publication result.
+An exact `cancelled` receipt says export cancelled. Fixed known failure messages
+expose Reload/reopen remediation without raw details. Malformed, mismatched,
+rejected or late receipts set retained `exportUnconfirmed`: check files, then
+explicitly Reload before another Export. Automatic reopening/loading cannot
+clear it. Export uncertainty alone does not block browser Open or unrelated
+saved edits; existing metadata uncertainty does block Export.
+
+Fresh Get is bounded to five seconds. The native file chooser has no presentation
+human-response deadline. Pending Export disables duplicates and conflicting
+actions. Query/selection/origin changes, Back, Hide and disposal invalidate late
+presentation without claiming to undo an already requested publication. The
+post-pending-publication guard checks current context before invoking the API.
+No path, JSON body, target URL or query is sent by the renderer. Export does not
+Save/remove a definition, count a use, navigate, copy, open a browser or hide the
+launcher. No automatic replay occurs after Reload.
+
+This increment adds 27 controller cases and seven Chromium keyboard/axe cases
+to the retained 171/37 baseline. Nine new public captures named
+`evidence/*-quicklinks-export-*` cover dark/light disclosure, success, cancelled
+and unknown states plus pending disabled actions. Tests cover fresh Get/selection
+only authority, literal/search/hidden definitions, missing capability, known
+failure, exact/malformed receipts, retained uncertainty, native human wait,
+synchronous publication and late/hidden/disposed contexts, held Enter and IME.
+Fixture exports are labelled request observations and create no real files.
+Typecheck, scoped ESLint, plan and diff checks pass on Linux x64 with pinned
+Node24.22.1/Bun1.4.4. Actual native chooser, safe JSON publication, file permissions,
+existing-file refusal and production lifecycle checks are coordinator-owned;
+shared main/preload prerequisite edfef0f is separate from the owned UI commit.
+The composing-Enter regression reproduced an ActionPanel invocation defect before
+the separate shared guard 6dd38a6; all 44 cases pass with that guard.
+
+This is partial L2-05 UI/PRIVACY evidence, retaining existing AC01/AC02 encoding
+and unsupported-placeholder regressions. It is one explicitly plaintext native
+interoperability export, not bulk export/import or an encrypted portable backup.
+Full templates/context/targets, saved-entry frecency/shortcuts, native desktop/AT,
+performance and release acceptance remain pending; L2-05 is not complete.
+
 Design sections: Shell/navigation; Results/actions; List/Grid/Detail/Form;
 States/motion; Accessibility; Review gate. Existing tokens, fonts, neutral rows,
 focus, disabled reasons and action affordances are reused. Fixture CSS changes
@@ -210,10 +258,10 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 171 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 198 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
-- `tests/quicklinks.ui.test.ts`: 37 real Chromium keyboard/axe cases, including
+- `tests/quicklinks.ui.test.ts`: 44 real Chromium keyboard/axe cases, including
   dirty cancel/focus, CRUD request observation, pending/late replies, explicit
   recovery, later identities, unavailable capabilities, typed definitions, local
   previews, exact argument/configuration receipts and held Enter. The 54 original
@@ -253,7 +301,7 @@ AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establi
 the complete placeholder feature. Actual coordinator persistence/dispatch evidence
 is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
 typed URL components, browser/
-open-with/file/registered-URI targets and native export remain
-required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
+open-with/file/registered-URI targets remain required. Bulk export/import is
+outside this increment; no import behaviour is implemented. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
 technology and release acceptance remain pending. This slice does not complete
 L2-05 or reduce the agreed 1.0 scope.
