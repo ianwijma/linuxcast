@@ -3,7 +3,7 @@ import {
 } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellApi } from '../../../../packages/contracts/src/desktop-shell.ts';
 import { calculatorCopyRequestSchema,calculatorCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
-import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherVisibilityRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema } from '../../../../packages/contracts/src/launcher.ts';
+import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherVisibilityRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema,launcherApplicationActionRequestSchema,launcherApplicationActionReplySchema } from '../../../../packages/contracts/src/launcher.ts';
 
 /** Private adapter, never exposed across contextBridge. No Electron event crosses it. */
 export interface ShellTransport {
@@ -23,6 +23,15 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    executeApplicationAction:async(request:Parameters<NonNullable<DesktopShellApi['executeApplicationAction']>>[0])=>{
+      try{
+        const parsed=launcherApplicationActionRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;
+        const value=await transport.invoke(LAUNCHER_CHANNELS.applicationAction,parsed.data);
+        if(new TextEncoder().encode(JSON.stringify(value)).length>MAX_ENVELOPE_BYTES)return unavailable;
+        const result=launcherApplicationActionReplySchema.safeParse(value);
+        return result.success&&(!result.data.ok||result.data.value.actionId===parsed.data.actionId)?result.data:unavailable;
+      }catch{return unavailable;}
+    },
     setLauncherHidden:async(request:Parameters<NonNullable<DesktopShellApi['setLauncherHidden']>>[0])=>{
       try{
         const parsed=launcherVisibilityRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;

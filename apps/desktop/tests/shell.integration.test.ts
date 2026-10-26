@@ -33,20 +33,27 @@ it('runs the bundled isolated shell, rejects renderer privileges and preserves r
   const profile = join(temporary, 'profile'), wrapper = join(temporary, 'entry.cjs');
   for (const name of ['profile', 'home', 'config', 'cache', 'data', 'runtime', 'system']) mkdirSync(join(temporary, name), { mode: 0o700 });
   mkdirSync(join(temporary,'data/applications'),{recursive:true,mode:0o700});
-  const launchMarker=join(temporary,'application-launch.json'),applicationTarget=join(temporary,'fixture executable with spaces');
+  const launchMarker=join(temporary,'application-launch.json'),actionMarker=join(temporary,'application-action.json'),applicationTarget=join(temporary,'fixture executable with spaces');
   writeFileSync(applicationTarget,`#!/usr/bin/python3
 import json,sys
-with open(${JSON.stringify(launchMarker)},'w',encoding='utf-8') as output:
+marker=${JSON.stringify(actionMarker)} if sys.argv[1:2]==['--new-window'] else ${JSON.stringify(launchMarker)}
+with open(marker,'w',encoding='utf-8') as output:
  json.dump({'argv':sys.argv[1:],'stdin':sys.stdin.read()},output)
 print('SYNTHETIC_CHILD_STDOUT')
 print('SYNTHETIC_CHILD_STDERR',file=sys.stderr)
 `,{mode:0o700});
-  writeFileSync(join(temporary,'data/applications/public-fixture.desktop'),`[Desktop Entry]
+  const applicationEntry=join(temporary,'data/applications/public-fixture.desktop');
+  const applicationDesktop=`[Desktop Entry]
 Type=Application
 Name=Public fixture app
 Comment=Public synthetic application
 Exec="${applicationTarget}" "two words" "literal;$(no-shell)" %c %% %f %u
-`,{mode:0o600});
+Actions=NewWindow;
+[Desktop Action NewWindow]
+Name=New window
+Exec="${applicationTarget}" --new-window "two words" "literal;$(no-shell)"
+`;
+  writeFileSync(applicationEntry,applicationDesktop,{mode:0o600});
   const urlMarker=join(temporary,'url-handoff.json'),urlTarget=join(temporary,'public browser handler with spaces');
   writeFileSync(urlTarget,`#!/usr/bin/python3
 import json,sys
@@ -95,6 +102,30 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
   expect(await showExisting()).toBe(0);
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
+  // The declared action is distinct from primary Open. A change to action Exec
+  // alone invalidates the old fingerprint and cannot run with a stale selection.
+  await query.fill('Public fixture app');await expect.poll(()=>page.getByRole('option').count()).toBe(1);
+  expect(existsSync(actionMarker)).toBe(false);
+  writeFileSync(applicationEntry,applicationDesktop.replace('--new-window "two words"','--new-window "updated two words"'),{mode:0o600});
+  await query.press('Control+k');const appActions=page.getByRole('searchbox',{name:'Find an action'});await appActions.fill('New window');await appActions.press('Enter');
+  await expect.poll(()=>page.getByRole('alert').textContent()).toContain('The application action was not requested.');expect(existsSync(actionMarker)).toBe(false);
+  await query.press('Control+k');await appActions.fill('Reload commands');await appActions.press('Enter');
+  await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Public fixture app');
+  await query.press('Control+k');await appActions.fill('New window');
+  // A single filtered action must fit the compact production window without
+  // clipping its separate Close button inside the popup's scrollport.
+  const menuGeometry=await page.getByRole('dialog',{name:'Actions',exact:true}).evaluate(element=>({scroll:element.scrollHeight,client:element.clientHeight,height:element.getBoundingClientRect().height,viewport:window.innerHeight,list:element.querySelector('.lc-action-list')?.getBoundingClientRect().height,field:element.querySelector('.lc-field')?.getBoundingClientRect().height,close:element.querySelector('button:last-child')?.getBoundingClientRect().height}));
+  expect(menuGeometry.scroll,JSON.stringify(menuGeometry)).toBeLessThanOrEqual(menuGeometry.client);
+  const actionEvidence=join(root,'apps/desktop/evidence');mkdirSync(actionEvidence,{recursive:true});
+  for(const theme of ['dark','light'] as const){
+    await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
+    await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
+    await page.screenshot({path:join(actionEvidence,`application-action-${theme}.png`)});expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);
+  }
+  expect(existsSync(actionMarker)).toBe(false);await appActions.press('Enter');
+  await expect.poll(async()=>{try{return JSON.parse(await readFile(actionMarker,'utf8'));}catch{return null;}}).toEqual({argv:['--new-window','updated two words','literal;$(no-shell)'],stdin:''});
+  await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
+  expect(await showExisting()).toBe(0);await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
   // A URL query offers a local command. Only explicit Form submission reaches GIO.
   const publicUrl='https://example.invalid/search?q=%24%28touch%20NO_SHELL%29%3B%20%22two%20words%22#public';
   await query.fill(publicUrl);await expect.poll(()=>page.getByRole('option').count()).toBe(1);
@@ -183,7 +214,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['copyCalculatorResult', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherHidden', 'setLauncherPinned'],
+    methods: ['copyCalculatorResult', 'executeApplicationAction', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherHidden', 'setLauncherPinned'],
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {
@@ -210,7 +241,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await page.getByRole('textbox',{name:'Search alias',exact:true}).fill('public-application');await page.getByRole('button',{name:'Save alias',exact:true}).click();await query.waitFor();
   await query.fill('public-application');await expect.poll(()=>page.getByRole('option').count()).toBe(1);
   const applicationMetadata=await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):undefined;});
-  expect(applicationMetadata?.usage).toMatchObject({pinned:true,alias:'public-application',useCount:1});
+  expect(applicationMetadata?.usage).toMatchObject({pinned:true,alias:'public-application',useCount:2});
   await action(page,'Hide command');await expect.poll(()=>page.getByRole('option').count()).toBe(0);
   await action(page,'Manage commands');const managed=page.getByRole('searchbox',{name:'Manage commands',exact:true});await managed.fill('public-application');
   await expect.poll(()=>page.getByRole('option').count()).toBe(1);await expect.poll(()=>page.getByRole('option').textContent()).toContain('Hidden');
@@ -260,7 +291,8 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   const before=JSON.parse(await readFile(exportFile,'utf8'));
   expect(before).toMatchObject({encrypted:false,data:{category:'command-usage'}});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
-  expect(before.data.records.find((record:{commandId:string})=>record.commandId.startsWith('application:'))).toMatchObject({useCount:1});
+  expect(before.data.records.find((record:{commandId:string})=>record.commandId.startsWith('application:'))).toMatchObject({useCount:2});
+  expect(JSON.stringify(before)).not.toContain('NewWindow');expect(JSON.stringify(before)).not.toContain('--new-window');
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-url',useCount:1}));
   expect(JSON.stringify(before)).not.toContain(publicUrl);

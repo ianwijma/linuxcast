@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { isAbsolute } from 'node:path';
-import { nativeApplicationSchema,nativeApplicationRequestSchema,nativeApplicationListReplySchema,nativeApplicationLaunchReplySchema } from '@linuxcast/contracts';
+import { nativeApplicationSchema,nativeApplicationRequestSchema,nativeApplicationListReplySchema,nativeApplicationLaunchReplySchema,nativeApplicationActionReplySchema } from '@linuxcast/contracts';
 import type { NativeApplication,NativeApplicationRequest } from '@linuxcast/contracts';
 export type { NativeApplication } from '@linuxcast/contracts';
 const MAX_OUTPUT=1024*1024,MAX_INPUT=64*1024,DEADLINE=2500,MAX_CATALOGUE=4096,MAX_HELPERS=2;
@@ -24,7 +24,7 @@ export function createApplications({helperPath}:{helperPath:string}) {
     let normalized:NativeApplicationRequest;try{normalized=nativeApplicationRequestSchema.parse(input);}catch{throw new ApplicationsUnavailable('invalid-request');}
     if(stopped)throw new ApplicationsUnavailable('stopped');if(signal?.aborted)throw new ApplicationsUnavailable('cancelled');if(active.size>=MAX_HELPERS)throw new ApplicationsUnavailable('busy');
     const wire=JSON.stringify(normalized)+'\n';if(Buffer.byteLength(wire)>MAX_INPUT)throw new ApplicationsUnavailable('invalid-request');
-    const env=environment();const outcome=normalized.operation==='launch' || normalized.operation==='open-url'?'unknown':'not-dispatched';
+    const env=environment();const outcome=normalized.operation==='launch' || normalized.operation==='open-url' || normalized.operation==='launch-action'?'unknown':'not-dispatched';
     return new Promise((resolve,reject)=>{
       const child=spawn(helperPath,['applications'],{stdio:['pipe','pipe','ignore'],env,shell:false});
       let failure:ApplicationsUnavailableReason|undefined,bytes=0,ended=false;const chunks:Buffer[]=[];
@@ -70,6 +70,17 @@ export function createApplications({helperPath}:{helperPath:string}) {
       let identity:Pick<NativeApplication,'desktopId'|'fingerprint'>;try{identity=nativeApplicationSchema.pick({desktopId:true,fingerprint:true}).parse(application);}catch{throw new ApplicationsUnavailable('invalid-request');}
       const raw=await request({protocolVersion:1,operation:'launch',...identity},options.signal);
       const parsed=nativeApplicationLaunchReplySchema.safeParse(raw);if(!parsed.success)throw new ApplicationsUnavailable('invalid-reply','unknown');if(!parsed.data.ok)throw new ApplicationsUnavailable(parsed.data.error,['invalid-request','stale-application','unavailable'].includes(parsed.data.error)?'not-dispatched':'unknown');return parsed.data.value.outcome;
+    },
+    async launchAction(application:Pick<NativeApplication,'desktopId'|'fingerprint'>&{actionId:string},options:{signal?:AbortSignal}={}):Promise<{outcome:'requested';actionId:string}>{
+      let input:Extract<NativeApplicationRequest,{operation:'launch-action'}>;
+      try{input=nativeApplicationRequestSchema.parse({...application,protocolVersion:1,operation:'launch-action'}) as typeof input;
+        if(Object.keys(application).some(key=>!['desktopId','fingerprint','actionId'].includes(key)))throw new Error();
+      }catch{throw new ApplicationsUnavailable('invalid-request');}
+      const raw=await request(input,options.signal),parsed=nativeApplicationActionReplySchema.safeParse(raw);
+      if(!parsed.success)throw new ApplicationsUnavailable('invalid-reply','unknown');
+      if(!parsed.data.ok){const reason=parsed.data.error;throw new ApplicationsUnavailable(reason==='catalogue-too-large'?'invalid-reply':reason,['invalid-request','stale-application','unavailable'].includes(reason)?'not-dispatched':'unknown');}
+      if(parsed.data.value.actionId!==input.actionId)throw new ApplicationsUnavailable('invalid-reply','unknown');
+      return parsed.data.value;
     },
     async openUrl(url:string,options:{signal?:AbortSignal}={}):Promise<'dispatched'>{
       const raw=await request({protocolVersion:1,operation:'open-url',url},options.signal);

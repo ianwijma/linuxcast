@@ -92,6 +92,81 @@ it('blocks overlapping mutations/execution and reports unconfirmed pin changes w
 });
 
 const applicationFixture=(index:number)=>({desktopId:`fixture-${String(index).padStart(3,'0')}.desktop`,title:`Fixture application ${index}`,description:'Public synthetic application',fingerprint:'a'.repeat(64)});
+const applicationWithActions=()=>({...applicationFixture(0),actions:{available:true,actions:[{id:'NewWindow',title:'New window'},{id:'Compose',title:'Compose public note'}]}});
+async function actionFixture(overrides:Partial<LauncherActions>={}){
+  const launchApplicationAction=vi.fn(async({actionId}:{actionId:string})=>({outcome:'requested' as const,actionId}));
+  const f=fixture({listApplications:async()=>[applicationWithActions()],launchApplicationAction,...overrides}),current=await catalogue(f),command=current.commands.find(command=>command.provider==='applications')!;
+  return {...f,current,command,payload:{protocolVersion:1,commandId:command.id,revision:current.revision,actionId:'NewWindow'}};
+}
+it('projects only declared application action IDs/titles and requests one typed action without hiding or running primary Open',async()=>{
+  const launchApplication=vi.fn(async()=>'dispatched' as const),f=await actionFixture({launchApplication});
+  expect(f.command.applicationActions).toEqual(applicationWithActions().actions);expect(f.command.id).toMatch(/^application:[a-f0-9]{64}$/u);
+  const text=JSON.stringify(f.current);for(const privateField of ['desktopId','fingerprint','Exec','argv'])expect(text).not.toContain(privateField);
+  expect(f.actions.launchApplicationAction).not.toHaveBeenCalled();
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toEqual({ok:true,value:{outcome:'requested',actionId:'NewWindow'}});
+  expect(f.actions.launchApplicationAction).toHaveBeenCalledExactlyOnceWith({desktopId:'fixture-000.desktop',fingerprint:'a'.repeat(64),actionId:'NewWindow'});
+  expect(f.actions.hide).not.toHaveBeenCalled();expect(launchApplication).not.toHaveBeenCalled();expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith(f.command.id);
+});
+it('rejects foreign frames, stale revisions, extra authority and undeclared or foreign action identities before native effects',async()=>{
+  const f=await actionFixture();
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload,{sender:{},senderFrame:f.frame} as never)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  for(const request of [{...f.payload,revision:0},{...f.payload,revision:f.current.revision+1},{...f.payload,commandId:'linuxcast:quit'},{...f.payload,actionId:'../private'},{...f.payload,argv:['SYNTHETIC_PRIVATE']},{...f.payload,fingerprint:'a'.repeat(64)}])expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,request)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  for(const request of [{...f.payload,actionId:'Absent'},{...f.payload,commandId:`application:${'f'.repeat(64)}`}])expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,request)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  expect(f.actions.launchApplicationAction).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('keeps primary Open independent of missing or unavailable action capability',async()=>{
+  for(const actions of [undefined,{available:false,actions:[]},{available:true,actions:[]}]){
+    const launchApplication=vi.fn(async()=>'dispatched' as const),f=await actionFixture({listApplications:async()=>[{...applicationFixture(0),...(actions?{actions}:{})}],launchApplication});
+    expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false});
+    expect(f.actions.launchApplicationAction).not.toHaveBeenCalled();expect(await f.execute(f.command.id,f.current.revision)).toMatchObject({ok:true,value:{outcome:'dispatched'}});expect(launchApplication).toHaveBeenCalledOnce();
+  }
+  const f=await actionFixture();delete f.actions.launchApplicationAction;expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+});
+it('freshly rejects hidden, failed visibility and replaced frames before requesting an application action',async()=>{
+  let hidden:string[]=[],rejectRead=false,finish!:(value:string[])=>void;
+  const listHidden=vi.fn(async()=>{if(rejectRead)throw new Error('SYNTHETIC_PRIVATE');return hidden;});
+  const f=await actionFixture({listHidden});hidden=[f.command.id];
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  const next=await catalogue(f);expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,{...f.payload,revision:next.revision})).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  hidden=[];const shown=await catalogue(f);rejectRead=true;
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,{...f.payload,revision:shown.revision})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  rejectRead=false;const ready=await catalogue(f);listHidden.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+  const pending=f.invoke(LAUNCHER_CHANNELS.applicationAction,{...f.payload,revision:ready.revision});await vi.waitFor(()=>expect(finish).toBeTypeOf('function'));
+  Object.assign(f.event.sender,{mainFrame:{url:APP_URL}});finish([]);
+  expect(await pending).toMatchObject({ok:false,error:{code:'permission-denied'}});expect(f.actions.launchApplicationAction).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('retains the native action slot until the backend settles, fences metadata and does not replay',async()=>{
+  let finish!:(value:{outcome:'requested';actionId:string})=>void;const launchApplicationAction=vi.fn(()=>new Promise<{outcome:'requested';actionId:string}>(resolve=>{finish=resolve;}));
+  const f=await actionFixture({launchApplicationAction}),pending=f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload);
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.execute('linuxcast:hide',f.current.revision)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.setPinned,{protocolVersion:1,revision:f.current.revision,commandId:f.command.id,pinned:true})).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:false,error:{code:'cancelled'}});
+  finish({outcome:'requested',actionId:'NewWindow'});expect(await pending).toMatchObject({ok:true});expect(launchApplicationAction).toHaveBeenCalledOnce();expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('never confirms mismatched or untruthful native action receipts and does not count or hide on failure',async()=>{
+  for(const receipt of [{outcome:'requested',actionId:'Compose'},{outcome:'dispatched',actionId:'NewWindow'},{outcome:'completed',actionId:'NewWindow'},{outcome:'requested',actionId:'NewWindow',private:'SYNTHETIC_PRIVATE'}]){
+    const launchApplicationAction=vi.fn(async()=>receipt as {outcome:'requested';actionId:string}),f=await actionFixture({launchApplicationAction}),reply=await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload);
+    expect(reply).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false,message:expect.stringContaining('unknown')}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(launchApplicationAction).toHaveBeenCalledOnce();expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+  }
+});
+it.each([['stale-application','not-dispatched','conflict'],['unavailable','not-dispatched','capability-unavailable'],['deadline-exceeded','unknown','deadline-exceeded']] as const)('distinguishes native action %s/%s and never automatically replays',async(reason,outcome,code)=>{
+  const launchApplicationAction=vi.fn(async()=>{throw new ApplicationsUnavailable(reason,outcome);}),f=await actionFixture({launchApplicationAction});
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false,error:{code,retryable:false}});expect(launchApplicationAction).toHaveBeenCalledOnce();expect(f.actions.hide).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('revises the catalogue when declared action metadata or its fingerprint changes',async()=>{
+  const applications=[applicationWithActions()],f=await actionFixture({listApplications:async()=>applications});
+  applications[0]={...applications[0]!,fingerprint:'b'.repeat(64),actions:{available:true,actions:[{id:'Compose',title:'Compose changed note'}]}};
+  const next=await catalogue(f);expect(next.revision).toBe(f.current.revision+1);expect(next.commands.find(command=>command.id===f.command.id)?.applicationActions?.actions).toEqual([{id:'Compose',title:'Compose changed note'}]);
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.actions.launchApplicationAction).not.toHaveBeenCalled();
+});
+it('fences a metadata read admitted before an application action even when the action settles first',async()=>{
+  let hold=false,finish!:(value:null)=>void;
+  const f=await actionFixture({getUsage:async id=>hold&&id.startsWith('application:')?new Promise<null>(resolve=>{finish=resolve;}):null});
+  hold=true;const reading=f.invoke(LAUNCHER_CHANNELS.getCommands);await vi.waitFor(()=>expect(finish).toBeTypeOf('function'));
+  expect(await f.invoke(LAUNCHER_CHANNELS.applicationAction,f.payload)).toMatchObject({ok:true,value:{outcome:'requested'}});
+  hold=false;finish(null);expect(await reading).toMatchObject({ok:false,error:{code:'cancelled'}});expect(f.actions.launchApplicationAction).toHaveBeenCalledOnce();
+});
 function visibilityFixture(overrides:Partial<LauncherActions>={}){
   let hidden:string[]=[];
   return fixture({listHidden:vi.fn(async()=>hidden),setHidden:vi.fn(async(commandId:string,value:boolean)=>{hidden=hidden.filter(id=>id!==commandId);if(value)hidden.push(commandId);hidden.sort();return {commandId,hidden:value};}),...overrides});

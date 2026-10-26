@@ -363,3 +363,130 @@ fn url_handler_working_directory_failure_is_not_success() {
     assert_eq!(f.open_url("https://example.com/")["error"], "launch-failed");
     assert!(!f.root.join("marker.json").exists());
 }
+
+#[test]
+fn desktop_actions_use_gio_arguments_and_isolate_protocol_streams() {
+    let f = Fixture::new();
+    // Observe inherited descriptors inside the actual GIO child, including any
+    // accidentally saved protocol pipes above stderr.
+    let script = include_str!("applications/fixture.py").replace("'stdin': sys.stdin.read()", "'stdin': sys.stdin.read(), 'streams': [os.readlink('/proc/self/fd/' + str(fd)) for fd in range(3)], 'extraPipes': [fd for fd in range(3, 64) if os.path.exists('/proc/self/fd/' + str(fd)) and os.readlink('/proc/self/fd/' + str(fd)).startswith('pipe:')]");
+    fs::write(f.root.join("fixture executable"), script).unwrap();
+    f.entry("actions.desktop", &format!("Actions=New;Other;\n[Desktop Action New]\nName=New Public Window\nExec=\"{}\" \"action two words\" \"literal;$(no-shell)\" %%\n[Desktop Action Other]\nName=Other Public Action\nExec=\"{}\" other", f.root.join("fixture executable").display(), f.root.join("fixture executable").display()));
+    let app = f.list()["value"]["applications"][0].clone();
+    assert_eq!(
+        app["actions"],
+        json!({"available":true,"actions":[{"id":"New","title":"New Public Window"},{"id":"Other","title":"Other Public Action"}]})
+    );
+    assert_eq!(f.launch(&app)["value"]["outcome"], "dispatched");
+    assert_eq!(f.marker()["argv"][0], "two words");
+    fs::remove_file(f.root.join("marker.json")).unwrap();
+    let request = json!({"protocolVersion":1,"operation":"launch-action","desktopId":app["desktopId"],"fingerprint":app["fingerprint"],"actionId":"New"});
+    assert_eq!(
+        f.request(request.clone()),
+        json!({"protocolVersion":1,"ok":true,"value":{"outcome":"requested","actionId":"New"}})
+    );
+    let marker = f.marker();
+    assert_eq!(
+        marker["streams"],
+        json!(["/dev/null", "/dev/null", "/dev/null"])
+    );
+    assert_eq!(marker["extraPipes"], json!([]));
+    assert_eq!(
+        marker["argv"],
+        json!(["action two words", "literal;$(no-shell)", "%"])
+    );
+    assert_eq!(marker["stdin"], "");
+    fs::remove_file(f.root.join("marker.json")).unwrap();
+    let path = f.root.join("data/applications/actions.desktop");
+    let source = fs::read_to_string(&path).unwrap();
+    for replacement in [
+        source.replace("action two words", "changed action only"),
+        source.replace("Actions=New;Other;", "Actions=Other;"),
+        source.replace("New Public Window", "Changed action title"),
+    ] {
+        fs::write(&path, replacement).unwrap();
+        assert_eq!(f.request(request.clone())["error"], "stale-application");
+    }
+    fs::remove_file(path).unwrap();
+    assert_eq!(f.request(request)["error"], "stale-application");
+    assert!(!f.root.join("marker.json").exists());
+}
+#[test]
+fn desktop_action_bounds_are_all_or_nothing_without_disabling_primary_launch() {
+    let f = Fixture::new();
+    let executable = f.root.join("fixture executable");
+    let section = |id: &str, title: &str| {
+        format!(
+            "\n[Desktop Action {id}]\nName={title}\nExec=\"{}\" action",
+            executable.display()
+        )
+    };
+    let cases = [
+        ("Bad/Id;".to_string(), section("Bad/Id", "Invalid ID")),
+        ("New;New;".to_string(), section("New", "Duplicate")),
+        ("New;".to_string(), section("New", &"x".repeat(129))),
+        ("New;".to_string(), section("New", "Control\tname")),
+        (
+            (0..17).map(|n| format!("A{n};")).collect(),
+            (0..17)
+                .map(|n| section(&format!("A{n}"), "Action"))
+                .collect(),
+        ),
+    ];
+    for (declared, sections) in cases {
+        f.entry(
+            "actions.desktop",
+            &format!("Actions={declared}\n{sections}"),
+        );
+        let app = f.list()["value"]["applications"][0].clone();
+        assert_eq!(app["actions"], json!({"available":false,"actions":[]}));
+        assert_eq!(f.request(json!({"protocolVersion":1,"operation":"launch-action","desktopId":app["desktopId"],"fingerprint":app["fingerprint"],"actionId":"New"}))["error"], "unavailable");
+        assert_eq!(f.launch(&app)["value"]["outcome"], "dispatched");
+        f.marker();
+        fs::remove_file(f.root.join("marker.json")).unwrap();
+    }
+    f.entry("actions.desktop", "");
+    let app = f.list()["value"]["applications"][0].clone();
+    assert_eq!(app["actions"], json!({"available":true,"actions":[]}));
+    for action in ["", "../New", "New;evil", "é", &"a".repeat(65)] {
+        assert_eq!(f.request(json!({"protocolVersion":1,"operation":"launch-action","desktopId":app["desktopId"],"fingerprint":app["fingerprint"],"actionId":action}))["error"], "invalid-request");
+    }
+    assert_eq!(f.request(json!({"protocolVersion":1,"operation":"launch-action","desktopId":app["desktopId"],"fingerprint":app["fingerprint"],"actionId":"Missing"}))["error"], "stale-application");
+    assert!(!f.root.join("marker.json").exists());
+}
+
+#[test]
+fn action_source_budget_is_bounded_and_assigned_in_stable_id_order() {
+    let f = Fixture::new();
+    // Reverse creation order deliberately differs from deterministic ID order.
+    for n in (0..9).rev() {
+        f.entry(
+            &format!("budget{n}.desktop"),
+            &format!(
+                "Actions=New;\n[Desktop Action New]\nName=New Window\nExec=\"{}\" action\n#{}",
+                f.root.join("fixture executable").display(),
+                "x".repeat(1_047_000)
+            ),
+        );
+    }
+    let rows = f.list()["value"]["applications"]
+        .as_array()
+        .unwrap()
+        .clone();
+    assert_eq!(rows.len(), 9);
+    for (n, row) in rows.iter().enumerate() {
+        assert_eq!(row["desktopId"], format!("budget{n}.desktop"));
+        assert_eq!(row["actions"]["available"], n < 8);
+    }
+    let page = f.request(
+        json!({"protocolVersion":1,"operation":"list","limit":1,"afterId":"budget7.desktop"}),
+    );
+    assert_eq!(page["value"]["applications"][0], rows[8]);
+    // Budget-disabled actions cannot break independent primary Open, nor can
+    // its no-source fingerprint authorize an action when freshly revalidated.
+    assert_eq!(f.launch(&rows[8])["value"]["outcome"], "dispatched");
+    f.marker();
+    fs::remove_file(f.root.join("marker.json")).unwrap();
+    assert_eq!(f.request(json!({"protocolVersion":1,"operation":"launch-action","desktopId":rows[8]["desktopId"],"fingerprint":rows[8]["fingerprint"],"actionId":"New"}))["error"], "stale-application");
+    assert!(!f.root.join("marker.json").exists());
+}

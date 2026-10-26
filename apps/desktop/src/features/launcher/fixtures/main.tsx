@@ -11,10 +11,14 @@ const snapshot:LauncherCommandsSnapshot={revision:1,rankingAvailable:mode!=='ran
   {id:'linuxcast:hide',title:'Hide Linuxcast',subtitle:'Keep Linuxcast running in the background',aliases:['hide'],keywords:['dismiss'],enabled:true,usage:null},
   {id:'linuxcast:quit',title:'Quit Linuxcast',subtitle:'Close Linuxcast and stop background work',aliases:['quit'],keywords:['exit'],enabled:true,usage:null},
 ]};
-const applicationMode=mode==='applications'||mode==='application-unknown'||mode?.startsWith('alias');
+const applicationMode=mode==='applications'||mode==='application-unknown'||mode?.startsWith('alias')||mode?.startsWith('desktop-actions');
 if(mode?.startsWith('url'))snapshot.commands.push({id:'linuxcast:open-url',title:'Open URL',subtitle:'Hand an HTTP or HTTPS address to your default browser',aliases:['url'],keywords:['browser','http','https'],enabled:mode!=='url-disabled',...(mode==='url-disabled'?{unavailableReason:'Browser handoff is unavailable. Reload commands to try again.'}:{}),usage:null});
 if(mode?.startsWith('alias'))snapshot.commands[1]!.usage={useCount:4,lastUsedAt:'2026-10-25T00:00:00Z',pinned:false,alias:'conceal'};
 if(applicationMode){snapshot.applicationState='available';snapshot.commands.push(...['Public Notes','Public Calculator'].map((title,index)=>({id:`application:${String(index+1).repeat(64)}`,provider:'applications' as const,title,subtitle:'Synthetic application fixture',aliases:[],keywords:['public'],enabled:true,usage:null})));}
+if(mode?.startsWith('desktop-actions')){
+  snapshot.visibilityAvailable=true;
+  snapshot.commands[3]!.applicationActions={available:mode!=='desktop-actions-unavailable',actions:mode==='desktop-actions-unavailable'||mode==='desktop-actions-empty'?[]:[{id:'NewWindow',title:'New Window'},{id:'scratch-pad',title:'Open Scratchpad'}]};
+}
 if(mode==='applications-unavailable')snapshot.applicationState='unavailable';
 const visibilityMode=mode?.startsWith('visibility');
 if(visibilityMode){
@@ -25,9 +29,15 @@ if(visibilityMode){
 function Fixture(){
   const [requested,setRequested]=useState('No command requested.');const [visible,setVisible]=useState(true);
   const [api]=useState<LauncherApi>(()=>{
-    const saved=structuredClone(snapshot);let urlRequests=0,visibilityRequests=0;
+    const saved=structuredClone(snapshot);let urlRequests=0,visibilityRequests=0,applicationActionRequests=0;
     const page=(cursor?:string)=>{const offset=cursor?Number(cursor.split(':')[1]):0,limit=visibilityMode?100:applicationMode?3:saved.commands.length;return structuredClone({...saved,commands:saved.commands.slice(offset,offset+limit),nextCursor:offset+limit<saved.commands.length?`${saved.revision}:${offset+limit}`:null});};
-    return {openLauncherUrl:async request=>{
+    return {...(mode==='desktop-actions-missing'?{}:{executeApplicationAction:async request=>{
+        setRequested(`Observed application action ${++applicationActionRequests}: ${request.actionId} for ${request.commandId}.`);
+        if(mode==='desktop-actions-pending')await new Promise(resolve=>setTimeout(resolve,1400));
+        if(mode==='desktop-actions-denied')return {ok:false as const,error:{code:'capability-unavailable' as const,message:'synthetic private application action detail',retryable:false}};
+        if(mode==='desktop-actions-unknown')throw new Error('synthetic private application action detail');
+        return {ok:true as const,value:{outcome:'requested' as const,actionId:mode==='desktop-actions-mismatch'?'not-requested':request.actionId}};
+      }}),openLauncherUrl:async request=>{
         setRequested(`Requested URL ${request.url}.`);
         if(mode==='url-pending')await new Promise(resolve=>setTimeout(resolve,600));
         if(mode==='url-unknown')return {ok:false,error:{code:'deadline-exceeded',message:'synthetic private URL detail',retryable:false}};
@@ -61,6 +71,6 @@ function Fixture(){
         return {ok:true,value:structuredClone(applicationMode?{...saved,commands:[command],updateOnly:true,nextCursor:null}:saved)};
       }};
   });
-  return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><main className="launcher-fixture"><Launcher api={api} visible={visible} onDismiss={async()=>{if(visibilityMode)setVisible(false);else if(!mode?.startsWith('url'))setRequested('Requested Hide.');return {ok:true,value:null};}}/>{visibilityMode&&<Button onClick={()=>setVisible(!visible)}>{visible?'Hide fixture window':'Show fixture window'}</Button>}<output aria-live="polite">{requested}</output><p className="lc-muted">Component fixture · command requests are observed, not executed.</p></main></ThemeProvider>;
+  return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><main className="launcher-fixture"><Launcher api={api} visible={visible} onDismiss={async()=>{if(mode==='desktop-actions-hide-failed')return {ok:false,error:{code:'capability-unavailable',message:'synthetic Hide detail',retryable:false}};if(visibilityMode||mode?.startsWith('desktop-actions'))setVisible(false);else if(!mode?.startsWith('url'))setRequested('Requested Hide.');return {ok:true,value:null};}}/>{(visibilityMode||mode?.startsWith('desktop-actions'))&&<Button onClick={()=>setVisible(!visible)}>{visible?'Hide fixture window':'Show fixture window'}</Button>}<output aria-live="polite">{requested}</output><p className="lc-muted">Component fixture · command requests are observed, not executed.</p></main></ThemeProvider>;
 }
 createRoot(document.getElementById('root')!).render(<Fixture/>);

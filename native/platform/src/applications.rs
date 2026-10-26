@@ -2,16 +2,18 @@
 //! All Exec interpretation belongs to GIO; URLs are passed as one literal URI.
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::{CStr, CString};
 use std::io::{Read, Write};
 use std::os::fd::AsRawFd;
 use std::os::raw::{c_char, c_int, c_void};
+use std::os::unix::fs::OpenOptionsExt;
 use std::ptr;
 
 const REQUEST_MAX: u64 = 65_536;
 const CATALOGUE_MAX: usize = 10_000;
 const URL_MAX: usize = 8192;
+const ACTION_SOURCE_BUDGET: u64 = 8 * 1_048_576;
 type Object = *mut c_void;
 #[repr(C)]
 struct GList {
@@ -38,6 +40,9 @@ unsafe extern "C" {
     fn g_desktop_app_info_get_type() -> usize;
     fn g_desktop_app_info_new(id: *const c_char) -> Object;
     fn g_desktop_app_info_get_filename(info: Object) -> *const c_char;
+    fn g_desktop_app_info_list_actions(info: Object) -> *const *const c_char;
+    fn g_desktop_app_info_get_action_name(info: Object, action: *const c_char) -> *mut c_char;
+    fn g_desktop_app_info_launch_action(info: Object, action: *const c_char, context: Object);
     fn g_desktop_app_info_get_is_hidden(info: Object) -> c_int;
     fn g_desktop_app_info_get_string(info: Object, key: *const c_char) -> *mut c_char;
     fn g_desktop_app_info_launch_uris_as_manager_with_fds(
@@ -143,6 +148,96 @@ fn valid_id(id: &str) -> bool {
         && id.ends_with(".desktop")
         && !id.chars().any(|c| c.is_control() || c == '/' || c == '\\')
 }
+fn valid_action_id(id: &str) -> bool {
+    !id.is_empty()
+        && id.len() <= 64
+        && id.as_bytes()[0].is_ascii_alphanumeric()
+        && id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b))
+}
+#[derive(Serialize)]
+struct Action {
+    id: String,
+    title: String,
+}
+#[derive(Serialize)]
+struct Actions {
+    available: bool,
+    actions: Vec<Action>,
+}
+impl Actions {
+    fn unavailable() -> Self {
+        Self {
+            available: false,
+            actions: Vec::new(),
+        }
+    }
+}
+// This path comes exclusively from GIO. Read no more than 1 MiB and never block
+// on a substituted FIFO/device. Source bytes are hashed, never interpreted/returned.
+fn source_digest(info: Object, budget: &mut u64) -> Option<String> {
+    if *budget == 0 {
+        return None;
+    }
+    let path = string(unsafe { g_desktop_app_info_get_filename(info) })?;
+    let file = std::fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NONBLOCK)
+        .open(path)
+        .ok()?;
+    let stat = file.metadata().ok()?;
+    if !stat.is_file() || stat.len() > 1_048_576 || stat.len() + 1 > *budget {
+        return None;
+    }
+    let bound = stat.len() + 1;
+    *budget -= bound;
+    let mut bytes = Vec::new();
+    file.take(bound).read_to_end(&mut bytes).ok()?;
+    if bytes.len() as u64 != stat.len() {
+        return None;
+    }
+    let digest =
+        OwnedString(unsafe { g_compute_checksum_for_data(2, bytes.as_ptr(), bytes.len()) });
+    string(digest.0)
+}
+fn actions(info: Object) -> Actions {
+    let entries = unsafe { g_desktop_app_info_list_actions(info) };
+    let mut result = Vec::new();
+    let mut ids = BTreeSet::new();
+    if !entries.is_null() {
+        for index in 0..=16 {
+            let entry = unsafe { *entries.add(index) };
+            if entry.is_null() {
+                return Actions {
+                    available: true,
+                    actions: result,
+                };
+            }
+            if index == 16 {
+                return Actions::unavailable();
+            }
+            let Some(id) = string(entry) else {
+                return Actions::unavailable();
+            };
+            if !valid_action_id(&id) || !ids.insert(id.clone()) {
+                return Actions::unavailable();
+            }
+            let title = OwnedString(unsafe { g_desktop_app_info_get_action_name(info, entry) });
+            let Some(title) = string(title.0) else {
+                return Actions::unavailable();
+            };
+            if title.is_empty() || title.len() > 128 || title.chars().any(char::is_control) {
+                return Actions::unavailable();
+            }
+            result.push(Action { id, title });
+        }
+    }
+    Actions {
+        available: true,
+        actions: result,
+    }
+}
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "lowercase", deny_unknown_fields)]
 enum Request {
@@ -159,6 +254,16 @@ enum Request {
         after_id: Option<String>,
         limit: u16,
     },
+    #[serde(rename = "launch-action")]
+    LaunchAction {
+        #[serde(rename = "protocolVersion")]
+        protocol_version: u8,
+        #[serde(rename = "desktopId")]
+        desktop_id: String,
+        fingerprint: String,
+        #[serde(rename = "actionId")]
+        action_id: String,
+    },
     Launch {
         #[serde(rename = "protocolVersion")]
         protocol_version: u8,
@@ -174,11 +279,12 @@ struct Application {
     title: String,
     description: String,
     fingerprint: String,
+    actions: Actions,
 }
 fn failure(code: &'static str) -> Value {
     json!({"protocolVersion":1,"ok":false,"error":code})
 }
-fn metadata(info: Object) -> Option<Application> {
+fn metadata(info: Object, budget: &mut u64) -> Option<Application> {
     unsafe {
         if info.is_null()
             || g_type_check_instance_is_a(info, g_desktop_app_info_get_type()) == 0
@@ -249,8 +355,18 @@ fn metadata(info: Object) -> Option<Application> {
         {
             return None;
         }
+        let mut actions = actions(info);
+        let source = if actions.available && !actions.actions.is_empty() {
+            let source = source_digest(info, budget);
+            if source.is_none() {
+                actions = Actions::unavailable();
+            }
+            source
+        } else {
+            None
+        };
         let bytes = serde_json::to_vec(&(
-            "linuxcast-gio-application-v1",
+            "linuxcast-gio-application-v2",
             &desktop_id,
             &title,
             &description,
@@ -260,6 +376,8 @@ fn metadata(info: Object) -> Option<Application> {
             string(icon_text.0),
             string(g_desktop_app_info_get_filename(info)),
             fields,
+            source,
+            &actions,
         ))
         .ok()?;
         if bytes.len() > 1_048_576 {
@@ -271,26 +389,35 @@ fn metadata(info: Object) -> Option<Application> {
             title,
             description,
             fingerprint: string(digest.0)?,
+            actions,
         })
     }
 }
 fn list(after: Option<String>, limit: u16) -> Value {
     let list = OwnedList(unsafe { g_app_info_get_all() });
-    let mut entries = BTreeMap::new();
+    let mut records = BTreeMap::new();
     let mut item = list.0;
     let mut count = 0;
+    let mut budget = ACTION_SOURCE_BUDGET;
     while !item.is_null() {
         count += 1;
         if count > CATALOGUE_MAX {
             return failure("catalogue-too-large");
         }
-        if let Some(app) = metadata(unsafe { (*item).data }) {
-            entries.insert(app.desktop_id.clone(), app);
+        let info = unsafe { (*item).data };
+        if let Some(id) = string(unsafe { g_app_info_get_id(info) }).filter(|id| valid_id(id)) {
+            records.insert(id, info);
         }
         item = unsafe { (*item).next };
     }
-    let mut entries = entries
+    // Allocate the aggregate source budget in stable ID order, independent of
+    // GIO enumeration order and requested page. OwnedList keeps references alive.
+    let entries: Vec<_> = records
         .into_values()
+        .filter_map(|info| metadata(info, &mut budget))
+        .collect();
+    let mut entries = entries
+        .into_iter()
         .filter(|app| after.as_ref().is_none_or(|id| app.desktop_id > *id));
     let applications: Vec<_> = entries.by_ref().take(usize::from(limit)).collect();
     let next = if entries.next().is_some() {
@@ -303,13 +430,97 @@ fn list(after: Option<String>, limit: u16) -> Value {
 fn launch(id: String, fingerprint: String) -> Value {
     let id = CString::new(id).expect("validated id");
     let app = OwnedObject(unsafe { g_desktop_app_info_new(id.as_ptr()) });
-    let Some(current) = metadata(app.0) else {
+    let mut budget = ACTION_SOURCE_BUDGET;
+    let Some(current) = metadata(app.0, &mut budget) else {
+        return failure("stale-application");
+    };
+    if current.desktop_id.as_bytes() != id.as_bytes() {
+        return failure("stale-application");
+    }
+    if current.fingerprint != fingerprint
+        && metadata(app.0, &mut 0).is_none_or(|fallback| fallback.fingerprint != fingerprint)
+    {
+        return failure("stale-application");
+    }
+    dispatch(app.0, ptr::null_mut())
+}
+// launch_action has no with-fds variant. The helper is one-shot: isolate its
+// standard streams during GIO dispatch. Saved protocol descriptors are CLOEXEC,
+// including while partially constructing/restoring this guard.
+struct IsolatedStdio {
+    saved: Vec<(c_int, c_int)>,
+}
+impl IsolatedStdio {
+    fn new() -> std::io::Result<Self> {
+        let null = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open("/dev/null")?;
+        let mut guard = Self { saved: Vec::new() };
+        for fd in 0..=2 {
+            let saved = unsafe { libc::fcntl(fd, libc::F_DUPFD_CLOEXEC, 3) };
+            if saved < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            guard.saved.push((fd, saved));
+            if unsafe { libc::dup2(null.as_raw_fd(), fd) } < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+        }
+        Ok(guard)
+    }
+    fn restore(&mut self) -> bool {
+        let mut success = true;
+        for (fd, saved) in self.saved.drain(..).rev() {
+            success &= unsafe { libc::dup2(saved, fd) } >= 0;
+            unsafe {
+                libc::close(saved);
+            }
+        }
+        success
+    }
+}
+impl Drop for IsolatedStdio {
+    fn drop(&mut self) {
+        self.restore();
+    }
+}
+fn launch_action(id: String, fingerprint: String, action_id: String) -> Value {
+    let id = CString::new(id).expect("validated id");
+    let app = OwnedObject(unsafe { g_desktop_app_info_new(id.as_ptr()) });
+    let mut budget = ACTION_SOURCE_BUDGET;
+    let Some(current) = metadata(app.0, &mut budget) else {
         return failure("stale-application");
     };
     if current.desktop_id.as_bytes() != id.as_bytes() || current.fingerprint != fingerprint {
         return failure("stale-application");
     }
-    dispatch(app.0, ptr::null_mut())
+    if !current.actions.available {
+        return failure("unavailable");
+    }
+    if !current
+        .actions
+        .actions
+        .iter()
+        .any(|action| action.id == action_id)
+    {
+        return failure("stale-application");
+    }
+    let action = CString::new(action_id.as_str()).expect("validated action");
+    let bus = OwnedObject(unsafe { g_bus_get_sync(2, ptr::null_mut(), ptr::null_mut()) });
+    let Ok(mut streams) = IsolatedStdio::new() else {
+        return failure("unavailable");
+    };
+    unsafe {
+        g_desktop_app_info_launch_action(app.0, action.as_ptr(), ptr::null_mut());
+    }
+    let flushed = bus.0.is_null()
+        || unsafe { g_dbus_connection_flush_sync(bus.0, ptr::null_mut(), ptr::null_mut()) } != 0;
+    if !streams.restore() || !flushed {
+        return failure("launch-failed");
+    }
+    // GIO's API is void. Even a target spawn failure cannot become success here.
+    json!({"protocolVersion":1,"ok":true,"value":{"outcome":"requested","actionId":action_id}})
 }
 /// The trusted main adapter sends URL.href's ASCII wire representation. Reject
 /// ambiguous/noncanonical authorities rather than guessing like a browser's input
@@ -498,6 +709,20 @@ fn respond(bytes: &[u8]) -> Value {
             limit,
         } if (1..=100).contains(&limit) && after_id.as_ref().is_none_or(|id| valid_id(id)) => {
             list(after_id, limit)
+        }
+        Request::LaunchAction {
+            protocol_version: 1,
+            desktop_id,
+            fingerprint,
+            action_id,
+        } if valid_id(&desktop_id)
+            && valid_action_id(&action_id)
+            && fingerprint.len() == 64
+            && fingerprint
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) =>
+        {
+            launch_action(desktop_id, fingerprint, action_id)
         }
         Request::Launch {
             protocol_version: 1,

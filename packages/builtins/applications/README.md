@@ -36,7 +36,7 @@ malformed/unexpected replies, timeout and post-request process failures are
 unknown. Cancellation/shutdown cannot establish that a browser effect was undone.
 No URL is automatically retried or saved as history by this adapter.
 
-`tests/transport.test.ts` has 49 private synthetic executable checks for pagination,
+`tests/transport.test.ts` has 69 private synthetic executable checks for pagination,
 limits, malformed framing, native failure classification, environment filtering,
 cancellation, timeout, shutdown and launched-child independence. These ran with
 Node 24.22.1/Bun 1.4.4. They establish transport behaviour, not GIO discovery or
@@ -44,5 +44,32 @@ actual desktop launch. The native lane and coordinator own real GIO fixtures and
 production Electron launch evidence. Fixtures use generated public names only.
 
 This slice contributes to L1-02-AC01/AC02 and PRIVACY. HTTP/HTTPS handoff is
-implemented; broader typed URI/file/argv/shell flows, desktop actions, clearable run history and the supported desktop matrix
+implemented; broader typed URI/file/argv/shell flows, clearable run history and the supported desktop matrix
 remain outstanding; this package does not mark all L1-02 complete.
+
+
+`launchAction({desktopId, fingerprint, actionId}, {signal})` sends the distinct
+`launch-action` operation. It accepts only `{outcome: 'requested', actionId}`
+matching that request. GIO's action API returns void: a request receipt never
+proves that an application started, completed, or focused. Invalid/stale/unavailable
+preflight errors are not-dispatched; malformed/mismatched receipts, launch-failed,
+timeout, cancellation after admission, and process loss remain unknown. Nothing
+is replayed automatically.
+
+The native catalogue publishes at most 16 unique declared action IDs with bounded
+localized display names, or an unavailable empty list. Primary Open remains
+independent. Only entries with supported nonempty action lists require a trusted
+GIO desktop-entry source hash: at most 1 MiB per regular file and 8 MiB total per
+helper invocation, assigned in desktop-ID order consistently across pages. A
+source read failure or exhausted budget disables affected actions. Primary Open
+can validate the no-source fingerprint; action launch cannot use that fallback.
+The source hash includes action Exec and metadata changes without parsing Exec.
+Fresh GIO construction revalidates every launch. Action child streams point at
+/dev/null, and saved helper protocol descriptors are CLOEXEC.
+
+Eleven native private-XDG tests exercise actual GIO discovery, primary/action
+argument handling, stale entries, bounds and deterministic source budgets, plus
+HTTP handoff regressions. Generated child fixtures observe empty stdin and no
+inherited protocol pipes. These checks do not establish supported desktop/DBus
+activation, terminal integration, localization coverage, native accessibility, or
+release acceptance. Production Electron action UI integration is coordinator-owned.

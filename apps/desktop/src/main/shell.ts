@@ -30,6 +30,7 @@ export interface ResidentShellOptions {
   setCommandHidden?: LauncherActions['setHidden'];
   listApplications?: LauncherActions['listApplications'];
   launchApplication?: LauncherActions['launchApplication'];
+  launchApplicationAction?:LauncherActions['launchApplicationAction'];
 }
 
 /** Called once, synchronously before Electron readiness, by the packaged entry. */
@@ -145,6 +146,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
       ...(options.listApplications ? {listApplications: options.listApplications} : {}),
       ...(options.launchApplication ? {launchApplication: options.launchApplication} : {}),
+      ...(options.launchApplicationAction?{launchApplicationAction:options.launchApplicationAction}:{}),
       ...(options.setCommandPinned ? {setPinned: options.setCommandPinned} : {}),
       ...(options.setCommandAlias ? {setAlias: options.setCommandAlias} : {}),
       ...(options.listHiddenCommands ? {listHidden:options.listHiddenCommands} : {}),
