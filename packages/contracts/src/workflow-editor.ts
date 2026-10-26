@@ -30,7 +30,7 @@ export type WorkflowEditorApi = {
   load(): Promise<z.infer<typeof workflowEditorReadResultSchema>>;
   write(input: WorkflowEditorWrite): Promise<z.infer<typeof workflowEditorWriteResultSchema>>;
   close(): Promise<void>;
-  onCloseRequested(listener: () => void): () => void;
+  onCloseRequested(listener: () => boolean | Promise<boolean>): () => void;
 };
 export const WORKFLOW_EDITOR_CHANNELS = {
   load: 'workflow-editor:load', write: 'workflow-editor:write', close: 'workflow-editor:close',
@@ -46,3 +46,6 @@ export type WorkflowWorkspaceApi = WorkflowEditorApi & {
   getAppearance(): Promise<'dark'|'light'>;
   onAppearance(listener: (appearance:'dark'|'light') => void): () => void;
 };
+export const WORKFLOW_EDITOR_CLOSE_FINISHED = 'workflow-editor:close-finished';
+export const workflowEditorCloseAttemptSchema = z.strictObject({protocolVersion:z.literal(1),attemptId:z.number().int().positive().safe()});
+export const workflowEditorCloseFinishedSchema = workflowEditorCloseAttemptSchema.extend({allowClose:z.boolean()});

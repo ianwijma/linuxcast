@@ -60,7 +60,7 @@ after shared dirty confirmation. Closing flushes the last draft or exposes a
 truthful retry/discard choice; OS window-close uses the same contract. Failed
 writes retain the editable graph and unsaved warning. Revert is explicit and
 confirmed when dirty. Successful Save/Revert update owner revision; no optimistic
-saved state. API close is navigation only. onCloseRequested invokes the same UI close/flush path for native window close; root wraps the component in ThemeProvider and handles appearance. The component does not create a separate theme system.
+saved state. API close is navigation only. onCloseRequested callback returns boolean/Promise<boolean>: true only after confirmed close request; false on failed flush/close. Main/preload bind the close attempt to its owner and nonce. Quit completes this human/flush preflight before timed resource teardown; false cancels Quit and leaves the app usable. onCloseRequested invokes the same UI close/flush path for native window close; root wraps the component in ThemeProvider and handles appearance. The component does not create a separate theme system.
 
 ## UI boundary and evidence
 
