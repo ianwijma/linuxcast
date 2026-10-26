@@ -133,3 +133,12 @@ it('canonicalizes tag labels at Save, preserves exact receipts and never treats 
  f.backend.save.mockResolvedValueOnce({...record,tags:['Other']});expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,tags:['Work']})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.backend.save).toHaveBeenCalledTimes(2);
  for(const tags of [['Work','ｗｏｒｋ'],['bad,tag'],['\nlabel'],Array.from({length:9},(_,i)=>`tag${i}`)])expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,tags})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.backend.save).toHaveBeenCalledTimes(2);expect(f.actions.openUrl).not.toHaveBeenCalled();
 });
+
+it('acknowledges only exact presentation preferences without external effects',async()=>{
+ const f=fixture();await f.version();const request={protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,pinned:true,hidden:true};f.backend.save.mockResolvedValueOnce({...record,pinned:true,hidden:true});expect(await f.invoke(QUICKLINK_CHANNELS.save,request)).toMatchObject({ok:true,value:{record:{pinned:true,hidden:true}}});
+ for(const receipt of [{...record,pinned:true},{...record,hidden:true},{...record,pinned:false,hidden:false}]){f.backend.save.mockResolvedValueOnce(receipt);expect(await f.invoke(QUICKLINK_CHANNELS.save,request)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});}expect(f.backend.save).toHaveBeenCalledTimes(4);expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('refuses freshly loaded hidden literal and search targets even if a renderer invokes Open directly',async()=>{
+ const f=fixture(),launcherRevision=await f.version();for(const config of [undefined,webSearch]){f.backend.get.mockResolvedValueOnce({...record,hidden:true,...(config?{webSearch:config}:{})});expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,...(config?{query:'Public search'}:{})})).toMatchObject({ok:false,error:{code:'permission-denied',message:expect.stringContaining('Show')}});}expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+ f.backend.get.mockResolvedValueOnce({...record,hidden:false});expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision})).toMatchObject({ok:true,value:{outcome:'dispatched'}});expect(f.actions.openUrl).toHaveBeenCalledExactlyOnceWith(record.url);
+});

@@ -45,3 +45,8 @@ it('canonicalizes bounded saved tags, rejects ambiguous/control/delimiter input 
  expect(quicklinkSaveSchema.parse({...save,tags:[' Work ']})).toEqual({...save,tags:['Work']});
  const tags=Array.from({length:8},(_,i)=>'😀'.repeat(15)+i),records=Array.from({length:MAX_QUICKLINKS},(_,i)=>({id:`00000000-0000-4000-8000-${i.toString(16).padStart(12,'0')}`,revision:1,name:'😀'.repeat(64),host:'x'.repeat(320),tags}));expect(quicklinkListSchema.parse(records)).toHaveLength(500);expect(Buffer.byteLength(JSON.stringify({ok:true,value:{records}}))).toBeLessThan(MAX_ENVELOPE_BYTES-4096);
 });
+
+it('accepts only boolean presentation preferences, with absent and false as ordinary defaults',()=>{
+ for(const pinned of [undefined,false,true])for(const hidden of [undefined,false,true]){const prefs={...(pinned===undefined?{}:{pinned}),...(hidden===undefined?{}:{hidden})};expect(quicklinkSaveSchema.parse({...save,...prefs})).toEqual({...save,...prefs});}
+ for(const patch of [{pinned:1},{hidden:'true'},{hidden:null},{pinned:{grant:'open'}}])expect(quicklinkSaveSchema.safeParse({...save,...patch}).success).toBe(false);
+});

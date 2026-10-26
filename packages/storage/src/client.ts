@@ -35,7 +35,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   else if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
   else if(method==='quicklinks.save'){
     const expected=quicklinkSaveSchema.parse(params);
-    valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch)&&JSON.stringify(row.tags??[])===JSON.stringify(expected.tags??[]);
+    valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch)&&JSON.stringify(row.tags??[])===JSON.stringify(expected.tags??[])&&(row.pinned??false)===(expected.pinned??false)&&(row.hidden??false)===(expected.hidden??false);
   }
   else if (method === 'dataControls.clear') valid = row.category === params.category;
   else if (method === 'dataControls.export') {

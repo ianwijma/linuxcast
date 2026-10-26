@@ -1,152 +1,82 @@
 # Coordinator checkpoint
 
-Updated27October2026. **Goal unfinished; work resumed after user unlock confirmation.** Complete all97
-agreed local1.0 tasks through R1-03/all release gates. Read the objective at
+Updated 27 October 2026. Goal ACTIVE and unfinished: complete all 97 agreed local
+1.0 tasks through R1-03 and every release gate. Read the objective attachment at
 `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
-An increment is not goal completion.
 
 ## Constraints
 
-- **All subagents GPT-6.1 SOL/high.** Reuse only existing SOL agents. No Astra.
-- Small reviewed/tested application increments, prompt normal merges; explicitly
-  unfinished acceptance. No infrastructure/research/proof work for manifest_review.
-- Full scope/security/dependencies/native and release gates unchanged. User
-  authorized unfinished application increments; no task-choice questions.
-- Normal 1Password signing unlocked/working. No signing downgrade. No physical
-  input/device authorization. Actual app checks use only owned private Xvfb.
+All subagents GPT-6.1 SOL/high; reuse only existing SOL agents. Small reviewed,
+tested application increments; prompt normal merges and explicit unfinished
+acceptance. No infrastructure/research/proof expansion for manifest_review_sol.
+Full scope/security/dependencies/native/AT/release gates unchanged. No task-choice
+questions. Normal existing 1Password signing works after user unlock. No physical
+input/device authorization; actual app checks use owned private Xvfb only.
 
-## Integrated base
+## Integrated application base
 
-Primary clean develop **e2dec5a8bc072eb291ca1c7e61f483ba45c071c9** (PR44; details below).
-Prior base **6feaf5831f7acaa3753083db5d79d2216599bed7**,
-[PR43](https://github.com/ianwijma/linuxcast/pull/43) merged26October19:39:18UTC.
-Exact reviewed head82c2a7dee76c29943ab88470a419d1a036635798, CI40388536916
-validate PASS10s; no requested GitHub reviewers/submissions/comments/threads.
-Normal exact-head merge; primary frozen install/production build66assets passed.
-Prior basec8be683c1825640cfd8dccb63d7b8af9dad5faf3,
-[PR42](https://github.com/ianwijma/linuxcast/pull/42) workflow draft editor merged
-26October16:43:56UTC. Prior [PR41](https://github.com/ianwijma/linuxcast/pull/41)
-cc837ab saved web searches merged16:03:05UTC. Both reviewed/tested, CI passed,
-normal exact-head merges and primary frozen installs/production builds passed.
-Prior application increments and remaining scope are recorded in registry/Git.
+Primary clean develop a44bbe6355645e8a8ce0b1e734de8cd4e3c5045c, merged PR45:
+https://github.com/ianwijma/linuxcast/pull/45 (26 October 22:47:36 UTC).
+Exact reviewed head3f05245, CI40415016605 validate passed12s; no requested reviews,
+submissions/comments/threads; normal exact-head merge. Primary frozen install and
+production build66assets passed. Saved Quicklinks tags/New/Edit/local search,
+strict receipts/migration010/native Open/restart are integrated. Evidence:
+`apps/desktop/evidence/quicklink-tags-application.md` and registry L2-05.
 
-## Integrated PR43: actual saved text workflow run
+PR44 https://github.com/ianwijma/linuxcast/pull/44 merged e2dec5a8 at22:26:34UTC:
+actual saved Keyword commands registered in launcher; search/Arrow/Enter opens
+exact saved entry, Run remains explicit. CI40412367124 passed; normal merge,
+primary build passed. Evidence workflow-launcher-application.md/registry W2-03.
+PR43 e2 ancestor6feaf58→a44 has actual text workflow run/approval/clipboard and
+journal recovery; PR42 draft editor; PR41 saved web searches; PR40 literal links.
+Historical evidence/commit references are in tasks.json, generated cards and Git.
 
-Coordinator `.worktrees/linuxcast-application-controls`; previous branch
-**codex/workflow-text-run** integrated by PR43. Freeze d9f6a09/4300656; exact-run Cancel fix1e96fe2. Engine e900235
-(author signed e7b1c7f); UI c3d53f9 (author signed a1e38dc), both integrated.
-Root integration signed d7337ea and final reset fix82c2a7d. All18 integration
-cases, exact-head independent reconciliation, CI passed; merged as above.
+## Current bounded increment: saved Quicklink pin/hide
 
-Before: valid workflow could be saved; Run visibly unavailable. After: Run saved
-workflow→input→dedicated fixed Keyword/Transform/Copy worker→exact main broker
-approval→real clipboard/read receipt→status/plain result. Main fresh-loads saved
-revision/hash/identity; renderer cannot supply principal/grants/operation/text for
-copy. Last explicitly saved version runs; newer draft excluded visibly.
-Back/reopen retains run and pending approval; no mount/navigation/restart replay.
-Native Close/Quit cancels before final editor flush. Unknown requires review.
+Coordinator isolated `.worktrees/linuxcast-application-controls`, branch
+`codex/quicklink-presentation` from a44bbe6. Contract f8c29a2, root boundary
+bd4faf5, UI61cd4be/0323aa5 (authors a43b0a7/1f8f77a), actual test489bec3.
+Current source complete and reviewed. Persisted Pin/Unpin/Hide/Show, empty-state
+include-hidden recovery, full500 search before100 projection and stable ID pin
+order. Fresh full-definition CAS preserves tags/config; exact flag receipts and
+unknown/Reload fences retained. Main denies hidden literal/search Open before
+effects. Additive migration011 defaults false, snapshot/reopen tested.
 
-Sole owner migration009 stores metadata only, no input/output/labels/raw errors/
-credentials/grants. Durable prepared/dispatched before native write; completion
-only after exact receipt/step ack. Recovery combines existing unknown/completed
-Copy evidence and dispatched steps, marks interrupted and never replays. Bounds
-30days/10kruns/10kactivations; startup prunes expired terminal metadata.
+PASS223 units/12contracts/32security/41L2integration(actual8.63s),37Chromium
+keyboard+axe,43F2storage, typecheck/scopedlint/plan/diff. Actual private sandboxed
+production Electron/GIO verifies flags/order/recovery/hidden denial/full restart,
+explicit real browser-handler argv+empty stdin and aggregate usage privacy.
+Nine component and six actual affected captures independently inspected clean.
+Only public synthetic data. UI post-publication reentrant Save P2 closed with
+query/selection/Back zero-write regressions; exact author/integrated trees match.
+Independent root boundary and UI/actual review clean. Full task remains in progress.
+Evidence `apps/desktop/evidence/quicklink-preferences-application.md`.
 
-Independent review resolved cancellation identity, crash aggregate/idle retention,
-urgent node-timeout→parent invocation cancellation, per-activation unknown after
-an earlier completed Copy, saved enabled/reachable node identity and receipt
-verification. Reset rechecks frame/saved identity after delayed inventory reads
-and before each revocation. Finishing/settled fences prevent new Start before terminal journal
-and make scoped reset wait for cancellation. Parent terminates worker only after
-final result acceptance; denial is explicitly permission-denied.
+Next: sign evidence/registry, create+attach focused PR, inspect exact-head CI and
+GitHub reviews/threads, normal merge, refresh primary frozen install/build. Then
+select next bounded concrete launcher/application flow without foundation growth.
 
-PASS Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4 Linuxamd64:
-37 engine units,6 contracts,5 run IPC/preload security,29 run controller units,
-14 Chromium keyboard/axe cases;18 W1-03 integration (5 owner journal,12 controlled
-transport/backend using real engine+validating client+owner,1 actual production
-Electron6.45s). Actual isolated private Xvfb verifies registered launcher→editor
-create/connect/save→Run/input→deny/persistent deny/reset/once/persistent exact
-clipboard/read receipt, Back/reopen, native Close cancel, full restart and abrupt
-main crash interrupted/no replay. Child PID/minimal env and renderer isolation
-checked. Two actual dark/light full-page captures plus11 component captures
-inspected;200%/IME/heldEnter/bounded/unknown states covered by component checks.
-Evidence `apps/desktop/evidence/workflow-run-application.md` and journal README.
+## Agents
 
-PASS43 F2storage,24 editor/Quit units,15 editor/preload security,8 existing editor
-integration including production Close/restart/Quit4.78s. Full typecheck/lint/plan/
-diff pass. Actual/component checks are not native Wayland/GNOME/KDE/AT acceptance.
-W1-02/W1-03/W2-03 remain in-progress; privacy passed only, all wider criteria pending.
+- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
+  `codex/l2-05-quicklink-presentation-ui`, signed a43b0a7/1f8f77a integrated above.
+  Bounded current UI assignment complete; await next concrete application flow.
+- alias_review_sol: exact-tree source/test and nine component/six actual captures
+  reviewed clean; P2 reentrant Save finding closed.
+- file_search_service_sol: root bd4faf5 migration/repository/receipt/hidden Open
+  boundary independently reviewed clean; idle.
 
-## Integrated PR44 / current Quicklinks tags application increment
+## Acceptance and runtime
 
-PR44 https://github.com/ianwijma/linuxcast/pull/44 merged as
-**e2dec5a8bc072eb291ca1c7e61f483ba45c071c9** at26October22:26:34UTC.
-Exact independently reconciled signed headfc9c94147c92ed27c9cdf63b2c7e630c746b230d,
-implementation2d22304/UI9e083d0(authorcf26299), CI40412367124 validatePASS10s.
-No requested GitHub reviewers/reviews/comments/threads; normal exact-head merge.
-Primary clean develop now e2dec5a; frozen install/build66assets pass.
-Signer failure resolved by user Unlocked; normal1Password SSH signing works.
-Goal controller still reports blocked from earlier audit; user authorized resumed
-work. Do not claim goal complete or change its objective.
+Registry 8done/18in-progress/71planned;56passed/325pending/8not-applicable. No
+fully accepted ready tasks. User-authorized unfinished application increments do
+not waive dependencies. Full L2-05 root provider/placeholders/context/arguments/
+typed targets/open-with/export, native sessions/AT/performance and release gates
+remain mandatory. All other complete local1.0 families still required; no MVP.
 
-Actual saved enabled Keywords are registered opaque launcher commands.
-Search/Arrow/Enter opens exact saved entry without Run/cancel/approval/replay.
-Main fresh saved revision/hash/frame checks, validated bounded metadata and
-builtin recovery; no renderer graph/grant authority. Actual private-Xvfb flow
-4.20s,321targeted/37debugger/20UI/2intentsecurity/7contracts/19workflowintegration/
-19commandowner/8editorintegration pass. Two actual and five component affected
-captures inspected. Evidence apps/desktop/evidence/workflow-launcher-application.md.
-Full task/native/session/AT/release gates remain pending.
-
-Next bounded required application feature is saved Quicklinks tags (L2-05),
-using existing registered command/shared List/Form/owner/browser backend.
-Coordinator `.worktrees/linuxcast-application-controls`, branch
-**codex/quicklink-tags** frome2dec5a. Frozen contract2881204, raw-control
-hardeningdbfabde. Shared optional tags:8labels,32UTF16/64UTF8 each, NFKC+trim,
-normalized case-insensitive unique, no raw controls/surrogates/comma. Labels
-never become templates, URL authority or grants. Migration010 adds local saved
-JSON labels; no query history. Root repository/main/preload/client exact receipts
-and real9→10 snapshot/reopen/clear tests implemented;70targeted +43existing
-storage integration, full typecheck/scoped lint pass; independent boundary review clean. Historical-schema tests inspect raw snapshots and do not run current
-repositories before latest migration. Actual/UI integration remains pending.
-
-Agents all SOL/high:
-- `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branch
-  **codex/l2-05-quicklink-tags-ui** from2881204; cherry-pick hardeningdbfabde.
-  Owns only quicklinks presentation/fixtures/tests/UI/evidence/README. Shared
-  Form Tags field, local search/display/prefill/clear, canonical receipts and
-  persistent unknown recovery; controller/keyboard/axe/dark-light evidence.
-  Signed75bcdcc/c3a6bfd integratedec0da28/62cc997; clean, bounded UI finish complete.
-  No infrastructure/research/proof or extra dependencies.
-- `file_search_service_sol`: completed bounded root tags boundary review clean.
-- `alias_review_sol`: PR44 exact-head and tags UI/12captures clean; pending Cancel P2 closed.
-
-Current root tag source/evidence complete on signed62cc997 (UIec0da28 author
-75bcdcc, sharedFormd00f8f4, final authoredc3a6bfd). Independent boundary/UI reviews
-clean; pending Save clipping P2 closed with corrected capture and full bounds/
-heldEnter/no-focus/no-duplicate regression. Author/integrated ownedtrees exact.
-PASS187units/11contracts/29security/36L2integration(actual5.77s),43F2storage,
-17D1units/11D1UI; author32tagUI+6focused followup cases. Six actual/12component
-captures inspected. Full typecheck/scopedlint/plan/diff pass. Actual reducedmotion
-captures avoid transient theme-animation pixels. Evidence
-`apps/desktop/evidence/quicklink-tags-application.md`. No current live test handles.
-Next: sign evidence/docs, publish focused PR, inspect exact-head CI/configured
-reviews/threads, normal merge promptly, primary frozen install/build and record
-merge. All broader L2-05/native/session/AT/release requirements remain pending.
-
-## Complete scope / runtime
-
-Registry8done/18in-progress/71planned;56passed/325pending/8not-applicable. Registry
-is authoritative; generated cards never hand edited. Full task/node families,
-settings/groups/packages/ten examples/debugger/history and all remaining1.0 scope
-remain required, including R1-01/R1-02/R1-03. F2credential setup/status/provider/
-package/nativeAT acceptance remains; launcher/providers/history/full native typed
-flows and file/calculator/Quicklinks full families also remain. No MVP downgrade.
-
-PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp. Normal escalation for Git metadata/
-signing/network and actual isolated apps/local storage sockets. Abstract sockets
-fail EPERM in the ordinary sandbox; don't call it a regression/change ownership.
-Mapped runner takes ONE task ID and validates every path. Targeted checks use
-LINUXCAST_TEST_FILES JSON + vitest config. Serialize actual tests sharing dist.
-No --no-sandbox/user display. Historical native lab remains stopped/private;
-no new device/VM/proof work scheduled. No live test handles after final checks.
+PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp; Node24.22.1/Bun1.4.4/Electron45/
+SQLite3.53.4/GIO2.72.4. Escalation needed for Git signing/network/private app and
+abstract owner sockets (ordinary sandbox EPERM is not a source regression).
+Mapped runner takes one task ID; targeted checks use LINUXCAST_TEST_FILES JSON.
+Serialize actual tests sharing dist. No --no-sandbox/user display. No live test
+handles. Historical native lab stays stopped/private; no new device/VM/proof work.

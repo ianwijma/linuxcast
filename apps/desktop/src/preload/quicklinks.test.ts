@@ -45,3 +45,8 @@ it('validates exact transient query receipts and forbids extra argument echoes f
 it('sends canonical tag labels and rejects mismatched tag receipts without replay',async()=>{
  const {api,invoke}=fixture();invoke.mockResolvedValueOnce({ok:true,value:{record:{...record,tags:['Work']}}});expect(await api.saveQuicklink({...save,tags:[' Ｗｏｒｋ ']})).toMatchObject({ok:true,value:{record:{tags:['Work']}}});expect(invoke).toHaveBeenLastCalledWith(QUICKLINK_CHANNELS.save,{protocolVersion:1,...save,url:record.url,tags:['Work']});invoke.mockResolvedValueOnce({ok:true,value:{record:{...record,tags:['Other']}}});expect(await api.saveQuicklink({...save,tags:['Work']})).toMatchObject({ok:false});invoke.mockClear();expect(await api.saveQuicklink({...save,tags:['Work','ｗｏｒｋ']})).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
 });
+
+it('requires exact pin/hide flags while treating false and absent as equivalent ordinary defaults',async()=>{
+ const {api,invoke}=fixture();for(const field of ['pinned','hidden'] as const){invoke.mockResolvedValueOnce({ok:true,value:{record}});expect(await api.saveQuicklink({...save,[field]:true})).toMatchObject({ok:false});invoke.mockResolvedValueOnce({ok:true,value:{record:{...record,[field]:true}}});expect(await api.saveQuicklink({...save,[field]:true})).toMatchObject({ok:true});}
+ invoke.mockResolvedValueOnce({ok:true,value:{record}});expect(await api.saveQuicklink({...save,pinned:false,hidden:false})).toMatchObject({ok:true});invoke.mockClear();expect(await api.saveQuicklink({...save,pinned:1} as never)).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
+});

@@ -119,6 +119,48 @@ unsupported-placeholder behavior remains covered by regressions, with no new
 placeholder capability. Actual tag SQLite migration/persistence and native
 browser dispatch are coordinator-owned checks, separate from these observers.
 
+## Saved Pin/Hide preferences
+
+Rows provide explicit **Pin quicklink / Unpin quicklink** and **Hide quicklink /
+Show quicklink** actions. The dedicated List filters the complete 500 summaries
+by local name/host/tags, sorts pinned matches first and stable IDs within each
+group, then projects at most 100 rows while retaining a matching selected ID.
+Hidden rows are excluded by default. **Show hidden Quicklinks / Hide hidden
+Quicklinks** remains available in Actions even when no results match; reopening
+starts with hidden rows excluded. Plain Pinned/Hidden labels expose state. A
+hidden row's Open action is disabled with Show remediation, including a saved
+web-search preview refreshed after a concurrent Hide.
+
+Each metadata action fresh-loads the selected exact record, then uses the existing
+full Save CAS while preserving name, URL, tags, search configuration and the other
+flag. Only a matching next revision and complete authoritative summary list may
+change presentation. False and absent flags are equivalent; unrelated summaries
+must remain unchanged. Form editing preserves the saved flags. Metadata actions
+never navigate, hide Linuxcast, copy or open a browser. A hidden selected row
+moves selection to a real remaining result without invoking it.
+
+Persistent unknown-metadata recovery, bounded requests and original query/view/
+selection guards remain in use. Read failure before Save does not claim a write;
+an unconfirmed Save requires explicit Reload before further writes/Open. Back,
+Hide, query/selection changes, hidden-inclusion changes and disposal fence late
+receipts. Reload never replays a mutation or browser operation.
+
+This increment adds 33 focused controller cases and five Chromium keyboard/axe
+cases to the retained 120/32 baseline. Nine inspected public captures named
+`evidence/*-quicklinks-preferences-*` cover dark/light pinned ordering, hidden
+rows, empty-result recovery and unknown Save, plus pending disabled actions.
+Held Enter during Hide cannot replay an action; existing held-Enter, IME shared
+behavior, dirty Form and 200%-text checks remain applicable. Linux x64,
+Node24.22.1/Bun1.4.4; controller and Chromium command selections are the same as
+above. Full typecheck, scoped ESLint, plan and diff checks pass.
+
+These are component request observations, not real SQLite migration/persistence
+or native browser acceptance; the coordinator owns those integrations. This
+supplies partial L2-05 UI/PRIVACY evidence and preserves AC01/AC02 regression
+coverage without adding placeholder authority. Root quicklink-provider ranking,
+frecency/shortcuts, native export, remaining templates/targets and supported
+desktop/AT/release gates are still required. Full L2-05 remains in progress.
+
 Design sections: Shell/navigation; Results/actions; List/Grid/Detail/Form;
 States/motion; Accessibility; Review gate. Existing tokens, fonts, neutral rows,
 focus, disabled reasons and action affordances are reused. Fixture CSS changes
@@ -126,10 +168,10 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 120 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 153 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
-- `tests/quicklinks.ui.test.ts`: 32 real Chromium keyboard/axe cases, including
+- `tests/quicklinks.ui.test.ts`: 37 real Chromium keyboard/axe cases, including
   dirty cancel/focus, CRUD request observation, pending/late replies, explicit
   recovery, later identities, unavailable capabilities, typed definitions, local
   previews, exact argument/configuration receipts and held Enter. The 54 original
@@ -169,7 +211,7 @@ AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establi
 the complete placeholder feature. Actual coordinator persistence/dispatch evidence
 is separately described above. Full context snapshots and other named arguments, nonrecursive snippets, other
 typed URL components, browser/
-open-with/file/registered-URI targets, pin/hide and native export remain
+open-with/file/registered-URI targets and native export remain
 required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive
 technology and release acceptance remain pending. This slice does not complete
 L2-05 or reduce the agreed 1.0 scope.
