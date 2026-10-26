@@ -22,7 +22,7 @@ export class FileSearchController {
   constructor(api:FileSearchApi){
     this.#api=api;this.session=new ViewSession(this.#foldersView(),id=>this.#closed(id));
     this.#pathCopy=new IndexedPathCopy({api,onChange:()=>this.#publish(),isCurrent:context=>this.#currentCopy(context)});
-    this.host={selectionChanged:()=>this.#publish(),queryChanged:(id,query)=>this.query(id,query),action:intent=>{void this.execute(intent);}};
+    this.host={selectionChanged:()=>{this.#invalidateCopy();this.#publish();},queryChanged:(id,query)=>this.query(id,query),action:intent=>{void this.execute(intent);}};
   }
   getAppearance=()=>this.#state?.appearance??'dark';
   start(){if(this.#active || this.#disposed)return;this.#active=true;this.#unsubscribe=this.#api.onState(state=>{if(this.#active)this.#acceptState(state);});void this.refresh();}

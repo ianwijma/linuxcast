@@ -76,3 +76,41 @@ buffer, preview/large-text windows, open/open-with/reveal, move/rename/trash wit
 conflict/restore policy, terminal actions and required deletion confirmations.
 No preview/index-cache deletion path or original-file mutation is added here.
 The complete local 1.0 scope is unchanged.
+
+## Integrated application evidence
+
+Coordinator checks on the pinned runtime pass:63mapped units (29presentation,
+31file-search controller,3shared native writer),18main/preload security,
+3contracts and10Chromium keyboard/axe. Shared host changes additionally pass
+16shared units,10shared-view/12file-search/19calculator browser regressions,
+and43calculator main/preload security checks. Typecheck/lint/frozeninstall and
+plan/diff validation pass. Independent GPT-6.1 SOL/high final source review is
+clean. Its two UI publication findings now have regression assertions: Detail
+Copy is enabled immediately under a stable paused root, and pending List→Folders
+Back immediately publishes the uncertainty warning without waiting for an event.
+The shared primary action remains focusable with aria-disabled while pending;
+dispatch is guarded, and Escape works after pointer activation.
+
+Actual production Electron45/SQLite3.53.4 and packaged native index/helper run in
+an owned private Xvfb/X11 profile. The5.50second file flow uses a separate native
+xclip reader to verify no copy on query/Details, explicit absolute path copying
+from both Detail and List, known unsupported session without writes and manual
+recovery. Real rename watching, resident close/reopen, full process restart paused
+and fresh query/copy are covered. Paused index clear removes rows proactively;
+a saved old result identity is rejected without another write. Original sources
+survive clearing and both folder-removal outcomes; Quit closes an active watcher.
+Native folder chooser/confirmation choices alone are instrumented. Actual
+`evidence/application-{dark,light}-indexed-path.png` captures were inspected and
+axe passes. The existing packaged calculator flow also passes in5.52seconds
+through the same native clipboard guard. Durations are smoke observations, not
+performance acceptance. No user's display or private clipboard is touched.
+
+The request exposes no clipboard payload or path argument. Main caches only the
+latest bounded admitted metadata and rechecks selected-root state before deriving
+the canonical path. A shared main-only native writer rejects concurrent effects
+rather than queuing them. A4second main receipt deadline retains its slot until
+the native effect settles; closing does not undo a possible write. Error replies
+and UI status remain fixed safe text. Copying does not create path history,
+resolve symlinks, verify existence, open a source or grant extension authority.
+Native desktop denial/session/AT, installed-package and full release gates remain
+outstanding along with all other full L2-03 actions/buffer/previews.

@@ -115,7 +115,7 @@ it('does not assign an old copy receipt to the newly selected result',async()=>{
   let finish!:(value:Awaited<ReturnType<NonNullable<FileSearchApi['copyPath']>>>)=>void;
   const copyPath=vi.fn<NonNullable<FileSearchApi['copyPath']>>(()=>new Promise(resolve=>{finish=resolve;}));const f=setup({copyPath});await settled();await search(f);const pending=invoke(f.controller,'files:copy-path',rows[0]!.id);
   f.controller.session.select(top(f.controller).view.viewId,rows[1]!.id);f.controller.host.selectionChanged?.(top(f.controller).view.viewId,rows[1]!.id);
-  finish({ok:true,value:{outcome:'copied',resultId:rows[0]!.id,rootId,generation,path:root.displayPath+'/'+rows[0]!.path}});await pending;expect(top(f.controller).selection).toBe(rows[1]!.id);expect(top(f.controller).view.status?.message).not.toBe('Path copied.');
+  finish({ok:true,value:{outcome:'copied',resultId:rows[0]!.id,rootId,generation,path:root.displayPath+'/'+rows[0]!.path}});await pending;expect(top(f.controller).selection).toBe(rows[1]!.id);expect(top(f.controller).view.status?.message).toContain('Copy may have occurred');
 });
 
 it('immediately publishes uncertainty when pending List copy returns to Folders without a state event',async()=>{
