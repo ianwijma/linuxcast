@@ -6,6 +6,7 @@ import {
 import type { QuicklinkRecord,QuicklinkSummary,QuicklinkSave,QuicklinkSelection,ShellCommandReply } from '@linuxcast/contracts';
 import { StorageRequestError } from '@linuxcast/storage';
 import { ApplicationsUnavailable } from '@linuxcast/applications';
+import { buildWebSearchUrl,WebSearchBuildError } from '@linuxcast/quicklinks/web-search';
 
 export interface QuicklinkBackend {
   list():Promise<QuicklinkSummary[]>;
@@ -68,7 +69,7 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         const {protocolVersion,...input}=quicklinkSaveRequestSchema.parse(payload);void protocolVersion;
         attempted=true;const record=await backend.save(input);
         const reply=quicklinkRecordReplySchema.parse({ok:true,value:{record}});
-        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url)throw new Error('Mismatched save receipt.');
+        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch))throw new Error('Mismatched save receipt.');
         return reply;
       }
       const selection=quicklinkGetRequestSchema.parse(operation==='open'?{protocolVersion:1,id:(payload as QuicklinkSelection).id,revision:(payload as QuicklinkSelection).revision}:payload);
@@ -93,14 +94,22 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         if(receipt.id!==target.id||receipt.revision!==target.revision)throw new Error('Mismatched deletion receipt.');
         return quicklinkRemoveReplySchema.parse({ok:true,value:{...receipt,outcome:'removed'}});
       }
+      const opening=quicklinkOpenRequestSchema.parse(payload),definition=checked.value.record;
+      let url=definition.url,webSearch:{query:string;url:string}|undefined;
+      if(definition.webSearch){
+        if(opening.query===undefined)return failed('invalid-request','Enter and review a query before opening this web search.');
+        url=buildWebSearchUrl(definition.url,definition.webSearch,opening.query);
+        webSearch={query:opening.query,url};
+      }else if(opening.query!==undefined)return failed('invalid-request','A literal Quicklink does not accept a search query. Reload Quicklinks.');
       // Awaiting the owner may have changed sender, registry or visibility.
       const freshBlocked=await gate.checkVisibility(event,expectedRevision);if(freshBlocked)return freshBlocked;
       if(!gate.trusted(event))return denied();
       if(!alive()||gate.revision()!==expectedRevision)return running();
-      attempted=true;const outcome=await gate.openUrl(checked.value.record.url);
-      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome}});
+      attempted=true;const outcome=await gate.openUrl(url);
+      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome,...(webSearch?{webSearch}:{})}});
       await gate.recordUse();return reply;
     }catch(error){
+      if(error instanceof WebSearchBuildError)return failed('invalid-request','This search target is invalid or too large. Edit the search or shorten the query, then review it again.');
       if(error instanceof StorageRequestError&&error.effectOutcome==='not-dispatched'){
         if(error.reasonCode==='conflict')return changed();
         if(error.reasonCode==='quicklink-name-conflict')return failed('conflict','Another Quicklink uses this name. Choose a different name.','quicklink-name-conflict');

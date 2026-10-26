@@ -52,7 +52,9 @@
     ],
     "L2-05": [
       "packages/builtins/quicklinks/tests/presentation.test.ts",
-      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
+      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
+      "packages/templates/tests/templates.test.ts",
+      "packages/builtins/quicklinks/tests/web-search.test.ts"
     ]
   },
   "contracts": {
@@ -181,6 +183,7 @@
     "L2-05": [
       "packages/builtins/quicklinks/tests/repository.integration.test.ts",
       "packages/storage/tests/quicklinks.integration.test.ts",
+      "packages/storage/tests/web-search.integration.test.ts",
       "apps/desktop/tests/quicklinks.integration.test.ts"
     ]
   },
