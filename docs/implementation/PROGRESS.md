@@ -17,20 +17,25 @@ An increment is not goal completion.
 
 ## Integrated base
 
-Primary clean develop c8be683c1825640cfd8dccb63d7b8af9dad5faf3,
+Primary clean develop **6feaf5831f7acaa3753083db5d79d2216599bed7**,
+[PR43](https://github.com/ianwijma/linuxcast/pull/43) merged26October19:39:18UTC.
+Exact reviewed head82c2a7dee76c29943ab88470a419d1a036635798, CI40388536916
+validate PASS10s; no requested GitHub reviewers/submissions/comments/threads.
+Normal exact-head merge; primary frozen install/production build66assets passed.
+Prior basec8be683c1825640cfd8dccb63d7b8af9dad5faf3,
 [PR42](https://github.com/ianwijma/linuxcast/pull/42) workflow draft editor merged
 26October16:43:56UTC. Prior [PR41](https://github.com/ianwijma/linuxcast/pull/41)
 cc837ab saved web searches merged16:03:05UTC. Both reviewed/tested, CI passed,
 normal exact-head merges and primary frozen installs/production builds passed.
 Prior application increments and remaining scope are recorded in registry/Git.
 
-## Current increment: actual saved text workflow run
+## Integrated PR43: actual saved text workflow run
 
-Coordinator `.worktrees/linuxcast-application-controls`, **codex/workflow-text-run**
-fromc8be683. Freeze d9f6a09/4300656; exact-run Cancel fix1e96fe2. Engine e900235
+Coordinator `.worktrees/linuxcast-application-controls`; previous branch
+**codex/workflow-text-run** integrated by PR43. Freeze d9f6a09/4300656; exact-run Cancel fix1e96fe2. Engine e900235
 (author signed e7b1c7f); UI c3d53f9 (author signed a1e38dc), both integrated.
-Root integration signed d7337ea; final reset-authority fix follows it.
-All18 integration cases pass. PR/CI/final exact-head reconciliation next.
+Root integration signed d7337ea and final reset fix82c2a7d. All18 integration
+cases, exact-head independent reconciliation, CI passed; merged as above.
 
 Before: valid workflow could be saved; Run visibly unavailable. After: Run saved
 workflow→input→dedicated fixed Keyword/Transform/Copy worker→exact main broker
@@ -83,13 +88,20 @@ W1-02/W1-03/W2-03 remain in-progress; privacy passed only, all wider criteria pe
   signed UI c3d53f9 exactly reconciled to reviewed a1e38dc/all11 captures, canvas
   embed/Back focus clean. Final root SHA/evidence reconciliation still needed.
 
-Next: sign/push focused actual text-run PR, attach it, inspect configured/requested
-GitHub reviews/bots and CI for current head, normal exact-head merge promptly.
-Refresh primary frozen install/build and record merge. Then select the next
-concrete application flow (saved workflow Keyword registration/search/action from
-existing launcher, or bounded W2-02 editing gaps needed by that flow), read its
-cards/norms/freeze shared interface, and dispatch only SOL/high disjoint product
-work. Do not give manifest_review infrastructure/research/proof expansion.
+Next concrete flow selected automatically: saved workflow Keyword commands in
+the actual launcher → search/navigate/activate → existing run workspace with
+the exact entry preselected → explicit Run/approval/result. Opening never runs.
+New coordinator branch **codex/workflow-launcher-commands** from6feaf583. Root
+owns command registration/opaque identities/fresh saved authority/routing/IPC.
+Frozen UI subset `packages/workflows/LAUNCHER-ENTRY-INCREMENT.md`; author may
+change only debugger/** for initialEntry presentation and guards.
+
+`manifest_review_sol` next bounded W2-03 assignment: reuse its clean worktree,
+new **codex/w2-03-launcher-entry-ui** from6feaf583; implement optional initialEntry
+with no fallback to the wrong/disabled/missing Keyword, no mount execution,
+preserve actual host run/prompt on intent changes, dark/light keyboard evidence.
+No infrastructure/research/proof. Full launcher registration/routing acceptance
+awaits root implementation and actual integration. All agents remain SOL/high.
 
 ## Complete scope / runtime
 
