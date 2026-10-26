@@ -16,7 +16,7 @@ afterEach(async()=>{vi.restoreAllMocks();for(const db of databases.splice(0))if(
 function request<M extends QuicklinkStorageMethod>(db:Database.Database,method:M,input:unknown):QuicklinkStorageMethods[M]['result'] {
   return db.transaction(()=>parseContract(quicklinkRepositoryContracts.get(method)!.result,dispatchQuicklinks(db,method,input))).immediate() as QuicklinkStorageMethods[M]['result'];
 }
-async function fixture(version:6|7|10=10){
+async function fixture(version:6|7|10|11=11){
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-quicklinks-repository-'));directories.push(directory);
   const path=join(directory,'data.db'),db=new Sqlite(path);databases.push(db);
   db.pragma('foreign_keys=ON');db.pragma('journal_mode=WAL');db.pragma('trusted_schema=OFF');
@@ -26,11 +26,13 @@ async function fixture(version:6|7|10=10){
   db.transaction(()=>db.exec(schema)).immediate();
   if(version>=7)db.transaction(()=>db.exec(webSearchMigration)).immediate();
   if(version>=10)db.transaction(()=>db.exec(tagsMigration)).immediate();
+  if(version>=11)db.transaction(()=>db.exec(presentationMigration)).immediate();
   return {db,path};
 }
 const schema=await readFile(new URL('../../../storage/src/migrations/006-quicklinks.sql',import.meta.url),'utf8');
 const webSearchMigration=await readFile(new URL('../../../storage/src/migrations/007-quicklink-web-searches.sql',import.meta.url),'utf8');
 const tagsMigration=await readFile(new URL('../../../storage/src/migrations/010-quicklink-tags.sql',import.meta.url),'utf8');
+const presentationMigration=await readFile(new URL('../../../storage/src/migrations/011-quicklink-presentation.sql',import.meta.url),'utf8');
 const create=(db:Database.Database,name='Public Link',url='https://example.com/public')=>request(db,'quicklinks.save',{expectedRevision:0,name,url});
 const selection=(value:QuicklinkRecord)=>({id:value.id,revision:value.revision});
 
@@ -118,7 +120,7 @@ it('rejects overflowing revision and overfilled catalogues; owner transaction ro
 it('upgrades actual literal schema6 rows without changing identity/version/base/timestamps and persists optional search configuration after reopen',async()=>{
   const {db,path}=await fixture(6),literal={id:randomUUID(),revision:4,name:'Existing Literal',url:'https://example.org/public?q=literal',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-02-01T00:00:00.000Z'};
   db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(literal.id,literal.revision,literal.name,'existing literal',literal.url,literal.createdAt,literal.updatedAt);
-  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);}).immediate();
+  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);db.exec(presentationMigration);}).immediate();
   expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
   expect(db.prepare('SELECT web_search FROM quicklinks').get()).toEqual({web_search:null});
   expect(request(db,'quicklinks.list',{})).toEqual([{id:literal.id,revision:4,name:literal.name,host:'example.org'}]);
@@ -177,4 +179,12 @@ it('stores canonical tag labels with exact versioning, summary projection, clear
 });
 it.each(['["Work","ｗｏｒｋ"]','["bad,tag"]','[1]','["bad\\nlabel"]'])('rejects corrupt stored tag labels without partial results or overwritten source: %s',async tags=>{
  const {db}=await fixture(),saved=create(db);db.prepare('UPDATE quicklinks SET tags_json=? WHERE id=?').run(tags,saved.id);for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Do not overwrite',url:saved.url})])expect(operation).toThrowError(expect.objectContaining({message:'Invalid protocol message.'}));expect(db.prepare('SELECT revision,name FROM quicklinks WHERE id=?').get(saved.id)).toEqual({revision:1,name:saved.name});
+});
+
+it('persists reversible pin/hide flags with CAS and preserves full saved definitions across reopen',async()=>{
+ const {db,path}=await fixture(),base={expectedRevision:0,name:'Public pinned search',url:'https://example.org/search',webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE},tags:['Public']},saved=request(db,'quicklinks.save',base);expect(saved).not.toHaveProperty('pinned');expect(saved).not.toHaveProperty('hidden');
+ const pinned=request(db,'quicklinks.save',{...base,id:saved.id,expectedRevision:1,pinned:true}),hidden=request(db,'quicklinks.save',{...base,id:saved.id,expectedRevision:2,pinned:true,hidden:true});expect(pinned).toMatchObject({...saved,revision:2,pinned:true,updatedAt:pinned.updatedAt});expect(hidden).toMatchObject({...saved,revision:3,pinned:true,hidden:true,updatedAt:hidden.updatedAt});expect(request(db,'quicklinks.list',{})).toEqual([{id:saved.id,revision:3,name:saved.name,host:'example.org',webSearch:true,tags:['Public'],pinned:true,hidden:true}]);expect(()=>request(db,'quicklinks.save',{...base,id:saved.id,expectedRevision:2,hidden:false})).toThrow(QuicklinkRepositoryError);db.close();const next=new Sqlite(path);databases.push(next);expect(request(next,'quicklinks.get',selection(hidden))).toEqual(hidden);const shown=request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:3,pinned:false,hidden:false});expect(shown).not.toHaveProperty('pinned');expect(shown).not.toHaveProperty('hidden');expect(shown).toMatchObject({...saved,revision:4,updatedAt:shown.updatedAt});expect(next.prepare('SELECT pinned,hidden FROM quicklinks WHERE id=?').get(saved.id)).toEqual({pinned:0,hidden:0});
+});
+it('rejects nonboolean stored presentation flags without publishing or overwriting corrupt source',async()=>{
+ const {db}=await fixture(),saved=create(db);db.pragma('ignore_check_constraints=ON');db.prepare('UPDATE quicklinks SET pinned=2 WHERE id=?').run(saved.id);for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:'Do not overwrite',url:saved.url})])expect(operation).toThrowError(expect.objectContaining({message:'Invalid protocol message.'}));expect(db.prepare('SELECT revision,pinned FROM quicklinks WHERE id=?').get(saved.id)).toEqual({revision:1,pinned:2});
 });

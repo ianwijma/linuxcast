@@ -18,7 +18,7 @@ export function createQuicklinkApi(transport:Pick<ShellTransport,'invoke'>):Requ
   saveQuicklink:async request=>{
     try{const parsed=quicklinkSaveRequestSchema.parse({...request,protocolVersion:1}),value=await transport.invoke(QUICKLINK_CHANNELS.save,parsed);
       if(!withinLimit(value))return unavailable;const result=quicklinkRecordReplySchema.parse(value);
-      return !result.ok||(parsed.id===undefined||result.value.record.id===parsed.id)&&result.value.record.revision===parsed.expectedRevision+1&&result.value.record.name===parsed.name&&result.value.record.url===parsed.url&&JSON.stringify(result.value.record.webSearch)===JSON.stringify(parsed.webSearch)&&JSON.stringify(result.value.record.tags??[])===JSON.stringify(parsed.tags??[])?result:unavailable;
+      return !result.ok||(parsed.id===undefined||result.value.record.id===parsed.id)&&result.value.record.revision===parsed.expectedRevision+1&&result.value.record.name===parsed.name&&result.value.record.url===parsed.url&&JSON.stringify(result.value.record.webSearch)===JSON.stringify(parsed.webSearch)&&JSON.stringify(result.value.record.tags??[])===JSON.stringify(parsed.tags??[])&&(result.value.record.pinned??false)===(parsed.pinned??false)&&(result.value.record.hidden??false)===(parsed.hidden??false)?result:unavailable;
     }catch{return unavailable;}
   },
   removeQuicklink:async request=>{
