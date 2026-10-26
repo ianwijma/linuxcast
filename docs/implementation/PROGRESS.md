@@ -150,8 +150,9 @@ metadata change. Root will own migration011/repository/main/preload/client,
 unknown receipt fences and actual app acceptance. Freeze/mocks do not establish
 persistence, native effects or acceptance; all implementation still pending.
 
-Next manifest_review_sol assignment will reuse its clean isolated worktree on
-**codex/l2-05-quicklink-presentation-ui** from the signed freeze. UI-owned paths
+manifest_review_sol is assigned and has verified its clean isolated worktree on
+**codex/l2-05-quicklink-presentation-ui** from signed freeze f8c29a2.
+Source implementation is underway; controller/UI/actual evidence does not yet exist. UI-owned paths
 only: presentation, fixtures/tests/evidence/README. No infrastructure/research/
 proof/new services/packages. Required tests/captures and limitations are in the
 freeze. Root actual integration and prompt reviewed/tested small merge next.
