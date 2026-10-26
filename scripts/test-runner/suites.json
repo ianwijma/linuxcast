@@ -51,6 +51,7 @@
       "packages/builtins/file-search/tests/controller.test.ts"
     ],
     "L2-05": [
+      "packages/builtins/quicklinks/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
     ]
   },
@@ -129,6 +130,9 @@
     ],
     "L2-03": [
       "packages/builtins/universal-actions/tests/path-copy.ui.test.ts"
+    ],
+    "L2-05": [
+      "packages/builtins/quicklinks/tests/quicklinks.ui.test.ts"
     ]
   },
   "integration": {
@@ -175,7 +179,8 @@
     ],
     "L2-05": [
       "packages/builtins/quicklinks/tests/repository.integration.test.ts",
-      "packages/storage/tests/quicklinks.integration.test.ts"
+      "packages/storage/tests/quicklinks.integration.test.ts",
+      "apps/desktop/tests/quicklinks.integration.test.ts"
     ]
   },
   "security": {

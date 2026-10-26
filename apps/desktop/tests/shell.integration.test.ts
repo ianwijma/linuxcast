@@ -214,7 +214,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     return { require: typeof windowApi.require, process: typeof windowApi.process,
       methods: Object.keys(windowApi.linuxcast ?? {}).sort(), runtime: windowApi.linuxcast?.runtime };
   })).toEqual({ require: 'undefined', process: 'undefined',
-    methods: ['copyCalculatorResult', 'executeApplicationAction', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherHidden', 'setLauncherPinned'],
+    methods: ['listQuicklinks','getQuicklink','saveQuicklink','removeQuicklink','openQuicklink','copyCalculatorResult', 'executeApplicationAction', 'executeLauncherCommand', 'getLauncherCommands', 'getState', 'hideLauncher', 'onState', 'openDataSettings', 'openLauncherUrl', 'quit', 'reportContentHeight', 'runtime', 'setLauncherAlias', 'setLauncherHidden', 'setLauncherPinned'].sort(),
     runtime: { sandboxed: true, contextIsolated: true } });
   expect(await page.evaluate(async () => {
     return await new Promise<boolean>(resolve => {

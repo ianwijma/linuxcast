@@ -57,15 +57,27 @@ Validation on Node 24.22.1/Bun 1.4.4:
 - `evidence/`: dark/light List, Form, invalid-input and unknown-opening captures,
   plus pending Save, loading, unavailable and separate Hide-failure states.
 - Typecheck, scoped ESLint, plan validation and diff checks pass. Tests use
-  `LINUXCAST_TEST_FILES` with the two explicit owned test paths until coordinator
-  suite integration. Shared List query-focus fix 74b9954 is a separate prerequisite.
+  the mapped `bun run test:unit -- L2-05` and `bun run test:ui -- L2-05` suites.
+  Shared List query-focus fix 74b9954 is a separate prerequisite.
+
+Coordinator integration also passes five strict contract tests, 21 main/preload
+security checks, 11 domain SQLite and five owner/client migration/persistence
+checks, three root routing checks and the actual bundled Electron45/GIO2.72.4
+flow on an owned private Xvfb X11 display (SQLite3.53.4). The latter creates,
+locally searches, edits and explicitly opens a saved URL through a real private
+browser-handler process with exact argv/empty stdin; it checks native-choice
+cancel/confirm deletion, usage clear, complete restart and a URL-free aggregate
+usage export. Only native dialog choices are instrumented. This is actual
+process/persistence evidence, not supported desktop/session or browser page
+completion acceptance. Production captures are in `apps/desktop/evidence/`
+with the `quicklinks-application-` prefix.
 
 Fixtures are labelled, public synthetic in-memory data and request observers.
 They perform no native confirmation, actual browser handoff, SQLite write or
 network request. These checks provide partial L2-05 AC01 input/authority,
 AC02 explicit unsupported-template, UI and PRIVACY evidence; they do not establish
-placeholder execution or native persistence/dispatch. The coordinator owns actual
-SQLite/main/preload/GIO and production-app validation. Full snapshot placeholders,
+placeholder execution. Actual coordinator persistence/dispatch evidence is
+separately described above. Full snapshot placeholders,
 named arguments, nonrecursive snippets, typed URL component builders, browser/
 open-with/file/registered-URI targets, tags/pin/hide and native export remain
 required. L1/F3 prerequisites, Debian GNOME/KDE Wayland/X11, native assistive

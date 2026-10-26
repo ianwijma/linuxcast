@@ -8,11 +8,12 @@ function setup(){let revision=1;
     listQuicklinks:vi.fn(async()=>({ok:true as const,value:{records:[{id,revision:1,name:'Public docs',host:'example.invalid'}]}})),getQuicklink:vi.fn(),saveQuicklink:vi.fn(),removeQuicklink:vi.fn(),openQuicklink:vi.fn(async()=>({ok:true as const,value:{id,revision:1,outcome:'dispatched' as const}}))};
   const dismiss=vi.fn(async()=>({ok:true as const,value:null})),controller=new LauncherController(api,dismiss);controllers.push(controller);controller.setVisible(true);return {api,dismiss,controller,nextRevision:()=>{revision++;}};
 }
+function query(f:ReturnType<typeof setup>,value:string){f.controller.session.setQuery('linuxcast-launcher',value);f.controller.query(value);}
 function top(f:ReturnType<typeof setup>){return f.controller.session.getSnapshot().frames.at(-1)!;}
 async function invoke(f:ReturnType<typeof setup>,actionId:string,itemId?:string){const frame=top(f);return f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId,...(itemId?{itemId}:{})});}
 async function open(f:ReturnType<typeof setup>){const frame=top(f);f.controller.session.select(frame.view.viewId,'linuxcast:open-quicklinks');await invoke(f,'linuxcast:open-quicklinks','linuxcast:open-quicklinks');await settle();}
 it('routes registered Quicklinks into the existing List/Form without generic execution or implicit browser effects',async()=>{
-  const f=setup();await settle();f.controller.query('saved root query');await settle();f.controller.query('Quicklinks');await settle();await open(f);expect(top(f).view).toMatchObject({kind:'list',title:'Quicklinks'});expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.api.openQuicklink).not.toHaveBeenCalled();
+  const f=setup();await settle();query(f,'saved root query');await settle();query(f,'Quicklinks');await settle();await open(f);expect(top(f).view).toMatchObject({kind:'list',title:'Quicklinks'});expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();expect(f.api.openQuicklink).not.toHaveBeenCalled();
   const list=top(f);f.controller.session.setQuery(list.view.viewId,'example.invalid');await settle();expect(top(f).view.kind).toBe('list');expect(top(f).view.kind==='list'&&top(f).query).toBe('example.invalid');await invoke(f,'quicklinks:new');expect(f.controller.session.getSnapshot().frames).toHaveLength(3);expect(top(f).view).toMatchObject({kind:'form',title:'New quicklink'});
   f.controller.setVisible(false);expect(f.controller.session.getSnapshot().frames).toHaveLength(1);f.controller.setVisible(true);await settle();expect(top(f).query).toBe('Quicklinks');expect(f.api.saveQuicklink).not.toHaveBeenCalled();expect(f.api.openQuicklink).not.toHaveBeenCalled();
 });
@@ -23,6 +24,6 @@ it('retains unknown Open across Hide/reopen and rejects a late receipt until exp
   await invoke(f,'quicklinks:reload');await invoke(f,'quicklinks:open',id);expect(f.api.openQuicklink).toHaveBeenLastCalledWith({id,revision:1,launcherRevision:2});expect(f.dismiss).toHaveBeenCalledTimes(1);
 });
 it('Back preserves root selection and query and never handles an action from a closed Quicklinks frame',async()=>{
-  const f=setup();await settle();f.controller.query('Quicklinks');await settle();await open(f);const frame=top(f);await invoke(f,'quicklinks:back');await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);expect(top(f).selection).toBe('linuxcast:open-quicklinks');expect(top(f).query).toBe('Quicklinks');
+  const f=setup();await settle();query(f,'Quicklinks');await settle();await open(f);const frame=top(f);await invoke(f,'quicklinks:back');await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);expect(top(f).selection).toBe('linuxcast:open-quicklinks');expect(top(f).query).toBe('Quicklinks');
   await f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:'quicklinks:open',itemId:id});expect(f.api.openQuicklink).not.toHaveBeenCalled();
 });
