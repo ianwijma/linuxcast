@@ -11,16 +11,13 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35). Frozen install unchanged and production build63assets pass. No app started on the user's display.
-Coordinator `.worktrees/linuxcast-application-controls` at same merge; branch **codex/file-search-navigation**, head **5f39ed3**, with merge checkpointb62d5cd, frozen directory contract765ee03 and reviewed owner/main/preload boundary95951fd. Uncommitted production navigation test is a DRAFT until UI/service integration; typecheck/lint pass but no runtime acceptance yet.
+Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/file-search-navigation**, sourcehead **ba092e3**. No uncommitted implementation or live testprocess at this checkpoint; all three SOL agents completed.
 
-[PR35](https://github.com/ianwijma/linuxcast/pull/35) merged26October07:27:02UTC. Exact reviewed head0cf3db5888ec12b6879653682d782f7eb8af88f8, CI40285788921 passed; no requested reviews/comments/unresolved threads. Normal exact-head merge. This goal turn made verified implementation/test/merge progress.
+Reviewed/tested L2-02 directory increment ready for focused PR/CI/normalmerge.117units/5contracts/22security/8actualintegration/35browser, fulltypecheck/lint pass. Production Electron/private-Xvfb actualflow11.48s; twoapplication+fourcomponent directory/emptycaptures inspected, axe passes. Final SOLhigh review clean through sourcee03e7e8 and productiontestba092e3 (same reviewed draft). Full task/nativeAT/session/release unfinished.
 
-Registry: done8 / in-progress12 / planned77;50passed/331pending/8not-applicable. L2-02 privacy passed with public fixture/source/screenshot evidence; full UI/extraction acceptance pending. Broader L1-01/D1-02 prerequisites remain incomplete under user-authorized unfinished increments.
+Prior goal turn made verified progress: PR35 filters merged31ce46b; current turn integrated navigation and verified its actualapplication flow. Registry done8/inprogress12/planned77,50passed/331pending/8NA. L2-02UI stillpending with partialevidence; privacy passed. Broader L1-01/D1-02 prerequisites unfinished under user-authorized increments.
 
-Verified:99units/4contracts/20security/7actualintegration;17sharedunits;39browser; fulltypecheck/lint/plan/diff. Actual production Electron/private-Xvfb flow8.56s. Independent SOL-high review clean. Four application and six component filter/range captures inspected. Shared empty-description and validation/theme regressions resolved.
-
-Next bounded application increment: **L2-02 indexed folder navigation**. Browse an actual directory result, view its direct indexed children, search within that folder, and move to its indexed parent/root using existing shared List/Actions. Keep filter/sort/query/copy safety, no source reads/opening/extraction or filesystem authority. Coordinator freezes narrow directory scope and owner SQL; manifest agent handles bounded UI. Contract/assignments active. `manifest_review_sol` implements bounded directory UI in `.worktrees/linuxcast-l1-01` / `codex/l2-02-directory-ui`; `file_search_service_sol` implements forwarding/echo/direct-child validation in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-directory-service`. Both SOLhigh. Service author9ed350c now integrated5f39ed3;31serviceunits+2actualnativeowner checks pass, integrated106L2-02units pass. Service final independent review clean. Root owns shared contracts/SQL/client/main/preload/status and real production integration. `alias_review_sol` boundary and service reviews clean; final UI/source delta still needed. No root live test process.
+Next: commit evidence/plan validation, push/open directory PR (attach), exacthead CI and requestedreview/comment/thread inspection, normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete application increment without asking the user. No infrastructure/proof expansion for manifest.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -36,15 +33,15 @@ Frozen request/formatter2e2aaaa; workspace linksb5704ad; shared-host pending key
 
 L2-03 stays **in-progress**. Current privacy criterion passed; full cardinality/deletion, preview/cache and UI criteria pending. Full typed actions, ordered multi-file buffer, open/open-with/reveal/move/rename/trash/conflicts/terminal, previews/large text and extension entry points still required. Indexed path copying does not verify source existence or grant file-open/read authority. Native desktop/session/AT, installed-package and release acceptance remain pending.
 
-## Active indexed navigation handoff
+## Current indexed navigation increment
 
-Frozen765ee03: search optional `directory:string`, canonical relative path, `''` means root children and requires `rootId`; successful reply echoes provided directory exactly. `fileSearchQueryInputSchema` is shared service input; request addsprotocol using safeExtend. `fileSearchMatchesDirectory(row,directory)` checks exact direct parent. Options/filter identity unchanged. This is index scope only, never filesystem authority.
+Frozen765ee03: optional canonical relative `directory` (`''`rootchildren) requires `rootId`; exactreplyecho/direct-parent helper. Root95951fd binds prefix and remaining-slash constraint beforeLIMIT; blankquery bypassesFTS only for explicitbrowse, relevancefallbackname. Service9ed350c→5f39ed3; UI24e4c0a→e03e7e8; actualappba092e3. All source independently reviewed clean.
 
-Root95951fd: blank query bypasses FTS only with explicit directory; bound literal prefix plus remaining-slash check excludes descendants/prefix siblings before LIMIT. Existing root/current generation/filter/sort constraints retained; relevance uses name order for browse without FTS. Actual5SQLite tests pass, including130rootrows and nested/wildcard/empty metadata scopes.22main/preload security cases pass, typecheck/scopedlint pass. Reviewer clean firstpass. Root uncommitted `apps/desktop/tests/file-search.integration.test.ts` draft inserts real nested/empty/child browse/copy/parent/root/Return flow after filterReset. Run only after authorcommits integrated; expectedactiontitles match manifest plan.
+Directory primaryBrowse, secondaryDetails/Copy; fileprimaryDetails/Copy unchanged. Root/Parent/Return replaceResults in place, preserve currentfilters, clearbrowsequery, restore original scope/query/selectedID onReturn when available. Exactdirectoryidentity, generation/copy fences, clear/removal/remediation retained. No filesystemread/open authority or history added.
 
-UI assignment: directory primary Browse folder, secondary Details/Copy; file primaryDetails/Copy. Browse root/Parent/Return actions replace currentResults frame, preserve filters, clearquery for browse, capture origin root/all/query/selectedID and restore onReturn under currentfilters. Exactdirectoryecho and stale/copyfences, visible path+empty state, only explicit browse sends emptyquery. Existing Escape stack retained. Own controller/tests/fixture/evidence/README only. Service owns service/tests/SERVICE only; author9ed350c integrated5f39ed3.31units+2existingrealnativeowner checks pass, fulltypecheck/scopedlint/plan pass; root integrated106units pass. Finalservice reviewclean. UI stillrunning; no authorSHA yet.
+Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. No PR yet at checkpoint; fullMIME/recents/extractors/nativeAT/session/release pending.
 
-Next: get author SHAs, cherry-pick onlyownedcommits, run actual productionflow and mapped checks, inspect newdark/lightshots, finalindependentreview; then focusedPR/CI/review/normalmerge. No navigationcompletion claim yet. Full MIME/recents/extractors/native/AT/release stillpending.
+Reusable completed SOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-02-directory-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-02-directory-service; read-only alias_review_sol. Verifyclean/switchbase for next assignment. Never reactivate Astra agents.
 
 ## Current L2-02 filter/sort integration
 
@@ -56,7 +53,7 @@ Service author24units+2actual checks; UI75units+19browser and10Copy path regress
 
 Reusable completed SOL-high agents: `manifest_review_sol` in `.worktrees/linuxcast-l1-01` / `codex/l2-02-filter-ui`; `file_search_service_sol` in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-filter-service`; read-only `alias_review_sol`. Verify clean and switch base before assigning next bounded work. Do not reactivate Astra agents.
 
-Full L2-02 remains in-progress: MIME filters, path navigation/recent files and opt-in budgeted/cancellable extractors absent. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
+Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/cancellable extractors absent. Indexed direct-child navigation now implemented in the current increment. Full supported desktop/session/native AT/release evidence and broader prerequisites stay pending. Name sort uses deterministic SQLite NOCASE ASCII folding, not locale-aware collation. Copy path is metadata only; no opening/read authority.
 
 ## Integrated application history and outstanding scope
 

@@ -236,3 +236,16 @@ still block submission; secure picker/credential/current-view guards remain.
 Independent GPT-6.1 SOL/high final source review is clean. All content/MIME/path
 navigation/recent-file, native/session/AT, dependency and release gaps above
 remain required; no complete L2-02 claim is made.
+
+## Integrated directory application evidence
+
+Coordinator `ba092e3` verifies production Electron navigation over actual Rust/SQLite
+indexed public sources: direct children, child search/native Copy path, nested and
+empty folders, Parent/root/Return and original query restoration. Existing watch,
+pause/restart, clear and original-preserving removal still pass. Only native
+chooser/confirmation choices are instrumented. Two inspected application dark/light
+captures are `evidence/application-*-directory.png`; axe passes.
+
+Integrated PASS:117units/5contracts/22security/8integration/35browser, fulltypecheck/lint.
+The11.48s private-Xvfb smoke is not performance or native desktop/AT/release evidence.
+Independent SOLhigh review clean. Full MIME/recents/extractor and release gaps remain.
