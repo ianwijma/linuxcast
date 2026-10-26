@@ -1,4 +1,4 @@
-# Explicit arithmetic and unit calculator — bounded L2-04 increments
+# Explicit arithmetic, unit and colour calculator — bounded L2-04 increments
 
 `CalculatorFlow` uses the existing launcher's shared `ViewSession` and host
 `ViewRenderer`. It pushes a Calculator Form onto the supplied parent view, then
@@ -12,15 +12,16 @@ Evaluate is a local read action against the separate pure `evaluateExpression`
 module. The Expression label and draft persist through fixed inline syntax,
 domain and size/complexity errors. Requests are bounded to 512 UTF-8 bytes and
 exclude controls/unpaired surrogates. A successful local result is plain metadata:
-Expression and Result. Detail Markdown is static and explains floating-point
-approximation, up to 15 significant digits and `%` dividing by 100. Expressions
+Expression and Result, plus Colour format for colour conversions. Detail Markdown
+is static: numbers explain floating-point approximation, up to15 significant
+digits and `%`; colours explain encoded-sRGB precision and quantization. Expressions
 cannot supply HTML, Markdown, links or executable content.
 
 **Copy result** is a separate primary write action. It uses only the optional
 named `copyCalculatorResult({revision, expression})` API. Main re-evaluates the
-expression and copies the canonical numeric result with its optional closed unit; the renderer
-has no arbitrary clipboard interface. A strict copied receipt must match both
-the numeric text and optional unit shown in the Detail before the UI reports “Result copied.” No automatic copy,
+expression and copies the canonical numeric/unit or closed colour result; the renderer
+has no arbitrary clipboard interface. A strict copied receipt must match text,
+optional unit and optional colour format before the UI reports “Result copied.” No automatic copy,
 hide, persistence, expression history or remote request is introduced.
 
 Pending copy disables duplicates and has a five-second presentation bound.
@@ -31,7 +32,7 @@ while a copy is pending invalidates its receipt and warns on the remaining Form
 that copying may have occurred; navigation/cancellation cannot undo a clipboard
 write. Disposal discards pending presentation work without claiming cancellation
 undid the write. A missing API disables Copy with remediation while local
-arithmetic remains usable.
+local calculation remains usable.
 
 Edit expression and Escape return Detail → Form → launcher, preserving the shared
 form draft/focus and the launcher's root query/selection. Dirty cancellation uses
@@ -78,6 +79,35 @@ Copy remains explicit. Missing, mismatched, invalid or unknown acknowledgement
 units are unknown copy outcomes, even if the numeric text matches. Back, hidden,
 disposed and stale unit-copy replies retain the existing no-replay guards.
 
+## Explicit local colours
+
+The same Form accepts one explicit colour followed by `to hex`, `to rgb` or
+`to hsl`, for example `#f80 to rgb`, `rgb(255 0 0 / 50%) to hex` or
+`hsl(120 100% 50%) to hex`. **Supported colours** is a read-only Form action with
+fixed syntax/range examples and public metadata. It preserves the unsent draft
+and focus, evaluates/copies nothing, and is unavailable from a result. Units help,
+colour help and a result are mutually exclusive, keeping root/Form/Detail depth3.
+
+Colour results show Expression, Colour format and the canonical Result as plain
+metadata. Their static explanation uses encoded sRGB, approximate floating-point
+conversion, 8-bit/channel hex quantization and up to6 fractional digits for
+functional output. Alpha is preserved without compositing. The numeric-unit and
+arithmetic-percent explanations do not appear on colour results. No custom swatch,
+CSS/DOM colour parser, remote resource or additional clipboard method is used.
+
+Hex supports3/4/6/8 digits; RGB/HSL use lowercase functional names with either
+legacy commas or space-separated components and optional alpha. Do not mix comma
+and slash syntax. Fixed errors retain invalid/range drafts and point to help.
+Named colours, variables, URLs, nested arithmetic, relative and wide-gamut colours
+are unsupported. See COLOURS.md for the exact grammar, component ranges, hue bound,
+canonical spelling and rounding policies; the separate pure engine owns parsing.
+
+Explicit Copy still sends revision/expression only. Numeric-looking, missing,
+mismatched, invalid or differently formatted colour receipts are unknown outcomes,
+even when another field matches. Back/disposal invalidate pending receipts without
+claiming the native write was undone; no copy is replayed automatically. Nothing
+stores expressions, colour results or history.
+
 Design references: DESIGN.md Shell and navigation; Results and actions; List,
 grid, detail and form; States and motion; Accessibility; Review gate. Production
 presentation contains only semantic ViewModels and existing host primitives,
@@ -85,27 +115,30 @@ tokens/fonts. `fixtures/preview.css` only lays out the labelled fixture.
 
 ## Evidence and remaining scope
 
-`tests/presentation.test.ts` has 49 passing presentation checks and
-`tests/calculator.ui.test.ts` has 19 passing Chromium keyboard/axe checks covering
+`tests/presentation.test.ts` has 72 passing presentation checks and
+`tests/calculator.ui.test.ts` has 29 passing Chromium keyboard/axe checks covering
 explicit Form and Detail transitions, draft errors/domain/oversize, clipboard unavailability,
 unknown/mismatched/pending replies, back/dirty cancel/focus, stale/disposed actions
 and local readonly metadata. Unit cases add length/function-scalar, temperature, decimal/binary
 data, unsupported/ambiguous and incompatible units, help draft/focus navigation,
-and exact numeric-text/unit copy acknowledgement checks. `fixtures/` explicitly observes clipboard requests
-without touching the host clipboard. Public synthetic arithmetic and unit expressions enter
+and exact numeric-text/unit copy acknowledgement checks. Colour cases add closed
+hex/RGB/HSL/alpha metadata, help/draft/error navigation, exact colour receipts,
+numeric/format/unit mismatch rejection and late pending/disposed guards. `fixtures/` explicitly observes clipboard requests
+without touching the host clipboard. Public synthetic arithmetic, unit and colour expressions enter
 test screenshots; no user content, secrets or external requests are used.
-Fifteen component screenshots cover dark/light Form, arithmetic and unit results,
-validation, Supported units help, plus unknown, unavailable and missing-copy
-states. Dark help/unit validation and light unit result were visually inspected;
+Twenty-one component screenshots cover dark/light Form, arithmetic/unit/colour
+results, validation, Supported units/colours help, plus unknown, unavailable and
+missing-copy states. All six new colour result/help/error captures were visually
+inspected. Dark help/unit validation and light unit result were visually inspected;
 the shared help-return focus fix is verified in both themes. Development checks use Node 24.22.1/Bun 1.4.4.
 Typecheck, scoped lint and plan validation pass. Browser checks require a local
 fixture server and real Chromium processes; they are not native clipboard proof.
 
-This presentation contributes bounded L2-04-AC01 and partial AC02 unit-conversion
+This presentation contributes bounded L2-04-AC01 and partial AC02 unit/colour-conversion
 UI and privacy evidence. The
-separate evaluator lane owns parser, conversion tables and numeric correctness. Coordinator main/
+separate evaluator lane owns parser, conversion tables and numeric/colour correctness. Coordinator main/
 preload/launcher routing owns sender validation, recomputation, actual clipboard
-and production Electron integration. Full L2-04 remains incomplete: calendar dates/timezones/DST, colours, configured currency/crypto adapters, timestamped
+and production Electron integration. Full L2-04 remains incomplete: calendar dates/timezones/DST, configured currency/crypto adapters, timestamped
 fixture-backed cache and stale/offline rate behavior remain required. Debian
 GNOME/KDE Wayland/X11, native assistive technology and full release acceptance
 remain pending. The complete local 1.0 scope is unchanged.
