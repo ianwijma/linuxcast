@@ -2133,7 +2133,8 @@
         "Bounded explicit Open URL increment25October2026: native author3c35b39/66ca32f integrated21671a8/69a30c9, application author1219ba0 integratedaece225, coordinator shared/main/preloadfbc5636/303f28e/31ce975 and real production fixture.108unit +84security +33browser +3URLcontracts +8native pass; actual production Electron45/SQLite3.53.4 private-Xvfb flow7.60s passes real missing-default recovery and actual one-URI process marker, separate Hide/reopen, owner usage/export and existing app/pin/alias/data/restart regression. Typecheck/lint/rustfmt/plan/diff pass. All author/reviewer agents GPT-6.1 SOL high. Independent shared/native/feature review clean after canonical hostname suffix correction; reviewer independently passed108units/35main/preload/3contracts, coordinator reran all84security/8native with working real pipes. Full task remains in-progress, no native desktop/release completion claim.",
         "Integrated25October2026 in PR30 https://github.com/ianwijma/linuxcast/pull/30, mergedaa24b9ea1139fdebb2236e2da2d4a9652f775d0 at12:53:37UTC. Exact reviewed head7ce70e2 CI40195078648 passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge; primary develop fast-forwarded clean. Full L1-02, prerequisite UI/native desktop and release acceptance remain unfinished. All author/reviewer agents were GPT-6.1 SOL high and completed.",
         "Next bounded application increment27October2026 after PR38/d1ac477: registered GIO Desktop Actions in existing root launcher Actions, preserving Open and metadata controls. Coordinatorowns shared contracts/main/preload/status; isolated SOLhigh author lanes own native application helper/transport and launcher UI. Frozen APPLICATION-ACTIONS.md defines declared allowlisted max16 actions, fresh fingerprint/visibility/sender checks, requested-only receipts, isolated stdio and no replay. This starts implementation only; no new native/UI/task acceptance inferred.",
-        "Bounded registered Desktop Actions increment27October2026: frozen81759cd/4545eff, main/preloada251db4, native923092d integratedad82d13, UI38fb7b5 integrated5df3a99, final wiring/compact-menu/actualevidencea537abe.210units/139security/5contracts/53launcher+10sharedbrowser checks and actual bundled11.23s flow pass; author11nativeprivate-XDG cases and69transport cases pass on identical integrated source. Fulltype/lint/rustfmt/plan/diff pass. Real action-Exec-only stale refusal, explicit Reload, distinct literal argv/empty stdin/nativeprocessmarker, separate Hide and aggregate-only owner export/restart verified. Saved descriptor isolation, deterministic bounded source hashes and primary-only fallback/no-action-authority independently reviewed clean. Ninecomponent/twoactual/fouraffectedshared captures inspected; full typed file/URI/argv/shell/history, native DBus/terminal/localization/AT/session/release gates remain required. No task completion claim."
+        "Bounded registered Desktop Actions increment27October2026: frozen81759cd/4545eff, main/preloada251db4, native923092d integratedad82d13, UI38fb7b5 integrated5df3a99, final wiring/compact-menu/actualevidencea537abe.210units/139security/5contracts/53launcher+10sharedbrowser checks and actual bundled11.23s flow pass; author11nativeprivate-XDG cases and69transport cases pass on identical integrated source. Fulltype/lint/rustfmt/plan/diff pass. Real action-Exec-only stale refusal, explicit Reload, distinct literal argv/empty stdin/nativeprocessmarker, separate Hide and aggregate-only owner export/restart verified. Saved descriptor isolation, deterministic bounded source hashes and primary-only fallback/no-action-authority independently reviewed clean. Ninecomponent/twoactual/fouraffectedshared captures inspected; full typed file/URI/argv/shell/history, native DBus/terminal/localization/AT/session/release gates remain required. No task completion claim.",
+        "Integrated27October2026 in PR39 https://github.com/ianwijma/linuxcast/pull/39, merge47fd2ef2b9824b90f5255dd7486d48ccc5bb4742 at26October14:35:20UTC. Exact reviewed head2e89dd9298eeb63aae2441a183789b6d9b251a27/CI40340598685 passed; no requested GitHub reviews/comments/unresolvedthreads. Normal exactheadmerge. Primarydeveloprefreshedclean, frozeninstall and productionbuild63rendererassets pass. Full L1-02/nativeAT/session/release remainsunfinished."
       ],
       "owner": "manifest_review_sol",
       "branch": "codex/application-desktop-actions",
@@ -2743,7 +2744,7 @@
     {
       "id": "L2-05",
       "title": "Implement quicklinks, web searches and placeholders",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -2807,20 +2808,37 @@
         {
           "id": "L2-05-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "Mapped L2-05 contract/unit/security/integration/UI checks; actual production usage-export assertions and review of synthetic fixtures/screenshots",
+              "outcome": "Fixtures/captures use public synthetic names and example.invalid/example.org URLs. Main derives targets from fresh stored IDs; URL/name/query bodies are absent from aggregate command usage and fixed error messages. Actual private browser-handler process receives only explicit saved URL argv with empty stdin; no implicit browser/network operation on navigation/save. No private or credential material added to tests, diagnostics or captures.",
+              "platform": "Linux x64, Node24.22.1/Bun1.4.4, Electron45/SQLite3.53.4/GIO2.72.4, owned private Xvfb X11; Chromium UI fixtures are separate from native acceptance.",
+              "reference": "Source11af106/f681529/4fa3078/49ead21; packages/builtins/quicklinks/{README.md,tests/,evidence/}, apps/desktop/tests/quicklinks.integration.test.ts and apps/desktop/evidence/quicklinks-application-{dark,light}-{form,list}.png. Independent SOL6.1/high review clean."
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:unit -- L2-05"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Selected27October2026 after merged PR39/47fd2ef: next bounded application flow is a saved named HTTP/HTTPS Quicklink, local search and explicit browser opening using existing shared List/Form/Actions, sole SQLite owner and validated native OpenURL backend. Coordinator isolated codex/quicklinks-application-flow; task card/normative references inspected. No implementation or acceptance evidence exists yet. Full placeholder/snapshot/template/argument/browser/file-URI/tag/export requirements remain mandatory; no MVP scope change. Existing L1-01/F3 interfaces are used under user-approved unfinished increments, with full prerequisite acceptance still required.",
+        "27October2026 bounded Quicklinks implementation in progress: frozen11af106 independently reviewed after canonical host bound fix; repository authorceaa5ef integratedf681529. PASS5strict contract/11actual SQLite repository/5owner-client tests including real schema5\u21926 backup/restart/clear preservation;21main/preload boundary tests including stale native prompt refusal;19storage visibility/pin/alias regression tests. Main/preload/storage source independently reviewed clean after stale-dialog fix. UI author and production Electron flow are not yet integrated/verified; no full acceptance claimed.",
+        "Reviewed application increment27October2026: frozen11af106, repositoryf681529(authorceaa5ef), shared query-focus74b9954, coordinator4fa3078 and UI49ead21(author0134083). Users create/edit literal named HTTP/HTTPS links through shared Form, locally search complete500 summaries with100 visible, explicitly Open via fresh owner ID/revision and existing GIO. Save/navigation never open a browser. Native-confirmed conditional deletion, strict receipts, shared effect/read fences and persistent unknown-state Reload recovery are integrated. Independent SOL6.1/high source reviews clean after canonical-host and stale-prompt fixes; no additional foundational work.",
+        "PASS57mapped units (54presentation+3rootrouting),5contracts,21main/preload security and17integration checks (11domain SQLite+5owner/client+1actual production app). Actual Electron45/SQLite3.53.4/GIO2.72.4/private-Xvfb X11 flow passed4.27s: create/search/real default-browser-handler argv+empty stdin/Open/edit/native-choice cancel+confirm removal/usageclear/Hide/restart/final owner persistence and aggregate export without names/URLs/queries. Only dialog choices instrumented. Four production Quicklinks and two affected root dark/light captures inspected; actual axe clean. These are smoke observations, not performance or supported-session acceptance.",
+        "UI author passed14Chromium keyboard/axe checks and inspected12dark/light/affected captures. Existing shared10UI,210launcher units,139application/main/preload security,19storage pin/alias/visibility and actual production shell regression9.56s pass. Full typecheck/lint/plan/diff pass. Real version5\u21926 migration includes consistent snapshot, confirmed reopen and definitions preserved by usage/index clear. Full L2-05 placeholder/component-builder/argument/nativeAT/session/release scope remains pending."
+      ],
+      "owner": "manifest_review_sol",
+      "branch": "codex/quicklinks-application-flow",
+      "limitations": [
+        "This reviewed increment implements only saved literal HTTP/HTTPS definitions and their create/edit/remove/local-search/explicit-Open flow. Full placeholder/argument and broader UI/desktop/release acceptance remains unfinished; the task stays in-progress. Native dispatch is not proof of browser page completion or focus.",
+        "Full L2-05 placeholder grammar/snapshot contexts/named arguments/nonrecursive snippets, typed component builders, browser/open-with/file/registered-URI targets, tags/pin/hide and native export remain required. Unsupported placeholder syntax must fail explicitly; it must not silently open a changed/literalized template.",
+        "L1-01/F3-01 full provider/permission UI/native prerequisite acceptance remains pending. User-approved unfinished increments do not waive complete dependencies or desktop/AT/release gates."
+      ]
     },
     {
       "id": "L2-06",

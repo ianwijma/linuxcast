@@ -6,7 +6,7 @@ export interface SearchCommand {
   usage:{useCount:number;lastUsedAt:string|null;pinned:boolean;alias:string|null}|null;
 }
 export const MAX_QUERY_LENGTH=512;
-export const MAX_COMMANDS=4102;
+export const MAX_COMMANDS=4103;
 export const MAX_COMMAND_RESULTS=20;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
 function subsequence(query:string,text:string):boolean {let cursor=0;for(const character of text)if(character===query[cursor])cursor++;return cursor===query.length;}

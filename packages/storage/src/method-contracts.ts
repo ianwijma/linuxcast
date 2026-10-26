@@ -2,6 +2,7 @@ import { dataControlContracts } from '@linuxcast/platform-contracts/data-control
 import { secretReferenceContracts } from '@linuxcast/platform-contracts/secrets';
 import { fileIndexContracts } from '@linuxcast/file-index/contracts';
 import * as z from 'zod';
+import { quicklinkRepositoryContracts } from '../../contracts/src/quicklinks.ts';
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
@@ -26,6 +27,7 @@ export const hiddenCommandIdsSchema = z.array(visibilityId).max(4102).refine(ids
   ids.every((id,index) => index === 0 || ids[index - 1]! < id));
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
+  ...quicklinkRepositoryContracts,
   ...createAiRepositoryContracts(),
   ...permissionRepositoryContracts,
   ...fileIndexContracts,

@@ -41,6 +41,7 @@
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/data-controls": "workspace:*",
         "@linuxcast/file-search": "workspace:*",
+        "@linuxcast/quicklinks": "workspace:*",
         "@linuxcast/search": "workspace:*",
         "@linuxcast/storage": "workspace:*",
         "@linuxcast/ui": "workspace:*",
@@ -80,6 +81,14 @@
         "@linuxcast/universal-actions": "workspace:*",
         "react": "19.3.1",
         "react-dom": "19.3.1",
+      },
+    },
+    "packages/builtins/quicklinks": {
+      "name": "@linuxcast/quicklinks",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/ui": "workspace:*",
       },
     },
     "packages/builtins/universal-actions": {
@@ -161,6 +170,7 @@
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/file-index": "workspace:*",
         "@linuxcast/platform-contracts": "workspace:*",
+        "@linuxcast/quicklinks": "workspace:*",
         "better-sqlite3": "13.0.3",
         "zod": "4.6.7",
       },
@@ -405,6 +415,8 @@
     "@linuxcast/permissions": ["@linuxcast/permissions@workspace:packages/permissions"],
 
     "@linuxcast/platform-contracts": ["@linuxcast/platform-contracts@workspace:packages/platform-contracts"],
+
+    "@linuxcast/quicklinks": ["@linuxcast/quicklinks@workspace:packages/builtins/quicklinks"],
 
     "@linuxcast/search": ["@linuxcast/search@workspace:packages/search"],
 

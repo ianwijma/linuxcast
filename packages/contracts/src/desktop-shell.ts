@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { capabilityStatusSchema, rpcFailureSchema } from './protocol.ts';
 import type { LauncherApi } from './launcher.ts';
+import type { QuicklinkApi } from './quicklinks.ts';
 
 export const SHELL_APP_ID = 'io.github.ianwijma.Linuxcast';
 export const SHELL_CHANNELS = {
@@ -32,7 +33,7 @@ export type ShellCommandReply = z.infer<typeof shellCommandReplySchema>;
 /** Only fixed shell operations are exposed to the sandboxed renderer.
  * Validation does not authenticate an IPC sender or establish native effects.
  */
-export interface DesktopShellApi extends LauncherApi {
+export interface DesktopShellApi extends LauncherApi,QuicklinkApi {
   readonly runtime: { readonly sandboxed: true; readonly contextIsolated: true };
   getState(): Promise<ShellStateReply>;
   hideLauncher(): Promise<ShellCommandReply>;

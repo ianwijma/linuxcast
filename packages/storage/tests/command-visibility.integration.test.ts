@@ -46,7 +46,7 @@ it('migrates a real version4 database with a consistent recovery snapshot and un
   const migrations=await foundationMigrations(),{owner,dir}=await open(undefined,migrations.slice(0,4));
   const commandId='linuxcast:calculator';request(owner,'commands.recordUse',{commandId});request(owner,'commands.setPinned',{commandId,pinned:true});request(owner,'commands.setAlias',{commandId,alias:'public calc'});
   const before=request(owner,'commands.getUsage',{commandId});await owner.confirmSuccessfulLaunch();await owner.close();
-  const next=(await open(dir)).owner;expect(next.version).toBe(5);
+  const next=(await open(dir,migrations.slice(0,5))).owner;expect(next.version).toBe(5);
   expect(request(next,'commands.getUsage',{commandId})).toEqual(before);expect(request(next,'commands.listHidden')).toEqual([]);
   const backupDirectory=join(dir,'backups'),journals=await Promise.all((await readdir(backupDirectory)).filter(name=>name.endsWith('.json')).map(async name=>JSON.parse(await readFile(join(backupDirectory,name),'utf8')) as {id:string;fromVersion:number;toVersion:number;state:string}));
   const migrated=journals.find(row=>row.fromVersion===4&&row.toVersion===5);expect(migrated?.state).toBe('awaiting-confirmation');

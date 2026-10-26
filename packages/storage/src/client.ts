@@ -1,4 +1,5 @@
 import { STORAGE_REASONS } from './errors.ts';
+import { quicklinkSaveSchema } from '../../contracts/src/quicklinks.ts';
 import type { StorageReason } from './errors.ts';
 import type { DataExportResult } from '@linuxcast/platform-contracts/data-controls';
 import type { SecretReferenceRecord } from '@linuxcast/platform-contracts/secrets';
@@ -26,7 +27,12 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if (method === 'dataControls.clear') valid = row.category === params.category;
+  if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
+  else if(method==='quicklinks.save'){
+    const expected=quicklinkSaveSchema.parse(params);
+    valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url;
+  }
+  else if (method === 'dataControls.clear') valid = row.category === params.category;
   else if (method === 'dataControls.export') {
     const exported = result as DataExportResult, ids = params.ids as string[] | undefined;
     valid = exported.category === params.category;

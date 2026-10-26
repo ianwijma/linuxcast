@@ -19,6 +19,7 @@ export interface ResidentShellOptions {
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
   copyCalculatorResult?:LauncherActions['copyCalculatorResult'];
+  quicklinks?:LauncherActions['quicklinks'];
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: LauncherActions['openUrl'];
@@ -143,6 +144,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),
       ...(options.copyCalculatorResult ? {copyCalculatorResult:options.copyCalculatorResult} : {}),
       ...(options.openUrl ? {openUrl:options.openUrl} : {}),
+      ...(options.quicklinks?{quicklinks:options.quicklinks}:{}),
       ...(options.getCommandUsage ? {getUsage: options.getCommandUsage} : {}),
       ...(options.listApplications ? {listApplications: options.listApplications} : {}),
       ...(options.launchApplication ? {launchApplication: options.launchApplication} : {}),

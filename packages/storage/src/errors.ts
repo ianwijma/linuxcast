@@ -1,7 +1,7 @@
 export const STORAGE_REASONS = ['owner-already-running', 'private-path-required', 'local-filesystem-required',
   'sqlite-version-unsupported', 'newer-schema', 'corrupt-database', 'invalid-migration',
   'backup-failed', 'insufficient-space', 'migration-failed', 'recovery-required',
-  'invalid-request', 'conflict', 'storage-unavailable', 'permission-denied', 'export-too-large'] as const;
+  'invalid-request', 'conflict', 'quicklink-name-conflict', 'quicklink-limit-reached', 'storage-unavailable', 'permission-denied', 'export-too-large'] as const;
 export type StorageReason = typeof STORAGE_REASONS[number];
 /** Fixed operational codes only: no paths, SQL, record bodies or native errors. */
 export class StorageError extends Error {

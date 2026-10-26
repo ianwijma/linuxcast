@@ -16,8 +16,11 @@ import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteRep
 import { hiddenCommandIdsSchema } from '@linuxcast/storage';
 import type { CommandUsage, CommandVisibility } from '@linuxcast/storage';
 import { trustedShellSender } from './ipc.ts';
+import { registerQuicklinksIpc } from './quicklinks-ipc.ts';
+import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
+  quicklinks?:QuicklinkBackend;
   contents(): WebContents | undefined;
   quitting(): boolean;
   hide(): void;
@@ -49,7 +52,7 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
 /** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
-  let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false;
+  let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false,quicklinksPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
@@ -68,6 +71,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic or convert units locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert'],enabled:true},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
+  if(actions.quicklinks)builtins.push({id:'linuxcast:open-quicklinks',title:'Quicklinks',subtitle:'Create, find and open saved web links',aliases:['quicklinks','saved links'],keywords:['web','browser','bookmark','link'],enabled:!!actions.openUrl,...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})});
   const recordUse = async (id: string) => {
     // Usage failure must never replay an action or prevent recovery through Hide/Quit.
     try { await actions.recordUse?.(id); } catch { /* Explicitly best-effort local ranking only. */ }
@@ -166,9 +170,9 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       await refreshApplications();
       if(!metadataPending&&admittedMetadata===metadataGeneration)await refreshVisibility(admittedMetadata);
     }
-    if(metadataPending || urlPending || applicationActionPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
+    if(metadataPending || urlPending || applicationActionPending || quicklinksPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
-    return metadataPending || urlPending || applicationActionPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+    return metadataPending || urlPending || applicationActionPending || quicklinksPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
   });
   ipc.handle(LAUNCHER_CHANNELS.applicationAction,async(event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherApplicationActionReply>=>{
     if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
@@ -340,7 +344,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
-    if(command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator')return failure('invalid-request');
+    if(command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
     busy = true;
     try {
       if(actions.listHidden&&!isLauncherVisibilityProtected(command.id)){
@@ -375,5 +379,13 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }
     finally { busy = false; }
   });
-  return () => { disposed = true; for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  const removeQuicklinks=actions.quicklinks?registerQuicklinksIpc(ipc,actions.quicklinks,{
+    trusted:event=>trustedShellSender(event,actions.contents()),active,busy:()=>busy||calculatorPending,
+    generation:()=>metadataGeneration,revision:()=>revision,
+    acquire:()=>{busy=true;quicklinksPending=true;metadataGeneration++;return()=>{busy=false;quicklinksPending=false;};},
+    checkVisibility:(event,expected)=>checkVisibility(event,'linuxcast:open-quicklinks',expected),
+    openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
+    recordUse:()=>recordUse('linuxcast:open-quicklinks'),
+  }):undefined;
+  return () => { disposed = true;removeQuicklinks?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }

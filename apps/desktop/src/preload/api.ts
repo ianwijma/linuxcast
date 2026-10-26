@@ -2,6 +2,7 @@ import {
   SHELL_CHANNELS, desktopShellStateSchema, shellCommandReplySchema, shellStateReplySchema,
 } from '../../../../packages/contracts/src/desktop-shell.ts';
 import type { DesktopShellApi } from '../../../../packages/contracts/src/desktop-shell.ts';
+import { createQuicklinkApi } from './quicklinks.ts';
 import { calculatorCopyRequestSchema,calculatorCopyReplySchema,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
 import { LAUNCHER_CHANNELS, launcherCommandsReplySchema, launcherExecuteReplySchema, launcherExecuteRequestSchema, launcherPinRequestSchema, launcherAliasRequestSchema, launcherVisibilityRequestSchema, launcherCommandsRequestSchema, launcherOpenUrlRequestSchema, launcherOpenUrlReplySchema,launcherApplicationActionRequestSchema,launcherApplicationActionReplySchema } from '../../../../packages/contracts/src/launcher.ts';
 
@@ -23,6 +24,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    ...createQuicklinkApi(transport),
     executeApplicationAction:async(request:Parameters<NonNullable<DesktopShellApi['executeApplicationAction']>>[0])=>{
       try{
         const parsed=launcherApplicationActionRequestSchema.safeParse({...request,protocolVersion:1});if(!parsed.success)return unavailable;

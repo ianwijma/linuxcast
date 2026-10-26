@@ -49,6 +49,10 @@
       "packages/builtins/universal-actions/tests/presentation.test.ts",
       "apps/desktop/src/main/clipboard-write.test.ts",
       "packages/builtins/file-search/tests/controller.test.ts"
+    ],
+    "L2-05": [
+      "packages/builtins/quicklinks/tests/presentation.test.ts",
+      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
     ]
   },
   "contracts": {
@@ -97,6 +101,9 @@
     ],
     "L1-01": [
       "packages/contracts/tests/launcher-visibility.contract.test.ts"
+    ],
+    "L2-05": [
+      "packages/contracts/tests/quicklinks.contract.test.ts"
     ]
   },
   "ui": {
@@ -123,6 +130,9 @@
     ],
     "L2-03": [
       "packages/builtins/universal-actions/tests/path-copy.ui.test.ts"
+    ],
+    "L2-05": [
+      "packages/builtins/quicklinks/tests/quicklinks.ui.test.ts"
     ]
   },
   "integration": {
@@ -166,6 +176,11 @@
     ],
     "L2-03": [
       "apps/desktop/tests/file-search.integration.test.ts"
+    ],
+    "L2-05": [
+      "packages/builtins/quicklinks/tests/repository.integration.test.ts",
+      "packages/storage/tests/quicklinks.integration.test.ts",
+      "apps/desktop/tests/quicklinks.integration.test.ts"
     ]
   },
   "security": {
@@ -226,6 +241,10 @@
       "apps/desktop/src/main/indexed-path-ipc.test.ts",
       "apps/desktop/src/main/file-search-ipc.test.ts",
       "apps/desktop/src/file-preload/api.test.ts"
+    ],
+    "L2-05": [
+      "apps/desktop/src/main/quicklinks-ipc.test.ts",
+      "apps/desktop/src/preload/quicklinks.test.ts"
     ]
   },
   "perf": {}
