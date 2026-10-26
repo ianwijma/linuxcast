@@ -1,12 +1,13 @@
 import * as z from 'zod';
+import { quicklinkSelectionSchema } from './quicklinks.ts';
 import type { CalculatorCopyReply } from './calculator.ts';
 import { httpUrlSchema } from './open-url.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 import { applicationActionsSchema,desktopActionIdSchema } from './applications.ts';
-export const MAX_LAUNCHER_COMMANDS=5104;
+export const MAX_LAUNCHER_COMMANDS=5604;
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
-export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search','linuxcast:calculator','linuxcast:open-quicklinks','linuxcast:open-workflow-editor']),z.string().regex(/^application:[a-f0-9]{64}$/u),z.string().regex(/^workflow:[a-f0-9]{64}$/u)]);
+export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search','linuxcast:calculator','linuxcast:open-quicklinks','linuxcast:open-workflow-editor']),z.string().regex(/^application:[a-f0-9]{64}$/u),z.string().regex(/^workflow:[a-f0-9]{64}$/u),z.string().length(46).refine(value=>value.startsWith('quicklink:')&&z.uuid().safeParse(value.slice(10)).success)]);
 export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url',copyCalculatorResult:'launcher:copy-calculator-result',setHidden:'launcher:set-hidden',applicationAction:'launcher:application-action'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
 export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
@@ -27,8 +28,9 @@ export const launcherCommandMetadataSchema=z.strictObject({
   aliases:z.array(z.string().max(256)).max(16),keywords:z.array(z.string().max(128)).max(16),
   hidden:z.boolean().optional(),enabled:z.boolean(),unavailableReason:z.string().max(256).optional(),
   applicationActions:applicationActionsSchema.optional(),
+  quicklink:quicklinkSelectionSchema.optional(),
   usage:z.strictObject({useCount:z.number().int().nonnegative().safe(),lastUsedAt:z.iso.datetime().nullable(),pinned:z.boolean(),alias:uiTextSchema.nullable()}).nullable(),
-}).refine(command=>(command.enabled||!!command.unavailableReason)&&(!isLauncherVisibilityProtected(command.id)||command.hidden!==true)&&(!command.applicationActions||command.id.startsWith('application:')));
+}).refine(command=>(command.enabled||!!command.unavailableReason)&&(!isLauncherVisibilityProtected(command.id)||command.hidden!==true)&&(!command.applicationActions||command.id.startsWith('application:'))&&(command.id.startsWith('quicklink:')?!!command.quicklink&&command.id===`quicklink:${command.quicklink.id}`:command.quicklink===undefined));
 export const launcherCommandsSnapshotSchema=z.strictObject({revision,commands:z.array(launcherCommandMetadataSchema).max(100),rankingAvailable:z.boolean(),visibilityAvailable:z.boolean().optional(),nextCursor:z.string().max(32).nullable().optional(),applicationState:z.enum(['available','unavailable']).optional(),updateOnly:z.boolean().optional()})
   .refine(snapshot=>new Set(snapshot.commands.map(command=>command.id)).size===snapshot.commands.length);
 const failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
