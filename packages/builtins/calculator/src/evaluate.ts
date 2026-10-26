@@ -1,5 +1,6 @@
 import type {Calculation} from './types.ts';
 import {convertUnitValue} from './units.ts';
+import {evaluateColourExpression} from './colours.ts';
 
 type FailureCode=Extract<Calculation,{ok:false}>['code'];
 type Token={kind:'number';value:number}|{kind:'name';value:string}|{kind:'+'|'-'|'*'|'/'|'^'|'%'|'('|')'|','|'end'};
@@ -9,6 +10,7 @@ const messages:Record<FailureCode,string>={
   'domain-error':'This calculation has no finite real result.',
   'unsupported-unit':'Use a supported, unambiguous unit identifier.',
   'incompatible-units':'Choose units with the same dimension.',
+  'invalid-colour':'Use a supported hex, RGB or HSL colour conversion within the component ranges.',
 };
 class EvaluationFailure extends Error {
   readonly code:FailureCode;
@@ -171,6 +173,7 @@ export function evaluateExpression(input:string):Calculation {
     // ASCII space is the sole whitespace. This also rejects controls, DEL,
     // non-ASCII syntax and lone UTF-16 surrogates before tokenization.
     if(/[^\x20-\x7e]/u.test(input))return reject('invalid-expression');
+    const colour=evaluateColourExpression(input);if(colour!==undefined)return colour;
     const request=conversion(input);
     const scalar=finite(new Parser(tokenize(request?.scalar??input)).parse());
     if(request) {

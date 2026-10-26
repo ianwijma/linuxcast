@@ -11,13 +11,25 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/file-search-navigation**, sourcehead **ba092e3**. No uncommitted implementation or live testprocess at this checkpoint; all three SOL agents completed.
+Primary clean `develop` at **aac0a3db5d6643472d8d2f56671f9debbc0983d8** (PR36); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/calculator-colours**, sourcehead **fc32887**. No uncommitted implementation or live testprocess; all three SOLhigh agents completed.
 
-Reviewed/tested L2-02 directory increment ready for focused PR/CI/normalmerge.117units/5contracts/22security/8actualintegration/35browser, fulltypecheck/lint pass. Production Electron/private-Xvfb actualflow11.48s; twoapplication+fourcomponent directory/emptycaptures inspected, axe passes. Final SOLhigh review clean through sourcee03e7e8 and productiontestba092e3 (same reviewed draft). Full task/nativeAT/session/release unfinished.
+L2-04 colour increment reviewed/tested and ready for focused PR/CI/normalmerge.594units/4contracts/45security/29browser/1actualproduction integration, fulltypecheck/lint pass. Real Electron/private-Xvfb/native xclip flow6.65s and fourapplication+sixcomponent dark/lightcolour/help/errorcaptures inspected; axe passes. Final source review clean. Full dates/DST/rates/nativeAT/session/package/release remainunfinished; L2-04inprogress.
 
-Prior goal turn made verified progress: PR35 filters merged31ce46b; current turn integrated navigation and verified its actualapplication flow. Registry done8/inprogress12/planned77,50passed/331pending/8NA. L2-02UI stillpending with partialevidence; privacy passed. Broader L1-01/D1-02 prerequisites unfinished under user-authorized increments.
+This goal turn made verified colourimplementation/test progress after priorPR36navigationmerge. Registry8done/12inprogress/77planned;50passed/331pending/8NA. AC02/UI remainpending withpartialcolour evidence; AC01/privacy remainpassed withnewregressionevidence. BroaderL1-01dependency/nativegates stillunfinished underuserauthorizedincrements.
 
-Next: commit evidence/plan validation, push/open directory PR (attach), exacthead CI and requestedreview/comment/thread inspection, normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete application increment without asking the user. No infrastructure/proof expansion for manifest.
+Next: commit evidence, validateplan, push/open/attachcolourPR; exactheadCI/reviewrequest/comment/thread checks; normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete applicationincrement; noinfra/proof expansion for manifest. Full97task1.0goalactive.
+
+## Current L2-04 colour integration
+
+Frozen5069131+333e913 defines closedcolourkind/text/receipt and exactgrammarCOLOURS.md; strictdecimals/alpha/achromatic gate. Engine9c55906→a9c6933 (146newcolour +371oldarithmetic/unit tests); main/preloadfa965e9; UIe7d1a1e→2858fc0 (72presentation/29browser); actualappfc32887. Independent source reviews clean after canonicalgate and duplicateerrorentry findings resolved.
+
+Explicit `<colour> to hex|rgb|hsl`, #RGB/A or6/8hex and closedrgb/rgba/hsl/hsla numeric/percentage/alpha grammar; encoded-sRGB, finite/range/hue/resourcebounds, sixfractioncanonicaloutput/nearestbytehex, alpha preservedwithoutcompositing. NoDOM/CSSparser/eval/dependency/I/O/network/persistence. Main recomputes beforeactualcopy; UIcomparestext+colour+unit andkeepspending/unknown/Back/Hide/noreplay guards. Existing sharedForm/Detail/Actions, helpfromFormonly, maxdepth3, drafts/focuspreserved.
+
+Actualflow writes8deliberatecopies total (5oldarithmetic/unit+3colour); no writeontyping/Evaluate/help/errors; separatexclip confirmsactualbytes; Hidefromcolourhelp/singleinstancereopen; realpostQuitownerexport aggregatecount8 andnoexpressions/results. Fullchecks594unit/4contracts/45security/29browser/1integration,type/lint/plan/diff. Fourapplication+sixcomponentshots inspected. NoPRyetatcheckpoint; fulltasknative/releaseunclaimed.
+
+ReusablecompletedSOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-04-colour-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-04-colour-engine; readonlyalias_review_sol. Verifyclean/switchbase fornextboundedassignment. Never reactivateAstra.
+
+W3C published22October2026 CSSColor4 source https://www.w3.org/TR/2026/CRD-css-color-4-20261022/ inspected fordefinitions; implementationindependent closedcalculatorgrammar. Skilllibrarycontext7/frontenddesignread; Context7toolsnotconnected andmandatoryuserDESIGNoverridesgeneralstyling suggestions. No newdependencies.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -39,7 +51,7 @@ Frozen765ee03: optional canonical relative `directory` (`''`rootchildren) requir
 
 Directory primaryBrowse, secondaryDetails/Copy; fileprimaryDetails/Copy unchanged. Root/Parent/Return replaceResults in place, preserve currentfilters, clearbrowsequery, restore original scope/query/selectedID onReturn when available. Exactdirectoryidentity, generation/copy fences, clear/removal/remediation retained. No filesystemread/open authority or history added.
 
-Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. No PR yet at checkpoint; fullMIME/recents/extractors/nativeAT/session/release pending.
+Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. IntegratedPR36/aac0a3d; currentprimarybuildpass. FullMIME/recents/extractors/nativeAT/session/release pending.
 
 Reusable completed SOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-02-directory-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-02-directory-service; read-only alias_review_sol. Verifyclean/switchbase for next assignment. Never reactivate Astra agents.
 
@@ -70,6 +82,7 @@ Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/c
 |33|851f6f2|92canonical unit conversions, help, exact numeric/unit copy|
 |34|f55ae06|Selected indexed result Copy path|
 |35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
+|36|aac0a3d|Indexed folder Browse/Parent/root/Return|
 
 PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
 

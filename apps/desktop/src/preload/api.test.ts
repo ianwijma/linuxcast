@@ -110,3 +110,11 @@ it('keeps URL opening a named typed HTTP action and refuses dangerous schemes/cr
   transport.invoke.mockResolvedValue({ok:true,value:{outcome:'completed'}});
   expect((await api.openLauncherUrl({revision:1,url:'http://[::1]:8080/'})).ok).toBe(false);
 });
+
+it('validates closed colour copy receipts without exposing an arbitrary renderer clipboard writer',async()=>{
+  const invoke=vi.fn(async()=>({ok:true,value:{outcome:'copied',colour:'rgb',text:'rgb(255 0 0 / 0.5)'}} as unknown));
+  const api=createShellApi({invoke,on:vi.fn(),removeListener:vi.fn()});
+  expect(await api.copyCalculatorResult!({revision:1,expression:'rgb(255 0 0 / 0.5) to rgb'})).toMatchObject({ok:true,value:{colour:'rgb'}});
+  for(const value of [{outcome:'copied',colour:'rgb',text:'url(private)'},{outcome:'copied',colour:'hex',text:'#ff0000',unit:'m'},{outcome:'copied',colour:'hsl',text:'hsl(0 101% 0%)'}]){invoke.mockResolvedValueOnce({ok:true,value});expect(await api.copyCalculatorResult!({revision:1,expression:'#fff to rgb'})).toMatchObject({ok:false});}
+  invoke.mockClear();expect(await api.copyCalculatorResult!({revision:1,expression:'#fff to rgb',text:'private'} as never)).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
+});

@@ -16,7 +16,7 @@ const executable=createRequire(import.meta.url)('electron') as string;
 let application:ElectronApplication|undefined,temporary='';
 afterEach(async()=>{if(application)await application.close().catch(()=>{application?.process().kill('SIGKILL');});application=undefined;if(temporary)rmSync(temporary,{recursive:true,force:true});});
 async function action(page:Page,title:string){await page.keyboard.press('Control+k');const filter=page.getByRole('searchbox',{name:'Find an action',exact:true});await filter.fill(title);await filter.press('Enter');}
-it('evaluates through the production launcher and copies only explicit arithmetic or canonical unit results to a private native clipboard',async()=>{
+it('evaluates through the production launcher and copies only explicit arithmetic, unit or colour results to a private native clipboard',async()=>{
   if(!process.env.DISPLAY||process.env.LINUXCAST_PRIVATE_DISPLAY!=='1')throw new Error('Requires an owned private Xvfb display; this is not native desktop acceptance.');
   execFileSync(process.execPath,['apps/desktop/build.ts'],{cwd:root,timeout:60000,stdio:'pipe'});
   temporary=mkdtempSync(join(tmpdir(),'linuxcast-calculator-app-'));
@@ -56,16 +56,25 @@ it('evaluates through the production launcher and copies only explicit arithmeti
     await action(page,'Copy result');await expect.poll(clipboardText).toBe(output);await expect.poll(()=>page.getByRole('status').textContent()).toBe('Result copied.');previousClipboard=output;
     await action(page,'Edit expression');
   }
+  // Actual sRGB results use the same explicit expression-only main-owned copy boundary.
+  const colours=[['#f00 to rgb','rgb(255 0 0)'],['rgb(255 128 0 / 50%) to hex','#ff800080'],['hsl(210 100% 50%) to hsl','hsl(210 100% 50%)']] as const;
+  await expression.fill(colours[0][0]);await action(page,'Supported colours');await page.getByRole('heading',{name:'Supported colours',exact:true}).waitFor();expect(clipboardText()).toBe(previousClipboard);
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);await page.screenshot({path:join(evidence,`application-${theme}-colours-help.png`)});}
+  await page.getByRole('button',{name:'Back',exact:true}).click();expect(await expression.inputValue()).toBe(colours[0][0]);await expect.poll(()=>expression.evaluate(element=>element===document.activeElement)).toBe(true);
+  for(const [input,output] of colours){await expression.fill(input);expect(clipboardText()).toBe(previousClipboard);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await page.getByRole('heading',{name:'Calculation',exact:true}).waitFor();await expect.poll(()=>page.getByText(output,{exact:true}).count()).toBe(1);expect(clipboardText()).toBe(previousClipboard);
+    if(input===colours[1][0])for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);expect((await new AxeBuilder({page}).setLegacyMode().analyze()).violations).toEqual([]);await page.screenshot({path:join(evidence,`application-${theme}-colour-result.png`)});}
+    await action(page,'Copy result');await expect.poll(clipboardText).toBe(output);await expect.poll(()=>page.getByRole('status').textContent()).toBe('Result copied.');previousClipboard=output;await action(page,'Edit expression');}
+  for(const input of ['rgb(256 0 0) to hex','hsl(0 101% 50%) to rgb','var(--private) to hex']){await expression.fill(input);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await expect.poll(()=>expression.getAttribute('aria-invalid')).toBe('true');expect(clipboardText()).toBe(previousClipboard);}
   for(const input of ['1 m to kg','1 gal to L','1 KB to B','-1 K to degC']){await expression.fill(input);await page.getByRole('button',{name:'Evaluate',exact:true}).click();await expect.poll(()=>expression.getAttribute('aria-invalid')).toBe('true');expect(clipboardText()).toBe(previousClipboard);}
-  expect(await page.evaluate(async()=>{const api=(window as unknown as {linuxcast:DesktopShellApi}).linuxcast;const reply=await api.getLauncherCommands();return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:calculator')?.usage:null;})).toMatchObject({useCount:5});
-  // Help has the same bounded depth as a result. Hide removes both nested frames.
-  await action(page,'Supported units');await page.getByRole('heading',{name:'Supported units',exact:true}).waitFor();
+  expect(await page.evaluate(async()=>{const api=(window as unknown as {linuxcast:DesktopShellApi}).linuxcast;const reply=await api.getLauncherCommands();return reply.ok?reply.value.commands.find(command=>command.id==='linuxcast:calculator')?.usage:null;})).toMatchObject({useCount:8});
+  // Colour help has the same bounded depth as a result. Hide removes both nested frames.
+  await action(page,'Supported colours');await page.getByRole('heading',{name:'Supported colours',exact:true}).waitFor();
 
   expect(await page.evaluate(async()=>await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.hideLauncher())).toMatchObject({ok:true});
   await expect.poll(()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(false);
   await new Promise<void>((resolve,reject)=>{const child=spawn(executable,[wrapper,'--show'],{env,stdio:'ignore'});const timer=setTimeout(()=>{child.kill('SIGKILL');reject(new Error('Reopen deadline.'));},10000);child.once('error',reject);child.once('exit',code=>{clearTimeout(timer);if(code===0)resolve();else reject(new Error('Reopen failed.'));});});
-  await query.waitFor();await expect.poll(()=>page.getByRole('textbox',{name:'Expression (required)',exact:true}).count()).toBe(0);expect(clipboardText()).toBe('1048576 B');
+  await query.waitFor();await expect.poll(()=>page.getByRole('textbox',{name:'Expression (required)',exact:true}).count()).toBe(0);expect(clipboardText()).toBe(previousClipboard);
   await query.fill('quit');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Quit Linuxcast');const exited=new Promise<number|null>(resolve=>app.process().once('exit',resolve));await query.press('Enter',{noWaitAfter:true});expect(await exited).toBe(0);application=undefined;
   const owner=await StorageOwner.open({dataDirectory:join(temporary,'data/linuxcast'),applicationBuild:'synthetic-calculator-reopen'});
-  try{const exported=owner.request({schemaVersion:1,requestId:randomUUID(),method:'dataControls.export',params:{category:'command-usage'}});expect(exported.result).toMatchObject({records:expect.arrayContaining([expect.objectContaining({commandId:'linuxcast:calculator',useCount:5})])});const text=JSON.stringify(exported);for(const expression of ['2 + 3 * 4',secondExpression,'process.exit()','1 / 0',...conversions.flat(),'1 m to kg','1 gal to L','1 KB to B','-1 K to degC'])expect(text).not.toContain(expression);}finally{await owner.close();}
+  try{const exported=owner.request({schemaVersion:1,requestId:randomUUID(),method:'dataControls.export',params:{category:'command-usage'}});expect(exported.result).toMatchObject({records:expect.arrayContaining([expect.objectContaining({commandId:'linuxcast:calculator',useCount:8})])});const text=JSON.stringify(exported);for(const expression of ['2 + 3 * 4',secondExpression,'process.exit()','1 / 0',...conversions.flat(),...colours.flat(),'rgb(256 0 0) to hex','hsl(0 101% 50%) to rgb','var(--private) to hex','1 m to kg','1 gal to L','1 KB to B','-1 K to degC'])expect(text).not.toContain(expression);}finally{await owner.close();}
 },60000);

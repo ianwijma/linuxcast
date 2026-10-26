@@ -137,7 +137,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
     if(!active()||busy||calculatorPending)return failure('cancelled');
     const calculated=evaluateExpression(parsed.data.expression);
-    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported expression with compatible units, then evaluate it again.',retryable:false}};
+    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported arithmetic, unit or colour expression, then evaluate it again.',retryable:false}};
     let clipboardText:string;try{clipboardText=formatCalculationText(calculated);}catch{return failure('invalid-request');}
     if(!actions.copyCalculatorResult)return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
     calculatorPending=true;
@@ -152,7 +152,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
       if(outcome!=='written')throw new Error('Invalid copy receipt.');
       await recordUse('linuxcast:calculator');
-      return {ok:true,value:{outcome:'copied',text:calculated.text,...(calculated.unit===undefined?{}:{unit:calculated.unit})}};
+      return {ok:true,value:{outcome:'copied',text:calculated.text,...(calculated.kind==='colour'?{colour:calculated.colour}:calculated.unit===undefined?{}:{unit:calculated.unit})}};
     }catch{return {ok:false,error:{code:'deadline-exceeded',message:'The copy outcome is unknown. Check your clipboard before choosing Copy result again.',retryable:false}};}
     finally{clearTimeout(timer);}
   });
