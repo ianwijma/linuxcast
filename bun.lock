@@ -88,6 +88,11 @@
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
       },
+      "devDependencies": {
+        "@linuxcast/ui": "workspace:*",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
+      },
     },
     "packages/contracts": {
       "name": "@linuxcast/contracts",
