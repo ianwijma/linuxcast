@@ -166,7 +166,7 @@ export class QuicklinksFlow {
       const previous=await this.#readRecord(pending,summary);if(!this.#current(pending))return;
       const flags={pinned:!!previous.pinned,hidden:!!previous.hidden};flags[flag]=!flags[flag];
       const request:QuicklinkSave={id:previous.id,expectedRevision:previous.revision,name:previous.name,url:previous.url,...(previous.tags?.length?{tags:previous.tags}:{}),...(previous.webSearch?{webSearch:previous.webSearch}:{}),...(flags.pinned?{pinned:true}:{}),...(flags.hidden?{hidden:true}:{})};
-      pending.kind='save';this.#publish();const reply=parseRecord(await bounded(this.#api.saveQuicklink!(request),pending.controller.signal));if(!this.#current(pending))return;
+      pending.kind='save';this.#publish();if(!this.#current(pending))return;const reply=parseRecord(await bounded(this.#api.saveQuicklink!(request),pending.controller.signal));if(!this.#current(pending))return;
       if(!reply.ok){if(['conflict','invalid-request','capability-unavailable','permission-denied'].includes(reply.error.code)){this.#status={kind:'error',message:'The quicklink preference was not saved. Reload quicklinks to review its current version or reopen Linuxcast to reconnect.'};return;}throw new Error();}
       const record=reply.value.record;this.#checkSavedRecord(record,request,previous);
       const records=await this.#readList(pending);this.#checkAfterMutation(records,record);if(!this.#current(pending))return;

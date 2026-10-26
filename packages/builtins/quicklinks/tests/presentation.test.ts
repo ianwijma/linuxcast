@@ -227,3 +227,10 @@ describe('saved Quicklink presentation preferences',()=>{
     const f=await searchSetup();await act(f,'quicklinks:open');await review(f);f.records[0]!.hidden=true;f.records[0]!.revision=2;await act(f,'quicklinks:reload');await review(f);expect(top(f).view.actions?.[0]?.disabledReason).toContain('Show this quicklink');await act(f,'quicklinks:open-search');expect(f.api.openQuicklink).not.toHaveBeenCalled();
   });
 });
+
+describe('preference Save publication fence',()=>{
+  it.each(['query','selection','back'] as const)('does not dispatch Save when a synchronous publication subscriber changes %s',async kind=>{
+    const f=await start();let invalidated=false;const unsubscribe=f.session.subscribe(()=>{const frame=top(f);if(invalidated||frame.view.status?.message!=='Saving quicklink…')return;invalidated=true;if(kind==='query')f.session.setQuery(frame.view.viewId,'Link 2');else if(kind==='selection')f.session.select(frame.view.viewId,id(2));else f.session.pop();});
+    try{await act(f,'quicklinks:pin');expect(invalidated).toBe(true);expect(f.api.getQuicklink).toHaveBeenCalledExactlyOnceWith({id:id(1),revision:1});expect(f.api.saveQuicklink).not.toHaveBeenCalled();expect(f.records[0]?.pinned).toBeUndefined();expect(f.api.openQuicklink).not.toHaveBeenCalled();expect(f.dismiss).not.toHaveBeenCalled();}finally{unsubscribe();}
+  });
+});
