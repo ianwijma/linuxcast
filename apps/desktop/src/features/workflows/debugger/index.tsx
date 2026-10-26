@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Button, EmptyState, ErrorState, LoadingState, UnavailableState } from '@linuxcast/ui';
 import '@linuxcast/ui/styles.css';
+import { workflowDisplayName } from '@linuxcast/contracts';
 import type { WorkflowDefinition, WorkflowRunApi, WorkflowRunErrorCode } from '@linuxcast/contracts';
 import { isActiveRun, WorkflowRunController } from './controller.ts';
 import './run-panel.css';
@@ -18,11 +19,11 @@ const errorText: Record<WorkflowRunErrorCode, string> = {
   cancelled: 'The run was cancelled. Cancellation does not undo a copy that already occurred.',
 };
 const names = { queued: 'Queued', running: 'Running', 'waiting-ui': 'Waiting for clipboard approval', cancelling: 'Cancelling', succeeded: 'Succeeded', failed: 'Failed', cancelled: 'Cancelled', interrupted: 'Interrupted' };
-export type WorkflowRunPanelProps = { api: WorkflowRunApi; editorRevision: number; savedDefinition: WorkflowDefinition; onClose: () => void };
-export function WorkflowRunPanel({ api, editorRevision, savedDefinition, onClose }: WorkflowRunPanelProps) {
+export type WorkflowRunPanelProps = { api: WorkflowRunApi; editorRevision: number; savedDefinition: WorkflowDefinition; initialEntry?: string; onClose: () => void };
+export function WorkflowRunPanel({ api, editorRevision, savedDefinition, initialEntry, onClose }: WorkflowRunPanelProps) {
   // Definition props are display metadata. Main re-loads the exact revision before starting.
   const definitionKey = JSON.stringify(savedDefinition);
-  const controller = useMemo(() => new WorkflowRunController(api, editorRevision, JSON.parse(definitionKey) as WorkflowDefinition), [api, editorRevision, definitionKey]);
+  const controller = useMemo(() => new WorkflowRunController(api, editorRevision, JSON.parse(definitionKey) as WorkflowDefinition, initialEntry), [api, editorRevision, definitionKey, initialEntry]);
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const id = useId(), entryId = useId(), inputId = useId(), inputHint = useId(), inputError = useId();
   const cancelRef = useRef<HTMLButtonElement>(null), headingRef = useRef<HTMLHeadingElement>(null), statusRef = useRef<HTMLElement>(null);
@@ -38,13 +39,13 @@ export function WorkflowRunPanel({ api, editorRevision, savedDefinition, onClose
     if (event.key === 'Enter' && event.repeat && !editable) { event.preventDefault(); event.stopPropagation(); }
     if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); }
   }}>
-    <header className="wr-header"><div><p className="wr-caption">SAVED TEXT WORKFLOW</p><h2 className="lc-focus" ref={headingRef} tabIndex={-1} id={id}>Run saved workflow</h2><p>{controller.definition?.name || 'Saved workflow'} · version {controller.definition?.version || 'unavailable'} · editor revision {editorRevision}</p></div><Button onClick={onClose}>Back to editor</Button></header>
+    <header className="wr-header"><div><p className="wr-caption">SAVED TEXT WORKFLOW</p><h2 className="lc-focus" ref={headingRef} tabIndex={-1} id={id}>Run saved workflow</h2><p>{workflowDisplayName(controller.definition?.name || 'Saved workflow')} · version {controller.definition?.version || 'unavailable'} · editor revision {editorRevision}</p></div><Button onClick={onClose}>Back to editor</Button></header>
     <p className="wr-caption">Returning to the editor keeps the host run and pending approval. Reopen Run to inspect them. Input and result are transient; the journal stores metadata only.</p>
     {state.loading && <LoadingState label="Connecting to workflow run…" />}
     {state.error && <ErrorState title="Run action needs review" description={state.error} />}
     {state.notice && <p role="status" className="wr-notice">{state.notice}</p>}
     {state.requiresReview && <ErrorState title="Inspect your clipboard" description="A clipboard effect may have occurred. Check its contents before starting a deliberate new run. The previous effect will not be retried or replayed." />}
-    {!controller.definition || !controller.entries.length ? <UnavailableState title="No enabled Keyword entry" description="Return to the editor, add an enabled Keyword and save a valid supported version." /> : <form aria-label="New text run" onSubmit={event => { event.preventDefault(); void controller.start(); }}>
+    {controller.requestedEntryUnavailable || !controller.definition || !controller.entries.length ? <UnavailableState title={controller.requestedEntryUnavailable ? 'Selected Keyword unavailable' : 'No enabled Keyword entry'} description={controller.requestedEntryUnavailable ? 'The selected saved Keyword is missing, disabled or no longer a Keyword. Return to the launcher or editor, save a valid version and reopen Run. Any attached run below remains available for inspection and cancellation.' : 'Return to the editor, add an enabled Keyword and save a valid supported version.'} action={<Button disabled={state.loading || pending} onClick={() => { void controller.refresh(); }}>Refresh run</Button>} /> : <form aria-label="New text run" onSubmit={event => { event.preventDefault(); void controller.start(); }}>
       <div className="wr-fields"><div className="lc-field"><label htmlFor={entryId} className="lc-field-label">Keyword entry</label><select id={entryId} className="lc-input lc-focus" disabled={disabled} value={state.entry} onChange={event => controller.entry(event.target.value)}>{controller.entries.map(node => <option key={node.id} value={node.id}>{node.label || String(node.config.keyword || node.id)} · {node.id}</option>)}</select></div>
         <div className="lc-field"><label htmlFor={inputId} className="lc-field-label">Text to run</label><textarea id={inputId} className="lc-input lc-focus wr-input" rows={4} value={state.input} disabled={disabled || entry?.config.argument === 'none'} maxLength={16384} aria-invalid={!!state.inputError} aria-describedby={`${inputHint}${state.inputError ? ` ${inputError}` : ''}`} onChange={event => controller.input(event.target.value)} /><p id={inputHint} className="lc-field-hint">{entry?.config.argument === 'none' ? 'This Keyword takes no argument.' : entry?.config.argument === 'required' ? 'This Keyword requires text.' : 'Text is optional for this Keyword.'} Up to 16 KiB; this is an explicit saved-version invocation.</p>{state.inputError && <p id={inputError} className="lc-field-error">{state.inputError}</p>}</div></div>
       <div className="wr-actions"><Button type="submit" variant="primary" busy={state.pending === 'start'} disabled={state.loading || active || state.unconfirmed || (pending && state.pending !== 'start')}>{snapshot && !active ? 'Start new run' : 'Run saved version'}</Button><Button disabled={state.loading || pending} onClick={() => { void controller.refresh(); }}>Refresh run</Button><Button busy={state.pending === 'reset'} disabled={state.loading || (pending && state.pending !== 'reset')} aria-describedby="wr-reset-hint" onClick={() => { void controller.resetPermission(); }}>Review clipboard access</Button></div>
@@ -56,7 +57,7 @@ export function WorkflowRunPanel({ api, editorRevision, savedDefinition, onClose
       {active && !prompt && <div className="wr-actions"><Button busy={state.pending === 'cancel'} disabled={state.loading || (pending && state.pending !== 'cancel')} onClick={() => { void controller.cancel(); }}>Cancel run</Button></div>}
       <section className="wr-steps" aria-label="Recent run steps"><h3>Recent steps</h3><p className="wr-caption">Last {snapshot.steps.length} of up to 50 metadata updates. Values are not captured per step.</p>{snapshot.steps.length ? <ol tabIndex={0} className="lc-focus" aria-label="Recent step updates">{snapshot.steps.map((step, index) => <li key={`${step.activationId}:${index}`}><span>{step.nodeId} · {step.nodeType}</span><span>{step.state}{step.durationMs !== undefined ? ` · ${step.durationMs} ms` : ''}</span></li>)}</ol> : <p className="lc-muted">Waiting for the first node update.</p>}</section>
       {snapshot.output !== undefined && <section aria-label="Workflow result"><h3>Result</h3><p className="wr-caption">Transient plain text · bounded to 64 KiB. This result is not an extra clipboard action.</p><pre role="region" className="wr-text" tabIndex={0} aria-label="Workflow result text">{snapshot.output}</pre></section>}
-    </> : !state.loading && <EmptyState title="No attached run" description="Choose a Keyword entry, enter text and explicitly Run the saved version. Opening this panel does not execute it." />}
+    </> : !state.loading && !controller.requestedEntryUnavailable && <EmptyState title="No attached run" description="Choose a Keyword entry, enter text and explicitly Run the saved version. Opening this panel does not execute it." />}
   </section>;
 }
 export default WorkflowRunPanel;

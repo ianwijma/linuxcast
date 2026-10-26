@@ -1,6 +1,6 @@
-import { isLauncherVisibilityProtected,launcherCommandMetadataSchema,launcherCommandsReplySchema,launcherCommandsRequestSchema } from '@linuxcast/contracts';
+import { MAX_LAUNCHER_COMMANDS,isLauncherVisibilityProtected,launcherCommandMetadataSchema,launcherCommandsReplySchema,launcherCommandsRequestSchema } from '@linuxcast/contracts';
 import type { LauncherCommandsSnapshot,LauncherCommandMetadata } from '@linuxcast/contracts';
-export const MAX_CATALOGUE=4104,MAX_CATALOGUE_BYTES=16*1024*1024;
+export const MAX_CATALOGUE=MAX_LAUNCHER_COMMANDS,MAX_CATALOGUE_BYTES=16*1024*1024;
 export type Catalogue=Omit<LauncherCommandsSnapshot,'commands'|'nextCursor'|'updateOnly'> & {commands:LauncherCommandMetadata[]};
 /** Validate complete pages before any catalogue enters the live view. */
 export function parsePage(raw:unknown):LauncherCommandsSnapshot {

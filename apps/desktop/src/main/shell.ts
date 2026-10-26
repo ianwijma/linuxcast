@@ -22,6 +22,8 @@ export interface ResidentShellOptions {
   createServices?: () => readonly ResidentService[];
   copyCalculatorResult?:LauncherActions['copyCalculatorResult'];
   quicklinks?:LauncherActions['quicklinks'];
+  loadWorkflowCommands?:LauncherActions['loadWorkflowCommands'];
+  openWorkflowEntry?:LauncherActions['openWorkflowEntry'];
   openWorkflowEditor?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
@@ -146,6 +148,8 @@ export function startResidentShell(options: ResidentShellOptions): void {
       contents: () => window?.webContents, quitting: () => lifecycle.quitting,
       hide: () => lifecycle.hide(), quit: () => requestQuit(),
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
+      ...(options.loadWorkflowCommands?{loadWorkflowCommands:options.loadWorkflowCommands}:{}),
+      ...(options.openWorkflowEntry?{openWorkflowEntry:options.openWorkflowEntry}:{}),
       ...(options.openWorkflowEditor ? {openWorkflowEditor:options.openWorkflowEditor} : {}),
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),
       ...(options.copyCalculatorResult ? {copyCalculatorResult:options.copyCalculatorResult} : {}),

@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { workflowRunCancelSchema,workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunSnapshotSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
+import { workflowDisplayName,workflowRunCancelSchema,workflowRunStartSchema,workflowRunDecisionSchema,workflowRunInputSchema,workflowRunSnapshotSchema,workflowWorkerStartSchema } from '../src/workflow-run.ts';
 import { createWorkflowDraft } from '../../workflows/src/registry.ts';
 const runId='00000000-0000-4000-8000-000000000001',promptId='00000000-0000-4000-8000-000000000002';
 it('accepts only fresh editor identity, selected entry and transient input as run authority',()=>{
@@ -30,3 +30,5 @@ it('requires exact cancellation run identity without current-run authority',()=>
   expect(workflowRunCancelSchema.parse({runId})).toEqual({runId});
   for(const input of [{},{runId:'other'},{runId,all:true}])expect(workflowRunCancelSchema.safeParse(input).success).toBe(false);
 });
+
+it('projects oversized Unicode saved names for bounded run display without splitting code points',()=>{expect(workflowDisplayName('😀'.repeat(200))).toBe('😀'.repeat(63)+'…');expect(workflowDisplayName('Public workflow')).toBe('Public workflow');});

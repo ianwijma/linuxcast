@@ -1,3 +1,8 @@
+import { registerWorkflowIntentIpc } from './workflow-intent-ipc.ts';
+import { compileWorkflowCommands,matchWorkflowCommand,WorkflowCommandUnavailable } from './workflow-commands.ts';
+import type { WorkflowCommandSelection } from './workflow-commands.ts';
+import { WORKFLOW_EDITOR_OPEN_INTENT } from '../../../../packages/contracts/src/workflow-editor.ts';
+import type { WorkflowEditorOpenIntent } from '../../../../packages/contracts/src/workflow-editor.ts';
 import { createWorkflowRuns } from './workflow-run.ts';
 import { registerWorkflowRunIpc } from './workflow-run-ipc.ts';
 import { workflowFork } from '../services/workflow-worker.ts';
@@ -22,9 +27,11 @@ export interface WorkflowEditorOptions {
   write(input:WorkflowEditorWrite):Promise<WorkflowEditorRecord>;
 }
 /** Named local authoring methods only. No graph execution, file path or grant authority. */
-export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):ResidentService&{open():Promise<void>;prepareClose():Promise<boolean>} {
+export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):ResidentService&{open(selection?:WorkflowCommandSelection,trusted?:()=>boolean):Promise<void>;prepareClose():Promise<boolean>} {
   let window:BrowserWindow|undefined,creating:Promise<void>|undefined;
   let stopped=false,stopping=false,approvedClose=false,stopPromise:Promise<void>|undefined;
+  let openIntent:WorkflowEditorOpenIntent={requestId:1,view:'editor'};
+  const removeIntentIpc=registerWorkflowIntentIpc(ipcMain,()=>window?.webContents,()=>openIntent);
   let closeSequence=0,attempt:{id:number;owner:BrowserWindow;promise:Promise<boolean>;resolve(value:boolean):void}|undefined;
   const finishAttempt=(value:boolean)=>{const pending=attempt;attempt=undefined;pending?.resolve(value);};
   const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
@@ -38,7 +45,7 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
   });
   const updated=()=>{if(window&&!window.isDestroyed()){window.setBackgroundColor(tokens.themes[appearance()].background);if(window.webContents.getURL()===WORKFLOW_EDITOR_URL)window.webContents.send(WORKFLOW_EDITOR_APPEARANCE,appearance());}};
   nativeTheme.on('updated',updated);
-  const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);ipc.remove();removeRunIpc();ipcMain.removeHandler(WORKFLOW_EDITOR_CLOSE_FINISHED);finishAttempt(false);};
+  const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);ipc.remove();removeRunIpc();removeIntentIpc();ipcMain.removeHandler(WORKFLOW_EDITOR_CLOSE_FINISHED);finishAttempt(false);};
   const requestClose=():Promise<boolean>=>{
     runs.cancelCurrent();
     const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);
@@ -55,10 +62,13 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
     return {ok:true};
   });
   return {
-    async open(){
+    async open(selection,trusted=()=>true){
       if(stopped||stopping)throw new Error('Workflow editor is unavailable.');
-      if(creating)return creating;
-      if(window&&!window.isDestroyed()){window.show();window.focus();return;}
+      if(selection)matchWorkflowCommand(compileWorkflowCommands(await options.load()),selection);
+      if(creating)await creating;
+      if(stopped||stopping||attempt||!trusted())throw new WorkflowCommandUnavailable();
+      openIntent=selection?{requestId:openIntent.requestId+1,view:'run',editorRevision:selection.editorRevision,triggerNodeId:selection.triggerNodeId}:{requestId:openIntent.requestId+1,view:'editor'};
+      if(window&&!window.isDestroyed()){window.webContents.send(WORKFLOW_EDITOR_OPEN_INTENT,openIntent);window.show();window.focus();return;}
       creating=(async()=>{
         const area=screen.getPrimaryDisplay().workArea,owner=new BrowserWindow({
           width:Math.max(1,Math.min(1200,area.width-32)),height:Math.max(1,Math.min(800,area.height-32)),minWidth:Math.min(640,area.width),minHeight:Math.min(400,area.height),
@@ -68,7 +78,7 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
         window=owner;approvedClose=false;owner.setMenu(null);restrictContents(owner.webContents);
         owner.on('close',event=>{if(!approvedClose&&!stopped){event.preventDefault();void requestClose();}});
         owner.on('closed',()=>{if(window===owner)window=undefined;if(attempt?.owner===owner)finishAttempt(true);});
-        try{await owner.loadURL(WORKFLOW_EDITOR_URL);if(alive(owner))owner.show();}catch{owner.destroy();throw new Error('Workflow editor is unavailable.');}
+        try{await owner.loadURL(WORKFLOW_EDITOR_URL);if(!trusted()||stopping)throw new WorkflowCommandUnavailable();if(alive(owner))owner.show();}catch{owner.destroy();throw new Error('Workflow editor is unavailable.');}
       })().finally(()=>{creating=undefined;});
       return creating;
     },

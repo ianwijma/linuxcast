@@ -3,6 +3,12 @@ import { workflowDefinitionSchema } from './workflow-graph.ts';
 import { workflowContextSchema } from './workflows.ts';
 import { MAX_ENVELOPE_BYTES } from './protocol.ts';
 const bytes=(value:string,limit:number)=>new TextEncoder().encode(value).byteLength<=limit;
+/** Bounded display projection; canonical saved names remain unchanged. */
+export function workflowDisplayName(value:string):string {
+  if(value.length<=128)return value;
+  let display='';for(const point of value){if(display.length+point.length>127)break;display+=point;}
+  return `${display}…`;
+}
 export const workflowRunTextSchema=z.string().max(65536).refine(value=>bytes(value,65536)&&!/[\p{Cs}]/u.test(value));
 export const workflowRunInputSchema=workflowRunTextSchema.refine(value=>bytes(value,16384));
 const revision=z.number().int().positive().safe();

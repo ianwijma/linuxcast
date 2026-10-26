@@ -1,3 +1,4 @@
+import { MAX_LAUNCHER_COMMANDS } from '../../contracts/src/launcher.ts';
 import { JOURNAL_METHODS } from '../../workflows/src/journal/contracts.ts';
 import type { JournalMethods } from '../../workflows/src/journal/contracts.ts';
 import { dispatchWorkflowJournal } from './workflow-journal.ts';
@@ -148,7 +149,7 @@ export class Repositories {
         if(hidden){
           const exists=db.prepare('SELECT 1 FROM command_visibility WHERE command_id=?').get(commandId);
           const {count}=db.prepare('SELECT count(*) AS count FROM command_visibility').get() as {count:number};
-          if(!exists && count>=4102)throw new StorageError('conflict');
+          if(!exists && count>=MAX_LAUNCHER_COMMANDS-2)throw new StorageError('conflict');
           db.prepare('INSERT OR IGNORE INTO command_visibility(command_id) VALUES(?)').run(commandId);
         }else db.prepare('DELETE FROM command_visibility WHERE command_id=?').run(commandId);
         return {commandId,hidden};

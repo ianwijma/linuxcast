@@ -4,7 +4,9 @@ import { ApplicationsUnavailable } from '@linuxcast/applications';
 import { LAUNCHER_CHANNELS } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandsReply } from '@linuxcast/contracts';
 import { APP_URL } from './assets.ts';
+import { createWorkflowDraft } from '../../../../packages/workflows/src/registry.ts';
 import { registerLauncherIpc } from './launcher-ipc.ts';
+import type { WorkflowCommandSelection } from './workflow-commands.ts';
 import type { LauncherActions } from './launcher-ipc.ts';
 function fixture(overrides: Partial<LauncherActions> = {}, localData = true, files = true) {
   const frame={url:APP_URL}, contents={mainFrame:frame,isDestroyed:()=>false,getURL:()=>APP_URL} as unknown as WebContents;
@@ -474,4 +476,22 @@ it('releases the Quit dispatch latch after a cancelled editor preflight and perm
   expect(await f.execute('linuxcast:hide')).toMatchObject({ok:true});expect(f.actions.hide).toHaveBeenCalledTimes(1);
   expect(await f.execute('linuxcast:quit')).toMatchObject({ok:true,value:{outcome:'dispatched'}});
   await vi.waitFor(()=>expect(quit).toHaveBeenCalledTimes(2));
+});
+
+function savedWorkflow(){const definition=createWorkflowDraft();definition.name='Public launcher workflow';definition.nodes=[{id:'entry',type:'input.keyword',typeVersion:1,config:{keyword:'public-entry',argument:'required',trimQuery:false}}];return {revision:1,draft:structuredClone(definition),saved:definition,updatedAt:'2026-10-27T00:00:00.000Z'};}
+it('opens the exact freshly saved Keyword without receiving a graph, input, grant or Run request',async()=>{
+ const saved=savedWorkflow(),openWorkflowEntry=vi.fn(async(selection:WorkflowCommandSelection,trusted:()=>boolean)=>{void selection;void trusted;}),f=fixture({loadWorkflowCommands:async()=>saved,openWorkflowEntry,openWorkflowEditor:async()=>{}}),current=await catalogue(f),row=current.commands.find(command=>command.id.startsWith('workflow:'))!;
+ expect(row).toMatchObject({aliases:['public-entry'],enabled:true,usage:{useCount:4}});expect(await f.execute(row.id,current.revision)).toMatchObject({ok:true,value:{outcome:'completed'}});expect(openWorkflowEntry).toHaveBeenCalledOnce();expect(openWorkflowEntry.mock.calls[0]![0]).toMatchObject({commandId:row.id,editorRevision:1,triggerNodeId:'entry',definitionHash:expect.stringMatching(/^[a-f0-9]{64}$/u)});
+ for(const extra of [{input:'private'},{definition:saved.saved},{grants:['clipboard.write']},{run:true}])expect(await f.invoke(LAUNCHER_CHANNELS.execute,{protocolVersion:1,commandId:row.id,revision:current.revision,...extra})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+ expect(openWorkflowEntry).toHaveBeenCalledOnce();expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith(row.id);
+ saved.saved.name='Changed without catalogue refresh';expect(await f.execute(row.id,current.revision)).toMatchObject({ok:false,error:{code:'conflict'}});expect(openWorkflowEntry).toHaveBeenCalledOnce();
+});
+it('keeps builtin recovery and previous workflow rows visible but disabled when saved metadata fails',async()=>{
+ const saved=savedWorkflow();saved.saved.name='😀'.repeat(1000);let broken=false;const f=fixture({loadWorkflowCommands:async()=>{if(broken)throw new Error('PRIVATE');return saved;},openWorkflowEntry:async()=>{},openWorkflowEditor:async()=>{}}),first=await catalogue(f);expect(first.commands.find(command=>command.id.startsWith('workflow:'))?.title.length).toBeLessThan(256);
+ broken=true;const next=await catalogue(f);expect(next.commands.find(command=>command.id.startsWith('workflow:'))).toMatchObject({enabled:false,unavailableReason:expect.stringContaining('Reload')});expect(next.commands.find(command=>command.id==='linuxcast:open-workflow-editor')).toMatchObject({enabled:true});expect(next.commands.find(command=>command.id==='linuxcast:quit')).toMatchObject({enabled:true});expect(JSON.stringify(next)).not.toContain('PRIVATE');
+});
+it('fences delayed workflow opening after sender navigation, hiding and disposal',async()=>{
+ for(const lose of ['frame','hidden','disposed'] as const){const saved=savedWorkflow();let resolve!:(value:typeof saved)=>void,slow=false;let hidden:string[]=[];const opened=vi.fn(async()=>{}),f=fixture({loadWorkflowCommands:async()=>slow?new Promise(done=>{resolve=done;}):saved,openWorkflowEntry:opened,listHidden:async()=>hidden}),current=await catalogue(f),row=current.commands.find(command=>command.id.startsWith('workflow:'))!;
+  slow=true;const pending=f.execute(row.id,current.revision);await vi.waitFor(()=>expect(resolve).toBeTypeOf('function'));if(lose==='frame')f.frame.url='https://example.test';if(lose==='disposed')f.remove();if(lose==='hidden'){hidden=[row.id];slow=false;await catalogue(f);}resolve(saved);expect(await pending).toMatchObject({ok:false});expect(opened).not.toHaveBeenCalled();
+ }
 });

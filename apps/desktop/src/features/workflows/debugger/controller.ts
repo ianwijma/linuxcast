@@ -1,4 +1,4 @@
-import { workflowDefinitionSchema, workflowRunInputSchema, workflowRunReplySchema, workflowRunSnapshotSchema, workflowRunStartSchema, type WorkflowDefinition, type WorkflowRunApi, type WorkflowRunState } from '@linuxcast/contracts';
+import { workflowDisplayName, workflowDefinitionSchema, workflowRunInputSchema, workflowRunReplySchema, workflowRunSnapshotSchema, workflowRunStartSchema, type WorkflowDefinition, type WorkflowRunApi, type WorkflowRunState } from '@linuxcast/contracts';
 export const isActiveRun = (state: WorkflowRunState | null) => !!state && ['queued', 'running', 'waiting-ui', 'cancelling'].includes(state.state);
 export type RunPanelState = {
   loading: boolean; pending: 'start' | 'decide' | 'cancel' | 'reset' | null;
@@ -11,17 +11,18 @@ const same = (a: unknown, b: unknown): boolean => {
   return stable(a) === stable(b);
 };
 export class WorkflowRunController {
-  readonly revision: number; readonly definition: WorkflowDefinition | null;
+  readonly revision: number; readonly initialEntry: string | undefined; readonly definition: WorkflowDefinition | null;
   #api: WorkflowRunApi; #listeners = new Set<() => void>(); #unsubscribe: (() => void) | undefined;
   #disposed = false; #read = 0; #operation = 0; #events = 0; #retired = new Set<string>();
   #start: { entry: string; previousId: string | undefined; acceptedId?: string } | undefined;
   #state: RunPanelState;
-  constructor(api: WorkflowRunApi, revision: number, definition: WorkflowDefinition) {
-    this.#api = api; this.revision = revision;
+  constructor(api: WorkflowRunApi, revision: number, definition: WorkflowDefinition, initialEntry?: string) {
+    this.#api = api; this.revision = revision; this.initialEntry = initialEntry;
     const parsed = workflowDefinitionSchema.safeParse(definition); this.definition = parsed.success && Number.isSafeInteger(revision) && revision > 0 ? parsed.data : null;
-    this.#state = { loading: true, pending: null, snapshot: null, input: '', entry: this.entries[0]?.id ?? '', inputError: '', error: '', notice: '', unconfirmed: false, requiresReview: false };
+    this.#state = { loading: true, pending: null, snapshot: null, input: '', entry: initialEntry ?? this.entries[0]?.id ?? '', inputError: '', error: '', notice: '', unconfirmed: false, requiresReview: false };
   }
   get entries() { return this.definition?.nodes.filter(node => node.type === 'input.keyword' && !node.disabled) ?? []; }
+  get requestedEntryUnavailable() { return this.initialEntry !== undefined && !this.entries.some(node => node.id === this.initialEntry); }
   getSnapshot = () => this.#state;
   subscribe = (listener: () => void) => { this.#listeners.add(listener); return () => { this.#listeners.delete(listener); }; };
   #publish(patch: Partial<RunPanelState>) { if (!this.#disposed) { this.#state = { ...this.#state, ...patch }; for (const listener of this.#listeners) listener(); } }
@@ -50,12 +51,12 @@ export class WorkflowRunController {
       if (next.sequence === current.sequence) { if (!same(next, current)) this.#unknown(); return false; }
     } else if (current) {
       if (source === 'event') {
-        if (!this.#start || next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== this.definition?.name || this.#start.acceptedId) return false;
+        if (!this.#start || next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== workflowDisplayName(this.definition?.name ?? '') || this.#start.acceptedId) return false;
         this.#start.acceptedId = next.runId;
       } else if (source === 'reply') return false;
       this.#retired.add(current.runId); if (this.#retired.size > 100) this.#retired.delete(this.#retired.values().next().value!);
     } else if (source === 'event' && this.#start) {
-      if (next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== this.definition?.name) return false;
+      if (next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== workflowDisplayName(this.definition?.name ?? '')) return false;
       this.#start.acceptedId = next.runId;
     }
     this.#publish({ snapshot: next, requiresReview: next.requiresReview || next.effectOutcome === 'unknown' || (current?.runId === next.runId && this.#state.requiresReview) }); return true;
@@ -81,7 +82,7 @@ export class WorkflowRunController {
   }
   input(value: string) { if (!this.#state.pending && !isActiveRun(this.#state.snapshot)) this.#publish({ input: value, inputError: '' }); }
   entry(id: string) {
-    if (this.#state.pending || isActiveRun(this.#state.snapshot) || !this.entries.some(node => node.id === id)) return;
+    if (this.requestedEntryUnavailable || this.#state.pending || isActiveRun(this.#state.snapshot) || !this.entries.some(node => node.id === id)) return;
     const entry = this.entries.find(node => node.id === id)!;
     this.#publish({ entry: id, input: entry.config.argument === 'none' ? '' : this.#state.input, inputError: '' });
   }
@@ -108,11 +109,11 @@ export class WorkflowRunController {
     finally { if (!this.#disposed && token === this.#operation) this.#publish({ pending: null }); }
   }
   async start() {
-    if (this.#disposed || this.#state.pending || this.#state.loading || this.#state.unconfirmed || isActiveRun(this.#state.snapshot) || !this.definition || !this.entries.some(node => node.id === this.#state.entry)) return false;
+    if (this.#disposed || this.requestedEntryUnavailable || this.#state.pending || this.#state.loading || this.#state.unconfirmed || isActiveRun(this.#state.snapshot) || !this.definition || !this.entries.some(node => node.id === this.#state.entry)) return false;
     const request = workflowRunStartSchema.safeParse({ editorRevision: this.revision, triggerNodeId: this.#state.entry, input: this.#state.input });
     if (!request.success || !workflowRunInputSchema.safeParse(this.#state.input).success) { this.#publish({ inputError: 'Use text up to 16 KiB without unpaired Unicode surrogates.' }); return false; }
     this.#start = { entry: request.data.triggerNodeId, previousId: this.#state.snapshot?.runId };
-    const result = await this.#mutate('start', () => this.#api.startWorkflowRun(request.data), next => !!next && next.runId !== this.#start?.previousId && next.editorRevision === this.revision && next.triggerNodeId === request.data.triggerNodeId && next.workflowName === this.definition?.name && (!this.#start?.acceptedId || next.runId === this.#start.acceptedId));
+    const result = await this.#mutate('start', () => this.#api.startWorkflowRun(request.data), next => !!next && next.runId !== this.#start?.previousId && next.editorRevision === this.revision && next.triggerNodeId === request.data.triggerNodeId && next.workflowName === workflowDisplayName(this.definition?.name ?? '') && (!this.#start?.acceptedId || next.runId === this.#start.acceptedId));
     this.#start = undefined; return result;
   }
   async decide(decision: 'once' | 'persistent' | 'deny') {

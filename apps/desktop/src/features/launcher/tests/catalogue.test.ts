@@ -20,7 +20,7 @@ describe('L1-02 atomic renderer catalogue',()=>{
     if(mode==='bad-cursor')second=page([application(2)],{nextCursor:'arbitrary'});
     const fetch=vi.fn().mockResolvedValueOnce(first).mockResolvedValueOnce(second);await expect(collectCatalogue(fetch)).rejects.toThrow();expect(fetch).toHaveBeenCalledTimes(2);
   });
-  it('bounds the complete catalogue to 4100 identities',async()=>{
+  it('bounds the complete catalogue to5104 identities',async()=>{
     let start=0;await expect(collectCatalogue(async()=>{const entries=Array.from({length:100},(_,i)=>application(start+i));start+=100;return page(entries,{nextCursor:`1:${start}`});})).rejects.toThrow('limit');
   });
   it('merges an acknowledged pin into a full catalogue without discarding other pages',()=>{
