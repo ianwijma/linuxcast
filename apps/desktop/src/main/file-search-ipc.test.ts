@@ -143,3 +143,17 @@ it('never lets a late same-query reply with earlier options overwrite the newer 
   expect(await f.invoke(C.copyPath,{...selection,resultId:directory.id})).toMatchObject({ok:true,value:{path:'/synthetic/public-folder'}});
   expect(copyPath).toHaveBeenCalledExactlyOnceWith('/synthetic/public-folder');
 });
+
+it('forwards direct-child directory scope, rejects forged scopes and fences late same-query folder pages',async()=>{
+  let finish!:(value:Awaited<ReturnType<FileSearchActions['search']>>)=>void;
+  const row={...indexedRow,id:rootId+':b/public.txt',path:'b/public.txt'},copyPath=vi.fn(async()=>'written' as const);
+  const search=vi.fn<FileSearchActions['search']>().mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;})).mockResolvedValueOnce({query:'',rootId,directory:'b',results:[row]});
+  const f=fixture({getState:async()=>indexedState,search,copyPath});
+  const pending=f.invoke(C.search,{protocolVersion:1,query:'',rootId,directory:'a'});expect(search).toHaveBeenLastCalledWith({query:'',rootId,directory:'a'});
+  expect(await f.invoke(C.search,{protocolVersion:1,query:'',rootId,directory:'b'})).toMatchObject({ok:true});
+  finish({query:'',rootId,directory:'a',results:[]});expect(await pending).toMatchObject({ok:false,error:{code:'cancelled'}});
+  expect(await f.invoke(C.copyPath,{...selection,resultId:row.id})).toMatchObject({ok:true,value:{path:'/synthetic/b/public.txt'}});expect(copyPath).toHaveBeenCalledExactlyOnceWith('/synthetic/b/public.txt');
+  const bad=fixture({getState:async()=>indexedState,search:async()=>({query:'',rootId,directory:'b',results:[]})});
+  expect(await bad.invoke(C.search,{protocolVersion:1,query:'',rootId,directory:'a'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  for(const payload of [{protocolVersion:1,query:'',directory:''},{protocolVersion:1,query:'',rootId,directory:'../a'}])expect(await bad.invoke(C.search,payload)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+});

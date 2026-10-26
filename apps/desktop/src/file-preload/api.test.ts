@@ -78,3 +78,11 @@ it('treats omitted options and explicit default relevance as equivalent without 
   expect(await api.search({query:'public',options:{sort:'relevance'}})).toEqual({ok:true,value:{query:'public',rootId:null,results:[]}});
   expect(invoke).toHaveBeenLastCalledWith(C.search,{protocolVersion:1,query:'public',options:{sort:'relevance'}});
 });
+
+it('forwards indexed directory scope and rejects absent/mismatched scope or descendant rows',async()=>{
+  const row={id:rootId+':a/public.txt',rootId,generation:'22222222-2222-4222-8222-222222222222',path:'a/public.txt',kind:'file',size:1,modifiedMs:0};
+  const value={query:'',rootId,directory:'a',results:[row]},invoke=vi.fn(async()=>({ok:true,value} as unknown)),api=createFileSearchApi({invoke,on:vi.fn(),removeListener:vi.fn()});
+  expect(await api.search({query:'',rootId,directory:'a'})).toEqual({ok:true,value});expect(invoke).toHaveBeenLastCalledWith(C.search,{protocolVersion:1,query:'',rootId,directory:'a'});
+  for(const bad of [{...value,directory:undefined},{...value,directory:'b',results:[]},{...value,results:[{...row,id:rootId+':a/deep/public.txt',path:'a/deep/public.txt'}]}]){invoke.mockResolvedValueOnce({ok:true,value:bad});expect(await api.search({query:'',rootId,directory:'a'})).toMatchObject({ok:false});}
+  invoke.mockClear();for(const request of [{query:'',directory:''},{query:'',rootId,directory:'../a'},{query:'',rootId,directory:'/a'}])expect(await api.search(request)).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
+});
