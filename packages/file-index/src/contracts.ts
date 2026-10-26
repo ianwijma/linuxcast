@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { fileSearchOptionsSchema } from '../../contracts/src/file-search.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 
 const integer = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
@@ -40,7 +41,7 @@ export const fileIndexSchemas = {
   'files.scan.abort': {params: z.strictObject({...scan, unavailable: z.boolean()}), result: ok},
   'files.scan.prune': {params: rootId, result: z.strictObject({removed: integer.max(512)})},
   'files.search': {params: z.strictObject({query: z.string().max(512), rootId: z.uuid().optional(),
-    limit: z.number().int().min(1).max(100)}), result: z.array(candidateSchema).max(100)},
+    limit: z.number().int().min(1).max(100),options:fileSearchOptionsSchema.optional()}), result: z.array(candidateSchema).max(100)},
 } as const;
 export type FileIndexMethod = keyof typeof fileIndexSchemas;
 export type FileIndexMethods = {[M in FileIndexMethod]: {
