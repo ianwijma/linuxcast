@@ -11,13 +11,15 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35); frozen install/current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls`, **codex/file-search-navigation**, sourcehead **ba092e3**. No uncommitted implementation or live testprocess at this checkpoint; all three SOL agents completed.
+Primary clean `develop` at **aac0a3db5d6643472d8d2f56671f9debbc0983d8** (PR36). Frozen install unchanged and current production build63assets pass. Coordinator `.worktrees/linuxcast-application-controls` atsame merge, switching from integrated `codex/file-search-navigation` to `codex/calculator-colours` next. No live test/authorprocess remains.
 
-Reviewed/tested L2-02 directory increment ready for focused PR/CI/normalmerge.117units/5contracts/22security/8actualintegration/35browser, fulltypecheck/lint pass. Production Electron/private-Xvfb actualflow11.48s; twoapplication+fourcomponent directory/emptycaptures inspected, axe passes. Final SOLhigh review clean through sourcee03e7e8 and productiontestba092e3 (same reviewed draft). Full task/nativeAT/session/release unfinished.
+[PR36](https://github.com/ianwijma/linuxcast/pull/36) merged26October07:45:18UTC. Exact reviewed headff0726be3175198dee25cb41e24eced19cd09ccd, CI40287663288 passed; no requested reviews/comments/unresolved threads. Normal exact-head merge. This goal turn made verified implementation/test/merge progress.
 
-Prior goal turn made verified progress: PR35 filters merged31ce46b; current turn integrated navigation and verified its actualapplication flow. Registry done8/inprogress12/planned77,50passed/331pending/8NA. L2-02UI stillpending with partialevidence; privacy passed. Broader L1-01/D1-02 prerequisites unfinished under user-authorized increments.
+Navigation verified117units/5contracts/22security/8actualintegration/35browser; fulltypecheck/lint/plan/diff. Actual production/private-Xvfb11.48s flow and twoapplication+fourcomponent captures inspected; independent SOLhigh reviewclean. Full L2-02 remains in-progress: MIME/recents/extractors/nativeAT/session/release outstanding. Registry8done/12inprogress/77planned,50passed/331pending/8NA.
 
-Next: commit evidence/plan validation, push/open directory PR (attach), exacthead CI and requestedreview/comment/thread inspection, normalmerge; primaryrefresh/frozeninstall/build and mergecheckpoint. Then select next concrete application increment without asking the user. No infrastructure/proof expansion for manifest.
+Next selected concrete application increment **L2-04 local colour conversion** in existing Calculator Form/Detail/explicitCopy. Read complete L2-04card and same security/data/builtins/testing/mandatorydesign refs. F2-01accepted; broaderL1-01/native gates remainunfinished underuser-authorized increments. Closed explicit sRGB hex/RGB/HSL syntax and alpha, bounded pure local conversion, typed canonical text; main recomputes expression before native Copy. No CSS evaluation, DOM colour parser, network, arbitraryclipboardwriter or persistence. Needfreeze typedresult/receipt and grammar, then assignpureengine andsharedpresentation toexistingSOLhigh agents with disjointpaths. No newcontract/assignment exists atthischeckpoint.
+
+W3C CSSColor4 published22October2026 draft inspected https://www.w3.org/TR/2026/CRD-css-color-4-20261022/ sections4/5/7 forhex/rgb/hsl andHSLconversion reference; explicit closed calculatorgrammar will be documented rather thanclaimfullCSSsyntax. Skill-libraryquery returnedcontext7/frontenddesign; readboth. Context7toolsnotconnected; useexistinginstalledAPI; usermandatoryDESIGN/tokens overridegeneralfrontend aesthetic suggestions. No dependencies needed.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -39,7 +41,7 @@ Frozen765ee03: optional canonical relative `directory` (`''`rootchildren) requir
 
 Directory primaryBrowse, secondaryDetails/Copy; fileprimaryDetails/Copy unchanged. Root/Parent/Return replaceResults in place, preserve currentfilters, clearbrowsequery, restore original scope/query/selectedID onReturn when available. Exactdirectoryidentity, generation/copy fences, clear/removal/remediation retained. No filesystemread/open authority or history added.
 
-Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. No PR yet at checkpoint; fullMIME/recents/extractors/nativeAT/session/release pending.
+Passed117units/5contracts/22security/8integration/35browser; fulltypecheck/lint/plan/diff. Native production private-Xvfb covers childcopy/nested/empty/Parent/root/Return plus retained watch/clear/restart/removal. All screenshots inspected. IntegratedPR36/aac0a3d; currentprimarybuildpass. FullMIME/recents/extractors/nativeAT/session/release pending.
 
 Reusable completed SOLhigh agents: manifest_review_sol `.worktrees/linuxcast-l1-01` / codex/l2-02-directory-ui; file_search_service_sol `.worktrees/linuxcast-l1-02-native` / codex/l2-02-directory-service; read-only alias_review_sol. Verifyclean/switchbase for next assignment. Never reactivate Astra agents.
 
@@ -70,6 +72,7 @@ Full L2-02 remains in-progress: MIME filters, recent files and opt-in budgeted/c
 |33|851f6f2|92canonical unit conversions, help, exact numeric/unit copy|
 |34|f55ae06|Selected indexed result Copy path|
 |35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
+|36|aac0a3d|Indexed folder Browse/Parent/root/Return|
 
 PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
 
