@@ -98,6 +98,14 @@ it('recomputes numeric calculator text in main and records only a confirmed expl
   expect(copyCalculatorResult).toHaveBeenCalledExactlyOnceWith('7');expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:calculator');expect(f.actions.hide).not.toHaveBeenCalled();
   expect(await f.execute('linuxcast:calculator')).toMatchObject({ok:false,error:{code:'invalid-request'}});
 });
+it('recomputes unit conversions and copies only a canonical numeric value with its closed unit',async()=>{
+  const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult});
+  expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'1 km to m'})).toEqual({ok:true,value:{outcome:'copied',text:'1000',unit:'m'}});
+  expect(copyCalculatorResult).toHaveBeenCalledExactlyOnceWith('1000 m');expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:calculator');
+  for(const expression of ['1 m to kg','1 gal to L','1 KB to B','-1 K to degC'])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'1 km to m',unit:'m'})).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(copyCalculatorResult).toHaveBeenCalledTimes(1);
+});
 it('rejects forged, stale, content-bearing and non-arithmetic calculator copy requests before clipboard access',async()=>{
   const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult}),request={protocolVersion:1,revision:1,expression:'2 + 2'};
   for(const payload of [{...request,text:'arbitrary'},{...request,revision:2},{...request,expression:'process.exit()'},{...request,expression:'1/0'},{...request,expression:'x'.repeat(513)}])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,payload)).toMatchObject({ok:false,error:{code:'invalid-request'}});
