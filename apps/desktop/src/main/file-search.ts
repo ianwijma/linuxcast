@@ -7,8 +7,9 @@ import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
 import { FILE_SEARCH_URL } from './assets.ts';
 import { restrictContents,securePreferences } from './security.ts';
 import { registerFileSearchIpc } from './file-search-ipc.ts';
+import type { ClipboardWriteOutcome } from './clipboard-write.ts';
 import type { ResidentService } from './lifecycle.ts';
-export function createFileSearchWorkspace(options:{resourcesDirectory:string;service:FileSearchService;isReady():boolean}):ResidentService&{open():Promise<void>;refresh():void} {
+export function createFileSearchWorkspace(options:{resourcesDirectory:string;service:FileSearchService;isReady():boolean;copyPath?(path:string):Promise<ClipboardWriteOutcome>}):ResidentService&{open():Promise<void>;refresh():void} {
   let window:BrowserWindow|undefined,creating:Promise<void>|undefined,stopped=false,closing:Promise<void>|undefined;
   let timer:ReturnType<typeof setTimeout>|undefined,publishing=false,dirty=false;
   const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
@@ -22,7 +23,6 @@ export function createFileSearchWorkspace(options:{resourcesDirectory:string;ser
       void state().then(value=>{if(alive(owner)&&owner.webContents.getURL()===FILE_SEARCH_URL)owner.webContents.send(FILE_SEARCH_CHANGED,value);}).catch(()=>{}).finally(()=>{publishing=false;if(dirty)schedule();});
     },100);
   };
-  const unsubscribe=options.service.subscribe(schedule);
   const removeIpc=registerFileSearchIpc(ipcMain,{
     contents:()=>window?.webContents,isReady:()=>!stopped&&options.isReady(),getState:state,
     async chooseFolder():Promise<FileSearchActionReply>{
@@ -39,13 +39,15 @@ export function createFileSearchWorkspace(options:{resourcesDirectory:string;ser
       if(choice.response!==1||!alive(owner))return 'cancelled';
       await options.service.removeFolder(rootId);schedule();return 'completed';
     },
+    ...(options.copyPath?{copyPath:options.copyPath}:{}),
     search:request=>options.service.search(request),close:()=>window?.close(),
   });
+  const unsubscribe=options.service.subscribe(()=>{removeIpc.invalidate();schedule();});
   const appearance=()=>{if(window&&!window.isDestroyed())window.setBackgroundColor(tokens.themes[nativeTheme.shouldUseDarkColors?'dark':'light'].background);schedule();};
   nativeTheme.on('updated',appearance);
   const close=()=>{stopped=true;clearTimeout(timer);unsubscribe();removeIpc();nativeTheme.off('updated',appearance);if(window&&!window.isDestroyed())window.destroy();window=undefined;};
   return {
-    refresh:schedule,
+    refresh:()=>{removeIpc.invalidate();schedule();},
     async open(){
       if(stopped)throw new Error('File search unavailable.');
       if(creating)return creating;
@@ -53,7 +55,7 @@ export function createFileSearchWorkspace(options:{resourcesDirectory:string;ser
       creating=(async()=>{
         const area=screen.getPrimaryDisplay().workArea;
         const owner=new BrowserWindow({width:Math.max(1,Math.min(1000,area.width-32)),height:Math.max(1,Math.min(720,area.height-32)),minWidth:Math.min(480,area.width),minHeight:Math.min(320,area.height),show:false,title:'File search — Linuxcast',backgroundColor:tokens.themes[nativeTheme.shouldUseDarkColors?'dark':'light'].background,webPreferences:securePreferences(join(options.resourcesDirectory,'file-preload.cjs'),session.fromPartition('linuxcast-shell'))});
-        window=owner;owner.setMenu(null);restrictContents(owner.webContents);owner.on('closed',()=>{if(window===owner)window=undefined;});
+        window=owner;owner.setMenu(null);restrictContents(owner.webContents);owner.on('closed',()=>{if(window===owner){removeIpc.invalidate();window=undefined;}});
         try{await owner.loadURL(FILE_SEARCH_URL);if(alive(owner))owner.show();}catch{owner.destroy();throw new Error('File search unavailable.');}
       })().finally(()=>{creating=undefined;});return creating;
     },

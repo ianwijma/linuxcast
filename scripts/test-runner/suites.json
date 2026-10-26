@@ -42,6 +42,11 @@
       "packages/builtins/calculator/tests/result.test.ts",
       "packages/builtins/calculator/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts"
+    ],
+    "L2-03": [
+      "packages/builtins/universal-actions/tests/presentation.test.ts",
+      "apps/desktop/src/main/clipboard-write.test.ts",
+      "packages/builtins/file-search/tests/controller.test.ts"
     ]
   },
   "contracts": {
@@ -83,6 +88,9 @@
     ],
     "L2-04": [
       "packages/contracts/tests/calculator.contract.test.ts"
+    ],
+    "L2-03": [
+      "packages/contracts/tests/file-search.contract.test.ts"
     ]
   },
   "ui": {
@@ -106,6 +114,9 @@
     ],
     "L2-04": [
       "packages/builtins/calculator/tests/calculator.ui.test.ts"
+    ],
+    "L2-03": [
+      "packages/builtins/universal-actions/tests/path-copy.ui.test.ts"
     ]
   },
   "integration": {
@@ -144,6 +155,9 @@
     ],
     "L2-04": [
       "apps/desktop/tests/calculator.integration.test.ts"
+    ],
+    "L2-03": [
+      "apps/desktop/tests/file-search.integration.test.ts"
     ]
   },
   "security": {
@@ -199,6 +213,11 @@
     "L2-04": [
       "apps/desktop/src/main/launcher-ipc.test.ts",
       "apps/desktop/src/preload/api.test.ts"
+    ],
+    "L2-03": [
+      "apps/desktop/src/main/indexed-path-ipc.test.ts",
+      "apps/desktop/src/main/file-search-ipc.test.ts",
+      "apps/desktop/src/file-preload/api.test.ts"
     ]
   },
   "perf": {}

@@ -21,7 +21,7 @@ export interface LauncherActions {
   quitting(): boolean;
   hide(): void;
   quit(): void;
-  copyCalculatorResult?: (text:string) => Promise<'written'|'unsupported'>;
+  copyCalculatorResult?: (text:string) => Promise<'written'|'unsupported'|'busy'>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
@@ -148,6 +148,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     let timer:ReturnType<typeof setTimeout>|undefined;
     try {
       const outcome=await Promise.race([work,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error('Copy deadline.')),4000);})]);
+      if(outcome==='busy')return failure('cancelled');
       if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
       if(outcome!=='written')throw new Error('Invalid copy receipt.');
       await recordUse('linuxcast:calculator');
