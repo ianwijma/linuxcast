@@ -10,9 +10,9 @@ import type { NativeApplication } from '../../../../packages/contracts/src/appli
 import type { IpcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import {
   LAUNCHER_CHANNELS, launcherCommandsRequestSchema, launcherExecuteRequestSchema,
-  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias, launcherOpenUrlRequestSchema, launcherVisibilityRequestSchema, isLauncherVisibilityProtected,
+  launcherCommandsReplySchema, launcherPinRequestSchema, launcherAliasRequestSchema, normalizeCommandAlias, launcherOpenUrlRequestSchema, launcherVisibilityRequestSchema, isLauncherVisibilityProtected, launcherApplicationActionRequestSchema,launcherApplicationActionReplySchema,
 } from '../../../../packages/contracts/src/launcher.ts';
-import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply, LauncherOpenUrlReply } from '../../../../packages/contracts/src/launcher.ts';
+import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteReply, LauncherOpenUrlReply,LauncherApplicationActionReply } from '../../../../packages/contracts/src/launcher.ts';
 import { hiddenCommandIdsSchema } from '@linuxcast/storage';
 import type { CommandUsage, CommandVisibility } from '@linuxcast/storage';
 import { trustedShellSender } from './ipc.ts';
@@ -30,6 +30,7 @@ export interface LauncherActions {
   recordUse?: (commandId: string) => Promise<unknown>;
   listApplications?: () => Promise<NativeApplication[]>;
   launchApplication?: (application: Pick<NativeApplication,'desktopId'|'fingerprint'>) => Promise<'dispatched'>;
+  launchApplicationAction?: (application:Pick<NativeApplication,'desktopId'|'fingerprint'>&{actionId:string})=>Promise<{outcome:'requested';actionId:string}>;
   setPinned?: (commandId: string, pinned: boolean) => Promise<CommandUsage>;
   setAlias?: (commandId: string, alias: string | null) => Promise<CommandUsage>;
   listHidden?: () => Promise<string[]>;
@@ -48,7 +49,7 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
 /** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
-  let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false;
+  let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
@@ -75,6 +76,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     ...builtins,
     ...[...applicationRecords].map(([id,application])=>({id,provider:'applications' as const,title:application.title,
       subtitle:application.description||'Installed application',aliases:[],keywords:[],enabled:applicationState==='available',
+      ...(application.actions?{applicationActions:application.actions}:{}),
       ...(applicationState!=='available'?{unavailableReason:'Applications are unavailable. Reload commands to try again.'}:{}),
     })),
   ] as Omit<LauncherCommandMetadata,'usage'>[]).map(command=>({
@@ -164,9 +166,38 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       await refreshApplications();
       if(!metadataPending&&admittedMetadata===metadataGeneration)await refreshVisibility(admittedMetadata);
     }
-    if(metadataPending || urlPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
+    if(metadataPending || urlPending || applicationActionPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
-    return metadataPending || urlPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+    return metadataPending || urlPending || applicationActionPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+  });
+  ipc.handle(LAUNCHER_CHANNELS.applicationAction,async(event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherApplicationActionReply>=>{
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+    const parsed=launcherApplicationActionRequestSchema.safeParse(payload);
+    if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active()||busy||calculatorPending)return failure('cancelled');
+    const {commandId,actionId}=parsed.data,application=applicationRecords.get(commandId);
+    if(!application||applicationState!=='available')return failure('permission-denied');
+    if(!application.actions?.available||!actions.launchApplicationAction)return {ok:false,error:{code:'capability-unavailable',message:'Application actions are unavailable. Open the application to use its other actions.',retryable:false}};
+    if(!application.actions.actions.some(action=>action.id===actionId))return failure('permission-denied');
+    busy=true;applicationActionPending=true;metadataGeneration++;
+    try{
+      if(actions.listHidden){const denied=await checkVisibility(event,commandId,parsed.data.revision);if(denied)return denied;}
+      if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+      if(!active())return failure('cancelled');
+      if(parsed.data.revision!==revision||applicationRecords.get(commandId)?.fingerprint!==application.fingerprint)return failure('invalid-request');
+      // Native reconstructs the current GIO entry and checks its fingerprint
+      // (including action Exec) and declared action before requesting it.
+      const receipt=await actions.launchApplicationAction({desktopId:application.desktopId,fingerprint:application.fingerprint,actionId});
+      const reply=launcherApplicationActionReplySchema.parse({ok:true,value:receipt});
+      if(!reply.ok||reply.value.actionId!==actionId)throw new Error('Mismatched application action receipt.');
+      await recordUse(commandId);
+      // The renderer validates context before separately invoking Hide. GIO's
+      // void API cannot establish target completion, startup or focus.
+      return reply;
+    }catch(error){
+      const known=error instanceof ApplicationsUnavailable&&error.effectOutcome==='not-dispatched';
+      return {ok:false,error:{code:known?error.reason==='stale-application'?'conflict':'capability-unavailable':'deadline-exceeded',message:known?'This application action is unavailable or changed. Reload commands, or open the application to use its other actions.':'The application action outcome is unknown. Check the application, then reload commands before trying again.',retryable:false}};
+    }finally{busy=false;applicationActionPending=false;}
   });
   ipc.handle(LAUNCHER_CHANNELS.copyCalculatorResult,async(event:IpcMainInvokeEvent,payload:unknown):Promise<CalculatorCopyReply>=>{
     if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');

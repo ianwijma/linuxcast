@@ -9,6 +9,13 @@ function fixture() {
     on: vi.fn(), removeListener: vi.fn() };
   return { transport, api: createShellApi(transport) };
 }
+it('exposes only a named registered-application action and validates exact requested identity receipts',async()=>{
+  const {api,transport}=fixture(),request={commandId:`application:${'a'.repeat(64)}`,revision:1,actionId:'NewWindow'};
+  for(const value of [{...request,commandId:'linuxcast:quit'},{...request,actionId:'../private'},{...request,revision:0},{...request,desktopId:'public.desktop'},{...request,argv:[]}])expect(await api.executeApplicationAction!(value as never)).toMatchObject({ok:false});
+  expect(transport.invoke).not.toHaveBeenCalled();transport.invoke.mockResolvedValue({ok:true,value:{outcome:'requested',actionId:'NewWindow'}});
+  expect(await api.executeApplicationAction!(request)).toEqual({ok:true,value:{outcome:'requested',actionId:'NewWindow'}});expect(transport.invoke).toHaveBeenCalledExactlyOnceWith(LAUNCHER_CHANNELS.applicationAction,{protocolVersion:1,...request});
+  for(const value of [{outcome:'requested',actionId:'Compose'},{outcome:'completed',actionId:'NewWindow'},{outcome:'dispatched',actionId:'NewWindow'},{outcome:'requested',actionId:'NewWindow',private:'SYNTHETIC_PRIVATE'},{outcome:'requested',actionId:'x'.repeat(1048577)}]){transport.invoke.mockResolvedValue({ok:true,value});expect(await api.executeApplicationAction!(request)).toMatchObject({ok:false});}
+});
 it('exposes only the strict named visibility method and rejects recovery, extra fields and malformed acknowledgements',async()=>{
   const {api,transport}=fixture(),valid={commandId:'linuxcast:calculator' as const,revision:1,hidden:true};
   for(const request of [{...valid,commandId:'linuxcast:hide'},{...valid,commandId:'linuxcast:quit',hidden:false},{...valid,hidden:'true'},{...valid,revision:0},{...valid,path:'/private'}])expect(await api.setLauncherHidden!(request as never)).toMatchObject({ok:false});
@@ -33,7 +40,7 @@ it('keeps only a closed unit in calculator copy receipts',async()=>{
 describe('sandboxed preload API', () => {
   it('exposes named methods, no channel forwarding or event objects', async () => {
     const { api, transport } = fixture();
-    expect(Object.keys(api).sort()).toEqual(['setLauncherHidden', 'copyCalculatorResult', 'openLauncherUrl', 'setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
+    expect(Object.keys(api).sort()).toEqual(['executeApplicationAction', 'setLauncherHidden', 'copyCalculatorResult', 'openLauncherUrl', 'setLauncherAlias', 'setLauncherPinned', 'getLauncherCommands', 'executeLauncherCommand', 'getState', 'openDataSettings', 'hideLauncher', 'reportContentHeight', 'quit', 'onState', 'runtime'].sort());
     expect(Object.isFrozen(api)).toBe(true); expect(Object.isFrozen(api.runtime)).toBe(true);
     await api.hideLauncher(); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.hide, { protocolVersion: 1 });
     await api.reportContentHeight(300); expect(transport.invoke).toHaveBeenLastCalledWith(SHELL_CHANNELS.contentHeight, { protocolVersion: 1, height: 300 });
