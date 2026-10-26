@@ -29,8 +29,8 @@ Prior application increments and remaining scope are recorded in registry/Git.
 Coordinator `.worktrees/linuxcast-application-controls`, **codex/workflow-text-run**
 fromc8be683. Freeze d9f6a09/4300656; exact-run Cancel fix1e96fe2. Engine e900235
 (author signed e7b1c7f); UI c3d53f9 (author signed a1e38dc), both integrated.
-Root worker/broker/journal/storage/build/preload/canvas integration and evidence
-ready for signed commit/PR/CI/final exact-head independent reconciliation.
+Root integration signed d7337ea; final reset-authority fix follows it.
+All18 integration cases pass. PR/CI/final exact-head reconciliation next.
 
 Before: valid workflow could be saved; Run visibly unavailable. After: Run saved
 workflow→input→dedicated fixed Keyword/Transform/Copy worker→exact main broker
@@ -49,15 +49,16 @@ Copy evidence and dispatched steps, marks interrupted and never replays. Bounds
 Independent review resolved cancellation identity, crash aggregate/idle retention,
 urgent node-timeout→parent invocation cancellation, per-activation unknown after
 an earlier completed Copy, saved enabled/reachable node identity and receipt
-verification. Finishing/settled fences prevent new Start before terminal journal
+verification. Reset rechecks frame/saved identity after delayed inventory reads
+and before each revocation. Finishing/settled fences prevent new Start before terminal journal
 and make scoped reset wait for cancellation. Parent terminates worker only after
 final result acceptance; denial is explicitly permission-denied.
 
 PASS Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4 Linuxamd64:
 37 engine units,6 contracts,5 run IPC/preload security,29 run controller units,
-14 Chromium keyboard/axe cases;16 W1-03 integration (5 owner journal,10 controlled
+14 Chromium keyboard/axe cases;18 W1-03 integration (5 owner journal,12 controlled
 transport/backend using real engine+validating client+owner,1 actual production
-Electron6.72s). Actual isolated private Xvfb verifies registered launcher→editor
+Electron6.45s). Actual isolated private Xvfb verifies registered launcher→editor
 create/connect/save→Run/input→deny/persistent deny/reset/once/persistent exact
 clipboard/read receipt, Back/reopen, native Close cancel, full restart and abrupt
 main crash interrupted/no replay. Child PID/minimal env and renderer isolation

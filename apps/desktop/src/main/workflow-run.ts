@@ -150,7 +150,10 @@ export function createWorkflowRuns(options:{repository:ReturnType<typeof createS
     async cancel(value:unknown):Promise<WorkflowRunReply>{const parsed=workflowRunCancelSchema.safeParse(value);if(!parsed.success)return failure('invalid-request');if(!current||current.state.runId!==parsed.data.runId)return failure('conflict');cancelCurrent();return ok();},
     async reset(value:unknown,trusted:()=>boolean):Promise<WorkflowRunReply>{const parsed=workflowRunPermissionResetSchema.safeParse(value);if(!parsed.success)return failure('invalid-request');if(busy||stopped||!options.ready())return failure('conflict');busy=true;
       try{cancelCurrent();const cancelled=current;if(cancelled?.child){await cancelled.child.exited;await cancelled.settled;}const editor=await repository.request('workflows.editor.get',{});if(!trusted()||!editor?.saved||editor.revision!==parsed.data.editorRevision)return failure('conflict');const principal:Principal={kind:'workflow',id:editor.saved.id,version:editor.saved.version,integrity:hash(editor.saved)},key=createHash('sha256').update(principalKeyMaterial(principal)).digest('hex');const records=await store.list(key);
-        for(const record of records)if(record.permissionId==='clipboard.write'&&record.scope.kind==='global')await store.revoke(record.id);
+        const freshReset=async()=>{if(stopped||!trusted())return false;const latest=await repository.request('workflows.editor.get',{});return !stopped&&trusted()&&!!latest?.saved&&latest.revision===parsed.data.editorRevision&&hash(latest.saved)===principal.integrity;};
+        if(!await freshReset())return failure('conflict');
+        let revoked=false;
+        for(const record of records)if(record.permissionId==='clipboard.write'&&record.scope.kind==='global'){if(!await freshReset())return failure(revoked?'unknown-outcome':'conflict');await store.revoke(record.id);revoked=true;}
         return ok();}catch{return failure('unknown-outcome');}finally{busy=false;}},
     cancelCurrent,
     async stop(){stopped=true;cancelCurrent();const run=current;if(run?.child){await run.child.exited;await run.settled;}},

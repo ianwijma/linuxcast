@@ -42,7 +42,8 @@ Controlled host tests use the real engine and validating SQLite client/owner
 with an injected transport/backend: exact run cancellation, late timeout Allow
 blocked, stale saved revisions, denial/reset/once, reset waits settled, known
 unsupported/busy distinct from unknown, first completed/second uncertain Copy,
-and forged/mismatched node identities. These backend cases are not native evidence.
+forged/mismatched node identities, and deferred permission-inventory frame/revision
+changes fenced before reset revocation. These backend cases are not native evidence.
 Five owner journal tests cover dispatched/unknown/completed crash gaps, privacy,
 CAS/terminal fencing and idle retention; six wire contracts and five IPC/preload
 checks cover named authority/schema/subscription boundaries.

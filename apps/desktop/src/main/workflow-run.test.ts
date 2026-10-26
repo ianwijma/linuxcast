@@ -77,3 +77,12 @@ it.each(['unsupported','busy'] as const)('keeps the known negative %s backend re
   const {service,repository}=await fixture(undefined,false,localEngineFork,outcome);await service.start({editorRevision:1,triggerNodeId:'node-0',input:'Public unavailable'},()=>true);await expect.poll(async()=>(await state(service))?.state).toBe('waiting-ui');const waiting=(await state(service))!;await service.decide({runId:waiting.runId,promptId:waiting.prompt!.id,decision:'once'});
   await expect.poll(async()=>(await state(service))?.state).toBe('failed');expect(await state(service)).toMatchObject({effectOutcome:'not-dispatched',requiresReview:false,errorCode:'unavailable'});expect((await repository.request('workflows.runs.recover',{}))?.steps.at(-1)?.state).toBe('failed');
 });
+
+it.each(['frame','revision'])('does not revoke durable decisions when %s changes during a deferred permission inventory',async change=>{
+  const {service,repository,definition}=await fixture();await service.start({editorRevision:1,triggerNodeId:'node-0',input:'Public stale reset'},()=>true);await expect.poll(async()=>(await state(service))?.state).toBe('waiting-ui');const waiting=(await state(service))!;await service.decide({runId:waiting.runId,promptId:waiting.prompt!.id,decision:'deny'});await expect.poll(async()=>(await state(service))?.state).toBe('failed');
+  const original=repository.request;let release!:()=>void,listed=false,revokes=0,principalKey='';const gate=new Promise<void>(done=>{release=done;});
+  repository.request=(async(...args:Parameters<typeof original>)=>{if(args[0]==='permissions.list'){listed=true;principalKey=(args[1] as {principalKey:string}).principalKey;await gate;}if(args[0]==='permissions.revoke')revokes++;return original(...args);}) as typeof original;
+  let trusted=true;const pending=service.reset({editorRevision:1},()=>trusted);await expect.poll(()=>listed).toBe(true);
+  if(change==='frame')trusted=false;else await original('workflows.editor.write',{expectedRevision:1,draft:{...definition,name:'Changed public version'},action:'save'});release();
+  expect(await pending).toMatchObject({ok:false,error:{code:'conflict'}});expect(revokes).toBe(0);repository.request=original;expect((await repository.request('permissions.list',{principalKey,limit:200})).records).toHaveLength(1);
+});
