@@ -1,3 +1,4 @@
+import { CalculatorFlow } from '@linuxcast/calculator/presentation';
 import { collectCatalogue,mergePinReply,mergeAliasReply,parsePage } from './catalogue.ts';
 import type { Catalogue } from './catalogue.ts';
 import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema } from '@linuxcast/contracts';
@@ -23,6 +24,7 @@ export class LauncherController {
   #snapshot:Catalogue|null=null;#query='';#viewRevision=0;
   #generations=new QueryGenerations();#load:AbortController|null=null;#execution:AbortController|null=null;#dismissal:AbortController|null=null;
   #active=false;#busy=false;#loading=true;#metadataUnconfirmed=false;#status:Status|undefined;
+  #calculator:CalculatorFlow|null=null;#calculatorSequence=0;
   #url:UrlEditor|null=null;#urlSequence=0;#urlUnconfirmed=false;
   #priorSelection:string|null=null;#alias:AliasEditor|null=null;#aliasSequence=0;
   constructor(api:LauncherApi,dismiss:()=>Promise<ShellCommandReply>) {
@@ -66,7 +68,7 @@ export class LauncherController {
   }
   #publish(){if(!this.#active)return;this.session.update(VIEW_ID,{protocolVersion:1,kind:'snapshot',view:this.#view()});if(this.#alias)this.session.update(this.#alias.viewId,{protocolVersion:1,kind:'snapshot',view:this.#aliasView()});if(this.#url)this.session.update(this.#url.viewId,{protocolVersion:1,kind:'snapshot',view:this.#urlView()});}
   query(query:string){
-    if(this.#alias || this.#url)return;
+    if(this.#alias || this.#url || this.#calculator?.active)return;
     this.#query=query;
     if(query.length>MAX_QUERY_LENGTH){this.#generations.cancel();this.#publish();return;}
     const token=this.#generations.begin(query);
@@ -77,10 +79,12 @@ export class LauncherController {
     this.#active=visible;
     if(visible){void this.refresh();return;}
     if(this.#alias || this.#url)this.session.pop();
+    for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
+    this.#calculator?.dispose();this.#calculator=null;
     this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;this.#busy=false;
   }
   async refresh(){
-    if(!this.#active || this.#busy || this.#alias || this.#url)return;
+    if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active)return;
     this.#load?.abort();const controller=new AbortController();this.#load=controller;
     this.#loading=true;this.#status=undefined;this.#publish();
     try{
@@ -94,6 +98,7 @@ export class LauncherController {
   async execute(intent:ActionIntent){
     const frame=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || this.#busy && !(this.#alias && intent.actionId===CANCEL_ALIAS || this.#url && intent.actionId===CANCEL_URL) || this.#loading || !frame || intent.viewId!==frame.view.viewId || intent.revision!==frame.view.revision)return;
+    if(this.#calculator?.active){await this.#calculator.handle(intent);return;}
     if(this.#alias){await this.#editAlias(intent);return;}
     if(this.#url){await this.#submitUrl(intent);return;}
     if(intent.viewId!==VIEW_ID)return;
@@ -103,6 +108,10 @@ export class LauncherController {
     const command=this.#snapshot?.commands.find(command=>command.id===intent.actionId);
     if(!command || !command.enabled || intent.itemId!==frame.selection || command.id!==frame.selection || this.#query.length>MAX_QUERY_LENGTH)return;
     if(command.id===OPEN_URL){this.#openUrl();return;}
+    if(command.id==='linuxcast:calculator'){
+      this.#calculator?.dispose();this.#calculator=new CalculatorFlow({session:this.session,api:this.#api,viewId:`launcher-calculator-${++this.#calculatorSequence}`,revision:this.#snapshot!.revision});
+      this.#calculator.open(VIEW_ID);return;
+    }
     const revision=this.#snapshot!.revision,controller=new AbortController();this.#execution=controller;this.#busy=true;this.#status=undefined;this.#publish();
     try{
       const reply=launcherExecuteReplySchema.parse(await bounded(this.#api.executeLauncherCommand({commandId:command.id,revision}),controller.signal));
@@ -194,6 +203,7 @@ export class LauncherController {
     finally{if(this.#execution===controller && !controller.signal.aborted){this.#busy=false;this.#publish();}}
   }
   async #closeView(viewId:string){
+    if(this.#calculator?.closed(viewId)){if(!this.#calculator.active){this.#calculator.dispose();this.#calculator=null;void this.refresh();}return;}
     if(viewId!==VIEW_ID){
       if(this.#url?.viewId===viewId){
         if(this.#busy){this.#urlUnconfirmed=true;this.#status={kind:'error',message:URL_UNKNOWN};this.#execution?.abort();this.#busy=false;}
@@ -219,7 +229,7 @@ export class LauncherController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:'Linuxcast could not hide this window. Try again.'};this.#publish();}}
     finally{if(this.#dismissal===controller)this.#dismissal=null;}
   }
-  dispose(){this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
+  dispose(){this.#calculator?.dispose();this.#calculator=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
   return new Promise((resolve,reject)=>{

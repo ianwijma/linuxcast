@@ -30,3 +30,4 @@ export * from './launcher.ts';
 export * from './applications.ts';
 export * from './open-url.ts';
 export * from './file-search.ts';
+export * from './calculator.ts';

@@ -35,6 +35,11 @@
     "L2-02": [
       "packages/builtins/file-search/tests/controller.test.ts",
       "packages/builtins/file-search/tests/service.test.ts"
+    ],
+    "L2-04": [
+      "packages/builtins/calculator/tests/evaluate.test.ts",
+      "packages/builtins/calculator/tests/presentation.test.ts",
+      "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts"
     ]
   },
   "contracts": {
@@ -73,6 +78,9 @@
     ],
     "L2-02": [
       "packages/contracts/tests/file-search.contract.test.ts"
+    ],
+    "L2-04": [
+      "packages/contracts/tests/calculator.contract.test.ts"
     ]
   },
   "ui": {
@@ -93,6 +101,9 @@
     ],
     "L2-02": [
       "packages/builtins/file-search/tests/file-search.ui.test.ts"
+    ],
+    "L2-04": [
+      "packages/builtins/calculator/tests/calculator.ui.test.ts"
     ]
   },
   "integration": {
@@ -128,6 +139,9 @@
     "L2-02": [
       "packages/builtins/file-search/tests/service.integration.test.ts",
       "apps/desktop/tests/file-search.integration.test.ts"
+    ],
+    "L2-04": [
+      "apps/desktop/tests/calculator.integration.test.ts"
     ]
   },
   "security": {
@@ -179,6 +193,10 @@
     "L2-02": [
       "apps/desktop/src/main/file-search-ipc.test.ts",
       "apps/desktop/src/file-preload/api.test.ts"
+    ],
+    "L2-04": [
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/preload/api.test.ts"
     ]
   },
   "perf": {}

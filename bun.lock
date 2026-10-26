@@ -37,6 +37,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/applications": "workspace:*",
+        "@linuxcast/calculator": "workspace:*",
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/data-controls": "workspace:*",
         "@linuxcast/file-search": "workspace:*",
@@ -57,6 +58,14 @@
       "version": "0.1.0",
       "dependencies": {
         "@linuxcast/contracts": "workspace:*",
+      },
+    },
+    "packages/builtins/calculator": {
+      "name": "@linuxcast/calculator",
+      "version": "0.1.0",
+      "dependencies": {
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/ui": "workspace:*",
       },
     },
     "packages/builtins/file-search": {
@@ -366,6 +375,8 @@
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
     "@linuxcast/applications": ["@linuxcast/applications@workspace:packages/builtins/applications"],
+
+    "@linuxcast/calculator": ["@linuxcast/calculator@workspace:packages/builtins/calculator"],
 
     "@linuxcast/contracts": ["@linuxcast/contracts@workspace:packages/contracts"],
 

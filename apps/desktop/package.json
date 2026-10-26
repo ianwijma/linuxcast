@@ -13,7 +13,8 @@
     "@linuxcast/data-controls": "workspace:*",
     "@linuxcast/search": "workspace:*",
     "@linuxcast/applications": "workspace:*",
-    "@linuxcast/file-search": "workspace:*"
+    "@linuxcast/file-search": "workspace:*",
+    "@linuxcast/calculator": "workspace:*"
   },
   "devDependencies": {
     "electron": "45.0.0",

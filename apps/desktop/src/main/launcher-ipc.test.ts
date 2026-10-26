@@ -23,7 +23,7 @@ describe('trusted launcher registry and action dispatch',()=>{
     const f=fixture();
     expect([...f.handlers.keys()].sort()).toEqual(Object.values(LAUNCHER_CHANNELS).sort());
     const reply=await f.invoke(LAUNCHER_CHANNELS.getCommands);
-    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'},{id:'linuxcast:open-file-search'}]}});
+    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'},{id:'linuxcast:open-file-search'},{id:'linuxcast:calculator'}]}});
     expect(JSON.stringify(reply)).not.toContain('commandId');
     expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,query:'SYNTHETIC_PRIVATE'})).toMatchObject({ok:false,error:{code:'invalid-request'}});
     f.remove();expect(f.handlers.size).toBe(0);
@@ -60,7 +60,7 @@ describe('trusted launcher registry and action dispatch',()=>{
   });
   it('reports unavailable commands and rejects execution during shutdown',async()=>{
     const f=fixture({},false);
-    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true},{enabled:true}]}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true},{enabled:true},{enabled:true}]}});
     expect(await f.execute('linuxcast:open-local-data',2)).toMatchObject({ok:false,error:{code:'permission-denied'}});
     const stopped=fixture({quitting:()=>true});
     expect(await stopped.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
@@ -92,6 +92,33 @@ it('blocks overlapping mutations/execution and reports unconfirmed pin changes w
 });
 
 const applicationFixture=(index:number)=>({desktopId:`fixture-${String(index).padStart(3,'0')}.desktop`,title:`Fixture application ${index}`,description:'Public synthetic application',fingerprint:'a'.repeat(64)});
+it('recomputes numeric calculator text in main and records only a confirmed explicit copy',async()=>{
+  const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult});
+  expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression:'1 + 2 * 3'})).toEqual({ok:true,value:{outcome:'copied',text:'7'}});
+  expect(copyCalculatorResult).toHaveBeenCalledExactlyOnceWith('7');expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:calculator');expect(f.actions.hide).not.toHaveBeenCalled();
+  expect(await f.execute('linuxcast:calculator')).toMatchObject({ok:false,error:{code:'invalid-request'}});
+});
+it('rejects forged, stale, content-bearing and non-arithmetic calculator copy requests before clipboard access',async()=>{
+  const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult}),request={protocolVersion:1,revision:1,expression:'2 + 2'};
+  for(const payload of [{...request,text:'arbitrary'},{...request,revision:2},{...request,expression:'process.exit()'},{...request,expression:'1/0'},{...request,expression:'x'.repeat(513)}])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,payload)).toMatchObject({ok:false,error:{code:'invalid-request'}});
+  expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,request,{sender:{},senderFrame:f.frame} as IpcMainInvokeEvent)).toMatchObject({ok:false,error:{code:'permission-denied'}});
+  expect(copyCalculatorResult).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('keeps an uncertain clipboard write serialized while Hide remains usable and never replays it',async()=>{
+  let finish!:(value:'written')=>void;const copyCalculatorResult=vi.fn(()=>new Promise<'written'>(resolve=>{finish=resolve;})),f=fixture({copyCalculatorResult}),request={protocolVersion:1,revision:1,expression:'2+2'};
+  vi.useFakeTimers();try {
+    const pending=f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,request);await vi.advanceTimersByTimeAsync(4001);
+    expect(await pending).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,request)).toMatchObject({ok:false,error:{code:'cancelled'}});
+    expect(await f.execute('linuxcast:hide')).toEqual({ok:true,value:{outcome:'completed'}});expect(f.actions.hide).toHaveBeenCalledOnce();
+    finish('written');await vi.advanceTimersByTimeAsync(1);expect(copyCalculatorResult).toHaveBeenCalledTimes(1);expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:hide');
+  }finally{vi.useRealTimers();}
+});
+it('distinguishes unavailable clipboard copying from unknown backend outcomes without exposing content',async()=>{
+  const request={protocolVersion:1,revision:1,expression:'2+2'};
+  for(const f of [fixture(),fixture({copyCalculatorResult:async()=>'unsupported'})])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,request)).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+  const f=fixture({copyCalculatorResult:async()=>{throw new Error('SYNTHETIC_PRIVATE');}}),reply=await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,request);expect(reply).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(JSON.stringify(reply)).not.toContain('SYNTHETIC_PRIVATE');expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
 it('opens File search through its registered command and records usage only after the workspace opens',async()=>{
   let finish=()=>{};const f=fixture({openFileSearch:()=>new Promise<void>(resolve=>{finish=resolve;})});
   const pending=f.execute('linuxcast:open-file-search');expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.hide).not.toHaveBeenCalled();
@@ -104,7 +131,7 @@ it('pages a complete registered application catalogue and rejects obsolete curso
   const f=fixture({listApplications:async()=>records,launchApplication}),first=await catalogue(f);
   expect(first.commands).toHaveLength(100);expect(first.nextCursor).toBe(`${first.revision}:100`);
   const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
-  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(35);
+  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(36);
   const selected=first.commands.find(command=>command.provider==='applications')!;
   expect(await f.execute(`application:${'f'.repeat(64)}`,first.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
   expect(await f.execute(selected.id,first.revision)).toEqual({ok:true,value:{outcome:'dispatched'}});
@@ -122,7 +149,7 @@ it('caps public page bytes and keeps paginating large saved aliases without drop
     const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:page.nextCursor}) as LauncherCommandsReply;
     if(!next.ok)throw new Error();page=next.value;
   }
-  expect(ids).toHaveLength(135);expect(new Set(ids).size).toBe(135);
+  expect(ids).toHaveLength(136);expect(new Set(ids).size).toBe(136);
 });
 it('returns a one-command authoritative pin acknowledgement for an application beyond page one',async()=>{
   const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),first=await catalogue(f);

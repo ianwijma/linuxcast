@@ -2363,7 +2363,8 @@
         "Bounded selected-folder metadata search increment26October2026: frozen shared contract/packagef0eac31; service author9ef6655 integratedac1d0ca; application author4f0934c integrated53af004; coordinator main/preload/window/launcher routing3529e6c and final review/integration evidence. All author/reviewer agents GPT-6.1 SOL high.",
         "Pinned Node24.22.1/Bun1.4.4/Rust1.95/Electron45/SQLite3.53.4 checks PASS:41unit (26controller/15service),9main/preload security,2contracts,12Chromium keyboard/axe,3actual native/owner/production Electron integration;108launcher units and36launcher main/preload security regressions. Production file flow4.89s and existing app/URL/alias/pin/data/restart6.93s; durations are synthetic smoke results, not performance acceptance. Typecheck/lint/plan/diff pass. Exact task mappings in scripts/test-runner/suites.json; detailed evidence packages/builtins/file-search/README.md and SERVICE.md.",
         "Actual private-Xvfb production flow covers native chooser cancellation/selection (dialogs instrumented), explicit Index, real filename query and navigation/readonly Details, hidden/symlink exclusion and no content-sentinel search, real rename watch, pause, resident workspace close/reopen, process restart paused, paused-root Local data clear proactively invalidating displayed results, cancel/confirm derived-metadata removal preserving originals, and Quit with active watcher. Actual dark/light Details and affected component screenshots inspected; no personal files or credentials used.",
-        "Independent GPT-6.1 SOL/high final source review clean after stale-owner Close, paused-index clear publication and human removal-confirmation deadline findings resolved. Added exact-owner deferred Close check and generation-fenced reads; two held10second removal confirmation tests verify both cancelled/completed receipts, no premature unknown gate and no replay. Storage shutdown waits for file jobs/data operations before closing sole owner."
+        "Independent GPT-6.1 SOL/high final source review clean after stale-owner Close, paused-index clear publication and human removal-confirmation deadline findings resolved. Added exact-owner deferred Close check and generation-fenced reads; two held10second removal confirmation tests verify both cancelled/completed receipts, no premature unknown gate and no replay. Storage shutdown waits for file jobs/data operations before closing sole owner.",
+        "Integrated26October2026 local date in PR31 https://github.com/ianwijma/linuxcast/pull/31, merge0e0b4c4285adbe0f06762e9918a9a78b007f97ae at25October13:27:33UTC. Exact reviewed head8d7af2109cd32f8c529b9aedfc863d133f8a1cac CI40197619422 passed; no requested GitHub reviews/comments/unresolved threads. Normal exact-head merge; primary develop fast-forwarded clean. Full task, broader prerequisite/native UI and release acceptance remain unfinished."
       ],
       "owner": "coordinator with manifest_review_sol and file_search_service_sol (GPT-6.1 SOL/high)",
       "branch": "codex/file-search-ui",
@@ -2459,7 +2460,7 @@
     {
       "id": "L2-04",
       "title": "Implement calculator and explicit rate adapters",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -2497,10 +2498,17 @@
         {
           "id": "L2-04-AC01",
           "text": "No eval or background query transmission; ordinary words do not hijack search.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- L2-04; bun run test:ui -- L2-04; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- L2-04",
+              "outcome": "Current arithmetic/functions implementation uses the reviewed bounded pure parser (e52a755/src/evaluate.ts), no eval/newFunction/dynamic execution/I/O/network.157 independent grammar/domain/resource fixtures plus29presentation and2launcher routing checks pass; explicit Evaluate is local and Copy is the sole expression IPC. Actual production private-Xvfb flow confirms ordinary-word query produces no calculator result or clipboard action.10browser checks observe no external requests; renderer CSP denies arbitrary connections. Full units/dates/colours/explicit-rate scope remains pending under AC02, not inferred complete.",
+              "platform": "Linux amd64 development host; verified Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4; private Xvfb/X11 with separate native xclip reader and Chromium fixtures. No supported Debian/GNOME/KDE/native AT or release claim.",
+              "reference": "e52a755/44960d8/35a93e9; packages/builtins/calculator/src/evaluate.ts; packages/builtins/calculator/README.md; packages/builtins/calculator/GRAMMAR.md; apps/desktop/tests/calculator.integration.test.ts; packages/builtins/calculator/evidence/"
+            }
+          ]
         },
         {
           "id": "L2-04-AC02",
@@ -2521,20 +2529,36 @@
         {
           "id": "L2-04-PRIVACY",
           "text": "No secrets/private content enter fixtures, diagnostics or screenshots.",
-          "status": "pending",
+          "status": "passed",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:unit -- L2-04; bun run test:ui -- L2-04; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- L2-04",
+              "outcome": "Only public synthetic expressions appear in fixtures/screenshots. Parser and main/preload use fixed safe failures. Actual private-Xvfb/native xclip check uses isolated HOME/XDG/profile/display; real post-Quit owner command-usage export contains only aggregate count2 and none of the evaluated/invalid expressions. No expression/result history or raw clipboard content logging is introduced. Evidence README.md, GRAMMAR.md, calculator.integration.test.ts and inspected dark/light/affected-state PNGs.",
+              "platform": "Linux amd64 development host; verified Node24.22.1/Bun1.4.4, Electron45.0.0/SQLite3.53.4; private Xvfb/X11 with separate native xclip reader and Chromium fixtures. No supported Debian/GNOME/KDE/native AT or release claim.",
+              "reference": "e52a755/44960d8/35a93e9; packages/builtins/calculator/src/evaluate.ts; packages/builtins/calculator/README.md; packages/builtins/calculator/GRAMMAR.md; apps/desktop/tests/calculator.integration.test.ts; packages/builtins/calculator/evidence/"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:unit -- L2-04"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "Bounded local arithmetic/functions calculator26October2026: shared package/contracts7cb0f34; pure evaluator author4b84ffb integratede52a755; presentation author7982f0a integrated35a93e9; coordinator launcher/main/preload44960d8 and final routing/production evidence. All authors/reviewer GPT-6.1 SOL high; final independent source review clean. Full task remains in-progress.",
+        "Pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4 checks PASS:188calculator units (157evaluator/29presentation/2launcherrouting),41main/preload security checks,2calculator contracts,10Chromium keyboard/axe checks,108launcher regression units; typecheck/lint/plan/diff. Exact suite mapping scripts/test-runner/suites.json; grammar/semantics and limitations packages/builtins/calculator/GRAMMAR.md and README.md.",
+        "Actual production Electron/private-Xvfb/native xclip flow2.39s PASS: ordinary words do not hijack root search; typing/Evaluate never copy; explicit Copy writes real CLIPBOARD14and521; invalid/domain input does not write; unavailable session and explicit recovery work; Hide removes both nested calculator views and real single-instance reopen does not replay; after Quit real owner usage export count2 omits expressions/results. Actual dark/light result screenshots inspected and axe passes. Existing real application/URL/alias/pin/data/restart7.18s regression passes. Smoke durations do not establish performance acceptance.",
+        "Main parses/recomputes finite numeric output, validates exact own frame/revision/schema, exposes only named numeric-copy IPC, awaits Electron45 async write/readback and retains unresolved copy slot after4s unknown receipt. Copy does not block Hide/Quit or automatically replay. Renderer evaluates only explicit form submit; readonly semantic metadata, exact ack-text validation, pending/back/hide/dispose guards and fresh registry reload on calculator close. No content persistence, remote rate source, arbitrary clipboard writer, paste or PRIMARY access."
+      ],
+      "owner": "coordinator with manifest_review_sol and file_search_service_sol (GPT-6.1 SOL/high)",
+      "branch": "codex/calculator-flow",
+      "limitations": [
+        "Reviewed arithmetic/functions and explicit numeric-result Copy increment only; full L2-04 remains in-progress. Units, dates/durations/timezones/DST, colours and opt-in configured currency/crypto rate adapters, timestamped fixture-backed cache and stale/offline states remain required.",
+        "Arithmetic is approximate IEEE754 with display up to15significantdigits; unsafe integers are not exact. See GRAMMAR.md for percent, precedence, radians/domain and extreme-number rounding. No remote provider/endpoint or background query transmission is added.",
+        "F2-01 accepted; reviewed existing L1-01 shell/search/UI interfaces reused under user-authorized unfinished incremental integration. Broader L1-01, native Debian13 GNOME/KDE Wayland/X11, assistive-technology, installed-package and release acceptance remain pending. Private-Xvfb/X11 clipboard evidence does not establish the supported desktop matrix or paste behavior."
+      ]
     },
     {
       "id": "L2-05",

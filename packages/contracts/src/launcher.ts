@@ -1,10 +1,11 @@
 import * as z from 'zod';
+import type { CalculatorCopyReply } from './calculator.ts';
 import { httpUrlSchema } from './open-url.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
-export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
-export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url'} as const;
+export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search','linuxcast:calculator']),z.string().regex(/^application:[a-f0-9]{64}$/u)]);
+export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url',copyCalculatorResult:'launcher:copy-calculator-result'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
 export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
 export const normalizeCommandAlias=(value:string)=>value.normalize('NFKC').toLocaleLowerCase('en-US').trim().replace(/\s+/gu,' ');
@@ -33,6 +34,7 @@ export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSche
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
 export interface LauncherApi {
+  copyCalculatorResult?:(request:{revision:number;expression:string})=>Promise<CalculatorCopyReply>;
   openLauncherUrl(request:{revision:number;url:string}):Promise<LauncherOpenUrlReply>;
   setLauncherAlias(request:Pick<z.infer<typeof launcherAliasRequestSchema>,'commandId'|'revision'|'alias'>):Promise<LauncherCommandsReply>;
   setLauncherPinned(request:Pick<z.infer<typeof launcherPinRequestSchema>,'commandId'|'revision'|'pinned'>):Promise<LauncherCommandsReply>;

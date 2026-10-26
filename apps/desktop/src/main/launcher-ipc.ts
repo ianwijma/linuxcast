@@ -1,3 +1,6 @@
+import { evaluateExpression } from '@linuxcast/calculator/evaluate';
+import { calculatorCopyRequestSchema } from '@linuxcast/contracts';
+import type { CalculatorCopyReply } from '@linuxcast/contracts';
 import { MAX_ENVELOPE_BYTES } from '../../../../packages/contracts/src/index.ts';
 import { ApplicationsUnavailable } from '@linuxcast/applications';
 import { createHash } from 'node:crypto';
@@ -17,6 +20,7 @@ export interface LauncherActions {
   quitting(): boolean;
   hide(): void;
   quit(): void;
+  copyCalculatorResult?: (text:string) => Promise<'written'|'unsupported'>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
@@ -40,7 +44,7 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
 /** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
-  let metadataPending=false,metadataGeneration=0,urlPending=false;
+  let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
   let applications: NativeApplication[] = [];
@@ -55,6 +59,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:open-file-search',title:'File search',subtitle:'Search filenames in folders you choose',aliases:['files','file search'],keywords:['folder','filename','index'],enabled:!!actions.openFileSearch,
       ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
+    {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate an expression locally and copy its numeric result',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate'],enabled:true},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   const recordUse = async (id: string) => {
@@ -124,6 +129,29 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(metadataPending || urlPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
     return metadataPending || urlPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
+  });
+  ipc.handle(LAUNCHER_CHANNELS.copyCalculatorResult,async(event:IpcMainInvokeEvent,payload:unknown):Promise<CalculatorCopyReply>=>{
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
+    const parsed=calculatorCopyRequestSchema.safeParse(payload);
+    if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
+    if(!active()||busy||calculatorPending)return failure('cancelled');
+    const calculated=evaluateExpression(parsed.data.expression);
+    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported finite arithmetic expression, then evaluate it again.',retryable:false}};
+    if(!actions.copyCalculatorResult)return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
+    calculatorPending=true;
+    // A timed-out write keeps its slot until the actual backend settles. Hide/Quit
+    // remain usable, and no later copy can overtake an unresolved clipboard write.
+    const work=Promise.resolve().then(()=>{if(!active())throw new Error('Stopped.');return actions.copyCalculatorResult!(calculated.text);});
+    void work.finally(()=>{calculatorPending=false;}).catch(()=>{});
+    let timer:ReturnType<typeof setTimeout>|undefined;
+    try {
+      const outcome=await Promise.race([work,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error('Copy deadline.')),4000);})]);
+      if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
+      if(outcome!=='written')throw new Error('Invalid copy receipt.');
+      await recordUse('linuxcast:calculator');
+      return {ok:true,value:{outcome:'copied',text:calculated.text}};
+    }catch{return {ok:false,error:{code:'deadline-exceeded',message:'The copy outcome is unknown. Check your clipboard before choosing Copy result again.',retryable:false}};}
+    finally{clearTimeout(timer);}
   });
   ipc.handle(LAUNCHER_CHANNELS.openUrl, async (event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherOpenUrlReply>=>{
     if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
@@ -208,7 +236,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
-    if(command.id==='linuxcast:open-url')return failure('invalid-request');
+    if(command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator')return failure('invalid-request');
     busy = true;
     try {
       if (command.id === 'linuxcast:quit') {
