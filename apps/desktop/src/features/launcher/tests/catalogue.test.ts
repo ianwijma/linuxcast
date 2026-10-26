@@ -1,5 +1,5 @@
 import { describe,expect,it,vi } from 'vitest';
-import { collectCatalogue,mergePinReply,mergeAliasReply } from '../catalogue.ts';
+import { collectCatalogue,mergePinReply,mergeAliasReply,mergeVisibilityCatalogue } from '../catalogue.ts';
 import type { Catalogue } from '../catalogue.ts';
 import type { LauncherCommandsSnapshot,LauncherCommandMetadata } from '@linuxcast/contracts';
 export const application=(number:number):LauncherCommandMetadata=>({id:`application:${number.toString(16).padStart(64,'0')}`,provider:'applications',title:`Public Fixture ${number}`,aliases:[],keywords:['synthetic'],enabled:true,usage:null});
@@ -74,4 +74,89 @@ describe('L1-01 alias acknowledgement integrity',()=>{
 it('L1-02 collects4100identities including4builtins without dropping finalpage',async()=>{
   const commands=Array.from({length:4096},(_,i)=>application(i));commands.push(...['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url'].map(id=>({id:id as LauncherCommandMetadata['id'],title:id,aliases:[],keywords:[],enabled:true,usage:null})));
   const result=await collectCatalogue(async cursor=>{const offset=cursor?Number(cursor.split(':')[1]):0;return page(commands.slice(offset,offset+100),{nextCursor:offset+100<commands.length?`1:${offset+100}`:null});});expect(result.commands).toHaveLength(4100);expect(result.commands.at(-1)!.id).toBe('linuxcast:open-url');
+});
+
+
+describe('L1-01 catalogue visibility boundaries',()=>{
+  it.each([true,false])('preserves explicit visibility availability %s across every collected page',async visibilityAvailable=>{
+    const result=await collectCatalogue(vi.fn().mockResolvedValueOnce(page([application(1)],{visibilityAvailable,nextCursor:'1:1'})).mockResolvedValueOnce(page([application(2)],{visibilityAvailable})));
+    expect(result.visibilityAvailable).toBe(visibilityAvailable);expect(result.commands).toHaveLength(2);
+  });
+  it.each([[true,false],[true,undefined],[undefined,false],[false,undefined]] as const)('rejects mixed visibility availability %s/%s across pages',async(first,second)=>{
+    const fetch=vi.fn().mockResolvedValueOnce(page([application(1)],{visibilityAvailable:first,nextCursor:'1:1'})).mockResolvedValueOnce(page([application(2)],{visibilityAvailable:second}));
+    await expect(collectCatalogue(fetch)).rejects.toThrow('Inconsistent');
+  });
+  it('keeps legacy missing visibility availability absent rather than simulating support',async()=>{
+    const result=await collectCatalogue(async()=>page([application(1)]));expect(result).not.toHaveProperty('visibilityAvailable');
+  });
+  it('preserves visibility through acknowledged pin and alias updates and rejects forged hidden state',()=>{
+    const target={...application(1),hidden:true,usage:{alias:'previous',pinned:false,useCount:7,lastUsedAt:null}};
+    const current:Catalogue={revision:1,rankingAvailable:true,visibilityAvailable:true,commands:[target]};
+    const pin={revision:1,rankingAvailable:true,visibilityAvailable:true,updateOnly:true,commands:[{...target,usage:{...target.usage,pinned:true}}]};
+    expect(mergePinReply(current,pin,target.id,true)).toMatchObject({visibilityAvailable:true,commands:[{hidden:true,usage:{pinned:true}}]});
+    const full={...pin,updateOnly:false,revision:2};expect(mergePinReply(current,full,target.id,true).visibilityAvailable).toBe(true);
+    const alias={...pin,commands:[{...target,usage:{...target.usage,alias:'next'}}]};
+    expect(mergeAliasReply(current,alias,target.id,'next')).toMatchObject({visibilityAvailable:true,commands:[{hidden:true,usage:{alias:'next'}}]});
+    for(const reply of [pin,full,alias]){
+      const forged=structuredClone(reply);forged.commands[0]!.hidden=false;
+      expect(()=>reply===alias?mergeAliasReply(current,forged,target.id,'next'):mergePinReply(current,forged,target.id,true)).toThrow();
+    }
+    for(const visibilityAvailable of [false,undefined]){
+      expect(()=>mergePinReply(current,{...pin,visibilityAvailable},target.id,true)).toThrow();
+      expect(()=>mergeAliasReply(current,{...alias,visibilityAvailable},target.id,'next')).toThrow();
+    }
+  });
+  it('rejects an unrelated hidden change in a legacy complete pin snapshot',()=>{
+    const target={...application(1),usage:{alias:null,pinned:false,useCount:0,lastUsedAt:null}},other={...application(2),hidden:true};
+    const current:Catalogue={revision:1,rankingAvailable:true,visibilityAvailable:true,commands:[target,other]};
+    expect(()=>mergePinReply(current,{revision:2,rankingAvailable:true,visibilityAvailable:true,commands:[{...target,usage:{...target.usage,pinned:true}},{...other,hidden:false}]},target.id,true)).toThrow();
+  });
+});
+
+describe('L1-01 fully collected visibility acknowledgement integrity',()=>{
+  const fixture=()=>{
+    const commands=Array.from({length:120},(_,i)=>application(i));
+    commands[90]!.hidden=true;commands[110]!.usage={alias:'saved target',pinned:true,useCount:7,lastUsedAt:'2026-10-25T00:00:00Z'};
+    const current:Catalogue={revision:1,rankingAvailable:true,visibilityAvailable:true,applicationState:'available',commands};
+    const next=structuredClone(current);next.revision=2;next.commands[110]!.hidden=true;
+    return {current,next,id:commands[110]!.id};
+  };
+  it('merges a later-page target without losing hidden rows, aliases, pins or authoritative use totals',()=>{
+    const {current,next,id}=fixture();next.commands[110]!.usage!.useCount=8;next.commands[110]!.usage!.lastUsedAt='2026-10-25T01:00:00Z';
+    next.commands[5]!.usage={alias:null,pinned:false,useCount:1,lastUsedAt:'2026-10-25T01:00:00Z'};
+    const merged=mergeVisibilityCatalogue(current,next,id,true);expect(merged.commands).toHaveLength(120);expect(merged.commands[90]!.hidden).toBe(true);
+    expect(merged.commands[110]).toMatchObject({hidden:true,usage:{alias:'saved target',pinned:true,useCount:8}});expect(merged.commands[5]!.usage!.useCount).toBe(1);
+    expect(current.commands[110]!.hidden).toBeUndefined();expect(current.commands[110]!.usage!.useCount).toBe(7);
+    const restored=structuredClone(merged);restored.revision=3;restored.commands[110]!.hidden=false;restored.commands[110]!.usage!.useCount=0;restored.commands[110]!.usage!.lastUsedAt=null;
+    expect(mergeVisibilityCatalogue(merged,restored,id,false).commands[110]).toMatchObject({hidden:false,usage:{alias:'saved target',pinned:true,useCount:0}});
+  });
+  it('compares complete registered ID sets rather than page position and treats omitted hidden as false',()=>{
+    const {current,next,id}=fixture();next.commands.reverse();expect(mergeVisibilityCatalogue(current,next,id,true)).toBe(next);
+    const shown=structuredClone(next);shown.revision=3;delete shown.commands.find(command=>command.id===id)!.hidden;
+    expect(mergeVisibilityCatalogue(next,shown,id,false)).toBe(shown);
+  });
+  it.each(['same-revision','skipped-revision','old-revision','partial','duplicate','new-id','target-id','wrong-hidden','other-hidden','title','aliases','keywords','provider','enabled','pin','alias','other-pin','other-alias','ranking','application-state','visibility','missing-visibility','current-visibility','cursor','update-only','invalid-count'] as const)('rejects %s rather than confirming a different or partial visibility write',mode=>{
+    const {current,next,id}=fixture(),target=next.commands[110]!;
+    if(mode==='same-revision')next.revision=1;if(mode==='skipped-revision')next.revision=3;if(mode==='old-revision')next.revision=0;
+    if(mode==='partial')next.commands=next.commands.slice(0,100);if(mode==='duplicate')next.commands[119]=next.commands[0]!;
+    if(mode==='new-id')next.commands[119]=application(500);if(mode==='target-id')target.id=application(501).id;
+    if(mode==='wrong-hidden')target.hidden=false;if(mode==='other-hidden')next.commands[90]!.hidden=false;
+    if(mode==='title')target.title='Changed';if(mode==='aliases')target.aliases=['forged'];if(mode==='keywords')target.keywords=['forged'];
+    if(mode==='provider')target.provider='commands';if(mode==='enabled'){target.enabled=false;target.unavailableReason='Synthetic unavailable';}
+    if(mode==='pin')target.usage!.pinned=false;if(mode==='alias')target.usage!.alias='forged';
+    if(mode==='other-pin')next.commands[5]!.usage={alias:null,pinned:true,useCount:0,lastUsedAt:null};
+    if(mode==='other-alias')next.commands[5]!.usage={alias:'forged',pinned:false,useCount:0,lastUsedAt:null};
+    if(mode==='ranking')next.rankingAvailable=false;if(mode==='application-state')next.applicationState='unavailable';
+    if(mode==='visibility')next.visibilityAvailable=false;if(mode==='missing-visibility')delete next.visibilityAvailable;if(mode==='current-visibility')current.visibilityAvailable=false;
+    if(mode==='cursor')Object.assign(next,{nextCursor:'2:100'});if(mode==='update-only')Object.assign(next,{updateOnly:true});if(mode==='invalid-count')target.usage!.useCount=-1;
+    expect(()=>mergeVisibilityCatalogue(current,next,id,true)).toThrow();
+  });
+  it('never hides protected recovery identities or accepts an unknown requested target',()=>{
+    const {current,next}=fixture();
+    for(const id of ['linuxcast:hide','linuxcast:quit'] as const){
+      const recovery={id,title:id,aliases:[],keywords:[],enabled:true,usage:null};current.commands.push(recovery);next.commands.push({...recovery,hidden:true});
+      expect(()=>mergeVisibilityCatalogue(current,next,id,true)).toThrow();next.commands.at(-1)!.hidden=false;
+    }
+    expect(()=>mergeVisibilityCatalogue(current,next,application(999).id,true)).toThrow();
+  });
 });
