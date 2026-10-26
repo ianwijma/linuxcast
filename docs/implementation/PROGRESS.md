@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated 27 October 2026. **Goal PAUSED** (confirmed by goal controller on27October2026; this agent did not change the status). Objective remains to complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Read `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md` before continuing. An increment does not complete the goal.
+Updated 27 October 2026. **Goal ACTIVE** (resumed and confirmed by controller on27October2026). Objective remains to complete all 97 agreed local 1.0 tasks through R1-03 and every applicable release gate. Read `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md` before continuing. An increment does not complete the goal.
 
 ## User constraints
 
@@ -17,7 +17,7 @@ Prior [PR41](https://github.com/ianwijma/linuxcast/pull/41) mergedcc837ab at26Oc
 
 ## Current bounded increment: W1-01 / W2-01 workflow draft editor
 
-Coordinator `.worktrees/linuxcast-application-controls`, branch **codex/workflow-run-checkpoint** fromc8be683. This contains only the administrative integration/pause checkpoint after merged PR42; no next application assignment is running. Frozen interface/ownership in `packages/workflows/EDITOR-INCREMENT.md`. Root owns shared registry/contracts/manifests/migrations, named sandbox workspace, launcher/build/preload/SQLite integration and registry status.
+Coordinator `.worktrees/linuxcast-application-controls`, branch **codex/workflow-text-run** fromc8be683. This includes the signed administrative checkpoint f75c70a and next frozen text-run application interface. Previous goal turn was verified progress (PR41/42 merged and production builds passed). Frozen interface/ownership in `packages/workflows/EDITOR-INCREMENT.md`. Root owns shared registry/contracts/manifests/migrations, named sandbox workspace, launcher/build/preload/SQLite integration and registry status.
 
 Commits: freeze91a0f7e; shared exports/dependencies3a5504b; pure model89f6ee3(author dd5dc01); close callback886f556; UI07ff408(author5d289d1); sealed-Form handle fixbc251e8(author67396c1). Root application integration/tests/evidence/docs signedfcbc50f; exact-SHA independent source/evidence reconciliation clean, all checks passed and PR42 merged.
 
@@ -44,11 +44,12 @@ All existing **GPT-6.1 SOL/high**, no older agents:
 - `file_search_service_sol`: `.worktrees/linuxcast-l1-02-native`, branchcodex/w1-01-workflow-graph, clean signed67396c1 atopdd5dc01. Both integrated.
 - `alias_review_sol`: read-only bounded source/evidence reviewer. All four actionable findings above resolved; exact final coordinator-SHA/evidence review still needed.
 
-When the user resumes the paused goal, continue a bounded usable workflow flow with the same three nodes, a real run input/result and explicitly approved useful output using existing shell/storage/UI/broker. Read W1-02/card/norms before freezing; no new assignment or implementation yet. Do not start it while the goal controller remains paused. All three SOL/high agents are completed, with no active subagent work. Preserve full runtime cancellation, journaling, permissions and release requirements; do not simulate successful effects or expand foundational work.
+Goal resumed and controller ACTIVE. Current selected application flow is W1-02/W1-03/W2-03 actual saved text execution: Keyword/Transform through a dedicated trusted utility process, explicit broker clipboard approval, result/status UI, sole-owner metadata checkpoints and no replay. Frozen interface packages/workflows/TEXT-RUN-INCREMENT.md. Coordinator codex/workflow-text-run includes checkpoint f75c70a from prior merge. No new implementation evidence beyond interface tests yet; delegate disjoint engine/** and debugger/** work only after signing freeze. Root owns worker/broker/journal/IPC/build/storage integration. Full prerequisite/task/native/AT/release acceptance stays pending; no infrastructure/proof expansion for UI author.
+
 
 ## Complete scope
 
-Registry **8done/15in-progress/74planned;53passed/328pending/8not-applicable**. Cards are generated from tasks.json. Run render_tasks/validate_plan/plan_status after registry changes. Never infer acceptance from documentation or an increment.
+Registry **8done/18in-progress/71planned;53passed/328pending/8not-applicable**. Cards are generated from tasks.json. Run render_tasks/validate_plan/plan_status after registry changes. Never infer acceptance from documentation or an increment.
 
 F2-02 credential/data core + Local data clear/export are integrated; credential setup/status/diagnostics, provider/package/nativeAT/release acceptance remain. L1 shell/registered commands/pins/aliases/visibility/applications/DesktopActions are increments; providers/fallback/permission administration/history/full typed launch/session acceptance remain. File metadata index/search/filter/sort/navigation and Copy path are increments; MIME/recent/extractors, multi-file buffer/full typed actions/preview/cache remain. Calculator arithmetic/92units/colours are increments; calendar/timezones/DST/rates/cache remain. Quicklinks full contexts/cursor/snippets/other component builders/arguments/browser/open-with/file targets/tags/export remain. Workflows full palette/multiple workflows/packages/bindings/settings/notes/copy-paste/execution/debugger/ten examples remain. All other task-card scope and R1-01/R1-02/R1-03 remain required.
 
