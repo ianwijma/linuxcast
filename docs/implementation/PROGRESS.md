@@ -11,14 +11,16 @@ Updated 26 October 2026. **Goal ACTIVE**: complete all 97 agreed local 1.0 tasks
 
 ## Authoritative current state
 
-Primary remains clean `develop` at f55ae06 (PR34); previous frozen install/build passed.
-Coordinator `.worktrees/linuxcast-application-controls`, branch `codex/file-search-filters`, source head **2b34229**. Reviewed/tested L2-02 metadata filter/sort increment ready for PR/CI/normal merge. No live exec or author process remains at this checkpoint; all three SOL agents completed. Previous goal turn made concrete implementation/test progress.
+Primary clean `develop` at **31ce46bb14bb0da67178321dfbcdb1e8a0c41c06** (PR35). Frozen install unchanged and production build63assets pass. No app started on the user's display.
+Coordinator `.worktrees/linuxcast-application-controls` at same merge; about to switch from integrated `codex/file-search-filters` to `codex/file-search-navigation`.
 
-Registry: done8 / in-progress12 / planned77. L2-02 privacy now passed with public fixture/source/screenshot evidence; full UI/extraction acceptance stays pending. Broader L1-01/D1-02 prerequisites remain incomplete under user-authorized unfinished increments.
+[PR35](https://github.com/ianwijma/linuxcast/pull/35) merged26October07:27:02UTC. Exact reviewed head0cf3db5888ec12b6879653682d782f7eb8af88f8, CI40285788921 passed; no requested reviews/comments/unresolved threads. Normal exact-head merge. This goal turn made verified implementation/test/merge progress.
 
-Current verification:99units/4contracts/20security/7actualintegration;17shared units;39browser checks; full typecheck/lint. Actual production Electron/private-Xvfb flow8.56s. Independent SOL-high review clean. Four application and six component filter/range captures inspected. Fixed shared extension empty-description rendering and corrected-error revival across appearance/status changes.
+Registry: done8 / in-progress12 / planned77;50passed/331pending/8not-applicable. L2-02 privacy passed with public fixture/source/screenshot evidence; full UI/extraction acceptance pending. Broader L1-01/D1-02 prerequisites remain incomplete under user-authorized unfinished increments.
 
-Next: commit evidence and validate plan, push/open focused filter PR (attach), inspect exact-head CI and requested reviews/comments/threads, normal merge when all applicable checks/reviews pass, refresh primary frozen install/build and record merge. Then select the next concrete application increment; do not add proof/infra to manifest agent. Keep all unimplemented task scope explicit.
+Verified:99units/4contracts/20security/7actualintegration;17sharedunits;39browser; fulltypecheck/lint/plan/diff. Actual production Electron/private-Xvfb flow8.56s. Independent SOL-high review clean. Four application and six component filter/range captures inspected. Shared empty-description and validation/theme regressions resolved.
+
+Next bounded application increment: **L2-02 indexed folder navigation**. Browse an actual directory result, view its direct indexed children, search within that folder, and move to its indexed parent/root using existing shared List/Actions. Keep filter/sort/query/copy safety, no source reads/opening/extraction or filesystem authority. Coordinator freezes narrow directory scope and owner SQL; manifest agent handles bounded UI. New contract/assignment not yet created at this checkpoint. All existing SOL agents completed, no live testprocess.
 
 ## Latest integrated application increment: L2-03 Copy path
 
@@ -40,7 +42,7 @@ Read `docs/implementation/tasks/L2-02.md`, data/security/builtins/testing refs a
 
 Commits:fd8a7a4 frozen contract; c04bd7d service;643c59a UI;b45b475 evidence;d04566f shared empty guidance;76ae034 main/preload tests;2b34229 owner/client/main/preload/shared Form/production integration.
 
-Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. No PR yet at this checkpoint.
+Service author24units+2actual checks; UI75units+19browser and10Copy path regressions. Coordinator reran integrated99units/4contracts/20security/7integration/17sharedunits/39browser, fulltypecheck/lint. Main/preload stale same-query/new-options cache tests and actual130metadata-row owner test pass. Source reviews clean. Integrated in PR35/31ce46b; exact-head validation and primary build pass.
 
 Reusable completed SOL-high agents: `manifest_review_sol` in `.worktrees/linuxcast-l1-01` / `codex/l2-02-filter-ui`; `file_search_service_sol` in `.worktrees/linuxcast-l1-02-native` / `codex/l2-02-filter-service`; read-only `alias_review_sol`. Verify clean and switch base before assigning next bounded work. Do not reactivate Astra agents.
 
@@ -60,6 +62,7 @@ Full L2-02 remains in-progress: MIME filters, path navigation/recent files and o
 |32|708a3d6|Bounded local arithmetic/functions and explicit native copy|
 |33|851f6f2|92canonical unit conversions, help, exact numeric/unit copy|
 |34|f55ae06|Selected indexed result Copy path|
+|35|31ce46b|Metadata kind/UTC date filters and owner-side sorting|
 
 PR33 exacthead81d9570 CI40278132784 passed; PR32 exacthead5c406c1 CI40275547480 passed. Detailed historical commands/platforms/reviews are in task registry/cards, package READMEs and Git history; old checkpoint history is available at9572300. All current application authors/reviewers used SOL-high.
 
