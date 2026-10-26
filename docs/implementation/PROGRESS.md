@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated27October2026. **Goal ACTIVE**, confirmed by controller. Complete all97
+Updated27October2026. **Goal BLOCKED on external 1Password signing**, after three consecutive blocked turns. Complete all97
 agreed local1.0 tasks through R1-03/all release gates. Read the objective at
 `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
 An increment is not goal completion.
@@ -76,32 +76,67 @@ integration including production Close/restart/Quit4.78s. Full typecheck/lint/pl
 diff pass. Actual/component checks are not native Wayland/GNOME/KDE/AT acceptance.
 W1-02/W1-03/W2-03 remain in-progress; privacy passed only, all wider criteria pending.
 
-## Agents / next action
+## Current bounded saved-Keyword launcher increment
 
+Coordinator `.worktrees/linuxcast-application-controls`, branch
+**codex/workflow-launcher-commands** atop6feaf583; freeze signed d504786,
+UI signed9e083d0 (author signed cf26299). Source complete; reviewed/tested;
+PR publication/CI/configured review/normal exact-head merge next.
+
+Publication blocker this turn: normal `git commit -S` and one TTY retry both
+ended128 with `1Password: failed to fill whole buffer`; no commit object written.
+Both handles6036/58711 are closed. Existing 1Password signing settings unchanged.
+An asynchronous user request asks to approve its signing prompt/unlock if it
+relocked; no reply yet. All source/tests/evidence are staged; HEAD remains9e083d0.
+No live test handles. Do not rerun successful tests or retry signing repeatedly
+without changed external state. On confirmation, sign staged increment normally,
+push/create+attach focused PR, inspect exact-head CI/reviews/threads, merge into
+develop normally, refresh primary frozen install/build and record merge evidence.
+Blocked audit3: previous turn was no progress (authoritative remote check only),
+not a verified wait. Current HEAD is still9e083d0, all37 implementation/evidence
+files remain staged and cached diff checks pass; only this checkpoint changed.
+No live op-ssh-sign/ssh-keygen/git process remains and no new signing confirmation
+has arrived. Same external failure has recurred across three consecutive turns.
+No useful next work is available within the user's merge-first sequence; do not
+expand foundational work or redirect manifest_review before this increment is
+integrated. Mark goal blocked to stop automatic no-progress continuations.
+Resume on user confirmation that the existing 1Password signer is ready; stage
+this checkpoint, sign normally, then publish/review/merge and continue full1.0.
+No signing configuration changes, unsigned workaround or task completion claim.
+
+Final independent staged-delta reconciliation clean: duplicate IDs rejected
+before publication; long-name real engine/owner execution+recovery and debugger
+receipt regressions sound. Native/full task/release acceptance remain pending.
+
+Actual saved enabled Keywords now appear as stable opaque launcher commands.
+Search/Arrow/Enter opens the exact saved entry; never Run/cancel/approval/replay.
+Fresh main saved revision/hash and original-frame checks fence stale requests.
+Main-only monotonic intent, read-only validated preload; canvas refuses dirty/
+stale fallback, preserves run/prompt. Bounded canonical-name display projection
+fix closes sole P2. Invalid lane metadata cannot remove builtin recovery.
+Shared catalogue/search/visibility capacity5104; no migration.
+
+PASS321 targeted;37 debugger units/20 Chromium keyboard+axe;2 intent security;
+7 run contracts;19 W1-03 integration (13 host+5 journal+actual6.50s),19 owner
+command storage,8 editor integration (actual4.50s); actual new launcher entry
+flow4.20s. Actual clipboard checks prove no action on open, uppercase original
+entry effect after approval, pending run/prompt survive another entry, stale
+Save rejects then explicit Reload recovers. Two actual dark/light and five
+component affected captures inspected; no renderer Node. Typecheck/scoped lint/
+plan/diff pass. Evidence `apps/desktop/evidence/workflow-launcher-application.md`.
+All native/session/AT/full task/release criteria remain pending.
+
+Agents all SOL/high, completed:
 - `manifest_review_sol`: `.worktrees/linuxcast-l1-01`, branch
-  codex/w2-03-text-run-ui, clean signed a1e38dc; source/evidence integrated c3d53f9.
-  Current bounded application UI finish achieved; no infrastructure/proof/research.
-- `file_search_service_sol`: `.worktrees/linuxcast-l1-02-native`, branch
-  codex/w1-02-text-engine, clean signed e7b1c7f; integrated e900235. Domain and
-  root integration reviews clean through finishing/settled/denial/lifetime delta.
-- `alias_review_sol`: read-only reviewer; engine and metadata findings closed;
-  signed UI c3d53f9 exactly reconciled to reviewed a1e38dc/all11 captures, canvas
-  embed/Back focus clean. Final root SHA/evidence reconciliation still needed.
+  codex/w2-03-launcher-entry-ui, clean signed cf26299; integrated9e083d0.
+  Bounded product UI finish achieved; no infrastructure/proof/research.
+- `alias_review_sol`: final current source review clean; oversized-name P2 closed.
+- `file_search_service_sol`: exact author/integrated UI and all five affected
+  captures clean; canvas dirty/stale gates reviewed.
 
-Next concrete flow selected automatically: saved workflow Keyword commands in
-the actual launcher → search/navigate/activate → existing run workspace with
-the exact entry preselected → explicit Run/approval/result. Opening never runs.
-New coordinator branch **codex/workflow-launcher-commands** from6feaf583. Root
-owns command registration/opaque identities/fresh saved authority/routing/IPC.
-Frozen UI subset `packages/workflows/LAUNCHER-ENTRY-INCREMENT.md`; author may
-change only debugger/** for initialEntry presentation and guards.
-
-`manifest_review_sol` next bounded W2-03 assignment: reuse its clean worktree,
-new **codex/w2-03-launcher-entry-ui** from6feaf583; implement optional initialEntry
-with no fallback to the wrong/disabled/missing Keyword, no mount execution,
-preserve actual host run/prompt on intent changes, dark/light keyboard evidence.
-No infrastructure/research/proof. Full launcher registration/routing acceptance
-awaits root implementation and actual integration. All agents remain SOL/high.
+After merge, reconcile current main/evidence and choose the next small concrete
+application flow using existing shell/storage/UI. Do not mark any whole task
+complete or expand foundational work to defer the merge.
 
 ## Complete scope / runtime
 

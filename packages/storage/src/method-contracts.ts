@@ -8,7 +8,7 @@ import { quicklinkRepositoryContracts } from '../../contracts/src/quicklinks.ts'
 import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/permissions';
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
-import { launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
+import { MAX_LAUNCHER_COMMANDS, launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
 const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
@@ -25,7 +25,7 @@ const setting = z.strictObject({id:settingId,revision:revision.min(1),value:sett
 const usage = z.strictObject({commandId,useCount:revision,lastUsedAt:z.iso.datetime().nullable(),pinned:z.boolean(),alias:uiTextSchema.nullable()});
 const visibilityId = launcherCommandIdSchema.refine(id => !isLauncherVisibilityProtected(id));
 const visibility = z.strictObject({commandId:visibilityId,hidden:z.boolean()});
-export const hiddenCommandIdsSchema = z.array(visibilityId).max(4102).refine(ids =>
+export const hiddenCommandIdsSchema = z.array(visibilityId).max(MAX_LAUNCHER_COMMANDS-2).refine(ids =>
   ids.every((id,index) => index === 0 || ids[index - 1]! < id));
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([

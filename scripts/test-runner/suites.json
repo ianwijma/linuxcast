@@ -25,7 +25,8 @@
     "L1-01": [
       "packages/search/tests/search.test.ts",
       "apps/desktop/src/features/launcher/tests/controller.test.ts",
-      "apps/desktop/src/features/launcher/tests/catalogue.test.ts"
+      "apps/desktop/src/features/launcher/tests/catalogue.test.ts",
+      "apps/desktop/src/main/workflow-commands.test.ts"
     ],
     "L1-02": [
       "packages/search/tests/search.test.ts",
@@ -223,6 +224,9 @@
       "packages/storage/tests/workflow-journal.integration.test.ts",
       "apps/desktop/src/main/workflow-run.test.ts",
       "apps/desktop/tests/workflow-run.integration.test.ts"
+    ],
+    "W2-03": [
+      "apps/desktop/tests/workflow-launcher.integration.test.ts"
     ]
   },
   "security": {
@@ -295,6 +299,9 @@
     "W1-02": [
       "apps/desktop/src/main/workflow-run-ipc.test.ts",
       "apps/desktop/src/workflow-preload/run-api.test.ts"
+    ],
+    "W2-03": [
+      "apps/desktop/src/main/workflow-intent-ipc.test.ts"
     ]
   },
   "perf": {}

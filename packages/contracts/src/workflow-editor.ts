@@ -51,5 +51,15 @@ export const WORKFLOW_EDITOR_CLOSE_FINISHED = 'workflow-editor:close-finished';
 export const workflowEditorCloseAttemptSchema = z.strictObject({protocolVersion:z.literal(1),attemptId:z.number().int().positive().safe()});
 export const workflowEditorCloseFinishedSchema = workflowEditorCloseAttemptSchema.extend({allowClose:z.boolean()});
 
-/** Production workspace exposes only these two named, validated surfaces. */
-export type WorkflowRunWorkspaceApi=WorkflowWorkspaceApi&WorkflowRunApi;
+/** Production workspace exposes only named, validated authoring, run and navigation surfaces. */
+export type WorkflowRunWorkspaceApi=WorkflowWorkspaceApi&WorkflowRunApi&WorkflowEditorIntentApi;
+
+/** Main-created navigation preference only. No Run, input, definition or grants. */
+export const workflowEditorOpenIntentSchema=z.discriminatedUnion('view',[
+  z.strictObject({requestId:revision.positive(),view:z.literal('editor')}),
+  z.strictObject({requestId:revision.positive(),view:z.literal('run'),editorRevision:revision.positive(),triggerNodeId:z.string().min(1).max(200).refine(value=>new TextEncoder().encode(value).length<=200&&!/[\p{Cc}\p{Cs}]/u.test(value))}),
+]);
+export type WorkflowEditorOpenIntent=z.infer<typeof workflowEditorOpenIntentSchema>;
+export const WORKFLOW_EDITOR_OPEN_INTENT='workflow-editor:open-intent';
+export const WORKFLOW_EDITOR_GET_OPEN_INTENT='workflow-editor:get-open-intent';
+export interface WorkflowEditorIntentApi {getOpenIntent():Promise<WorkflowEditorOpenIntent>;onOpenIntent(listener:(intent:WorkflowEditorOpenIntent)=>void):()=>void}

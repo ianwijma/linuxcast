@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Button, EmptyState, ErrorState, LoadingState, UnavailableState } from '@linuxcast/ui';
 import '@linuxcast/ui/styles.css';
+import { workflowDisplayName } from '@linuxcast/contracts';
 import type { WorkflowDefinition, WorkflowRunApi, WorkflowRunErrorCode } from '@linuxcast/contracts';
 import { isActiveRun, WorkflowRunController } from './controller.ts';
 import './run-panel.css';
@@ -38,7 +39,7 @@ export function WorkflowRunPanel({ api, editorRevision, savedDefinition, initial
     if (event.key === 'Enter' && event.repeat && !editable) { event.preventDefault(); event.stopPropagation(); }
     if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); }
   }}>
-    <header className="wr-header"><div><p className="wr-caption">SAVED TEXT WORKFLOW</p><h2 className="lc-focus" ref={headingRef} tabIndex={-1} id={id}>Run saved workflow</h2><p>{controller.definition?.name || 'Saved workflow'} · version {controller.definition?.version || 'unavailable'} · editor revision {editorRevision}</p></div><Button onClick={onClose}>Back to editor</Button></header>
+    <header className="wr-header"><div><p className="wr-caption">SAVED TEXT WORKFLOW</p><h2 className="lc-focus" ref={headingRef} tabIndex={-1} id={id}>Run saved workflow</h2><p>{workflowDisplayName(controller.definition?.name || 'Saved workflow')} · version {controller.definition?.version || 'unavailable'} · editor revision {editorRevision}</p></div><Button onClick={onClose}>Back to editor</Button></header>
     <p className="wr-caption">Returning to the editor keeps the host run and pending approval. Reopen Run to inspect them. Input and result are transient; the journal stores metadata only.</p>
     {state.loading && <LoadingState label="Connecting to workflow run…" />}
     {state.error && <ErrorState title="Run action needs review" description={state.error} />}

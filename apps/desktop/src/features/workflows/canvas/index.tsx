@@ -6,7 +6,7 @@ import { Button, EmptyState, ErrorState, LoadingState, TextField, UnavailableSta
 import '@linuxcast/ui/styles.css';
 import type { WorkflowEditorApi, WorkflowDefinition } from '@linuxcast/contracts';
 import { EDITOR_NODE_REGISTRY, EDITOR_NODE_TYPES } from '@linuxcast/workflows/registry';
-import type { WorkflowRunApi } from '@linuxcast/contracts';
+import type { WorkflowRunApi,WorkflowEditorOpenIntent } from '@linuxcast/contracts';
 import { WorkflowRunPanel } from '../debugger/index.tsx';
 import { WorkflowEditorController } from './controller.ts';
 import './editor.css';
@@ -33,10 +33,16 @@ function Confirmation({ title, message, confirm, onConfirm, onCancel }: { title:
     if (event.key === 'Tab') { const buttons = [...(ref.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])]; const first = buttons[0], last = buttons.at(-1); if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } }
   }}><h2 id={id}>{title}</h2><p id={description}>{message}</p><div className="wf-actions"><Button onClick={onCancel}>Keep editing</Button><Button variant="danger" onClick={onConfirm}>{confirm}</Button></div></div></div>;
 }
-export function WorkflowEditor({ api, runApi }: { api: WorkflowEditorApi;runApi?:WorkflowRunApi }) {
+export function WorkflowEditor({ api, runApi,launchIntent }: { api: WorkflowEditorApi;runApi?:WorkflowRunApi;launchIntent?:WorkflowEditorOpenIntent }) {
   const [controller] = useState(() => new WorkflowEditorController(api));
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-  const [runOpen,setRunOpen]=useState(false);
+  const [runOpen,setRunOpen]=useState(false),[initialEntry,setInitialEntry]=useState<string>(),[entryMessage,setEntryMessage]=useState('');
+  const lastIntent=useRef(0);
+  useEffect(()=>{if(!launchIntent||launchIntent.requestId<=lastIntent.current||state.loading||state.busy||state.closing)return;lastIntent.current=launchIntent.requestId;
+    if(launchIntent.view==='editor'){setRunOpen(false);setInitialEntry(undefined);setEntryMessage('');return;}
+    if(state.dirty||state.blocked||!state.record?.saved||state.record.revision!==launchIntent.editorRevision){setRunOpen(false);setInitialEntry(undefined);setEntryMessage('The saved workflow or draft changed. Reload the editor, then reopen the entry from the launcher. No run was started.');return;}
+    setInitialEntry(launchIntent.triggerNodeId);setEntryMessage('');setRunOpen(true);
+  },[launchIntent,state.loading,state.busy,state.closing,state.dirty,state.blocked,state.record]);
   const runButton=useRef<HTMLButtonElement>(null);
   const [palette, setPalette] = useState(''), [from, setFrom] = useState(''), [port, setPort] = useState('out'), [to, setTo] = useState('');
   const [confirm, setConfirm] = useState<'reload' | 'revert' | 'discard' | null>(null);
@@ -60,7 +66,7 @@ export function WorkflowEditor({ api, runApi }: { api: WorkflowEditorApi;runApi?
     ariaLabel: `Connection ${edge.from.nodeId} ${edge.from.port} to ${edge.to.nodeId} in` }));
   const source = draft?.nodes.find(node => node.id === from);
   let ports: string[] = []; try { ports = source ? [...(EDITOR_NODE_REGISTRY.get(source.type)?.outputPorts(source.config) ?? [])] : []; } catch { /* Same fixed editable invalid state. */ }
-  if(runOpen&&runApi&&state.record?.saved)return <main><h1 className="wf-run-workspace-title">Workflow editor</h1><WorkflowRunPanel api={runApi} editorRevision={state.record.revision} savedDefinition={state.record.saved} onClose={()=>{setRunOpen(false);requestAnimationFrame(()=>runButton.current?.focus());}}/></main>;
+  if(runOpen&&runApi&&state.record?.saved)return <main><h1 className="wf-run-workspace-title">Workflow editor</h1><WorkflowRunPanel api={runApi} editorRevision={state.record.revision} savedDefinition={state.record.saved} {...(initialEntry===undefined?{}:{initialEntry})} onClose={()=>{setRunOpen(false);requestAnimationFrame(()=>runButton.current?.focus());}}/></main>;
   return <main className="wf-editor" onKeyDown={event => {
     if (event.nativeEvent.isComposing || confirm) return;
     if (event.repeat) { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') event.preventDefault(); return; }
@@ -71,11 +77,12 @@ export function WorkflowEditor({ api, runApi }: { api: WorkflowEditorApi;runApi?
       <Button disabled={!draft || state.blocked || state.loading || state.closing} busy={state.busy} variant="primary" onClick={() => { void controller.write('save'); }}>Save workflow</Button>
       <Button disabled={!draft || state.blocked || state.loading || state.closing} busy={state.busy} onClick={() => confirmAction('revert')}>Revert</Button>
       <Button disabled={state.loading || state.closing} aria-disabled={state.busy} onClick={() => confirmAction('reload')}>Reload</Button>
-      <Button ref={runButton} disabled={!runApi||!state.record?.saved||state.blocked||state.busy||state.dirty||locked} aria-describedby="wf-run-reason" onClick={()=>setRunOpen(true)}>{runApi?'Run saved workflow':'Run unavailable'}</Button>
+      <Button ref={runButton} disabled={!runApi||!state.record?.saved||state.blocked||state.busy||state.dirty||locked} aria-describedby="wf-run-reason" onClick={()=>{setInitialEntry(undefined);setEntryMessage('');setRunOpen(true);}}>{runApi?'Run saved workflow':'Run unavailable'}</Button>
       <Button disabled={locked} onClick={() => { void controller.requestClose(); }}>Close editor</Button>
     </div></header>
     <p id="wf-run-reason" className="wf-caption">{runApi?'Run uses the last explicitly saved version; newer draft changes are excluded. Clipboard access requires broker approval.':'Run cannot execute this graph. Permission declarations are descriptions, not grants.'}</p>
     <div role="status" aria-live="polite" className="wf-save-state">{state.blocked ? 'Reload required before writing again' : state.busy ? 'Writing local draft…' : state.dirty ? 'Unsaved local changes' : state.record ? 'Draft stored locally' : 'No stored workflow'}</div>
+    {entryMessage&&<div role="alert" className="wf-notice">{entryMessage}</div>}
     {state.message && <div role="alert" className="wf-notice">{state.message}</div>}
     {state.connectionError && <div role="alert" className="wf-notice">{state.connectionError}</div>}
     {state.validation && <div role="alert" className="wf-notice">{state.validation}</div>}

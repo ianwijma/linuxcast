@@ -48,3 +48,7 @@ it('unavailable launcher intent retains actual approval for inspect/cancel and c
   const owner = createRunFixture('attached'), c = new WorkflowRunController(owner.api, 5, multipleEntryDefinition, 'disabled'); live.push(c); await c.attach();
   expect(c.requestedEntryUnavailable).toBe(true); expect(c.getSnapshot().snapshot?.prompt?.text).toBe('PUBLIC TEXT'); expect(await c.start()).toBe(false); expect(owner.calls.starts).toEqual([]); expect(await c.cancel()).toBe(true); expect(owner.calls.cancels).toEqual([{runId: uuid(1)}]); expect(await c.start()).toBe(false); expect(owner.calls.decisions).toEqual([]);
 });
+
+it('accepts host start receipts with bounded display names for valid long canonical saved names',async()=>{
+ const name='😀'.repeat(200),owner=createRunFixture(),c=new WorkflowRunController({...owner.api,startWorkflowRun:async()=>{const value=snapshot({workflowName:'😀'.repeat(63)+'…',state:'running'});delete value.prompt;return {ok:true,value};}},5,{...savedDefinition,name});live.push(c);await c.attach();c.input('Public long name');expect(await c.start()).toBe(true);expect(c.definition?.name).toBe(name);expect(c.getSnapshot().snapshot?.workflowName).toBe('😀'.repeat(63)+'…');
+});

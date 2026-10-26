@@ -1,4 +1,4 @@
-import { workflowDefinitionSchema, workflowRunInputSchema, workflowRunReplySchema, workflowRunSnapshotSchema, workflowRunStartSchema, type WorkflowDefinition, type WorkflowRunApi, type WorkflowRunState } from '@linuxcast/contracts';
+import { workflowDisplayName, workflowDefinitionSchema, workflowRunInputSchema, workflowRunReplySchema, workflowRunSnapshotSchema, workflowRunStartSchema, type WorkflowDefinition, type WorkflowRunApi, type WorkflowRunState } from '@linuxcast/contracts';
 export const isActiveRun = (state: WorkflowRunState | null) => !!state && ['queued', 'running', 'waiting-ui', 'cancelling'].includes(state.state);
 export type RunPanelState = {
   loading: boolean; pending: 'start' | 'decide' | 'cancel' | 'reset' | null;
@@ -51,12 +51,12 @@ export class WorkflowRunController {
       if (next.sequence === current.sequence) { if (!same(next, current)) this.#unknown(); return false; }
     } else if (current) {
       if (source === 'event') {
-        if (!this.#start || next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== this.definition?.name || this.#start.acceptedId) return false;
+        if (!this.#start || next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== workflowDisplayName(this.definition?.name ?? '') || this.#start.acceptedId) return false;
         this.#start.acceptedId = next.runId;
       } else if (source === 'reply') return false;
       this.#retired.add(current.runId); if (this.#retired.size > 100) this.#retired.delete(this.#retired.values().next().value!);
     } else if (source === 'event' && this.#start) {
-      if (next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== this.definition?.name) return false;
+      if (next.editorRevision !== this.revision || next.triggerNodeId !== this.#start.entry || next.workflowName !== workflowDisplayName(this.definition?.name ?? '')) return false;
       this.#start.acceptedId = next.runId;
     }
     this.#publish({ snapshot: next, requiresReview: next.requiresReview || next.effectOutcome === 'unknown' || (current?.runId === next.runId && this.#state.requiresReview) }); return true;
@@ -113,7 +113,7 @@ export class WorkflowRunController {
     const request = workflowRunStartSchema.safeParse({ editorRevision: this.revision, triggerNodeId: this.#state.entry, input: this.#state.input });
     if (!request.success || !workflowRunInputSchema.safeParse(this.#state.input).success) { this.#publish({ inputError: 'Use text up to 16 KiB without unpaired Unicode surrogates.' }); return false; }
     this.#start = { entry: request.data.triggerNodeId, previousId: this.#state.snapshot?.runId };
-    const result = await this.#mutate('start', () => this.#api.startWorkflowRun(request.data), next => !!next && next.runId !== this.#start?.previousId && next.editorRevision === this.revision && next.triggerNodeId === request.data.triggerNodeId && next.workflowName === this.definition?.name && (!this.#start?.acceptedId || next.runId === this.#start.acceptedId));
+    const result = await this.#mutate('start', () => this.#api.startWorkflowRun(request.data), next => !!next && next.runId !== this.#start?.previousId && next.editorRevision === this.revision && next.triggerNodeId === request.data.triggerNodeId && next.workflowName === workflowDisplayName(this.definition?.name ?? '') && (!this.#start?.acceptedId || next.runId === this.#start.acceptedId));
     this.#start = undefined; return result;
   }
   async decide(decision: 'once' | 'persistent' | 'deny') {

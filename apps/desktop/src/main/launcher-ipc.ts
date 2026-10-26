@@ -1,3 +1,6 @@
+import { compileWorkflowCommands,matchWorkflowCommand,WorkflowCommandUnavailable } from './workflow-commands.ts';
+import type { WorkflowCommand,WorkflowCommandSelection } from './workflow-commands.ts';
+import type { WorkflowEditorRecord } from '../../../../packages/contracts/src/workflow-editor.ts';
 import { formatCalculationText } from '@linuxcast/calculator/result';
 import { evaluateExpression } from '@linuxcast/calculator/evaluate';
 import { calculatorCopyRequestSchema } from '@linuxcast/contracts';
@@ -21,6 +24,8 @@ import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
   quicklinks?:QuicklinkBackend;
+  loadWorkflowCommands?:()=>Promise<WorkflowEditorRecord|null>;
+  openWorkflowEntry?:(selection:WorkflowCommandSelection,trusted:()=>boolean)=>Promise<void>;
   contents(): WebContents | undefined;
   quitting(): boolean;
   hide(): void;
@@ -50,12 +55,13 @@ const failure = (code: 'invalid-request' | 'permission-denied' | 'cancelled' | '
   }[code], retryable: false},
 });
 
-/** Registered built-ins and GIO applications only. No query, path or Exec authority enters main. */
+/** Registered built-ins, GIO applications and saved Keyword entries. No query, path or Exec authority enters main. */
 export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>, actions: LauncherActions): () => void {
   let disposed = false, busy = false, quitDispatched = false;
   let metadataPending=false,metadataGeneration=0,urlPending=false,calculatorPending=false,applicationActionPending=false,quicklinksPending=false;
   let revision = actions.openDataSettings ? 1 : 2;
   let applicationState: 'available'|'unavailable'|undefined;
+  let workflowState:'available'|'unavailable'|undefined,workflowCommands:WorkflowCommand[]=[],workflowRefreshing:Promise<void>|undefined;
   let applications: NativeApplication[] = [];
   let refreshing: Promise<void>|undefined;
   let hiddenIds=new Set<string>(),visibilityAvailable:boolean|undefined;
@@ -80,6 +86,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   };
   const descriptors = (): Omit<LauncherCommandMetadata,'usage'>[] => ([
     ...builtins,
+    ...workflowCommands.map(command=>({...command.metadata,...(workflowState==='unavailable'?{enabled:false,unavailableReason:'Saved workflow commands are unavailable. Reload commands to reconnect.'}:{})})),
     ...[...applicationRecords].map(([id,application])=>({id,provider:'applications' as const,title:application.title,
       subtitle:application.description||'Installed application',aliases:[],keywords:[],enabled:applicationState==='available',
       ...(application.actions?{applicationActions:application.actions}:{}),
@@ -87,6 +94,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     })),
   ] as Omit<LauncherCommandMetadata,'usage'>[]).map(command=>({
     ...command,
+    ...(command.id==='linuxcast:open-workflow-editor'&&workflowState==='unavailable'?{subtitle:'Saved commands unavailable. Open the editor or Reload commands to reconnect.'}:{}),
     ...(visibilityAvailable===undefined?{}:{hidden:hiddenIds.has(command.id)}),
     ...(visibilityAvailable===false&&!isLauncherVisibilityProtected(command.id)?{
       enabled:false,unavailableReason:'Command visibility is unavailable. Reload commands to reconnect to storage.',
@@ -135,6 +143,16 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     })().finally(()=>{refreshing=undefined;});
     await refreshing;
   };
+  const refreshWorkflows=async()=>{
+    if(!actions.loadWorkflowCommands||!actions.openWorkflowEntry)return;
+    if(!workflowRefreshing)workflowRefreshing=(async()=>{
+      try{const next=compileWorkflowCommands(await actions.loadWorkflowCommands!());if(!active())return;
+        if(workflowState!=='available'||JSON.stringify(next)!==JSON.stringify(workflowCommands))revision++;
+        workflowCommands=next;workflowState='available';
+      }catch{if(active()){if(workflowState!=='unavailable')revision++;workflowState='unavailable';}}
+    })().finally(()=>{workflowRefreshing=undefined;});
+    await workflowRefreshing;
+  };
   const snapshot = async (start=0,changed?: CommandUsage): Promise<LauncherCommandsReply> => {
     try {
       const expectedRevision=revision,all=descriptors(),selected=changed?all.filter(command=>command.id===changed.commandId):all.slice(start,start+100);
@@ -170,10 +188,13 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       start=offset;
     }else{
       await refreshApplications();
+      await refreshWorkflows();
       if(!metadataPending&&admittedMetadata===metadataGeneration)await refreshVisibility(admittedMetadata);
     }
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
     if(metadataPending || urlPending || applicationActionPending || quicklinksPending || admittedMetadata!==metadataGeneration)return failure('cancelled');
     const reply=await snapshot(start);
+    if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');
     return metadataPending || urlPending || applicationActionPending || quicklinksPending || admittedMetadata!==metadataGeneration?failure('cancelled'):reply;
   });
   ipc.handle(LAUNCHER_CHANNELS.applicationAction,async(event:IpcMainInvokeEvent,payload:unknown):Promise<LauncherApplicationActionReply>=>{
@@ -366,13 +387,23 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
         await recordUse(command.id);
         return {ok:true,value:{outcome}};
       }
-      if(command.id==='linuxcast:open-workflow-editor')await actions.openWorkflowEditor!();
+      if(command.id.startsWith('workflow:')){
+        const selected=workflowCommands.find(candidate=>candidate.metadata.id===command.id);
+        if(!selected||workflowState!=='available'||!actions.loadWorkflowCommands||!actions.openWorkflowEntry)return failure('permission-denied');
+        const current=compileWorkflowCommands(await actions.loadWorkflowCommands());
+        const trusted=()=>active()&&revision===parsed.data.revision&&trustedShellSender(event,actions.contents());
+        if(!trusted())return failure('permission-denied');
+        const matched=matchWorkflowCommand(current,selected.selection);
+        await actions.openWorkflowEntry(matched.selection,trusted);
+      }
+      else if(command.id==='linuxcast:open-workflow-editor')await actions.openWorkflowEditor!();
       else if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
       else if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
       else actions.hide();
       await recordUse(command.id);
       return {ok:true,value:{outcome:'completed'}};
     } catch (error) {
+      if(error instanceof WorkflowCommandUnavailable)return {ok:false,error:{code:'conflict',message:error.message,retryable:false}};
       if(command.provider==='applications') {
         const code=error instanceof ApplicationsUnavailable && error.effectOutcome==='not-dispatched'
           ? error.reason==='stale-application'?'conflict':'capability-unavailable' : 'deadline-exceeded';
