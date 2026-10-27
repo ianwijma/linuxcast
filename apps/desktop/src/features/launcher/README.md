@@ -214,12 +214,57 @@ fixtures do not establish native process effects, persistence or stdio isolation
 Those checks belong to the coordinator/native integration lane. Scoped file/URI/
 argv/shell/history and complete desktop/native-AT/release gates remain required.
 
+## Explicit configured web-search fallback
+
+A valid nonblank query with no ranked command matches offers **Search with
+<saved name>** rows in a separate Configured web searches section. The query stays
+local. Only shown/enabled saved web-search metadata with a shown/enabled Quicklinks
+parent qualifies; literal/path links never become fallback providers. Providers
+sort by name/ID, cap at 100 with an explicit cap label, and retain a matching
+selected synthetic identity across refresh/reordering. Loading, failed catalogue
+reads, invalid/blank queries and matching registered commands offer no fallback.
+
+Arrow/Enter deliberately chooses one provider. Its synthetic ID cannot enter
+Execute or preference APIs. `QuicklinksFlow.openWebSearch` receives only strict
+saved ID/revision plus the captured query, reads the complete current saved list
+and exact shown search definition, then opens the existing shared Query Form.
+The user still explicitly **Review search → Open search**. Ordinary saved-entry
+navigation keeps an empty argument. Cancel/List/Back restore the original root
+query/selection; Hide drops the captured query. Search/navigation/Review perform
+no browser/network/copy/Save/use operation and persist no query.
+
+Stale, deleted, hidden, wrong-kind or unavailable definitions withhold alternate
+rows and offer Reload/Back. Explicit Reload is manual recovery, never replay.
+A fallback converted to a literal/path link cannot reuse the captured query.
+Pending reads, synchronous publication, newer Reload operations and root/query/
+selection/Back/Hide/disposal changes fence late Form navigation. Existing exact
+browser receipts, separate Hide-failure truth and persistent unknown gates remain.
+
+Validation on Linux x64, Node24.22.1/Bun1.4.4: **403 focused tests** pass
+(249 Quicklinks presentation, 27 routing, 127 launcher controller), including
+36 added fallback cases. **68 launcher Chromium keyboard/axe cases** pass,
+including seven new fallback cases and all 61 earlier cases. Full typecheck,
+scoped ESLint, plan and diff checks pass. Commands use explicit
+`LINUXCAST_TEST_FILES` selections with the existing Vitest/Playwright configs.
+Ten inspected public captures `evidence/*-web-search-fallback-*` cover dark/light
+root/Query/Review, stale/pending/unknown recovery and 200%-text controls. DESIGN
+Shell/navigation, Results/actions, List/Form/Detail, States/motion, Accessibility
+and Review gate apply; existing host primitives/tokens are reused without CSS.
+Fixtures are synthetic request observers, not native dispatch/persistence proof.
+
+This supplies partial L1-01 AC01 selected-identity/cancellation, UI and PRIVACY,
+and L2-05 typed-query/UI/privacy evidence. Coordinator owns production saved
+config→fallback→exact GIO argv/restart/export checks. Full multi-provider/file/AI
+fallback, ranking controls, templates/context/targets, prerequisite acceptance,
+Debian GNOME/KDE Wayland/X11, native AT/performance and release gates remain
+pending. Neither task is complete and complete1.0 scope is unchanged.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
-- `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/controller.test.ts`: 127 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
-- `tests/launcher.ui.test.ts`: 53 Chromium component checks covering keyboard,
+- `tests/launcher.ui.test.ts`: 68 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
@@ -249,6 +294,6 @@ Generated fixture data only; no user content, secret values, query logging or
 remote requests. Unit/browser checks are development evidence. The coordinator
 owns the actual main/preload/storage/Electron flow and its validation. Debian
 GNOME/KDE Wayland/X11 and native assistive-technology acceptance remain pending,
-along with full L1 providers, ranking controls and explicit fallbacks. F1/D1
+along with full L1 providers, ranking controls and remaining file/AI fallback actions. F1/D1
 native gates remain pending. Broader typed URI/file/argv/shell flows and URL/run-history controls remain
 outstanding in L1-02. This slice does not mark all L1-01 or L1-02 complete.
