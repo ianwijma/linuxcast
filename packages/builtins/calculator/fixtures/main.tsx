@@ -16,19 +16,22 @@ function Fixture(){
   const [connection]=useState(()=>{
     const session=new ViewSession(root,id=>{flow?.closed(id);});
     const api:Pick<LauncherApi,'copyCalculatorResult'>=mode==='missing-api'?{}:{copyCalculatorResult:async request=>{
-      const result=evaluateExpression(request.expression);setRequested(`Requested ${result.ok&&result.kind==='colour'?'colour':'numeric'} result copy for ${request.expression}.`);
+      const result=evaluateExpression(request.expression);setRequested(`Requested ${result.ok&&result.kind==='date-time'?'date/time':result.ok&&result.kind==='colour'?'colour':'numeric'} result copy for ${request.expression}.`);
       if(mode==='pending')await new Promise(resolve=>setTimeout(resolve,600));
       if(mode==='unknown')throw new Error('synthetic private detail');
       if(mode==='unavailable')return {ok:false,error:{code:'capability-unavailable',message:'synthetic private detail',retryable:false}};
       if(mode==='unit-mismatch')return {ok:true,value:{outcome:'copied',text:'5000',unit:'km'}};
       if(mode==='unit-missing')return {ok:true,value:{outcome:'copied',text:'5000'}};
       if(mode==='unit-unknown')return {ok:true,value:{outcome:'copied',text:'5000',unit:'not-a-unit'}} as never;
+      if(mode==='date-missing')return {ok:true,value:{outcome:'copied',text:'2026-10-26T22:00:00+00:00[UTC]'}} as never;
+      if(mode==='date-wrong-kind')return {ok:true,value:{outcome:'copied',text:'20'}};
+      if(mode==='date-mismatch')return {ok:true,value:{outcome:'copied',text:'2026-10-26T23:00:00+00:00[UTC]',dateTime:'zoned'}};
       if(mode==='colour-numeric')return {ok:true,value:{outcome:'copied',text:'255'}};
       if(mode==='colour-tag')return {ok:true,value:{outcome:'copied',text:'rgb(255 136 0)',colour:'hex'}} as never;
       if(mode==='colour-unit')return {ok:true,value:{outcome:'copied',text:'rgb(255 136 0)',colour:'rgb',unit:'m'}} as never;
       if(mode==='mismatch')return {ok:true,value:{outcome:'copied',text:'999'}};
       if(!result.ok)return {ok:false,error:{code:'invalid-request',message:'synthetic private detail',retryable:false}};
-      return {ok:true,value:{outcome:'copied',text:result.text,...(result.kind==='colour'?{colour:result.colour}:result.unit?{unit:result.unit}:{})}};
+      return {ok:true,value:{outcome:'copied',text:result.text,...(result.kind==='date-time'?{dateTime:result.dateTime}:result.kind==='colour'?{colour:result.colour}:result.unit?{unit:result.unit}:{})}};
     }};
     const flow=new CalculatorFlow({session,api,viewId:'fixture-calculator',revision:7});
     const host:ViewHost={action:intent=>{if(flow.active){void flow.handle(intent);return;}if(intent.actionId==='calculator')flow.open('root');}};
