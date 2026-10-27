@@ -62,3 +62,9 @@ it('exports one versioned saved definition without accepting queries, grants or 
  for(const patch of [{format:'other'},{formatVersion:2},{records:[]},{records:[record,record]},{query:'private'},{grants:[]}])expect(quicklinkExportFileSchema.safeParse({...file,...patch}).success).toBe(false);
  for(const outcome of ['exported','cancelled'])expect(quicklinkExportReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(true);for(const outcome of ['completed','dispatched','opened'])expect(quicklinkExportReplySchema.safeParse({ok:true,value:{id,revision:1,outcome}}).success).toBe(false);
 });
+
+it('marks only opaque saved web-search entries as explicit fallback candidates',()=>{
+ const value={id:`quicklink:${id}`,quicklink:{id,revision:7,webSearch:true},title:'Public saved search',aliases:[],keywords:[],enabled:true,usage:null};expect(launcherCommandMetadataSchema.parse(value)).toEqual(value);
+ for(const quicklink of [{id,revision:7,webSearch:false},{id,revision:7,webSearch:'true'},{id,revision:7,webSearch:true,url:save.url},{id,revision:7,webSearch:true,query:'public'}])expect(launcherCommandMetadataSchema.safeParse({...value,quicklink}).success).toBe(false);
+ expect(launcherCommandMetadataSchema.safeParse({...value,id:'linuxcast:open-quicklinks'}).success).toBe(false);expect(launcherCommandIdSchema.safeParse(`web-search:${id}`).success).toBe(false);
+});

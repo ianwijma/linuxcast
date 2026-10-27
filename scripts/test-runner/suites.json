@@ -26,7 +26,8 @@
       "packages/search/tests/search.test.ts",
       "apps/desktop/src/features/launcher/tests/controller.test.ts",
       "apps/desktop/src/features/launcher/tests/catalogue.test.ts",
-      "apps/desktop/src/main/workflow-commands.test.ts"
+      "apps/desktop/src/main/workflow-commands.test.ts",
+      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
     ],
     "L1-02": [
       "packages/search/tests/search.test.ts",
@@ -118,7 +119,8 @@
       "packages/contracts/tests/file-search.contract.test.ts"
     ],
     "L1-01": [
-      "packages/contracts/tests/launcher-visibility.contract.test.ts"
+      "packages/contracts/tests/launcher-visibility.contract.test.ts",
+      "packages/contracts/tests/quicklinks.contract.test.ts"
     ],
     "L2-05": [
       "packages/contracts/tests/quicklinks.contract.test.ts",
@@ -269,7 +271,8 @@
     ],
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",
-      "apps/desktop/src/preload/api.test.ts"
+      "apps/desktop/src/preload/api.test.ts",
+      "apps/desktop/src/main/quicklinks-ipc.test.ts"
     ],
     "L1-02": [
       "packages/builtins/applications/tests/transport.test.ts",
