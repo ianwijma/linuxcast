@@ -140,9 +140,10 @@ frozen install and production build66assets pass. Signing unchanged and working.
 ## Next bounded application flow: explicit saved web-search fallback
 
 Root worktree `.worktrees/linuxcast-application-controls`, branch
-`codex/launcher-web-search-fallback` fromf79a345. Metadata-only marker and
-apps/desktop/src/features/launcher/FALLBACK-INCREMENT.md freeze are in progress;
-not implemented/accepted. Explicit provider choice from unmatched root query
+`codex/launcher-web-search-fallback` fromf79a345. Signed9f09aa4 freezes the metadata-only marker and
+apps/desktop/src/features/launcher/FALLBACK-INCREMENT.md. Independent bounded
+metadata review clean;50contract/main checks+type/lint/plan/diff pass. UI/actual
+not yet accepted. Explicit provider choice from unmatched root query
 will open existing prefilled Query→Review→separate Open, no implicit remote action.
 Root owns contracts/projection/mappings/actual/registry; no new infrastructure,
 research/proof/service/dependency. Full task/prerequisite/release gates unchanged.
@@ -152,11 +153,19 @@ research/proof/service/dependency. Full task/prerequisite/release gates unchange
 All GPT-6.1 SOL/high; no Astra or new agents.
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
   `codex/l1-01-web-search-fallback-ui` fromf79a345. Bounded L1-01 existing
-  launcher/Quicklinks UI assignment; read spec, waiting root freeze SHA before
-  behavior edits. No shared edits. Previous signedc68e1264 integrated PR49.
-- alias_review_sol: completed clean PR49 exactb73ef0b actual/UI/source/captures.
-- file_search_service_sol: completed clean PR49 boundary97e6eed. Next narrow
-  metadata/projection review will be assigned after freeze checks; no extra scope.
+  launcher/Quicklinks UI assignment on9f09aa4; source/tests underway. No shared
+  edits. Previous signedc68e1264 integrated PR49. Required edges: preserve
+  fallback webSearch kind through Reload and fence successful List publication
+  against a reentrant newer Reload/Get/Export before pushing captured Form.
+- alias_review_sol: independent fallback UI review in progress; identified the
+  bounded successful-publication/newer-Reload P2, author asked to fix/regress.
+- file_search_service_sol: independently clean fallback metadata9f09aa4.
+
+Root actual test is prepared (uncommitted), type/lintpass, not yet run: unmatched
+Unicode/metachar query→explicit provider→prefilledQuery→Cancel/List/Back restores
+rootquery/selection→Review/heldEnter→separate exact GIOargv+emptystdin→private
+export excludes transient query/target. Six actual affected captures planned.
+No live root test handles; wait reviewed signed UI then run mapped actual checks.
 
 ## Acceptance and runtime
 
