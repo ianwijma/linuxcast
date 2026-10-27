@@ -18,7 +18,10 @@ locale-dependent date, implicit zone, alternate calendar, leap-second60 or24:00.
 Use UTC or a supported IANA area/location identifier, never an abbreviation or
 offset-only zone. Local ICU normalizes supported aliases; result may use their
 canonical spelling. Fixed-offset IANA Etc/GMT names retain their standard
-reversed sign convention. Conversion preserves the exact instant.
+reversed sign convention. Conversion preserves the exact instant, including
+historical second-level offsets. The fields form enforces exact source-offset
+matching; plain target fields plus its exact offset avoid Temporal string
+serialization's minute-rounded compatibility behavior.
 
 Source offset, if given, must match that local time and source zone. Z is checked
 as a supplied +00:00 offset, never an override of the named zone. Unknown -00:00

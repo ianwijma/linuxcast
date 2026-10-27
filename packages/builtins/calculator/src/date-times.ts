@@ -31,9 +31,18 @@ export function evaluateDateTimeExpression(input:string):Calculation|undefined{
       if(offset===undefined)return fail('ambiguous-date-time');
     }
     // Z means a supplied zero offset here, never Temporal's offset-override form.
-    if(offset!==undefined)resolved=Temporal.ZonedDateTime.from(`${local.toString()}${offset}[${sourceZone}]`,{overflow:'reject',offset:'reject',disambiguation:'reject'});
+    if(offset!==undefined){
+      resolved=Temporal.ZonedDateTime.from({calendar:'iso8601',year:local.year,month:local.month,day:local.day,hour:local.hour,minute:local.minute,second:local.second,millisecond:local.millisecond,microsecond:local.microsecond,nanosecond:local.nanosecond,timeZone:sourceZone,offset},{overflow:'reject',offset:'reject',disambiguation:'reject'});
+      // The fields form disables legacy minute-rounded string matching, even
+      // when fold candidates differ only in seconds. Assert the exact offset.
+      const [hours,minutes,seconds=0]=offset.slice(1).split(':').map(Number),supplied=(offset[0]==='-'?-1:1)*(hours!*3600+minutes!*60+seconds)*1e9;
+      if(resolved.offsetNanoseconds!==supplied)return fail('invalid-date-time');
+    }
     if(!resolved)return fail('invalid-date-time');
-    const text=resolved.withTimeZone(targetZone).toString({calendarName:'never'});
+    const target=resolved.withTimeZone(targetZone);
+    // ZonedDateTime.toString rounds offsets to minutes. Preserve exact local
+    // fields and offset seconds, so parsing this result preserves the instant.
+    const text=`${target.toPlainDateTime().toString({calendarName:'never'})}${target.offset}[${target.timeZoneId}]`;
     if(!calculatorDateTimeTextSchema.safeParse(text).success)return fail('invalid-date-time');
     return {ok:true,kind:'date-time',dateTime:'zoned',text};
   }catch{return fail('invalid-date-time');}

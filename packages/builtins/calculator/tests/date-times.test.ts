@@ -23,6 +23,8 @@ const conversions=[
  [' 2024-01-01T00:00[Etc/UTC]   to   UTC ','2024-01-01T00:00:00+00:00[UTC]'],
  ['0001-01-01T00:00[UTC] to UTC','0001-01-01T00:00:00+00:00[UTC]'],
  ['9999-12-31T23:59:59[UTC] to UTC','9999-12-31T23:59:59+00:00[UTC]'],
+ ['1890-01-01T00:00[UTC] to Europe/Paris','1890-01-01T00:09:21+00:09:21[Europe/Paris]'],
+ ['1890-01-01T00:09:21+00:09:21[Europe/Paris] to UTC','1890-01-01T00:00:00+00:00[UTC]'],
 ] as const;
 it.each(conversions)('converts a fixed explicit local date/time: %s',(input,text)=>{
  const result=evaluateExpression(input);expect(result).toEqual({ok:true,kind:'date-time',dateTime:'zoned',text});if(!result.ok)throw new Error();expect(formatCalculationText(result)).toBe(text);expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',dateTime:'zoned',text}}).success).toBe(true);
@@ -36,6 +38,7 @@ it.each([
  '2024-01-01T00:00[UTC] to UTC to Europe/Paris','2024-01-01T00:00[UTC][u-ca=hebrew] to UTC',
  '2024-01-01T00:00:00.1234567890[UTC] to UTC',
  '0001-01-01T00:00[UTC] to Etc/GMT+12','9999-12-31T23:59[UTC] to Etc/GMT-14',
+ '1890-01-01T00:09:21+00:09[Europe/Paris] to UTC',
 ])('refuses invalid/implicit/contradictory calendar structure: %s',input=>{expect(evaluateExpression(input)).toMatchObject({ok:false,code:'invalid-date-time'});});
 it.each(['EST','+05:30','Europe/Not_A_Zone','../UTC','http://example.invalid','constructor','UTC;process.exit()'])('rejects unknown, abbreviated or offset-only zones: %s',name=>{expect(evaluateExpression(`2024-01-01T00:00[${name}] to UTC`)).toMatchObject({ok:false,code:'unsupported-time-zone'});expect(evaluateExpression(`2024-01-01T00:00[UTC] to ${name}`)).toMatchObject({ok:false,code:'unsupported-time-zone'});});
 it('preserves numeric subtraction and pre-library resource/input bounds with fixed redacted failures',()=>{
