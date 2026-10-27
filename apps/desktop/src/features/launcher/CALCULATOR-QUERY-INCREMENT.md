@@ -8,7 +8,7 @@ No new IPC/contract/migration/dependency/service/research/proof. Full1.0 unchang
 
 Only when the root query has no ranked registered-command matches, consider a
 local calculator candidate. Require the existing calculatorExpressionSchema,
-at least one explicit mathematical/number/colour signal `[0-9#()+*/^%\\-]`, a
+at least one explicit mathematical/number/colour signal `[0-9#()+*/^%-]`, a
 shown/enabled registered Calculator command and an actual successful bounded
 pure evaluateExpression + formatCalculationText result. Ordinary words and bare
 word constants do not become candidates. Invalid/domain/unsupported/oversized

@@ -82,11 +82,16 @@ Full dates/DST/rates/providers/nativeAT/release remain required.
 ## Agents
 
 All SOL6.1/high; no new unbounded work assigned:
-- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l1-01-web-search-fallback-ui`; signedc715b6f integratedd22f1e6. Rootfreeze
-  localb02b21b. No shared edits or new foundational/research/proof assignment.
-- alias_review_sol: signed UI/tencaptures and root62eaaee actual/sixcaptures clean;
-  both review findings closed. No remaining actionable source finding.
+- manifest_review_sol: prior signedc715b6f integratedd22f1e6 in PR50; finished.
+  Next bounded L1-01/L2-04 calculator-query UI dispatched in same worktree
+  `.worktrees/linuxcast-l1-01`, branch `codex/l2-04-root-query-ui` fromb72d364 +
+  coordinatorfreezececb394. Owns existing launcher+calculator presentation/
+  fixtures/tests/README/evidence only; no shared/engine grammar changes. Read
+  full cards/norms/frozen note, finish tested signed commit and stop. Root actual
+  private clipboard integration remains next-continuation work; not yet run.
+- alias_review_sol: prior signed UI/tencaptures and root62eaaee actual/sixcaptures
+  clean; both findings closed. Next same bounded calculator-query source/capture
+  review dispatched, waiting coherent author checkpoint; no edits or extra scope.
 - file_search_service_sol: narrow metadata/main/schema/mapping9f09aa4 review clean.
 
 ## Acceptance and runtime
