@@ -6,7 +6,7 @@ import {formatCalculationText} from '../src/result.ts';
 
 function success(expression:string) {
   const result=evaluateExpression(expression);expect(result.ok,JSON.stringify(result)).toBe(true);
-  if(!result.ok||result.kind==='colour')throw new Error('Expected a successful synthetic conversion.');
+  if(!result.ok||result.kind==='colour'||result.kind==='date-time')throw new Error('Expected a successful synthetic conversion.');
   expect(Number.isFinite(result.value)).toBe(true);expect(calculatorResultTextSchema.safeParse(result.text).success).toBe(true);
   expect(calculatorUnitSchema.safeParse(result.unit).success).toBe(true);return result;
 }

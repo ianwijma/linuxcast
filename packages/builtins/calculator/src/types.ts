@@ -1,3 +1,3 @@
-import type { CalculatorUnit,CalculatorColourValue } from '@linuxcast/contracts';
+import type { CalculatorUnit,CalculatorColourValue,CalculatorDateTimeValue } from '@linuxcast/contracts';
 /** Pure local output; numeric text and closed unit are distinct, neither is persisted. */
-export type Calculation={ok:true;kind?:'number';value:number;text:string;unit?:CalculatorUnit;colour?:never}|({ok:true;kind:'colour';value?:never}&CalculatorColourValue)|{ok:false;code:'invalid-expression'|'limit-exceeded'|'domain-error'|'unsupported-unit'|'incompatible-units'|'invalid-colour';message:string};
+export type Calculation={ok:true;kind?:'number';value:number;text:string;unit?:CalculatorUnit;colour?:never;dateTime?:never}|({ok:true;kind:'colour';value?:never}&CalculatorColourValue)|({ok:true;kind:'date-time';value?:never}&CalculatorDateTimeValue)|{ok:false;code:'invalid-expression'|'limit-exceeded'|'domain-error'|'unsupported-unit'|'incompatible-units'|'invalid-colour'|'invalid-date-time'|'unsupported-time-zone'|'ambiguous-date-time'|'nonexistent-date-time';message:string};

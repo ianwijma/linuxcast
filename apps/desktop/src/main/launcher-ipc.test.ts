@@ -495,3 +495,12 @@ it('fences delayed workflow opening after sender navigation, hiding and disposal
   slow=true;const pending=f.execute(row.id,current.revision);await vi.waitFor(()=>expect(resolve).toBeTypeOf('function'));if(lose==='frame')f.frame.url='https://example.test';if(lose==='disposed')f.remove();if(lose==='hidden'){hidden=[row.id];slow=false;await catalogue(f);}resolve(saved);expect(await pending).toMatchObject({ok:false});expect(opened).not.toHaveBeenCalled();
  }
 });
+
+it('recomputes exact zoned date/time text and exclusive receipts before native copying',async()=>{
+ const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult}),expression='2024-11-03T01:30-05:00[America/New_York] to UTC',text='2024-11-03T06:30:00+00:00[UTC]';
+ expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression})).toEqual({ok:true,value:{outcome:'copied',dateTime:'zoned',text}});expect(copyCalculatorResult).toHaveBeenCalledExactlyOnceWith(text);expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:calculator');
+ for(const extra of [{text:'arbitrary'},{dateTime:'zoned'},{unit:'m'},{colour:'hex'}])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression,...extra})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(copyCalculatorResult).toHaveBeenCalledTimes(1);
+});
+it('refuses ambiguous, nonexistent and mismatched-zone date/time before clipboard or usage effects',async()=>{
+ const copyCalculatorResult=vi.fn(async()=>'written' as const),f=fixture({copyCalculatorResult});for(const expression of ['2024-03-10T02:30[America/New_York] to UTC','2024-11-03T01:30[America/New_York] to UTC','2024-11-03T01:30-06:00[America/New_York] to UTC','2023-02-29T00:00[UTC] to UTC'])expect(await f.invoke(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,revision:1,expression})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(copyCalculatorResult).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});

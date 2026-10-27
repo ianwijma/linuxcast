@@ -132,3 +132,8 @@ it('validates closed colour copy receipts without exposing an arbitrary renderer
   for(const value of [{outcome:'copied',colour:'rgb',text:'url(private)'},{outcome:'copied',colour:'hex',text:'#ff0000',unit:'m'},{outcome:'copied',colour:'hsl',text:'hsl(0 101% 0%)'}]){invoke.mockResolvedValueOnce({ok:true,value});expect(await api.copyCalculatorResult!({revision:1,expression:'#fff to rgb'})).toMatchObject({ok:false});}
   invoke.mockClear();expect(await api.copyCalculatorResult!({revision:1,expression:'#fff to rgb',text:'private'} as never)).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
 });
+
+it('carries only strict canonical zoned-date receipts over the existing expression-only copy method',async()=>{
+ const {api,transport}=fixture(),request={revision:1,expression:'2024-01-01T00:00[UTC] to UTC'},value={outcome:'copied',dateTime:'zoned',text:'2024-01-01T00:00:00+00:00[UTC]'};transport.invoke.mockResolvedValue({ok:true,value});expect(await api.copyCalculatorResult!(request)).toEqual({ok:true,value});expect(transport.invoke).toHaveBeenCalledExactlyOnceWith(LAUNCHER_CHANNELS.copyCalculatorResult,{protocolVersion:1,...request});
+ for(const patch of [{dateTime:'other'},{text:'arbitrary'},{unit:'m'},{colour:'hex'},{expression:'private'}]){transport.invoke.mockResolvedValue({ok:true,value:{...value,...patch}});expect(await api.copyCalculatorResult!(request)).toMatchObject({ok:false});}
+});

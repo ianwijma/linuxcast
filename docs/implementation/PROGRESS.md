@@ -16,9 +16,9 @@ private Xvfb/profile only. No user display, --no-sandbox, or credential changes.
 
 ## Integrated base
 
-Primary clean developb72d364e4dfb12b7b63d56f2ff26a470d40a90e7 (PR50).
-Exact signed reviewed headfb09b4b23ad709c2340321c93dad173763782553, CI40425939433
-validatePASS12s; no requested GitHub reviews/submissions/comments/threads. Normal
+Primary clean develop4612ec061ad800e2616e55a296f32b973248f62d (PR51).
+Exact signed reviewed head3ed6d8521a8b8904a2417f16bb208cd70bcf1502, CI40427595390
+validatePASS11s; no requested GitHub reviews/submissions/comments/threads. Normal
 exact-head merge; primary frozen install and production build66assets pass.
 
 Recent merged application increments (full evidence in registry/cards/artifacts):
@@ -92,9 +92,22 @@ pass. UIcode/tests/fixtures/README/captures exactauthor. Independent signedUI/
 exactintegratedactual review clean atb6cd69b; no pending source findings.
 Evidence apps/desktop/evidence/launcher-calculator-query-application.md.
 
-Next publish focused PR, exact-head CI/GitHub review/threads, normal merge,
-primary frozeninstall/build verification and next concrete required application
-flow. Full dates/DST/rates/providers/prerequisites/nativeAT/release remain pending.
+PR51 https://github.com/ianwijma/linuxcast/pull/51 merged4612ec0 as above, clean
+primary frozeninstall/build66assets pass. Full dates/DST/rates/providers/
+prerequisites/nativeAT/release remain pending.
+
+## Next required bounded application flow: explicit zoned date/time
+
+Root reuses worktree, branch `codex/calculator-zoned-datetime` from4612ec0.
+DATE-TIMES.md freezes strict ISO local/sourcezone→targetzone, gap refusal and
+matching explicit fold offset. Coordinator implemented typed result/receipt,
+fixed bounded Temporal helper/formatter/main/preload and exact dependency/license
+records;132focused5file checks +676mappedunits/5contracts/77security and
+fulltype/scopedlint pass. No new IPC/migration/
+process/infrastructure/research/proof. UI/actual native integration not yet
+implemented/accepted. Full civil-duration arithmetic/rates and nativeAT/release
+remain required. Next commit core/freeze, independent bounded core review, then
+only existing date/time result/help/error/receipt UI to manifest_review_sol.
 
 ## Agents
 

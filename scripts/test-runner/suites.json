@@ -46,7 +46,8 @@
       "packages/builtins/calculator/tests/colours.test.ts",
       "packages/builtins/calculator/tests/result.test.ts",
       "packages/builtins/calculator/tests/presentation.test.ts",
-      "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts"
+      "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts",
+      "packages/builtins/calculator/tests/date-times.test.ts"
     ],
     "L2-03": [
       "packages/builtins/universal-actions/tests/presentation.test.ts",

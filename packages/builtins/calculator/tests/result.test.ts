@@ -12,3 +12,8 @@ it('formats only validated canonical colour values without numeric or unit ambig
   expect(formatCalculationText({ok:true,kind:'colour',colour:'rgb',text:'rgb(255 0 0 / 0.5)'})).toBe('rgb(255 0 0 / 0.5)');
   for(const value of [{ok:true,kind:'colour',colour:'rgb',text:'rgb(255.0 0 0 / 1)'},{ok:true,kind:'colour',colour:'hsl',text:'hsl(30 0% 50%)'},{ok:true,kind:'colour',colour:'hex',text:'#ff0000ff'},{ok:true,kind:'colour',colour:'rgb',text:'url(private)'},{ok:true,kind:'colour',colour:'hex',text:'#ff0000',unit:'m'},{ok:true,kind:'colour',colour:'hex',text:'#ff0000',value:1},{ok:true,value:1,text:'1',colour:'hex'}])expect(()=>formatCalculationText(value as never)).toThrow('Invalid calculator output.');
 });
+
+it('formats canonical zoned dates only with their exclusive kind',()=>{
+ const value={ok:true as const,kind:'date-time' as const,dateTime:'zoned' as const,text:'2024-01-01T00:00:00+00:00[UTC]'};expect(formatCalculationText(value)).toBe(value.text);
+ for(const patch of [{value:1},{unit:'m'},{colour:'hex'},{dateTime:'other'},{text:'arbitrary'},{kind:'number'},{kind:'colour'}])expect(()=>formatCalculationText({...value,...patch} as never)).toThrow('Invalid calculator output.');
+});

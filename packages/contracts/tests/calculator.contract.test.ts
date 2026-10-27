@@ -22,3 +22,11 @@ it('accepts only bounded closed-format sRGB colour receipts and never mixed unit
   expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',colour:'hex',text:'#ff0000',unit:'m'}}).success).toBe(false);
   expect(calculatorCopyRequestSchema.safeParse({protocolVersion:1,revision:1,expression:'#fff to rgb',colour:'rgb'}).success).toBe(false);
 });
+
+it('accepts only closed canonical zoned-date receipts, never mixed numeric/colour authority',()=>{
+ const value={outcome:'copied',dateTime:'zoned',text:'2024-11-03T01:30:00-04:00[America/New_York]'};expect(calculatorCopyReplySchema.safeParse({ok:true,value}).success).toBe(true);
+ for(const text of ['2023-02-29T00:00:00+00:00[UTC]','0000-01-01T00:00:00+00:00[UTC]','2024-01-01T00:00:00.120+00:00[UTC]','2024-01-01T00:00:00-00:00[UTC]','2024-01-01T00:00:00+00:00:00[UTC]','2024-01-01T00:00:00+00:00[../UTC]','arbitrary','<script>'])expect(calculatorCopyReplySchema.safeParse({ok:true,value:{...value,text}}).success).toBe(false);
+ for(const patch of [{dateTime:'date'},{unit:'m'},{colour:'hex'},{text:'42'},{expression:'private'}])expect(calculatorCopyReplySchema.safeParse({ok:true,value:{...value,...patch}}).success).toBe(false);
+ expect(calculatorCopyReplySchema.safeParse({ok:true,value:{outcome:'copied',text:'42',dateTime:'zoned'}}).success).toBe(false);
+ expect(calculatorCopyRequestSchema.safeParse({protocolVersion:1,revision:1,expression:'2024-01-01T00:00[UTC] to UTC',dateTime:'zoned'}).success).toBe(false);
+});
