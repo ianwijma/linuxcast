@@ -240,7 +240,7 @@ Pending reads, synchronous publication, newer Reload operations and root/query/
 selection/Back/Hide/disposal changes fence late Form navigation. Existing exact
 browser receipts, separate Hide-failure truth and persistent unknown gates remain.
 
-Validation on Linux x64, Node24.22.1/Bun1.4.4: **403 focused tests** pass
+Validation on Linux x64, Node 24.22.1/Bun 1.4.4: **403 focused tests** pass
 (251 Quicklinks presentation, 27 routing, 125 launcher controller), including
 38 added fallback cases. **68 launcher Chromium keyboard/axe cases** pass,
 including seven new fallback cases and all 61 earlier cases. Full typecheck,
@@ -259,12 +259,48 @@ fallback, ranking controls, templates/context/targets, prerequisite acceptance,
 Debian GNOME/KDE Wayland/X11, native AT/performance and release gates remain
 pending. Neither task is complete and complete1.0 scope is unchanged.
 
+## Local calculator root result
+
+An unmatched valid query with an explicit digit/math/colour signal can show one
+**Calculate expression** row with canonical local output before configured saved
+searches. The real bounded evaluator/formatter supplies arithmetic, existing unit
+and colour results; ordinary words/bare constants, invalid/domain/unsupported/
+oversized input and a hidden/disabled Calculator produce no candidate. Existing
+registered matches retain priority. A selected saved-search alternative is not
+replaced when the local candidate appears.
+
+Only a current selected/revision/query-matching deliberate choice invokes local
+`CalculatorFlow.openExpression`, which re-evaluates and opens the existing
+Form/Detail within total depth 3. No synthetic ID reaches generic Execute or
+metadata writes. Typing, classifying and choosing copy/transmit/persist nothing;
+Copy result remains a separate exact named operation. Edit/Back/Cancel preserve
+root query/selection; Hide clears captured state; generic Calculator opens empty.
+Pre-API pending-publication, original-context and lifecycle guards prevent
+reentrant zero-intent Copy and stale success; unknown outcomes never replay.
+
+262 focused unit checks pass (82 calculator presentation,27 calculator routing,
+125 launcher controller,28 Quicklink routing); 35 cases are new. Eight affected
+Chromium keyboard/axe checks and 29 retained calculator cases pass. The launcher
+suite now contains 76 cases, retaining 68 earlier PR50 cases without expanding this
+slice's browser run. Typecheck, scoped lint, plan and diff pass on Linux x64 with pinned
+Node 24.22.1/Bun 1.4.4. Twelve inspected public captures
+`evidence/*-root-calculator-*` cover dark/light root/result/Edit, unit/colour,
+error/pending/unknown and 200%-text states. Shared tokens/primitives follow DESIGN
+Shell/navigation, Results/actions, List/Form/Detail, States/motion, Accessibility
+and Review gate. Fixtures observe synthetic requests, not clipboard effects.
+
+Partial L1-01 AC01/UI/privacy and L2-04 AC01/partial AC02/UI/privacy evidence only;
+coordinator owns real native clipboard/independent-reader/aggregate-export
+integration. Remaining providers/ranking, dates/DST/rates, prerequisite/native
+GNOME/KDE Wayland/X11/AT/performance/release gates stay required. No full task or
+scope reduction is claimed.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
 - `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
-- `tests/launcher.ui.test.ts`: 68 Chromium component checks covering keyboard,
+- `tests/launcher.ui.test.ts`: 76 Chromium component cases (68 retained plus eight new) covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly

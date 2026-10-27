@@ -16,9 +16,9 @@ private Xvfb/profile only. No user display, --no-sandbox, or credential changes.
 
 ## Integrated base
 
-Primary clean developf79a345e3d81c2e42cb0b0466c3b2e8de579d7c5 (PR49).
-Exact signed reviewed head2f978eed30031d057cfe58c3ced4dce965472273, CI40424267110
-validatePASS11s; no requested GitHub reviews/submissions/comments/threads. Normal
+Primary clean developb72d364e4dfb12b7b63d56f2ff26a470d40a90e7 (PR50).
+Exact signed reviewed headfb09b4b23ad709c2340321c93dad173763782553, CI40425939433
+validatePASS12s; no requested GitHub reviews/submissions/comments/threads. Normal
 exact-head merge; primary frozen install and production build66assets pass.
 
 Recent merged application increments (full evidence in registry/cards/artifacts):
@@ -64,19 +64,47 @@ clean. Converted-kind Reload and reentrant successful-publication/newerReload
 findings fixed with meaningful regressions. No pending source finding.
 
 Evidence `apps/desktop/evidence/launcher-web-search-fallback-application.md`.
-Next publish focused PR, inspect exact-head CI/configured GitHub review/threads,
-normal merge, refresh primary frozen install/build, record merge and select next
-concrete documented application flow. No full task/native acceptance claimed.
+PR50 https://github.com/ianwijma/linuxcast/pull/50 mergedb72d364 as above. Clean
+primary frozen install/production build66assets pass. No pending review/CI/signing
+blocker; full task/native acceptance unclaimed.
+
+## Current reviewed application increment: local calculator query result
+
+Root `.worktrees/linuxcast-application-controls`, branch
+`codex/launcher-calculator-query` fromb72d364. Freezececb394/03eb428, UI904a16c
+(signed author8ac184b), actualb6cd69b. Existing pure evaluator/formatter offers
+one local canonical result for explicitly mathematical successful unmatchedquery,
+shown/enabled Calculator only. Ordinary words/constants/invalid/matchingcommands
+retain search behavior; stable syntheticID cannot Execute/preferences/persist.
+Deliberate choice reevaluates→existingResult, separate expression-only Copy API
+mainrecomputes canonical text. No new grammar/API/dependency/migration/service/
+research/proof. Edit/Cancelrootquery+selectionrestore, Hideclear, genericempty;
+origin/immediate post-publication Copy guards close stale/reentrant effects.
+
+PASS mappedL1:269units; L2:628units/4contracts/74security/1actualproduction8.15s.
+Author262focused,8newrootChromium+29retainedCalculatorChromium pass. Native
+independent xclip confirms root42/7000m/HSL and8retainedcopies, noCopy fromtyping/
+heldEnter/choice, Edit/Cancel, Hide/reopen/noreplay/genericblank; owneraggregate
+count11/allowlistedexportkeys/noexpressions/results. Firstactual assertion matched
+retainedroot+Detailtextcount2; scoped visibleDetail only and finalmappedpass.
+Twelvecomponent/fouractualcaptures independentclean; type/scopedlint/plan/diff
+pass. UIcode/tests/fixtures/README/captures exactauthor. Independent signedUI/
+exactintegratedactual review clean atb6cd69b; no pending source findings.
+Evidence apps/desktop/evidence/launcher-calculator-query-application.md.
+
+Next publish focused PR, exact-head CI/GitHub review/threads, normal merge,
+primary frozeninstall/build verification and next concrete required application
+flow. Full dates/DST/rates/providers/prerequisites/nativeAT/release remain pending.
 
 ## Agents
 
-All SOL6.1/high, bounded assignments complete; no new unbounded work assigned:
+All GPT-6.1 SOL/high, bounded assignments complete, no new work assigned:
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l1-01-web-search-fallback-ui`; signedc715b6f integratedd22f1e6. Rootfreeze
-  localb02b21b. No shared edits or new foundational/research/proof assignment.
-- alias_review_sol: signed UI/tencaptures and root62eaaee actual/sixcaptures clean;
-  both review findings closed. No remaining actionable source finding.
-- file_search_service_sol: narrow metadata/main/schema/mapping9f09aa4 review clean.
+  `codex/l2-04-root-query-ui`; signed8ac184b integrated904a16c. Localfreeze20b63d7.
+  No shared/engine grammar edits or new foundational/research/proof work.
+- alias_review_sol: signedUI/twelvecaptures + rootb6cd69b actual/fourcaptures
+  independently clean; no actionable finding or pending re-review.
+- file_search_service_sol: prior metadata/main/schema/mapping9f09aa4 review clean.
 
 ## Acceptance and runtime
 

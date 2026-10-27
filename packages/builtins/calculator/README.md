@@ -2,12 +2,15 @@
 
 `CalculatorFlow` uses the existing launcher's shared `ViewSession` and host
 `ViewRenderer`. It pushes a Calculator Form onto the supplied parent view, then
-a Calculation Detail after a successful explicit Evaluate. It creates no new
-window, root query provider or visual system. The host supplies a unique view ID
+a Calculation Detail after a successful explicit Evaluate. The local
+`openExpression` entry prepares the same Form and result from a deliberately
+chosen root candidate. It creates no new window or visual system. The host supplies a unique view ID
 prefix and current command registry revision and forwards close notifications
 synchronously through `closed(viewId)`.
 
-Typing and opening the Form do not evaluate, copy or transmit expressions.
+Typing in the dedicated Form and generic opening do not evaluate, copy or
+transmit expressions. Root candidate classification is separately local and
+bounded; choosing it explicitly re-evaluates without any IPC.
 Evaluate is a local read action against the separate pure `evaluateExpression`
 module. The Expression label and draft persist through fixed inline syntax,
 domain and size/complexity errors. Requests are bounded to 512 UTF-8 bytes and
@@ -113,9 +116,49 @@ grid, detail and form; States and motion; Accessibility; Review gate. Production
 presentation contains only semantic ViewModels and existing host primitives,
 tokens/fonts. `fixtures/preview.css` only lays out the labelled fixture.
 
+## Deliberately selected root expressions
+
+The launcher offers a local **Calculate expression** candidate only for an
+unmatched query with an explicit number/math/colour signal and a successful real
+bounded parser/formatter result. Ordinary words, bare constants, unsupported,
+domain-error and oversized inputs cannot hijack root search. Matching registered
+commands keep priority; Calculator must be shown/enabled. Saved-search alternatives
+stay separate and a selected provider retains its identity when a calculation
+appears. The synthetic item cannot enter generic Execute or preference APIs.
+
+`openExpression(fromViewId, expression)` uses the same private evaluation helper
+as explicit Evaluate, pushes the existing Form/Detail and retains the captured
+expression for Edit. Generic `open` stays empty. Root query/selection survives
+Edit/Back/Cancel; Hide/dispose clears the invocation. Form publication is fenced
+before Result navigation. Copy remains separate expression-only named IPC, with
+exact receipt validation. Original root context and pending/lifecycle ownership
+are checked immediately after pending publication and before the API call, so
+synchronous Back/dispose/query invalidation causes zero Copy requests. Late or
+unknown outcomes never report copied or replay automatically.
+
+Author checks pass on Linux x64 with Node24.22.1/Bun1.4.4: **262 focused units**
+(82 presentation, 27 calculator routing, 125 launcher controller, 28 Quicklink
+routing), including 35 new cases; **eight new root Chromium keyboard/axe checks**
+and **29 retained calculator Chromium checks**. Full typecheck, scoped ESLint,
+plan and diff checks pass. Vitest/Playwright use explicit `LINUXCAST_TEST_FILES`
+selections with the existing test-runner configs. Twelve inspected public
+captures in the launcher's `evidence/*-root-calculator-*` cover dark/light root,
+result and Edit Form, units/colour, inline domain error, pending/unknown Copy and
+200%-text footer containment. Existing shared DESIGN Shell/navigation,
+Results/actions, List/Form/Detail, States/motion, Accessibility and Review gate
+apply; no feature CSS or window is added. Fixture clipboard requests are observed,
+not performed. Coordinator owns native clipboard/independent-reader and aggregate
+export privacy integration.
+
+This provides bounded L2-04 AC01 no-execution/no-background-transmission/word-query,
+partial AC02 arithmetic/unit/colour UI, and L1-01 selected-identity/UI/privacy
+evidence. Full dates/civil-time/DST, configured stale/offline currency/crypto rates,
+provider/ranking, prerequisite/native desktop/AT/performance/release gates remain
+pending. Neither task is complete and full1.0 scope is unchanged.
+
 ## Evidence and remaining scope
 
-`tests/presentation.test.ts` has 72 passing presentation checks and
+`tests/presentation.test.ts` has 82 passing presentation checks and
 `tests/calculator.ui.test.ts` has 29 passing Chromium keyboard/axe checks covering
 explicit Form and Detail transitions, draft errors/domain/oversize, clipboard unavailability,
 unknown/mismatched/pending replies, back/dirty cancel/focus, stale/disposed actions
