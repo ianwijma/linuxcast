@@ -27,7 +27,8 @@
       "apps/desktop/src/features/launcher/tests/controller.test.ts",
       "apps/desktop/src/features/launcher/tests/catalogue.test.ts",
       "apps/desktop/src/main/workflow-commands.test.ts",
-      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts"
+      "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
+      "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts"
     ],
     "L1-02": [
       "packages/search/tests/search.test.ts",
