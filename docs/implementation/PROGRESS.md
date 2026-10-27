@@ -15,12 +15,14 @@ input/device authorization; actual app checks use owned private Xvfb only.
 
 ## Integrated application base
 
-Primary clean develop64e9fdae03d27c0eb833eaaf66cba9da656ad972 (merged PR48).
-Exact signed reviewed heada1736de, CI40422104791 validate passed11s; no requested
+Primary clean developf79a345e3d81c2e42cb0b0466c3b2e8de579d7c5 (merged PR49).
+Exact signed reviewed head2f978eed, CI40424267110 validate passed11s; no requested
 GitHub reviews/submissions/comments/threads. Normal exact-head merge, primary
 frozen install and production build66assets pass. No open PRs remain.
 
 Recent merged application increments:
+- PR49 https://github.com/ianwijma/linuxcast/pull/49: explicit path argument,
+  local exact review and separate real browser Open; full task remains unfinished.
 - PR48 https://github.com/ianwijma/linuxcast/pull/48: selected native JSON export,
   explicit plaintext disclosure, real private file publication and shared IME fix.
 - PR47 https://github.com/ianwijma/linuxcast/pull/47: root saved-link name/host/tag
@@ -132,20 +134,29 @@ matches author. Final independent root/UI/actual reviews clean, no findings.
 Evidence apps/desktop/evidence/quicklink-path-application.md. Full task/context/
 othercomponents/targets/prerequisites/nativeAT/session/performance/release remain
 pending. Registry8done/18inprogress/71planned unchanged; no whole-task claim.
-Next publish focused reviewed increment and merge normally after exact-head CI/
-GitHub review checks. Signing succeeded with unchanged existing1Password setup.
+PR49 mergedf79a345 as above after exact-head CI/review checks. Clean primary
+frozen install and production build66assets pass. Signing unchanged and working.
+
+## Next bounded application flow: explicit saved web-search fallback
+
+Root worktree `.worktrees/linuxcast-application-controls`, branch
+`codex/launcher-web-search-fallback` fromf79a345. Metadata-only marker and
+apps/desktop/src/features/launcher/FALLBACK-INCREMENT.md freeze are in progress;
+not implemented/accepted. Explicit provider choice from unmatched root query
+will open existing prefilled Query→Review→separate Open, no implicit remote action.
+Root owns contracts/projection/mappings/actual/registry; no new infrastructure,
+research/proof/service/dependency. Full task/prerequisite/release gates unchanged.
 
 ## Agents
 
-All GPT-6.1 SOL/high; no Astra or new agents. Completed bounded assignments:
+All GPT-6.1 SOL/high; no Astra or new agents.
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-path-argument-ui`; signedc68e1264 integrated38738f4. No shared edits.
-- alias_review_sol: root exactb73ef0b integrated/actual/UI and all affected
-  captures independently clean; sole P2 closed. No remaining source finding.
-- file_search_service_sol: root boundary97e6eed independently clean.
-
-After merge select and dispatch next concrete documented application flow using
-existing shell/storage/sharedUI. No foundational/research/proof expansion.
+  `codex/l1-01-web-search-fallback-ui` fromf79a345. Bounded L1-01 existing
+  launcher/Quicklinks UI assignment; read spec, waiting root freeze SHA before
+  behavior edits. No shared edits. Previous signedc68e1264 integrated PR49.
+- alias_review_sol: completed clean PR49 exactb73ef0b actual/UI/source/captures.
+- file_search_service_sol: completed clean PR49 boundary97e6eed. Next narrow
+  metadata/projection review will be assigned after freeze checks; no extra scope.
 
 ## Acceptance and runtime
 

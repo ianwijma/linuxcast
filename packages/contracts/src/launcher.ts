@@ -28,7 +28,7 @@ export const launcherCommandMetadataSchema=z.strictObject({
   aliases:z.array(z.string().max(256)).max(16),keywords:z.array(z.string().max(128)).max(16),
   hidden:z.boolean().optional(),enabled:z.boolean(),unavailableReason:z.string().max(256).optional(),
   applicationActions:applicationActionsSchema.optional(),
-  quicklink:quicklinkSelectionSchema.optional(),
+  quicklink:quicklinkSelectionSchema.extend({webSearch:z.literal(true).optional()}).optional(),
   usage:z.strictObject({useCount:z.number().int().nonnegative().safe(),lastUsedAt:z.iso.datetime().nullable(),pinned:z.boolean(),alias:uiTextSchema.nullable()}).nullable(),
 }).refine(command=>(command.enabled||!!command.unavailableReason)&&(!isLauncherVisibilityProtected(command.id)||command.hidden!==true)&&(!command.applicationActions||command.id.startsWith('application:'))&&(command.id.startsWith('quicklink:')?!!command.quicklink&&command.id===`quicklink:${command.quicklink.id}`:command.quicklink===undefined));
 export const launcherCommandsSnapshotSchema=z.strictObject({revision,commands:z.array(launcherCommandMetadataSchema).max(100),rankingAvailable:z.boolean(),visibilityAvailable:z.boolean().optional(),nextCursor:z.string().max(32).nullable().optional(),applicationState:z.enum(['available','unavailable']).optional(),updateOnly:z.boolean().optional()})
