@@ -241,8 +241,8 @@ selection/Back/Hide/disposal changes fence late Form navigation. Existing exact
 browser receipts, separate Hide-failure truth and persistent unknown gates remain.
 
 Validation on Linux x64, Node24.22.1/Bun1.4.4: **403 focused tests** pass
-(249 Quicklinks presentation, 27 routing, 127 launcher controller), including
-36 added fallback cases. **68 launcher Chromium keyboard/axe cases** pass,
+(251 Quicklinks presentation, 27 routing, 125 launcher controller), including
+38 added fallback cases. **68 launcher Chromium keyboard/axe cases** pass,
 including seven new fallback cases and all 61 earlier cases. Full typecheck,
 scoped ESLint, plan and diff checks pass. Commands use explicit
 `LINUXCAST_TEST_FILES` selections with the existing Vitest/Playwright configs.
@@ -262,7 +262,7 @@ pending. Neither task is complete and complete1.0 scope is unchanged.
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
-- `tests/controller.test.ts`: 127 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
+- `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
 - `tests/launcher.ui.test.ts`: 68 Chromium component checks covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.

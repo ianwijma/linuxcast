@@ -214,8 +214,8 @@ cannot reuse fallback text. Original-context and newer-operation fences protect
 late reads and synchronous List publication; persistent uncertainty remains gated.
 Review is local; a separate exact Open search is the only browser request.
 
-The fallback increment has 249 passing presentation cases (19 new), 27 launcher
-routing cases and 127 launcher-controller cases, plus 68 launcher Chromium
+The fallback increment has 251 passing presentation cases (21 new), 27 launcher
+routing cases and 125 launcher-controller cases, plus 68 launcher Chromium
 keyboard/axe checks. Ten inspected fallback captures and exact commands/limits
 are recorded in the launcher's README. Existing 52 dedicated Quicklinks browser
 cases remain unchanged. This is partial L1-01/L2-05 UI/privacy and selection/input
@@ -321,7 +321,7 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 249 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 251 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
 - `tests/quicklinks.ui.test.ts`: 52 real Chromium keyboard/axe cases, including
