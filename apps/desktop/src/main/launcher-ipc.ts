@@ -77,7 +77,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:open-file-search',title:'File search',subtitle:'Search filenames in folders you choose',aliases:['files','file search'],keywords:['folder','filename','index'],enabled:!!actions.openFileSearch,
       ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
-    {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic or convert units locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert'],enabled:true},
+    {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic, units, colours or dates locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert','dates','timezones'],enabled:true},
   ];
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   if(actions.openWorkflowEditor)builtins.push({id:'linuxcast:open-workflow-editor',title:'Workflow draft',subtitle:'Build and save a local workflow draft',aliases:['workflow','workflows'],keywords:['graph','editor','automation','draft'],enabled:true});
@@ -255,7 +255,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if(!parsed.success||parsed.data.revision!==revision)return failure('invalid-request');
     if(!active()||busy||calculatorPending)return failure('cancelled');
     const calculated=evaluateExpression(parsed.data.expression);
-    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported arithmetic, unit or colour expression, then evaluate it again.',retryable:false}};
+    if(!calculated.ok)return {ok:false,error:{code:'invalid-request',message:'Enter a supported arithmetic, unit, colour or date/time expression, then evaluate it again.',retryable:false}};
     let clipboardText:string;try{clipboardText=formatCalculationText(calculated);}catch{return failure('invalid-request');}
     if(!actions.copyCalculatorResult)return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
     calculatorPending=true;
@@ -275,7 +275,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       if(outcome==='unsupported')return {ok:false,error:{code:'capability-unavailable',message:'Clipboard copying is unavailable in this session. The local result is still available.',retryable:false}};
       if(outcome!=='written')throw new Error('Invalid copy receipt.');
       await recordUse('linuxcast:calculator');
-      return {ok:true,value:{outcome:'copied',text:calculated.text,...(calculated.kind==='colour'?{colour:calculated.colour}:calculated.unit===undefined?{}:{unit:calculated.unit})}};
+      return {ok:true,value:{outcome:'copied',text:calculated.text,...(calculated.kind==='date-time'?{dateTime:calculated.dateTime}:calculated.kind==='colour'?{colour:calculated.colour}:calculated.unit===undefined?{}:{unit:calculated.unit})}};
     }catch{return {ok:false,error:{code:'deadline-exceeded',message:'The copy outcome is unknown. Check your clipboard before choosing Copy result again.',retryable:false}};}
     finally{clearTimeout(timer);}
   });

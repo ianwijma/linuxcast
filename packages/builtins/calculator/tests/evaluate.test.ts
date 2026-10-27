@@ -4,7 +4,7 @@ import {evaluateExpression} from '../src/evaluate.ts';
 
 function value(input:string):number {
   const result=evaluateExpression(input);expect(result.ok,JSON.stringify(result)).toBe(true);
-  if(!result.ok||result.kind==='colour')throw new Error('Expected a successful synthetic calculation.');
+  if(!result.ok||result.kind==='colour'||result.kind==='date-time')throw new Error('Expected a successful synthetic calculation.');
   expect(Number.isFinite(result.value)).toBe(true);expect(calculatorResultTextSchema.safeParse(result.text).success).toBe(true);
   return result.value;
 }

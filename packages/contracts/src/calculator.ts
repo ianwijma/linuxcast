@@ -19,11 +19,21 @@ function validColourText(colour:CalculatorColourFormat,text:string):boolean{
   const values=[Number(match[1]),Number(match[2]),Number(match[3])];
   return values.every(value=>Number.isFinite(value))&&(colour==='rgb'?values.every(value=>value<=255):values[0]!<360&&values[1]!<=100&&values[2]!<=100&&(values[1]!==0||values[0]===0)&&((values[2]!==0&&values[2]!==100)||(values[0]===0&&values[1]===0)));
 }
-export const calculatorColourValueSchema=z.strictObject({colour:calculatorColourFormatSchema,text:z.string().min(1).max(96),unit:z.never().optional()})
+export const calculatorColourValueSchema=z.strictObject({colour:calculatorColourFormatSchema,text:z.string().min(1).max(96),unit:z.never().optional(),dateTime:z.never().optional()})
   .refine(value=>validColourText(value.colour,value.text));
 export type CalculatorColourValue=z.infer<typeof calculatorColourValueSchema>;
+/** Canonical ISO calendar result with an explicit offset and named zone. No free-form clipboard text. */
+const dateTimeText=/^([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])(?:\.([0-9]{0,8}[1-9]))?([+-])([01][0-9]|2[0-3]):([0-5][0-9])(?::([0-5][0-9]))?\[(UTC|[A-Za-z_]+(?:\/[A-Za-z0-9_+-]+)+)\]$/u;
+export const calculatorDateTimeTextSchema=z.string().min(30).max(192).refine(text=>{
+  const match=dateTimeText.exec(text);if(!match)return false;
+  const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+  const days=[31,year%4===0&&(year%100!==0||year%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
+  return year>=1&&day<=days[month-1]!&&match[11]!=='00'&&!(match[8]==='-'&&Number(match[9])===0&&Number(match[10])===0&&(match[11]===undefined||Number(match[11])===0));
+});
+export const calculatorDateTimeValueSchema=z.strictObject({dateTime:z.literal('zoned'),text:calculatorDateTimeTextSchema,unit:z.never().optional(),colour:z.never().optional()});
+export type CalculatorDateTimeValue=z.infer<typeof calculatorDateTimeValueSchema>;
 export const calculatorCopyReplySchema=z.discriminatedUnion('ok',[
-  z.strictObject({ok:z.literal(true),value:z.union([z.strictObject({outcome:z.literal('copied'),text:calculatorResultTextSchema,unit:calculatorUnitSchema.optional(),colour:z.never().optional()}),calculatorColourValueSchema.safeExtend({outcome:z.literal('copied')})])}),
+  z.strictObject({ok:z.literal(true),value:z.union([z.strictObject({outcome:z.literal('copied'),text:calculatorResultTextSchema,unit:calculatorUnitSchema.optional(),colour:z.never().optional(),dateTime:z.never().optional()}),calculatorColourValueSchema.safeExtend({outcome:z.literal('copied')}),calculatorDateTimeValueSchema.extend({outcome:z.literal('copied')})])}),
   z.strictObject({ok:z.literal(false),error:rpcFailureSchema}),
 ]);
 export type CalculatorCopyReply=z.infer<typeof calculatorCopyReplySchema>;

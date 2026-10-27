@@ -295,12 +295,27 @@ integration. Remaining providers/ranking, dates/DST/rates, prerequisite/native
 GNOME/KDE Wayland/X11/AT/performance/release gates stay required. No full task or
 scope reduction is claimed.
 
+## Zoned date/time through the existing root calculator
+
+The supplied date/time engine is accepted by the unchanged local classifier and
+canonical formatter. Explicit ISO date/source-zone→target-zone input offers the
+existing Calculate expression row; gap/fold/invalid inputs offer no guessed
+result. A deliberate choice opens the existing local Date/time Result, and only
+separate Copy sends expression/revision. The updated request-observing fixture
+returns the exclusive dateTime receipt; one new root Chromium keyboard/axe check
+and four routing checks pass. Its inspected public capture is
+`evidence/dark-root-date-time-query.png`. The calculator README records the
+136 focused units, 39 calculator browser checks, ten other date/time captures,
+exact-acknowledgement/help/error behavior and limits. Production clipboard and
+privacy integration remain coordinator-owned; full civil-duration/rates/provider,
+prerequisite/native desktop/AT/performance/release acceptance stays pending.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
 - `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
-- `tests/launcher.ui.test.ts`: 76 Chromium component cases (68 retained plus eight new) covering keyboard,
+- `tests/launcher.ui.test.ts`: 77 Chromium component cases (68 retained plus eight root-calculator and one date/time case) covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly

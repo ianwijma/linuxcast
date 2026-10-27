@@ -1,4 +1,4 @@
-# Explicit arithmetic, unit and colour calculator — bounded L2-04 increments
+# Explicit arithmetic, unit, colour and zoned date/time calculator — bounded L2-04 increments
 
 `CalculatorFlow` uses the existing launcher's shared `ViewSession` and host
 `ViewRenderer`. It pushes a Calculator Form onto the supplied parent view, then
@@ -15,7 +15,7 @@ Evaluate is a local read action against the separate pure `evaluateExpression`
 module. The Expression label and draft persist through fixed inline syntax,
 domain and size/complexity errors. Requests are bounded to 512 UTF-8 bytes and
 exclude controls/unpaired surrogates. A successful local result is plain metadata:
-Expression and Result, plus Colour format for colour conversions. Detail Markdown
+Expression and Result, plus Colour format or Date/time format for those results. Detail Markdown
 is static: numbers explain floating-point approximation, up to15 significant
 digits and `%`; colours explain encoded-sRGB precision and quantization. Expressions
 cannot supply HTML, Markdown, links or executable content.
@@ -24,7 +24,7 @@ cannot supply HTML, Markdown, links or executable content.
 named `copyCalculatorResult({revision, expression})` API. Main re-evaluates the
 expression and copies the canonical numeric/unit or closed colour result; the renderer
 has no arbitrary clipboard interface. A strict copied receipt must match text,
-optional unit and optional colour format before the UI reports “Result copied.” No automatic copy,
+optional unit, colour format and date/time format before the UI reports “Result copied.” No automatic copy,
 hide, persistence, expression history or remote request is introduced.
 
 Pending copy disables duplicates and has a five-second presentation bound.
@@ -136,7 +136,7 @@ are checked immediately after pending publication and before the API call, so
 synchronous Back/dispose/query invalidation causes zero Copy requests. Late or
 unknown outcomes never report copied or replay automatically.
 
-Author checks pass on Linux x64 with Node24.22.1/Bun1.4.4: **262 focused units**
+Author checks pass on Linux x64 with Node 24.22.1/Bun 1.4.4: **262 focused units**
 (82 presentation, 27 calculator routing, 125 launcher controller, 28 Quicklink
 routing), including 35 new cases; **eight new root Chromium keyboard/axe checks**
 and **29 retained calculator Chromium checks**. Full typecheck, scoped ESLint,
@@ -156,10 +156,52 @@ evidence. Full dates/civil-time/DST, configured stale/offline currency/crypto ra
 provider/ranking, prerequisite/native desktop/AT/performance/release gates remain
 pending. Neither task is complete and full1.0 scope is unchanged.
 
+## Explicit zoned date/time conversion
+
+Use `2026-10-27T09:00[Australia/Sydney] to UTC` or an explicitly offset repeated
+time such as `2024-11-03T01:30-04:00[America/New_York] to UTC`. The existing local
+Form and root candidate use the supplied real bounded engine; there is no new
+query route or IPC. Result shows plain **Date/time format: Zoned ISO date/time**
+and canonical text, with exact-instant/explicit-zone guidance rather than numeric
+approximation copy. Copy stays separate and compares text plus dateTime/unit/
+colour presence for every result kind. A missing/wrong kind cannot confirm Copy.
+
+**Supported date/time** is a read-only Form action using the same total depth 3
+help pattern. It preserves unsent drafts/focus on Back, provides UTC/IANA and both
+fold-offset examples, explains real Gregorian years 0001–9999, optional seconds
+and 1–9 fraction digits, zone aliases/Etc-GMT policy, checked source offsets/Z,
+unknown -00:00 refusal, year bounds and no ambient clock. Missing local times
+are refused even with an offset; repeated times need a matching offset. Fixed
+inline invalid-date, unknown-zone, fold and gap messages retain the expression
+and direct manual correction/help. Help, typing, Evaluate and result navigation
+never copy, save or contact a service. Existing original-context, reentrant Copy,
+late/disposed, unknown and no-replay guards remain unchanged.
+
+Author checks on Linux x64, pinned Node 24.22.1/Bun 1.4.4: **136 focused units pass**
+(105 presentation, 31 launcher calculator-routing; 27 new). **39 calculator Chromium
+keyboard/axe checks pass** (29 retained, 10 new), plus one new root-date Chromium
+case. Full typecheck, scoped ESLint, plan and diff checks pass. Tests use explicit
+`LINUXCAST_TEST_FILES` selections with the existing Vitest/Playwright configs.
+Ten inspected `evidence/*-date-time-*` captures cover dark/light Result/help/fold/
+gap, unknown receipt and 200%-text exact fractional output/footer containment;
+`apps/desktop/src/features/launcher/evidence/dark-root-date-time-query.png` shows
+local root classification before any Copy. Fixtures use public synthetic dates
+and observed requests, never real clipboard writes. Shared DESIGN Shell/navigation,
+Results/actions, List/Form/Detail, States/motion, Accessibility and Review gate
+plus existing primitives/tokens apply. No custom CSS/window is introduced.
+
+This is partial L2-04 AC02/UI and preserved AC01/privacy evidence. Core
+contracts/engine/formatter/main/preload and native clipboard independent-reader
+production evidence are coordinator-owned prerequisites; UI fixtures do not prove
+those effects. Full civil-date/duration arithmetic, configured timestamped
+stale/offline currency/crypto rates, providers/ranking, prerequisite acceptance,
+Debian GNOME/KDE Wayland/X11, native AT/performance/release gates remain required.
+Neither L2-04 nor complete local 1.0 is marked complete.
+
 ## Evidence and remaining scope
 
-`tests/presentation.test.ts` has 82 passing presentation checks and
-`tests/calculator.ui.test.ts` has 29 passing Chromium keyboard/axe checks covering
+`tests/presentation.test.ts` has 105 passing presentation checks and
+`tests/calculator.ui.test.ts` has 39 passing Chromium keyboard/axe checks covering
 explicit Form and Detail transitions, draft errors/domain/oversize, clipboard unavailability,
 unknown/mismatched/pending replies, back/dirty cancel/focus, stale/disposed actions
 and local readonly metadata. Unit cases add length/function-scalar, temperature, decimal/binary
@@ -181,7 +223,7 @@ This presentation contributes bounded L2-04-AC01 and partial AC02 unit/colour-co
 UI and privacy evidence. The
 separate evaluator lane owns parser, conversion tables and numeric/colour correctness. Coordinator main/
 preload/launcher routing owns sender validation, recomputation, actual clipboard
-and production Electron integration. Full L2-04 remains incomplete: calendar dates/timezones/DST, configured currency/crypto adapters, timestamped
+and production Electron integration. Full L2-04 remains incomplete: broader civil-date/duration arithmetic, configured currency/crypto adapters, timestamped
 fixture-backed cache and stale/offline rate behavior remain required. Debian
 GNOME/KDE Wayland/X11, native assistive technology and full release acceptance
 remain pending. The complete local 1.0 scope is unchanged.

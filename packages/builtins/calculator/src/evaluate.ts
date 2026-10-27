@@ -1,6 +1,7 @@
 import type {Calculation} from './types.ts';
 import {convertUnitValue} from './units.ts';
 import {evaluateColourExpression} from './colours.ts';
+import {evaluateDateTimeExpression} from './date-times.ts';
 
 type FailureCode=Extract<Calculation,{ok:false}>['code'];
 type Token={kind:'number';value:number}|{kind:'name';value:string}|{kind:'+'|'-'|'*'|'/'|'^'|'%'|'('|')'|','|'end'};
@@ -11,6 +12,10 @@ const messages:Record<FailureCode,string>={
   'unsupported-unit':'Use a supported, unambiguous unit identifier.',
   'incompatible-units':'Choose units with the same dimension.',
   'invalid-colour':'Use a supported hex, RGB or HSL colour conversion within the component ranges.',
+  'invalid-date-time':'Use an explicit valid ISO date/time, matching offset and named zone.',
+  'unsupported-time-zone':'Use UTC or a supported IANA area/location time zone.',
+  'ambiguous-date-time':'This local time occurs twice. Add its matching UTC offset to choose one occurrence.',
+  'nonexistent-date-time':'This local time does not exist. Choose a valid time outside the clock change.',
 };
 class EvaluationFailure extends Error {
   readonly code:FailureCode;
@@ -173,6 +178,7 @@ export function evaluateExpression(input:string):Calculation {
     // ASCII space is the sole whitespace. This also rejects controls, DEL,
     // non-ASCII syntax and lone UTF-16 surrogates before tokenization.
     if(/[^\x20-\x7e]/u.test(input))return reject('invalid-expression');
+    const dateTime=evaluateDateTimeExpression(input);if(dateTime!==undefined)return dateTime;
     const colour=evaluateColourExpression(input);if(colour!==undefined)return colour;
     const request=conversion(input);
     const scalar=finite(new Parser(tokenize(request?.scalar??input)).parse());

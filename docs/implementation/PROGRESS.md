@@ -16,9 +16,9 @@ private Xvfb/profile only. No user display, --no-sandbox, or credential changes.
 
 ## Integrated base
 
-Primary clean developb72d364e4dfb12b7b63d56f2ff26a470d40a90e7 (PR50).
-Exact signed reviewed headfb09b4b23ad709c2340321c93dad173763782553, CI40425939433
-validatePASS12s; no requested GitHub reviews/submissions/comments/threads. Normal
+Primary clean develop4612ec061ad800e2616e55a296f32b973248f62d (PR51).
+Exact signed reviewed head3ed6d8521a8b8904a2417f16bb208cd70bcf1502, CI40427595390
+validatePASS11s; no requested GitHub reviews/submissions/comments/threads. Normal
 exact-head merge; primary frozen install and production build66assets pass.
 
 Recent merged application increments (full evidence in registry/cards/artifacts):
@@ -92,19 +92,62 @@ pass. UIcode/tests/fixtures/README/captures exactauthor. Independent signedUI/
 exactintegratedactual review clean atb6cd69b; no pending source findings.
 Evidence apps/desktop/evidence/launcher-calculator-query-application.md.
 
-Next publish focused PR, exact-head CI/GitHub review/threads, normal merge,
-primary frozeninstall/build verification and next concrete required application
-flow. Full dates/DST/rates/providers/prerequisites/nativeAT/release remain pending.
+PR51 https://github.com/ianwijma/linuxcast/pull/51 merged4612ec0 as above, clean
+primary frozeninstall/build66assets pass. Full dates/DST/rates/providers/
+prerequisites/nativeAT/release remain pending.
+
+## Current reviewed application increment: explicit zoned date/time
+
+Root `.worktrees/linuxcast-application-controls`, branch
+`codex/calculator-zoned-datetime` from4612ec0, signed core/freeze76d4121.
+Historical-offset P2 fix staged in DATE-TIMES.md/src/date-times.ts/tests; exact
+object source offset matching and exact target localfields+offset+zone avoid
+Temporal minute-rounding compatibility. Three Paris regressions;119targeted/
+type/lint pass, file_search re-review closes P2, no further finding.
+
+Reviewed author UI integrated exactly from staged binary patch SHA256
+`d0942a065024c86acef1a99e629661911f02bac11ce6b142f478c998ab6626ad`.
+Original patch `/tmp/linuxcast-date-time-ui-owned.patch`, byte hashes
+`/tmp/linuxcast-date-time-ui-owned-hashes.json`. Owned20paths only, source stable.
+Existing Form/rootResult/Supported date-time help/error recovery/exclusiveReceipt
+UI; no additional infrastructure/research/proof. Fullscope remains unchanged.
+
+PASS final706mappedL2units/5contracts/77security, fulltype/scopedlint/diff.
+Author136focused/39calculatorChromium+1rootcase pass;11componentcaptures clean.
+Actual sandboxed production/privateXvfb/native xclip10.89s PASS: rootSydney
+previousdayUTC, bothNYfolds, historicalParis exactseconds, fourrefusals/manualhelp/
+draftfocus/heldEnter/Hide/reopen; all11retainedcopies+4dates=15. Realownerexport
+count15/allowlistedkeys/noexpressions/results. Electron45.0.0/ICU78.2/tz2026e;
+unitNode24.22.1/ICU78.3/tz2026e. Sixactualcaptures root+alias independently clean.
+Incidental oldtrackedcapture churn restored only. Exactactualtestsource clean.
+Evidence `apps/desktop/evidence/calculator-datetime-application.md`.
+Registry/card partialevidence appended; plan/statuspass, AC02/UI remainpending.
+
+## Publication and next action
+
+User unlock recovered unchanged normal1Password signing. Historicaloffset fix
+signed2c08f6e40a8dba158a62b6f57d6b747c5684126b; exact reviewedUI20filehashes
+reconciled. No source changes since passing actual/mappedchecks/reviews. Prior
+terminal signingerrors are resolved. ReviewedUI/actual/evidence/registry are
+being signed/published as one small applicationincrement, no unsigned bypass.
+Prepared focused PR body `/tmp/linuxcast-zoned-datetime-pr-body.md`.
+
+Push focusedPR, attach; inspect exacthead configuredreviews/threads/CI, normalmerge,
+refresh primary frozeninstall/productionbuild. Then select next REQUIRED concrete
+application flow automatically (civil-duration/calendar arithmetic/rates remain),
+freeze bounded interfaces and redirect manifest_review_sol only into application
+UI work. No taskchoice question, no infrastructure/research/proof expansion.
 
 ## Agents
 
-All GPT-6.1 SOL/high, bounded assignments complete, no new work assigned:
-- manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-04-root-query-ui`; signed8ac184b integrated904a16c. Localfreeze20b63d7.
-  No shared/engine grammar edits or new foundational/research/proof work.
-- alias_review_sol: signedUI/twelvecaptures + rootb6cd69b actual/fourcaptures
-  independently clean; no actionable finding or pending re-review.
-- file_search_service_sol: prior metadata/main/schema/mapping9f09aa4 review clean.
+All GPT-6.1 SOL/high, bounded assignments finished, no new work assigned:
+- manifest_review_sol: `.worktrees/linuxcast-l1-01`, branch
+  `codex/l2-04-zoned-datetime-ui`, exactstagedpatch above based oncore76d4121.
+ 136units/39calculator+1rootbrowser/type/lint/plan/diff pass. No live sessions.
+- alias_review_sol: UI/source/11component/sixactualcaptures and actualtest
+  independentclean, stablepatch+actualdelta. No findings; commitreconciliation
+  pending signing only. No reruns requested.
+- file_search_service_sol: core historicalP2 fixed/rechecked, no furtherfinding.
 
 ## Acceptance and runtime
 

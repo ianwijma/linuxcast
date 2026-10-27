@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",
-    "@linuxcast/ui": "workspace:*"
+    "@linuxcast/ui": "workspace:*",
+    "@js-temporal/polyfill": "0.5.1"
   }
 }
