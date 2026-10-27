@@ -107,34 +107,45 @@ instrumented; full task/nativeAT/session/performance/release remains pending.
 PR48 merged as above. Current export assignment integrated; no pending review,
 PR or signing blocker. Full task/native/AT/performance/release gates stay pending.
 
-## Next bounded application flow: explicit URL path argument
+## Current bounded application flow: explicit URL path argument
 
-Coordinator reused isolated `.worktrees/linuxcast-application-controls`, new
-branch `codex/quicklink-path-argument` from64e9fda. Required typed URL component
-builder/argument portion of L2-05: one explicit user-provided argument as a path
-component, existing saved Query→Review→Open, no raw string interpolation or
-implicit context. This is selection only, not implementation or acceptance.
+Coordinator isolated `.worktrees/linuxcast-application-controls`, branch
+`codex/quicklink-path-argument` from64e9fda. Source53bb3a9 freezes the exclusive
+pathArgument config, summary marker/typed receipt and pure one-segment builder.
+Source97e6eed adds additive schema012, strict repository/CAS/storage receipts,
+fresh main path dispatch, preload checks and root marker description. Independent
+SOL6.1/high boundary review clean. PASS25builder/contracts,93targeted storage/
+owner/main/preload checks,43F2storageintegration; full type/scopedlint/diff pass.
+Real11→12 consistent snapshot/reopen preserves old definitions; usage/index clear
+preserves path config. No new dependency/service/research/proof.
 
-Next root read existing builder/parser/storage/configuration and task norms,
-freeze exact typed config/security/encoding/canonicalization/receipt boundaries,
-then give manifest_review_sol only the bounded existing UI implementation.
-Preserve literal/named-query saved searches, tags/preferences/export and all CAS/
-original-context/unknown/effect gates. Root owns contracts/migration/builder/main/
-preload/actual tests/registry; no infrastructure/research/proof/dependency/service.
-Required evidence includes Unicode/metacharacters/dot segments/authority/query/
-fragment isolation, explicit argument/review/native Open and real persistence;
-full context/other arguments/browser/file/URI/nativeAT/release remain mandatory.
+UI38738f4 integrates exact signed authorc68e1264. Sole pending-publication
+Save/Open P2 closed by immediate context guards and two zero-effect regressions.
+Actualb73ef0b passes45mappedintegration, real production13.57s: save/root tag
+selection→emptyargument→dotrefusal→heldEnterReview→separate exact encoded native
+GIO argv+emptystdin, hidden0600export/config/privacy, prefs, fullrestart/empty
+argument and aggregate usage privacy. PASS323units/15contracts/49security; author
+230presentation/52Chromium cases verified. Twelvecomponent/fouractual affected
+captures independently clean; full type/scopedlint/plan/diff pass. Exact UI tree
+matches author. Final independent root/UI/actual reviews clean, no findings.
+
+Evidence apps/desktop/evidence/quicklink-path-application.md. Full task/context/
+othercomponents/targets/prerequisites/nativeAT/session/performance/release remain
+pending. Registry8done/18inprogress/71planned unchanged; no whole-task claim.
+Next publish focused reviewed increment and merge normally after exact-head CI/
+GitHub review checks. Signing succeeded with unchanged existing1Password setup.
 
 ## Agents
 
-All GPT-6.1 SOL/high, no Astra. Currently completed/idle, no additional assignment:
+All GPT-6.1 SOL/high; no Astra or new agents. Completed bounded assignments:
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-05-quicklink-export-ui`; signedf390256 integrated1066541 in PR48.
-  Root prerequisites edfef0f/6dd38a6 locally0fda0ce/52be188. No shared edits.
-- alias_review_sol: export source/nine component/four actual captures and exact
-  UI integration independently clean. Shared IME guard reviewed.
-- file_search_service_sol: root export edfef0f and earlier saved-entry/search/
-  receipt/persistence boundaries clean. No pending findings.
+  `codex/l2-05-path-argument-ui`; signedc68e1264 integrated38738f4. No shared edits.
+- alias_review_sol: root exactb73ef0b integrated/actual/UI and all affected
+  captures independently clean; sole P2 closed. No remaining source finding.
+- file_search_service_sol: root boundary97e6eed independently clean.
+
+After merge select and dispatch next concrete documented application flow using
+existing shell/storage/sharedUI. No foundational/research/proof expansion.
 
 ## Acceptance and runtime
 
