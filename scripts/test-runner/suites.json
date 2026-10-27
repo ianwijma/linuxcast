@@ -55,7 +55,8 @@
       "packages/builtins/quicklinks/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
       "packages/templates/tests/templates.test.ts",
-      "packages/builtins/quicklinks/tests/web-search.test.ts"
+      "packages/builtins/quicklinks/tests/web-search.test.ts",
+      "packages/builtins/quicklinks/tests/path-argument.test.ts"
     ],
     "W1-01": [
       "packages/workflows/src/graph/tests/graph.test.ts",

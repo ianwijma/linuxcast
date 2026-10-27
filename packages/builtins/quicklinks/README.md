@@ -203,6 +203,49 @@ merge/fallback/AI, saved-entry frecency/shortcuts, remaining placeholder/target/
 export behavior, native desktop/AT and release acceptance remain pending. Neither
 full task is complete.
 
+## Explicit path arguments
+
+New/Edit **Type → Path argument link** saves the fixed path-segment configuration;
+Query parameter stays blank. Tags, Pin/Hide flags and the other saved fields are
+preserved through exact Save CAS and complete-list acknowledgement. A selected
+path row opens an empty **Path argument** Form. **Review link** uses the real
+shared builder locally, replaces that frame with plain Argument/Target URL
+metadata, and performs no browser request. **Edit argument** restores the unsent
+draft/focus. Only a separate deliberate **Open link** submits saved ID/version,
+launcher revision and the captured argument. It sends no renderer-built URL.
+
+The builder appends one encoded segment while preserving origin, base path, query
+and fragment. Spaces, Unicode, percent signs, slashes, backslashes and metacharacters
+remain literal argument data. Standalone `.` and `..`, invalid inputs and an
+oversized encoded URL receive fixed inline remediation. No query is inferred from
+root search, context or the local List filter, and no argument/history is saved.
+The exact receipt must identify the selected path configuration, argument and
+reviewed canonical URL; literal/web-search receipts cannot substitute. Unknown
+opening retains the existing browser-check/explicit-Reload gate without replay.
+Save/Open also recheck context after synchronous pending publication, before
+calling either effect API; reentrant query invalidation cannot start an effect.
+
+Validation adds 32 controller cases and eight Chromium keyboard/axe cases to the
+retained 198/44 baseline: **230 controller cases pass; all 52 browser cases pass**
+(the retained 44 in the full run, then all eight affected path cases after fixing
+an ambiguous fixture search). Coverage includes all three definition types,
+config/receipt mismatches, literal encoding, dot rejection, limits, tags/flags,
+root selection, preserved uncertainty, late replies, synchronous publication,
+dirty Back/focus, held Enter/IME and a long preview at 200% text. Twelve inspected
+public captures named `evidence/*-path-argument-*` cover dark/light definition,
+argument Form, Review, invalid and unknown states, plus pending and 200% layouts.
+Full typecheck, scoped ESLint, plan and diff checks pass on Linux x64 with
+Node24.22.1/Bun1.4.4. The fixtures observe requests with synthetic saved metadata;
+they do not perform native handoff, SQLite persistence or network operations.
+
+This provides partial L2-05 AC01 typed-input/encoding, UI and PRIVACY evidence;
+existing AC02 unsupported-template regressions remain covered. Coordinator-owned
+persistence/main/native production evidence is separate. Other named arguments,
+context snapshots, snippets, typed components/targets and saved-entry
+frecency/shortcuts remain required. Full L1/F3 prerequisites, supported desktop
+sessions, native assistive technology and release gates remain pending. This
+increment does not complete L2-05 or reduce the agreed 1.0 scope.
+
 ## Export one selected Quicklink
 
 The dedicated List provides **Export quicklink (unencrypted JSON)** with an
@@ -258,10 +301,10 @@ layout only; there is no second visual system or added window.
 
 Validation on Node 24.22.1/Bun 1.4.4:
 
-- `tests/presentation.test.ts`: 198 controller cases for strict records/receipts,
+- `tests/presentation.test.ts`: 230 controller cases for strict records/receipts,
   complete refresh, 500/100 bounds, validation/drafts, known/unknown outcomes,
   no replay, persistent gates, navigation/disposal and separate Hide failures.
-- `tests/quicklinks.ui.test.ts`: 44 real Chromium keyboard/axe cases, including
+- `tests/quicklinks.ui.test.ts`: 52 real Chromium keyboard/axe cases, including
   dirty cancel/focus, CRUD request observation, pending/late replies, explicit
   recovery, later identities, unavailable capabilities, typed definitions, local
   previews, exact argument/configuration receipts and held Enter. The 54 original

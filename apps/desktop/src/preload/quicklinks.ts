@@ -24,7 +24,7 @@ export function createQuicklinkApi(transport:Pick<ShellTransport,'invoke'>):Requ
   saveQuicklink:async request=>{
     try{const parsed=quicklinkSaveRequestSchema.parse({...request,protocolVersion:1}),value=await transport.invoke(QUICKLINK_CHANNELS.save,parsed);
       if(!withinLimit(value))return unavailable;const result=quicklinkRecordReplySchema.parse(value);
-      return !result.ok||(parsed.id===undefined||result.value.record.id===parsed.id)&&result.value.record.revision===parsed.expectedRevision+1&&result.value.record.name===parsed.name&&result.value.record.url===parsed.url&&JSON.stringify(result.value.record.webSearch)===JSON.stringify(parsed.webSearch)&&JSON.stringify(result.value.record.tags??[])===JSON.stringify(parsed.tags??[])&&(result.value.record.pinned??false)===(parsed.pinned??false)&&(result.value.record.hidden??false)===(parsed.hidden??false)?result:unavailable;
+      return !result.ok||(parsed.id===undefined||result.value.record.id===parsed.id)&&result.value.record.revision===parsed.expectedRevision+1&&result.value.record.name===parsed.name&&result.value.record.url===parsed.url&&JSON.stringify(result.value.record.webSearch)===JSON.stringify(parsed.webSearch)&&JSON.stringify(result.value.record.pathArgument)===JSON.stringify(parsed.pathArgument)&&JSON.stringify(result.value.record.tags??[])===JSON.stringify(parsed.tags??[])&&(result.value.record.pinned??false)===(parsed.pinned??false)&&(result.value.record.hidden??false)===(parsed.hidden??false)?result:unavailable;
     }catch{return unavailable;}
   },
   removeQuicklink:async request=>{
@@ -36,7 +36,7 @@ export function createQuicklinkApi(transport:Pick<ShellTransport,'invoke'>):Requ
   openQuicklink:async request=>{
     try{const parsed=quicklinkOpenRequestSchema.parse({...request,protocolVersion:1}),value=await transport.invoke(QUICKLINK_CHANNELS.open,parsed);
       if(!withinLimit(value))return unavailable;const result=quicklinkOpenReplySchema.parse(value);
-      return !result.ok||result.value.id===parsed.id&&result.value.revision===parsed.revision&&(parsed.query===undefined?result.value.webSearch===undefined:result.value.webSearch?.query===parsed.query)?result:unavailable;
+      return !result.ok||result.value.id===parsed.id&&result.value.revision===parsed.revision&&(parsed.query===undefined?result.value.webSearch===undefined&&result.value.pathArgument===undefined:result.value.webSearch?.query===parsed.query||result.value.pathArgument?.query===parsed.query)?result:unavailable;
     }catch{return unavailable;}
   },
 };}
