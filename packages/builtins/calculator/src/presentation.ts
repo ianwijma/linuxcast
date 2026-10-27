@@ -16,7 +16,7 @@ export class CalculatorFlow {
   #session:ViewSession;#api:Pick<LauncherApi,'copyCalculatorResult'>;#registryRevision:number;
   #formId:string;#resultId:string;#helpId:string;#colourHelpId:string;#helpOpen=false;#viewRevision=0;#opened=false;#resultOpen=false;#disposed=false;
   #expression='';#error:string|undefined;#formStatus:Status|undefined;#resultStatus:Status|undefined;#calculation:Success|null=null;
-  #pending:AbortController|null=null;
+  #pending:AbortController|null=null;#origin:{viewId:string;query:string;selection:string|null}|null=null;
   constructor({session,api,viewId,revision}:{session:ViewSession;api:Pick<LauncherApi,'copyCalculatorResult'>;viewId:string;revision:number}){
     this.#session=session;this.#api=api;this.#formId=`${viewId}-form`;this.#resultId=`${viewId}-result`;this.#helpId=`${viewId}-units`;this.#colourHelpId=`${viewId}-colours`;this.#registryRevision=revision;
   }
@@ -24,9 +24,15 @@ export class CalculatorFlow {
   owns(viewId:string){return viewId===this.#formId || viewId===this.#resultId || viewId===this.#helpId || viewId===this.#colourHelpId;}
   open(fromViewId:string){
     if(this.#disposed || this.#opened || this.#session.getSnapshot().frames.at(-1)?.view.viewId!==fromViewId)return;
+    const root=this.#session.getSnapshot().frames[0]!;this.#origin={viewId:root.view.viewId,query:root.query,selection:root.selection};
     this.#expression='';this.#error=undefined;this.#formStatus=undefined;this.#resultStatus=undefined;this.#calculation=null;
     this.#opened=this.#session.navigate({protocolVersion:1,kind:'push',fromViewId,view:this.#form()});
   }
+  openExpression(fromViewId:string,expression:string){
+    if(this.#disposed||this.#opened)return;this.open(fromViewId);if(this.#formCurrent())this.#evaluate(expression);
+  }
+  #originCurrent(){const root=this.#session.getSnapshot().frames[0];return !!this.#origin&&root?.view.viewId===this.#origin.viewId&&root.query===this.#origin.query&&root.selection===this.#origin.selection;}
+  #formCurrent(){return this.active&&this.#originCurrent()&&this.#session.getSnapshot().frames.at(-1)?.view.viewId===this.#formId;}
   #form():ViewModel{return {protocolVersion:1,viewId:this.#formId,revision:++this.#viewRevision,kind:'form',title:'Calculator',
     fields:[{id:'expression',kind:'text',title:'Expression',required:true,value:this.#expression,description:'Arithmetic or units: (2+3) km to m, 32 degF to degC, 1 MiB to B. Colours: #f80 to rgb, rgb(255 0 0 / 50%) to hex. Find Supported units and Supported colours in Actions. Nothing is copied automatically.',...(this.#error?{error:this.#error}:{})}],
     submitActionId:EVALUATE,cancelActionId:CANCEL,actions:[{id:EVALUATE,title:'Evaluate',kind:'invoke',effect:'read'},{id:CANCEL,title:'Cancel',kind:'invoke',effect:'read'},{id:UNITS,title:'Supported units',kind:'invoke',effect:'read'},{id:COLOURS,title:'Supported colours',kind:'invoke',effect:'read'}],...(this.#formStatus?{status:this.#formStatus}:{})};}
@@ -60,14 +66,7 @@ export class CalculatorFlow {
       if(intent.actionId!==EVALUATE || this.#pending)return;
       const values=intent.values,expression=values?.expression;
       if(!values || Object.keys(values).length!==1 || typeof expression!=='string')return;
-      this.#expression=expression;this.#formStatus=undefined;
-      if(!calculatorExpressionSchema.safeParse(expression).success){this.#error='Use a non-empty expression up to 512 UTF-8 bytes without control characters.';this.#publishForm();return;}
-      let result:Calculation;
-      try{result=evaluateExpression(expression);}catch{this.#error='This expression could not be evaluated. Check it and try again.';this.#publishForm();return;}
-      if(!result.ok){this.#error=result.code==='domain-error'?(/\bto\b/u.test(expression)?'This expression has no finite real result. Check divisions, function inputs and absolute temperatures: K ≥ 0, degC ≥ -273.15, degF ≥ -459.67.':'This expression has no finite real result. Check divisions and function inputs.'):result.code==='limit-exceeded'?'Reduce the expression length, number of operations or nesting depth.':result.code==='invalid-colour'?'Use supported hex, rgb or hsl input with valid ranges, followed by to hex, rgb or hsl. Open Supported colours in Actions for examples.':result.code==='unsupported-unit'?'Use a supported, case-sensitive unit symbol. Open Supported units in Actions for the list.':result.code==='incompatible-units'?'Choose source and target units from the same category. See Supported units in Actions.':'Enter a supported arithmetic expression.';this.#publishForm();return;}
-      try{formatCalculationText(result);}catch{this.#error='This expression could not be evaluated. Check it and try again.';this.#publishForm();return;}
-      this.#error=undefined;this.#calculation=result;this.#resultStatus=undefined;this.#publishForm();
-      this.#resultOpen=this.#session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#formId,view:this.#result()});return;
+      this.#evaluate(expression);return;
     }
     if(intent.values!==undefined || !this.#resultOpen || !this.#calculation)return;
     if(intent.actionId===EDIT){this.#session.pop();return;}
@@ -75,6 +74,7 @@ export class CalculatorFlow {
     const controller=new AbortController(),calculation=this.#calculation,expression=this.#expression;
     this.#pending=controller;this.#resultStatus={kind:'info',message:'Copying result…'};this.#publishResult();
     try{
+      if(!this.#current(controller,calculation))return;
       const reply=calculatorCopyReplySchema.parse(await bounded(this.#api.copyCalculatorResult({revision:this.#registryRevision,expression}),controller.signal));
       if(!this.#current(controller,calculation))return;
       if(!reply.ok){
@@ -83,19 +83,30 @@ export class CalculatorFlow {
       if(reply.value.text!==calculation.text || reply.value.unit!==calculation.unit || reply.value.colour!==calculation.colour)throw new Error('Unconfirmed copy.');
       this.#resultStatus={kind:'info',message:'Result copied.'};
     }catch{if(this.#current(controller,calculation))this.#resultStatus={kind:'error',message:UNKNOWN};}
-    finally{if(this.#pending===controller){this.#pending=null;if(this.active && this.#resultOpen && this.#session.getSnapshot().frames.at(-1)?.view.viewId===this.#resultId)this.#publishResult();}}
+    finally{if(this.#pending===controller){if(!this.#originCurrent())this.#resultStatus={kind:'error',message:UNKNOWN};this.#pending=null;if(this.active && this.#resultOpen && this.#session.getSnapshot().frames.at(-1)?.view.viewId===this.#resultId)this.#publishResult();}}
   }
-  #current(controller:AbortController,calculation:Success){return this.active && !controller.signal.aborted && this.#pending===controller && this.#calculation===calculation && this.#resultOpen && this.#session.getSnapshot().frames.at(-1)?.view.viewId===this.#resultId;}
+  #evaluate(expression:string){
+    if(!this.#formCurrent())return;
+    this.#expression=expression;this.#formStatus=undefined;
+    if(!calculatorExpressionSchema.safeParse(expression).success){this.#error='Use a non-empty expression up to 512 UTF-8 bytes without control characters.';this.#publishForm();return;}
+    let result:Calculation;
+    try{result=evaluateExpression(expression);}catch{this.#error='This expression could not be evaluated. Check it and try again.';this.#publishForm();return;}
+    if(!result.ok){this.#error=result.code==='domain-error'?(/\bto\b/u.test(expression)?'This expression has no finite real result. Check divisions, function inputs and absolute temperatures: K ≥ 0, degC ≥ -273.15, degF ≥ -459.67.':'This expression has no finite real result. Check divisions and function inputs.'):result.code==='limit-exceeded'?'Reduce the expression length, number of operations or nesting depth.':result.code==='invalid-colour'?'Use supported hex, rgb or hsl input with valid ranges, followed by to hex, rgb or hsl. Open Supported colours in Actions for examples.':result.code==='unsupported-unit'?'Use a supported, case-sensitive unit symbol. Open Supported units in Actions for the list.':result.code==='incompatible-units'?'Choose source and target units from the same category. See Supported units in Actions.':'Enter a supported arithmetic expression.';this.#publishForm();return;}
+    try{formatCalculationText(result);}catch{this.#error='This expression could not be evaluated. Check it and try again.';this.#publishForm();return;}
+    this.#error=undefined;this.#calculation=result;this.#resultStatus=undefined;this.#publishForm();
+    if(!this.#formCurrent())return;this.#resultOpen=this.#session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#formId,view:this.#result()});return;
+  }
+  #current(controller:AbortController,calculation:Success){return this.active && this.#originCurrent() && !controller.signal.aborted && this.#pending===controller && this.#calculation===calculation && this.#resultOpen && this.#session.getSnapshot().frames.at(-1)?.view.viewId===this.#resultId;}
   closed(viewId:string){
     if(!this.owns(viewId))return false;
     if(viewId===this.#helpId || viewId===this.#colourHelpId){this.#helpOpen=false;return true;}
     if(viewId===this.#resultId){
       if(this.#pending){this.#pending.abort();this.#pending=null;this.#formStatus={kind:'warning',message:LEFT_PENDING};}
       this.#resultOpen=false;this.#calculation=null;this.#resultStatus=undefined;this.#publishForm();
-    }else{this.#opened=false;this.#resultOpen=false;this.#helpOpen=false;this.#pending?.abort();this.#pending=null;this.#calculation=null;this.#expression='';}
+    }else{this.#opened=false;this.#resultOpen=false;this.#helpOpen=false;this.#pending?.abort();this.#pending=null;this.#calculation=null;this.#expression='';this.#origin=null;}
     return true;
   }
-  dispose(){this.#disposed=true;this.#opened=false;this.#resultOpen=false;this.#helpOpen=false;this.#pending?.abort();this.#pending=null;this.#calculation=null;this.#expression='';}
+  dispose(){this.#disposed=true;this.#opened=false;this.#resultOpen=false;this.#helpOpen=false;this.#pending?.abort();this.#pending=null;this.#calculation=null;this.#expression='';this.#origin=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{return new Promise((resolve,reject)=>{
   const finish=(fn:()=>void)=>{clearTimeout(timer);signal.removeEventListener('abort',abort);fn();};const abort=()=>finish(()=>reject(new Error('Cancelled.')));const timer=setTimeout(()=>finish(()=>reject(new Error('Deadline exceeded.'))),5000);signal.addEventListener('abort',abort,{once:true});if(signal.aborted){abort();return;}void promise.then(value=>finish(()=>resolve(value)),()=>finish(()=>reject(new Error('Request failed.'))));
