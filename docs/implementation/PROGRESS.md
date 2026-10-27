@@ -16,9 +16,9 @@ private Xvfb/profile only. No user display, --no-sandbox, or credential changes.
 
 ## Integrated base
 
-Primary clean developf79a345e3d81c2e42cb0b0466c3b2e8de579d7c5 (PR49).
-Exact signed reviewed head2f978eed30031d057cfe58c3ced4dce965472273, CI40424267110
-validatePASS11s; no requested GitHub reviews/submissions/comments/threads. Normal
+Primary clean developb72d364e4dfb12b7b63d56f2ff26a470d40a90e7 (PR50).
+Exact signed reviewed headfb09b4b23ad709c2340321c93dad173763782553, CI40425939433
+validatePASS12s; no requested GitHub reviews/submissions/comments/threads. Normal
 exact-head merge; primary frozen install and production build66assets pass.
 
 Recent merged application increments (full evidence in registry/cards/artifacts):
@@ -64,13 +64,24 @@ clean. Converted-kind Reload and reentrant successful-publication/newerReload
 findings fixed with meaningful regressions. No pending source finding.
 
 Evidence `apps/desktop/evidence/launcher-web-search-fallback-application.md`.
-Next publish focused PR, inspect exact-head CI/configured GitHub review/threads,
-normal merge, refresh primary frozen install/build, record merge and select next
-concrete documented application flow. No full task/native acceptance claimed.
+PR50 https://github.com/ianwijma/linuxcast/pull/50 mergedb72d364 as above. Clean
+primary frozen install/production build66assets pass. No pending review/CI/signing
+blocker; full task/native acceptance unclaimed.
+
+## Next bounded application flow: local calculator query result
+
+Root reused worktree, branch `codex/launcher-calculator-query` fromb72d364.
+CALCULATOR-QUERY-INCREMENT.md freezes existing local engine/launcher result→
+deliberate choice→separate Copy. No new IPC/API/grammar/migration/dependency/
+service/research/proof. Ordinary words/constants and existing command matches
+keep search behavior; no network or clipboard before explicit Copy. This is a
+freeze only; UI/actual tests not implemented/accepted yet. Root owns shared/
+registry/actual checks; bounded author owns existing launcher+calculator UI.
+Full dates/DST/rates/providers/nativeAT/release remain required.
 
 ## Agents
 
-All SOL6.1/high, bounded assignments complete; no new unbounded work assigned:
+All SOL6.1/high; no new unbounded work assigned:
 - manifest_review_sol: clean `.worktrees/linuxcast-l1-01`, branch
   `codex/l1-01-web-search-fallback-ui`; signedc715b6f integratedd22f1e6. Rootfreeze
   localb02b21b. No shared edits or new foundational/research/proof assignment.
