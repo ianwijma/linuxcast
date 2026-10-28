@@ -66,7 +66,7 @@ pre-release; no stable/audited claim. Full release SBOM/package audit stays open
   PASS. Independent source re-review closes P2, no further finding.
 - Independent UI/actual source review and all11component/sixactual date captures
   clean. UI patch bytes exactly match author staged tree; no source changes
-  after review. Normal signing recovered. Final GitHub CI/review/merge remain pending.
+  after review. Normal signing recovered. Exact signedheadb012c84 independently reconciled, CI40436099692 passed and PR52 merged7aa0d91 on27October2026; no requested GitHub reviews/comments/threads. Primary frozeninstall/productionbuild66assets pass.
 
 Design: DESIGN Shell/navigation, Results/actions, List/Form/Detail, states and
 accessibility; shared primitives/tokens, no feature CSS. Captures contain public

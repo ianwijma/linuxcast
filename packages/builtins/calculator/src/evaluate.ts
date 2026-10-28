@@ -12,6 +12,8 @@ const messages:Record<FailureCode,string>={
   'unsupported-unit':'Use a supported, unambiguous unit identifier.',
   'incompatible-units':'Choose units with the same dimension.',
   'invalid-colour':'Use a supported hex, RGB or HSL colour conversion within the component ranges.',
+  'invalid-duration':'Use a supported ISO duration with bounded components and seconds-only fractions.',
+  'invalid-duration-result':'The duration produces an invalid date or a missing or repeated local time. Choose another date/duration or use elapsed hours.',
   'invalid-date-time':'Use an explicit valid ISO date/time, matching offset and named zone.',
   'unsupported-time-zone':'Use UTC or a supported IANA area/location time zone.',
   'ambiguous-date-time':'This local time occurs twice. Add its matching UTC offset to choose one occurrence.',

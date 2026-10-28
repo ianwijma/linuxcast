@@ -310,12 +310,25 @@ exact-acknowledgement/help/error behavior and limits. Production clipboard and
 privacy integration remain coordinator-owned; full civil-duration/rates/provider,
 prerequisite/native desktop/AT/performance/release acceptance stays pending.
 
+## Calendar arithmetic through the existing calculator entry
+
+The unchanged local classifier/formatter accepts the supplied calendar/elapsed
+engine results. The new root fixture check verifies P1D and PT24H show distinct
+spring results and neither choice copies; Edit/Cancel returns the captured query.
+Two routing checks retain expression-only, separate exact dated Copy. Its public
+capture is `evidence/dark-root-calendar-arithmetic-query.png`; no launcher
+controller, API, ranking or persistence boundary changes. Calculator README
+records 158 focused units, 47 calculator browser cases, the root case and twelve
+inspected affected captures. This is partial AC02/UI/privacy evidence; production
+native readback remains coordinator-owned and complete rates/provider/prerequisite/
+native AT/session/performance/release acceptance remains pending.
+
 ## Evidence and limits
 
 - `packages/search/tests/search.test.ts`: bounded ranking/generation/URL and visibility matching tests.
 - `tests/controller.test.ts`: 125 registry/selection/action/failure tests, including alias draft, stale action, cancellation and acknowledgement behavior.
 - `tests/catalogue.test.ts`: atomic pagination and pin/alias/visibility integrity checks.
-- `tests/launcher.ui.test.ts`: 77 Chromium component cases (68 retained plus eight root-calculator and one date/time case) covering keyboard,
+- `tests/launcher.ui.test.ts`: 78 Chromium component cases (68 retained plus eight root-calculator, one date/time and one calendar-arithmetic case) covering keyboard,
   action-panel focus, disabled states, loading, filtered-empty, errors and axe.
 - `evidence/`: actual dark/light component screenshots plus affected states;
   viewed for layout. These use the three real command names and public synthetic applications with an explicitly
