@@ -1,5 +1,48 @@
 # Selected-folder metadata search — bounded L2-02 UI
 
+## Explicit Copy text from a confirmed preview
+
+A loaded readonly preview now offers secondary **Copy text** through shared
+Actions. **Back to results** remains primary and focused; typing, opening/loading,
+appearance, held Enter and navigation never copy. Confirmed empty text is
+copyable deliberately, with a visible explanation that it clears the clipboard.
+Copy sends only selected result/root/generation plus the issued preview ID to
+optional `copyPreviewText`; no renderer text/path/format is submitted or reread.
+Exact strict identity/token receipt is required before “Text copied.” appears.
+Missing token/API remains visibly disabled with recovery guidance. Stale/expired
+preview requires Back and a fresh explicit preview; clipboard denial supports
+manual Copy retry. Unknown/malformed/rejected/lost receipts say check clipboard
+before deliberate retry, never replay or claim cancellation undoes a write.
+
+Pending Copy leaves Back usable. Leaving/clearing/disposal invalidates late
+presentation, clears preview text/token and preserves possible-copy warning in
+Results where available. Disposal becomes inactive before any synchronous pop or
+publication, preventing reentrant Preview/Copy dispatch during teardown. A late
+receipt for an old token cannot mark a fresh preview copied. Content remains
+literal and transient; no copy history/index/cache/network or new source read.
+
+Author validation on Linux/headless Chromium, Node 24.22.1 / Bun 1.4.4:
+150 focused units (121 controller including 30 new Copy cases, 29 retained Copy path)
+and 57 Chromium keyboard/axe cases (47 File search including 10 new Copy cases,
+10 Copy path regressions) pass. Final disposal refinement has two direct
+synchronous-publication regressions; no additional UI/source/capture scope.
+Full typecheck/scoped ESLint/plan/diff checks pass. Run with explicit
+`LINUXCAST_TEST_FILES` test paths under existing Vitest/Playwright runner configs.
+Seven inspected public affected captures in `evidence/`: dark/light
+`preview-text-copied`; light `preview-empty-copied`, `preview-copy-unavailable`;
+dark `preview-copy-pending`, `preview-copy-unknown`, `preview-copy-denied`.
+Incidental old captures are preserved. DESIGN Shell/navigation, Results/actions,
+List/Grid/Detail/Form, States/motion, Accessibility and Review gate apply; no
+feature CSS or independent visual system.
+
+Fixtures observe synthetic requests without real clipboard writes or source
+reads. This is partial L2-03 AC01/AC02/UI/privacy presentation evidence;
+coordinator owns actual ephemeral-text/clipboard binding and private native
+application/source-preservation checks. Full tasks/prerequisites, native Open,
+other file/cardinality/buffer/preview actions and Debian GNOME/KDE Wayland/X11/AT/
+session/package/performance/release acceptance remain unfinished.
+
+
 ## Explicit readonly text preview (bounded L2-03/L2-02)
 
 Results offer secondary **Preview text** for one selected indexed file. It pushes
@@ -20,7 +63,8 @@ without replay; Back remains reachable while loading. Reentrant Back/Close/query
 selection during pending publication dispatches no read. Navigation/source changes
 or index removal clear the Text frame and retained content; disposal also removes
 it. Escape/Back restores exact Results query/selection/focus. No preview content is
-stored, indexed, cached, logged, added to history, copied or opened externally.
+stored, indexed, cached, logged, added to history or opened externally. Only the
+separate explicit Copy text action can write the clipboard.
 
 Author validation on Linux/headless Chromium with Node 24.22.1 / Bun 1.4.4:
 120 focused units (91 File search controller including 36 new preview cases and 29

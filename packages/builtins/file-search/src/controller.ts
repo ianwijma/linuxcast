@@ -1,15 +1,15 @@
 import { IndexedPathCopy,COPY_INDEXED_PATH } from '@linuxcast/universal-actions';
 import type { IndexedPathContext } from '@linuxcast/universal-actions';
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
-import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewReplySchema } from '@linuxcast/contracts';
+import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewReplySchema,indexedTextCopyReplySchema } from '@linuxcast/contracts';
 import type { ActionModel,FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult,FileSearchOptions,ViewModel } from '@linuxcast/contracts';
 import { defaultOptionsKey,optionsDraft,optionsSummary,parseOptionsDraft,parseUtcDate } from './options.ts';
 import type { OptionsDraft,OptionsErrors } from './options.ts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
-const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options',BROWSE='files:browse',BROWSE_ROOT='files:browse-root',PARENT='files:parent',RETURN='files:return-scope',PREVIEW='files:preview-text',RETRY_PREVIEW='files:retry-preview',BACK_PREVIEW='files:back-preview';
+const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options',BROWSE='files:browse',BROWSE_ROOT='files:browse-root',PARENT='files:parent',RETURN='files:return-scope',PREVIEW='files:preview-text',RETRY_PREVIEW='files:retry-preview',BACK_PREVIEW='files:back-preview',COPY_PREVIEW='files:copy-preview-text';
 type Status={kind:'info'|'warning'|'error';message:string};
-type TextPreview={viewId:string;fromViewId:string;row:FileSearchResult;rootPath:string;query:string;optionsKey:string;directory:string|undefined;text:string;loading:boolean;status:Status;controller:AbortController|null};
+type TextPreview={viewId:string;fromViewId:string;row:FileSearchResult;rootPath:string;query:string;optionsKey:string;directory:string|undefined;text:string;loading:boolean;status:Status;controller:AbortController|null;previewId:string|null;loaded:boolean;copyController:AbortController|null;copyStatus:Status|undefined;copyBlocked:boolean};
 type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;options?:FileSearchOptions;directory?:string;origin?:{rootId:string|null;query:string;selection:string|null};status?:Status;retainSelection?:string};
 const action=(id:string,title:string,effect:ActionModel['effect']='read',disabledReason?:string):ActionModel=>({id,title,kind:'invoke',effect,...(disabledReason?{disabledReason}:{})});
 /** Presentation only: paths are display metadata, never file-open authority.
@@ -124,12 +124,20 @@ export class FileSearchController {
     if(row.kind!=='file'||!/[.](txt|text|md|csv|json|log)$/iu.test(row.path)||row.size>65536)return 'Preview supports non-executable UTF-8 .txt, .text, .md, .csv, .json or .log files up to 64 KiB. Select a supported file.';
     return this.#results?.loading?'Wait for the current search results.':undefined;
   }
-  #previewView():ViewModel{const preview=this.#preview!;return {protocolVersion:1,viewId:preview.viewId,revision:++this.#revision,kind:'text',title:`Text preview · ${preview.row.path.split('/').at(-1)!}`,text:preview.text,editable:false,loading:preview.loading,status:preview.status,actions:[action(BACK_PREVIEW,'Back to results'),...(preview.status.kind==='error'?[action(RETRY_PREVIEW,'Retry preview','read',this.#previewReason(preview.row))]:[])]};}
+  #previewCopyReason(preview:TextPreview):string|undefined{
+    if(preview.copyController)return 'Wait for the current Copy text request.';
+    if(!preview.loaded||preview.loading)return 'Wait for a confirmed text preview.';
+    if(preview.copyBlocked)return 'Return to Results and choose Preview text again to refresh the expired or changed preview.';
+    if(!preview.previewId)return 'Copy text needs a current preview token. Return to Results and choose Preview text again, or reopen Linuxcast to reconnect.';
+    if(typeof this.#api.copyPreviewText!=='function')return 'Preview text copying is unavailable. Reopen Linuxcast to reconnect.';
+    return undefined;
+  }
+  #previewView():ViewModel{const preview=this.#preview!,reason=this.#previewCopyReason(preview);return {protocolVersion:1,viewId:preview.viewId,revision:++this.#revision,kind:'text',title:`Text preview · ${preview.row.path.split('/').at(-1)!}`,text:preview.text,editable:false,loading:preview.loading||!!preview.copyController,status:preview.copyStatus??preview.status,actions:[action(BACK_PREVIEW,'Back to results'),...(preview.loaded?[action(COPY_PREVIEW,'Copy text','write',reason)]:[]),...(!preview.loaded&&preview.status.kind==='error'?[action(RETRY_PREVIEW,'Retry preview','read',this.#previewReason(preview.row))]:[])]};}
   #currentPreview(preview:TextPreview){const top=this.session.getSnapshot().frames.at(-1),results=this.#results,frame=this.session.getSnapshot().frames.find(value=>value.view.viewId===preview.fromViewId),row=results?.rows.find(value=>value.id===preview.row.id),root=this.#root(preview.row.rootId);return this.#active&&!this.#disposed&&this.#preview===preview&&top?.view.viewId===preview.viewId&&!this.#loading&&!this.#busy&&!results?.loading&&results?.viewId===preview.fromViewId&&frame?.query===preview.query&&results.query===preview.query&&frame.selection===preview.row.id&&fileSearchOptionsKey(results.options)===preview.optionsKey&&results.directory===preview.directory&&row?.generation===preview.row.generation&&row.kind==='file'&&row.path===preview.row.path&&row.size===preview.row.size&&row.modifiedMs===preview.row.modifiedMs&&root?.generation===preview.row.generation&&root.displayPath===preview.rootPath&&root.state!=='unavailable'&&root.activity!=='unavailable';}
-  #discardPreview(){const preview=this.#preview;if(!preview)return;this.#preview=null;preview.controller?.abort();preview.controller=null;preview.text='';if(this.session.getSnapshot().frames.at(-1)?.view.viewId===preview.viewId)this.session.pop();this.#publish();}
+  #discardPreview(){const preview=this.#preview;if(!preview)return;this.#preview=null;if(preview.copyController){this.#copyWarning={kind:'warning',message:'Copy may have occurred. Check your clipboard before copying again.'};preview.copyController.abort();preview.copyController=null;}preview.controller?.abort();preview.controller=null;preview.text='';preview.previewId=null;preview.loaded=false;if(this.session.getSnapshot().frames.at(-1)?.view.viewId===preview.viewId)this.session.pop();this.#publish();}
   async #readPreview(preview:TextPreview){
     if(!this.#currentPreview(preview)||preview.controller||this.#previewReason(preview.row))return;
-    const controller=new AbortController();preview.controller=controller;preview.loading=true;preview.text='';preview.status={kind:'info',message:'Loading text preview…'};this.#publish();
+    const controller=new AbortController();preview.controller=controller;preview.loading=true;preview.text='';preview.previewId=null;preview.loaded=false;preview.copyStatus=undefined;preview.copyBlocked=false;preview.status={kind:'info',message:'Loading text preview…'};this.#publish();
     try{
       if(!this.#currentPreview(preview)||controller.signal.aborted)return;
       const selection={resultId:preview.row.id,rootId:preview.row.rootId,generation:preview.row.generation};
@@ -137,14 +145,27 @@ export class FileSearchController {
       if(!this.#currentPreview(preview)||controller.signal.aborted||preview.controller!==controller)return;
       if(!reply.ok){preview.status={kind:'error',message:['invalid-request','conflict','capability-unavailable','permission-denied','cancelled'].includes(reply.error.code)?'Text preview was not read. Return to Results, refresh folders and check file access, UTF-8 format and the 64 KiB limit; retry only explicitly.':'Text preview could not be confirmed. Choose Retry preview explicitly or return to Results.'};return;}
       if(reply.value.resultId!==selection.resultId||reply.value.rootId!==selection.rootId||reply.value.generation!==selection.generation)throw new Error('Unconfirmed preview.');
-      preview.text=reply.value.text;preview.status={kind:'info',message:preview.text?'Read-only text preview. Content is not saved, indexed or added to history.':'This text file is empty. Content is not saved, indexed or added to history.'};
+      preview.text=reply.value.text;preview.previewId=reply.value.previewId??null;preview.loaded=true;preview.status={kind:'info',message:preview.text?'Read-only text preview. Content is not saved, indexed or added to history.':'This text file is empty. Copying empty text deliberately clears the clipboard. Content is not saved, indexed or added to history.'};
     }catch{if(this.#currentPreview(preview)&&!controller.signal.aborted)preview.status={kind:'error',message:'Text preview could not be confirmed. Choose Retry preview explicitly or return to Results.'};}
     finally{if(this.#currentPreview(preview)&&preview.controller===controller){preview.controller=null;preview.loading=false;this.#publish();}}
+  }
+  async #copyPreview(preview:TextPreview){
+    if(!this.#currentPreview(preview)||this.#previewCopyReason(preview))return;
+    const previewId=preview.previewId!,selection={resultId:preview.row.id,rootId:preview.row.rootId,generation:preview.row.generation,previewId},controller=new AbortController();preview.copyController=controller;preview.copyStatus={kind:'info',message:'Copying text…'};this.#copyWarning=undefined;this.#publish();
+    const current=()=>this.#currentPreview(preview)&&!controller.signal.aborted&&preview.copyController===controller&&preview.previewId===previewId;
+    try{
+      if(!current())return;
+      const reply=indexedTextCopyReplySchema.parse(await bounded(this.#api.copyPreviewText!(selection),controller.signal));if(!current())return;
+      if(!reply.ok){if(['conflict','invalid-request'].includes(reply.error.code)){preview.copyBlocked=true;preview.copyStatus={kind:'error',message:'Text was not copied. Return to Results and choose Preview text again to refresh the expired or changed preview.'};}else preview.copyStatus={kind:'error',message:['capability-unavailable','permission-denied','cancelled'].includes(reply.error.code)?'Text was not copied. Check clipboard access, then choose Copy text again explicitly.':'The copy outcome is unknown. Check your clipboard before choosing Copy text again.'};return;}
+      if(reply.value.resultId!==selection.resultId||reply.value.rootId!==selection.rootId||reply.value.generation!==selection.generation||reply.value.previewId!==previewId)throw new Error('Unconfirmed text copy.');
+      preview.copyStatus={kind:'info',message:'Text copied.'};
+    }catch{if(current())preview.copyStatus={kind:'error',message:'The copy outcome is unknown. Check your clipboard before choosing Copy text again.'};}
+    finally{if(current()){preview.copyController=null;this.#publish();}}
   }
   async #openPreview(row:FileSearchResult,fromViewId:string){
     if(this.#previewReason(row)||this.#preview||!this.#results)return;const results=this.#results;
     this.#invalidateCopy();const frame=this.session.getSnapshot().frames.at(-1);if(!this.#active||this.#results!==results||frame?.view.viewId!==fromViewId||frame.selection!==row.id)return;
-    const preview:TextPreview={viewId:`file-search-preview-${++this.#sequence}`,fromViewId,row:{...row},rootPath:this.#root(row.rootId)!.displayPath,query:results.query,optionsKey:fileSearchOptionsKey(results.options),directory:results.directory,text:'',loading:false,status:{kind:'info',message:'Preparing read-only text preview…'},controller:null};this.#preview=preview;
+    const preview:TextPreview={viewId:`file-search-preview-${++this.#sequence}`,fromViewId,row:{...row},rootPath:this.#root(row.rootId)!.displayPath,query:results.query,optionsKey:fileSearchOptionsKey(results.options),directory:results.directory,text:'',loading:false,status:{kind:'info',message:'Preparing read-only text preview…'},controller:null,previewId:null,loaded:false,copyController:null,copyStatus:undefined,copyBlocked:false};this.#preview=preview;
     if(!this.session.navigate({protocolVersion:1,kind:'push',fromViewId,view:this.#previewView()})){this.#discardPreview();return;}await this.#readPreview(preview);
   }
   #publish(){if(!this.#active)return;this.session.update(FOLDERS,{protocolVersion:1,kind:'snapshot',view:this.#foldersView()});if(!this.#active)return;const results=this.#results;if(results){
@@ -219,7 +240,7 @@ export class FileSearchController {
   async execute(intent:ActionIntent){
     const top=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || !top || top.view.viewId!==intent.viewId || top.view.revision!==intent.revision || this.#busy || this.#loading)return;
-    if(this.#preview){if(top.view.viewId!==this.#preview.viewId||intent.itemId!==undefined||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId'].includes(key)))return;if(intent.actionId===BACK_PREVIEW){this.session.pop();return;}if(intent.actionId===RETRY_PREVIEW&&this.#preview.status.kind==='error')await this.#readPreview(this.#preview);return;}
+    if(this.#preview){if(top.view.viewId!==this.#preview.viewId||intent.itemId!==undefined||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId'].includes(key)))return;if(intent.actionId===BACK_PREVIEW){this.session.pop();return;}if(intent.actionId===COPY_PREVIEW){await this.#copyPreview(this.#preview);return;}if(intent.actionId===RETRY_PREVIEW&&!this.#preview.loaded&&this.#preview.status.kind==='error')await this.#readPreview(this.#preview);return;}
     if(this.#filters){
       if(top.view.viewId!==this.#filters.viewId||intent.itemId!==undefined||top.selection!==null||Object.keys(intent).some(key=>!['viewId','revision','actionId','values'].includes(key)))return;
       if(intent.actionId===CANCEL&&intent.values===undefined){this.session.pop();return;}
@@ -285,7 +306,7 @@ export class FileSearchController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:'File search could not close. Try again.'};this.#publish();}}
     finally{if(this.#closing===controller)this.#closing=null;}
   }
-  dispose(){this.#previewSubscription();this.#active=false;if(this.#preview){const viewId=this.#preview.viewId;this.#preview.controller?.abort();this.#preview.text='';this.#preview=null;if(this.session.getSnapshot().frames.at(-1)?.view.viewId===viewId)this.session.pop();}this.#pathCopy.dispose();this.#active=false;this.#disposed=true;this.#unsubscribe?.();this.#unsubscribe=null;this.#cancelSearch();this.#load?.abort();this.#mutation?.abort();this.#closing?.abort();}
+  dispose(){this.#active=false;this.#disposed=true;this.#previewSubscription();this.#discardPreview();if(this.#copyWarning&&this.#results){const frame=this.session.getSnapshot().frames.find(value=>value.view.viewId===this.#results?.viewId);if(frame)this.session.update(frame.view.viewId,{protocolVersion:1,kind:'snapshot',view:{...frame.view,revision:++this.#revision,status:this.#copyWarning}});}this.#pathCopy.dispose();this.#unsubscribe?.();this.#unsubscribe=null;this.#cancelSearch();this.#load?.abort();this.#mutation?.abort();this.#closing?.abort();}
 }
 function rootActivity(root:FileSearchRoot){const state={idle:'Not indexed',scanning:'Scanning',ready:'Ready',degraded:'Limited',unavailable:'Unavailable'}[root.state];return state+' · '+(root.activity==='paused'?'Paused · index may be outdated':root.activity==='indexing'?'Indexing':root.activity==='watching'?(root.state==='degraded'?'Watching · some paths unavailable':'Watching'): 'Unavailable · check folder access');}
 function bounded<T>(promise:Promise<T>,signal:AbortSignal,timeout:number|null=5000):Promise<T>{return new Promise((resolve,reject)=>{
