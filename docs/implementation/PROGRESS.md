@@ -1,6 +1,6 @@
 # Coordinator checkpoint
 
-Updated 27 October 2026. Goal ACTIVE and unfinished: complete all 97 agreed local
+Updated 29 October 2026. Goal unfinished; application work resumed: complete all 97 agreed local
 1.0 tasks through R1-03 and all documented release gates. Objective attachment:
 `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
 
@@ -16,10 +16,11 @@ private Xvfb/profile only. No user display, --no-sandbox, or credential changes.
 
 ## Integrated base
 
-Primary clean develop4612ec061ad800e2616e55a296f32b973248f62d (PR51).
-Exact signed reviewed head3ed6d8521a8b8904a2417f16bb208cd70bcf1502, CI40427595390
-validatePASS11s; no requested GitHub reviews/submissions/comments/threads. Normal
-exact-head merge; primary frozen install and production build66assets pass.
+Primary clean develop7aa0d91c8a8c9624c9689fc5101a7f9e0af5fdf6 (PR52).
+Exact signed independently reconciledheadb012c84d94f9845f615b41096fc938d67781615c,
+CI40436099692 validatePASS14s; no requested GitHub reviews/comments/threads.
+Normal exactheadmerge27October2026; frozeninstall/build66assets pass.
+Remote rechecked29October: unchangeddevelop, no openPRs.
 
 Recent merged application increments (full evidence in registry/cards/artifacts):
 - PR49 https://github.com/ianwijma/linuxcast/pull/49: saved path argument,
@@ -123,31 +124,41 @@ Incidental oldtrackedcapture churn restored only. Exactactualtestsource clean.
 Evidence `apps/desktop/evidence/calculator-datetime-application.md`.
 Registry/card partialevidence appended; plan/statuspass, AC02/UI remainpending.
 
-## Publication and next action
+## Current required application increment: calendar/elapsed arithmetic
 
-User unlock recovered unchanged normal1Password signing. Historicaloffset fix
-signed2c08f6e40a8dba158a62b6f57d6b747c5684126b; exact reviewedUI20filehashes
-reconciled. No source changes since passing actual/mappedchecks/reviews. Prior
-terminal signingerrors are resolved. ReviewedUI/actual/evidence/registry are
-being signed/published as one small applicationincrement, no unsigned bypass.
-Prepared focused PR body `/tmp/linuxcast-zoned-datetime-pr-body.md`.
+Root `.worktrees/linuxcast-application-controls`, branch
+`codex/calculator-calendar-arithmetic` frommergedPR52/7aa0d91. DATE-DURATIONS.md
+freezes bounded oneISOduration +/-, calendarY/M/W/D first with overflowreject and
+no implicit missing/repeated calendarresult, then exactelapsedH/M/S/fractions.
+Existing zonedresult/receipt/request unchanged. Two fixed localfailurecodes.
+No new IPC/dependency/migration/process/research/proof. Fullscope unchanged.
 
-Push focusedPR, attach; inspect exacthead configuredreviews/threads/CI, normalmerge,
-refresh primary frozeninstall/productionbuild. Then select next REQUIRED concrete
-application flow automatically (civil-duration/calendar arithmetic/rates remain),
-freeze bounded interfaces and redirect manifest_review_sol only into application
-UI work. No taskchoice question, no infrastructure/research/proof expansion.
+Root core125datefixtures+66maincopychecks=191focusedPASS, fulltype/scopedlint/diff
+PASS after adding newcodes to evaluator's closedmessage table. Existing50date
+cases retained. Newcases fixedspring/fallday-vs24h, subtraction, LordHowe30min,
+foldsourceidentity/elapsedfold, mixedfields/months/leap/nanosecond/large/refusal/
+limits; mainrecomputes exactoutput, errors noCopy/use. UI/actualproduction notyet
+implemented/accepted. Core signing/freeze next; reviewfile_search assigned.
+
+PR52 integratedsource/evidence complete as above; historicalP2closed at2c08f6e.
+Prior signererrors resolved after userunlock; normal signing unchanged. No live
+signing oractualtest sessions. Corechecksession57503 completed, no reruns needed.
+Next signedcore→author UI→reviewed integration→actualnativecopy→focusedPR/CI/merge.
 
 ## Agents
 
-All GPT-6.1 SOL/high, bounded assignments finished, no new work assigned:
-- manifest_review_sol: `.worktrees/linuxcast-l1-01`, branch
-  `codex/l2-04-zoned-datetime-ui`, exactstagedpatch above based oncore76d4121.
- 136units/39calculator+1rootbrowser/type/lint/plan/diff pass. No live sessions.
-- alias_review_sol: UI/source/11component/sixactualcaptures and actualtest
-  independentclean, stablepatch+actualdelta. No findings; commitreconciliation
-  pending signing only. No reruns requested.
-- file_search_service_sol: core historicalP2 fixed/rechecked, no furtherfinding.
+All GPT-6.1 SOL/high, reuse existingagents only:
+- manifest_review_sol: bounded L2-04/L1-01 calendar/elapsedUI assignment sent;
+  `.worktrees/linuxcast-l1-01`, newbranch`codex/l2-04-calendar-arithmetic-ui`
+  from7aa0d91 after verifying/preserving then removing ONLY already-integrated
+ 20fileoldstagedpatch. Own calculatorpresentation/fixtures/tests/README/evidence
+ +necessaryexistinglaunchertests/fixtures/README/evidence only; no sharedfiles.
+  Existing Form/rootResult/Detail/Supporteddatehelp/Edit/separateCopy, relevant
+  recovery/keyboard/200%/axe/darklight. Root tosend signedcoreSHA; noinfra/proof.
+- file_search_service_sol: independent bounded arithmeticcore source review
+  assigned, no edits/research/broadreruns. Fullacceptance/nativeUI unclaimed.
+- alias_review_sol: PR52 exactsignedtree+20hashes/actualsource/17captures clean;
+  idle pending newUI source/capture review when authorready.
 
 ## Acceptance and runtime
 

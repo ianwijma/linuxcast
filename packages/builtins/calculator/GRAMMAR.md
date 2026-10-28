@@ -1,14 +1,17 @@
-# Local arithmetic, unit and colour evaluator — bounded L2-04 increments
+# Local calculator evaluator — bounded L2-04 increments
 
 `evaluateExpression(input: string): Calculation` is a pure, synchronous local
 function shared by trusted main and the presentation layer. It returns either
 `{ok: true, value: number, text: string, unit?: CalculatorUnit}`, a disjoint colour
-success `{ok: true, kind: 'colour', colour: 'hex'|'rgb'|'hsl', text: string}`, or a
+success `{ok: true, kind: 'colour', colour: 'hex'|'rgb'|'hsl', text: string}`,
+a zoned date/time success described in DATE-TIMES.md/DATE-DURATIONS.md, or a
 fixed failure with code `invalid-expression`, `limit-exceeded`, `domain-error`,
 `unsupported-unit`, `incompatible-units`, or `invalid-colour`. Invalid runtime types
 are rejected without coercion. No expression or result is persisted, transmitted,
 or interpreted as JavaScript. The arithmetic parser imports only its fixed local
-unit and colour implementations at runtime. There are no external runtime dependencies, I/O,
+unit/colour implementations and the pinned Temporal date helper at runtime.
+The zoned date/time helper uses @js-temporal/polyfill0.5.1 with jsbi4.3.2 and local
+ICU. It does not patch globals or use ambient time. There is no I/O,
 network requests, clock reads, randomness, or user-selected property access.
 
 ## Syntax
@@ -245,10 +248,10 @@ no desktop behavior is established by them.
 
 The unit/colour increments provide partial `L2-04-AC02` evidence for fixed fixtures
 and preserves the reviewed `L2-04-AC01`/`L2-04-PRIVACY` parser boundaries (no
-execution/transmission, synthetic fixtures, fixed diagnostics). Colour UI/copy
-integration and full acceptance remain coordinator-owned. Calendar dates,
-durations with civil/timezone/DST semantics and explicit opt-in
-currency/crypto rate adapters with timestamped stale/offline states remain
-unimplemented here. `L2-04-AC02`, UI acceptance, and
+execution/transmission, synthetic fixtures, fixed diagnostics). Date conversion and bounded calendar/elapsed arithmetic use the same strict
+source/target zones and exclusive date result; see DATE-TIMES.md and
+DATE-DURATIONS.md. Full UI/copy integration and acceptance remain coordinator-owned.
+Explicit opt-in currency/crypto rate adapters with timestamped stale/offline states
+remain required. `L2-04-AC02`, UI acceptance, and
 full Debian 13 GNOME/KDE Wayland/X11/native acceptance remain pending. This slice
 does not mark L2-04 complete or reduce its agreed scope.
