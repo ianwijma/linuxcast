@@ -1,10 +1,57 @@
 # Selected-folder metadata search — bounded L2-02 UI
 
+## Explicit readonly text preview (bounded L2-03/L2-02)
+
+Results offer secondary **Preview text** for one selected indexed file. It pushes
+an existing shared readonly Text view at depth 3; Details/Browse/Copy remain the
+existing primary actions. Details explains how to return to Results for preview.
+Only explicit selection/retry sends `{resultId,rootId,generation}` to optional
+`previewText`; no path, URI, handler, options or content authority is submitted.
+There is no read on typing, selection, Details, appearance changes or reopening.
+Supported non-executable UTF-8 .txt/.text/.md/.csv/.json/.log files are bounded to
+64 KiB; main/native owns actual source admission and read validation. All content
+is literal text, including Markdown/HTML-looking input; no links/scripts/images
+are parsed or fetched. Empty text is labelled as an empty file.
+
+Strict reply schema, exact selection identity and original Results query,
+selection/options/directory/root/path/index generation fence publication. The
+five-second presentation deadline exposes fixed safe failure and manual Retry
+without replay; Back remains reachable while loading. Reentrant Back/Close/query/
+selection during pending publication dispatches no read. Navigation/source changes
+or index removal clear the Text frame and retained content; disposal also removes
+it. Escape/Back restores exact Results query/selection/focus. No preview content is
+stored, indexed, cached, logged, added to history, copied or opened externally.
+
+Author validation on Linux/headless Chromium with Node 24.22.1 / Bun 1.4.4:
+120 focused units (91 File search controller including 36 new preview cases and 29
+Copy regressions), 47 Chromium keyboard/axe cases (37 File search including 12 new
+preview cases and 10 Copy regressions), full typecheck/scoped ESLint/plan/diff pass.
+Checks use explicit `LINUXCAST_TEST_FILES` paths under the existing Vitest and
+Playwright runner configs. Eight inspected affected captures in `evidence/`:
+dark/light `text-preview-literal`; light `text-preview-empty`,
+`text-preview-unavailable`, `text-preview-200-percent`; dark `text-preview-loading`,
+`text-preview-error`, `text-preview-invalid`. Old incidental captures are preserved.
+Applicable DESIGN sections: Shell/navigation, Results/actions, List/Grid/Detail/
+Form, States/motion, Accessibility and Review gate; only shared primitives/tokens.
+Independent SOL/high source/capture review found no actionable issue.
+
+Fixtures supply labelled public synthetic text/metadata and observe requests;
+they never read source files. Partial L2-03 AC01/AC02/UI/privacy and L2-02 AC02/UI
+presentation evidence only. Coordinator owns native source preservation/security
+and actual application integration. Native Open remains unavailable/unmerged;
+this increment does not carry that code or substitute a pathname fallback.
+Full content extraction/opt-in/MIME/recents, multi-file/buffer/open-with/reveal/
+mutation/conflict/terminal/media previews/large text, prerequisites and Debian
+GNOME/KDE Wayland/X11/native AT/session/package/performance/release gates remain
+required. Neither task is complete from these component checks.
+
+
 `FileSearch({api})` renders the dedicated window through the existing shared
 `ViewSession`, `ViewRenderer` and `ThemeProvider`. The main/preload and resident
 index service own native folder selection, jobs, SQLite and lifecycle. The UI
-receives display metadata, uses named `FileSearchApi` methods and never obtains
-file-read, file-open, arbitrary path or repository authority.
+receives indexed display metadata and explicitly requested bounded literal text,
+uses named `FileSearchApi` methods and never obtains arbitrary path, repository
+or generic file-read/open authority.
 
 The Folders overview shows actual root state, indexing/watching/paused activity
 and available progress counts. **Choose folder** remains a global action and is

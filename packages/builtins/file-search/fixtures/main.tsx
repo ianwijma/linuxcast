@@ -12,6 +12,7 @@ const root:FileSearchRoot={id:rootId,name:'Public documents',displayPath:'/publi
 function Fixture(){
   const [requested,setRequested]=useState('No request observed.');
   const [copyObserved,setCopyObserved]=useState('No clipboard request observed.');
+  const [previewObserved,setPreviewObserved]=useState('No text preview request observed.');
   const [connection]=useState(()=>{
     const state:FileSearchState={revision:1,appearance:params.get('theme')==='light'?'light':'dark',roots:mode==='empty'?[]:[{...structuredClone(root),...(mode==='unavailable'?{state:'unavailable',activity:'unavailable'}:{})}]};
     const listeners=new Set<(value:FileSearchState)=>void>();
@@ -44,10 +45,11 @@ function Fixture(){
         return {ok:true,value:{query:request.query,rootId:request.rootId??null,...(request.options?{options:request.options}:{}),...(request.directory!==undefined?{directory:request.directory}:{}),results:available?matches.slice(0,100):[]}};
       },
       copyPath:async selection=>{setCopyObserved(`Requested Copy path for ${selection.resultId}.`);if(mode==='copy-pending'||mode==='navigation-copy-pending')await new Promise(resolve=>setTimeout(resolve,700));return {ok:true,value:{...selection,outcome:'copied',path:root.displayPath+'/'+selection.resultId.slice(rootId.length+1)}};},
+      ...(mode==='missing-preview'?{}:{previewText:async (selection:Parameters<NonNullable<FileSearchApi['previewText']>>[0])=>{setPreviewObserved(value=>`${value==='No text preview request observed.'?'':value+'\n'}Requested Preview text for ${selection.resultId}.`);if(mode==='preview-pending')await new Promise(resolve=>setTimeout(resolve,900));if(mode==='preview-error')return {ok:false as const,error:{code:'permission-denied' as const,message:'synthetic private diagnostic',retryable:false}};if(mode==='preview-unknown')throw new Error('synthetic private diagnostic');return {ok:true as const,value:{...selection,outcome:'previewed' as const,...(mode==='preview-mismatch'?{resultId:'wrong'}:{}),text:mode==='preview-empty'?'':mode==='preview-oversized'?'x'.repeat(65537):'# Literal heading\n<script>window.previewAttack=true</script>\n[Not a link](https://example.invalid)\nPlain UTF-8 · 世界\nColumn A\tColumn B'}};}}),
       close:async()=>{setRequested('Requested Close file search.');return {ok:true,value:{outcome:'completed'}};},
     };
     return {api,clear:()=>{for(const value of state.roots){value.activity='paused';value.state='idle';value.generation=null;value.progress=null;}publish();}};
   });
-  return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><div className="file-search-fixture"><FileSearch api={connection.api}/><aside aria-label="Fixture observations"><output aria-live="polite">{requested}</output><p role="status" aria-label="Clipboard request observations">{copyObserved}</p><p className="lc-muted">Component fixture · public metadata only; requests are observed, not performed.</p><Button onClick={connection.clear}>Simulate index clear</Button></aside></div></ThemeProvider>;
+  return <ThemeProvider appearance={params.get('theme')==='light'?'light':'dark'}><div className="file-search-fixture"><FileSearch api={connection.api}/><aside aria-label="Fixture observations"><output aria-live="polite">{requested}</output><p role="status" aria-label="Clipboard request observations">{copyObserved}</p><p role="status" aria-label="Text preview request observations">{previewObserved}</p><p className="lc-muted">Component fixture · public synthetic metadata/text only; requests are observed, not performed. No source files are read.</p><Button onClick={connection.clear}>Simulate index clear</Button></aside></div></ThemeProvider>;
 }
 createRoot(document.getElementById('root')!).render(<Fixture/>);
