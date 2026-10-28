@@ -92,7 +92,7 @@ SQLite3.53.4/Rust1.95/GIO2.72.4. Git/network/signing/privateapp/owner sockets an
 ownedfixturechildprocess tests need escalation; default EPERM is sandbox, not
 backend regression. Serialize application tests sharingdist. No running signprompt.
 
-## Current follow-on Copy text increment (unmerged)
+## Integrated follow-on Copy text increment (PR56)
 
 Root codex/indexed-preview-copy from26c54818, freeze0b1b55c, main/preload
 4e2588a, actualscenario+mocktypefix221b3d8. NamedcopyPreviewText accepts only
@@ -120,6 +120,29 @@ sourcecopiesdisplayedsnapshot/no reread, clear+savedtokenrefusal, emptyCopy
 clearsactualElectron45read/type andX11TARGETS, sourcespreserved, retainedfile
 flow/Quit. Initialharness ambiguousresult/emptySTRING/removedformatAPI assumptions
 corrected; finalno unresolvedfailure. Fiveactualpubliccaptures inspected, unrelated
-DetailsPNGchurn restored. Finalactualtest/captures/evidencereview and signedhead/
-push/PR/CI/normalmerge next. Evidence indexed-preview-copy-application.md.
+DetailsPNGchurn restored. Finalactualtest/captures/evidencereview clean at signedhead
+d6f563bc971f892a4f37e4a2ed073d3f2e58a9fa. PR56 normally merged
+dc4f47e1714780349213c81ee7953be735a96c7e; CI40729166196 success, no requested
+reviews/submissions/comments/unresolvedthreads. Primary clean develop refreshed,
+frozeninstall unchanged/build66assetsPASS. Evidence indexed-preview-copy-application.md.
 No fulltask/nativeOpen/supporteddesktop/AT/performance/package/release claim.
+
+## Next selected bounded application work
+
+Root .worktrees/linuxcast-application-controls now NEWcodex/notes-create-edit
+frommergedPR56/developdc4f47e. Next selected U1-01 (card read): registered Notes
+workspace with real local create/edit/save/title-content search and restart
+persistence, using existing resident shell, sole-owner storage and shared UI
+styles. Required TiptapOSS editor/slash/tasks/autosave/draftrecovery/pin/archive/
+trash/restore/Markdownexport remain full scope; do not replace with a permanent
+plaintext substitute. No Notes implementation or acceptance yet; task remains
+planned until implementation begins. Read normative data/builtins/testing/design
+Chat-and-notes/security and verify dependencies before freezing interfaces.
+F2-01 done; broader D1-02/nativeAT unfinished under existing authorized
+smallincrement sequencing. Storage domain/interface must be implemented and
+reviewed, not assumed from documentation; current packages/storage/src search
+found no notes implementation. Coordinator owns contracts/migration/manifests/
+registration. manifest_review_sol is clean completedCopyUI, awaiting nextbounded
+concreteapplication contract; no infrastructure/research/proof assignment.
+All agents remain SOL6.1/high, reviewscompletedclean. No running app/tests/sign
+prompts; normal1Password signing works. No external input needed. FullGoalactive.
