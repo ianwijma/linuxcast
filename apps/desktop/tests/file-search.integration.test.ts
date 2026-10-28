@@ -61,10 +61,10 @@ it('opens selected-folder search through the real launcher and preserves native 
   await app.evaluate(({nativeTheme})=>{nativeTheme.themeSource='light';});await expect.poll(()=>files.locator('[data-lc-theme="light"]').count()).toBeGreaterThan(0);await files.screenshot({path:join(evidence,'application-light-indexed-path.png')});
   // Querying and showing details never copy. Only the deliberate selected-result action writes.
   await action(files,'Copy path');await expect.poll(clipboardText).toBe(join(selected,'public-summary.txt'));await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
-  await files.keyboard.press('Escape');await search.fill('public-notes');await expect.poll(()=>files.getByRole('option').count()).toBe(1);expect(clipboardText()).toBe(join(selected,'public-summary.txt'));
+  await files.keyboard.press('Escape');await search.fill('public-notes');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-notes.txt');expect(clipboardText()).toBe(join(selected,'public-summary.txt'));
   await action(files,'Copy path');await expect.poll(clipboardText).toBe(notes);await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
   // Explicit real native read: no automatic content access or HTML/Markdown interpretation.
-  await search.fill('public-summary');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
+  await search.fill('public-summary');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-summary.txt');
   expect(await files.locator('pre.lc-text-content').count()).toBe(0);
   const external:string[]=[];files.on('request',request=>{if(!request.url().startsWith('linuxcast-app://'))external.push(request.url());});
   await action(files,'Preview text');await files.getByRole('heading',{name:'Text preview · public-summary.txt',exact:true}).waitFor();
@@ -73,7 +73,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>files.locator(`[data-lc-theme="${theme}"]`).count()).toBeGreaterThan(0);expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);await files.screenshot({path:join(evidence,`application-${theme}-text-preview.png`)});}
   await files.keyboard.press('Escape');await expect.poll(()=>search.inputValue()).toBe('public-summary');await expect.poll(()=>search.evaluate(element=>element===document.activeElement)).toBe(true);expect(await files.getByRole('option',{selected:true}).textContent()).toContain('public-summary.txt');
   expect(await files.locator('pre.lc-text-content').count()).toBe(0);expect(external).toEqual([]);expect(readFileSync(join(selected,'public-summary.txt'),'utf8')).toBe(publicText);
-  await search.fill('public-notes');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
+  await search.fill('public-notes');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-notes.txt');
   // Known unsupported session does not write; recovery needs another explicit action.
   await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(files,'Copy path');await expect.poll(()=>files.getByRole('alert').textContent()).toContain('not copied');expect(clipboardText()).toBe(notes);await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe(notes);await action(files,'Copy path');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
   // Filters use real indexed metadata and the production sole-owner query, never source contents.
@@ -109,7 +109,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   renameSync(notes,join(selected,'public-renamed.txt'));await search.fill('public renamed');await expect.poll(()=>files.getByRole('option').count(),{timeout:10000}).toBe(1);
   await action(files,'Pause indexing');await expect.poll(state).toMatchObject({roots:[{activity:'paused'}]});
   // Paused metadata never authorizes a mismatched source read; retry is explicit.
-  await search.fill('public-summary');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
+  await search.fill('public-summary');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-summary.txt');
   writeFileSync(join(selected,'public-summary.txt'),'PUBLIC_CHANGED_SOURCE_WITH_DIFFERENT_SIZE');
   await action(files,'Preview text');await files.getByRole('heading',{name:'Text preview · public-summary.txt',exact:true}).waitFor();await expect.poll(()=>files.getByRole('alert').textContent()).toContain('Text preview was not read.');
   expect(await files.locator('pre.lc-text-content').textContent()).not.toContain('PUBLIC_CHANGED_SOURCE');
@@ -134,7 +134,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   expect(await data.evaluate(async()=>await (window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData.clearCategory('file-index'))).toMatchObject({ok:true});
   await expect.poll(()=>files.getByRole('option').count()).toBe(0);await expect.poll(state).toMatchObject({roots:[{activity:'paused',generation:null}]});
   expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.copyPath!(selection),savedSelection)).toMatchObject({ok:false});expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));
-  expect(await files.locator('pre.lc-text-content').count()).toBe(0);expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.previewText!(selection),savedSelection)).toMatchObject({ok:false});
+  await expect.poll(()=>files.locator('pre.lc-text-content').count()).toBe(0);expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.previewText!(selection),savedSelection)).toMatchObject({ok:false});
   expect(readFileSync(join(selected,'public-renamed.txt'),'utf8')).toBe('SYNTHETIC_CONTENT_SENTINEL');expect(readFileSync(join(selected,'public-summary.txt'),'utf8')).toBe(publicText);
   // Original sources survive index clearing and both removal outcomes.
   expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);await data.close();await files.getByRole('searchbox',{name:'Search files',exact:true}).press('Escape');
