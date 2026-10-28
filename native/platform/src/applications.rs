@@ -241,6 +241,18 @@ fn actions(info: Object) -> Actions {
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "lowercase", deny_unknown_fields)]
 enum Request {
+    #[serde(rename = "preview-text")]
+    PreviewText {
+        #[serde(rename = "protocolVersion")]
+        protocol_version: u8,
+        #[serde(rename = "rootPath")]
+        root_path: String,
+        #[serde(rename = "relativePath")]
+        relative_path: String,
+        size: u64,
+        #[serde(rename = "modifiedMs")]
+        modified_ms: i64,
+    },
     #[serde(rename = "open-url")]
     OpenUrl {
         #[serde(rename = "protocolVersion")]
@@ -699,6 +711,18 @@ fn respond(bytes: &[u8]) -> Value {
         return failure("invalid-request");
     };
     match request {
+        Request::PreviewText {
+            protocol_version: 1,
+            root_path,
+            relative_path,
+            size,
+            modified_ms,
+        } => match crate::text_preview::preview(&root_path, &relative_path, size, modified_ms) {
+            Ok(text) => {
+                json!({"protocolVersion":1,"ok":true,"value":{"outcome":"previewed","text":text}})
+            }
+            Err(code) => failure(code),
+        },
         Request::OpenUrl {
             protocol_version: 1,
             url,
