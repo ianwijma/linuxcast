@@ -4,7 +4,7 @@ import { createFileSearchApi } from './api.ts';
 const rootId='11111111-1111-4111-8111-111111111111';
 it('exposes only named metadata actions and validates root/query inputs before crossing IPC',async()=>{
   const invoke=vi.fn(async()=>({ok:true,value:{outcome:'completed'}})),api=createFileSearchApi({invoke,on:vi.fn(),removeListener:vi.fn()});
-  expect(Object.isFrozen(api)).toBe(true);expect(Object.keys(api).sort()).toEqual(['chooseFolder','close','copyPath','getState','onState','pauseIndex','removeFolder','search','startIndex']);
+  expect(Object.isFrozen(api)).toBe(true);expect(Object.keys(api).sort()).toEqual(['chooseFolder','close','copyPath','getState','onState','pauseIndex','previewText','removeFolder','search','startIndex']);
   await api.chooseFolder();expect(invoke).toHaveBeenLastCalledWith(C.choose,{protocolVersion:1});
   await api.startIndex(rootId);expect(invoke).toHaveBeenLastCalledWith(C.start,{protocolVersion:1,rootId});
   invoke.mockClear();await api.startIndex('/private');await api.search({query:'x'.repeat(513)});await api.search({query:'public',path:'/private'} as never);expect(invoke).not.toHaveBeenCalled();
@@ -85,4 +85,14 @@ it('forwards indexed directory scope and rejects absent/mismatched scope or desc
   expect(await api.search({query:'',rootId,directory:'a'})).toEqual({ok:true,value});expect(invoke).toHaveBeenLastCalledWith(C.search,{protocolVersion:1,query:'',rootId,directory:'a'});
   for(const bad of [{...value,directory:undefined},{...value,directory:'b',results:[]},{...value,results:[{...row,id:rootId+':a/deep/public.txt',path:'a/deep/public.txt'}]}]){invoke.mockResolvedValueOnce({ok:true,value:bad});expect(await api.search({query:'',rootId,directory:'a'})).toMatchObject({ok:false});}
   invoke.mockClear();for(const request of [{query:'',directory:''},{query:'',rootId,directory:'../a'},{query:'',rootId,directory:'/a'}])expect(await api.search(request)).toMatchObject({ok:false});expect(invoke).not.toHaveBeenCalled();
+});
+
+
+it('exposes identity-only preview and validates literal text, size and exact receipts',async()=>{
+ const generation='22222222-2222-4222-8222-222222222222',selection={resultId:rootId+':notes.txt',rootId,generation};
+ const value={...selection,outcome:'previewed',text:'<script>public</script>'};const invoke=vi.fn(async()=>({ok:true,value} as unknown)),api=createFileSearchApi({invoke,on:vi.fn(),removeListener:vi.fn()});
+ expect(await api.previewText!(selection)).toEqual({ok:true,value});expect(invoke).toHaveBeenCalledExactlyOnceWith(C.previewText,{protocolVersion:1,...selection});
+ invoke.mockClear();await api.previewText!({...selection,path:'/private'} as never);expect(invoke).not.toHaveBeenCalled();
+ for(const bad of [{...value,resultId:'other'},{...value,rootId:generation},{...value,generation:rootId},{...value,path:'/private'},{...value,text:'x'.repeat(65537)},{...value,text:'x\0'},{...value,outcome:'requested'}]){invoke.mockResolvedValueOnce({ok:true,value:bad});expect(await api.previewText!(selection)).toMatchObject({ok:false,error:{code:'internal'}});}
+ invoke.mockRejectedValueOnce(Error('SYNTHETIC_PRIVATE'));expect(JSON.stringify(await api.previewText!(selection))).not.toContain('SYNTHETIC_PRIVATE');
 });

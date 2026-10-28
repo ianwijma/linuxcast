@@ -44,7 +44,7 @@ export const indexedPathTextSchema=text(8193).min(1).refine(value=>value.startsW
 export const indexedPathCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({outcome:z.literal('copied'),path:indexedPathTextSchema})}),failure]);
 /** Explicit foreground read only; never content indexing or a persisted preview. */
 export const INDEXED_TEXT_MAX_BYTES=64*1024;
-export const indexedTextSchema=text(INDEXED_TEXT_MAX_BYTES).refine(value=>!/[\p{Cs}\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/u.test(value));
+export const indexedTextSchema=text(INDEXED_TEXT_MAX_BYTES).refine(value=>Array.from(value).every(char=>{const code=char.codePointAt(0)!;return (code>=32&&code!==127&&(code<0xd800||code>0xdfff))||code===9||code===10||code===13;}));
 export const indexedTextPreviewRequestSchema=indexedPathSelectionSchema.extend({protocolVersion:z.literal(1)});
 export const indexedTextPreviewReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({outcome:z.literal('previewed'),text:indexedTextSchema})}),failure]);
 export type IndexedTextPreviewReply=z.infer<typeof indexedTextPreviewReplySchema>;

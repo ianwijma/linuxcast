@@ -1,8 +1,8 @@
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
 import type { ClipboardWriteOutcome } from './clipboard-write.ts';
 import type { IpcMain,IpcMainInvokeEvent,WebContents } from 'electron';
-import { FILE_SEARCH_CHANNELS,fileSearchRequestSchema,fileSearchRootRequestSchema,fileSearchQueryRequestSchema,fileSearchStateReplySchema,fileSearchQueryReplySchema,fileSearchActionReplySchema,fileSearchStateSchema,indexedPathCopyRequestSchema,fileSearchOptionsKey,fileSearchMatchesDirectory,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
-import type { FileSearchState,FileSearchActionReply,FileSearchQueryReply,FileSearchResult,FileSearchRoot,IndexedPathCopyReply,FileSearchApi } from '@linuxcast/contracts';
+import { FILE_SEARCH_CHANNELS,fileSearchRequestSchema,fileSearchRootRequestSchema,fileSearchQueryRequestSchema,fileSearchStateReplySchema,fileSearchQueryReplySchema,fileSearchActionReplySchema,fileSearchStateSchema,indexedPathCopyRequestSchema,indexedTextPreviewRequestSchema,indexedTextPreviewReplySchema,fileSearchOptionsKey,fileSearchMatchesDirectory,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
+import type { FileSearchState,FileSearchActionReply,FileSearchQueryReply,FileSearchResult,FileSearchRoot,IndexedPathCopyReply,IndexedTextPreviewReply,FileSearchApi } from '@linuxcast/contracts';
 import { trustedAppSender } from './ipc.ts';
 import { FILE_SEARCH_URL } from './assets.ts';
 export interface FileSearchActions {
@@ -15,13 +15,15 @@ export interface FileSearchActions {
   removeFolder(rootId:string):Promise<'completed'|'cancelled'>;
   search(request:Parameters<FileSearchApi['search']>[0]):Promise<Extract<FileSearchQueryReply,{ok:true}>['value']>;
   copyPath?(path:string):Promise<ClipboardWriteOutcome>;
+  isVisible?():boolean;
+  previewText?(input:{rootPath:string;relativePath:string;size:number;modifiedMs:number}):Promise<string>;
   close():void;
 }
 const failed=(code:'invalid-request'|'permission-denied'|'capability-unavailable'|'cancelled'|'internal'|'conflict'|'deadline-exceeded',message:string)=>({ok:false as const,error:{code,message,retryable:false}});
 /** Dedicated metadata window: path copying accepts only an admitted result identity.
  * Indexed display paths never grant file read/open authority. */
 export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,actions:FileSearchActions):(()=>void)&{invalidate():void} {
-  let stopped=false,mutating=false,reads=0,mutationGeneration=0,querySequence=0,copyPending=false;
+  let stopped=false,mutating=false,reads=0,mutationGeneration=0,querySequence=0,copyPending=false,previewPending=false;
   let admitted=new Map<string,{row:FileSearchResult;root:FileSearchRoot}>(),admittedOwner:WebContents|undefined;
   const invalidate=()=>{querySequence++;admitted.clear();admittedOwner=undefined;};
   const validate=<T>(value:unknown,schema:{parse(value:unknown):T}):T=>{
@@ -29,10 +31,35 @@ export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
   };
   for(const channel of Object.values(FILE_SEARCH_CHANNELS))ipc.handle(channel,async(event:IpcMainInvokeEvent,payload:unknown)=>{
     if(stopped||!trustedAppSender(event,actions.contents(),FILE_SEARCH_URL))return failed('permission-denied','File search request denied.');
-    const schema=channel===FILE_SEARCH_CHANNELS.copyPath?indexedPathCopyRequestSchema:channel===FILE_SEARCH_CHANNELS.search?fileSearchQueryRequestSchema:channel===FILE_SEARCH_CHANNELS.start||channel===FILE_SEARCH_CHANNELS.pause||channel===FILE_SEARCH_CHANNELS.remove?fileSearchRootRequestSchema:fileSearchRequestSchema;
+    const schema=channel===FILE_SEARCH_CHANNELS.previewText?indexedTextPreviewRequestSchema:channel===FILE_SEARCH_CHANNELS.copyPath?indexedPathCopyRequestSchema:channel===FILE_SEARCH_CHANNELS.search?fileSearchQueryRequestSchema:channel===FILE_SEARCH_CHANNELS.start||channel===FILE_SEARCH_CHANNELS.pause||channel===FILE_SEARCH_CHANNELS.remove?fileSearchRootRequestSchema:fileSearchRequestSchema;
     const parsed=schema.safeParse(payload);if(!parsed.success)return failed('invalid-request','Invalid file search request.');
     if(channel===FILE_SEARCH_CHANNELS.close){invalidate();setImmediate(()=>{if(!stopped&&trustedAppSender(event,actions.contents(),FILE_SEARCH_URL))actions.close();});return {ok:true,value:{outcome:'completed'}};}
     if(!actions.isReady())return failed('capability-unavailable','File search storage is unavailable. Refresh folders to try again.');
+    if(channel===FILE_SEARCH_CHANNELS.previewText){
+      const request=indexedTextPreviewRequestSchema.parse(payload),selected=admitted.get(request.resultId),sequence=querySequence;
+      if(mutating||previewPending)return failed('cancelled','A preview is still running. Try Preview text again shortly.');
+      if(!selected||admittedOwner!==event.sender||selected.row.kind!=='file'||selected.row.rootId!==request.rootId||selected.row.generation!==request.generation)return failed('conflict','Search again and select a current file before previewing.');
+      if(!actions.previewText||!actions.isVisible?.())return failed('capability-unavailable','Text preview is unavailable. Reopen file search to reconnect.');
+      previewPending=true;
+      const current=()=>!stopped&&!mutating&&sequence===querySequence&&admitted.get(request.resultId)===selected&&actions.isReady()&&actions.isVisible?.()===true&&trustedAppSender(event,actions.contents(),FILE_SEARCH_URL);
+      const rootCurrent=(state:FileSearchState)=>{const root=state.roots.find(value=>value.id===request.rootId);return !!root&&root.generation===selected.row.generation&&root.displayPath===selected.root.displayPath&&root.state!=='idle'&&root.state!=='unavailable'&&root.activity!=='unavailable';};
+      const stale=()=>failed('conflict','Folder or search changed. Search again before previewing.');
+      const work=(async():Promise<IndexedTextPreviewReply>=>{
+        try{
+          const state=validate(await actions.getState(),fileSearchStateSchema);
+          if(!current()||!rootCurrent(state))return stale();
+          const text=await actions.previewText!({rootPath:selected.root.displayPath,relativePath:selected.row.path,size:selected.row.size,modifiedMs:selected.row.modifiedMs});
+          if(!current())return stale();
+          const finalState=validate(await actions.getState(),fileSearchStateSchema);
+          if(!current()||!rootCurrent(finalState))return stale();
+          return validate({ok:true,value:{outcome:'previewed',resultId:request.resultId,rootId:request.rootId,generation:request.generation,text}},indexedTextPreviewReplySchema);
+        }catch{return failed('capability-unavailable','Text preview could not be read. Use a supported UTF-8 text file up to 64 KiB, or index the folder again.');}
+      })();
+      void work.finally(()=>{previewPending=false;}).catch(()=>{});
+      let timer:ReturnType<typeof setTimeout>|undefined;
+      try{return await Promise.race([work,new Promise<IndexedTextPreviewReply>(resolve=>{timer=setTimeout(()=>resolve(failed('deadline-exceeded','Text preview timed out. Try Preview text again shortly.')),4000);})]);}
+      finally{clearTimeout(timer);}
+    }
     if(channel===FILE_SEARCH_CHANNELS.copyPath){
       const request=indexedPathCopyRequestSchema.parse(payload),selected=admitted.get(request.resultId),sequence=querySequence;
       if(mutating||copyPending)return failed('cancelled','A file action is still running. Try Copy path again after checking your clipboard.');

@@ -9,7 +9,7 @@ import { restrictContents,securePreferences } from './security.ts';
 import { registerFileSearchIpc } from './file-search-ipc.ts';
 import type { ClipboardWriteOutcome } from './clipboard-write.ts';
 import type { ResidentService } from './lifecycle.ts';
-export function createFileSearchWorkspace(options:{resourcesDirectory:string;service:FileSearchService;isReady():boolean;copyPath?(path:string):Promise<ClipboardWriteOutcome>}):ResidentService&{open():Promise<void>;refresh():void} {
+export function createFileSearchWorkspace(options:{resourcesDirectory:string;service:FileSearchService;isReady():boolean;copyPath?(path:string):Promise<ClipboardWriteOutcome>;previewText?(input:{rootPath:string;relativePath:string;size:number;modifiedMs:number}):Promise<string>}):ResidentService&{open():Promise<void>;refresh():void} {
   let window:BrowserWindow|undefined,creating:Promise<void>|undefined,stopped=false,closing:Promise<void>|undefined;
   let timer:ReturnType<typeof setTimeout>|undefined,publishing=false,dirty=false;
   const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
@@ -39,6 +39,8 @@ export function createFileSearchWorkspace(options:{resourcesDirectory:string;ser
       if(choice.response!==1||!alive(owner))return 'cancelled';
       await options.service.removeFolder(rootId);schedule();return 'completed';
     },
+    isVisible:()=>!!window&&alive(window)&&window.isVisible()&&!window.isMinimized(),
+    ...(options.previewText?{previewText:options.previewText}:{}),
     ...(options.copyPath?{copyPath:options.copyPath}:{}),
     search:request=>options.service.search(request),close:()=>window?.close(),
   });

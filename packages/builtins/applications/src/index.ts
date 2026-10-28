@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { isAbsolute } from 'node:path';
-import { nativeApplicationSchema,nativeApplicationRequestSchema,nativeApplicationListReplySchema,nativeApplicationLaunchReplySchema,nativeApplicationActionReplySchema } from '@linuxcast/contracts';
+import { nativeApplicationSchema,nativeApplicationRequestSchema,nativeApplicationListReplySchema,nativeApplicationLaunchReplySchema,nativeApplicationActionReplySchema,nativeTextPreviewReplySchema } from '@linuxcast/contracts';
 import type { NativeApplication,NativeApplicationRequest } from '@linuxcast/contracts';
 export type { NativeApplication } from '@linuxcast/contracts';
 const MAX_OUTPUT=1024*1024,MAX_INPUT=64*1024,DEADLINE=2500,MAX_CATALOGUE=4096,MAX_HELPERS=2;
@@ -92,6 +92,14 @@ export function createApplications({helperPath}:{helperPath:string}) {
         throw new ApplicationsUnavailable(reason==='launch-failed'?reason:'invalid-reply','unknown');
       }
       return parsed.data.value.outcome;
+    },
+    async previewText(input:Omit<Extract<NativeApplicationRequest,{operation:'preview-text'}>,'protocolVersion'|'operation'>,options:{signal?:AbortSignal}={}):Promise<string>{
+      if(Object.keys(input).some(key=>!['rootPath','relativePath','size','modifiedMs'].includes(key)))throw new ApplicationsUnavailable('invalid-request');
+      const raw=await request({...input,protocolVersion:1,operation:'preview-text'},options.signal);
+      const parsed=nativeTextPreviewReplySchema.safeParse(raw);
+      if(!parsed.success)throw new ApplicationsUnavailable('invalid-reply');
+      if(!parsed.data.ok)throw new ApplicationsUnavailable(parsed.data.error);
+      return parsed.data.value.text;
     },
     async stop(){stopped=true;const pending=[...active];pending.forEach(handle=>handle.cancel('stopped'));await Promise.all(pending.map(handle=>handle.done));},
     async terminate(){stopped=true;const pending=[...active];pending.forEach(handle=>handle.cancel('stopped',true));await Promise.all(pending.map(handle=>handle.done));},

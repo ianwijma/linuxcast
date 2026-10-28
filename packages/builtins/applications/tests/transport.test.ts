@@ -63,6 +63,14 @@ let input='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>input+
   if(mode==='fixture:too-many'){const start=q.afterId?Number(q.afterId.slice(1,5))+1:0;const entries=Array.from({length:100},(_,i)=>app('x'+String(start+i).padStart(4,'0')+'.desktop'));return send({applications:entries,nextCursor:entries.at(-1).desktopId});}
   return send(q.afterId?{applications:[app('c.desktop')],nextCursor:null}:{applications:[app('a.desktop'),app('b.desktop')],nextCursor:'b.desktop'});
  }
+ if(q.operation==='preview-text'){
+  const mode=q.relativePath;
+  if(mode==='huge.txt')return send({outcome:'previewed',text:'é'.repeat(32769)});
+  if(mode==='nul.txt')return send({outcome:'previewed',text:'x\u0000'});
+  if(mode==='extra.txt')return send({outcome:'previewed',text:'public',path:'/private'});
+  if(mode==='error.txt')return process.stdout.write(JSON.stringify({protocolVersion:1,ok:false,error:'stale-application'})+'\n');
+  fs.writeFileSync(path.join(dir,'preview-input'),JSON.stringify(q));return send({outcome:'previewed',text:'<script>public</script>'});
+ }
  if(q.operation==='launch-action')fs.appendFileSync(path.join(dir,'actions'),q.actionId+'\n');
  const mode=q.operation==='open-url'?process.env.XDG_CURRENT_DESKTOP.slice('fixture:url-'.length):q.desktopId.slice(0,-8);
  if(q.operation==='open-url')fs.appendFileSync(path.join(dir,'urls'),q.url+'\n');
@@ -137,4 +145,12 @@ describe('L1-02 Desktop Action transport (request-observing helper only)',()=>{
   it('rejects already cancelled actions before helper admission',async()=>{
     const abort=new AbortController();abort.abort();await expect(service().launchAction(action(),{signal:abort.signal})).rejects.toMatchObject({reason:'cancelled',effectOutcome:'not-dispatched'});await expect(readFile(join(directory,'invocations'),'utf8')).rejects.toHaveProperty('code','ENOENT');
   });
+});
+
+
+describe('L2-03 explicit text preview transport (request-observing helper fixture)',()=>{
+ const input={rootPath:'/public',relativePath:'notes.txt',size:9,modifiedMs:0};
+ it('uses a fixed bounded read request without shell or new process route',async()=>{expect(await service().previewText(input)).toBe('<script>public</script>');expect(JSON.parse(await readFile(join(directory,'preview-input'),'utf8'))).toEqual({protocolVersion:1,operation:'preview-text',...input});});
+ it.each([{...input,relativePath:'../x'},{...input,rootPath:'/a/../b'},{...input,size:65537},{...input,argv:['x']},{...input,modifiedMs:NaN}])('refuses invalid native authority before spawn',async value=>{await expect(service().previewText(value)).rejects.toHaveProperty('reason','invalid-request');await expect(readFile(join(directory,'invocations'),'utf8')).rejects.toHaveProperty('code','ENOENT');});
+ it.each(['huge.txt','nul.txt','extra.txt','error.txt'])('rejects invalid %s result with no read replay or effect claim',async relativePath=>{await expect(service().previewText({...input,relativePath})).rejects.toMatchObject({reason:relativePath==='error.txt'?'stale-application':'invalid-reply',effectOutcome:'not-dispatched'});expect(await readFile(join(directory,'invocations'),'utf8')).toBe('preview-text\n');});
 });
