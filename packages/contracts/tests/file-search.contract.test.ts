@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory } from '../src/file-search.ts';
+import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewRequestSchema,indexedTextPreviewReplySchema } from '../src/file-search.ts';
 const rootId='11111111-1111-4111-8111-111111111111',generation='22222222-2222-4222-8222-222222222222';
 const result={id:`${rootId}:public.txt`,rootId,generation,path:'public.txt',kind:'file',size:4,modifiedMs:1};
 it('accepts bounded metadata identities and rejects traversal, content and scope confusion',()=>{
@@ -39,4 +39,13 @@ it('bounds indexed directory scope to a selected root and direct relative childr
   expect(fileSearchQueryRequestSchema.safeParse({protocolVersion:1,query:'',directory:''}).success).toBe(false);
   expect(fileSearchMatchesDirectory({path:'a/b.txt'},'a')).toBe(true);expect(fileSearchMatchesDirectory({path:'a/b/c.txt'},'a')).toBe(false);expect(fileSearchMatchesDirectory({path:'ab/c.txt'},'a')).toBe(false);expect(fileSearchMatchesDirectory({path:'top.txt'},'')).toBe(true);
   expect(fileSearchQueryReplySchema.safeParse({ok:true,value:{query:'',rootId,directory:'a',results:[result]}}).success).toBe(false);
+});
+
+it('keeps text preview explicit identity-only with bounded literal UTF8 replies',()=>{
+ const selection={resultId:result.id,rootId,generation},request={...selection,protocolVersion:1};expect(indexedTextPreviewRequestSchema.safeParse(request).success).toBe(true);
+ for(const bad of [{...request,path:'/private'},{...request,rootPath:'/private'},{...request,mime:'text/plain'},[request]])expect(indexedTextPreviewRequestSchema.safeParse(bad).success).toBe(false);
+ const reply={ok:true,value:{...selection,outcome:'previewed',text:'<script>public</script>'}};expect(indexedTextPreviewReplySchema.safeParse(reply).success).toBe(true);
+ for(const text of ['', 'é'.repeat(32768),'a\t\n\rb'])expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,text}}).success).toBe(true);
+ for(const text of ['é'.repeat(32769),'a\0b','a\u0001b','\ud800','a\u007fb'])expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,text}}).success).toBe(false);
+ expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,path:'/private'}}).success).toBe(false);
 });

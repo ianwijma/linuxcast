@@ -1,14 +1,15 @@
 import { IndexedPathCopy,COPY_INDEXED_PATH } from '@linuxcast/universal-actions';
 import type { IndexedPathContext } from '@linuxcast/universal-actions';
 import { formatIndexedPath } from '@linuxcast/universal-actions/path';
-import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory } from '@linuxcast/contracts';
+import { fileSearchStateReplySchema,fileSearchStateSchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewReplySchema } from '@linuxcast/contracts';
 import type { ActionModel,FileSearchApi,FileSearchRoot,FileSearchState,FileSearchResult,FileSearchOptions,ViewModel } from '@linuxcast/contracts';
 import { defaultOptionsKey,optionsDraft,optionsSummary,parseOptionsDraft,parseUtcDate } from './options.ts';
 import type { OptionsDraft,OptionsErrors } from './options.ts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
-const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options',BROWSE='files:browse',BROWSE_ROOT='files:browse-root',PARENT='files:parent',RETURN='files:return-scope';
+const FOLDERS='file-search-folders',CHOOSE='files:choose',ALL='files:all',REFRESH='files:refresh',SEARCH='files:search',INDEX='files:index',PAUSE='files:pause',REMOVE='files:remove',DETAIL='files:details',FILTER='files:filter',RESET='files:reset-options',APPLY='files:apply-options',CANCEL='files:cancel-options',BROWSE='files:browse',BROWSE_ROOT='files:browse-root',PARENT='files:parent',RETURN='files:return-scope',PREVIEW='files:preview-text',RETRY_PREVIEW='files:retry-preview',BACK_PREVIEW='files:back-preview';
 type Status={kind:'info'|'warning'|'error';message:string};
+type TextPreview={viewId:string;fromViewId:string;row:FileSearchResult;rootPath:string;query:string;optionsKey:string;directory:string|undefined;text:string;loading:boolean;status:Status;controller:AbortController|null};
 type Results={viewId:string;rootId:string|null;query:string;rows:FileSearchResult[];loading:boolean;options?:FileSearchOptions;directory?:string;origin?:{rootId:string|null;query:string;selection:string|null};status?:Status;retainSelection?:string};
 const action=(id:string,title:string,effect:ActionModel['effect']='read',disabledReason?:string):ActionModel=>({id,title,kind:'invoke',effect,...(disabledReason?{disabledReason}:{})});
 /** Presentation only: paths are display metadata, never file-open authority.
@@ -19,12 +20,14 @@ export class FileSearchController {
   #api:FileSearchApi;#state:FileSearchState|null=null;#active=false;#disposed=false;#unsubscribe:(()=>void)|null=null;
   #revision=0;#sequence=0;#loading=true;#busy=false;#unconfirmed=false;#status:Status|undefined;#copyWarning:Status|undefined;
   #filters:{viewId:string;draft:OptionsDraft;errors:OptionsErrors}|null=null;
+  #preview:TextPreview|null=null;#previewSubscription:()=>void;
   #results:Results|null=null;#detail:{viewId:string;row:FileSearchResult}|null=null;
   #load:AbortController|null=null;#mutation:AbortController|null=null;#search:AbortController|null=null;#closing:AbortController|null=null;
   #queryGeneration=0;#timer:ReturnType<typeof setTimeout>|undefined;
   constructor(api:FileSearchApi){
     this.#api=api;this.session=new ViewSession(this.#foldersView(),id=>this.#closed(id));
     this.#pathCopy=new IndexedPathCopy({api,onChange:()=>this.#publish(),isCurrent:context=>this.#currentCopy(context)});
+    this.#previewSubscription=this.session.subscribe(()=>{const preview=this.#preview;if(preview&&!this.#currentPreview(preview))this.#discardPreview();});
     this.host={selectionChanged:()=>{this.#invalidateCopy();this.#publish();},queryChanged:(id,query)=>this.query(id,query),action:intent=>{void this.execute(intent);}};
   }
   getAppearance=()=>this.#state?.appearance??'dark';
@@ -75,7 +78,7 @@ export class FileSearchController {
   #resultsView():ViewModel{
     const results=this.#results!,root=results.rootId?this.#root(results.rootId):undefined,status=this.#resultsStatus(),summary=optionsSummary(results.options),browsing=results.directory!==undefined,scope=[root?.name??(results.rootId?'Removed folder':'All selected folders'),browsing?`Indexed folder: ${results.directory||'(root)'}`:undefined].filter(Boolean).join(' · ');
     return {protocolVersion:1,viewId:results.viewId,revision:++this.#revision,kind:'list',title:'Search files',loading:results.loading,search:{query:results.query,placeholder:browsing?'Search this indexed folder’s direct children…':'Search indexed filenames and paths…',mode:'extension'},
-      sections:[{id:'results',title:[scope,summary].filter(Boolean).join(' · '),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[...(row.kind==='directory'?[action(BROWSE,'Browse folder','read',results.loading?'Updating search results.':undefined)]:[]),action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action]}))}],
+      sections:[{id:'results',title:[scope,summary].filter(Boolean).join(' · '),items:results.rows.map(row=>({id:row.id,title:row.path.split('/').at(-1)!,subtitle:`${this.#root(row.rootId)?.name??'Folder'} · ${row.path}`,icon:{kind:'builtin' as const,name:row.kind==='directory'?'folder':'file'},actions:[...(row.kind==='directory'?[action(BROWSE,'Browse folder','read',results.loading?'Updating search results.':undefined)]:[]),action(DETAIL,'Show details','read',results.loading?'Updating search results.':undefined),this.#copyModel(row,results.viewId).action,...(row.kind==='file'?[action(PREVIEW,'Preview text','read',this.#previewReason(row))]:[])]}))}],
       empty:{title:results.query.trim()?'No matching files':browsing?'No indexed children':'Search selected folders',description:[browsing?`${scope}. Browsing direct indexed children only; no file is opened or read.`:undefined,results.query.trim()?'Try another filename or path. Check whether indexing is paused or incomplete.':browsing?'This scope has no matching indexed children. Check filters or whether indexing is paused or incomplete.':'Enter a filename or path to search indexed metadata. No file content is searched.',summary?`Applied: ${summary}.`:undefined].filter(Boolean).join(' ')},...(status?{status}:{}),
       actions:[...(root?[action(BROWSE_ROOT,'Browse root folder','read',results.directory===''?'Already browsing this root folder.':undefined)]:[]),...(browsing?[action(PARENT,'Parent folder','read',results.directory===''?'Already at the selected root folder.':undefined),action(RETURN,'Return to search scope')]:[]),action(FILTER,'Filter and sort'),action(RESET,'Reset filters and sort','read',fileSearchOptionsKey(results.options)===defaultOptionsKey?'Filters and sort are already at their defaults.':undefined),...(root?this.#rootActions(root):[]),...this.#globalActions()]};
   }
@@ -112,15 +115,44 @@ export class FileSearchController {
     const detail=this.#detail!,row=detail.row,copy=this.#copyModel(row,detail.viewId);
     let path='Unavailable. Return to results and search again.';try{const root=this.#root(row.rootId);if(root)path=formatIndexedPath(root,row);}catch{/* Fixed display fallback. */}
     const date=new Date(row.modifiedMs);
-    return {protocolVersion:1,viewId:detail.viewId,revision:++this.#revision,kind:'detail',title:row.path.split('/').at(-1)!,markdown:'Indexed metadata only. Copy path copies the location shown in the index; it does not open the file or verify that it still exists. File opening, previews and other actions are unavailable in this view.',attachments:[],loading:copy.loading,...(copy.status?{status:copy.status}:this.#copyWarning?{status:this.#copyWarning}:this.#status?{status:this.#status}:{}),
+    return {protocolVersion:1,viewId:detail.viewId,revision:++this.#revision,kind:'detail',title:row.path.split('/').at(-1)!,markdown:'Indexed metadata only. Copy path copies the location shown in the index; it does not open the file or verify that it still exists. For a supported text file, return to Results and choose Preview text in Actions. File opening and other actions remain unavailable.',attachments:[],loading:copy.loading,...(copy.status?{status:copy.status}:this.#copyWarning?{status:this.#copyWarning}:this.#status?{status:this.#status}:{}),
       metadata:[{label:'Folder',value:this.#root(row.rootId)?.name??'Removed folder'},{label:'Relative path',value:row.path},{label:'Indexed path',value:path},{label:'Kind',value:row.kind==='file'?'File':'Directory'},{label:'Size',value:`${row.size} bytes`},{label:'Modified (UTC)',value:Number.isFinite(date.getTime())?date.toISOString():'Timestamp unavailable'}],actions:[copy.action]};
   }
-  #publish(){if(!this.#active)return;this.session.update(FOLDERS,{protocolVersion:1,kind:'snapshot',view:this.#foldersView()});if(this.#results){
-      const selected=()=>this.session.getSnapshot().frames.find(frame=>frame.view.viewId===this.#results?.viewId)?.selection;
-      const prior=selected();this.session.update(this.#results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
-      // Initial and replacement snapshots can select a new first result.
-      if(selected()!==prior)this.session.update(this.#results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
-    }if(this.#detail)this.session.update(this.#detail.viewId,{protocolVersion:1,kind:'snapshot',view:this.#detailView()});if(this.#filters)this.session.update(this.#filters.viewId,{protocolVersion:1,kind:'snapshot',view:this.#filtersView()});}
+  #previewReason(row:FileSearchResult):string|undefined{
+    if(typeof this.#api.previewText!=='function')return 'Text preview is unavailable. Reopen Linuxcast to reconnect.';
+    const root=this.#root(row.rootId);if(!root||root.generation!==row.generation||root.state==='unavailable'||root.activity==='unavailable')return 'Refresh folders and select a current indexed file.';
+    if(row.kind!=='file'||!/[.](txt|text|md|csv|json|log)$/iu.test(row.path)||row.size>65536)return 'Preview supports non-executable UTF-8 .txt, .text, .md, .csv, .json or .log files up to 64 KiB. Select a supported file.';
+    return this.#results?.loading?'Wait for the current search results.':undefined;
+  }
+  #previewView():ViewModel{const preview=this.#preview!;return {protocolVersion:1,viewId:preview.viewId,revision:++this.#revision,kind:'text',title:`Text preview · ${preview.row.path.split('/').at(-1)!}`,text:preview.text,editable:false,loading:preview.loading,status:preview.status,actions:[action(BACK_PREVIEW,'Back to results'),...(preview.status.kind==='error'?[action(RETRY_PREVIEW,'Retry preview','read',this.#previewReason(preview.row))]:[])]};}
+  #currentPreview(preview:TextPreview){const top=this.session.getSnapshot().frames.at(-1),results=this.#results,frame=this.session.getSnapshot().frames.find(value=>value.view.viewId===preview.fromViewId),row=results?.rows.find(value=>value.id===preview.row.id),root=this.#root(preview.row.rootId);return this.#active&&!this.#disposed&&this.#preview===preview&&top?.view.viewId===preview.viewId&&!this.#loading&&!this.#busy&&!results?.loading&&results?.viewId===preview.fromViewId&&frame?.query===preview.query&&results.query===preview.query&&frame.selection===preview.row.id&&fileSearchOptionsKey(results.options)===preview.optionsKey&&results.directory===preview.directory&&row?.generation===preview.row.generation&&row.kind==='file'&&row.path===preview.row.path&&row.size===preview.row.size&&row.modifiedMs===preview.row.modifiedMs&&root?.generation===preview.row.generation&&root.displayPath===preview.rootPath&&root.state!=='unavailable'&&root.activity!=='unavailable';}
+  #discardPreview(){const preview=this.#preview;if(!preview)return;this.#preview=null;preview.controller?.abort();preview.controller=null;preview.text='';if(this.session.getSnapshot().frames.at(-1)?.view.viewId===preview.viewId)this.session.pop();this.#publish();}
+  async #readPreview(preview:TextPreview){
+    if(!this.#currentPreview(preview)||preview.controller||this.#previewReason(preview.row))return;
+    const controller=new AbortController();preview.controller=controller;preview.loading=true;preview.text='';preview.status={kind:'info',message:'Loading text preview…'};this.#publish();
+    try{
+      if(!this.#currentPreview(preview)||controller.signal.aborted)return;
+      const selection={resultId:preview.row.id,rootId:preview.row.rootId,generation:preview.row.generation};
+      const reply=indexedTextPreviewReplySchema.parse(await bounded(this.#api.previewText!(selection),controller.signal));
+      if(!this.#currentPreview(preview)||controller.signal.aborted||preview.controller!==controller)return;
+      if(!reply.ok){preview.status={kind:'error',message:['invalid-request','conflict','capability-unavailable','permission-denied','cancelled'].includes(reply.error.code)?'Text preview was not read. Return to Results, refresh folders and check file access, UTF-8 format and the 64 KiB limit; retry only explicitly.':'Text preview could not be confirmed. Choose Retry preview explicitly or return to Results.'};return;}
+      if(reply.value.resultId!==selection.resultId||reply.value.rootId!==selection.rootId||reply.value.generation!==selection.generation)throw new Error('Unconfirmed preview.');
+      preview.text=reply.value.text;preview.status={kind:'info',message:preview.text?'Read-only text preview. Content is not saved, indexed or added to history.':'This text file is empty. Content is not saved, indexed or added to history.'};
+    }catch{if(this.#currentPreview(preview)&&!controller.signal.aborted)preview.status={kind:'error',message:'Text preview could not be confirmed. Choose Retry preview explicitly or return to Results.'};}
+    finally{if(this.#currentPreview(preview)&&preview.controller===controller){preview.controller=null;preview.loading=false;this.#publish();}}
+  }
+  async #openPreview(row:FileSearchResult,fromViewId:string){
+    if(this.#previewReason(row)||this.#preview||!this.#results)return;const results=this.#results;
+    this.#invalidateCopy();const frame=this.session.getSnapshot().frames.at(-1);if(!this.#active||this.#results!==results||frame?.view.viewId!==fromViewId||frame.selection!==row.id)return;
+    const preview:TextPreview={viewId:`file-search-preview-${++this.#sequence}`,fromViewId,row:{...row},rootPath:this.#root(row.rootId)!.displayPath,query:results.query,optionsKey:fileSearchOptionsKey(results.options),directory:results.directory,text:'',loading:false,status:{kind:'info',message:'Preparing read-only text preview…'},controller:null};this.#preview=preview;
+    if(!this.session.navigate({protocolVersion:1,kind:'push',fromViewId,view:this.#previewView()})){this.#discardPreview();return;}await this.#readPreview(preview);
+  }
+  #publish(){if(!this.#active)return;this.session.update(FOLDERS,{protocolVersion:1,kind:'snapshot',view:this.#foldersView()});if(!this.#active)return;const results=this.#results;if(results){
+      const selected=()=>this.session.getSnapshot().frames.find(frame=>frame.view.viewId===results.viewId)?.selection;
+      const prior=selected();this.session.update(results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
+      if(!this.#active||this.#results!==results)return;
+      if(selected()!==prior)this.session.update(results.viewId,{protocolVersion:1,kind:'snapshot',view:this.#resultsView()});
+    }if(!this.#active)return;if(this.#detail)this.session.update(this.#detail.viewId,{protocolVersion:1,kind:'snapshot',view:this.#detailView()});if(this.#filters)this.session.update(this.#filters.viewId,{protocolVersion:1,kind:'snapshot',view:this.#filtersView()});if(this.#preview)this.session.update(this.#preview.viewId,{protocolVersion:1,kind:'snapshot',view:this.#previewView()});}
   #signature(state:FileSearchState|null,scope:string|null){return JSON.stringify((state?.roots??[]).filter(root=>scope===null||root.id===scope).map(root=>[root.id,root.generation,root.state,root.activity]).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))));}
   #acceptState(raw:unknown){
     const parsed=fileSearchStateSchema.safeParse(raw);if(!parsed.success){this.#status={kind:'error',message:'Folder state could not be read. Refresh folders to try again.'};this.#publish();return false;}
@@ -187,6 +219,7 @@ export class FileSearchController {
   async execute(intent:ActionIntent){
     const top=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || !top || top.view.viewId!==intent.viewId || top.view.revision!==intent.revision || this.#busy || this.#loading)return;
+    if(this.#preview){if(top.view.viewId!==this.#preview.viewId||intent.itemId!==undefined||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId'].includes(key)))return;if(intent.actionId===BACK_PREVIEW){this.session.pop();return;}if(intent.actionId===RETRY_PREVIEW&&this.#preview.status.kind==='error')await this.#readPreview(this.#preview);return;}
     if(this.#filters){
       if(top.view.viewId!==this.#filters.viewId||intent.itemId!==undefined||top.selection!==null||Object.keys(intent).some(key=>!['viewId','revision','actionId','values'].includes(key)))return;
       if(intent.actionId===CANCEL&&intent.values===undefined){this.session.pop();return;}
@@ -209,6 +242,7 @@ export class FileSearchController {
       this.#invalidateCopy();this.#filters={viewId:`file-search-options-${++this.#sequence}`,draft:optionsDraft(this.#results.options),errors:{}};
       this.session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#results.viewId,view:this.#filtersView()});return;
     }
+    if(intent.actionId===PREVIEW){if(!this.#results||this.#detail||top.view.viewId!==this.#results.viewId||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||intent.itemId!==top.selection)return;const row=this.#results.rows.find(value=>value.id===intent.itemId);if(row)await this.#openPreview(row,top.view.viewId);return;}
     if(intent.actionId===COPY_INDEXED_PATH){
       if(intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
       const context=this.#selectedCopy();if(!context||!this.#currentCopy(context)||(this.#detail?.viewId===top.view.viewId?intent.itemId!==undefined:intent.itemId!==top.selection))return;
@@ -251,7 +285,7 @@ export class FileSearchController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:'File search could not close. Try again.'};this.#publish();}}
     finally{if(this.#closing===controller)this.#closing=null;}
   }
-  dispose(){this.#pathCopy.dispose();this.#active=false;this.#disposed=true;this.#unsubscribe?.();this.#unsubscribe=null;this.#cancelSearch();this.#load?.abort();this.#mutation?.abort();this.#closing?.abort();}
+  dispose(){this.#previewSubscription();this.#active=false;if(this.#preview){const viewId=this.#preview.viewId;this.#preview.controller?.abort();this.#preview.text='';this.#preview=null;if(this.session.getSnapshot().frames.at(-1)?.view.viewId===viewId)this.session.pop();}this.#pathCopy.dispose();this.#active=false;this.#disposed=true;this.#unsubscribe?.();this.#unsubscribe=null;this.#cancelSearch();this.#load?.abort();this.#mutation?.abort();this.#closing?.abort();}
 }
 function rootActivity(root:FileSearchRoot){const state={idle:'Not indexed',scanning:'Scanning',ready:'Ready',degraded:'Limited',unavailable:'Unavailable'}[root.state];return state+' · '+(root.activity==='paused'?'Paused · index may be outdated':root.activity==='indexing'?'Indexing':root.activity==='watching'?(root.state==='degraded'?'Watching · some paths unavailable':'Watching'): 'Unavailable · check folder access');}
 function bounded<T>(promise:Promise<T>,signal:AbortSignal,timeout:number|null=5000):Promise<T>{return new Promise((resolve,reject)=>{

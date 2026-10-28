@@ -1,4 +1,4 @@
-import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsKey,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
+import { FILE_SEARCH_CHANNELS,FILE_SEARCH_CHANGED,fileSearchStateSchema,fileSearchStateReplySchema,fileSearchActionReplySchema,fileSearchQueryReplySchema,fileSearchQueryRequestSchema,fileSearchRootRequestSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,indexedTextPreviewRequestSchema,indexedTextPreviewReplySchema,fileSearchOptionsKey,fileSearchMatchesOptions,MAX_ENVELOPE_BYTES } from '@linuxcast/contracts';
 import type { FileSearchApi,IndexedPathSelection } from '@linuxcast/contracts';
 import type { ShellTransport } from '../preload/api.ts';
 export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
@@ -26,6 +26,14 @@ export function createFileSearchApi(transport:ShellTransport):FileSearchApi {
       const parsed=indexedPathCopyRequestSchema.safeParse({...selection,protocolVersion:1});if(!parsed.success)return failed;
       try{
         const reply=indexedPathCopyReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.copyPath,parsed.data)));
+        if(reply.ok&&(reply.value.resultId!==parsed.data.resultId||reply.value.rootId!==parsed.data.rootId||reply.value.generation!==parsed.data.generation))return failed;
+        return reply;
+      }catch{return failed;}
+    },
+    async previewText(selection:IndexedPathSelection){
+      const parsed=indexedTextPreviewRequestSchema.safeParse({...selection,protocolVersion:1});if(!parsed.success)return failed;
+      try{
+        const reply=indexedTextPreviewReplySchema.parse(bounded(await transport.invoke(FILE_SEARCH_CHANNELS.previewText,parsed.data)));
         if(reply.ok&&(reply.value.resultId!==parsed.data.resultId||reply.value.rootId!==parsed.data.rootId||reply.value.generation!==parsed.data.generation))return failed;
         return reply;
       }catch{return failed;}
