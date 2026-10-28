@@ -301,3 +301,12 @@ describe('F2-01 real SQLite storage owner', () => {
     await expect(result).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false}); expect(sent).toHaveLength(1);
   });
 });
+
+it.each(['rates.cache.get','rates.cache.put'] as const)('rejects mismatched %s snapshot acknowledgements without replay',async method=>{
+ let receive:(value:unknown)=>void=()=>{};const sent:unknown[]=[];const client=createStorageClient({send:value=>sent.push(value),onMessage:listener=>{receive=listener;return()=>{};}});
+ const snapshot={provider:'frankfurter' as const,base:'USD',quote:'EUR',rate:0.92,asOfDate:'2026-10-28',fetchedAt:'2026-10-28T12:00:00.000Z'};
+ const pending=method==='rates.cache.get'?client.request(method,{base:'USD',quote:'EUR'}):client.request(method,{snapshot,configurationRevision:1});
+ const envelope=sent[0] as {request:{requestId:string;method:string}};
+ receive({kind:'response',response:{schemaVersion:1,requestId:envelope.request.requestId,method:envelope.request.method,outcome:'completed',result:{...snapshot,quote:'GBP'}}});
+ await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(sent).toHaveLength(1);
+});

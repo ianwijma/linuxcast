@@ -20,10 +20,14 @@ import type { LauncherCommandMetadata, LauncherCommandsReply, LauncherExecuteRep
 import { hiddenCommandIdsSchema } from '@linuxcast/storage';
 import type { CommandUsage, CommandVisibility } from '@linuxcast/storage';
 import { trustedShellSender } from './ipc.ts';
+import {registerRateIpc} from './rate-ipc.ts';
+import type {RateConversionService} from './rate-service.ts';
 import { registerQuicklinksIpc } from './quicklinks-ipc.ts';
 import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
+  rates?:RateConversionService;
+  rateVisible?:()=>boolean;
   quicklinks?:QuicklinkBackend;
   loadWorkflowCommands?:()=>Promise<WorkflowEditorRecord|null>;
   openWorkflowEntry?:(selection:WorkflowCommandSelection,trusted:()=>boolean)=>Promise<void>;
@@ -82,6 +86,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   if(actions.openWorkflowEditor)builtins.push({id:'linuxcast:open-workflow-editor',title:'Workflow draft',subtitle:'Build and save a local workflow draft',aliases:['workflow','workflows'],keywords:['graph','editor','automation','draft'],enabled:true});
   if(actions.quicklinks)builtins.push({id:'linuxcast:open-quicklinks',title:'Quicklinks',subtitle:'Create, find and open saved web links',aliases:['quicklinks','saved links'],keywords:['web','browser','bookmark','link'],enabled:!!actions.openUrl,...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})});
+  if(actions.rates)builtins.push({id:'linuxcast:currency-conversion',title:'Currency conversion',subtitle:'Convert with an explicitly configured reference-rate source',aliases:['currency','rates'],keywords:['exchange','money','reference'],enabled:true});
   const recordUse = async (id: string) => {
     // Usage failure must never replay an action or prevent recovery through Hide/Quit.
     try { await actions.recordUse?.(id); } catch { /* Explicitly best-effort local ranking only. */ }
@@ -393,7 +398,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
-    if(command.id.startsWith('quicklink:')||command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
+    if(command.id.startsWith('quicklink:')||command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:currency-conversion'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
     busy = true;
     try {
       if(actions.listHidden&&!isLauncherVisibilityProtected(command.id)){
@@ -439,6 +444,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }
     finally { busy = false; }
   });
+  const removeRates=actions.rates?registerRateIpc(ipc,actions.rates,{trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&!busy&&(actions.rateVisible?.()??true),revision:()=>revision,checkVisibility:(event,expected)=>checkVisibility(event,'linuxcast:currency-conversion',expected),...(actions.copyCalculatorResult?{copy:actions.copyCalculatorResult}:{}),recordUse:()=>recordUse('linuxcast:currency-conversion')}):undefined;
   const removeQuicklinks=actions.quicklinks?registerQuicklinksIpc(ipc,actions.quicklinks,{
     trusted:event=>trustedShellSender(event,actions.contents()),active,busy:()=>busy||calculatorPending,
     generation:()=>metadataGeneration,revision:()=>revision,
@@ -447,5 +453,5 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
     recordUse:()=>recordUse('linuxcast:open-quicklinks'),
   }):undefined;
-  return () => { disposed = true;removeQuicklinks?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  return () => { disposed = true;removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }

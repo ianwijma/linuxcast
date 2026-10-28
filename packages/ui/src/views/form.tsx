@@ -21,6 +21,13 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
   // Loading/status rows shrink the viewport; keep Cancel reachable without
   // moving focus onto an action that a held submit key could activate.
   useLayoutEffect(() => { if(active&&(busy||view.loading))formElement.current?.querySelector<HTMLElement>('.lc-form-actions')?.scrollIntoView?.({block:'nearest'}); },[active,busy,view.loading]);
+  const wasLoading=useRef(Boolean(view.loading));
+  useLayoutEffect(()=>{
+    const finished=wasLoading.current&&!view.loading;wasLoading.current=Boolean(view.loading);
+    // A native disabled input loses focus to the document. Recover only that
+    // lost focus after a host operation, never steal focus from Cancel/Actions.
+    if(active&&finished&&document.activeElement===document.body)formElement.current?.querySelector<HTMLElement>('input:not(:disabled), textarea:not(:disabled), select:not(:disabled)')?.focus();
+  },[active,view.loading]);
   const current = useRef({ view, active }); current.current = { view, active };
   const lifetime = useRef(new AbortController());
   useEffect(() => { const controller = new AbortController(); lifetime.current = controller; return () => controller.abort(); }, []);

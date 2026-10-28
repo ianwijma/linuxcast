@@ -1,3 +1,6 @@
+import {RateConversionService} from './rate-service.ts';
+import {fetchFrankfurterRate} from './rate-http.ts';
+import {RATE_ENDPOINT} from '@linuxcast/contracts';
 import { saveDataExport } from './data-export.ts';
 import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
@@ -18,7 +21,15 @@ let dataSettings:ReturnType<typeof createDataSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
 let applications:ReturnType<typeof createApplications>|undefined;
 const copyText=createClipboardWriter(clipboard,()=>process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY);
-startResidentShell({ resourcesDirectory: __dirname,
+const rates=new RateConversionService({
+ async configuration(){if(!storage?.isReady())throw new Error('Rates storage unavailable.');const setting=await storage.repository.request('settings.get',{id:'calculator.rateSource'});return {revision:setting?.revision??0,source:setting?.value==='frankfurter'?'frankfurter':'disabled',endpoint:RATE_ENDPOINT};},
+ async configure(expectedRevision,source){if(!storage?.isReady())throw new Error('Rates storage unavailable.');const setting=await storage.repository.request('settings.set',{id:'calculator.rateSource',expectedRevision,value:source});return {revision:setting.revision,source:setting.value==='frankfurter'?'frankfurter':'disabled',endpoint:RATE_ENDPOINT};},
+ async cached(pair){if(!storage?.isReady())throw new Error('Rates storage unavailable.');return storage.repository.request('rates.cache.get',pair);},
+ async cache(snapshot,configurationRevision){if(!storage?.isReady())throw new Error('Rates storage unavailable.');await storage.repository.request('rates.cache.put',{snapshot,configurationRevision});},
+ async clear(configurationRevision){if(!storage?.isReady())throw new Error('Rates storage unavailable.');await storage.repository.request('rates.cache.clear',{configurationRevision});},
+ fetch:fetchFrankfurterRate,
+});
+startResidentShell({ resourcesDirectory: __dirname,rates,
   prepareQuit:async()=>workflowEditor?workflowEditor.prepareClose():true,
   copyCalculatorResult:copyText,
   quicklinks:{

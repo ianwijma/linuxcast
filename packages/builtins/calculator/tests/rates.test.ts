@@ -1,0 +1,10 @@
+import {expect,it} from 'vitest';
+import {parseFrankfurterRate,calculateRateText,isRateStale} from '../src/rates.ts';
+const now='2026-10-29T00:00:00.000Z',pair={base:'USD',quote:'EUR'},payload={date:'2026-10-28',base:'USD',quote:'EUR',rate:0.8};
+const snapshot=parseFrankfurterRate(payload,pair,now);
+it('parses a public synthetic provider fixture with its own publication date and fetch timestamp',()=>{expect(snapshot).toEqual({provider:'frankfurter',base:'USD',quote:'EUR',rate:0.8,asOfDate:'2026-10-28',fetchedAt:now});});
+it.each([['100','80'],['-12.5','-10'],['0','0'],['0.000000000000000001','8e-19'],['999999999999999','799999999999999']])('formats a local approximate amount without transmitting it: %s',(amount,text)=>{expect(calculateRateText(amount,snapshot)).toBe(text);});
+it.each(['1e3','Infinity','NaN','1 + 2','100 USD to EUR','01','1,000','1.','+1','1\n','1000000000000000','0.0000000000000000001'])('rejects unsupported amount syntax: %s',amount=>{expect(()=>calculateRateText(amount,snapshot)).toThrow();});
+it.each([{...payload,date:'2026-02-29'},{...payload,date:'0000-01-01'},{...payload,date:'2026-10-30'},{...payload,base:'GBP'},{...payload,quote:'USD'},{...payload,rate:0},{...payload,rate:-1},{...payload,rate:Infinity},{...payload,rate:NaN},{...payload,rate:'0.8'},{...payload,url:'https://private.invalid'},{...payload,date:'2026-10-28T00:00Z'}])('rejects hostile, contradictory or non-finite rate response %#',value=>{expect(()=>parseFrankfurterRate(value,pair,now)).toThrow();});
+it('labels old data, old fetches and clock rollback as stale',()=>{expect(isRateStale(snapshot,now)).toBe(false);expect(isRateStale({...snapshot,asOfDate:'2026-10-24'},now)).toBe(true);expect(isRateStale({...snapshot,fetchedAt:'2026-10-27T00:00:00.000Z'},now)).toBe(true);expect(isRateStale(snapshot,'2026-10-28T23:59:59.000Z')).toBe(true);expect(isRateStale({...snapshot,asOfDate:'2026-10-29'},'2026-10-28T00:00:00.000Z')).toBe(true);});
+it('rejects non-finite result overflow instead of returning a simulated price',()=>{expect(()=>calculateRateText('999999999999999',{...snapshot,rate:Number.MAX_VALUE})).toThrow();});

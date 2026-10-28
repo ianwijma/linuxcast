@@ -9,7 +9,9 @@
     "./presentation": "./src/presentation.ts",
     "./types": "./src/types.ts",
     "./result": "./src/result.ts",
-    "./units": "./src/units.ts"
+    "./units": "./src/units.ts",
+    "./rates": "./src/rates.ts",
+    "./rate-presentation": "./src/rate-presentation.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",

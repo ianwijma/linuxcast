@@ -16,6 +16,7 @@ import type { ResidentService } from './lifecycle.ts';
 import { restrictContents, restrictSession, securePreferences } from './security.ts';
 
 export interface ResidentShellOptions {
+  rates?:LauncherActions['rates'];
   resourcesDirectory: string;
   prepareQuit?:()=>Promise<boolean>;
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
@@ -105,7 +106,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       if (!lifecycle.quitting) { event.preventDefault(); lifecycle.hide(); publish(); }
     });
     current.on('show', publish);
-    current.on('hide', publish);
+    current.on('hide',()=>{options.rates?.invalidate();publish();});
     current.on('focus', publish);
     current.on('blur', publish);
     current.on('closed', () => { if (window === current) window = undefined; });
@@ -146,6 +147,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
     services.push(...(options.createServices?.() ?? []));
     removeLauncherIpc = registerLauncherIpc(ipcMain, {
       contents: () => window?.webContents, quitting: () => lifecycle.quitting,
+      ...(options.rates?{rates:options.rates,rateVisible:()=>!!window&&!window.isDestroyed()&&window.isVisible()}:{}),
       hide: () => lifecycle.hide(), quit: () => requestQuit(),
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
       ...(options.loadWorkflowCommands?{loadWorkflowCommands:options.loadWorkflowCommands}:{}),
