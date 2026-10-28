@@ -12,7 +12,7 @@ export const fileSearchStateSchema=z.strictObject({revision:integer.min(1),appea
   .refine(value=>new Set(value.roots.map(root=>root.id)).size===value.roots.length);
 export const fileSearchResultSchema=z.strictObject({id:text(4200).min(1),rootId:z.uuid(),generation:z.uuid(),path:text(4096).min(1),kind:z.enum(['file','directory']),size:integer,modifiedMs:z.number().int().safe()})
   .refine(value=>value.id===`${value.rootId}:${value.path}` && !value.path.startsWith('/') && value.path.split('/').every(part=>part!=='' && part!=='.' && part!=='..') && !value.path.includes('\0'));
-export const FILE_SEARCH_CHANNELS={state:'file-search:state',choose:'file-search:choose',start:'file-search:start',pause:'file-search:pause',remove:'file-search:remove',search:'file-search:search',close:'file-search:close',copyPath:'file-search:copy-path',previewText:'file-search:preview-text'} as const;
+export const FILE_SEARCH_CHANNELS={state:'file-search:state',choose:'file-search:choose',start:'file-search:start',pause:'file-search:pause',remove:'file-search:remove',search:'file-search:search',close:'file-search:close',copyPath:'file-search:copy-path',previewText:'file-search:preview-text',copyPreviewText:'file-search:copy-preview-text'} as const;
 export const FILE_SEARCH_CHANGED='file-search:changed';
 export const fileSearchRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 export const fileSearchRootRequestSchema=fileSearchRequestSchema.extend({rootId:z.uuid()});
@@ -46,7 +46,10 @@ export const indexedPathCopyReplySchema=z.discriminatedUnion('ok',[z.strictObjec
 export const INDEXED_TEXT_MAX_BYTES=64*1024;
 export const indexedTextSchema=text(INDEXED_TEXT_MAX_BYTES).refine(value=>Array.from(value).every(char=>{const code=char.codePointAt(0)!;return (code>=32&&code!==127&&(code<0xd800||code>0xdfff))||code===9||code===10||code===13;}));
 export const indexedTextPreviewRequestSchema=indexedPathSelectionSchema.extend({protocolVersion:z.literal(1)});
-export const indexedTextPreviewReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({outcome:z.literal('previewed'),text:indexedTextSchema})}),failure]);
+export const indexedTextPreviewReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({outcome:z.literal('previewed'),text:indexedTextSchema,previewId:z.uuid().optional()})}),failure]);
+export const indexedTextCopyRequestSchema=indexedPathSelectionSchema.extend({protocolVersion:z.literal(1),previewId:z.uuid()});
+export const indexedTextCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:indexedPathSelectionSchema.extend({previewId:z.uuid(),outcome:z.literal('copied')})}),failure]);
+export type IndexedTextCopyReply=z.infer<typeof indexedTextCopyReplySchema>;
 export type IndexedTextPreviewReply=z.infer<typeof indexedTextPreviewReplySchema>;
 export type IndexedPathSelection=z.infer<typeof indexedPathSelectionSchema>;
 export type IndexedPathCopyReply=z.infer<typeof indexedPathCopyReplySchema>;
@@ -65,6 +68,7 @@ export interface FileSearchApi {
   search(request:{query:string;rootId?:string;options?:FileSearchOptions;directory?:string}):Promise<FileSearchQueryReply>;
   copyPath?(selection:IndexedPathSelection):Promise<IndexedPathCopyReply>;
   previewText?(selection:IndexedPathSelection):Promise<IndexedTextPreviewReply>;
+  copyPreviewText?(selection:IndexedPathSelection&{previewId:string}):Promise<IndexedTextCopyReply>;
   close():Promise<FileSearchActionReply>;
   onState(listener:(state:FileSearchState)=>void):()=>void;
 }

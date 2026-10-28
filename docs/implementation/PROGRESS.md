@@ -37,7 +37,7 @@ Normal GIO original pathname handoff was removed after TOCTOU review. Fixed
 Documents portal candidate is stored with hard safe_handoff_available=false,
 no original path fallback. Independent source review found upstream O_NOFOLLOW
 consumer path readlink/reopen can follow replaced host ancestors. Open remains
-unavailable/unmerged, no PR55 exists yet, no safe native success claimed.
+unavailable/unmerged, PR55 contains only the independent text-preview flow, no safe native success claimed.
 No additional portal/FUSE/VM/proof work assigned. /dev/fuse is available under
 proper permissions; no private portal or mount was created. Do not claim absence
 from default sandbox visibility. Complete native Open remains REQUIRED; text
@@ -74,7 +74,13 @@ apps/desktop/evidence/indexed-text-preview-application.md.
 
 Nativeagentcompletedclean. UIagentcompletedclean/noexpansion. alias_review_sol
 main/native/exactUI/eightcomponentcapture reviewclean afterP2timeoutrepair; final
-actualtest/captures/docs review, signedfinalcommit/push/PR/CI/merge next.
+actualtest/captures/docs review clean at6df006ca04ea7cc3d4f57b66942b86b08dd0a794.
+PR55 https://github.com/ianwijma/linuxcast/pull/55 normally merged26c54818ec8f91c52d64af05ee51177d98c2cf07; CI40725225471 success, no requestedreviews/submissions/comments/unresolvedthreads.
+Primary develop clean fastforwarded26c54818; frozeninstall unchanged/build66assetsPASS. Root nextbranch codex/indexed-preview-copy
+frommergedPR55; frozen PREVIEW-COPY-INCREMENT.md adds optionalpreviewId and
+named token-only copyPreviewText with bounded ephemeralmaintext. Next UIagent
+assignment is explicit Copy text in existingreadonlypreview, no infrastructure/
+research/proof work. Main/preload/realnativeclipboard integration coordinatorowned.
 No fulltask/desktop/AT/releaseacceptanceclaim.
 
 Registry8done/18in-progress/71planned;56passed/325pending/8N/A. L2-02/03 remain
