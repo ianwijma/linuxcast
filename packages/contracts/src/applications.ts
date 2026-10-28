@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { indexedPathTextSchema,fileSearchDirectorySchema,indexedTextSchema } from './file-search.ts';
 import { httpUrlSchema } from './open-url.ts';
 /** Native application operations are distinct from URI/file/argv/shell operations. */
 export const desktopApplicationIdSchema=z.string().min(9).max(512).refine(value=>value.endsWith('.desktop') && !/[\\/\p{Cc}]/u.test(value) && new TextEncoder().encode(value).length<=512);
@@ -10,6 +11,7 @@ export const applicationActionsSchema=z.strictObject({available:z.boolean(),acti
   .refine(value=>(value.available||value.actions.length===0)&&new Set(value.actions.map(action=>action.id)).size===value.actions.length);
 export const nativeApplicationSchema=z.strictObject({desktopId:desktopApplicationIdSchema,title:z.string().min(1).max(256),description:z.string().max(512),fingerprint:applicationFingerprintSchema,actions:applicationActionsSchema.optional()});
 export const nativeApplicationRequestSchema=z.discriminatedUnion('operation',[
+  z.strictObject({protocolVersion:z.literal(1),operation:z.literal('preview-text'),rootPath:indexedPathTextSchema,relativePath:fileSearchDirectorySchema.refine(value=>value.length>0),size:z.number().int().nonnegative().max(65536),modifiedMs:z.number().int().safe()}),
   z.strictObject({protocolVersion:z.literal(1),operation:z.literal('open-url'),url:httpUrlSchema}),
   z.strictObject({protocolVersion:z.literal(1),operation:z.literal('list'),afterId:desktopApplicationIdSchema.optional(),limit:z.number().int().min(1).max(100)}),
   z.strictObject({protocolVersion:z.literal(1),operation:z.literal('launch'),desktopId:desktopApplicationIdSchema,fingerprint:applicationFingerprintSchema}),
@@ -28,3 +30,6 @@ export const nativeApplicationActionReplySchema=z.discriminatedUnion('ok',[
 ]);
 export type NativeApplication=z.infer<typeof nativeApplicationSchema>;
 export type NativeApplicationRequest=z.infer<typeof nativeApplicationRequestSchema>;
+
+/** Main-only descriptor-bound read; no pathname or file contents supplied by renderer. */
+export const nativeTextPreviewReplySchema=z.discriminatedUnion('ok',[z.strictObject({protocolVersion:z.literal(1),ok:z.literal(true),value:z.strictObject({outcome:z.literal('previewed'),text:indexedTextSchema})}),applicationFailureSchema]);
