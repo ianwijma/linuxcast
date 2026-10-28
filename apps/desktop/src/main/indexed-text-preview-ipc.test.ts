@@ -62,3 +62,9 @@ it.each(['nul','control','huge','surrogate','exception'] as const)('strips inval
 it('accepts empty text and an exact UTF8 byte boundary',async()=>{
  const f=fixture({previewText:async()=>''});await f.admit();expect(await f.invoke(C.previewText)).toMatchObject({ok:true,value:{text:''}});f.actions.previewText=async()=>'é'.repeat(32768);expect(await f.invoke(C.previewText)).toMatchObject({ok:true});
 });
+
+it('never begins a source read when initial folder preflight resolves after the receipt deadline',async()=>{
+ vi.useFakeTimers();const f=fixture();await f.admit();let finish!:(s:typeof state)=>void;
+ f.actions.getState=()=>new Promise(resolve=>{finish=resolve;});const pending=f.invoke(C.previewText);await vi.advanceTimersByTimeAsync(4000);
+ expect(await pending).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});finish(state);await settle();expect(f.actions.previewText).not.toHaveBeenCalled();
+});

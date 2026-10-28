@@ -40,8 +40,8 @@ export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       if(mutating||previewPending)return failed('cancelled','A preview is still running. Try Preview text again shortly.');
       if(!selected||admittedOwner!==event.sender||selected.row.kind!=='file'||selected.row.rootId!==request.rootId||selected.row.generation!==request.generation)return failed('conflict','Search again and select a current file before previewing.');
       if(!actions.previewText||!actions.isVisible?.())return failed('capability-unavailable','Text preview is unavailable. Reopen file search to reconnect.');
-      previewPending=true;
-      const current=()=>!stopped&&!mutating&&sequence===querySequence&&admitted.get(request.resultId)===selected&&actions.isReady()&&actions.isVisible?.()===true&&trustedAppSender(event,actions.contents(),FILE_SEARCH_URL);
+      previewPending=true;let expired=false;const deadline=performance.now()+4000;
+      const current=()=>!expired&&performance.now()<deadline&&!stopped&&!mutating&&sequence===querySequence&&admitted.get(request.resultId)===selected&&actions.isReady()&&actions.isVisible?.()===true&&trustedAppSender(event,actions.contents(),FILE_SEARCH_URL);
       const rootCurrent=(state:FileSearchState)=>{const root=state.roots.find(value=>value.id===request.rootId);return !!root&&root.generation===selected.row.generation&&root.displayPath===selected.root.displayPath&&root.state!=='idle'&&root.state!=='unavailable'&&root.activity!=='unavailable';};
       const stale=()=>failed('conflict','Folder or search changed. Search again before previewing.');
       const work=(async():Promise<IndexedTextPreviewReply>=>{
@@ -57,7 +57,7 @@ export function registerFileSearchIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       })();
       void work.finally(()=>{previewPending=false;}).catch(()=>{});
       let timer:ReturnType<typeof setTimeout>|undefined;
-      try{return await Promise.race([work,new Promise<IndexedTextPreviewReply>(resolve=>{timer=setTimeout(()=>resolve(failed('deadline-exceeded','Text preview timed out. Try Preview text again shortly.')),4000);})]);}
+      try{return await Promise.race([work,new Promise<IndexedTextPreviewReply>(resolve=>{timer=setTimeout(()=>{expired=true;resolve(failed('deadline-exceeded','Text preview timed out. Try Preview text again shortly.'));},4000);})]);}
       finally{clearTimeout(timer);}
     }
     if(channel===FILE_SEARCH_CHANNELS.copyPath){
