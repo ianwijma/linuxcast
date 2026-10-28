@@ -91,3 +91,35 @@ PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp, Node24.22.1/Bun1.4.4/Electron45/
 SQLite3.53.4/Rust1.95/GIO2.72.4. Git/network/signing/privateapp/owner sockets and
 ownedfixturechildprocess tests need escalation; default EPERM is sandbox, not
 backend regression. Serialize application tests sharingdist. No running signprompt.
+
+## Current follow-on Copy text increment (unmerged)
+
+Root codex/indexed-preview-copy from26c54818, freeze0b1b55c, main/preload
+4e2588a, actualscenario+mocktypefix221b3d8. NamedcopyPreviewText accepts only
+issuedresult/root/generation/previewId UUID, nevercallertext/path. Mainkeepsone
+64KiB5minmonotonic memorylease; source is not reread onCopy. Cleared onnewpreview/
+query/servicegeneration/windowclose/disposal/expiry, nohistory/storage/network.
+UItextclearedonBack; mainlease hasboundedexplicit lifetime. Nativeclipboard
+write usesexistingwriter/sharedCopygate;4sdeadline retainsactualslot, no late
+preflightwrite, exactcurrentreceiptonly, truthfulunknown/no replay. SharedPathCopy
+preflightdeadline repairedtoo.85mappedsecurity/7contracts/fulltype/scopedlintPASS;
+independent file_search_service_sol sourceclean4e2588a+testliteralcorrection.
+Native readerunchanged20checksfromPR55, not rerun as newevidence.
+
+UIauthor7bfed5c23cad2f2be0a0f1983d7281593891fb5c integrated03e49d7,
+worktree .worktrees/linuxcast-l1-01 clean codex/indexed-preview-copy-ui.
+Final232mappedunits/7contracts/85security/fulltype/scopedlint/plan/diffPASS,
+author150focusedunits/57ChromiumkeyboardaxePASS. Sevennewpubliccomponentcaptures
+inspected. alias_review_sol founddisposalreentryP2: fixedinactive/disposedbefore
+publication+two directregressions; exactUI/source/capture reconciliation clean.
+Core independentserviceagent clean, no newnativecode/proofwork.
+
+Actual productionprivateXvfb/nativeclipboard16.02sPASS, build66assetsPASS.
+ExactUnicode/literalclipboard/xclip, unsupportedhintmanualretry, pausedchanged
+sourcecopiesdisplayedsnapshot/no reread, clear+savedtokenrefusal, emptyCopy
+clearsactualElectron45read/type andX11TARGETS, sourcespreserved, retainedfile
+flow/Quit. Initialharness ambiguousresult/emptySTRING/removedformatAPI assumptions
+corrected; finalno unresolvedfailure. Fiveactualpubliccaptures inspected, unrelated
+DetailsPNGchurn restored. Finalactualtest/captures/evidencereview and signedhead/
+push/PR/CI/normalmerge next. Evidence indexed-preview-copy-application.md.
+No fulltask/nativeOpen/supporteddesktop/AT/performance/package/release claim.
