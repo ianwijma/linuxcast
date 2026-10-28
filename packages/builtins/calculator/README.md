@@ -1,5 +1,51 @@
 # Explicit arithmetic, unit, colour and zoned date/time calculator — bounded L2-04 increments
 
+## Configured fiat rates UI (bounded L2-04 increment)
+
+`src/rate-presentation.ts` exports `RateConversionFlow` with the existing shared
+Form/Detail lifecycle. Currency conversion opens with 100 / USD / EUR, reads actual
+configuration and requires explicit opt-in to Frankfurter reference rates.
+Configure source, About rates and typing do not convert or copy. Explicit Convert
+shows the timestamped estimate, publication/fetch timestamps, endpoint, independent
+Online/Offline and Recent/Stale labels. Separate Copy sends only registry revision
+and opaque quote ID; its receipt must match ID, numeric text and target currency.
+Results disclose approximate daily reference data, not exact accounting/live prices.
+
+Missing capabilities are disabled with recovery guidance. Source Save uses exact
+CAS revision+1 and source acknowledgement. Failed/malformed/lost Save or Clear
+requires manual Reload with no replay. The host retains
+`createRateConversionFlowState()` across disposal/reopen; automatic configuration
+reads cannot clear `metadataUnconfirmed` or prove cache deletion. Unknown Copy
+requires checking the clipboard before a deliberate retry. Expired quotes, clock
+rollback, stale views/root context, reentrant pending publication, Back/Hide and
+late/disposed completions cannot confirm or silently repeat an action. Unsent
+Form drafts/focus survive readonly help/source navigation; depth stays 3.
+
+Author validation on Linux/headless Chromium, Node 24.22.1 / Bun 1.4.4:
+
+- 56 focused `tests/rate-presentation.test.ts` cases pass; 15
+  `tests/rates.ui.test.ts` keyboard/browser cases pass, including axe, held Enter,
+  IME, disabled opt-in, offline/stale, input/receipt failures, unknown recovery,
+  pending operations, missing APIs and 200% control bounds. Strengthened help-focus
+  and 200% metadata captures were separately rerun successfully.
+- Full typecheck, scoped ESLint, plan validation and diff whitespace checks pass.
+- 16 inspected public synthetic captures: dark/light `rates-disabled`,
+  `rates-source`, `rates-result`, `rates-invalid`; dark `rates-about`,
+  `rates-unavailable`, `rates-copy-unknown`, `rates-clear-unknown`,
+  `rates-copy-pending`, `rates-save-pending`; light `rates-offline-stale` and
+  `rates-200-percent` (all under `evidence/`, theme prefix, `.png`).
+
+Reproduce using `LINUXCAST_TEST_FILES` containing the explicit test path with
+`scripts/test-runner/vitest.config.ts` or `playwright.config.ts`. The labelled
+`fixtures/rates.html` observer supplies synthetic configuration/quote receipts;
+it performs no provider/network, storage or clipboard effects. This is partial
+AC02/UI/privacy presentation evidence. Coordinator-owned native network, only-pair
+transmission, persistence/cache and independent clipboard integration are separate.
+Required crypto/secure credential setup, paste variants, full L2-04/1.0,
+prerequisite/native Wayland/GNOME/KDE/AT/session/performance/release gates remain
+unfinished; no simulated operation or headless check establishes those gates.
+
+
 `CalculatorFlow` uses the existing launcher's shared `ViewSession` and host
 `ViewRenderer`. It pushes a Calculator Form onto the supplied parent view, then
 a Calculation Detail after a successful explicit Evaluate. The local
