@@ -13,7 +13,7 @@ afterEach(()=>{disposers.splice(0).forEach(dispose=>dispose());vi.useRealTimers(
 function fixture(overrides:Partial<FileSearchActions>={}){
  const frame={url:FILE_SEARCH_URL},contents={mainFrame:frame,isDestroyed:()=>false,getURL:()=>FILE_SEARCH_URL} as unknown as WebContents,event={sender:contents,senderFrame:frame} as IpcMainInvokeEvent;
  const handlers=new Map<string,(event:IpcMainInvokeEvent,payload:unknown)=>unknown>();
- const actions:FileSearchActions={contents:()=>contents,isReady:()=>true,isVisible:()=>true,getState:vi.fn(async()=>structuredClone(state)),chooseFolder:vi.fn(),startIndex:vi.fn(),pauseIndex:vi.fn(),removeFolder:vi.fn(),search:vi.fn(async request=>({...request,rootId:request.rootId??null,results:[row]})),previewText:vi.fn(async()=>'<script>public</script>\n雪 🐧'),copyText:vi.fn(async()=>'written'),close:vi.fn(),...overrides};
+ const actions:FileSearchActions={contents:()=>contents,isReady:()=>true,isVisible:()=>true,getState:vi.fn(async()=>structuredClone(state)),chooseFolder:vi.fn(),startIndex:vi.fn(),pauseIndex:vi.fn(),removeFolder:vi.fn(),search:vi.fn(async request=>({...request,rootId:request.rootId??null,results:[row]})),previewText:vi.fn(async()=>'<script>public</script>\n雪 🐧'),copyText:vi.fn(async()=>'written' as const),close:vi.fn(),...overrides};
  const dispose=registerFileSearchIpc({handle:(channel,handler)=>{handlers.set(channel,handler);},removeHandler:channel=>{handlers.delete(channel);}},actions);disposers.push(dispose);
  const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>handlers.get(channel)!(sender,payload);
  const admit=()=>invoke(C.search,{protocolVersion:1,query:'notes',rootId});

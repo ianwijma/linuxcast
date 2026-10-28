@@ -71,9 +71,15 @@ it('opens selected-folder search through the real launcher and preserves native 
   await expect.poll(()=>files.locator('pre.lc-text-content').textContent()).toBe(publicText);
   expect(await files.locator('pre script, pre a, pre img').count()).toBe(0);expect(clipboardText()).toBe(notes);
   for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>files.locator(`[data-lc-theme="${theme}"]`).count()).toBeGreaterThan(0);expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);await files.screenshot({path:join(evidence,`application-${theme}-text-preview.png`)});}
+  // Copy is a separate explicit effect and copies the exact displayed literal snapshot.
+  await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');await expect.poll(clipboardText).toBe(publicText);
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>files.locator(`[data-lc-theme="${theme}"]`).count()).toBeGreaterThan(0);expect((await new AxeBuilder({page:files}).setLegacyMode().analyze()).violations).toEqual([]);await files.screenshot({path:join(evidence,`application-${theme}-preview-text-copied.png`)});}
+  await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(files,'Copy text');await expect.poll(()=>files.getByRole('alert').textContent()).toContain('Text was not copied.');expect(clipboardText()).toBe(publicText);await files.screenshot({path:join(evidence,'application-preview-copy-unavailable.png')});
+  await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe(publicText);await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');expect(clipboardText()).toBe(publicText);
   await files.keyboard.press('Escape');await expect.poll(()=>search.inputValue()).toBe('public-summary');await expect.poll(()=>search.evaluate(element=>element===document.activeElement)).toBe(true);expect(await files.getByRole('option',{selected:true}).textContent()).toContain('public-summary.txt');
   expect(await files.locator('pre.lc-text-content').count()).toBe(0);expect(external).toEqual([]);expect(readFileSync(join(selected,'public-summary.txt'),'utf8')).toBe(publicText);
   await search.fill('public-notes');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-notes.txt');
+  await action(files,'Copy path');await expect.poll(clipboardText).toBe(notes);
   // Known unsupported session does not write; recovery needs another explicit action.
   await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='unknown';});await action(files,'Copy path');await expect.poll(()=>files.getByRole('alert').textContent()).toContain('not copied');expect(clipboardText()).toBe(notes);await app.evaluate(()=>{process.env.XDG_SESSION_TYPE='x11';});expect(clipboardText()).toBe(notes);await action(files,'Copy path');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Path copied.');
   // Filters use real indexed metadata and the production sole-owner query, never source contents.
@@ -110,7 +116,9 @@ it('opens selected-folder search through the real launcher and preserves native 
   await action(files,'Pause indexing');await expect.poll(state).toMatchObject({roots:[{activity:'paused'}]});
   // Paused metadata never authorizes a mismatched source read; retry is explicit.
   await search.fill('public-summary');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent()).toContain('public-summary.txt');
+  await action(files,'Preview text');await expect.poll(()=>files.locator('pre.lc-text-content').textContent()).toBe(publicText);
   writeFileSync(join(selected,'public-summary.txt'),'PUBLIC_CHANGED_SOURCE_WITH_DIFFERENT_SIZE');
+  await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');await expect.poll(clipboardText).toBe(publicText);expect(await files.locator('pre.lc-text-content').textContent()).toBe(publicText);await files.screenshot({path:join(evidence,'application-paused-preview-snapshot-copy.png')});await files.keyboard.press('Escape');
   await action(files,'Preview text');await files.getByRole('heading',{name:'Text preview · public-summary.txt',exact:true}).waitFor();await expect.poll(()=>files.getByRole('alert').textContent()).toContain('Text preview was not read.');
   expect(await files.locator('pre.lc-text-content').textContent()).not.toContain('PUBLIC_CHANGED_SOURCE');
   await files.screenshot({path:join(evidence,'application-text-preview-stale.png')});await files.keyboard.press('Escape');
@@ -128,6 +136,10 @@ it('opens selected-folder search through the real launcher and preserves native 
 
   await action(files,'Preview text');await expect.poll(()=>files.locator('pre.lc-text-content').textContent()).toBe('SYNTHETIC_CONTENT_SENTINEL');
 
+  const issuedPreview=await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.previewText!(selection),savedSelection);
+  if(!issuedPreview.ok||!issuedPreview.value.previewId)throw new Error('Synthetic preview token missing.');
+  const savedPreviewCopy={...savedSelection,previewId:issuedPreview.value.previewId};
+
   // This root remains paused: clear must publish invalidation without any live job callback.
   const local=launcher.getByRole('searchbox',{name:'Search commands',exact:true});await local.fill('local data');const opened=app.waitForEvent('window');await local.press('Enter');const data=await opened;await data.waitForURL('linuxcast-app://shell/data-settings.html');
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
@@ -135,11 +147,13 @@ it('opens selected-folder search through the real launcher and preserves native 
   await expect.poll(()=>files.getByRole('option').count()).toBe(0);await expect.poll(state).toMatchObject({roots:[{activity:'paused',generation:null}]});
   expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.copyPath!(selection),savedSelection)).toMatchObject({ok:false});expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));
   await expect.poll(()=>files.locator('pre.lc-text-content').count()).toBe(0);expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.previewText!(selection),savedSelection)).toMatchObject({ok:false});
+  expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.copyPreviewText!(selection),savedPreviewCopy)).toMatchObject({ok:false});expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));
   expect(readFileSync(join(selected,'public-renamed.txt'),'utf8')).toBe('SYNTHETIC_CONTENT_SENTINEL');expect(readFileSync(join(selected,'public-summary.txt'),'utf8')).toBe(publicText);
   // Original sources survive index clearing and both removal outcomes.
   expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);await data.close();await files.getByRole('searchbox',{name:'Search files',exact:true}).press('Escape');
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(state).toMatchObject({roots:[]});expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},selected);
-  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('searchbox',{name:'Search files',exact:true}).waitFor();await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching'}]});await quit();
+  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('searchbox',{name:'Search files',exact:true}).waitFor();await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching'}]});
+  const empty=join(selected,'public-empty.txt');writeFileSync(empty,'');const finalSearch=files.getByRole('searchbox',{name:'Search files',exact:true});await finalSearch.fill('public-empty');await expect.poll(()=>files.getByRole('option',{selected:true}).textContent(),{timeout:10000}).toContain('public-empty.txt');await action(files,'Preview text');await expect.poll(()=>files.getByRole('status').textContent()).toContain('This text file is empty.');expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');await expect.poll(clipboardText).toBe('');await files.screenshot({path:join(evidence,'application-empty-preview-copy.png')});expect(readFileSync(empty,'utf8')).toBe('');await quit();
 },60000);
