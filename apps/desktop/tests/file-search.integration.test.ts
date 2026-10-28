@@ -44,7 +44,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   let files=await openFiles();
   const state=()=>files.evaluate(async()=>{const reply=await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.getState();return reply.ok?reply.value:null;});
   await expect.poll(state).toMatchObject({roots:[]});await expect.poll(()=>files.getByRole('option').count()).toBe(0);
-  expect(await files.evaluate(()=>({node:typeof process,require:typeof (window as unknown as {require?:unknown}).require,keys:Object.keys((window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles).sort()}))).toEqual({node:'undefined',require:'undefined',keys:['chooseFolder','close','copyPath','getState','onState','pauseIndex','previewText','removeFolder','search','startIndex']});
+  expect(await files.evaluate(()=>({node:typeof process,require:typeof (window as unknown as {require?:unknown}).require,keys:Object.keys((window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles).sort()}))).toEqual({node:'undefined',require:'undefined',keys:['chooseFolder','close','copyPath','copyPreviewText','getState','onState','pauseIndex','previewText','removeFolder','search','startIndex']});
   // Native dialogs alone are instrumented; renderer, IPC, native index, storage and lifecycle are production.
   await app.evaluate(({dialog})=>{dialog.showOpenDialog=async()=>({canceled:true,filePaths:[]});});
   await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');expect((await state())?.roots).toEqual([]);

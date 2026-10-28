@@ -56,3 +56,8 @@ it('retains unresolved native copies beyond the deadline, keeps Close usable and
 it('does not claim a confirmed copy after the source query/window context changed during native work',async()=>{
   let finish!:(value:'written')=>void;const f=setup({copyPath:vi.fn<NonNullable<FileSearchActions['copyPath']>>(()=>new Promise(resolve=>{finish=resolve;}))});await f.search();const pending=f.invoke(C.copyPath,request);await vi.waitFor(()=>expect(f.actions.copyPath).toHaveBeenCalledOnce());await f.search('');finish('written');expect(await pending).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
 });
+
+it('does not begin a path copy after a delayed preflight receipt deadline',async()=>{
+ vi.useFakeTimers();const f=setup();await f.search();let finish!:(value:FileSearchState)=>void;
+ vi.mocked(f.actions.getState).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));const pending=f.invoke(C.copyPath,request);await vi.advanceTimersByTimeAsync(4000);expect(await pending).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});finish(f.state);for(let n=0;n<8;n++)await Promise.resolve();expect(f.actions.copyPath).not.toHaveBeenCalled();f.registration();
+});

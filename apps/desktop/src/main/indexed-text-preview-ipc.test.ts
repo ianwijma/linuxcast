@@ -23,7 +23,7 @@ function fixture(overrides:Partial<FileSearchActions>={}){
 const settle=async()=>{for(let n=0;n<8;n++)await Promise.resolve();};
 it('reads only one admitted current identity and returns literal bounded text, with no background read',async()=>{
  const f=fixture();await f.admit();expect(f.actions.previewText).not.toHaveBeenCalled();
- expect(await f.invoke(C.previewText)).toEqual({ok:true,value:{outcome:'previewed',resultId:row.id,rootId,generation,text:'<script>public</script>'}});
+ expect(await f.invoke(C.previewText)).toEqual({ok:true,value:{outcome:'previewed',resultId:row.id,rootId,generation,text:'<script>public</script>',previewId:expect.any(String)}});
  expect(f.actions.previewText).toHaveBeenCalledExactlyOnceWith({rootPath:'/public',relativePath:'notes.txt',size:9,modifiedMs:0});
  expect(f.actions.getState).toHaveBeenCalledTimes(3);
 });

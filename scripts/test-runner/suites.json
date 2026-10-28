@@ -309,7 +309,8 @@
       "apps/desktop/src/main/indexed-path-ipc.test.ts",
       "apps/desktop/src/main/file-search-ipc.test.ts",
       "apps/desktop/src/file-preload/api.test.ts",
-      "apps/desktop/src/main/indexed-text-preview-ipc.test.ts"
+      "apps/desktop/src/main/indexed-text-preview-ipc.test.ts",
+      "apps/desktop/src/main/indexed-preview-copy-ipc.test.ts"
     ],
     "L2-05": [
       "apps/desktop/src/main/quicklinks-ipc.test.ts",
