@@ -34,3 +34,4 @@ export * from './file-search.ts';
 export * from './calculator.ts';
 export * from './workflow-editor.ts';
 export * from './workflow-run.ts';
+export * from './rate-conversion.ts';

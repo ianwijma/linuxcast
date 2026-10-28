@@ -15,14 +15,16 @@ checks use ownedprivateXvfb/profile only; no userdisplay/device/--no-sandbox.
 
 ## Integrated base
 
-Primary clean develop7aa0d91c8a8c9624c9689fc5101a7f9e0af5fdf6 (PR52), rechecked
-29October unchanged/noopenPRs. PR52 zoneddate conversion: exact signed reviewed
+Primary clean developdbafd815e601e9d4f8d90d453663affdf1132c02 (PR53),
+normalmerge29OctoberSydney/28OctoberUTC. Exact signedheada79d41e, CI40707235400
+validatePASS13s; no requested GitHubreviews/comments/threads; primaryfrozeninstall/
+build66assetsPASS. PR52 remainsintegrated. PR52 zoneddate conversion: exact signed reviewed
 headb012c84d94f9845f615b41096fc938d67781615c, CI40436099692 validatePASS14s,
 no requested GitHubreviews/comments/threads. Normalexactheadmerge27October;
 primaryfrozeninstall/build66assetsPASS. HistoricaloffsetP2fixed2c08f6e. Full task
 unclaimed. See registry/cards/evidence for all earlier merged increments.
 
-## Current required application increment: calendar/elapsed arithmetic
+## Integrated calendar/elapsed arithmetic increment
 
 Root `.worktrees/linuxcast-application-controls`, branch
 `codex/calculator-calendar-arithmetic` fromPR52. Signedcore/freeze c6cf018,
@@ -46,8 +48,8 @@ source/capture review independentlyclean at81ba9d0. No live tests/signing sessio
 Evidence `apps/desktop/evidence/calculator-calendar-application.md`; registry/card
 partial evidence appended, AC02/UI/taskpending. Coreinitialtypecheck required two
 new fixedcodes in closedmessage table; finaltypepass, no unresolved failure.
-Next finalreview→signedevidence→focusedPR/attach→configuredGitHubreviews/CI→normal
-exactheadmerge→primaryfrozeninstall/build. No redundant reruns without changes.
+IntegratedPR53/dbafd815 as above; finalexactsource/captures81ba9d0 clean.
+No redundant reruns without changes.
 
 ## Agents
 
@@ -60,13 +62,25 @@ All GPT-6.1 SOL/high:
   rootpreparedactualsourceclean, finalintegrated81ba9d0/8actualcapturesreview
   clean at81ba9d0, no reruns or scopeexpansion.
 
-## Next required application work and acceptance
+## Current next required application work: configured currency rates
 
-Aftermerge select next REQUIRED L2-04 opt-in configured rates/timestamped
-stale/offline flow using existing shell/storage/sharedUI; coordinator owns
-contracts/storage/main boundaries, manifest only bounded applicationUI after
-freeze. No task-choice question, no infrastructure/research/proof. Copy/paste
-variants and full remaining1.0scope remain required; no MVP or prerequisitewaiver.
+Root reuses controlsworktree, newbranch`codex/calculator-rate-conversion` fromPR53.
+RATES-INCREMENT.md freezes disabled-by-default namedFrankfurter nativeendpoint
+configuration→explicitConvert→timestampedResult/stale/offline→separateopaquequote
+Copy. No query-as-you-type, amount/rawquery/networktransmission or backgroundfetch.
+Crypto/securekeysetup/paste/fullnative/release remainrequired subsequentincrements.
+
+Currentuncommitted: closed RateConversionApi/strict schemas incontracts,
+calculator pure rates parser/estimate/staleness helper and32syntheticfixedtests.
+Initialhelperdirectzodimport lackeddeclareddependency; moved schema validation to
+existingcontracts package, no newdependency. Final32PASS; fulltype/lint session
+72345 toconfirm. No backend/storage/network/main/preload/routing/productionrate
+feature implemented/accepted yet. Next coordinatorHTTPSpublicfixedorigin/
+responsebounds/singleowner64paircache/CASconfig/ephemeralquote+clipboardfences;
+then actualintegration and focusedPR. UIauthor boundedRateFlow assignment next
+fromsignedfreeze, noinfra/research/proof. Primarydocs verified Frankfurterv2
+flatdate/base/quote/rate, CoinGeckoDemo timestamp/keyrequirement. Skilllibrary
+Context7queried/read, tool unavailable, officialdocs fallbackused.
 
 Registry8done/18in-progress/71planned;56passed/325pending/8N/A. No fully accepted
 ready tasks; approvedunfinishedincrements do not waive native/releaseacceptance.
