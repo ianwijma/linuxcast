@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { conversationRecordSchema, messageRevisionRecordSchema, uiTextSchema } from '../../contracts/src/index.ts';
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
-export const localSettingIdSchema = z.enum(['ui.theme','launcher.shortcut','onboarding.completed','clipboard.historyEnabled']);
+export const localSettingIdSchema = z.enum(['ui.theme','launcher.shortcut','onboarding.completed','clipboard.historyEnabled','calculator.rateSource']);
 const ids = (item:z.ZodType<string>) => z.array(item).max(100).refine(values=>new Set(values).size===values.length).optional();
 export const dataClearParamsSchema = z.discriminatedUnion('category',[
   z.strictObject({category:z.literal('command-usage'),ids:ids(commandId)}),
@@ -17,6 +17,7 @@ export const dataExportParamsSchema = z.discriminatedUnion('category',[
 ]);
 const setting = z.strictObject({id:localSettingIdSchema,revision:z.number().int().positive().safe(),value:z.union([z.string(),z.boolean()]),modifiedAt:z.iso.datetime()}).refine(record=>{
   switch(record.id) {
+    case 'calculator.rateSource': return typeof record.value==='string'&&['disabled','frankfurter'].includes(record.value);
     case 'ui.theme': return typeof record.value==='string'&&['system','dark','light'].includes(record.value);
     case 'launcher.shortcut': return typeof record.value==='string'&&record.value.length<=100&&![...record.value].some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127);
     default: return typeof record.value==='boolean';

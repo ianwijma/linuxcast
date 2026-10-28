@@ -1,5 +1,6 @@
 import { evaluateExpression } from '@linuxcast/calculator/evaluate';
 import { formatCalculationText } from '@linuxcast/calculator/result';
+import {RateConversionFlow,createRateConversionFlowState} from '@linuxcast/calculator/rate-presentation';
 import { CalculatorFlow } from '@linuxcast/calculator/presentation';
 import { QuicklinksFlow,createQuicklinksFlowState } from '@linuxcast/quicklinks/presentation';
 import { collectCatalogue,mergePinReply,mergeAliasReply,mergeVisibilityCatalogue,parsePage } from './catalogue.ts';
@@ -36,6 +37,7 @@ export class LauncherController {
   #generations=new QueryGenerations();#load:AbortController|null=null;#execution:AbortController|null=null;#dismissal:AbortController|null=null;
   #active=false;#busy=false;#loading=true;#metadataUnconfirmed=false;#status:Status|undefined;
   #calculator:CalculatorFlow|null=null;#calculatorSequence=0;
+  #rates:RateConversionFlow|null=null;#ratesSequence=0;#ratesState=createRateConversionFlowState();
   #quicklinks:QuicklinksFlow|null=null;#quicklinksSequence=0;#quicklinksState=createQuicklinksFlowState();
   #url:UrlEditor|null=null;#urlSequence=0;#urlUnconfirmed=false;
   #manager:{viewId:string;query:string;selectedId:string|null}|null=null;#managerSequence=0;#visibilityPending:{controller:AbortController;viewId:string}|null=null;#visibilityWarning:Status|undefined;
@@ -126,7 +128,7 @@ export class LauncherController {
       actions:[{id:BACK_MANAGE,title:'Back',kind:'invoke',effect:'read'},{id:RETRY,title:'Reload commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})}]};
   }
   #openManager(){
-    if(this.#manager || this.#alias || this.#url || this.#calculator?.active || this.#quicklinks?.active)return;
+    if(this.#manager || this.#alias || this.#url || this.#calculator?.active || this.#rates?.active || this.#quicklinks?.active)return;
     this.#manager={viewId:`launcher-management-${++this.#managerSequence}`,query:'',selectedId:this.session.getSnapshot().frames[0]?.selection??null};
     this.session.navigate({protocolVersion:1,kind:'push',fromViewId:VIEW_ID,view:this.#managedView()});
   }
@@ -171,7 +173,7 @@ export class LauncherController {
   }
   #publish(){if(!this.#active)return;this.session.update(VIEW_ID,{protocolVersion:1,kind:'snapshot',view:this.#view()});if(this.#alias)this.session.update(this.#alias.viewId,{protocolVersion:1,kind:'snapshot',view:this.#aliasView()});if(this.#manager)this.session.update(this.#manager.viewId,{protocolVersion:1,kind:'snapshot',view:this.#managedView()});if(this.#url)this.session.update(this.#url.viewId,{protocolVersion:1,kind:'snapshot',view:this.#urlView()});}
   query(query:string){
-    if(this.#manager || this.#alias || this.#url || this.#calculator?.active)return;
+    if(this.#manager || this.#alias || this.#url || this.#calculator?.active || this.#rates?.active)return;
     if(query!==this.#query)this.#abortApplicationAction();this.#query=query;
     if(query.length>MAX_QUERY_LENGTH){this.#generations.cancel();this.#publish();return;}
     const token=this.#generations.begin(query);
@@ -185,12 +187,14 @@ export class LauncherController {
     if(this.#alias || this.#url)this.session.pop();
     for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
     this.#calculator?.dispose();this.#calculator=null;
+    for(let depth=0;depth<2 && this.#rates?.active;depth++)this.session.pop();
+    this.#rates?.dispose();this.#rates=null;
     for(let depth=0;depth<2 && this.#quicklinks?.active;depth++)this.session.pop();
     this.#quicklinks?.dispose();this.#quicklinks=null;
     this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;this.#busy=false;
   }
   async refresh(explicit=true){
-    if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active || this.#quicklinks?.active)return;
+    if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active || this.#rates?.active || this.#quicklinks?.active)return;
     this.#load?.abort();const controller=new AbortController();this.#load=controller;
     this.#loading=true;this.#status=undefined;this.#publish();
     try{
@@ -205,6 +209,7 @@ export class LauncherController {
     const frame=this.session.getSnapshot().frames.at(-1);
     if(!this.#active || this.#busy && !(this.#alias && intent.actionId===CANCEL_ALIAS || this.#url && intent.actionId===CANCEL_URL || this.#manager && intent.actionId===BACK_MANAGE) || this.#loading && !(this.#manager && intent.actionId===BACK_MANAGE) || !frame || intent.viewId!==frame.view.viewId || intent.revision!==frame.view.revision)return;
     if(this.#calculator?.active){if(this.#snapshot?.commands.find(command=>command.id==='linuxcast:calculator')?.hidden)return;await this.#calculator.handle(intent);return;}
+    if(this.#rates?.active){const parent=this.#snapshot?.commands.find(command=>command.id==='linuxcast:currency-conversion');if(!parent?.enabled||parent.hidden)return;await this.#rates.handle(intent);return;}
     if(this.#quicklinks?.active){const parent=this.#snapshot?.commands.find(command=>command.id==='linuxcast:open-quicklinks');if(!parent?.enabled||parent.hidden)return;await this.#quicklinks.handle(intent);return;}
     if(this.#manager){
       if(intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
@@ -238,6 +243,10 @@ export class LauncherController {
       if(this.#quicklinkUnavailable(command)||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
       this.#quicklinks?.dispose();this.#quicklinks=new QuicklinksFlow({session:this.session,api:this.#api,viewId:`launcher-quicklinks-${++this.#quicklinksSequence}`,revision:this.#snapshot!.revision,state:this.#quicklinksState,onDismiss:this.#dismiss});
       this.#quicklinks.open(VIEW_ID,command.quicklink?{id:command.quicklink.id,revision:command.quicklink.revision}:undefined);return;
+    }
+    if(command.id==='linuxcast:currency-conversion'){
+      if(intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
+      this.#rates?.dispose();this.#rates=new RateConversionFlow({session:this.session,api:this.#api,viewId:`launcher-rates-${++this.#ratesSequence}`,revision:this.#snapshot!.revision,state:this.#ratesState});this.#rates.open(VIEW_ID);return;
     }
     if(command.id==='linuxcast:calculator'){
       this.#calculator?.dispose();this.#calculator=new CalculatorFlow({session:this.session,api:this.#api,viewId:`launcher-calculator-${++this.#calculatorSequence}`,revision:this.#snapshot!.revision});
@@ -334,6 +343,7 @@ export class LauncherController {
     finally{if(this.#execution===controller && !controller.signal.aborted){this.#busy=false;this.#publish();}}
   }
   async #closeView(viewId:string){
+    if(this.#rates?.closed(viewId)){if(!this.#rates.active){this.#rates.dispose();this.#rates=null;void this.refresh(false);}return;}
     if(this.#quicklinks?.owns(viewId)){this.#quicklinks.close(viewId);if(!this.#quicklinks.active){this.#quicklinks.dispose();this.#quicklinks=null;void this.refresh(false);}return;}
     if(this.#calculator?.closed(viewId)){if(!this.#calculator.active){this.#calculator.dispose();this.#calculator=null;void this.refresh(false);}return;}
     if(this.#manager?.viewId===viewId){this.#abortVisibility();this.#manager=null;this.#publish();return;}
@@ -362,7 +372,7 @@ export class LauncherController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:failureMessage};this.#publish();}}
     finally{if(this.#dismissal===controller)this.#dismissal=null;}
   }
-  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#quicklinks?.dispose();this.#quicklinks=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
+  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#rates?.dispose();this.#rates=null;this.#quicklinks?.dispose();this.#quicklinks=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
   return new Promise((resolve,reject)=>{

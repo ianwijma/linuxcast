@@ -84,3 +84,13 @@ describe('form lifecycle and trusted host boundary', () => {
   });
 
 });
+
+it('restores a field after host loading loses native focus, preserving deliberate focus elsewhere',()=>{
+ const props={host:{action:vi.fn()},active:true,onDirty:()=>{},requestCancel:()=>{}};
+ const rendered=render(<ViewForm view={simple} {...props}/>);
+ const field=screen.getByLabelText(/Name/);field.focus();
+ rendered.rerender(<ViewForm view={{...simple,loading:true,revision:2}} {...props}/>);document.body.tabIndex=-1;document.body.focus();document.body.removeAttribute('tabindex');expect(document.activeElement).toBe(document.body);
+ rendered.rerender(<ViewForm view={{...simple,loading:false,revision:3}} {...props}/>);expect(document.activeElement).toBe(field);
+ rendered.rerender(<ViewForm view={{...simple,loading:true,revision:4}} {...props}/>);const cancel=screen.getByRole('button',{name:'Cancel'});cancel.focus();
+ rendered.rerender(<ViewForm view={{...simple,loading:false,revision:5}} {...props}/>);expect(document.activeElement).toBe(cancel);
+});

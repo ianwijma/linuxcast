@@ -51,43 +51,56 @@ new fixedcodes in closedmessage table; finaltypepass, no unresolved failure.
 IntegratedPR53/dbafd815 as above; finalexactsource/captures81ba9d0 clean.
 No redundant reruns without changes.
 
-## Agents
+## Current bounded fiat rates integration
 
-All GPT-6.1 SOL/high:
-- manifest_review_sol: boundedUI finished, clean `.worktrees/linuxcast-l1-01`,
-  branch`codex/l2-04-calendar-arithmetic-ui`, signed0eeb82b based oncorelocal
-  a64593a. Owned sevenexistingUI/test/READMEfiles+12captures only. No new work.
-- file_search_service_sol: boundedcore source review clean; no edits/reruns.
-- alias_review_sol: signedsourcetests/README/12componentcaptures clean at0eeb82b;
-  rootpreparedactualsourceclean, finalintegrated81ba9d0/8actualcapturesreview
-  clean at81ba9d0, no reruns or scopeexpansion.
+Root controls worktree, branch codex/calculator-rate-conversion, base PR53.
+Signed freeze2a4eea4; UI31bbecf from signed author2e814135, author worktree clean.
+Coordinator reviewed files implement fixed public HTTPS, settings CAS, migration013/
+single-owner64pair cache, service/quote expiry, named preload/IPC, registry routing
+and shared Form focus recovery. See RATES-INCREMENT.md and
+apps/desktop/evidence/calculator-rates-application.md for behaviour and gaps.
 
-## Current next required application work: configured currency rates
+PASS907 selected L2 units/19 contracts;49 real F2-01 storage integration tests;
+56 author controller/15 Chromium keyboard+axe;6 routing and12 Form regressions;
+96 search/catalogue/Quicklink ceiling checks,14 shell/lifecycle fixtures. New command
+raises ceiling to5605 (4096apps+1000workflows+500Quicklinks+9native). Full typecheck
+passed after correcting test-only TestingLibrary options; scoped lint passed.
 
-Root reuses controlsworktree, newbranch`codex/calculator-rate-conversion` fromPR53.
-RATES-INCREMENT.md freezes disabled-by-default namedFrankfurter nativeendpoint
-configuration→explicitConvert→timestampedResult/stale/offline→separateopaquequote
-Copy. No query-as-you-type, amount/rawquery/networktransmission or backgroundfetch.
-Crypto/securekeysetup/paste/fullnative/release remainrequired subsequentincrements.
+Actual sandboxed production/private Xvfb/native xclip PASS6.19s: one real fixed
+public USD/EUR GET, zero fetch on opening/typing/help/Save,2 explicit native copies,
+trusted harness subsequent HTTPS failure→real matching Offline cache, Hide/reopen,
+Clear→missing-cache refusal, Disable with no fetch and real owner postQuit disabled
+revision2/cacheempty/aggregate2 allowlisted privacy. Eight actual captures and16
+component captures independently reviewed clean. No full desktop/nativeAT claim.
+Focus recovery defect reproduced in actualapp fixed and verified. Author screenshots
+may receive timestamp-only churn from rerun; preserve signed reviewed originals.
 
-Currentuncommitted: closed RateConversionApi/strict schemas incontracts,
-calculator pure rates parser/estimate/staleness helper and32syntheticfixedtests.
-Initialhelperdirectzodimport lackeddeclareddependency; moved schema validation to
-existingcontracts package, no newdependency. Final32PASS; fulltype/lint session
-72345 toconfirm. No backend/storage/network/main/preload/routing/productionrate
-feature implemented/accepted yet. Next coordinatorHTTPSpublicfixedorigin/
-responsebounds/singleowner64paircache/CASconfig/ephemeralquote+clipboardfences;
-then actualintegration and focusedPR. UIauthor boundedRateFlow assignment next
-fromsignedfreeze, noinfra/research/proof. Primarydocs verified Frankfurterv2
-flatdate/base/quote/rate, CoinGeckoDemo timestamp/keyrequirement. Skilllibrary
-Context7queried/read, tool unavailable, officialdocs fallbackused.
+Review closed late cache publication after final configuration await, registry
+revision quote replay and Clear/Configure during final Copy visibility await.
+Immediate no-await issuedQuote object identity + service quote/expiry guard fixes
+last dispatch boundary.25 focused real-service/launcher-gate regressions pass;
+final mapped172 security/full typecheck/scoped lint/plan/diff PASS. No remaining
+boundary finding. Actual online/native/cache/clear evidence remains valid after
+small final quote-state check; regression tests specifically cover the final race.
+Before file inventory was finished mapped runner reported the pending test missing;
+resolved. Preload exposed-method inventory updated for five named capabilities,
+final172PASS. No unresolved test/type/lint failure. PR publication/CI/normal exact
+head merge and primary install/build next, then next bounded application flow.
 
-Registry8done/18in-progress/71planned;56passed/325pending/8N/A. No fully accepted
-ready tasks; approvedunfinishedincrements do not waive native/releaseacceptance.
-Full providers/ranking/context/placeholder/target flows and supported Debian13
-GNOME/KDE Wayland/X11/nativeAT/performance/packages/release gates staypending.
+## Agents (all GPT-6.1 SOL/high)
 
-PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp; Node24.22.1/Bun1.4.4/Electron45/
-SQLite3.53.4/GIO2.72.4. Escalation for Git/signing/network/privateapp/abstractowner
-sockets; sandboxEPERM is not regression. Mappedrunner takesoneID. Serializeactual
-app tests sharingdist. Historicalnativelab stopped; no newdevice/VM/proof work.
+- manifest_review_sol finished bounded rates UI at2e814135; no more foundational work.
+- alias_review_sol clean review of exact UI31bbecf, routing/shared focus/actual test
+  and24 captures; no reruns or expansion.
+- file_search_service_sol core review clean after late-cache fix, bounded main/preload
+  integration review and new rate-ipc.test.ts done.25PASS/final source clean, no
+  further actionable boundary finding; no production edits or commit by reviewer.
+
+Registry8done/18in-progress/71planned;56passed/325pending/8N/A. Full97task local1.0
+scope/security remain. Crypto/secure keys/paste and prerequisites/native/AT/session/
+performance/packages/release remain required; no whole-task acceptance inferred.
+
+PATH .worktrees/tools:$PATH, BUN_TMPDIR=/tmp; Node24.22.1/Bun1.4.4/Electron45/
+SQLite3.53.4/GIO2.72.4. Git/signing/network/privateapp/owner sockets need escalation;
+normal unchanged1Password signing works. Serialize app tests sharingdist. No new
+user display/device/VM/proof work. Goal unfinished; keep working through R1-03.

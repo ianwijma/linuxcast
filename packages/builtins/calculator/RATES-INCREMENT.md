@@ -118,3 +118,7 @@ Crypto remains required: CoinGecko Demo simple/price has last_updated_at support
 and documented x-cg-demo-api-key authentication; no subscription-token harvesting
 or insecure key storage. https://docs.coingecko.com/demo/reference/simple-price .
 Context7 skill queried; tool unavailable, official primary docs used directly.
+
+Registry ceiling is5605: up to4096 applications +1000 workflow commands +500
+Quicklinks +9 native commands including this rates flow. Existing duplicate,
+paging/byte and query/result bounds remain enforced.

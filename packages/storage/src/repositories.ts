@@ -1,3 +1,5 @@
+import {getCachedRate,putCachedRate,clearCachedRates} from './rate-cache.ts';
+import type {RateSnapshot} from '../../contracts/src/rate-conversion.ts';
 import { MAX_LAUNCHER_COMMANDS } from '../../contracts/src/launcher.ts';
 import { JOURNAL_METHODS } from '../../workflows/src/journal/contracts.ts';
 import type { JournalMethods } from '../../workflows/src/journal/contracts.ts';
@@ -24,7 +26,7 @@ import { storageContracts } from './method-contracts.ts';
 import { StorageError } from './errors.ts';
 
 type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
-export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled';
+export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
@@ -40,6 +42,9 @@ export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods
   'permissions.list': { params: {principalKey: string; afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string | null} };
   'permissions.put': { params: {record: DecisionRecord}; result: DecisionRecord };
   'permissions.revoke': { params: {id: string}; result: boolean };
+  'rates.cache.get': {params:{base:string;quote:string};result:RateSnapshot|null};
+  'rates.cache.put': {params:{snapshot:RateSnapshot;configurationRevision:number};result:RateSnapshot};
+  'rates.cache.clear': {params:{configurationRevision:number};result:{outcome:'cleared'}};
   'settings.get': { params: {id: SettingId}; result: Setting | null };
   'settings.set': { params: {id: SettingId; expectedRevision: number; value: string | boolean}; result: Setting };
   'commands.setPinned': { params: {commandId: string; pinned: boolean}; result: CommandUsage };
@@ -54,7 +59,7 @@ export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'rates.cache.get','rates.cache.put','rates.cache.clear', 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -74,10 +79,11 @@ function revision(value: unknown): number {
   return value;
 }
 function settingId(value: unknown): SettingId {
-  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled'].includes(value)) throw new StorageError('invalid-request');
+  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource'].includes(value)) throw new StorageError('invalid-request');
   return value as SettingId;
 }
 function settingValue(id: SettingId, value: unknown): string | boolean {
+  if (id === 'calculator.rateSource' && typeof value==='string' && ['disabled','frankfurter'].includes(value))return value;
   if (id === 'ui.theme' && typeof value === 'string' && ['system', 'dark', 'light'].includes(value)) return value as string;
   if (id === 'launcher.shortcut' && typeof value === 'string' && value.length <= 100 && ![...value].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return value;
   if ((id === 'onboarding.completed' || id === 'clipboard.historyEnabled') && typeof value === 'boolean') return value;
@@ -125,6 +131,9 @@ export class Repositories {
       case 'permissions.list': return listPermissionDecisions(db, input as StorageMethods['permissions.list']['params']);
       case 'permissions.put': return putPermissionDecision(db, (input as StorageMethods['permissions.put']['params']).record);
       case 'permissions.revoke': return revokePermissionDecision(db, (input as StorageMethods['permissions.revoke']['params']).id);
+      case 'rates.cache.get': return getCachedRate(db,input as StorageMethods['rates.cache.get']['params']);
+      case 'rates.cache.put': {const p=input as StorageMethods['rates.cache.put']['params'];return putCachedRate(db,p.snapshot,p.configurationRevision);}
+      case 'rates.cache.clear': return clearCachedRates(db,(input as StorageMethods['rates.cache.clear']['params']).configurationRevision);
       case 'settings.get': {
         const p = object(input, ['id']); return this.getSetting(settingId(p.id));
       }

@@ -37,6 +37,8 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
     const expected=quicklinkSaveSchema.parse(params);
     valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch)&&JSON.stringify(row.pathArgument)===JSON.stringify(expected.pathArgument)&&JSON.stringify(row.tags??[])===JSON.stringify(expected.tags??[])&&(row.pinned??false)===(expected.pinned??false)&&(row.hidden??false)===(expected.hidden??false);
   }
+  else if(method==='rates.cache.get')valid=row.base===params.base&&row.quote===params.quote;
+  else if(method==='rates.cache.put'){const expected=params.snapshot as Record<string,unknown>;valid=['provider','base','quote','rate','asOfDate','fetchedAt'].every(key=>row[key]===expected[key]);}
   else if (method === 'dataControls.clear') valid = row.category === params.category;
   else if (method === 'dataControls.export') {
     const exported = result as DataExportResult, ids = params.ids as string[] | undefined;

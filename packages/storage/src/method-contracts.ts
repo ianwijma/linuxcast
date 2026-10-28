@@ -1,3 +1,4 @@
+import {rateSnapshotSchema,ratePairSchema} from '../../contracts/src/rate-conversion.ts';
 import { journalContracts } from '../../workflows/src/journal/contracts.ts';
 import { workflowEditorRecordSchema, workflowEditorWriteSchema } from '../../contracts/src/workflow-editor.ts';
 import { dataControlContracts } from '@linuxcast/platform-contracts/data-controls';
@@ -9,12 +10,13 @@ import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/per
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 import { MAX_LAUNCHER_COMMANDS, launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
-const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled']);
+const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
 const settingValue = z.union([z.string(), z.boolean()]);
 const validSetting = (v: {id:string;value:string|boolean}) => {
   switch(v.id) {
+    case 'calculator.rateSource': return typeof v.value==='string'&&['disabled','frankfurter'].includes(v.value);
     case 'ui.theme': return typeof v.value === 'string' && ['system','dark','light'].includes(v.value);
     case 'launcher.shortcut': return typeof v.value === 'string' && v.value.length <= 100 &&
       ![...v.value].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127);
@@ -30,6 +32,9 @@ export const hiddenCommandIdsSchema = z.array(visibilityId).max(MAX_LAUNCHER_COM
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...quicklinkRepositoryContracts,
+  ['rates.cache.get',{params:ratePairSchema,result:rateSnapshotSchema.nullable()}],
+  ['rates.cache.put',{params:z.strictObject({snapshot:rateSnapshotSchema,configurationRevision:revision}),result:rateSnapshotSchema}],
+  ['rates.cache.clear',{params:z.strictObject({configurationRevision:revision}),result:z.strictObject({outcome:z.literal('cleared')})}],
   ...journalContracts,
   ['workflows.editor.get',{params:z.strictObject({}),result:workflowEditorRecordSchema.nullable()}],
   ['workflows.editor.write',{params:workflowEditorWriteSchema,result:workflowEditorRecordSchema}],
