@@ -101,7 +101,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
     controls,executable:join(__dirname,'platform'),
   });
-  fileSearch=createFileSearchWorkspace({resourcesDirectory:__dirname,service:fileService,isReady:currentStorage.isReady,copyPath:copyText,previewText:async input=>{if(!applications)throw new Error('Preview unavailable.');return applications.previewText(input);}});
+  fileSearch=createFileSearchWorkspace({resourcesDirectory:__dirname,service:fileService,isReady:currentStorage.isReady,copyPath:copyText,copyText,previewText:async input=>{if(!applications)throw new Error('Preview unavailable.');return applications.previewText(input);}});
   const currentFiles=fileSearch;
   dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
     async exportCategory(category,signal){

@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewRequestSchema,indexedTextPreviewReplySchema } from '../src/file-search.ts';
+import { fileSearchQueryRequestSchema,fileSearchQueryReplySchema,fileSearchStateSchema,fileSearchResultSchema,indexedPathCopyRequestSchema,indexedPathCopyReplySchema,fileSearchOptionsSchema,fileSearchOptionsKey,fileSearchMatchesOptions,fileSearchMatchesDirectory,indexedTextPreviewRequestSchema,indexedTextPreviewReplySchema,indexedTextCopyRequestSchema,indexedTextCopyReplySchema } from '../src/file-search.ts';
 const rootId='11111111-1111-4111-8111-111111111111',generation='22222222-2222-4222-8222-222222222222';
 const result={id:`${rootId}:public.txt`,rootId,generation,path:'public.txt',kind:'file',size:4,modifiedMs:1};
 it('accepts bounded metadata identities and rejects traversal, content and scope confusion',()=>{
@@ -48,4 +48,10 @@ it('keeps text preview explicit identity-only with bounded literal UTF8 replies'
  for(const text of ['', 'é'.repeat(32768),'a\t\n\rb'])expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,text}}).success).toBe(true);
  for(const text of ['é'.repeat(32769),'a\0b','a\u0001b','\ud800','a\u007fb'])expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,text}}).success).toBe(false);
  expect(indexedTextPreviewReplySchema.safeParse({...reply,value:{...reply.value,path:'/private'}}).success).toBe(false);
+});
+
+it('limits preview copy to a single identity plus opaque UUID without caller text or returned content',()=>{
+ const q={protocolVersion:1,resultId:result.id,rootId,generation,previewId:'33333333-3333-4333-8333-333333333333'};expect(indexedTextCopyRequestSchema.safeParse(q).success).toBe(true);
+ for(const bad of [{...q,text:'caller'},{...q,path:'/private'},{...q,previewId:'bad'},[q]])expect(indexedTextCopyRequestSchema.safeParse(bad).success).toBe(false);
+ const value={resultId:result.id,rootId,generation,previewId:q.previewId,outcome:'copied'};expect(indexedTextCopyReplySchema.safeParse({ok:true,value}).success).toBe(true);expect(indexedTextCopyReplySchema.safeParse({ok:true,value:{...value,text:'private'}}).success).toBe(false);
 });

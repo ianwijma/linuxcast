@@ -37,7 +37,7 @@ Normal GIO original pathname handoff was removed after TOCTOU review. Fixed
 Documents portal candidate is stored with hard safe_handoff_available=false,
 no original path fallback. Independent source review found upstream O_NOFOLLOW
 consumer path readlink/reopen can follow replaced host ancestors. Open remains
-unavailable/unmerged, no PR55 exists yet, no safe native success claimed.
+unavailable/unmerged, PR55 contains only the independent text-preview flow, no safe native success claimed.
 No additional portal/FUSE/VM/proof work assigned. /dev/fuse is available under
 proper permissions; no private portal or mount was created. Do not claim absence
 from default sandbox visibility. Complete native Open remains REQUIRED; text
@@ -74,7 +74,13 @@ apps/desktop/evidence/indexed-text-preview-application.md.
 
 Nativeagentcompletedclean. UIagentcompletedclean/noexpansion. alias_review_sol
 main/native/exactUI/eightcomponentcapture reviewclean afterP2timeoutrepair; final
-actualtest/captures/docs review, signedfinalcommit/push/PR/CI/merge next.
+actualtest/captures/docs review clean at6df006ca04ea7cc3d4f57b66942b86b08dd0a794.
+PR55 https://github.com/ianwijma/linuxcast/pull/55 normally merged26c54818ec8f91c52d64af05ee51177d98c2cf07; CI40725225471 success, no requestedreviews/submissions/comments/unresolvedthreads.
+Primary develop clean fastforwarded26c54818; frozeninstall unchanged/build66assetsPASS. Root nextbranch codex/indexed-preview-copy
+frommergedPR55; frozen PREVIEW-COPY-INCREMENT.md adds optionalpreviewId and
+named token-only copyPreviewText with bounded ephemeralmaintext. Next UIagent
+assignment is explicit Copy text in existingreadonlypreview, no infrastructure/
+research/proof work. Main/preload/realnativeclipboard integration coordinatorowned.
 No fulltask/desktop/AT/releaseacceptanceclaim.
 
 Registry8done/18in-progress/71planned;56passed/325pending/8N/A. L2-02/03 remain
@@ -85,3 +91,35 @@ PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp, Node24.22.1/Bun1.4.4/Electron45/
 SQLite3.53.4/Rust1.95/GIO2.72.4. Git/network/signing/privateapp/owner sockets and
 ownedfixturechildprocess tests need escalation; default EPERM is sandbox, not
 backend regression. Serialize application tests sharingdist. No running signprompt.
+
+## Current follow-on Copy text increment (unmerged)
+
+Root codex/indexed-preview-copy from26c54818, freeze0b1b55c, main/preload
+4e2588a, actualscenario+mocktypefix221b3d8. NamedcopyPreviewText accepts only
+issuedresult/root/generation/previewId UUID, nevercallertext/path. Mainkeepsone
+64KiB5minmonotonic memorylease; source is not reread onCopy. Cleared onnewpreview/
+query/servicegeneration/windowclose/disposal/expiry, nohistory/storage/network.
+UItextclearedonBack; mainlease hasboundedexplicit lifetime. Nativeclipboard
+write usesexistingwriter/sharedCopygate;4sdeadline retainsactualslot, no late
+preflightwrite, exactcurrentreceiptonly, truthfulunknown/no replay. SharedPathCopy
+preflightdeadline repairedtoo.85mappedsecurity/7contracts/fulltype/scopedlintPASS;
+independent file_search_service_sol sourceclean4e2588a+testliteralcorrection.
+Native readerunchanged20checksfromPR55, not rerun as newevidence.
+
+UIauthor7bfed5c23cad2f2be0a0f1983d7281593891fb5c integrated03e49d7,
+worktree .worktrees/linuxcast-l1-01 clean codex/indexed-preview-copy-ui.
+Final232mappedunits/7contracts/85security/fulltype/scopedlint/plan/diffPASS,
+author150focusedunits/57ChromiumkeyboardaxePASS. Sevennewpubliccomponentcaptures
+inspected. alias_review_sol founddisposalreentryP2: fixedinactive/disposedbefore
+publication+two directregressions; exactUI/source/capture reconciliation clean.
+Core independentserviceagent clean, no newnativecode/proofwork.
+
+Actual productionprivateXvfb/nativeclipboard16.02sPASS, build66assetsPASS.
+ExactUnicode/literalclipboard/xclip, unsupportedhintmanualretry, pausedchanged
+sourcecopiesdisplayedsnapshot/no reread, clear+savedtokenrefusal, emptyCopy
+clearsactualElectron45read/type andX11TARGETS, sourcespreserved, retainedfile
+flow/Quit. Initialharness ambiguousresult/emptySTRING/removedformatAPI assumptions
+corrected; finalno unresolvedfailure. Fiveactualpubliccaptures inspected, unrelated
+DetailsPNGchurn restored. Finalactualtest/captures/evidencereview and signedhead/
+push/PR/CI/normalmerge next. Evidence indexed-preview-copy-application.md.
+No fulltask/nativeOpen/supporteddesktop/AT/performance/package/release claim.
