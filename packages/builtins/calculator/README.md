@@ -198,10 +198,59 @@ stale/offline currency/crypto rates, providers/ranking, prerequisite acceptance,
 Debian GNOME/KDE Wayland/X11, native AT/performance/release gates remain required.
 Neither L2-04 nor complete local 1.0 is marked complete.
 
+## Calendar and elapsed arithmetic
+
+The existing date/time Form/root result accepts one explicit operation such as
+`2024-03-09T12:00[America/New_York] + P1D to America/New_York`.
+**Supported date/time** explains the fixed uppercase ISO duration grammar:
+unsigned components 0–999999, fixed order, no redundant leading zeros, and
+1–9 fractional digits only on seconds. M before T means months; after T it means
+minutes. One + or - applies to the whole duration; the target zone stays explicit.
+There is no new view, engine grammar in presentation, IPC or clipboard authority.
+
+Calendar years/months/weeks/days apply to source-zone Gregorian fields first,
+then hours/minutes/seconds add exact elapsed time. P1D can span 23 hours in spring
+or 25 in autumn; PT24H always advances 24 elapsed hours. Result text explains
+that arithmetic changes the instant; only plain conversion retains the original
+exact-instant wording. Mixed durations apply calendar then elapsed fields, with
+nanosecond precision preserved by the existing real engine/formatter. Fixed
+scalar d/wk conversions retain their elapsed 86400/604800-second meanings.
+
+Invalid duration syntax/limits receive fixed inline grammar remediation.
+Invalid month-end/leap/year-bound/gap/fold calendar results are refused rather
+than clamped or given an implicit offset. Drafts remain editable; guidance offers
+another date/duration, elapsed hours or explicit unambiguous date conversion.
+Source offsets never authorize a calendar result. Help remains read-only within
+total depth 3, preserving unsent draft/focus; screenshots scroll to new duration
+content. Edit/Back/Cancel, held Enter/IME, original-context/reentrant/pending/
+unknown/no-replay fences and separate exact dated Copy remain in use.
+
+Author validation on Linux x64 with Node 24.22.1/Bun 1.4.4: **158 focused units**
+(125 presentation, 33 calculator routing; 22 new), **47 calculator Chromium
+keyboard/axe cases** (39 retained, 8 new), plus **one root-arithmetic Chromium
+case** pass. Full typecheck, scoped ESLint, plan and diff checks pass. Commands
+use explicit `LINUXCAST_TEST_FILES` with the existing test-runner configs.
+Twelve inspected public captures cover dark/light calendar-day/elapsed-hour
+results, calendar-result errors and duration help, invalid duration, unknown Copy,
+200%-text containment and the existing root candidate. Calculator files are
+`evidence/*-{calendar,elapsed,duration}-*`; the root capture is
+`apps/desktop/src/features/launcher/evidence/dark-root-calendar-arithmetic-query.png`.
+Incidental regenerated old screenshots are restored. Fixtures observe requests,
+not native clipboard effects; coordinator owns production/independent-reader
+integration. Core c6cf018 is a separate prerequisite, not duplicated in UI work.
+
+DESIGN Shell/navigation, Results/actions, List/Form/Detail, States/motion,
+Accessibility and Review gate apply; existing shared primitives/tokens are reused.
+This is partial L2-04 AC02/UI with preserved AC01/privacy evidence, not full task
+completion. Broader date/civil-duration behavior, configured timestamped stale/
+offline currency/crypto rates, providers/ranking, copy/paste variants, prerequisite
+and native desktop/AT/session/performance/release gates remain required. Complete
+local 1.0 scope is unchanged.
+
 ## Evidence and remaining scope
 
-`tests/presentation.test.ts` has 105 passing presentation checks and
-`tests/calculator.ui.test.ts` has 39 passing Chromium keyboard/axe checks covering
+`tests/presentation.test.ts` has 125 passing presentation checks and
+`tests/calculator.ui.test.ts` has 47 passing Chromium keyboard/axe checks covering
 explicit Form and Detail transitions, draft errors/domain/oversize, clipboard unavailability,
 unknown/mismatched/pending replies, back/dirty cancel/focus, stale/disposed actions
 and local readonly metadata. Unit cases add length/function-scalar, temperature, decimal/binary
