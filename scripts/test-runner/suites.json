@@ -100,7 +100,8 @@
       "packages/builtins/emoji/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/emoji-routing.test.ts",
       "packages/ui/src/views/glyph.test.tsx",
-      "packages/ui/src/views/loading.test.tsx"
+      "packages/ui/src/views/loading.test.tsx",
+      "packages/storage/tests/emoji-favourites-client.test.ts"
     ]
   },
   "contracts": {
@@ -295,7 +296,9 @@
     ],
     "L2-06": [
       "apps/desktop/tests/emoji.integration.test.ts",
-      "apps/desktop/tests/emoji-tone.integration.test.ts"
+      "apps/desktop/tests/emoji-tone.integration.test.ts",
+        "apps/desktop/tests/emoji-favourites.integration.test.ts",
+      "packages/storage/tests/emoji-favourites.integration.test.ts"
     ]
   },
   "security": {
@@ -398,7 +401,8 @@
       "apps/desktop/src/preload/emoji.test.ts",
       "apps/desktop/src/preload/api.test.ts",
       "apps/desktop/src/main/launcher-ipc.test.ts",
-      "apps/desktop/src/main/clipboard-write.test.ts"
+      "apps/desktop/src/main/clipboard-write.test.ts",
+      "packages/storage/tests/emoji-favourites-client.test.ts"
     ]
   },
   "perf": {}

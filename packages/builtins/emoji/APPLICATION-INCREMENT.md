@@ -98,3 +98,59 @@ actualapp integration/routingtests/mapping/status. Freeze patch+perfilehashes;
 meaningful tests dark/light/keyboard/Cancel/Apply/empty/pending/stale tone/malformed
 echo/currentcanonicalCopy. FullL2-06/dictionary/favourites/nativepaste/nativeAT/
 Debian/release remain pending.
+
+## Persistent favourites increment — base PR68/6227ef0
+
+Coordinator codex/emoji-favourites in .worktrees/linuxcast-emoji-search. Reuse
+existing revisioned StorageOwner settings (`emoji.favourites` canonical JSON
+sorted uniqueID array, max4096 supports entire3944catalogue); no migration/table/
+dataset/deps. Privateuserpreference exported through existingexplicitsettings
+export, never usage/queryhistory. Absentsetting genuinelymeansrevision0/empty;
+unavailable/invalidstore mustneverbeempty-success. MainonlyresolvescanonicalIDs.
+
+Frozencontracts emoji.ts: search/copy input+reply optional `favouritesOnly:true`
+(omit=All; false/null/ownundefinedinvalid); exactecho. Search success optional
+`favourites:{available:true,revision:number>=0}|{available:false}`; missing means
+unavailable for compatibility. Ifavailable, each returnedrecord hasboolean
+`favourite`; ifunavailable/missing no favouritefield and no write/filteravailable.
+FavouritesOnly successrequiresavailable and onlytruefavourite records; otherwise
+failedrequest, never pretendempty. Groups/rowcap100/sourcecanonicaldata unchanged.
+
+New optional named `setEmojiFavourite` takes Copy input context +`favourite:boolean`
+and`favouritesRevision` from currentsearch. Newfixedchannel launcher:set-emoji-favourite.
+Receipt exactcontext+id+desiredboolean+`outcome:updated`+`favouritesRevision=old+1`.
+No fullpreferenceIDs returned to renderer. Main bindsissuedchoiceowner/frame/
+catalogue/query/group/tone/favouritesOnly/prefrevision; verifiescanonicalcurrent
+row andfreshpreferenceCAS, holdsactualwriterbusy untilunderlyingstorage settles,
+reauthorizes beforedispatch; stale/released/cancelledpre-dispatch hasnoeffect.
+Late/unknownwrite never success/replay, requiresfreshread. Successinvalidatesold
+handle and UI readreloads; never automaticCopy/Paste or usageincrement. Existing
+Copy and favourite writes serialize against eachother and metadata.
+
+Mainbackendsearchinternal accepts optional `ids:readonlystring[]` ONLY for main
+resolvedfavourites, validatedstrict/sortedunique/4096; filterBEFOREcap/rank in
+source search. Omittedall; []genuinelyempty; never inputrecordpayload fromrenderer.
+Source data/metadata unchanged. Main backend optionalfavourites.read/write use
+Snapshot{revision,ids}; settingsCAS/writeexactreceipts; storageclient validates
+newsettingid/value/revision. No genericsettings method exposedinpreload.
+
+UI per-row Add to favourites / Remove from favourites (effectwrite); top-level
+Show favourites / Show all emoji (effectread) retainsquery/category/tone/density,
+releasesoldsearch+readreloads andkeepsselectedID ifstillpresent. Clearlymark
+Favourite usingexistingaccessory/tag; no visualsystem. Copy staysprimaryEnter;
+favouritechange onlyexplicitActionsselection. Emptyfavourites actionableShow all.
+Unavailablefaves keepsordinarycataloguebrowsable/Copy and explainsstorage/reload;
+filters/write disabledvisibly. Successreceipt shows exactname+savedstate after
+readrefresh; uncertainmutationnooptimisticstar andno repeated/queued/auto write.
+Guardpendingactualmutation acrossquery/pop/Hide/dispose/lateack; resetfilteronopen;
+persistidsafterrestart. Category/tone/density neverimplyfavouritechange.
+
+Ownership: UI ONLYpresentation/tests/fixtures/new*favourite*.png/FAVOURITES-UI.md;
+data ONLYsearch.ts/search.test.ts/READMEaddendum; independenttestlane ONLYexisting
+emoji contracts/main/preload/api tests +newstoragefavourites tests. Coordinator
+allproductionstorage/contracts/main/preload/manifests/routing/status/actualapp.
+ReadfullL2-06card+PLAN/data/builtins/security/testing-release/DESIGN/tokens; prior
+actualL1/D1/storageintegratedbutcompleteacceptancepending userapprovedincrements.
+AllagentsSOL/high. Freezeownedpatch/hashes/results/platform/limits, no stage/commit.
+No infrastructure/research/proof expansion. FullL2-06/dictionary/customkeywords/
+frecency/nativepaste/semanticAI/nativeDebianAT/platform/release remainrequired.

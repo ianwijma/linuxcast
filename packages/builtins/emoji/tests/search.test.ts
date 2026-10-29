@@ -157,3 +157,62 @@ it('validates the closed tone enum and own data properties before encoding, with
  const own=Object.assign(Object.create(null) as EmojiSearchInput,{query:'thumbs up',tone:'dark' as EmojiTone});
  expect(searchEmoji(own).map(entry=>entry.value)).toEqual(['👍🏿']);
 });
+
+it('an omitted ID subset browses all data while an explicit empty subset genuinely returns no results',()=>{
+ expect(searchEmoji({query:'',limit:100})).toEqual(emojiData.slice(0,100));
+ expect(searchEmoji({query:'',ids:[],limit:100})).toEqual([]);
+ expect(searchEmoji({query:'grinning face',ids:[]})).toEqual([]);
+ expect(searchEmoji({query:'',ids:['emoji:10ffff']})).toEqual([]);
+});
+it('selects favourite IDs beyond the first hundred before capping and retains pinned source order',()=>{
+ const chosen=[emojiData[3900]!,emojiData[900]!,emojiData[2500]!],ids=chosen.map(row=>row.id).sort();
+ expect(searchEmoji({query:'',ids,limit:100})).toEqual([chosen[1],chosen[2],chosen[0]]);
+ expect(searchEmoji({query:'',ids,limit:1})).toEqual([chosen[1]]);
+ expect(searchEmoji({query:'',ids,limit:2})).toEqual([chosen[1],chosen[2]]);
+ expect(emojiData.slice(0,100).some(row=>ids.includes(row.id))).toBe(false);
+});
+it('ranks the matching subset before its limit rather than using input order or truncating prior to relevance',()=>{
+ const early=getEmoji(id('😄'))!,exact=getEmoji(id('☺️'))!,ids=[early.id,exact.id].sort();
+ expect(emojiData.indexOf(early)).toBeLessThan(emojiData.indexOf(exact));
+ expect(searchEmoji({query:'',ids})).toEqual([early,exact]);
+ expect(searchEmoji({query:'smiling face',ids,limit:2})).toEqual([exact,early]);
+ expect(searchEmoji({query:'smiling face',ids,limit:1})).toEqual([exact]);
+});
+it('combines the internal subset with query, group and tone without rebuilding canonical glyphs',()=>{
+ const medium=getEmoji(id('👩🏽‍💻'))!,dark=getEmoji(id('👩🏿‍💻'))!,flag=getEmoji(id('🇦🇺'))!,ids=[medium.id,dark.id,flag.id].sort();
+ expect(searchEmoji({query:'woman technologist',group:'People & Body',tone:'medium',ids})).toEqual([medium]);
+ expect(searchEmoji({query:'👩🏿‍💻',group:'People & Body',tone:'dark',ids})).toEqual([dark]);
+ expect(searchEmoji({query:'woman technologist',tone:'unmodified',ids})).toEqual([]);
+ expect(searchEmoji({query:'woman technologist',group:'Food & Drink',ids})).toEqual([]);
+ expect(searchEmoji({query:'🇦🇺',group:'Flags',tone:'unmodified',ids})).toEqual([flag]);
+ expect(searchEmoji({query:'👩🏽‍💻',ids:[dark.id]})).toEqual([]);
+});
+it('accepts the complete 3944-record catalogue and the exact 4096-ID boundary without altering existing searches',()=>{
+ const ids=emojiData.map(row=>row.id).sort();expect(ids).toHaveLength(3944);
+ expect(searchEmoji({query:'',ids,limit:100})).toEqual(searchEmoji({query:'',limit:100}));
+ expect(searchEmoji({query:'woman technologist',tone:'dark',group:'People & Body',ids})).toEqual(searchEmoji({query:'woman technologist',tone:'dark',group:'People & Body'}));
+ const atLimit=[...ids,...Array.from({length:152},(_,index)=>`emoji:${(0xe1000+index).toString(16)}`)].sort();
+ expect(atLimit).toHaveLength(4096);expect(searchEmoji({query:'',ids:atLimit,limit:100})).toEqual(emojiData.slice(0,100));
+ expect(()=>searchEmoji({query:'',ids:[...atLimit,'emoji:10ffff'].sort()})).toThrow(EmojiInputError);
+});
+it('rejects malformed, unsorted, duplicate and accessor ID lists before encoding without running user callbacks',()=>{
+ const getter=vi.fn(()=>id('😀')),coerce=vi.fn(()=>id('😀'));
+ const accessor=Object.defineProperty([],'0',{get:getter,enumerable:true});
+ const sparse=Array<string>(1),extra=Object.assign([id('😀')],{extra:true});
+ const symbol=Object.assign([id('😀')],{[Symbol('private')]:true});
+ const inherited=Object.setPrototypeOf([id('😀')],Object.create(Array.prototype)) as string[];
+ const bad:unknown[]=[undefined,null,'emoji:1f600',{},[undefined],[null],[1],[{toString:coerce}],sparse,accessor,extra,symbol,inherited,
+  ['emoji:1F600'],['emoji:1f600\0'],['emoji:1f600\u202e'],['emoji:../private'],['😀'],[id('😀'),id('😀')],[id('🥰'),id('😀')],Array(4097).fill(id('😀'))];
+ const topAccessor=Object.defineProperty({query:''},'ids',{get:getter,enumerable:true});
+ const encode=vi.spyOn(TextEncoder.prototype,'encode');
+ try{for(const ids of bad)expect(()=>searchEmoji({query:'',ids} as EmojiSearchInput)).toThrow(EmojiInputError);expect(()=>searchEmoji(topAccessor as EmojiSearchInput)).toThrow(EmojiInputError);expect(encode).not.toHaveBeenCalled();}finally{encode.mockRestore();}
+ expect(getter).not.toHaveBeenCalled();expect(coerce).not.toHaveBeenCalled();
+});
+it('keeps returned canonical records immutable and independent of later changes to a caller-owned ID array',()=>{
+ const record=getEmoji(id('👩🏽‍💻'))!,ids=[record.id],result=searchEmoji({query:'',ids});
+ expect(result[0]).toBe(record);ids[0]=id('😀');
+ expect(result[0]?.value).toBe('👩🏽‍💻');expect(Object.isFrozen(result)).toBe(true);
+ expect(Reflect.set(result[0]!,'value','wrong')).toBe(false);expect(Reflect.set(result,'0',getEmoji(id('😀')))).toBe(false);
+ expect(searchEmoji({query:'',ids}).map(row=>row.value)).toEqual(['😀']);
+ const frozen:readonly string[]=Object.freeze([record.id]);expect(searchEmoji({query:'',ids:frozen})).toEqual([record]);
+});

@@ -1,3 +1,4 @@
+import {parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
 import {searchRootNotes} from './notes-root-search.ts';
 import type {NotesRootStorageMethods} from '../../contracts/src/notes-launcher.ts';
 import {NOTES_STORAGE_METHODS} from '../../contracts/src/notes.ts';
@@ -31,7 +32,7 @@ import { storageContracts } from './method-contracts.ts';
 import { StorageError } from './errors.ts';
 
 type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
-export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource';
+export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource' | 'emoji.favourites';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
@@ -84,10 +85,11 @@ function revision(value: unknown): number {
   return value;
 }
 function settingId(value: unknown): SettingId {
-  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource'].includes(value)) throw new StorageError('invalid-request');
+  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites'].includes(value)) throw new StorageError('invalid-request');
   return value as SettingId;
 }
 function settingValue(id: SettingId, value: unknown): string | boolean {
+  if(id==='emoji.favourites'&&typeof value==='string'&&parseEmojiFavouriteSetting(value)!==undefined)return value;
   if (id === 'calculator.rateSource' && typeof value==='string' && ['disabled','frankfurter'].includes(value))return value;
   if (id === 'ui.theme' && typeof value === 'string' && ['system', 'dark', 'light'].includes(value)) return value as string;
   if (id === 'launcher.shortcut' && typeof value === 'string' && value.length <= 100 && ![...value].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return value;
