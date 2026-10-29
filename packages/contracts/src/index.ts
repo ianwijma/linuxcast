@@ -38,3 +38,5 @@ export * from './rate-conversion.ts';
 
 export * from './notes.ts';
 export * from './notes-export.ts';
+
+export * from './notes-launcher.ts';

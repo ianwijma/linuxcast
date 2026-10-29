@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type {LauncherNotesApi} from './notes-launcher.ts';
 import { quicklinkSelectionSchema } from './quicklinks.ts';
 import type {RateConversionApi} from './rate-conversion.ts';
 import type { CalculatorCopyReply } from './calculator.ts';
@@ -45,7 +46,7 @@ export type LauncherCommandMetadata=z.infer<typeof launcherCommandMetadataSchema
 export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSchema>;
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
-export interface LauncherApi extends Partial<RateConversionApi> {
+export interface LauncherApi extends Partial<RateConversionApi>,LauncherNotesApi {
   executeApplicationAction?:(request:Pick<z.infer<typeof launcherApplicationActionRequestSchema>,'commandId'|'revision'|'actionId'>)=>Promise<LauncherApplicationActionReply>;
   setLauncherHidden?:(request:Pick<z.infer<typeof launcherVisibilityRequestSchema>,'commandId'|'revision'|'hidden'>)=>Promise<LauncherCommandsReply>;
   copyCalculatorResult?:(request:{revision:number;expression:string})=>Promise<CalculatorCopyReply>;

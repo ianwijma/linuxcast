@@ -1,6 +1,6 @@
-import {noteExportReplySchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryReplySchema,noteRevisionReadReplySchema} from '@linuxcast/contracts';
+import {noteExportReplySchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,notesLauncherSelectionSchema} from '@linuxcast/contracts';
 import { emptyNoteDocument, noteContentKey, noteContentSchema, notesListReplySchema, notesListRequestSchema, notesReadReplySchema, notesWriteReplySchema } from '@linuxcast/contracts';
-import type { NoteHistory, NoteRevisionRead, NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList } from '@linuxcast/contracts';
+import type { NotesLauncherSelection, NoteHistory, NoteRevisionRead, NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList } from '@linuxcast/contracts';
 
 type Pending={id:string;done:Promise<boolean>;finish:(ok:boolean)=>void;cancel:AbortController};
 export interface RevisionReview {loading:boolean;rows:NoteHistory['revisions'];preview?:NoteRevisionRead['savedRevision']|undefined;previewing?:number|undefined;error?:string|undefined;confirm:boolean;restoring:boolean}
@@ -19,7 +19,7 @@ async function bounded<T>(promise:Promise<T>,signal?:AbortSignal):Promise<T>{
 }
 export class NotesController {
  #api:NotesApi; #state:NotesState={query:'',pinnedOnly:false,showArchived:false,showTrashed:false,rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,pinning:false,archiving:false,trashing:false,trashConfirm:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
- #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #metadata:Promise<boolean>|undefined; #trashConfirmation:{id:string;revision:number;generation:number}|undefined; #review:ReviewContext|undefined; #revisionConfirmation:{context:ReviewContext;preview:NoteRevisionRead['savedRevision'];record:NoteRecord}|undefined; #restore:Promise<boolean>|undefined;
+ #opening:{id:string|undefined;generation:number}|undefined; #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #metadata:Promise<boolean>|undefined; #trashConfirmation:{id:string;revision:number;generation:number}|undefined; #review:ReviewContext|undefined; #revisionConfirmation:{context:ReviewContext;preview:NoteRevisionRead['savedRevision'];record:NoteRecord}|undefined; #restore:Promise<boolean>|undefined;
  constructor(api:NotesApi){this.#api=api;}
  get snapshot(){return this.#state;} subscribe=(listener:()=>void)=>{this.#listeners.add(listener);return()=>{this.#listeners.delete(listener);};};
  #publish(patch:Partial<NotesState>){this.#state={...this.#state,...patch};for(const listener of this.#listeners)listener();}
@@ -27,10 +27,10 @@ export class NotesController {
  get dirty(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.draft);}
  get unsaved(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.saved);}
  start(){void this.reloadList();}
- setQuery(query:string){if(!this.#active||this.#review||this.#metadata||this.#metadataBusy)return;this.#listGeneration++;clearTimeout(this.#searchTimer);this.#publish({query,cursor:null});this.#searchTimer=setTimeout(()=>void this.reloadList(),150);}
- setPinnedOnly(pinnedOnly:boolean){if(!this.#active||this.#review||this.#metadata||this.#metadataBusy||typeof pinnedOnly!=='boolean'||pinnedOnly===this.#state.pinnedOnly)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({pinnedOnly,rows:[],cursor:null,listError:undefined});void this.reloadList();}
- setShowArchived(showArchived:boolean){if(!this.#active||this.#review||this.#metadata||this.#metadataBusy||typeof showArchived!=='boolean'||showArchived===this.#state.showArchived)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showArchived,...(showArchived?{showTrashed:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
- setShowTrashed(showTrashed:boolean){if(!this.#active||this.#review||this.#metadata||this.#metadataBusy||typeof showTrashed!=='boolean'||showTrashed===this.#state.showTrashed)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showTrashed,...(showTrashed?{showArchived:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
+ setQuery(query:string){if(!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy)return;this.#listGeneration++;clearTimeout(this.#searchTimer);this.#publish({query,cursor:null});this.#searchTimer=setTimeout(()=>void this.reloadList(),150);}
+ setPinnedOnly(pinnedOnly:boolean){if(!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||typeof pinnedOnly!=='boolean'||pinnedOnly===this.#state.pinnedOnly)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({pinnedOnly,rows:[],cursor:null,listError:undefined});void this.reloadList();}
+ setShowArchived(showArchived:boolean){if(!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||typeof showArchived!=='boolean'||showArchived===this.#state.showArchived)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showArchived,...(showArchived?{showTrashed:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
+ setShowTrashed(showTrashed:boolean){if(!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||typeof showTrashed!=='boolean'||showTrashed===this.#state.showTrashed)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showTrashed,...(showTrashed?{showArchived:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
  async reloadList(more=false){
   if(!this.#active)return;const query=this.#state.query,pinnedOnly=this.#state.pinnedOnly,archived=this.#state.showArchived,trashed=this.#state.showTrashed,cursor=more?this.#state.cursor:null;if(more&&!cursor)return;
   const input={query,...(trashed?{trashed:true}:{}),...(archived?{archived:true}:{}),...(pinnedOnly?{pinnedOnly:true}:{}),...(cursor?{cursor}: {})};if(!notesListRequestSchema.safeParse(input).success){this.#publish({listing:false,listError:'Search is limited to 256 UTF-8 bytes.'});return;}
@@ -43,7 +43,7 @@ export class NotesController {
   }catch{if(this.#active&&generation===this.#listGeneration)this.#publish({listing:false,listError:'Notes could not be loaded. Retry the local search.'});}
  }
  async select(id:string){
-  if(!this.#active||this.#review||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
+  if(!this.#active||this.#opening||this.#review||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
   if(!await this.flush()||!this.#active||generation!==this.#navigation||this.#metadata||this.#metadataBusy||this.#state.exporting||this.#state.closing)return;
   this.#publish({reading:true,error:undefined});if(!this.#active||generation!==this.#navigation||this.#metadata||this.#metadataBusy||this.#state.exporting||this.#state.closing)return;
   try{const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(id)));if(!this.#active||generation!==this.#navigation)return;
@@ -51,9 +51,32 @@ export class NotesController {
    this.#publish({id,record,content:copy(record.draft),reading:false,blocked:false,paused:false,reloadConfirm:false,error:undefined,message:key(record.draft)!==key(record.saved)?'Recovered draft. Save explicitly to replace the last saved version.':undefined});
   }catch{if(this.#active&&generation===this.#navigation)this.#publish({reading:false,error:'This note is unavailable. Reload the list and choose the note again.'});}
  }
+ /** A launcher selection is an identity, never note content or a fallback choice. */
+ async openSelected(selection:NotesLauncherSelection):Promise<boolean>{
+  const parsed=notesLauncherSelectionSchema.safeParse(selection);
+  if(!parsed.success||!this.#active)return false;
+  if(this.#opening||this.#review||this.#metadata||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||this.#state.blocked||this.#state.paused||this.#state.reloadConfirm||this.#state.closeFailed||this.dirty&&(this.#state.record?.archived||this.#state.record?.trashed)){
+   if(!this.#state.error)this.#publish({error:'The selected note was not opened. Finish the current operation or review and recover retained edits, then select it again.'});return false;
+  }
+  const target=parsed.data,saving=this.#save,context={id:this.#state.id,generation:++this.#navigation};this.#opening=context;clearTimeout(this.#timer);
+  const current=()=>this.#active&&this.#opening===context&&this.#navigation===context.generation&&this.#state.id===context.id&&!this.#state.closing&&!this.#close&&!this.#export&&!this.#metadata&&!this.#review;
+  this.#publish({reading:true,message:'Opening selected note…'});
+  try{
+   if(!current())return false;
+   if(saving&&!await saving)return false;
+   if(!current()||this.#state.blocked||this.#state.paused)return false;
+   if(!await this.#flush()||!current())return false;
+   this.#publish({reading:true,message:'Loading selected note…'});if(!current())return false;
+   const reply=notesReadReplySchema.safeParse(await bounded(this.#api.get(target.id)));if(!current())return false;
+   if(!reply.success||!reply.data.ok||!reply.data.value||reply.data.value.id!==target.id||reply.data.value.revision!==target.revision||reply.data.value.archived||reply.data.value.trashed)throw new Error('selection');
+   const record=reply.data.value;this.#publish({id:record.id,record,content:copy(record.draft),reading:false,blocked:false,paused:false,reloadConfirm:false,error:undefined,message:key(record.draft)!==key(record.saved)?'Recovered draft. Save explicitly to replace the last saved version.':undefined});
+   return this.#active&&this.#opening===context&&this.#navigation===context.generation&&this.#state.id===target.id&&this.#state.record?.revision===target.revision;
+  }catch{if(current())this.#publish({error:'The selected note is unavailable or changed. Reload the launcher and select it again. Your current note and local edits remain here.',message:undefined});return false;}
+  finally{if(this.#opening===context){this.#opening=undefined;if(this.#active&&this.#state.reading)this.#publish({reading:false,...(this.#state.message==='Opening selected note…'||this.#state.message==='Loading selected note…'?{message:undefined}:{})});}}
+ }
  async newNote():Promise<boolean>{
   if(!this.#active)return false;
-  if(this.#review||this.#metadata||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy){if(!this.#state.error)this.#publish({error:'A new note was not created. Finish the current Notes operation, then request a new note again.'});return false;}
+  if(this.#opening||this.#review||this.#metadata||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy){if(!this.#state.error)this.#publish({error:'A new note was not created. Finish the current Notes operation, then request a new note again.'});return false;}
   const outgoingId=this.#state.id,saving=this.#save;this.#new=true;const generation=++this.#navigation;
   try{
    if(saving&&!await saving)return false;
@@ -67,7 +90,7 @@ export class NotesController {
  editTitle(title:string){if(this.#state.content)this.#edit({...this.#state.content,title});}
  editDocument(document:NoteDocument){if(this.#state.content)this.#edit({...this.#state.content,document});}
  inputError(message:string){if(this.#active)this.#publish({error:message});}
- #edit(content:NoteContent){if(!this.#active||this.#review||(this.#state.record?.archived||this.#state.record?.trashed)||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
+ #edit(content:NoteContent){if(!this.#active||this.#opening||this.#review||(this.#state.record?.archived||this.#state.record?.trashed)||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
  async #write(action:'draft'|'save'):Promise<boolean>{
   if(!this.#active||(this.#state.record?.archived||this.#state.record?.trashed)||this.#state.closing||this.#pending||this.#state.blocked||!this.#state.id||!this.#state.content)return false;
   const valid=noteContentSchema.safeParse(this.#state.content);if(!valid.success){this.#publish({error:'Use a nonblank title of at most 256 UTF-8 bytes and a supported note body of at most 64 KiB.',paused:true});return false;}
@@ -83,19 +106,19 @@ export class NotesController {
   finally{const current=this.#pending===pending;if(current)this.#pending=undefined;const ok=this.#active&&!this.#state.blocked&&!this.#state.paused&&this.#state.id===id&&key(this.#state.record?.draft)===key(content);finish(ok);if(current&&this.#active)this.#publish({busy:false});}
  }
  #current(pending:Pending){return this.#active&&!this.#state.closing&&this.#pending===pending&&this.#state.id===pending.id&&!pending.cancel.signal.aborted;}
- flush():Promise<boolean>{return this.#review?Promise.resolve(false):this.#flush();}
+ flush():Promise<boolean>{return this.#review||this.#opening?Promise.resolve(false):this.#flush();}
  async #flush():Promise<boolean>{
   clearTimeout(this.#timer);if(!this.#active||this.#state.trashConfirm)return false;if(this.#pending&&!await this.#pending.done)return false;
   if(this.#state.blocked)return false;if(!this.dirty)return true;if(this.#state.record?.trashed){this.#publish({error:'Restore from Trash to review and store retained local edits before navigating or closing.'});return false;}if(this.#state.record?.archived){this.#publish({error:'Restore this note to review and store retained local edits before navigating or closing.'});return false;}
   if(!await this.#write('draft'))return false;return this.dirty?await this.#flush():true;
  }
  save():Promise<boolean>{if(this.#save)return this.#save;this.#save=this.#saveNow().finally(()=>{this.#save=undefined;});return this.#save;}
- async #saveNow(){if(this.#review||this.#new||(this.#state.record?.archived||this.#state.record?.trashed)||this.#metadata||this.#metadataBusy)return false;clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#metadata||this.#state.blocked||this.#state.exporting||this.#metadataBusy||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
- retry(){if(this.#active&&!this.#review&&!this.#state.record?.archived&&!this.#state.record?.trashed&&!this.#metadata&&!this.#metadataBusy&&!this.#state.blocked){this.#publish({paused:false});return this.flush();}return Promise.resolve(false);}
- confirmReload(){if(this.#active&&!this.#review&&!this.#metadata&&!this.#metadataBusy&&this.#state.id&&!this.#pending)this.#publish({reloadConfirm:true});}
+ async #saveNow(){if(this.#opening||this.#review||this.#new||(this.#state.record?.archived||this.#state.record?.trashed)||this.#metadata||this.#metadataBusy)return false;clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#metadata||this.#state.blocked||this.#state.exporting||this.#metadataBusy||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
+ retry(){if(this.#active&&!this.#opening&&!this.#review&&!this.#state.record?.archived&&!this.#state.record?.trashed&&!this.#metadata&&!this.#metadataBusy&&!this.#state.blocked){this.#publish({paused:false});return this.flush();}return Promise.resolve(false);}
+ confirmReload(){if(this.#active&&!this.#opening&&!this.#review&&!this.#metadata&&!this.#metadataBusy&&this.#state.id&&!this.#pending)this.#publish({reloadConfirm:true});}
  cancelReload(){if(this.#active)this.#publish({reloadConfirm:false});}
  async reconcile(){
-  if(!this.#active||this.#review||this.#metadata||!this.#state.reloadConfirm||!this.#state.id||this.#metadataBusy||this.#pending)return;const id=this.#state.id,generation=++this.#navigation;clearTimeout(this.#timer);this.#publish({reading:true,reloadConfirm:false});if(!this.#active||generation!==this.#navigation)return;
+  if(!this.#active||this.#opening||this.#review||this.#metadata||!this.#state.reloadConfirm||!this.#state.id||this.#metadataBusy||this.#pending)return;const id=this.#state.id,generation=++this.#navigation;clearTimeout(this.#timer);this.#publish({reading:true,reloadConfirm:false});if(!this.#active||generation!==this.#navigation)return;
   try{const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(id)));if(!this.#active||generation!==this.#navigation||this.#state.id!==id)return;
    if(!result.success||!result.data.ok||result.data.value&&result.data.value.id!==id||!result.data.value&&this.#state.record)throw new Error('read');
    this.#publish({record:result.data.value??undefined,reading:false,blocked:false,paused:true,error:undefined,message:'Stored state loaded. Your local edits are retained. Review them, then choose Retry draft or Save; no write was replayed.'});void this.reloadList();
@@ -104,7 +127,7 @@ export class NotesController {
  #reviewCurrent(context:ReviewContext){return this.#active&&this.#review===context&&this.#navigation===context.generation&&this.#state.id===context.id&&(!context.record||this.#state.record?.revision===context.record.revision);}
  #reviewError(context:ReviewContext,message:string){if(this.#reviewCurrent(context)&&this.#state.history)this.#publish({paused:true,history:{...this.#state.history,loading:false,previewing:undefined,preview:undefined,error:message}});}
  async openHistory():Promise<boolean>{
-  if(!this.#active||this.#review||!this.#state.record||this.#state.blocked||this.#metadata||this.#metadataBusy||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.reloadConfirm||this.#state.closeFailed)return false;
+  if(!this.#active||this.#opening||this.#review||!this.#state.record||this.#state.blocked||this.#metadata||this.#metadataBusy||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.reloadConfirm||this.#state.closeFailed)return false;
   if(!this.#api.history||!this.#api.getRevision){if(!this.#state.error)this.#publish({error:'Saved revisions are unavailable. Reopen Notes to reconnect.'});return false;}
   const saving=this.#save,context:ReviewContext={id:this.#state.record.id,generation:++this.#navigation,previewGeneration:0};this.#review=context;clearTimeout(this.#timer);this.#publish({history:{loading:true,rows:[],confirm:false,restoring:false}});
   try{
@@ -143,7 +166,7 @@ export class NotesController {
   finally{if(this.#pending===pending)this.#pending=undefined;finish(accepted&&this.#active);if(this.#active)this.#publish({busy:false});}
  }
  requestTrash(){
-  if(!this.#active||this.#review||this.#trashConfirmation||this.#metadata||this.#metadataBusy||this.#pending||this.#save||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.blocked||this.#state.reloadConfirm||this.#state.closeFailed||!this.#state.record||this.#state.record.trashed)return;
+  if(!this.#active||this.#opening||this.#review||this.#trashConfirmation||this.#metadata||this.#metadataBusy||this.#pending||this.#save||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.blocked||this.#state.reloadConfirm||this.#state.closeFailed||!this.#state.record||this.#state.record.trashed)return;
   if(!this.#api.setTrashed){if(!this.#state.error)this.#publish({error:'Trash and restore are unavailable. Reopen Notes to reconnect.'});return;}
   clearTimeout(this.#timer);const generation=++this.#navigation;this.#trashConfirmation={id:this.#state.record.id,revision:this.#state.record.revision,generation};this.#publish({trashConfirm:true});
  }
@@ -156,7 +179,7 @@ export class NotesController {
  setPinned(pinned:boolean):Promise<boolean>{return this.#admitMetadata('pin',pinned);}
  setArchived(archived:boolean):Promise<boolean>{return this.#admitMetadata('archive',archived);}
  #admitMetadata(kind:'pin'|'archive'|'trash',desired:boolean):Promise<boolean>{
-  if(this.#review||this.#trashConfirmation||kind!=='trash'&&this.#state.record?.trashed)return Promise.resolve(false);
+  if(this.#opening||this.#review||this.#trashConfirmation||kind!=='trash'&&this.#state.record?.trashed)return Promise.resolve(false);
   if(this.#metadata)return this.#metadata;
   if(!this.#active||typeof desired!=='boolean'||!(kind==='pin'?this.#api.setPinned:kind==='archive'?this.#api.setArchived:this.#api.setTrashed)||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#export||this.#close||this.#new)return Promise.resolve(false);
   const generation=++this.#navigation;const operation=Promise.resolve().then(()=>this.#changeMetadata(kind,desired,generation)).finally(()=>{if(this.#metadata===operation)this.#metadata=undefined;});this.#metadata=operation;return operation;
@@ -181,7 +204,7 @@ export class NotesController {
   }catch{if(this.#active&&this.#state.id===id)this.#publish({blocked:true,paused:true,message:undefined,error:`The ${noun} change could not be confirmed. It may already be stored. Confirm Reload stored note before another write; nothing will be replayed.`});return false;}
   finally{if(pending&&this.#pending===pending)this.#pending=undefined;pending?.finish(accepted&&this.#active);if(this.#active)this.#publish({pinning:false,archiving:false,trashing:false,busy:false});}
  }
- exportMarkdown():Promise<boolean>{if(this.#review||this.#new)return Promise.resolve(false);if(this.#export)return this.#export;if(this.#metadata)return Promise.resolve(false);const operation=Promise.resolve().then(()=>this.#exportNow()).finally(()=>{if(this.#export===operation)this.#export=undefined;});this.#export=operation;return operation;}
+ exportMarkdown():Promise<boolean>{if(this.#opening||this.#review||this.#new)return Promise.resolve(false);if(this.#export)return this.#export;if(this.#metadata)return Promise.resolve(false);const operation=Promise.resolve().then(()=>this.#exportNow()).finally(()=>{if(this.#export===operation)this.#export=undefined;});this.#export=operation;return operation;}
  async #exportNow():Promise<boolean>{
   if(!this.#active||this.#state.closing||this.#state.reading||this.#state.exporting||this.#metadataBusy||this.#state.blocked||this.#new||!this.#state.id||!this.#api.exportMarkdown)return false;
   this.#publish({exporting:true,error:undefined,message:'Preparing Markdown export…'});
@@ -198,10 +221,10 @@ export class NotesController {
  }
  requestClose():Promise<boolean>{return this.#beginClose(false);}
  closeWithoutFlush():Promise<boolean>{return this.#beginClose(true);}
- #beginClose(skip:boolean):Promise<boolean>{if(this.#review){if(this.#active&&!this.#state.error)this.#publish({error:'Close Saved revisions before closing Notes.'});return Promise.resolve(false);}if(this.#new){if(this.#active)this.#publish({error:'Wait for the new note to finish before closing Notes.'});return Promise.resolve(false);}if(this.#close)return this.#close;let finish!:(ok:boolean)=>void;const operation=new Promise<boolean>(resolve=>{finish=resolve;});this.#close=operation;void this.#closeNow(skip).then(result=>{if(this.#close===operation)this.#close=undefined;finish(result);},()=>{if(this.#close===operation)this.#close=undefined;finish(false);});return operation;}
+ #beginClose(skip:boolean):Promise<boolean>{if(this.#opening)return Promise.resolve(false);if(this.#review){if(this.#active&&!this.#state.error)this.#publish({error:'Close Saved revisions before closing Notes.'});return Promise.resolve(false);}if(this.#new){if(this.#active)this.#publish({error:'Wait for the new note to finish before closing Notes.'});return Promise.resolve(false);}if(this.#close)return this.#close;let finish!:(ok:boolean)=>void;const operation=new Promise<boolean>(resolve=>{finish=resolve;});this.#close=operation;void this.#closeNow(skip).then(result=>{if(this.#close===operation)this.#close=undefined;finish(result);},()=>{if(this.#close===operation)this.#close=undefined;finish(false);});return operation;}
  async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#new){this.#publish({error:'Wait for the new note to finish before closing Notes.'});return false;}if(this.#metadata||this.#metadataBusy){this.#publish({error:this.#state.trashing||this.#state.trashConfirm?'Finish or cancel the Trash operation before closing Notes.':this.#state.archiving?'Wait for the archive change to finish before closing Notes.':'Wait for the pin change to finish before closing Notes.'});return false;}if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active||this.#metadata||this.#metadataBusy||this.#state.exporting)return false;
   this.#publish({closing:true});if(!this.#active)return false;try{await bounded(this.#api.close());return true;}catch{if(this.#active)this.#publish({closing:false,closeFailed:true,error:'The Notes window could not close. Keep editing or retry closing.'});return false;}
  }
  keepEditing(){if(this.#active)this.#publish({closeFailed:false});}
- dispose(){if(!this.#active)return;this.#active=false;this.#review=undefined;this.#revisionConfirmation=undefined;this.#trashConfirmation=undefined;++this.#navigation;++this.#listGeneration;clearTimeout(this.#timer);clearTimeout(this.#searchTimer);const pending=this.#pending;this.#pending=undefined;pending?.cancel.abort();pending?.finish(false);this.#listeners.clear();}
+ dispose(){if(!this.#active)return;this.#active=false;this.#opening=undefined;this.#review=undefined;this.#revisionConfirmation=undefined;this.#trashConfirmation=undefined;++this.#navigation;++this.#listGeneration;clearTimeout(this.#timer);clearTimeout(this.#searchTimer);const pending=this.#pending;this.#pending=undefined;pending?.cancel.abort();pending?.finish(false);this.#listeners.clear();}
 }

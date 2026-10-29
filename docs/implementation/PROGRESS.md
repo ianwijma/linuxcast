@@ -1,59 +1,67 @@
 # Linuxcast coordinator checkpoint
 
-29 October 2026. Full local1.0/all97tasks/R1-03/release objective unfinished.
-All subagents must use GPT-6.1 SOL/high. Existing assignments finished; no new
-infrastructure/research/proof work. Historical evidence lives in tasks.json/cards.
+29 October 2026. Complete local1.0/all97tasks/R1-03/release objective unfinished.
+All subagents GPT-6.1 SOL/high. Current assignments finished. No new infrastructure,
+research or proof work. Historical evidence is in tasks.json/cards and linked files.
 
-## Integrated and current queue
+## Integrated state
 
-1Password signing repaired after user confirmation. Normal configured signer
-created Trash commit40c9b9afe7403e48799aca3891e187eb39249363; local cryptographic
-verification passed against the configured public key. No signing configuration
-change or unsigned fallback. Prior signing blocker is resolved.
+1Password signing repaired. Configured SSH signer unchanged; all prepared commits
+now signed and locally verified against the configured public key. Prior signing
+blocker resolved. No unsigned fallback or signing-configuration change.
 
-PR62 https://github.com/ianwijma/linuxcast/pull/62 merged normally into develop
-351d797b5335f096409c6fbb76e891fb2d6529fb. Current-head CI40818238599 passed11s,
-no requested/submitted GitHub reviews/comments/threads. Primary clean fast-forwarded.
-Trash application source exactly matches reviewed TREEb938e51c65efa363b457d61d04c0dd26aafc8919;
-only coordinator checkpoint differs. Original .worktrees/linuxcast-application-controls
-is preserved with its signed commit and unstaged continuity; never reset it.
+PR62 Trash/restore https://github.com/ianwijma/linuxcast/pull/62 integrated as
+351d797b5335f096409c6fbb76e891fb2d6529fb, reviewed signed head40c9b9afe7403e48799aca3891e187eb39249363,
+CI40818238599 PASS11s. PR63 saved revisions https://github.com/ianwijma/linuxcast/pull/63
+integrated as89d91af034b327a6ce3621c33cce3d661cb33dac, signed reviewedd1a2ce6204312b9fa55009d960386a1534796de0,
+CI40818468167 PASS14s. Both normal expected-head merges, no requested/submitted
+GitHub reviews/comments/threads. Primary develop clean fast-forwarded toPR63.
+All reviewed application/test/capture hashes preserved; only integration docs differ.
 
-Saved revisions next: .worktrees/linuxcast-notes-revisions-integrate branch
-codex/notes-revisions-integrate based on mergedTrash. Exact48-file reviewed patch
-/tmp/linuxcast-notes-revision-reviewed-root.patch applied; application/test/evidence
-hashes match its .sha256.json. Only checkpoint conflict required reconciliation;
-registry/cards gain actual Trash integration references. No implementation changes
-or repeated passing application checks. Evidence apps/desktop/evidence/notes-revision-application.md:
-330units/20contracts/156security/24integration PASS, final app-only20.02s;
-164authorunits/50distinctbrowser split45+5, clean source/capture reviews. Full task,
-Debian/session/AT/performance/package/release acceptance remain pending. Sign/push,
-focusedPR/attach, current-head CI/configuredreviews, normal expected-head merge.
+## Current launcher integration
 
-Then launcher Notes search/exact open: frozen source .worktrees/linuxcast-notes-launcher-search
-branch codex/notes-launcher-search, original HEADf00984e plus reviewed Trash/revisions.
-Baseline TREE15d2db5ee706535bd0b9385c596b84013e975887. Launcher-only patch
-/tmp/linuxcast-notes-launcher-reviewed-root.patch SHA770b62c6be11c3b2e9dd033f231d25291c8785f09456735212eb68b2bb73435a;
-60-file .sha256.json SHA0488136ee3fe962409bcc9dd623c6b62f82bf20f7d6cded7a50a92bc70721e9f.
-Apply only this delta onto mergedrevisions, preserving integrated registry refs.
-567mappedunits/43contracts/49integration PASS; security L1-01 170/U1-01 208 overlap;
-actualproduction verifies fullbodysearch/twoIDs/Arrow/selectedopen/outgoingdraftflush/
-real --show/restart/crash/privacy. FullNodeTypeScript/scopedlint/planPASS. Final
-source/backend/UI/capture reviews clean. Evidence apps/desktop/evidence/notes-launcher-application.md.
-No need repeat passing checks absent source changes/findings; CI/review currenthead.
+.worktrees/linuxcast-notes-launcher-integrate / codex/notes-launcher-integrate
+based on mergedPR63. Exact launcher-only60-file patch applied from frozen baseline
+TREE15d2db5ee706535bd0b9385c596b84013e975887. All application/test/evidence hashes
+match /tmp/linuxcast-notes-launcher-reviewed-root.sha256.json. Only registry/card/
+checkpoint conflicts reconciled, preserving PR62/63 integration records. Source
+unchanged; no repeated passing application checks. Next sign/push/focusedPR/attach,
+current-head CI and configured GitHub reviews, then normal expected-head merge.
 
-## Remaining scope and preserved work
+Owner searches active/nontrashed title+fullbody, bounded20 metadata results after
+normalization/filter/order, no full document returned. Shared launcher Notes group,
+keyboard selection and named exact-open API bind issued identity/revision/frame/
+metadata generation/fresh owner source. Existing workspace waits Save and flushes
+ordinary outgoing draft without Save; retained/readonly/blocked/history/Close/
+export uncertainty refuses with explicit recovery. No generic UUID execution,
+fallback/create/replay/implicitSave; usage only fixed parent aggregate.
 
-All three are user-authorized reviewed/tested unfinished application increments;
-no full U1/L1/release completion. Permanentdelete/EmptyTrash, attachments, full
-Markdownimport/roundtrip/nativechooser, otherproviders/ranking/fallback/AI and all
-remaining1.0 tasks required. NativeDebian13amd64 GNOME/KDE Wayland/X11, assistive
-technology/highcontrast/performance/packages/release checks remain pending. Private
-Xvfb/Chromium is not native desktop evidence; SQLite unencrypted; unacknowledged
-local edits can be lost on forcedcrash. Latest registry8done19inprogress70planned,
-56passed325pending8N/A.
+Final checks before freeze:567mappedunits/43contracts/49integration PASS; security
+L1-01 170/U1-01 208 overlap,96changed main/preload cases. Final actual production
+union23.34s total verifies real two fullbody matches/Arrow/selected exact workspace,
+outgoing draftCAS+1/savedpreserved, actual --show/Close/Quit/restart/crash/privacy.
+Author392distinctunits,7launcher+5Notes browser passes; redundant browser startup
+SIGSEGV executednone. Final one-line completion cleanup passed targeted17/unitunion/
+production; no later browser claim. Full directNodeTypeScript/scoped35lintPASS;
+11contracts+contractlint after length-before-encoding guard. Independent source/
+backend/UI/12component+4actual capture reviews clean; all findings closed. Earlier
+failed attempts/limitations explicitly disclosed. Evidence apps/desktop/evidence/notes-launcher-application.md.
 
-Frozen original author/review worktrees must not be reset. NativeFileOpen remains
-unavailable/unmerged: preserved codex/indexed-file-open8fdc37d/UIaf07a32, no unsafe
-GIOpathname fallback or portal/FUSE/VM/proof expansion. Oldlinuxcast-l1-01 staged
-create-edit source already integrated; do not reset. Runtime .worktrees/tools,
-Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4. Never use --no-sandbox.
+## Remaining complete scope
+
+These are user-authorized reviewed/tested unfinished increments, not whole U1/L1
+or release acceptance. All97tasks remain required. Permanentdelete/EmptyTrash,
+attachments/fullMarkdownimport-roundtrip/nativechooser, fullproviders/ranking/
+fallback/AI and remainingapplication flows mandatory. Debian13amd64 GNOME/KDE
+Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance pending.
+PrivateXvfb/Chromium is not desktop/session/AT evidence; SQLite unencrypted;
+unacknowledgedlocaledits can be lost on forcedcrash. Registry8done19inprogress70planned,
+56passed325pending8N/A; no status inflated by these integrations.
+
+Preserve frozen sourceworktrees linuxcast-application-controls (Trash signed,
+unstaged continuity), linuxcast-notes-revision-restore, linuxcast-notes-launcher-search
+and authorworktrees; never reset. No further foundational expansion. NativeFileOpen
+unavailable/unmerged codex/indexed-file-open8fdc37d/UIaf07a32; unsafeGIOpath fallback
+removed, no portal/FUSE/VM/proof expansion. Oldlinuxcast-l1-01 staged create/edit
+source already integrated; do not reset. Runtime .worktrees/tools Node24.22.1/
+Bun1.4.4/Electron45/SQLite3.53.4. No --no-sandbox.

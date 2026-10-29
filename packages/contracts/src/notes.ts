@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type {NotesLauncherSelection} from './notes-launcher.ts';
 import type {NoteExportSelection,NoteExportReply} from './notes-export.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import type { RepositoryContracts } from './repositories.ts';
@@ -110,6 +111,7 @@ export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.numb
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export const notesQuickNoteFinishedSchema=notesCloseAttemptSchema.extend({created:z.boolean()});
 export interface NotesApi{
+ onOpenNoteRequested?(listener:(selection:NotesLauncherSelection)=>boolean|Promise<boolean>):()=>void;
  history?(input:NoteHistoryRequest):Promise<NoteHistoryReply>;
  getRevision?(input:NoteRevisionSelection):Promise<NoteRevisionReadReply>;
  restoreRevision?(input:NoteRevisionSelection):Promise<NotesWriteReply>;

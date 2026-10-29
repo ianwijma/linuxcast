@@ -26,6 +26,9 @@ export interface ResidentShellOptions {
   loadWorkflowCommands?:LauncherActions['loadWorkflowCommands'];
   openWorkflowEntry?:LauncherActions['openWorkflowEntry'];
   openWorkflowEditor?: () => Promise<void>;
+  searchNotes?:LauncherActions['searchNotes'];
+  getNote?:LauncherActions['getNote'];
+  openNote?:LauncherActions['openNote'];
   openNotes?: () => Promise<void>;
   openQuickNote?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
@@ -155,6 +158,9 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.loadWorkflowCommands?{loadWorkflowCommands:options.loadWorkflowCommands}:{}),
       ...(options.openWorkflowEntry?{openWorkflowEntry:options.openWorkflowEntry}:{}),
       ...(options.openWorkflowEditor ? {openWorkflowEditor:options.openWorkflowEditor} : {}),
+      ...(options.searchNotes?{searchNotes:options.searchNotes}:{}),
+      ...(options.getNote?{getNote:options.getNote}:{}),
+      ...(options.openNote?{openNote:options.openNote}:{}),
       ...(options.openNotes ? {openNotes:options.openNotes} : {}),
       ...(options.openQuickNote ? {openQuickNote:options.openQuickNote} : {}),
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),

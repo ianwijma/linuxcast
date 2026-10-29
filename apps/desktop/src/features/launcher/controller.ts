@@ -5,8 +5,8 @@ import { CalculatorFlow } from '@linuxcast/calculator/presentation';
 import { QuicklinksFlow,createQuicklinksFlowState } from '@linuxcast/quicklinks/presentation';
 import { collectCatalogue,mergePinReply,mergeAliasReply,mergeVisibilityCatalogue,parsePage } from './catalogue.ts';
 import type { Catalogue } from './catalogue.ts';
-import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema,launcherApplicationActionReplySchema,isLauncherVisibilityProtected,webSearchQuerySchema,calculatorExpressionSchema } from '@linuxcast/contracts';
-import type { LauncherApi,QuicklinkApi,ViewModel,ShellCommandReply,LauncherCommandMetadata } from '@linuxcast/contracts';
+import { httpUrlSchema,launcherOpenUrlReplySchema,commandAliasSchema,launcherCommandsReplySchema,launcherExecuteReplySchema,shellCommandReplySchema,launcherApplicationActionReplySchema,isLauncherVisibilityProtected,webSearchQuerySchema,calculatorExpressionSchema,notesRootQuerySchema,launcherNotesSearchReplySchema,launcherNoteOpenReplySchema } from '@linuxcast/contracts';
+import type { LauncherApi,QuicklinkApi,ViewModel,ShellCommandReply,LauncherCommandMetadata,NotesRootSearch,NotesLauncherSelection } from '@linuxcast/contracts';
 import { ViewSession } from '@linuxcast/ui/views';
 import type { ActionIntent,ViewHost } from '@linuxcast/ui/views';
 import { QueryGenerations,rankCommands,rankManagedCommands,MAX_QUERY_LENGTH } from '@linuxcast/search';
@@ -17,6 +17,9 @@ const APPLICATION_ACTION_UNKNOWN='The application action outcome is unknown. Che
 const APPLICATION_ACTION_UNAVAILABLE_REASON='Application actions are unavailable. Open the application to use its other actions.';
 type ApplicationActionPending={controller:AbortController;commandId:string;actionId:string;revision:number;query:string;frameQuery:string};
 const CALCULATE='launcher:calculation';
+const NOTE_PREFIX='note:',NOTES_MORE='launcher:notes-more',NOTES_PARENT='linuxcast:open-notes';
+const NOTE_UNKNOWN='The selected note opening could not be confirmed. Check Notes, then reload commands before selecting a note again.';
+type NotePending={controller:AbortController;selection:NotesLauncherSelection;revision:number;query:string;frameQuery:string};
 const FALLBACK_PREFIX='launcher:web-search:';
 const QUICKLINK_PREFERENCES='Use the Quicklinks list actions to edit saved-link preferences.';
 const VISIBILITY_UNKNOWN='Visibility may have changed. Reload commands before trying again.';
@@ -28,7 +31,7 @@ const ALIAS='launcher:alias',SAVE_ALIAS='launcher:save-alias',CANCEL_ALIAS='laun
 type AliasEditor={viewId:string;commandId:string;revision:number;value:string;error?:string;status?:Status;needsReload?:boolean};
 type Status={kind:'info'|'warning'|'error';message:string};
 /** Renderer presentation controller; the main registry is the only source of
- * commands and execution authority. Queries never leave this process. */
+ * commands and execution authority. Command matching is local; Notes queries go only to the named local owner search. */
 export class LauncherController {
   readonly session:ViewSession;
   readonly host:ViewHost;
@@ -42,18 +45,22 @@ export class LauncherController {
   #url:UrlEditor|null=null;#urlSequence=0;#urlUnconfirmed=false;
   #manager:{viewId:string;query:string;selectedId:string|null}|null=null;#managerSequence=0;#visibilityPending:{controller:AbortController;viewId:string}|null=null;#visibilityWarning:Status|undefined;
   #applicationPending:ApplicationActionPending|null=null;#applicationNeedsReload=false;#applicationWarning:Status|undefined;
+  #notesRead:AbortController|null=null;#notes: {query:string;revision:number;records:NotesRootSearch['records'];hasMore:boolean;state:'idle'|'loading'|'available'|'error'|'unavailable'}|null=null;
+  #notePending:NotePending|null=null;#noteNeedsReload=false;#noteWarning:Status|undefined;
   #priorSelection:string|null=null;#alias:AliasEditor|null=null;#aliasSequence=0;
   constructor(api:LauncherApi&QuicklinkApi,dismiss:()=>Promise<ShellCommandReply>) {
     this.#api=api;this.#dismiss=dismiss;
     this.session=new ViewSession(this.#view(),id=>{void this.#closeView(id);});
-    this.session.subscribe(()=>{const frame=this.session.getSnapshot().frames[0];if(frame&&!(frame.selection===null&&this.#loading&&(this.#priorSelection===CALCULATE||this.#priorSelection?.startsWith(FALLBACK_PREFIX))))this.#priorSelection=frame.selection;if(this.#applicationPending&&!this.#applicationContextCurrent(this.#applicationPending))this.#abortApplicationAction();});
+    this.session.subscribe(()=>{const frame=this.session.getSnapshot().frames[0];if(frame&&!(frame.selection===null&&this.#loading&&(this.#priorSelection===CALCULATE||this.#priorSelection?.startsWith(FALLBACK_PREFIX))))this.#priorSelection=frame.selection;if(this.#applicationPending&&!this.#applicationContextCurrent(this.#applicationPending))this.#abortApplicationAction();if(this.#notePending&&!this.#noteContextCurrent(this.#notePending))this.#abortNote();if(this.session.getSnapshot().frames.at(-1)?.view.viewId!==VIEW_ID){this.#cancelNotesRead();}else if(!this.#loading&&!this.#busy&&(!this.#notes||this.#notes.state==='idle'))queueMicrotask(()=>void this.#searchNotes());});
     this.host={queryChanged:(id,query)=>{if(this.#manager?.viewId===id){this.#manager.query=query;this.#publish();}else if(id===VIEW_ID)this.query(query);},action:intent=>{void this.execute(intent);}};
   }
   #view():ViewModel {
     const tooLong=this.#query.length>MAX_QUERY_LENGTH;
     const commands=this.#snapshot && !tooLong?rankCommands(this.#snapshot.commands,this.#query,Date.now(),this.#priorSelection):[];
-    const fallback=commands.length?[]:this.#fallbacks(),calculation=commands.length?null:this.#calculationCandidate();
-    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#applicationPending?{kind:'info' as const,message:'Requesting application action…'}:this.#status??this.#applicationWarning??this.#visibilityWarning;
+    const calculation=commands.length?null:this.#calculationCandidate(),notes=this.#noteRows().slice(0,Math.max(0,100-commands.length-(calculation?1:0)));
+    const retainedNote=this.#noteRows().find(row=>NOTE_PREFIX+row.id===this.#priorSelection);if(retainedNote&&notes.length&&!notes.includes(retainedNote))notes[notes.length-1]=retainedNote;
+    const fallback=commands.length?[]:this.#fallbacks(100-commands.length-notes.length-(calculation?1:0));
+    const status=tooLong?{kind:'warning' as const,message:`Keep searches to ${MAX_QUERY_LENGTH} characters or fewer.`}:this.#applicationPending?{kind:'info' as const,message:'Requesting application action…'}:this.#notePending?{kind:'info' as const,message:'Opening selected note…'}:this.#status??this.#noteWarning??this.#applicationWarning??this.#visibilityWarning??this.#notesStatus();
     return {protocolVersion:1,viewId:VIEW_ID,revision:++this.#viewRevision,kind:'list',title:'Search commands',loading:this.#loading,...((calculation&&this.#priorSelection===CALCULATE)||fallback.some(command=>FALLBACK_PREFIX+command.quicklink!.id===this.#priorSelection)?{selectedId:this.#priorSelection!}:{}),
       search:{query:this.#query,placeholder:'Search commands…',mode:'extension'},
       sections:[...[...new Set(commands.map(command=>command.provider??(command.id.startsWith('application:')?'applications':'commands')))].map(provider=>({id:provider,title:provider==='applications'?'Applications':'Linuxcast',items:commands.filter(command=>(command.provider??(command.id.startsWith('application:')?'applications':'commands'))===provider).map(command=>({id:command.id,title:command.title,...(command.subtitle?{subtitle:command.subtitle}:{}),icon:{kind:'builtin' as const,name:command.id==='linuxcast:open-local-data'?'settings':command.id===OPEN_URL?'link':'search'},
@@ -63,20 +70,51 @@ export class LauncherController {
           {id:command.usage?.pinned?UNPIN:PIN,title:command.usage?.pinned?'Unpin command':'Pin command',kind:'invoke' as const,effect:'write' as const,icon:{kind:'builtin' as const,name:'star'},
             ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Pinning is unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},
           {id:ALIAS,title:'Edit search alias',kind:'invoke' as const,effect:'read' as const,icon:{kind:'builtin' as const,name:'search'},
-            ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Aliases are unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},this.#visibilityAction(command),...this.#applicationActions(command)])]}))})),...(calculation?[{id:'calculation',title:'Calculation · Local evaluation; Copy is a separate action',items:[{id:CALCULATE,title:'Calculate expression',subtitle:calculation,icon:{kind:'builtin' as const,name:'search'},actions:[{id:CALCULATE,title:'Calculate expression',kind:'invoke' as const,effect:'read' as const}]}]}]:[]),...(fallback.length?[{id:'web-search-fallback',title:`Configured web searches${this.#snapshot!.commands.filter(command=>command.quicklink?.webSearch&&!command.hidden&&command.enabled).length>100?' · Up to 100 providers':''} · Choosing opens a local form; only Open search sends the query`,items:fallback.map(command=>({id:FALLBACK_PREFIX+command.quicklink!.id,title:`Search with ${command.title}`,subtitle:command.subtitle??'Configured web search',icon:{kind:'builtin' as const,name:'search'},actions:[{id:FALLBACK_PREFIX+command.quicklink!.id,title:`Search with ${command.title}`,kind:'invoke' as const,effect:'read' as const}]}))}]:[])],
+            ...(!this.#snapshot?.rankingAvailable?{disabledReason:'Aliases are unavailable. Reload commands to reconnect to storage.'}:this.#metadataUnconfirmed?{disabledReason:'Reload commands to check the last metadata change before trying again.'}:{})},this.#visibilityAction(command),...this.#applicationActions(command)])]}))})),...(calculation?[{id:'calculation',title:'Calculation · Local evaluation; Copy is a separate action',items:[{id:CALCULATE,title:'Calculate expression',subtitle:calculation,icon:{kind:'builtin' as const,name:'search'},actions:[{id:CALCULATE,title:'Calculate expression',kind:'invoke' as const,effect:'read' as const}]}]}]:[]),...(notes.length?[{id:'notes',title:'Notes · Local title and body matches',items:notes.map(row=>({id:NOTE_PREFIX+row.id,title:row.title,subtitle:row.excerpt||'Empty note',icon:{kind:'builtin' as const,name:'search'},accessories:[...(row.pinned?[{text:'Pinned'}]:[]),...(row.hasDraft?[{text:'Draft'}]:[])],...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading||this.#notes?.state!=='available'?{disabledReason:'Refreshing local Notes…'}:{}),actions:[{id:NOTE_PREFIX+row.id,title:'Open note',kind:'invoke' as const,effect:'read' as const,...(this.#noteNeedsReload?{disabledReason:'Check Notes, then reload commands before selecting a note again.'}:!this.#api.openLauncherNote?{disabledReason:'Opening selected notes is unavailable. Open Notes or reload commands to reconnect.'}:{})}]}))}]:[]),...(fallback.length?[{id:'web-search-fallback',title:`Configured web searches${this.#snapshot!.commands.filter(command=>command.quicklink?.webSearch&&!command.hidden&&command.enabled).length>100?' · Up to 100 providers':''} · Choosing opens a local form; only Open search sends the query`,items:fallback.map(command=>({id:FALLBACK_PREFIX+command.quicklink!.id,title:`Search with ${command.title}`,subtitle:command.subtitle??'Configured web search',icon:{kind:'builtin' as const,name:'search'},actions:[{id:FALLBACK_PREFIX+command.quicklink!.id,title:`Search with ${command.title}`,kind:'invoke' as const,effect:'read' as const}]}))}]:[])],
       empty:{title:this.#loading?'Loading commands…':'No commands available',description:this.#loading?'Getting commands from Linuxcast.':'Reload commands to try again.'},
-      ...(status?{status}:{}),actions:[{id:MANAGE,title:'Manage commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})},...((this.#status?.kind==='error' || this.#metadataUnconfirmed || this.#applicationNeedsReload || this.#urlUnconfirmed || this.#snapshot && (!this.#snapshot.rankingAvailable || this.#snapshot.applicationState==='unavailable' || this.#snapshot.visibilityAvailable!==true)) && !this.#busy?[{id:RETRY,title:'Reload commands',kind:'invoke' as const,effect:'read' as const}]:[])]};
+      ...(status?{status}:{}),actions:[{id:MANAGE,title:'Manage commands',kind:'invoke',effect:'read',...(this.#busy?{disabledReason:'Wait for the current command to finish.'}:this.#loading?{disabledReason:'Refreshing commands…'}:{})},...(this.#notesParent()?[{id:NOTES_MORE,title:'Open Notes',kind:'invoke' as const,effect:'read' as const,...(this.#busy||this.#loading?{disabledReason:'Wait for the current command to finish.'}:{})}]:[]),...((this.#status?.kind==='error' || this.#metadataUnconfirmed || this.#applicationNeedsReload || this.#noteNeedsReload || this.#notes?.state==='error' || this.#notes?.state==='unavailable' || this.#urlUnconfirmed || this.#snapshot && (!this.#snapshot.rankingAvailable || this.#snapshot.applicationState==='unavailable' || this.#snapshot.visibilityAvailable!==true)) && !this.#busy?[{id:RETRY,title:'Reload commands',kind:'invoke' as const,effect:'read' as const}]:[])]};
   }
   #calculationCandidate(){
     if(!this.#active||this.#loading||this.#busy||!this.#snapshot||this.#status?.kind==='error'||this.#query.length>MAX_QUERY_LENGTH||!calculatorExpressionSchema.safeParse(this.#query).success||![...this.#query].some(character=>'0123456789#()+-*/^%'.includes(character))||rankCommands(this.#snapshot.commands,this.#query).length)return null;
     const command=this.#snapshot.commands.find(command=>command.id==='linuxcast:calculator');if(!command?.enabled||command.hidden)return null;
     try{const result=evaluateExpression(this.#query);return result.ok?formatCalculationText(result):null;}catch{return null;}
   }
-  #fallbacks(){
+  #fallbacks(limit=100){
     if(!this.#active||this.#loading||this.#busy||!this.#snapshot||this.#status?.kind==='error'||this.#query.length>MAX_QUERY_LENGTH||!webSearchQuerySchema.safeParse(this.#query).success||rankCommands(this.#snapshot.commands,this.#query,Date.now(),this.#priorSelection).length)return [];
     const parent=this.#snapshot.commands.find(command=>command.id==='linuxcast:open-quicklinks');if(!parent?.enabled||parent.hidden)return [];
     const all=this.#snapshot.commands.filter(command=>command.quicklink?.webSearch&&command.enabled&&!command.hidden).sort((a,b)=>a.title.localeCompare(b.title,'en')||a.id.localeCompare(b.id,'en'));
-    const rows=all.slice(0,100),retained=all.find(command=>FALLBACK_PREFIX+command.quicklink!.id===this.#priorSelection);if(retained&&!rows.includes(retained)){rows[rows.length-1]=retained;rows.sort((a,b)=>all.indexOf(a)-all.indexOf(b));}return rows;
+    if(limit<=0)return [];const rows=all.slice(0,limit),retained=all.find(command=>FALLBACK_PREFIX+command.quicklink!.id===this.#priorSelection);if(retained&&!rows.includes(retained)){rows[rows.length-1]=retained;rows.sort((a,b)=>all.indexOf(a)-all.indexOf(b));}return rows;
+  }
+  #notesParent(){const parent=this.#snapshot?.commands.find(command=>command.id===NOTES_PARENT);return !!parent?.enabled&&!parent.hidden;}
+  #noteRows(){return this.#notesParent()&&this.#notes?.query===this.#query?this.#notes.records:[];}
+  #notesStatus():Status|undefined{
+    if(!this.#notesParent()||!notesRootQuerySchema.safeParse(this.#query).success)return;
+    const state=this.#notes?.state;
+    return {kind:state==='error'?'error':state==='unavailable'?'warning':'info',message:state==='loading'||!state?'Searching local Notes…':state==='error'?'Local Notes search failed. Reload commands or open Notes to retry.':state==='unavailable'?'Local Notes search is unavailable. Open Notes or reload commands to reconnect.':this.#notes?.hasMore?'More local Notes matches are available. Open Notes to search the full library.':!this.#notes?.records.length?'No matching local Notes. Open Notes to search or create a note.':'Notes match stored titles and body text locally. Open a selected note explicitly.'};
+  }
+  #cancelNotesRead(){this.#notesRead?.abort();this.#notesRead=null;if(this.#notes?.state==='loading')this.#notes={...this.#notes,state:'idle'};}
+  async #searchNotes(){
+    if(!this.#active||this.#busy||this.#loading||!this.#snapshot||!this.#notesParent()||!notesRootQuerySchema.safeParse(this.#query).success||this.session.getSnapshot().frames.at(-1)?.view.viewId!==VIEW_ID||this.#notesRead)return;
+    const query=this.#query,revision=this.#snapshot.revision;if(this.#notes?.query===query&&this.#notes.revision===revision&&this.#notes.state!=='idle')return;
+    const controller=new AbortController();this.#notesRead=controller;this.#notes={query,revision,records:this.#notes?.query===query?this.#notes.records:[],hasMore:false,state:this.#api.searchLauncherNotes?'loading':'unavailable'};this.#publish();
+    const current=()=>this.#active&&!controller.signal.aborted&&this.#notesRead===controller&&this.#query===query&&this.#snapshot?.revision===revision&&this.#notesParent()&&this.session.getSnapshot().frames.at(-1)?.view.viewId===VIEW_ID;
+    try{if(!current()||!this.#api.searchLauncherNotes)return;const reply=launcherNotesSearchReplySchema.parse(await bounded(this.#api.searchLauncherNotes({revision,query}),controller.signal));if(!current())return;
+      if(!reply.ok||reply.value.query!==query||reply.value.revision!==revision)throw new Error('search');this.#notes={...reply.value,state:'available'};
+    }catch{if(current())this.#notes={query,revision,records:[],hasMore:false,state:'error'};}
+    finally{if(this.#notesRead===controller){this.#notesRead=null;if(this.#active)this.#publish();}}
+  }
+  #noteContextCurrent(pending:NotePending){const frame=this.session.getSnapshot().frames.at(-1);return this.#active&&this.#notesParent()&&this.#snapshot?.revision===pending.revision&&this.#query===pending.query&&frame?.view.viewId===VIEW_ID&&frame.query===pending.frameQuery&&frame.selection===NOTE_PREFIX+pending.selection.id&&this.#notes?.state==='available'&&this.#noteRows().some(row=>row.id===pending.selection.id&&row.revision===pending.selection.revision);}
+  #abortNote(){const pending=this.#notePending;if(!pending)return;this.#notePending=null;pending.controller.abort();this.#noteNeedsReload=true;this.#noteWarning={kind:'error',message:NOTE_UNKNOWN};if(this.#execution===pending.controller)this.#busy=false;this.#publish();}
+  async #openNote(intent:ActionIntent){
+    const frame=this.session.getSnapshot().frames.at(-1),row=this.#noteRows().find(row=>NOTE_PREFIX+row.id===intent.actionId);
+    if(!row||!frame||frame.query!==this.#query||frame.selection!==intent.actionId||intent.itemId!==frame.selection||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||!this.#api.openLauncherNote||this.#noteNeedsReload||this.#notes?.state!=='available')return;
+    const pending:NotePending={controller:new AbortController(),selection:{id:row.id,revision:row.revision},revision:this.#snapshot!.revision,query:this.#query,frameQuery:frame.query};this.#notePending=pending;this.#execution=pending.controller;this.#busy=true;this.#status=undefined;this.#publish();
+    try{if(this.#notePending!==pending||!this.#noteContextCurrent(pending))return;const reply=launcherNoteOpenReplySchema.parse(await bounded(this.#api.openLauncherNote({revision:pending.revision,selection:pending.selection}),pending.controller.signal));if(this.#notePending!==pending||!this.#noteContextCurrent(pending))return;
+      if(!reply.ok){this.#noteNeedsReload=true;this.#noteWarning={kind:'error',message:['invalid-request','conflict','capability-unavailable','permission-denied','cancelled'].includes(reply.error.code)?'The selected note was not opened. Resolve any pending Notes edits, then reload commands and select it again.':NOTE_UNKNOWN};return;}
+      if(reply.value.selection.id!==row.id||reply.value.selection.revision!==row.revision)throw new Error('receipt');this.#notePending=null;this.#noteWarning=undefined;
+      await this.#hideWindow('The selected note was opened, but Linuxcast could not hide this window. Try Hide again.');
+    }catch{if(!pending.controller.signal.aborted){this.#noteNeedsReload=true;this.#noteWarning={kind:'error',message:NOTE_UNKNOWN};}}
+    finally{if(this.#execution===pending.controller&&!pending.controller.signal.aborted){this.#notePending=null;this.#busy=false;this.#publish();}}
   }
   #quicklinkUnavailable(command:LauncherCommandMetadata){const parent=this.#snapshot?.commands.find(value=>value.id==='linuxcast:open-quicklinks');return command.quicklink&&(!parent?.enabled||parent.hidden)?'Quicklinks is unavailable or hidden. Reload commands or show Quicklinks in Manage commands.':undefined;}
   #applicationActions(command:LauncherCommandMetadata){
@@ -174,16 +212,16 @@ export class LauncherController {
   #publish(){if(!this.#active)return;this.session.update(VIEW_ID,{protocolVersion:1,kind:'snapshot',view:this.#view()});if(this.#alias)this.session.update(this.#alias.viewId,{protocolVersion:1,kind:'snapshot',view:this.#aliasView()});if(this.#manager)this.session.update(this.#manager.viewId,{protocolVersion:1,kind:'snapshot',view:this.#managedView()});if(this.#url)this.session.update(this.#url.viewId,{protocolVersion:1,kind:'snapshot',view:this.#urlView()});}
   query(query:string){
     if(this.#manager || this.#alias || this.#url || this.#calculator?.active || this.#rates?.active)return;
-    if(query!==this.#query)this.#abortApplicationAction();this.#query=query;
+    if(query!==this.#query){this.#abortApplicationAction();this.#abortNote();this.#cancelNotesRead();this.#notes=null;}this.#query=query;
     if(query.length>MAX_QUERY_LENGTH){this.#generations.cancel();this.#publish();return;}
     const token=this.#generations.begin(query);
-    queueMicrotask(()=>{if(this.#active && this.#generations.current(token.generation))this.#publish();});
+    queueMicrotask(()=>{if(this.#active && this.#generations.current(token.generation)){this.#publish();void this.#searchNotes();}});
   }
   setVisible(visible:boolean){
     if(visible===this.#active)return;
     this.#active=visible;
     if(visible){void this.refresh(false);return;}
-    this.#abortApplicationAction();this.#abortVisibility();if(this.#manager)this.session.pop();
+    this.#abortNote();this.#cancelNotesRead();this.#notes=null;this.#abortApplicationAction();this.#abortVisibility();if(this.#manager)this.session.pop();
     if(this.#alias || this.#url)this.session.pop();
     for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
     this.#calculator?.dispose();this.#calculator=null;
@@ -195,15 +233,15 @@ export class LauncherController {
   }
   async refresh(explicit=true){
     if(!this.#active || this.#busy || this.#alias || this.#url || this.#calculator?.active || this.#rates?.active || this.#quicklinks?.active)return;
-    this.#load?.abort();const controller=new AbortController();this.#load=controller;
+    this.#cancelNotesRead();if(this.#notes)this.#notes={...this.#notes,state:'idle'};this.#load?.abort();const controller=new AbortController();this.#load=controller;
     this.#loading=true;this.#status=undefined;this.#publish();
     try{
       const next=await collectCatalogue(cursor=>{if(controller.signal.aborted)throw new Error();return bounded(this.#api.getLauncherCommands(cursor?{cursor}:undefined),controller.signal);});
       if(!this.#active || controller.signal.aborted)return;
       if(this.#snapshot && next.revision<this.#snapshot.revision)throw new Error();
-      this.#snapshot=next;if(explicit){this.#metadataUnconfirmed=false;this.#visibilityWarning=undefined;this.#applicationNeedsReload=false;this.#applicationWarning=undefined;}this.#status=this.#applicationWarning??this.#visibilityWarning??catalogueStatus(next);
+      this.#snapshot=next;if(explicit){this.#metadataUnconfirmed=false;this.#visibilityWarning=undefined;this.#applicationNeedsReload=false;this.#applicationWarning=undefined;this.#noteNeedsReload=false;this.#noteWarning=undefined;}this.#status=this.#applicationWarning??this.#visibilityWarning??catalogueStatus(next);
     }catch{if(!controller.signal.aborted)this.#status={kind:'error',message:'Commands could not be loaded. Reload commands to try again.'};}
-    finally{if(this.#load===controller && !controller.signal.aborted){this.#loading=false;this.#publish();}}
+    finally{if(this.#load===controller && !controller.signal.aborted){this.#loading=false;this.#publish();void this.#searchNotes();}}
   }
   async execute(intent:ActionIntent){
     const frame=this.session.getSnapshot().frames.at(-1);
@@ -220,6 +258,8 @@ export class LauncherController {
     if(this.#alias){await this.#editAlias(intent);return;}
     if(this.#url){await this.#submitUrl(intent);return;}
     if(intent.viewId!==VIEW_ID)return;
+    if(intent.actionId.startsWith(NOTE_PREFIX)){await this.#openNote(intent);return;}
+    if(intent.actionId===NOTES_MORE){if(intent.itemId!==undefined&&intent.itemId!==frame.selection||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key))||!this.#notesParent())return;const query=this.#query,selection=frame.selection,revision=this.#snapshot!.revision,controller=new AbortController();this.#busy=true;this.#execution=controller;this.#publish();try{if(!this.#active||controller.signal.aborted||!this.#notesParent()||this.session.getSnapshot().frames.at(-1)?.view.viewId!==VIEW_ID||this.#query!==query||this.session.getSnapshot().frames.at(-1)?.selection!==selection)return;const reply=launcherExecuteReplySchema.parse(await bounded(this.#api.executeLauncherCommand({commandId:NOTES_PARENT,revision}),controller.signal));if(!reply.ok)throw new Error('unavailable');}catch{if(this.#active&&!controller.signal.aborted)this.#status={kind:'error',message:'Notes could not be opened. Check Notes and reload commands before trying again.'};}finally{if(this.#active&&this.#execution===controller&&!controller.signal.aborted){this.#busy=false;this.#publish();}}return;}
     if(intent.actionId===CALCULATE){
       if(!this.#calculationCandidate()||frame.query!==this.#query||frame.selection!==CALCULATE||intent.itemId!==CALCULATE||intent.values!==undefined||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId'].includes(key)))return;
       this.#calculator?.dispose();this.#calculator=new CalculatorFlow({session:this.session,api:this.#api,viewId:`launcher-calculator-${++this.#calculatorSequence}`,revision:this.#snapshot!.revision});this.#calculator.openExpression(VIEW_ID,this.#query);return;
@@ -360,7 +400,7 @@ export class LauncherController {
     }
     // The shared view pops its root on Escape. Restore the local presentation
     // before requesting Hide so a denied/failed hide never leaves a blank window.
-    this.#abortApplicationAction();this.#abortVisibility();const selection=this.#priorSelection;
+    this.#abortNote();this.#cancelNotesRead();this.#notes=null;this.#abortApplicationAction();this.#abortVisibility();const selection=this.#priorSelection;
     this.session.navigate({protocolVersion:1,kind:'push',fromViewId:null,view:this.#view()});
     if(selection)this.session.select(VIEW_ID,selection);
     await this.#hideWindow();
@@ -372,7 +412,7 @@ export class LauncherController {
     catch{if(!controller.signal.aborted){this.#status={kind:'error',message:failureMessage};this.#publish();}}
     finally{if(this.#dismissal===controller)this.#dismissal=null;}
   }
-  dispose(){this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#rates?.dispose();this.#rates=null;this.#quicklinks?.dispose();this.#quicklinks=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
+  dispose(){this.#notesRead?.abort();this.#notePending?.controller.abort();this.#notePending=null;this.#applicationPending?.controller.abort();this.#applicationPending=null;this.#visibilityPending?.controller.abort();this.#visibilityPending=null;this.#calculator?.dispose();this.#calculator=null;this.#rates?.dispose();this.#rates=null;this.#quicklinks?.dispose();this.#quicklinks=null;this.#active=false;this.#generations.cancel();this.#load?.abort();this.#execution?.abort();this.#dismissal?.abort();this.#dismissal=null;}
 }
 function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{
   return new Promise((resolve,reject)=>{
