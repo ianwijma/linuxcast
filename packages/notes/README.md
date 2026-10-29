@@ -104,7 +104,7 @@ its request observer is not SQLite, native-close or restart evidence.
 This increment contributes partial U1-01-UI/PRIVACY and preserves the bounded
 AC01 recovery boundary. Coordinator owner migration/CAS/filter/native workspace
 and production reopen evidence remains separate. Full import/Markdown roundtrip,
-trash/trash restore/revision restore/attachments, root Notes provider,
+permanent deletion/revision restore/attachments, root Notes provider,
 Debian GNOME/KDE Wayland/X11/native AT/session/performance/package/release and
 all complete U1 acceptance remain required; no whole-task completion is claimed.
 
@@ -152,7 +152,7 @@ these checks do not establish native/SQLite/restart behaviour.
 
 This supplies partial U1-01-UI/PRIVACY and preserves bounded AC01 recovery
 presentation. Coordinator production persistence/native-close/restart evidence is
-separate. Full AC02 import/Markdown roundtrip, Trash/trash restore/revision restore,
+separate. Full AC02 import/Markdown roundtrip, permanent deletion/revision restore,
 attachments, root Notes provider and Debian GNOME/KDE Wayland/X11/AT,
 session/performance/package/release acceptance remain required. This increment
 neither completes U1-01 nor establishes full D1-02 acceptance.
@@ -200,10 +200,62 @@ callbacks and persistence are explicitly synthetic observers, not native launche
 SQLite, restart or supported-session evidence.
 
 This contributes partial U1-01-AC01/UI/PRIVACY presentation evidence. All four U1
-criteria remain pending, including full import/Markdown roundtrip, Trash/revision
+criteria remain pending, including full import/Markdown roundtrip, permanent deletion/revision
 restore/attachments/root provider and complete Debian GNOME/KDE Wayland/X11,
 native AT/session/performance/package/release scope. Integrated shared primitives
 do not establish full D1-02 acceptance.
+
+## Recoverable Trash/restore — 29 October 2026
+
+Move to Trash reserves the exact selected note/revision before displaying an
+explicit confirmation. Keep note is focused first; Escape cancels. No draft or
+metadata write occurs before confirmation. Cancelling retains local edits, pauses
+that draft timer and offers explicit Retry draft/Save. Confirmation freezes
+editing, search/filter/navigation, New/Quick, Close and other metadata actions;
+post-publication and post-flush ownership checks prevent target changes.
+
+Confirm flushes the latest editable draft without Save, then sends only the named
+ID/revision/Trash boolean. Archived content skips the flush. Exact revision +1
+receipts preserve pin, archive, draft/saved content and creation/modification
+times. Rows leave Active/Archive only after acknowledgement, retaining the readonly
+selected editor. Ordinary edits, tasks, formatting, Save, Pin and Archive refuse
+trashed content. Restore from Trash is metadata-only: retained local edits stay
+paused for review/Retry/Save; previously archived notes stay readonly until the
+separate Restore note action. Unknown outcomes require explicit fresh Reload,
+retain local content and never replay Trash/restore.
+
+Show trashed notes loads owner-filtered Trash across archive states. It is mutually
+exclusive with Show archived notes; Pinned only remains independent. The UI checks
+normalized echoes and every row, fences old pages and resets the cursor. Recovery
+never permanently deletes a note, empties Trash or schedules retention work.
+
+Bounded author verification on Linux amd64 / Node24.22.1 / Bun1.4.4:
+
+- 131 focused unit cases: 124 controller and seven export; 26 new confirmation,
+  cancellation/no-effect, exact/forged metadata receipts, archived/retained restore,
+  unknown/manual retry, readonly, reentrant disposal and owner-filter/paging cases.
+- 43 actual Tiptap Chromium cases: 37 retained plus six new Trash flows. Both
+  themes cover keyboard/held Enter/Escape cancellation, readonly tasks, Trash+pin
+  filtering and active/archived restore; pending, unknown, missing/refused capability
+  and retained local recovery are covered. Tested new states pass axe. The retained
+  200% case checks reachable Move to Trash geometry as well as existing controls.
+- Owned Notes typecheck with existing CSS declarations, scoped ESLint, plan
+  integrity and whitespace checks pass. Complete integrated type/security/native
+  lifecycle checks remain coordinator-owned.
+
+The explicit Notes unit/browser selections above use existing repository configs.
+Twelve affected public images are inspected: dark/light confirmation, Trash+pin
+filter and restored active editor; dark pending/refusal; light unknown, restored
+local, missing capability and restored-but-archived editor. The confirmation is
+normally scrolled into view by focused Keep note. Unrelated regenerated historical
+PNGs are restored. The fixture labels synthetic persistence and observed requests;
+it is not SQLite, native-close, crash/restart or supported-desktop evidence.
+
+This contributes partial U1-01-AC01/UI/PRIVACY presentation evidence only. All four
+U1 criteria remain pending. Full import/Markdown roundtrip, revision restoration,
+attachments/root provider and full Debian
+GNOME/KDE Wayland/X11/native AT/session/performance/package/release acceptance
+remain required. Reviewed shared UI does not establish complete D1-02 acceptance.
 
 ## Earlier create/edit author verification — 29 October 2026
 
@@ -237,7 +289,7 @@ in-memory data, **not** SQLite/crash/native-close evidence.
 This supports partial U1-01-AC01 recovery presentation, U1-01-UI and PRIVACY only.
 Coordinator production persistence/crash/restart evidence is recorded separately in
 apps/desktop/evidence/notes-create-edit-application.md and the export evidence above.
-U1-01-AC02 Markdown roundtrip is not implemented or accepted. Trash/
-trash restore/revision restore, root Notes provider and full native
+U1-01-AC02 Markdown roundtrip is not implemented or accepted. Permanent deletion/
+revision restore, root Notes provider and full native
 Debian GNOME/KDE Wayland/X11/AT/session/performance/package/release acceptance
 remain required. Reviewed primitives do not establish full D1-02 acceptance.

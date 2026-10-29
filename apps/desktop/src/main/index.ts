@@ -106,6 +106,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
     write:input=>currentStorage.repository.request('notes.write',input,{timeoutMs:2000}),
     setPinned:input=>currentStorage.repository.request('notes.setPinned',input,{timeoutMs:2000}),
     setArchived:input=>currentStorage.repository.request('notes.setArchived',input,{timeoutMs:2000}),
+    setTrashed:input=>currentStorage.repository.request('notes.setTrashed',input,{timeoutMs:2000}),
   });
   const currentNotes=notes;
   const controls=new DataControls(currentStorage.repository);
