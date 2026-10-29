@@ -1,3 +1,4 @@
+import type {DictionaryApi} from './dictionary.ts';
 import * as z from 'zod';
 import type {EmojiApi} from './emoji.ts';
 import type {LauncherNotesApi} from './notes-launcher.ts';
@@ -8,9 +9,9 @@ import { httpUrlSchema } from './open-url.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import { uiTextSchema } from './scalars.ts';
 import { applicationActionsSchema,desktopActionIdSchema } from './applications.ts';
-export const MAX_LAUNCHER_COMMANDS=5608;
+export const MAX_LAUNCHER_COMMANDS=5609;
 /** Stable opaque app IDs map to main-owned GIO identities, never renderer paths or Exec. */
-export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search','linuxcast:open-notes','linuxcast:quick-note','linuxcast:calculator','linuxcast:currency-conversion','linuxcast:open-quicklinks','linuxcast:open-workflow-editor','linuxcast:emoji']),z.string().regex(/^application:[a-f0-9]{64}$/u),z.string().regex(/^workflow:[a-f0-9]{64}$/u),z.string().length(46).refine(value=>value.startsWith('quicklink:')&&z.uuid().safeParse(value.slice(10)).success)]);
+export const launcherCommandIdSchema=z.union([z.enum(['linuxcast:open-local-data','linuxcast:hide','linuxcast:quit','linuxcast:open-url','linuxcast:open-file-search','linuxcast:open-notes','linuxcast:quick-note','linuxcast:calculator','linuxcast:currency-conversion','linuxcast:open-quicklinks','linuxcast:open-workflow-editor','linuxcast:emoji','linuxcast:dictionary']),z.string().regex(/^application:[a-f0-9]{64}$/u),z.string().regex(/^workflow:[a-f0-9]{64}$/u),z.string().length(46).refine(value=>value.startsWith('quicklink:')&&z.uuid().safeParse(value.slice(10)).success)]);
 export const LAUNCHER_CHANNELS={getCommands:'launcher:get-commands',execute:'launcher:execute',setPinned:'launcher:set-pinned',setAlias:'launcher:set-alias',openUrl:'launcher:open-url',copyCalculatorResult:'launcher:copy-calculator-result',setHidden:'launcher:set-hidden',applicationAction:'launcher:application-action'} as const;
 /** Alias changes are bounded metadata, never a new command or execution authority. */
 export const commandAliasSchema=z.string().min(1).max(128).refine(value=>value===value.trim() && [...value].length<=64 && !/[\p{Cc}\p{Cs}]/u.test(value) && new TextEncoder().encode(value).length<=256);
@@ -47,7 +48,7 @@ export type LauncherCommandMetadata=z.infer<typeof launcherCommandMetadataSchema
 export type LauncherCommandsSnapshot=z.infer<typeof launcherCommandsSnapshotSchema>;
 export type LauncherCommandsReply=z.infer<typeof launcherCommandsReplySchema>;
 export type LauncherExecuteReply=z.infer<typeof launcherExecuteReplySchema>;
-export interface LauncherApi extends Partial<RateConversionApi>,LauncherNotesApi,EmojiApi {
+export interface LauncherApi extends Partial<RateConversionApi>,LauncherNotesApi,EmojiApi,DictionaryApi {
   executeApplicationAction?:(request:Pick<z.infer<typeof launcherApplicationActionRequestSchema>,'commandId'|'revision'|'actionId'>)=>Promise<LauncherApplicationActionReply>;
   setLauncherHidden?:(request:Pick<z.infer<typeof launcherVisibilityRequestSchema>,'commandId'|'revision'|'hidden'>)=>Promise<LauncherCommandsReply>;
   copyCalculatorResult?:(request:{revision:number;expression:string})=>Promise<CalculatorCopyReply>;

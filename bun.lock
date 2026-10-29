@@ -40,6 +40,7 @@
         "@linuxcast/calculator": "workspace:*",
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/data-controls": "workspace:*",
+        "@linuxcast/dictionary": "workspace:*",
         "@linuxcast/emoji": "workspace:*",
         "@linuxcast/file-search": "workspace:*",
         "@linuxcast/notes": "workspace:*",
@@ -71,6 +72,14 @@
       "version": "0.1.0",
       "dependencies": {
         "@js-temporal/polyfill": "0.5.1",
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/ui": "workspace:*",
+      },
+    },
+    "packages/builtins/dictionary": {
+      "name": "@linuxcast/dictionary",
+      "version": "0.1.0",
+      "dependencies": {
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/ui": "workspace:*",
       },
@@ -459,6 +468,8 @@
     "@linuxcast/data-controls": ["@linuxcast/data-controls@workspace:packages/data-controls"],
 
     "@linuxcast/desktop": ["@linuxcast/desktop@workspace:apps/desktop"],
+
+    "@linuxcast/dictionary": ["@linuxcast/dictionary@workspace:packages/builtins/dictionary"],
 
     "@linuxcast/emoji": ["@linuxcast/emoji@workspace:packages/builtins/emoji"],
 

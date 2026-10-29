@@ -101,7 +101,10 @@
       "apps/desktop/src/features/launcher/tests/emoji-routing.test.ts",
       "packages/ui/src/views/glyph.test.tsx",
       "packages/ui/src/views/loading.test.tsx",
-      "packages/storage/tests/emoji-favourites-client.test.ts"
+      "packages/storage/tests/emoji-favourites-client.test.ts",
+      "packages/builtins/dictionary/tests/installed.test.ts",
+      "packages/builtins/dictionary/tests/presentation.test.ts",
+      "apps/desktop/src/features/launcher/tests/dictionary-routing.test.ts"
     ]
   },
   "contracts": {
@@ -173,7 +176,8 @@
       "packages/contracts/tests/notes-launcher.contract.test.ts"
     ],
     "L2-06": [
-      "packages/contracts/tests/emoji.contract.test.ts"
+      "packages/contracts/tests/emoji.contract.test.ts",
+      "packages/contracts/tests/dictionary.contract.test.ts"
     ]
   },
   "ui": {
@@ -221,7 +225,8 @@
       "packages/notes/tests/delete.ui.test.ts"
     ],
     "L2-06": [
-      "packages/builtins/emoji/tests/emoji.ui.test.ts"
+      "packages/builtins/emoji/tests/emoji.ui.test.ts",
+      "packages/builtins/dictionary/tests/dictionary.ui.test.ts"
     ]
   },
   "integration": {
@@ -297,8 +302,9 @@
     "L2-06": [
       "apps/desktop/tests/emoji.integration.test.ts",
       "apps/desktop/tests/emoji-tone.integration.test.ts",
-        "apps/desktop/tests/emoji-favourites.integration.test.ts",
-      "packages/storage/tests/emoji-favourites.integration.test.ts"
+      "apps/desktop/tests/emoji-favourites.integration.test.ts",
+      "packages/storage/tests/emoji-favourites.integration.test.ts",
+      "apps/desktop/tests/dictionary.integration.test.ts"
     ]
   },
   "security": {
@@ -402,7 +408,9 @@
       "apps/desktop/src/preload/api.test.ts",
       "apps/desktop/src/main/launcher-ipc.test.ts",
       "apps/desktop/src/main/clipboard-write.test.ts",
-      "packages/storage/tests/emoji-favourites-client.test.ts"
+      "packages/storage/tests/emoji-favourites-client.test.ts",
+      "apps/desktop/src/main/dictionary-ipc.test.ts",
+      "apps/desktop/src/preload/dictionary.test.ts"
     ]
   },
   "perf": {}

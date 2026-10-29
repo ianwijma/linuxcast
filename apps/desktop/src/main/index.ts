@@ -1,3 +1,4 @@
+import {createInstalledDictionary} from '../../../../packages/builtins/dictionary/src/installed.ts';
 import {getEmoji,getEmojiGroups} from '../../../../packages/builtins/emoji/src/data.ts';
 import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
 import {createNotesWorkspace} from './notes.ts';
@@ -33,7 +34,7 @@ const rates=new RateConversionService({
  async clear(configurationRevision){if(!storage?.isReady())throw new Error('Rates storage unavailable.');await storage.repository.request('rates.cache.clear',{configurationRevision});},
  fetch:fetchFrankfurterRate,
 });
-startResidentShell({ resourcesDirectory: __dirname,rates,
+startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstalledDictionary(),
   prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
   emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100}),favourites:{

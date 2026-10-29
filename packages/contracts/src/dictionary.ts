@@ -1,0 +1,38 @@
+import * as z from 'zod';
+import {rpcFailureSchema} from './protocol.ts';
+const encoder=new TextEncoder();
+const clean=(value:string)=>!/[\p{Cc}\p{Cs}\p{Bidi_Control}]/u.test(value);
+const positive=z.number().int().positive().safe();
+export const dictionaryQuerySchema=z.string().max(512).refine(value=>value.length<=512&&clean(value)&&encoder.encode(value).length<=2048);
+export const dictionaryWordSchema=z.string().min(1).max(256).refine(value=>value.length<=256&&clean(value)&&!/[\s]/u.test(value)&&Array.from(value).length<=128&&encoder.encode(value).length<=512);
+export const dictionaryLanguageIdSchema=z.string().regex(/^language:[0-9a-f]{64}$/u);
+export const dictionaryWordIdSchema=z.string().regex(/^word:[0-9a-f]{64}$/u);
+export const dictionarySnapshotIdSchema=z.string().regex(/^[0-9a-f]{64}$/u);
+export const dictionaryLanguageSchema=z.strictObject({id:dictionaryLanguageIdSchema,name:z.string().min(1).max(64).regex(/^[A-Za-z][A-Za-z0-9_-]*$/u),state:z.enum(['available','unsupported-encoding','invalid','unavailable']),encoding:z.string().min(1).max(32).regex(/^[A-Za-z0-9_-]+$/u).optional(),message:z.string().max(512).refine(clean).optional()}).refine(value=>(!Object.hasOwn(value,'encoding')||value.encoding!==undefined)&&(!Object.hasOwn(value,'message')||value.message!==undefined));
+export type DictionaryLanguage=z.infer<typeof dictionaryLanguageSchema>;
+export const dictionaryWordRecordSchema=z.strictObject({id:dictionaryWordIdSchema,word:dictionaryWordSchema});
+const languages=z.array(dictionaryLanguageSchema).max(64).refine(rows=>new Set(rows.map(row=>row.id)).size===rows.length);
+export const dictionaryCatalogueSchema=z.strictObject({languages,truncated:z.boolean()});
+export const dictionaryBackendSearchSchema=z.strictObject({language:dictionaryLanguageSchema,snapshotId:dictionarySnapshotIdSchema,query:dictionaryQuerySchema,words:z.array(dictionaryWordRecordSchema).max(100),truncated:z.boolean()}).refine(value=>value.language.state==='available'&&new Set(value.words.map(row=>row.id)).size===value.words.length&&new Set(value.words.map(row=>row.word)).size===value.words.length);
+export const dictionarySearchInputSchema=z.strictObject({revision:positive,query:dictionaryQuerySchema,languageId:dictionaryLanguageIdSchema.optional()}).refine(value=>!Object.hasOwn(value,'languageId')||value.languageId!==undefined);
+export const dictionarySearchRequestSchema=dictionarySearchInputSchema.safeExtend({protocolVersion:z.literal(1)});
+export const dictionarySearchValueSchema=z.strictObject({revision:positive,searchId:positive,query:dictionaryQuerySchema,requestedLanguageId:dictionaryLanguageIdSchema.nullable(),language:dictionaryLanguageSchema.nullable(),languages,languagesTruncated:z.boolean(),snapshotId:dictionarySnapshotIdSchema.nullable(),records:z.array(dictionaryWordRecordSchema).max(100),truncated:z.boolean()}).refine(value=>(!value.requestedLanguageId||value.language?.id===value.requestedLanguageId)&&(!value.language||value.languages.some(language=>language.id===value.language!.id&&JSON.stringify(language)===JSON.stringify(value.language)))&&(value.language?.state==='available'?value.snapshotId!==null:value.snapshotId===null&&value.records.length===0&&!value.truncated)&&new Set(value.records.map(row=>row.id)).size===value.records.length&&new Set(value.records.map(row=>row.word)).size===value.records.length);
+const failure=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
+export const dictionarySearchReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:dictionarySearchValueSchema}),failure]);
+export type DictionarySearchValue=z.infer<typeof dictionarySearchValueSchema>;
+export type DictionarySearchReply=z.infer<typeof dictionarySearchReplySchema>;
+export const dictionaryCopyInputSchema=z.strictObject({revision:positive,searchId:positive,query:dictionaryQuerySchema,languageId:dictionaryLanguageIdSchema,snapshotId:dictionarySnapshotIdSchema,id:dictionaryWordIdSchema});
+export const dictionaryCopyRequestSchema=dictionaryCopyInputSchema.extend({protocolVersion:z.literal(1)});
+export const dictionaryCopyValueSchema=dictionaryCopyInputSchema.extend({outcome:z.literal('copied'),word:dictionaryWordSchema});
+export const dictionaryCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:dictionaryCopyValueSchema}),failure]);
+export type DictionaryCopyReply=z.infer<typeof dictionaryCopyReplySchema>;
+export const dictionaryReleaseInputSchema=z.strictObject({revision:positive,searchId:positive});
+export const dictionaryReleaseRequestSchema=dictionaryReleaseInputSchema.extend({protocolVersion:z.literal(1)});
+export const dictionaryReleaseReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('released'),searchId:positive})}),failure]);
+export type DictionaryReleaseReply=z.infer<typeof dictionaryReleaseReplySchema>;
+export interface DictionaryApi{
+ searchDictionary?(input:z.infer<typeof dictionarySearchInputSchema>):Promise<DictionarySearchReply>;
+ copyDictionaryWord?(input:z.infer<typeof dictionaryCopyInputSchema>):Promise<DictionaryCopyReply>;
+ releaseDictionarySearch?(input:z.infer<typeof dictionaryReleaseInputSchema>):Promise<DictionaryReleaseReply>;
+}
+export const DICTIONARY_CHANNELS={search:'launcher:search-dictionary',copy:'launcher:copy-dictionary-word',release:'launcher:release-dictionary-search'} as const;
