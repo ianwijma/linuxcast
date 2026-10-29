@@ -1,67 +1,72 @@
 # Coordinator checkpoint —29 October2026
 
-Goal remains active: complete agreed local1.0/all97tasks/R1-03/release gates.
-User authorized reviewed/tested unfinished application increments; record limits.
-All subagents SOL6.1/high. Normal1Password signing works; preserve configuration.
-Primary develop clean at6227ef05ad02f636d8a6bd7aee8f90e81de4b6f8, remote matches;
-openPR[]/unprotecteddevelop/rules[] checked before this increment.
-PR67 offlineEmoji and PR68 skin-tone merged; earlier Notes/application increments
-remain integrated. Do not reset/archive old worktrees or duplicate completed work.
+Goal active: complete agreedlocal1.0/all97tasks/R1-03/releasegates. Userauthorizes
+reviewed/tested unfinishedapplicationincrements with explicitremainingacceptance.
+All subagents SOL6.1/high. Configured1Password signing works; preserveconfiguration.
+PreviousgoalturnPROGRESS(PR69merged); currentPROGRESS(Dictionaryapplicationready).
+Primarydevelopclean at0696e1d9f7a0ef9eb44b7619b00b7a2472a965b6, remote/openPR[]
+verifiedatstart. PR67offlineEmoji/68tone/69persistentfavourites integrated; older
+Notes/applicationflowsremain. Do notreset/archiveoldworktrees/patches/branches.
 
-Current coordinator .worktrees/linuxcast-emoji-search, codex/emoji-favourites,
-base6227ef0. Persistent favourites application increment ready for signedcommit/
-push/PR/currentCI+configuredreviewinspection/normalexpected-headmerge. No active
-signer or user question. All changes unstaged at this checkpoint.
-Explicit Add/Remove viaActions, source-confirmed Favourite tag, retained-filter
-Showfavourites/all, persistence through existing revisioned settingsCAS. Copy stays
-primary/separate; no implicit clipboard/usage effects. No newdataset/dependency/
-migration/table. Renderer sees only bounded rows/favouriteflags/revision; named
-selected-context write, actualpending ownership, exactCAS receipts/noautoreplay.
-Independent canonical group-staleness and newer contradictory refresh message
-findings fixed/re-reviewed clean; lateststate neutral guidance has2regressions.
+Currentcoordinator .worktrees/linuxcast-emoji-search, codex/dictionary-headwords,
+base0696e1d. Dictionaryincrement reviewed/tested/readytonormal signedcommit+
+verify/push/PR/currentCI+configuredreviewinspection/normalexpected-headmerge.
+Allchangesunstaged atcheckpoint; noPR/signer/userquestion/liveparentprocess.
+Fixedsystem Hunspell pairedfiles/UTF8/discoverymetadata<=64, selected-source
+strictboundeddecode/wordvalidation/snapshots/opaqueIDs/search<=100. Dictionary
+registeredexistingroot; sharedList/languageForm/canonicalwordCopy/manualpaste.
+No sourcepaths/fullarraysrenderer/genericfilesystemauthority/download/network/
+newexternaldependency/migration; onlylocalworkspacepackage+lockdelta.
+13builtinsraiseaggregatecap5609, providercapsunchanged;96affectedcatalogue/search/
+QuicklinkregressionsPASS. Oldlauncher/shell74PASS; finalmain69PASS(no-effectgeneric
+DictionaryExecute regression). InitialoverlimitfixtureupdatedMAX_COMMANDS+1.
 
-Frozen patches exact/applied:
-- data3files /tmp/linuxcast-emoji-favourites-data.patch sha406eed2f0a1a8b48793f94d8b53a6958f3000052bb7eef374bd8401c1efa6039
-- boundary6files /tmp/linuxcast-emoji-favourites-boundary.patch sha5846659b4c96375387fcb802df0282366c632d23b9e617f2fa005ee7be4a6298
-- UI13files /tmp/linuxcast-emoji-favourites-ui.patch sha01459be086ca3c5b40d1f840853c47aa5f771b219284e000c292d2454652dd36
-  plus parent2-file lateststate review fix, independently verified.
-- actual6files /tmp/linuxcast-emoji-favourites-application.patch sha068dae09f0b4d1866cab2cd9a651114a80876d1b17c2c41f6c4c16795049fa29
-All manifests /tmp/samename-manifest.json; actual16testedproductionhashes match.
-8component+4actual dark/light affectedcaptures inspected/axe0/independentreviewclean.
-Historical43PNG unchanged; regression recaptures restored to reviewed artifacts.
+Mapped286unit/33contract/241securityPASS beforefinalnewmainregression; mapped34UI
+PASS24.4s. Finalmapped8integrationchecks/5filesPASS26.77s:4actualElectron scenarios
+(Dictionary8.21s/originalEmoji5.63/favourites5.27/tone5.11)+4realstorageowner checks.
+FinalfullpinnedNodeprojectTS/scopedallchangedTSlint/actual+newmainlint/plan/diffPASS.
+ActualDict:en_GB café/[63,61,66,e9] nativeXclipCopy onlyexplicitly; query/selection/
+languageCancel/Escape/readonlyApply/empty; requiredSpanishfullbodyrefusal/recovery
+andunsupportedencoding; Hide/reopen/defaultlanguagereset/Quit/restart/noreplay;
+aggregateusage1/privacy. RendererHTTP(S)0qualifiedpageonly. Fullsandboxtrue.
+InstalledSpanishheaderpassesbutoneU+200E line1746failsfullread; strictreaderunchanged,
+refusalnotsuccess. Fullspellchecking/definitions visiblyunavailable. Initialactual
+aria-busywaitassumptionfixedTESTONLYtosemanticstatus/loadedlanguageassertions.
 
-Checks: parent mapped186unit/18contract/187securityPASS beforefinal2controller
-regressions; finalfocusedpresentation122PASS. Mapped24UI23.5sPASS afterunknown
-read-refusalfix and beforelateststate messagefix. Finalmappedintegration7PASS/
-4files18.44s: favourites5.60s, originalEmoji5.71s, tone5.05s +4realstorageowner
-cases. Actual Add/filter/Copy exactMediumUnicode/Remove/empty/recovery/Hide/reopen/
-tworestarts/settingsabsent-vs-empty/export/aggregateusageprivacy. No write-replay.
-FinaldirectNodeTypeScript/scopedallchangedTSlint/diff/plan PASS. Taskregistry/cards
-record partialevidence, no criterion promoted:8done/20inprogress/69planned;
-56passed/325pending/8N/A. Existing Vitestconfig scopedserialization only when
-appdesktoptestselected avoids shared-dist buildrace, reviewed. No newrunner.
-All parent process handles terminal.
+Frozen/applied/reviewed patches/manifests in/tmp:
+- linuxcast-dictionary-headwords-data.patch f1251ed8dd141d558d1a8c71e5e875658c671f25a4fad5dbfb11a1a6a4b49a55 (3files)
+- linuxcast-dictionary-headwords-ui.patch 2c5c3a17c689240e8d34abfbf21328936c0f08ba1c11d6bfde3496eafb14ecc4 (15files/8captures)
+- linuxcast-dictionary-boundary.patch ac1433212bf64b476e82af2df2652ed740cfb6e572e24fc60a51bfe86071e7cc (4tests/82authorPASS)
+- linuxcast-dictionary-application.patch 41d26e5f862f1d5ad256ef01a351d8407c99d692fab40e3d701070f648c86fca (6files/4captures)
+Allownedhashes+16testedproductionhashes verified. Reportsapps/desktop/evidence/
+dictionary-application.md +packages/builtins/dictionary/{HEADWORDS,UI}.md. Lastreport
+coordinatorappendafterhashfreezeintentional. New8component+4actualPNG reviewed/axe0;
+47historicalEmojiPNGunchanged, recaptures restoredexactreviewedauthorartifacts.
+Independentdata/main/preload/root/sharedintegration/UI/actualassertions/report/
+capturereviews clean. Findingsfixedandregressed:preencoderbounds, ownundefined
+metadata, unknownpendingCopyfailedreadmustretainuncertainty. No remainingfinding.
 
-Agents completed:
-- manifest_notes_delete_sol .worktrees/linuxcast-emoji-favourites-ui,
-  codex/emoji-favourites-ui: presentation then6actualfiles, frozen reviewed.
-- notes_delete_boundary_sol .worktrees/linuxcast-emoji-favourites-boundary,
-  codex/emoji-favourites-boundary: boundarytests thenindependentUI/data/actualreview.
-- notes_merge_record_review_sol .worktrees/linuxcast-emoji-favourites-data,
-  codex/emoji-favourites-data: data38tests/source, frozen reviewed.
-No more foundation/research/proof assignments. After merge select registered
-Dictionary application flow with installedlocaldata/missing-language guidance,
-existing shell/storage/sharedUI. ReadcompleteL2-06card/normativereferences first,
-bound next assignment to usefulapplicationflow and ownpaths. Do not ask user.
+Completedagents (existingSOL6.1/high):
+- manifest_notes_delete_sol .worktrees/linuxcast-dictionary-headwords-data,
+  codex/dictionary-headwords-data:3readerfiles then6actualfiles, frozen.
+- notes_merge_record_review_sol .worktrees/linuxcast-dictionary-headwords-ui,
+  codex/dictionary-headwords-ui:15UIfiles/49units/10browser, frozen.
+- notes_delete_boundary_sol .worktrees/linuxcast-dictionary-headwords-boundary,
+  codex/dictionary-headwords-boundary:4tests82PASS thenindependentsourcereviews.
+No additionalproof/research/infrastructureassignments. Nextaftermerge: configured
+localdefinitionlookupapplicationflow, preservecompleteHunspell/StarDict/Emoji1.0.
+Read taskcard/normativerefs before boundedimplementation; choose automatically.
 
-Runtime pinnedNode24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95;
-Pop!_OS22.04 amd64/privateXvfb X11/xclip is realapplication evidence, not Debian13
-GNOME/KDE Wayland/X11/nativeAT acceptance. ExistingpinnedElectron override:
-.worktrees/linuxcast-emoji-ui/node_modules/electron/dist; normal sandbox enabled.
-PATH=.worktrees/tools:$PATH BUN_TMPDIR=/tmp. Fullcompiler directNode project.
-Gitindex/sign/network/ownerlocks useauthorizedescalation when sandboxreadonly.
+RuntimeNode24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95; Pop!_OS22.04amd64/
+privateXvfbX11/xclip isrealapp evidence, notDebian13GNOME/KDEWayland/X11/nativeAT.
+PATH=.worktrees/tools:$PATH BUN_TMPDIR=/tmp. ExistingpinnedElectronoverride
+.worktrees/linuxcast-emoji-ui/node_modules/electron/dist; no --no-sandbox.
+Gitindex/sign/network/ownerlocks useauthorizedescalation ifsandboxreadonly.
+Fullcompiler directNodeproject avoids priorBuncompilerintermittentcrash.
 
-Unfinished: full dictionary/Hunspell/configuredStarDict definitions/discovery/
-missinglanguage, customkeywords/frecency/nativepaste/explicitglobalprovidersemantic
-lookup; fullL1/D1/prerequisites/nativeAT/highcontrast/performance/package/release.
-No fullL2-06/task/Goal completionclaim. Keep complete1.0scope/security unchanged.
+Taskstatusunchanged8done/20inprogress/69planned;56passed/325pending/8N/A. Partial
+criterion evidence updated; no fullcriterionpromoted. RemainingcompleteHunspell
+spellchecking/otherencodings/StarDictdefinitions/thesaurus, source support, Emoji
+customkeywords/frecency/nativepaste/globalproviderexplicitsemanticlookup, full
+prerequisites/nativeAT/highcontrast/performance/package/release/all97/R1-03.
+Goalcompletionunproven; keepactive, no scope downgrade.

@@ -20,6 +20,7 @@
     "@linuxcast/workflows": "workspace:*",
     "zod": "4.6.7",
     "@linuxcast/notes": "workspace:*",
+    "@linuxcast/dictionary": "workspace:*",
     "@linuxcast/emoji": "workspace:*"
   },
   "devDependencies": {

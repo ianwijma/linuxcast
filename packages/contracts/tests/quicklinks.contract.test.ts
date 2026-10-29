@@ -52,7 +52,7 @@ it('accepts only boolean presentation preferences, with absent and false as ordi
 });
 
 it('binds read-only launcher entries to exact saved selections without accepting executable targets',()=>{
- const value={id:`quicklink:${id}`,quicklink:{id,revision:7},title:'Public saved link',aliases:[],keywords:['Work'],enabled:true,usage:null};expect(launcherCommandMetadataSchema.parse(value)).toEqual(value);expect(MAX_LAUNCHER_COMMANDS).toBe(5608);
+ const value={id:`quicklink:${id}`,quicklink:{id,revision:7},title:'Public saved link',aliases:[],keywords:['Work'],enabled:true,usage:null};expect(launcherCommandMetadataSchema.parse(value)).toEqual(value);expect(MAX_LAUNCHER_COMMANDS).toBe(5609);
  for(const patch of [{quicklink:undefined},{quicklink:{id:'00000000-0000-4000-8000-000000000002',revision:7}},{quicklink:{id,revision:0}},{quicklink:{id,revision:7,url:save.url}},{id:'linuxcast:open-quicklinks'},{applicationActions:{available:true,actions:[]}}])expect(launcherCommandMetadataSchema.safeParse({...value,...patch}).success).toBe(false);
  for(const commandId of ['quicklink:not-a-uuid','quicklink:../../public','quicklink:'+id+'x'])expect(launcherCommandIdSchema.safeParse(commandId).success).toBe(false);
 });

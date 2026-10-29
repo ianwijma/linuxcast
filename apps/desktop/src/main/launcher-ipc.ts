@@ -1,3 +1,5 @@
+import {registerDictionaryIpc} from './dictionary-ipc.ts';
+import type {DictionaryBackend} from './dictionary-ipc.ts';
 import {registerEmojiIpc} from './emoji-ipc.ts';
 import type {EmojiBackend} from './emoji-ipc.ts';
 import {registerLauncherNotesIpc} from './notes-launcher-ipc.ts';
@@ -31,6 +33,8 @@ import { registerQuicklinksIpc } from './quicklinks-ipc.ts';
 import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
+  dictionary?:DictionaryBackend;
+  dictionaryVisible?:()=>boolean;
   emoji?:EmojiBackend;
   emojiVisible?:()=>boolean;
   searchNotes?:(query:string)=>Promise<NotesRootSearch>;
@@ -99,6 +103,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic, units, colours or dates locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert','dates','timezones'],enabled:true},
   ];
+  if(actions.dictionary)builtins.push({id:'linuxcast:dictionary',title:'Dictionary',subtitle:'Browse installed language base entries and copy a selected word',aliases:['dictionary','spelling'],keywords:['word','language','hunspell','headword'],enabled:true});
   if(actions.emoji)builtins.push({id:'linuxcast:emoji',title:'Emoji',subtitle:'Search offline Unicode emoji and copy a selected result',aliases:['emoji','emoticon'],keywords:['unicode','symbol','smile','copy','character'],enabled:true});
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   if(actions.openWorkflowEditor)builtins.push({id:'linuxcast:open-workflow-editor',title:'Workflow draft',subtitle:'Build and save a local workflow draft',aliases:['workflow','workflows'],keywords:['graph','editor','automation','draft'],enabled:true});
@@ -415,7 +420,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     if (!active() || busy) return failure('cancelled');
     const command = descriptors().find(item => item.id === parsed.data.commandId);
     if (!command?.enabled) return failure('permission-denied');
-    if(command.id==='linuxcast:emoji'||command.id.startsWith('quicklink:')||command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:currency-conversion'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
+    if(command.id==='linuxcast:dictionary'||command.id==='linuxcast:emoji'||command.id.startsWith('quicklink:')||command.id==='linuxcast:open-url'||command.id==='linuxcast:calculator'||command.id==='linuxcast:currency-conversion'||command.id==='linuxcast:open-quicklinks')return failure('invalid-request');
     busy = true;
     try {
       if(actions.listHidden&&!isLauncherVisibilityProtected(command.id)){
@@ -463,6 +468,11 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }
     finally { busy = false; }
   });
+  const removeDictionary=actions.dictionary?registerDictionaryIpc(ipc,actions.dictionary,{
+    trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.dictionaryVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
+    authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:dictionary',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.dictionaryVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:dictionary');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
+    acquire:()=>{busy=true;metadataGeneration++;return()=>{busy=false;};},recordUse:()=>recordUse('linuxcast:dictionary'),...(actions.copyCalculatorResult?{copy:actions.copyCalculatorResult}:{}),
+  }):undefined;
   const removeEmoji=actions.emoji?registerEmojiIpc(ipc,actions.emoji,{
     trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.emojiVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
     authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:emoji',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.emojiVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:emoji');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
@@ -482,5 +492,5 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
     recordUse:()=>recordUse('linuxcast:open-quicklinks'),
   }):undefined;
-  return () => { disposed = true;removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  return () => { disposed = true;removeDictionary?.();removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }
