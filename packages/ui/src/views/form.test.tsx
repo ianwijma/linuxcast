@@ -94,3 +94,22 @@ it('restores a field after host loading loses native focus, preserving deliberat
  rendered.rerender(<ViewForm view={{...simple,loading:true,revision:4}} {...props}/>);const cancel=screen.getByRole('button',{name:'Cancel'});cancel.focus();
  rendered.rerender(<ViewForm view={{...simple,loading:false,revision:5}} {...props}/>);expect(document.activeElement).toBe(cancel);
 });
+
+it('multiline text preserves Unicode and newlines locally until explicit form submission',async()=>{
+ const action=vi.fn(),dirty=vi.fn(),view={...simple,fields:[{id:'keywords',kind:'text' as const,title:'Search keywords',required:false,value:'public one',multiline:true as const,description:'One phrase per line.'}]};
+ render(<ViewForm view={view} host={{action}} active onDirty={dirty} requestCancel={()=>{}}/>);
+ const input=screen.getByRole('textbox',{name:'Search keywords'}) as HTMLTextAreaElement;expect(input.tagName).toBe('TEXTAREA');expect(document.activeElement).toBe(input);expect(input.getAttribute('aria-describedby')).toBeTruthy();
+ const value='café au lait\npublic family 👨‍👩‍👧‍👦';fireEvent.change(input,{target:{value}});fireEvent.keyDown(input,{key:'Enter'});expect(input.value).toBe(value);expect(action).not.toHaveBeenCalled();expect(dirty).toHaveBeenCalledWith(true);submit();await waitFor(()=>expect(action).toHaveBeenCalledTimes(1));expect(action.mock.calls[0]![0].values).toEqual({keywords:value});
+});
+
+it.each(['body','disabled submit'] as const)('recovers %s focus after a host failure revision even when loading transitions were batched away',origin=>{
+ const props={host:{action:vi.fn()},active:true,onDirty:()=>{},requestCancel:()=>{}},view={...simple,fields:[{id:'keywords',kind:'text' as const,title:'Search keywords',required:false,value:'public',multiline:true as const}]};
+ const rendered=render(<ViewForm view={view} {...props}/>);const input=screen.getByRole('textbox',{name:'Search keywords'});expect(document.activeElement).toBe(input);
+ if(origin==='body'){document.body.tabIndex=-1;document.body.focus();document.body.removeAttribute('tabindex');}else screen.getByRole('button',{name:view.actions!.find(action=>action.id===view.submitActionId)!.title}).focus();
+ const failed={...view,revision:view.revision+1,status:{kind:'error' as const,message:'The save outcome is unknown.'},actions:view.actions!.map(action=>action.id===view.submitActionId?{...action,disabledReason:'Reload before another save.'}:action)};
+ rendered.rerender(<ViewForm view={failed} {...props}/>);expect(document.activeElement).toBe(input);const cancel=screen.getByRole('button',{name:'Cancel'});cancel.focus();rendered.rerender(<ViewForm view={{...failed,revision:failed.revision+1}} {...props}/>);expect(document.activeElement).toBe(cancel);
+});
+
+it('keeps pending form keyboard events inside an inert container when disabled controls lose focus',()=>{
+ const action=vi.fn(),props={host:{action},active:true,onDirty:()=>{},requestCancel:()=>{}},rendered=render(<ViewForm view={simple} {...props}/>);document.body.tabIndex=-1;document.body.focus();document.body.removeAttribute('tabindex');rendered.rerender(<ViewForm view={{...simple,revision:simple.revision+1,loading:true}} {...props}/>);const form=screen.getByRole('form');expect(document.activeElement).toBe(form);expect(form.tabIndex).toBe(-1);fireEvent.keyDown(form,{key:'Enter'});expect(action).not.toHaveBeenCalled();expect(document.activeElement).not.toBe(screen.getByRole('button',{name:'Cancel'}));
+});

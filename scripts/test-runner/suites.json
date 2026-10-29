@@ -107,7 +107,10 @@
       "apps/desktop/src/features/launcher/tests/dictionary-routing.test.ts",
       "packages/builtins/dictionary/tests/stardict.test.ts",
       "packages/builtins/dictionary/tests/definitions.test.ts",
-      "packages/storage/tests/dictionary-definitions-client.test.ts"
+      "packages/storage/tests/dictionary-definitions-client.test.ts",
+      "packages/builtins/emoji/tests/custom-keywords-search.test.ts",
+      "packages/builtins/emoji/tests/keywords.test.ts",
+      "packages/ui/src/views/form.test.tsx"
     ]
   },
   "contracts": {
@@ -181,7 +184,8 @@
     "L2-06": [
       "packages/contracts/tests/emoji.contract.test.ts",
       "packages/contracts/tests/dictionary.contract.test.ts",
-      "packages/contracts/tests/dictionary-definitions.contract.test.ts"
+      "packages/contracts/tests/dictionary-definitions.contract.test.ts",
+      "packages/contracts/tests/emoji-keywords.contract.test.ts"
     ]
   },
   "ui": {
@@ -231,7 +235,8 @@
     "L2-06": [
       "packages/builtins/emoji/tests/emoji.ui.test.ts",
       "packages/builtins/dictionary/tests/dictionary.ui.test.ts",
-      "packages/builtins/dictionary/tests/definitions.ui.test.ts"
+      "packages/builtins/dictionary/tests/definitions.ui.test.ts",
+      "packages/builtins/emoji/tests/keywords.ui.test.ts"
     ]
   },
   "integration": {
@@ -311,7 +316,9 @@
       "packages/storage/tests/emoji-favourites.integration.test.ts",
       "apps/desktop/tests/dictionary.integration.test.ts",
       "packages/storage/tests/dictionary-definitions.integration.test.ts",
-      "apps/desktop/tests/dictionary-definitions.integration.test.ts"
+      "apps/desktop/tests/dictionary-definitions.integration.test.ts",
+      "packages/storage/tests/emoji-keywords.integration.test.ts",
+      "apps/desktop/tests/emoji-keywords.integration.test.ts"
     ]
   },
   "security": {
@@ -420,7 +427,9 @@
       "apps/desktop/src/preload/dictionary.test.ts",
       "apps/desktop/src/main/dictionary-definitions-ipc.test.ts",
       "apps/desktop/src/preload/dictionary-definitions.test.ts",
-      "packages/storage/tests/dictionary-definitions-client.test.ts"
+      "packages/storage/tests/dictionary-definitions-client.test.ts",
+      "apps/desktop/src/main/emoji-keywords-ipc.test.ts",
+      "apps/desktop/src/preload/emoji-keywords.test.ts"
     ]
   },
   "perf": {}
