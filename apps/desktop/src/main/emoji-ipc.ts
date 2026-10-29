@@ -1,9 +1,9 @@
 import type {IpcMain,IpcMainInvokeEvent} from 'electron';
 import {EMOJI_CHANNELS,emojiSearchRequestSchema,emojiSearchReplySchema,emojiCopyRequestSchema,emojiCopyReplySchema,emojiReleaseRequestSchema,emojiReleaseReplySchema,emojiRowSchema} from '../../../../packages/contracts/src/emoji.ts';
-import type {EmojiRow,EmojiCopyReply,EmojiSearchValue} from '../../../../packages/contracts/src/emoji.ts';
+import type {EmojiRow,EmojiCopyReply,EmojiSearchValue,EmojiTone} from '../../../../packages/contracts/src/emoji.ts';
 export interface EmojiBackend{
  groups:readonly EmojiSearchValue['groups'][number][];
- search(input:{query:string;group?:string}):readonly EmojiRow[]|Promise<readonly EmojiRow[]>;
+ search(input:{query:string;group?:string;tone?:EmojiTone}):readonly EmojiRow[]|Promise<readonly EmojiRow[]>;
  get(id:string):EmojiRow|undefined;
 }
 interface Context{
@@ -13,7 +13,7 @@ interface Context{
  copy?:(text:string)=>Promise<'written'|'unsupported'|'busy'>;
 }
 const failure=(code:'invalid-request'|'permission-denied'|'capability-unavailable'|'cancelled'|'conflict'|'deadline-exceeded')=>({ok:false as const,error:{code,retryable:false,message:code==='deadline-exceeded'?'Copy could not be confirmed. Check your clipboard, then reload Emoji results before another explicit Copy.':code==='conflict'?'Emoji results changed. Reload results and select an emoji again.':code==='cancelled'?'Finish the current launcher action before copying.':'Emoji search or Copy is unavailable. Reload results; copying is separate from pasting into another application.'}});
-type Issued={owner:IpcMainInvokeEvent['sender'];frame:IpcMainInvokeEvent['senderFrame'];revision:number;generation:number;searchId:number;query:string;group:string|null;records:Map<string,string>;copying:boolean};
+type Issued={owner:IpcMainInvokeEvent['sender'];frame:IpcMainInvokeEvent['senderFrame'];revision:number;generation:number;searchId:number;query:string;group:string|null;tone?:EmojiTone;records:Map<string,string>;copying:boolean};
 const project=(row:EmojiRow)=>emojiRowSchema.parse({id:row.id,value:row.value,name:row.name,group:row.group,subgroup:row.subgroup,version:row.version});
 /** Public fixed dataset only. Main resolves canonical copy data, never renderer text. */
 export function registerEmojiIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,backend:EmojiBackend,context:Context,timeoutMs=4000){
@@ -32,11 +32,11 @@ export function registerEmojiIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,back
   const current=()=>!expired&&performance.now()<expires&&!disposed&&context.active()&&!context.busy()&&context.trusted(event)&&context.revision()===request.revision&&context.generation()===generation&&sequence===searchId;
   const work=(async()=>{try{
    const denied=await context.authorize(event,request.revision);if(denied)return denied;if(!current())return failure('cancelled');
-   const records=(await backend.search({query:request.query,...(request.group?{group:request.group}:{})})).map(project);if(!current())return failure('cancelled');
+   const records=(await backend.search({query:request.query,...(request.group?{group:request.group}:{}),...(request.tone?{tone:request.tone}:{})})).map(project);if(!current())return failure('cancelled');
    const revoked=await context.authorize(event,request.revision);if(revoked)return revoked;if(!current())return failure('cancelled');
-   const reply=emojiSearchReplySchema.parse({ok:true,value:{revision:request.revision,searchId,datasetVersion:'17.0',query:request.query,group:request.group??null,groups:backend.groups.map(group=>({...group})),records}});
+   const reply=emojiSearchReplySchema.parse({ok:true,value:{revision:request.revision,searchId,datasetVersion:'17.0',query:request.query,group:request.group??null,...(request.tone?{tone:request.tone}:{}),groups:backend.groups.map(group=>({...group})),records}});
    if(!reply.ok)return failure('capability-unavailable');
-   issued={owner:event.sender,frame:event.senderFrame,revision:request.revision,generation,searchId,query:request.query,group:request.group??null,records:new Map(reply.value.records.map(row=>[row.id,row.value])),copying:false};return reply;
+   issued={owner:event.sender,frame:event.senderFrame,revision:request.revision,generation,searchId,query:request.query,group:request.group??null,...(request.tone?{tone:request.tone}:{}),records:new Map(reply.value.records.map(row=>[row.id,row.value])),copying:false};return reply;
   }catch{return failure('capability-unavailable');}finally{reads--;}})();
   try{return await Promise.race([work,new Promise<ReturnType<typeof failure>>(resolve=>{timer=setTimeout(()=>{expired=true;resolve(failure('capability-unavailable'));},timeoutMs);})]);}finally{clearTimeout(timer);}
  });
@@ -45,7 +45,7 @@ export function registerEmojiIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,back
   if(!parsed.success||parsed.data.revision!==context.revision())return failure('invalid-request');
   if(disposed||!context.active()||context.busy())return failure('cancelled');
   const request=parsed.data,choice=issued;
-  if(!choice||choice.copying||choice.owner!==event.sender||choice.frame!==event.senderFrame||choice.revision!==request.revision||choice.generation!==context.generation()||choice.searchId!==request.searchId||choice.query!==request.query||choice.group!==(request.group??null)||!choice.records.has(request.id))return failure('conflict');
+  if(!choice||choice.copying||choice.owner!==event.sender||choice.frame!==event.senderFrame||choice.revision!==request.revision||choice.generation!==context.generation()||choice.searchId!==request.searchId||choice.query!==request.query||choice.group!==(request.group??null)||choice.tone!==request.tone||!choice.records.has(request.id))return failure('conflict');
   if(!context.copy)return failure('capability-unavailable');
   choice.copying=true;const release=context.acquire(),generation=context.generation(),expires=performance.now()+timeoutMs;let expired=false,dispatched=false,timer:ReturnType<typeof setTimeout>|undefined;
   const current=()=>!expired&&performance.now()<expires&&!disposed&&issued===choice&&sequence===choice.searchId&&context.active()&&context.trusted(event)&&context.revision()===request.revision&&context.generation()===generation;
@@ -59,7 +59,7 @@ export function registerEmojiIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,back
    if(outcome==='unsupported')return failure('capability-unavailable');if(outcome==='busy')return failure('cancelled');if(outcome!=='written')throw new Error('Copy not confirmed.');
    await context.recordUse();if(!current()){invalidate(choice);return failure('deadline-exceeded');}
    choice.generation=generation;
-   return emojiCopyReplySchema.parse({ok:true,value:{outcome:'copied',revision:request.revision,searchId:request.searchId,query:request.query,group:request.group??null,id:row.id,value:row.value}});
+   return emojiCopyReplySchema.parse({ok:true,value:{outcome:'copied',revision:request.revision,searchId:request.searchId,query:request.query,group:request.group??null,...(request.tone?{tone:request.tone}:{}),id:row.id,value:row.value}});
   }catch{invalidate(choice);return failure(dispatched?'deadline-exceeded':'capability-unavailable');}finally{choice.copying=false;release();}})();
   try{return await Promise.race([work,new Promise<ReturnType<typeof failure>>(resolve=>{timer=setTimeout(()=>{expired=true;invalidate(choice);resolve(failure(dispatched?'deadline-exceeded':'cancelled'));},timeoutMs);})]);}finally{clearTimeout(timer);}
  });

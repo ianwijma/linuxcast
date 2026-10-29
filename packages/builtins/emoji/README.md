@@ -135,3 +135,46 @@ Pop!_OS 22.04 amd64, Node 24.22.1/Bun 1.4.4; they are pure component/data eviden
 The coordinator records the integrated application checks separately. Debian 13,
 GNOME/KDE Wayland/X11, native clipboard/paste, native assistive technology, high
 contrast, full L2-06 and release acceptance remain pending.
+
+## Skin-tone filtering — bounded data increment, 29 October 2026
+
+Based on integrated PR67 `981d4b2`, isolated `codex/emoji-tone-data`.
+`EmojiSearchInput` adds optional `tone?: EmojiTone` using the coordinator's closed
+contract enum. Omission includes all tones; present `undefined`, `null`, `all`,
+unknown strings and non-string values are invalid. `unmodified` selects sequences
+without U+1F3FB–U+1F3FF; `light`, `medium-light`, `medium`, `medium-dark` and `dark`
+select sequences containing the corresponding modifier. Mixed-tone sequences can
+match more than one filter. No Unicode variant is synthesized or normalized.
+
+Tone and group filtering run over the complete pinned catalogue before ranking
+and the result cap. Existing empty-query source order, literal glyph matching,
+names/keywords, category and limit semantics remain. Returned records and arrays
+are the same immutable canonical source objects. Closed own-property validation
+rejects extra fields, symbols, accessors and inherited options without invoking
+getters or coercion. Query controls, unpaired surrogates and directional formatting
+characters are refused before UTF-8 encoding; bounded legitimate emoji scalars,
+ZWJ and VS16 remain intact. No catalogue/source/license file changes, downloads,
+persistence, clipboard authority or network path are introduced.
+
+On Pop!_OS22.04 amd64 with pinned Node24.22.1/Bun1.4.4:
+
+- Frozen dependency installation passed with the committed lockfile unchanged.
+  The first restricted attempt reported `EROFS` for its temporary directory; the
+  authorized elevated retry passed without changing dependency versions.
+- The exact existing focused command recorded above ran once: PASS31 tests in
+  2.00s total /1.07s test time (the original22 unchanged plus9 new cases). New
+  cases cover all five modifiers, unmodified, mixed tones, filtering before cap,
+  category/text/glyph interactions, exact immutable values and invalid inputs.
+- Scoped ESLint for `src/search.ts` and `tests/search.test.ts`: PASS.
+- Full direct-Node TypeScript initially reported three coordinator-owned
+  `packages/contracts/src/emoji.ts` helper-signature errors involving
+  `exactOptionalPropertyTypes`; no owned-file diagnostics. Coordinator owns the
+  shared correction and final integrated compiler check.
+
+This supports bounded L2-06-AC02 canonical filtering/value preservation and
+PRIVACY input-boundary evidence. It does not establish actual tone-picker UI,
+clipboard/paste, supported desktop/native AT, dictionary, complete prerequisites
+or full task/release acceptance. All full criteria remain pending. Coordinator
+owns UI/main/preload/receipt integration, task records and actual application
+evidence. Only `src/search.ts`, `tests/search.test.ts` and this README are owned;
+the copied coordinator contract/backend/freeze files are excluded from this patch.

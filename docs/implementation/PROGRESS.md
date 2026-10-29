@@ -1,122 +1,115 @@
 # Linuxcast coordinator checkpoint
 
-29 October 2026. Full local1.0/all97tasks/R1-03/release objective remains active and
-unfinished. Current goal turn made PROGRESS: signing repaired, four reviewed/tested
-application increments merged, next application flow started. All subagents must
-use GPT-6.1 SOL/high. No infrastructure/research/proof expansion; no MVP reduction.
-Historical full evidence lives in tasks.json/cards and linked evidence files.
+29October2026. Full local1.0/all97/R1-03/release Goal ACTIVE/UNFINISHED. This goal
+turn made PROGRESS: PR67 actual Emoji application integrated. All subagents are
+GPT6.1SOL/high; no infra/research/proof expansion or MVP scope reduction.
 
 ## Integrated state
 
-Primary /home/ian/Projects/ianwijma/linuxcast clean develop
-42afa6ba397f77f079fc057ac2c2f9f3d08d87cc; origin/develop matches; openPRlist[] verified.
-Normal configured1Password signer works; all signed heads locally verified against
-configured publickey. No configuration change/unsigned fallback/pending unlock or
-live signer. No approval/protection bypass; last checkeddeveloprules[]/unprotected.
+Primary /home/ian/Projects/ianwijma/linuxcast clean develop981d4b24f3684f26f3d17293f604283eb2f63221;
+origin/develop matches; openPR[] verified aftermerge. PR67
+https://github.com/ianwijma/linuxcast/pull/67 signedheadcb554b94aec2ba1349c51b9ef6842c2585472756,
+normalexpected-head merge981d4b24f3684f26f3d17293f604283eb2f63221. CI40832100836
+PASS14s (planningCI only); no requested/submittedreview/comments/threads. Branch
+unprotected/rules[] checked, no bypass. Existing1Password signerworked unchanged,
+localcrypto verificationPASS. No pendingunlock/question/live signer.
 
-- PR62 https://github.com/ianwijma/linuxcast/pull/62 Trash/restore:
-  head40c9b9afe7403e48799aca3891e187eb39249363;
-  merge351d797b5335f096409c6fbb76e891fb2d6529fb; CI40818238599 PASS11s.
-- PR63 https://github.com/ianwijma/linuxcast/pull/63 saved revision preview/restore:
-  headd1a2ce6204312b9fa55009d960386a1534796de0;
-  merge89d91af034b327a6ce3621c33cce3d661cb33dac; CI40818468167 PASS14s.
-- PR64 https://github.com/ianwijma/linuxcast/pull/64 launcher fullbody Notes search,
-  Arrow navigation and exact existingworkspaceopen:
-  headf648313c095be938555c09d8c474a83bf5a629b8;
-  mergef6585ed2c14faed6558e4e661995152cd695e986; CI40818690887 PASS13s.
-- PR65 https://github.com/ianwijma/linuxcast/pull/65 coordinator integration records:
-  headd049af36dc265f1282e1994fb28c3216c8b057d5;
-  merge0be9eaba8a9cedcbc1bbeb43e79f519ace2b9dc2; CI40826288650 PASS13s.
-- PR66 https://github.com/ianwijma/linuxcast/pull/66 one selectedtrashednote permanent
-  deletion plus retainedsavedrevisions, Keep/Escape noflush/effect, exact CAS/receipt,
-  actualunknownslot/Close/export/freshGet/no replay, unrelatedsourcepreserved:
-  head9fabb9091026a9f8d8ec506ed883034b65eb20b6;
-  merge42afa6ba397f77f079fc057ac2c2f9f3d08d87cc; CI40827432097 PASS13s.
+PR67 actual registeredEmoji->3944fullUnicode17.0/CLDR48offlineSearch/category/
+Arrowselection/comfortablecompactGrid/explicitcanonicalCopy existingwriter. Three
+namedclosedmethods bindowner/frame/catalogue/search/query/group/generation; held
+actualwriterslot/deadline/noqueue/replay. Renderer gets100cap, nofullcatalogue or
+clipboardtextauthority. Source/licences/provenance bundled; onlylocalworkspace
+manifest/lockmetadata11addedlines, no externaldependencychange.
 
-All normal expected-head merges; no requested/submitted GitHub reviews/comments/
-threads. Final source/backend/UI/actualassertion/capture independentreviews clean.
-Exact reviewed application/test/capture hashes preserved through integration;
-only coordinator records reconciled. Primary final production build PASS69assets;
-frozen Bun1.4.4 install afterPR64 passed, dependency manifests unchanged thereafter.
+Checks: author22data/45presentation/78boundary PASS,12componentbrowser14.1s/19public
+captures/axe0. Parent545initial542pass+3oldcapfailures; new12thbuiltinmax5608/reject
+5609 corrected ONLYsearch/quicklinkcontract/cataloguetitle tests; targeted70final
+PASS (overlap). FullfinalNodeTS/scopedlintPASS, requiredmappedUI12PASS16.2s, build
+PASS69rendererassets +existingpinnedElectronSQLiteaddonrebuilt. ActualprivateXvfb/
+xclip/Electron45 testcasePASS6.51s/7.47total, exactZWJ/modifier/VS16/keycap/flag,
+category/density, Back/Hide/reopen/Quit/restart, aggregate-only5copies/noqueryvalues,
+3builtlicensebyteequalitychecks,4actualcaptures/axe0. InjectedunknownmainXDG state
+onSAMEprivateXvfb explicitlylabelled; rendererpageHTTPrequests0 only(notmainnetwork
+instrumentation). FullnativeDebian/GNOME/KDE/Wayland/X11/AT/highcontrast/perf/package/
+release unchangedpending. All11data/27UI/5boundary/6actualartifacts exactfrozenhash
+verified;16productionfiles byteidenticalactualtestedlane. Independentdata/main/
+preload/contracts/glyph/UI/root/cap/actualassertion/capture reviewsCLEAN. P2generic
+Execute pretendingcompletedfixedandtested; forbiddencharactersrejectedpreencoding.
+3recapturedcomponentPNGs restoredexactreviewedauthorartifacts. Initialcompiler
+SIGSEGV/oldcapfixtures/evidenceformatfailuresdisclosed; finalchecksPASS.
 
-PR66 evidence apps/desktop/evidence/notes-delete-application.md:395mappedunits/
-32contracts/238security PASS; independent boundary205distinct(178focused+27owner),
-aftertypefix89main PASS again (overlap). Author216units incl23new,10newbrowser25.2s+
-55existingbrowser1.2m PASS. Actualapp-only38.17s/40.90srunner PASS retainsallNotes/
-root/crashflows then600ms confirmation/Escape+Keep unchangedsource/history/delete/
-othernoteexact/Close/Quit/restart/rootsearch/privacy. Not one fullmappedintegration
-claim. FullNodeTypeScript/scoped18TS lint/planPASS.14component+4actual captures
-independently clean; historical35actualPNGs restoredbaseline. Initial owner/browser
-sandboxdenials and missingisolatedSQLiteaddonsetup disclosed; finalchecks pass,
-no --no-sandbox. All fullU1/D1/nativeAT/platform/release acceptance remains pending.
+Prior PR62Trash/restore,63savedrevisionpreview/restore,64launcherNotesfullbodyexact
+open,65coordinatorrecords,66singletrashedNote+savedrevisionspermanentdelete remain
+integrated. Details tasks.json +apps/desktop/evidence/notes-delete-application.md;
+PR66 merge42afa6ba397f77f079fc057ac2c2f9f3d08d87cc. Neverresetoldworktrees/source.
 
-## Active next application assignment: L2-06 Emoji search and explicit Copy
+## Active next bounded L2-06 application increment: skin-tone selection
 
-Coordinator worktree .worktrees/linuxcast-emoji-search branch codex/emoji-search,
-HEAD42afa6b with UNCOMMITTED coordinator registry/card/checkpoint updates recording
-PR66 and starting L2-06. This is the newest checkpoint; primary remains clean.
-Read full docs/implementation/tasks/L2-06.md and normative data.md, builtins.md,
-testing-release.md, security.md, DESIGN.md/tokens. Actual integrated L1registry,
-D1sharedUI and fixedclipboard action exist; full dependency acceptance unfinished,
-user-authorized bounded app increments do not claim those prerequisites complete.
+Coordinator REUSES .worktrees/linuxcast-emoji-search but branchNOWcodex/emoji-tone,
+base981d4b2. NewUNCOMMITTED contracts/main/preload +APPLICATION-INCREMENT.md appended
+freeze +registryPR67integrationreference. Primary remainsclean develop. Allcriteria
+unchangedpending, totals8done/20inprogress/69planned;56passed/325pending/8N/A.
 
-Current increment state (29October continuation): full Unicode17.0 catalogue3944
-fullyqualified rows/9groups/98subgroups, CLDR48 English metadata, two source XMLs,
-licenses and provenance applied from frozen11file data patch de15e2400af6978e89ae5553f39309a60358f95f7d566a97b56b591f8afb26f9.
-Data22tests/type/lintPASS author; independent exactsource/licence/contracts/glyph
-review clean. Newlocal @linuxcast/emoji workspace; desktopdependency/bun.lock only
-local metadata11addedlines, frozeninstallsPASS, no externalversionchanges.
+Frozenoptional tone enum on search/copyinputs+success values: omitted=All,
+unmodified/light/medium-light/medium/medium-dark/dark. No null/allwirevalue. All
+responses echo exactpresence/value. unmodifiedmeansnoU+1F3FB..FF; otherchoicesmean
+CONTAINSselectedmodifier(includingmixedsequences). FilterwholecatalogueBEFOREcap/
+rank; canonicalsourcevaluesonly/no synthesis. Contracts exportsEmojiTone/schema/
+emojiMatchesTone. Parentmainissuedhandle+copy/preloadecho alreadyupdated; parent
+fullNodeTSrunning(newsessionpending). No tests/acceptanceyetforthisincrement.
 
-Closed contracts3namedmethods search/canonicalIDCopy/release, glyph inerttext,
-preload3methods, main issuedsearch/frame/revision/gen/group/canonicalbinding,
-4actualreadlimit/monotonicdeadline/actualheldcopywriter/noqueueorreplay, shell
-registeredlinuxcast:emoji/backend+fixedclipboardwriter, buildvendorednotices done.
-Rootcontroller EmojiFlow open/query/actions/Back/Hide/dispose integrated. Main
-reviewP2 fixed: genericExecute explicitly rejects Emoji instead of pretending
-completed/hiding. Forbiddentext guard rejects before UTF8encoding. Noacceptance
-promoted. Firstroot6case test5pass/1fixturefailure(rootquery notsetsession) fixed;
-rerunpending. FullNode tsc --project tsconfig.base.json running session42066.
+ExplicitSOL/high agents assigned newworktrees from981d4b2:
+- manifest_notes_delete_sol .worktrees/linuxcast-emoji-tone-ui/codex/emoji-tone-ui:
+  ownsONLYpresentation.ts/presentationtests/UIbrowser/fixtures/NEW*tone*.png and
+  TONE-UI.md. FrozeninstallPASS. SharedSkin toneFormChoose/Apply/Cancel,visiblefilter,
+  preservequery/category/density;Applyreleases/reloadsreadonly;Cancelunchanged;
+  exacttonecontext/receipt/heldslot/noReplay/Hide/dispose/reset. No old19capturechurn.
+- notes_merge_record_review_sol .worktrees/linuxcast-emoji-tone-data/codex/emoji-tone-data:
+  ownsONLYsearch.ts/search.test.ts/READMEaddendum. Addstrictoptionaltonevalidate/
+  prelimitfilter,all5/unmodified/mixed/query/group/boundregressions, no dataassets.
+- notes_delete_boundary_sol .worktrees/linuxcast-emoji-tone-boundary/codex/emoji-tone-boundary:
+  ownsONLYexistingemoji.contract.test.ts/mainemoji-ipc.test.ts/preloademoji.test.ts;
+  independentproposedproductionreview, wrong/missing/extraecho andforgedtonecopy,
+  oldlifetime/heldslotretained. No source/sharededits/stage/commits.
 
-Frozen27file UI patch cfe010ff4882f64d5ca596908f870945ec5d6aeb606edb14fd14bae3638452c4
-verified/applied to parent. SharedGrid/categoryForm/density/explicitCopy,45focused
-and12browser14.1sPASS,19publiccaptures inspected/axe0, type/lint/planPASS author.
-FinalUI fixed latehandle leak between rawresolve andawaitcontinuation(regression).
+Alllaneshavecopiedproposedcontract/main/preload/appendedfreeze; data/boundaryneed
+pinnedfrozeninstall. Parent owns actualapp/routing/status/mapping/manifests. Next:
+resolvefindings, integrateexactpatches, extendactualappSkin toneForm/canonicalCopy/
+Cancel/Hide with4newdarklightcaptures; meaningfultests/finaltype/lint/plan/review;
+normalconfiguredsign+verify/push/PR/currentCI/review/merge. Avoidexpandingscope.
+No needmoredata/research/infrastructure.
 
-Active allSOL/high agents:
-- notes_delete_boundary_sol .worktrees/linuxcast-emoji-boundary codex/emoji-boundary:
-  new emoji.contract/main emoji-ipc/preload emoji/glyph tests + exactpreloadAPI test;
-  only5testfilesowned.74passed;3finalcases+genericexclusion regression/finalhashes
-  pending. MainreviewP2 fixed/copied. No otherfindingreported.
-- manifest_notes_delete_sol .worktrees/linuxcast-emoji-ui codex/emoji-ui: frozenUI
-  done; nowONLYnew apps/desktop/tests/emoji.integration.test.ts and
-  apps/desktop/evidence/emoji-application.md/emoji-application-*.png. Actualprivate
-  Xvfb production Electron clipboard flow; allproduction+data copied. Firstcompiler
-  SIGSEGV139 no diagnostic(notpass); retryaftermissingdatacopy. Needsetup:sqlite.
-- notes_merge_record_review_sol read-only parentUI/root19captures review running;
-  priordatareviewclean. Actualtest/capture reviewafterfreeze.
+FullL2-06dictionaryinstalledHunspell/configuredStarDict/missinglanguageguidance,
+customkeywords/favourites/frecency/nativepaste/explicitconfiguredsemanticAI and
+full1.0 remain required. Tonepickerinprogressnotcomplete. FullL1/D1prerequisite/
+Debian13GNOME/KDEWayland/X11/nativeAT/highcontrast/perf/package/release pending.
+ActualXvfb doesnotestablishdesktopmatrix. KeepGoalactivewhileusefulworkremains.
 
-Parent next: rootroutingtests; applyfrozenboundary5files; map L2-06 suites; review
-findings; productionactualtest/captures; finaltargetedchecks; honestrecords;
-normalconfiguredsignedcommit/localverify/push/focusedPR/currentCI/reviews/merge.
-NoEmojiPR/commit/stagingyet; primarydevelop42afa6bclean. No pendinguserquestion or
-signer. Avoid more infrastructure/research/proof expansion.
+Tone continuation PROGRESS: corrected sharedtonePresence typeannotation topermit
+Zodinferredoptionalundefinedwhile runtime rejectsownundefined. All3frozenpatches
+applied/ownedhashesverified. ParentfullTS PASS(session18546); mappedunits124PASS/
+contracts14PASS/security142PASS; scopedlintPASS; mappedUI18PASS17.5s. Sharedreview
+P2 pendingqueryprematureempty fixedrenderer !view.loading guard; new2SSRList/Grid
+pending→settledchecksPASS andpendingbrowser1PASS1.7s/newpendingPNG. InitialSSR
+fixturesinvalid(imagesonList/missingGridDensity)fixed; finaltype/lintPASSpending.
+No fulltaskacceptancepromoted. Parentnewroot8testsincludeToneFormApply/boundCopy/
+Hide/reset/omittedAll. UI/data/boundarysource reviewotherwiseclean; resolvedP2
+re-reviewrequested notes_delete_boundary_sol. manifest_notes_delete_sol nowowns
+ONLYNEWactualtone testcase/evidence/4capturesin .worktrees/linuxcast-emoji-tone-ui,
+notoldactualtestorhistoricalcaptures. Productionsearch/main/preload/contracts+
+sharedrendererfix copied. Itprepares existingpinnedSQLite/Electronbinary, no new
+infra/deps. Next exactcopyactual6files/review/finaltype/lint/mapping/plan/sign/PR/
+merge. Currentactivebranchcodex/emoji-tone .worktrees/linuxcast-emoji-search,
+primaryclean develop981d4b2. No commit/staging/PRyetforthisToneincrement.
 
-FullL2-06 dictionary/Hunspell/definition/missinglanguage, tonepicker/customkeywords/
-favourites/frecency/nativepaste/semanticAI; nativeDebian13GNOME/KDEWayland/X11/AT/
-highcontrast/perf/packaging/release remain pending. ActualXvfb must notpromote these.
-Oldworktrees/commits/patches preserved unchanged; no FileOpen proofexpansion.
-
-Final Emoji integration checkpoint: allfrozen11data/27UI/5boundary/6actualfiles
-appliedexactly; actualtested16productionfiles byteidentical. Final fullproject
-NodeTypeScript PASS(session90915); scopedproduction/testlintPASS. Requiredmapped
-bun run test:ui -- L2-06 PASS12cases16.2s;3newrecapturedcomponentPNGs restored to
-exactreviewedauthorartifacts. Actual6.51s/7.47total1scenarioPASS including3built
-licence/provenancebytechecks,4actualcaptures/axe0 +19componentcaptures. Allsource/
-captests/actualassertions/captures independentlyCLEAN. Parent545caseinitial542pass/
-3staleoldcapfails; corrected12builtinmax5608/reject5609;70targetedfinalcasesPASS.
-NewmappedL2-06 unit/contracts/ui/security/integration paths allpresent. No criteria
-promoted(8done/20inprogress/69planned;56passed/325pending/8N/A unchanged).
-ParentsetupSQLitePASS(session52370), productionbuildPASS69assets(session11432). Acceptanceevidenceformatstrings
-initiallyrejectedbyplanvalidator; correctedtostructuredcommand/outcome/platform/
-referenceobjectswithoutpromotingstatuses. Nextfinishplan/diff, normalconfiguredsignedcommit+verify/push/PR/currentCI/reviews/merge.
-No pendinguserquestion/signattempt. Allcheck/code/capturechanges uncommittedyet.
+Tone finalprecommit: all3frozenfeaturepatches+6actualfiles integratedexactly;9tested
+productionhashes match actualauthor. Parentfinaltype74491PASS/lintPASS;282distinct
+unit/contract/security/loadingPASS;18UI17.5sPASS+P2focusedpending1.7sPASS. Actual
+2serializedcurrentbuildscenariosPASS13.79s(session47411): existingPR67flow+newtone.
+Authornewactual5.91s/6.87totalPASS.4newactualcapturesrestoredexactreviewedauthor
+hashesafterparentrerun;4PR67actualPNGsretainedhistorically.8newcomponenttonePNGs
+reviewedfinal; P2pendingPNG correctedSHA44056d7d5eec5d25412bbd81f805a4c9581b5472a8c70efc539d739aa23f54c4.
+Independent finalsource/UI/data/security/actualassertion/evidence/captures CLEAN.
+Allsubagentscompleted; no moreworkassignedyet. Nextplan/diff/sign/verify/publish
+focusedPR/currentCI/reviews/normalmerge; then newactualapplicationflow. No new
+externaldeps/datasets/migrations/infra. Fullcriteriaunchangedpending.

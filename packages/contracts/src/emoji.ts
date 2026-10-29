@@ -11,16 +11,27 @@ export const emojiValueSchema=text(128).min(1).refine(value=>Array.from(value).l
 export function canonicalEmojiId(value:string):string{return 'emoji:'+Array.from(value,char=>char.codePointAt(0)!.toString(16).padStart(4,'0')).join('-');}
 export const emojiRowSchema=z.strictObject({id:emojiIdSchema,value:emojiValueSchema,name:text(256).min(1),group:emojiGroupSchema,subgroup:text(128).min(1),version:z.string().max(8).regex(/^[0-9]{1,2}\.[0-9]$/u)}).refine(row=>row.value.length<=128&&row.id.length<=230&&canonicalEmojiId(row.value)===row.id);
 export type EmojiRow=z.infer<typeof emojiRowSchema>;
-export const emojiSearchInputSchema=z.strictObject({revision:positive,query:emojiQuerySchema,group:emojiGroupSchema.optional()});
-export const emojiSearchRequestSchema=emojiSearchInputSchema.extend({protocolVersion:z.literal(1)});
-export const emojiSearchValueSchema=z.strictObject({revision:positive,searchId:positive,datasetVersion:z.literal('17.0'),query:emojiQuerySchema,group:emojiGroupSchema.nullable(),groups:z.array(z.strictObject({id:emojiGroupSchema,name:emojiGroupSchema,count:z.number().int().positive().max(10000)})).max(16),records:z.array(emojiRowSchema).max(100)}).refine(value=>new Set(value.groups.map(row=>row.id)).size===value.groups.length&&new Set(value.records.map(row=>row.id)).size===value.records.length&&(value.group===null||value.groups.some(row=>row.id===value.group))&&value.records.every(row=>value.groups.some(group=>group.id===row.group)&&(value.group===null||row.group===value.group)));
-export const emojiCopyInputSchema=emojiSearchInputSchema.extend({searchId:positive,id:emojiIdSchema});
-export const emojiCopyRequestSchema=emojiCopyInputSchema.extend({protocolVersion:z.literal(1)});
+export const emojiToneSchema=z.enum(['unmodified','light','medium-light','medium','medium-dark','dark']);
+export type EmojiTone=z.infer<typeof emojiToneSchema>;
+/** Tone filters select real source sequences. Mixed tones match each modifier they contain. */
+export function emojiMatchesTone(value:string,tone:EmojiTone):boolean{
+ if(value.length>128)return false;
+ const modifiers=Array.from(value,char=>char.codePointAt(0)!).filter(point=>point>=0x1f3fb&&point<=0x1f3ff);
+ if(tone==='unmodified')return modifiers.length===0;
+ const point={light:0x1f3fb,'medium-light':0x1f3fc,medium:0x1f3fd,'medium-dark':0x1f3fe,dark:0x1f3ff}[tone];
+ return modifiers.includes(point);
+}
+const tonePresence=(value:{tone?:EmojiTone|undefined})=>!Object.hasOwn(value,'tone')||value.tone!==undefined;
+export const emojiSearchInputSchema=z.strictObject({revision:positive,query:emojiQuerySchema,group:emojiGroupSchema.optional(),tone:emojiToneSchema.optional()}).refine(tonePresence);
+export const emojiSearchRequestSchema=emojiSearchInputSchema.safeExtend({protocolVersion:z.literal(1)});
+export const emojiSearchValueSchema=z.strictObject({revision:positive,searchId:positive,datasetVersion:z.literal('17.0'),query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),groups:z.array(z.strictObject({id:emojiGroupSchema,name:emojiGroupSchema,count:z.number().int().positive().max(10000)})).max(16),records:z.array(emojiRowSchema).max(100)}).refine(value=>tonePresence(value)&&new Set(value.groups.map(row=>row.id)).size===value.groups.length&&new Set(value.records.map(row=>row.id)).size===value.records.length&&(value.group===null||value.groups.some(row=>row.id===value.group))&&value.records.every(row=>value.groups.some(group=>group.id===row.group)&&(value.group===null||row.group===value.group)&&(value.tone===undefined||emojiMatchesTone(row.value,value.tone))));
+export const emojiCopyInputSchema=emojiSearchInputSchema.safeExtend({searchId:positive,id:emojiIdSchema});
+export const emojiCopyRequestSchema=emojiCopyInputSchema.safeExtend({protocolVersion:z.literal(1)});
 export const emojiReleaseInputSchema=z.strictObject({revision:positive,searchId:positive});
 export const emojiReleaseRequestSchema=emojiReleaseInputSchema.extend({protocolVersion:z.literal(1)});
 const failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const emojiSearchReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiSearchValueSchema}),failed]);
-export const emojiCopyValueSchema=z.strictObject({outcome:z.literal('copied'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),id:emojiIdSchema,value:emojiValueSchema}).refine(row=>row.value.length<=128&&row.id.length<=230&&canonicalEmojiId(row.value)===row.id);
+export const emojiCopyValueSchema=z.strictObject({outcome:z.literal('copied'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),id:emojiIdSchema,value:emojiValueSchema}).refine(row=>row.value.length<=128&&row.id.length<=230&&canonicalEmojiId(row.value)===row.id&&tonePresence(row)&&(row.tone===undefined||emojiMatchesTone(row.value,row.tone)));
 export const emojiCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiCopyValueSchema}),failed]);
 export const emojiReleaseReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('released'),searchId:positive})}),failed]);
 export type EmojiSearchValue=z.infer<typeof emojiSearchValueSchema>;

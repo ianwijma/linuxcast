@@ -20,7 +20,8 @@
     ],
     "D1-02": [
       "packages/ui/src/views/session.test.ts",
-      "packages/ui/src/views/form.test.tsx"
+      "packages/ui/src/views/form.test.tsx",
+      "packages/ui/src/views/loading.test.tsx"
     ],
     "L1-01": [
       "packages/search/tests/search.test.ts",
@@ -98,7 +99,8 @@
       "packages/builtins/emoji/tests/search.test.ts",
       "packages/builtins/emoji/tests/presentation.test.ts",
       "apps/desktop/src/features/launcher/tests/emoji-routing.test.ts",
-      "packages/ui/src/views/glyph.test.tsx"
+      "packages/ui/src/views/glyph.test.tsx",
+      "packages/ui/src/views/loading.test.tsx"
     ]
   },
   "contracts": {
@@ -292,7 +294,8 @@
       "packages/storage/tests/notes-root-search.integration.test.ts"
     ],
     "L2-06": [
-      "apps/desktop/tests/emoji.integration.test.ts"
+      "apps/desktop/tests/emoji.integration.test.ts",
+      "apps/desktop/tests/emoji-tone.integration.test.ts"
     ]
   },
   "security": {

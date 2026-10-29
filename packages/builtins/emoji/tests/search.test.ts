@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {emojiData,emojiGroups,getEmoji,getEmojiGroups,EmojiInputError,EMOJI_UNICODE_VERSION,EMOJI_CLDR_VERSION} from '../src/data.ts';
 import {searchEmoji} from '../src/search.ts';
 import type {EmojiSearchInput} from '../src/search.ts';
+import type {EmojiTone} from '@linuxcast/contracts';
 import provenance from '../data/provenance.json' with {type:'json'};
 
 const id=(value:string)=>'emoji:'+Array.from(value,scalar=>scalar.codePointAt(0)!.toString(16).padStart(4,'0')).join('-');
@@ -106,4 +107,53 @@ it('prevents callers mutating catalogue values, metadata, categories and result 
  expect(Reflect.set(emojiGroups[0]!,'count',0)).toBe(false);expect(Reflect.set(first,'0',emojiData[1])).toBe(false);expect(Reflect.set(emojiData,'0',emojiData[1])).toBe(false);
  expect(searchEmoji({query:'grinning face',limit:1})).toEqual(first);expect(getEmoji(record.id)).toBe(record);expect(getEmojiGroups()[0]?.count).toBe(171);
  const request={query:'grinning face',limit:1};const result=searchEmoji(request);request.query='poop';expect(result[0]?.value).toBe('😀');
+});
+
+const toneSamples=[['light','🏻','👍🏻'],['medium-light','🏼','👍🏼'],['medium','🏽','👍🏽'],['medium-dark','🏾','👍🏾'],['dark','🏿','👍🏿']] as const;
+it.each(toneSamples)('filters %s to the exact pinned modifier sequence without synthesizing values',(tone,modifier,glyph)=>{
+ const result=searchEmoji({query:'thumbs up',tone,limit:100});
+ expect(result.map(entry=>entry.value)).toEqual([glyph]);expect(result[0]).toBe(getEmoji(id(glyph)));
+ expect(result.every(entry=>entry.value.includes(modifier))).toBe(true);
+ expect(searchEmoji({query:glyph,tone,limit:1})[0]).toBe(result[0]);
+ expect(Object.isFrozen(result)).toBe(true);expect(Reflect.set(result[0]!,'value','wrong')).toBe(false);
+});
+it('filters the entire source catalogue before the initial cap while retaining its canonical order',()=>{
+ for(const [tone,modifier] of toneSamples){
+  const expected=emojiData.filter(entry=>entry.value.includes(modifier));
+  expect(expected.length).toBeGreaterThan(100);expect(emojiData.indexOf(expected[0]!)).toBeGreaterThan(100);
+  expect(searchEmoji({query:'',tone,limit:1})).toEqual(expected.slice(0,1));
+  expect(searchEmoji({query:'',tone,limit:100})).toEqual(expected.slice(0,100));
+ }
+ const expected=emojiData.filter(entry=>!/[\u{1f3fb}-\u{1f3ff}]/u.test(entry.value));
+ expect(searchEmoji({query:'',tone:'unmodified',limit:100})).toEqual(expected.slice(0,100));
+ expect(searchEmoji({query:'',limit:100})).toEqual(emojiData.slice(0,100));
+});
+it('unmodified excludes all five modifiers while group, text and exact-glyph search keep their existing meaning',()=>{
+ expect(searchEmoji({query:'woman technologist',tone:'unmodified'}).map(entry=>entry.value)).toEqual(['👩‍💻']);
+ expect(searchEmoji({query:'woman technologist',tone:'medium',group:'People & Body'}).map(entry=>entry.value)).toEqual(['👩🏽‍💻']);
+ expect(searchEmoji({query:'👩🏽‍💻',tone:'unmodified'})).toEqual([]);
+ expect(searchEmoji({query:'coder',tone:'medium',group:'Food & Drink'})).toEqual([]);
+ expect(searchEmoji({query:'',tone:'light',group:'Flags'})).toEqual([]);
+ expect(searchEmoji({query:'🇦🇺',tone:'unmodified',group:'Flags'})[0]).toBe(getEmoji(id('🇦🇺')));
+ expect(searchEmoji({query:'❤️',tone:'unmodified'})[0]?.value).toBe('❤️');
+ expect(searchEmoji({query:'   ',tone:'medium',limit:3})).toEqual(searchEmoji({query:'',tone:'medium',limit:3}));
+});
+it('a mixed-tone source sequence matches every modifier it contains and no other tone',()=>{
+ const glyph='🫱🏻‍🫲🏿',record=getEmoji(id(glyph));expect(record).toBeDefined();
+ for(const tone of ['light','dark'] as const)expect(searchEmoji({query:glyph,tone,limit:1})[0]).toBe(record);
+ for(const tone of ['unmodified','medium-light','medium','medium-dark'] as const)expect(searchEmoji({query:glyph,tone})).toEqual([]);
+ expect(searchEmoji({query:glyph})[0]?.value).toBe(glyph);expect(record?.value).toBe(glyph);
+});
+it('validates the closed tone enum and own data properties before encoding, without invoking getters or coercion',()=>{
+ const getter=vi.fn(()=> 'light'),coerce=vi.fn(()=> 'light');
+ const accessor=Object.defineProperty({query:''},'tone',{get:getter,enumerable:true});
+ const invalid:unknown[]=[accessor,{query:'',tone:undefined},{query:'',tone:null},{query:'',tone:'all'},{query:'',tone:'Light'},{query:'',tone:'light\0'},
+  {query:'',tone:'\u202e'},{query:'',tone:'x'.repeat(10000)},{query:'',tone:1},{query:'',tone:['light']},{query:'',tone:{toString:coerce}},
+  {query:'',tone:'light',extra:true},{query:'',tone:'light',[Symbol('private')]:true},Object.create({query:'',tone:'light'})];
+ const encode=vi.spyOn(TextEncoder.prototype,'encode');
+ try{for(const input of invalid)expect(()=>searchEmoji(input as EmojiSearchInput)).toThrow(EmojiInputError);expect(encode).not.toHaveBeenCalled();}finally{encode.mockRestore();}
+ expect(getter).not.toHaveBeenCalled();expect(coerce).not.toHaveBeenCalled();
+ for(const query of ['\0','\ud800','\u202e','\u2066'])expect(()=>searchEmoji({query,tone:'light'})).toThrow(EmojiInputError);
+ const own=Object.assign(Object.create(null) as EmojiSearchInput,{query:'thumbs up',tone:'dark' as EmojiTone});
+ expect(searchEmoji(own).map(entry=>entry.value)).toEqual(['👍🏿']);
 });

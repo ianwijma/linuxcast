@@ -66,3 +66,35 @@ Evidence: meaningful lifecycle/generation/query/category/selection/exactreceipt/
  Unicodecopy-readback/category/back/Hide/reopen/privacy plus independentreviews.
  No browser/privateXvfb=>Debian13GNOME/KDE Wayland/X11/Orca/highcontrast claim.
  Keep all fulltask criteria pending until complete required evidence exists.
+
+## Next bounded increment — skin-tone selection, base PR67
+
+Coordinator codex/emoji-tone reuses .worktrees/linuxcast-emoji-search, base981d4b2.
+Existing catalogue/data assets stay unchanged; no infrastructure/research/proof.
+Optional `tone` on search/copy input and success values is a closed enum:
+unmodified, light, medium-light, medium, medium-dark, dark. Omitted meansAll tones;
+no null or all token on wire. All replies echo presence/value exactly. Search
+filters BEFORE limit/ranking; unmodified means no U+1F3FB..1F3FF; each other choice
+means CONTAINS that selected modifier (mixed-tone sequences may match multiple
+choices). Use canonical source sequences, never synthesize modifier variants.
+Contracts export EmojiTone/emojiToneSchema/emojiMatchesTone helper. Main issued
+search/copy/preload exactbinding includes tone; wrong/missing/extra echo never
+authorizes effect or success. Existing query/group/lifetime/heldslot/noReplay
+semantics remain. New source API searchEmoji({query,group?,tone?,limit?}).
+
+UI adds shared Skin tone enum Form via Choose skin tone action; optionsAll tones,
+Unmodified, Light, Medium-light, Medium, Medium-dark, Dark. Explain it filters
+sequences containing chosen modifier. Apply retains query/category/density,
+invalidates/releases old handle, reloads read only and retains selection only if
+still present; Cancel/Escape changes nothing. No automatic Copy/Paste. Active
+filter visible in Grid/status; All restores mixed/all sequences. Form lifecycle
+same maxdepth as category; Hide/pop/dispose/reopen clearsfilters. No persistence,
+newtable/preferences,downloads,providerrequests or fabricated Unicode.
+
+UI owns presentation/tests/fixtures/newtonecaptures+TONE-UI.md; data owns only
+src/search.ts/tests/search.test.ts and README smalladdendum; boundary lane only
+existing emoji contract/main/preload tests. Coordinator owns allshared changes,
+actualapp integration/routingtests/mapping/status. Freeze patch+perfilehashes;
+meaningful tests dark/light/keyboard/Cancel/Apply/empty/pending/stale tone/malformed
+echo/currentcanonicalCopy. FullL2-06/dictionary/favourites/nativepaste/nativeAT/
+Debian/release remain pending.

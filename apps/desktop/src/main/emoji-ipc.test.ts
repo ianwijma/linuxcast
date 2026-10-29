@@ -23,7 +23,7 @@ function fixture(){
  const invoke=(channel:string,payload:unknown,sender=event)=>Promise.resolve(handlers.get(channel)!(sender,payload));
  const search=(query='coder')=>invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:state.revision,query});
  const issue=async(query='coder')=>{const reply=emojiSearchReplySchema.parse(await search(query));expect(reply.ok).toBe(true);if(!reply.ok)throw new Error('Synthetic issue failed');return reply.value;};
- const selection=(choice:EmojiSearchValue)=>({protocolVersion:1,revision:choice.revision,query:choice.query,searchId:choice.searchId,...(choice.group?{group:choice.group}:{}),id:row.id});
+ const selection=(choice:EmojiSearchValue)=>({protocolVersion:1,revision:choice.revision,query:choice.query,searchId:choice.searchId,...(choice.group?{group:choice.group}:{}),...(choice.tone?{tone:choice.tone}:{}),id:row.id});
  return {state,frame,event,backend,context,released,handlers,remove,invoke,search,issue,selection};
 }
 afterEach(()=>vi.useRealTimers());
@@ -112,4 +112,32 @@ it('registers Emoji but refuses generic Execute without simulated completion, Hi
  try{const catalogue=launcherCommandsReplySchema.parse(await handlers.get(LAUNCHER_CHANNELS.getCommands)!(event,{protocolVersion:1}));expect(catalogue.ok).toBe(true);if(!catalogue.ok)throw new Error('Synthetic catalogue failed');expect(catalogue.value.commands.find(command=>command.id==='linuxcast:emoji')).toMatchObject({enabled:true});
   expect(await handlers.get(LAUNCHER_CHANNELS.execute)!(event,{protocolVersion:1,revision:catalogue.value.revision,commandId:'linuxcast:emoji'})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(hide).not.toHaveBeenCalled();expect(recordUse).not.toHaveBeenCalled();expect(copy).not.toHaveBeenCalled();expect(search).not.toHaveBeenCalled();expect(get).not.toHaveBeenCalled();
  }finally{remove();}expect(handlers.size).toBe(0);
+});
+
+it('rejects invalid or own-undefined tone authority before search, source access or clipboard reservation',async()=>{
+ const f=fixture(),base={protocolVersion:1,revision:5,query:'coder'};
+ for(const tone of [null,undefined,'all','Light','medium_dark',0,{},['medium']]){expect(await f.invoke(EMOJI_CHANNELS.search,{...base,tone})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(await f.invoke(EMOJI_CHANNELS.copy,{...base,tone,searchId:1,id:row.id})).toMatchObject({ok:false,error:{code:'invalid-request'}});}
+ expect(await f.invoke(EMOJI_CHANNELS.search,{...base,tone:'medium',skinTone:'dark'})).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.backend.search).not.toHaveBeenCalled();expect(f.backend.get).not.toHaveBeenCalled();expect(f.context.acquire).not.toHaveBeenCalled();expect(f.context.copy).not.toHaveBeenCalled();
+});
+it('binds issued selected-tone Copy to exact tone/query/category before canonical source lookup or any effect',async()=>{
+ const f=fixture(),raw=await f.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:5,query:'coder',group:row.group,tone:'medium'}),reply=emojiSearchReplySchema.parse(raw);expect(reply.ok).toBe(true);if(!reply.ok)throw new Error('Synthetic tone search failed');expect(reply.value.tone).toBe('medium');expect(Object.hasOwn(reply.value,'tone')).toBe(true);expect(f.backend.search).toHaveBeenCalledExactlyOnceWith({query:'coder',group:row.group,tone:'medium'});
+ const payload=f.selection(reply.value),{tone:_,...withoutTone}=payload;void _;
+ for(const forged of [withoutTone,{...payload,tone:'light'},{...payload,query:'wrong'},{...payload,group:other.group}])expect(await f.invoke(EMOJI_CHANNELS.copy,forged)).toMatchObject({ok:false,error:{code:'conflict'}});
+ expect(f.backend.get).not.toHaveBeenCalled();expect(f.context.copy).not.toHaveBeenCalled();expect(f.context.acquire).not.toHaveBeenCalled();expect(await f.invoke(EMOJI_CHANNELS.copy,payload)).toMatchObject({ok:true,value:{tone:'medium',id:row.id,value:row.value,query:'coder',group:row.group}});expect(f.context.copy).toHaveBeenCalledExactlyOnceWith(row.value);
+});
+it('does not reinterpret an All-tone issued handle as a selected tone',async()=>{
+ const f=fixture(),choice=await f.issue(),payload=f.selection(choice);expect(Object.hasOwn(choice,'tone')).toBe(false);expect(await f.invoke(EMOJI_CHANNELS.copy,{...payload,tone:'medium'})).toMatchObject({ok:false,error:{code:'conflict'}});expect(f.backend.get).not.toHaveBeenCalled();expect(f.context.copy).not.toHaveBeenCalled();expect(await f.invoke(EMOJI_CHANNELS.copy,payload)).toMatchObject({ok:true,value:{value:row.value}});
+});
+it.each(['light','dark'] as const)('keeps the real mixed-tone sequence unchanged for a containing %s filter',async tone=>{
+ const f=fixture(),value='🫱🏻‍🫲🏿',mixed={...row,id:canonicalEmojiId(value),value,name:'handshake: light skin tone, dark skin tone'};f.backend.search.mockResolvedValueOnce([mixed]);f.backend.get.mockReturnValueOnce(mixed);const reply=emojiSearchReplySchema.parse(await f.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:5,query:'handshake',group:row.group,tone}));expect(reply.ok).toBe(true);if(!reply.ok)throw new Error('Synthetic mixed tone search failed');
+ expect(reply.value.records).toEqual([mixed]);expect(await f.invoke(EMOJI_CHANNELS.copy,{...f.selection(reply.value),id:mixed.id})).toMatchObject({ok:true,value:{tone,id:mixed.id,value}});expect(f.context.copy).toHaveBeenCalledExactlyOnceWith(value);
+});
+it('keeps canonical unmodified ZWJ content and refuses mismatched toned backend rows before issuing a Copy handle',async()=>{
+ const f=fixture(),value='👩‍💻',plain={...row,id:canonicalEmojiId(value),value,name:'woman technologist'};f.backend.search.mockResolvedValueOnce([plain]);f.backend.get.mockReturnValueOnce(plain);const reply=emojiSearchReplySchema.parse(await f.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:5,query:'coder',tone:'unmodified'}));expect(reply.ok).toBe(true);if(!reply.ok)throw new Error('Synthetic unmodified search failed');expect(await f.invoke(EMOJI_CHANNELS.copy,{...f.selection(reply.value),id:plain.id})).toMatchObject({ok:true,value:{tone:'unmodified',id:plain.id,value}});expect(f.context.copy).toHaveBeenCalledExactlyOnceWith(value);
+ const mismatched=fixture();expect(await mismatched.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:5,query:'coder',tone:'unmodified'})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});expect(await mismatched.invoke(EMOJI_CHANNELS.copy,{protocolVersion:1,revision:5,query:'coder',tone:'unmodified',searchId:1,id:row.id})).toMatchObject({ok:false,error:{code:'conflict'}});expect(mismatched.context.copy).not.toHaveBeenCalled();
+});
+it('replaces a tone handle without allowing an old tone Copy or stale release to retarget the new choice',async()=>{
+ const f=fixture(),value='🫱🏻‍🫲🏿',mixed={...row,id:canonicalEmojiId(value),value};f.backend.search.mockResolvedValue([mixed]);f.backend.get.mockReturnValue(mixed);
+ const issueTone=async(tone:'light'|'dark')=>{const reply=emojiSearchReplySchema.parse(await f.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,revision:5,query:'handshake',tone}));if(!reply.ok)throw new Error('Synthetic tone replacement failed');return reply.value;};
+ const old=await issueTone('light'),fresh=await issueTone('dark');expect(await f.invoke(EMOJI_CHANNELS.copy,{...f.selection(old),id:mixed.id})).toMatchObject({ok:false,error:{code:'conflict'}});await f.invoke(EMOJI_CHANNELS.release,{protocolVersion:1,revision:5,searchId:old.searchId});expect(f.context.copy).not.toHaveBeenCalled();expect(await f.invoke(EMOJI_CHANNELS.copy,{...f.selection(fresh),id:mixed.id})).toMatchObject({ok:true,value:{tone:'dark',value}});expect(f.context.copy).toHaveBeenCalledTimes(1);
 });

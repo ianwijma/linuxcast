@@ -1,5 +1,6 @@
 import {expect,it,vi} from 'vitest';
 import {EMOJI_CHANNELS,canonicalEmojiId,emojiQuerySchema,emojiValueSchema,emojiIdSchema,emojiRowSchema,emojiSearchInputSchema,emojiSearchRequestSchema,emojiSearchReplySchema,emojiCopyInputSchema,emojiCopyReplySchema,emojiReleaseRequestSchema,emojiReleaseReplySchema} from '../src/emoji.ts';
+import {emojiToneSchema,emojiMatchesTone,emojiCopyRequestSchema} from '../src/emoji.ts';
 const row={id:'emoji:1f469-1f3fd-200d-1f4bb',value:'👩🏽‍💻',name:'woman technologist: medium skin tone',group:'People & Body',subgroup:'person-role',version:'4.0'};
 const group={id:row.group,name:row.group,count:2418};
 const search={revision:2,searchId:3,datasetVersion:'17.0',query:'coder',group:null,groups:[group],records:[row]};
@@ -33,4 +34,31 @@ it('admits only actual copied/released receipts and rejects optimistic, extra or
  expect(emojiCopyReplySchema.parse({ok:true,value:copy})).toEqual({ok:true,value:copy});
  for(const patch of [{outcome:'requested'},{outcome:'pasted'},{value:'👩‍💻'},{id:'emoji:1f600'},{path:'/tmp/public'},{text:'SYNTHETIC_PRIVATE'}])expect(emojiCopyReplySchema.safeParse({ok:true,value:{...copy,...patch}}).success).toBe(false);
  expect(emojiReleaseReplySchema.parse({ok:true,value:{outcome:'released',searchId:3}})).toMatchObject({ok:true});for(const value of [{outcome:'released',searchId:0},{outcome:'released',searchId:3,query:'private'},{outcome:'copied',searchId:3}])expect(emojiReleaseReplySchema.safeParse({ok:true,value}).success).toBe(false);
+});
+
+it('admits only the six tone filters or an omitted All field, rejecting null, own undefined and unsupported authority',()=>{
+ for(const tone of ['unmodified','light','medium-light','medium','medium-dark','dark']){
+  expect(emojiToneSchema.parse(tone)).toBe(tone);expect(emojiSearchInputSchema.parse({revision:2,query:'coder',tone}).tone).toBe(tone);expect(emojiCopyInputSchema.parse({revision:2,query:'coder',searchId:3,id:row.id,tone}).tone).toBe(tone);
+ }
+ expect(Object.hasOwn(emojiSearchInputSchema.parse({revision:2,query:'coder'}),'tone')).toBe(false);
+ for(const tone of [null,undefined,'all','Light','medium_dark','',0,{},['medium']]){
+  for(const schema of [emojiSearchInputSchema,emojiSearchRequestSchema])expect(schema.safeParse({revision:2,query:'coder',tone,...(schema===emojiSearchRequestSchema?{protocolVersion:1}:{})}).success).toBe(false);
+  for(const schema of [emojiCopyInputSchema,emojiCopyRequestSchema])expect(schema.safeParse({revision:2,searchId:3,query:'coder',id:row.id,tone,...(schema===emojiCopyRequestSchema?{protocolVersion:1}:{})}).success).toBe(false);
+ }
+ expect(emojiSearchInputSchema.safeParse({revision:2,query:'coder',skinTone:'medium'}).success).toBe(false);expect(emojiReleaseRequestSchema.safeParse({protocolVersion:1,revision:2,searchId:3,tone:'medium'}).success).toBe(false);
+});
+it('uses contains-modifier semantics for real mixed sequences and no-modifier semantics for unmodified values',()=>{
+ const mixed='🫱🏻‍🫲🏿';expect(emojiMatchesTone(mixed,'light')).toBe(true);expect(emojiMatchesTone(mixed,'dark')).toBe(true);
+ for(const tone of ['medium-light','medium','medium-dark','unmodified'] as const)expect(emojiMatchesTone(mixed,tone)).toBe(false);
+ for(const value of ['👩‍💻','❤️','🇦🇺','#️⃣'])expect(emojiMatchesTone(value,'unmodified')).toBe(true);
+ for(const [tone,modifier] of [['light','🏻'],['medium-light','🏼'],['medium','🏽'],['medium-dark','🏾'],['dark','🏿']] as const){expect(emojiMatchesTone('👍'+modifier,tone)).toBe(true);expect(emojiMatchesTone('👍'+modifier,'unmodified')).toBe(false);}
+});
+it('rejects row/tone mismatch in successful pages and Copy receipts while preserving canonical mixed sequences',()=>{
+ const mixedValue='🫱🏻‍🫲🏿',mixed={...row,id:canonicalEmojiId(mixedValue),value:mixedValue};
+ for(const tone of ['light','dark'] as const){expect(emojiSearchReplySchema.parse({ok:true,value:{...search,tone,records:[mixed]}})).toMatchObject({ok:true,value:{tone,records:[{id:mixed.id,value:mixedValue}]}});expect(emojiCopyReplySchema.parse({ok:true,value:{...copy,tone,id:mixed.id,value:mixedValue}})).toMatchObject({ok:true,value:{tone,id:mixed.id,value:mixedValue}});}
+ const plainValue='👩‍💻',plain={...row,id:canonicalEmojiId(plainValue),value:plainValue};expect(emojiSearchReplySchema.parse({ok:true,value:{...search,tone:'unmodified',records:[plain]}})).toMatchObject({ok:true,value:{records:[{value:plainValue}]}});
+ for(const [tone,record] of [['unmodified',row],['medium',mixed],['light',plain]] as const){expect(emojiSearchReplySchema.safeParse({ok:true,value:{...search,tone,records:[record]}}).success).toBe(false);expect(emojiCopyReplySchema.safeParse({ok:true,value:{...copy,tone,id:record.id,value:record.value}}).success).toBe(false);}
+ expect(emojiSearchReplySchema.safeParse({ok:true,value:{...search,tone:'dark',records:[]}}).success).toBe(true);
+ for(const tone of [undefined,null,'all']){expect(emojiSearchReplySchema.safeParse({ok:true,value:{...search,tone}}).success).toBe(false);expect(emojiCopyReplySchema.safeParse({ok:true,value:{...copy,tone}}).success).toBe(false);}
+ const all=emojiSearchReplySchema.parse({ok:true,value:search});expect(all.ok).toBe(true);if(all.ok)expect(Object.hasOwn(all.value,'tone')).toBe(false);
 });
