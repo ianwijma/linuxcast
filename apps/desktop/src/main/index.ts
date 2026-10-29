@@ -103,6 +103,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
     list:input=>currentStorage.repository.request('notes.list',input,{timeoutMs:2000}),
     get:id=>currentStorage.repository.request('notes.get',{id},{timeoutMs:2000}),
     write:input=>currentStorage.repository.request('notes.write',input,{timeoutMs:2000}),
+    setPinned:input=>currentStorage.repository.request('notes.setPinned',input,{timeoutMs:2000}),
   });
   const currentNotes=notes;
   const controls=new DataControls(currentStorage.repository);

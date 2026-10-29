@@ -10,14 +10,14 @@ import {trustedAppSender} from './ipc.ts';
 import {restrictContents,securePreferences} from './security.ts';
 import type {ResidentService} from './lifecycle.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
-export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'list'|'get'|'write'>):ResidentService&{open():Promise<void>;prepareClose():Promise<boolean>}{
+export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'list'|'get'|'write'|'setPinned'>):ResidentService&{open():Promise<void>;prepareClose():Promise<boolean>}{
  let window:BrowserWindow|undefined,creating:Promise<void>|undefined,stopped=false,stopping=false,approvedClose=false,stopPromise:Promise<void>|undefined,sequence=0;
  let attempt:{id:number;owner:BrowserWindow;promise:Promise<boolean>;resolve(value:boolean):void;timer:ReturnType<typeof setTimeout>}|undefined;
  const finish=(value:boolean)=>{const pending=attempt;attempt=undefined;if(pending){clearTimeout(pending.timer);pending.resolve(value);}};
  const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
  const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
- const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),appearance,list:options.list,get:options.get,write:options.write,
-  close(){if(window&&alive(window)&&!exporter.busy()){approvedClose=true;window.close();}},
+ const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),appearance,list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,
+  close(){if(window&&alive(window)&&!exporter.busy()&&!api.isWriting()){approvedClose=true;window.close();}},
  });
  const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:api.isWriting,get:options.get,publish:saveNoteMarkdown,
   async choose(record){const owner=window;if(!owner||!alive(owner))return null;const choice=await dialog.showSaveDialog(owner,{title:'Export note — unencrypted Markdown',defaultPath:`linuxcast-note-${record.id}.md`,buttonLabel:'Save unencrypted Markdown',filters:[{name:'Markdown',extensions:['md']}],properties:['createDirectory']});if(!alive(owner)||owner.webContents.getURL()!==NOTES_URL)throw new Error('Notes export owner changed.');return choice.canceled||!choice.filePath?null:choice.filePath;},
@@ -25,7 +25,7 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  const updated=()=>{if(window&&alive(window)){window.setBackgroundColor(tokens.themes[appearance()].background);if(window.webContents.getURL()===NOTES_URL)window.webContents.send(NOTES_APPEARANCE,appearance());}};
  nativeTheme.on('updated',updated);
  const requestClose=():Promise<boolean>=>{
-  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(exporter.busy())return Promise.resolve(false);if(attempt?.owner===owner)return attempt.promise;
+  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(exporter.busy()||api.isWriting())return Promise.resolve(false);if(attempt?.owner===owner)return attempt.promise;
   if(owner.webContents.getURL()!==NOTES_URL)return Promise.resolve(false);
   let resolve!:(value:boolean)=>void;const promise=new Promise<boolean>(done=>{resolve=done;});
   attempt={id:++sequence,owner,promise,resolve,timer:setTimeout(()=>finish(false),15000)};
@@ -34,6 +34,7 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  ipcMain.handle(NOTES_CLOSE_FINISHED,(event,payload)=>{
   const parsed=notesCloseFinishedSchema.safeParse(payload),pending=attempt;
   if(!pending||!parsed.success||parsed.data.attemptId!==pending.id||pending.owner!==window||!trustedAppSender(event,pending.owner.webContents,NOTES_URL))return {ok:false};
+  if(exporter.busy()||api.isWriting()){finish(false);return {ok:false};}
   if(!parsed.data.allowClose)finish(false);
   return {ok:true};
  });
