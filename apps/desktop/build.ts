@@ -11,6 +11,9 @@ execFileSync('cargo',['build','--locked','--release','-p','linuxcast-platform','
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 await cp(join(root,'target/release/linuxcast-platform'),join(output,'platform'));
+await mkdir(join(output,'licenses/emoji'),{recursive:true});
+for(const name of ['LICENSE-UNICODE.txt','LICENSE-CLDR-48.txt','provenance.json'])
+  await cp(join(root,'packages/builtins/emoji/data',name),join(output,'licenses/emoji',name));
 for (const entry of ['main', 'preload', 'data-preload', 'file-preload', 'workflow-preload', 'notes-preload']) {
   await build({ absWorkingDir: root, entryPoints: [`apps/desktop/src/${entry}/index.ts`],
     outfile: join(output, `${entry}.cjs`), platform: 'node', format: 'cjs', bundle: true,

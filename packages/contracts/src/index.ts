@@ -40,3 +40,5 @@ export * from './notes.ts';
 export * from './notes-export.ts';
 
 export * from './notes-launcher.ts';
+
+export * from './emoji.ts';

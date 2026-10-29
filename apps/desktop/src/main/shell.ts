@@ -22,6 +22,7 @@ export interface ResidentShellOptions {
   /** Called once after instance ownership and Electron readiness; return owned handles synchronously. */
   createServices?: () => readonly ResidentService[];
   copyCalculatorResult?:LauncherActions['copyCalculatorResult'];
+  emoji?:LauncherActions['emoji'];
   quicklinks?:LauncherActions['quicklinks'];
   loadWorkflowCommands?:LauncherActions['loadWorkflowCommands'];
   openWorkflowEntry?:LauncherActions['openWorkflowEntry'];
@@ -164,6 +165,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.openNotes ? {openNotes:options.openNotes} : {}),
       ...(options.openQuickNote ? {openQuickNote:options.openQuickNote} : {}),
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),
+      ...(options.emoji?{emoji:options.emoji,emojiVisible:()=>!!window&&!window.isDestroyed()&&window.isVisible()}:{}),
       ...(options.copyCalculatorResult ? {copyCalculatorResult:options.copyCalculatorResult} : {}),
       ...(options.openUrl ? {openUrl:options.openUrl} : {}),
       ...(options.quicklinks?{quicklinks:options.quicklinks}:{}),

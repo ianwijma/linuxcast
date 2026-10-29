@@ -1,0 +1,108 @@
+import {emojiSearchInputSchema,emojiSearchReplySchema,emojiCopyReplySchema} from '@linuxcast/contracts';
+import type {EmojiApi,EmojiSearchValue,EmojiRow,ViewModel} from '@linuxcast/contracts';
+import type {ActionIntent,ViewSession} from '@linuxcast/ui/views';
+const COPY='emoji:copy',RELOAD='emoji:reload',CATEGORY='emoji:category',APPLY='emoji:apply-category',CANCEL='emoji:cancel-category',COMPACT='emoji:compact',COMFORTABLE='emoji:comfortable',BACK='emoji:back';
+const DISCLOSURE='Offline Unicode 17.0 · Up to 100 matches; refine your search. Copy only; nothing is pasted automatically.';
+const UNKNOWN='The copy outcome is unknown. Check your clipboard. Wait for any pending copy to settle, then Reload emoji or enter a new search before choosing Copy emoji again. Nothing will be replayed.';
+type Status={kind:'info'|'warning'|'error';message:string};
+type Search={generation:number;query:string;group:string|null;controller:AbortController;viewRevision:number;received?:EmojiSearchValue};
+type Copy={generation:number;data:EmojiSearchValue;row:EmojiRow;controller:AbortController;viewRevision:number;queryRevision:number};
+/** Renderer presentation accepts bounded metadata only. Main owns the catalogue,
+ * canonical clipboard value, issued search authority and actual write lifetime. */
+export class EmojiFlow {
+ #session:ViewSession;#api:EmojiApi;#revision:number;#gridId:string;#categoryId:string;#viewRevision=0;#opened=false;#disposed=false;#categoryOpen=false;
+ #origin:{viewId:string;query:string;selection:string|null}|undefined;#query='';#group:string|null=null;#density:'compact'|'comfortable'='comfortable';#data:EmojiSearchValue|undefined;#groups:EmojiSearchValue['groups']=[];#preferred:string|null=null;#status:Status|undefined;#unknown=false;#generation=0;
+ #search:Search|undefined;#copy:Copy|undefined;#actualCopy:object|undefined;#released=new Set<number>();#unsubscribe:()=>void;
+ constructor({session,api,viewId,revision}:{session:ViewSession;api:EmojiApi;viewId:string;revision:number}){
+  this.#session=session;this.#api=api;this.#revision=revision;this.#gridId=`${viewId}-grid`;this.#categoryId=`${viewId}-category`;
+  this.#unsubscribe=session.subscribe(()=>{
+   if(!this.#opened||this.#disposed)return;
+   const grid=this.#frame();
+   if(!grid||!this.#originCurrent()){this.#abandon();return;}
+   if(grid.query!==this.#query){this.#query=grid.query;this.#replace();return;}
+   if(this.#copy&&!this.#copyContext(this.#copy,false)){this.#copy.controller.abort();this.#copy=undefined;this.#unknown=true;this.#status={kind:'error',message:UNKNOWN};this.#publish();}
+  });
+ }
+ get active(){return this.#opened&&!this.#disposed&&!!this.#frame();}
+ owns(viewId:string){return viewId===this.#gridId||viewId===this.#categoryId;}
+ #frame(){return this.#session.getSnapshot().frames.find(frame=>frame.view.viewId===this.#gridId);}
+ #top(){return this.#session.getSnapshot().frames.at(-1);}
+ #originCurrent(){const root=this.#session.getSnapshot().frames[0];return !!this.#origin&&root?.view.viewId===this.#origin.viewId&&root.query===this.#origin.query&&root.selection===this.#origin.selection;}
+ #gridCurrent(){return this.active&&this.#originCurrent()&&this.#top()?.view.viewId===this.#gridId&&!this.#categoryOpen;}
+ open(fromViewId:string){
+  if(this.#disposed||this.#opened||this.#top()?.view.viewId!==fromViewId)return;
+  const root=this.#session.getSnapshot().frames[0]!;this.#origin={viewId:root.view.viewId,query:root.query,selection:root.selection};this.#query='';this.#group=null;this.#groups=[];this.#status=undefined;this.#preferred=null;this.#unknown=false;this.#opened=true;
+  if(!this.#session.navigate({protocolVersion:1,kind:'push',fromViewId,view:this.#grid()})){this.#opened=false;return;}void this.#load();
+ }
+ query(viewId:string,query:string){if(!this.#gridCurrent()||viewId!==this.#gridId||!this.#originCurrent())return;const frame=this.#frame();if(frame?.query!==query)this.#session.setQuery(viewId,query);else if(this.#query!==query){this.#query=query;this.#replace();}}
+ #release(searchId:number){
+  if(this.#released.has(searchId)||this.#data?.searchId===searchId||!this.#api.releaseEmojiSearch)return;this.#released.add(searchId);
+  try{void this.#api.releaseEmojiSearch({revision:this.#revision,searchId}).catch(()=>{});}catch{/* Main also expires owned search handles; release has no clipboard effect. */}
+ }
+ #dropData(){const old=this.#data;this.#data=undefined;if(old)this.#release(old.searchId);}
+ #abandon(){++this.#generation;this.#search?.controller.abort();this.#search=undefined;if(this.#copy){this.#copy.controller.abort();this.#copy=undefined;this.#unknown=true;}this.#dropData();}
+ #replace(){this.#preferred=this.#frame()?.selection??null;this.#abandon();this.#status=undefined;if(this.#gridCurrent())void this.#load();}
+ #disabledCopy(){return this.#copy||this.#actualCopy?'Wait for the current clipboard request to settle.':this.#search?'Wait for emoji search to finish.':this.#unknown?UNKNOWN:!this.#api.copyEmoji?'Clipboard copying is unavailable. Reopen Linuxcast to reconnect.':!this.#data?'Reload emoji to choose a current item.':undefined;}
+ #grid():ViewModel{
+  const busy=!!this.#search||!!this.#copy,disabled=this.#disabledCopy(),records=this.#data?.records??[];
+  return{protocolVersion:1,viewId:this.#gridId,revision:++this.#viewRevision,kind:'grid',title:'Emoji',density:this.#density,images:[],loading:busy,search:{query:this.#query,placeholder:'Search emoji names, categories or Unicode…',mode:'extension'},
+   ...(this.#preferred&&records.some(row=>row.id===this.#preferred)?{selectedId:this.#preferred}:{}),
+   sections:[{id:'emoji-results',title:`${this.#group??'All categories'} · Up to 100 matches; refine your search`,items:records.map(row=>({id:row.id,title:row.name,subtitle:row.subgroup,icon:{kind:'glyph' as const,value:row.value},actions:[{id:COPY,title:'Copy emoji',kind:'invoke' as const,effect:'write' as const,...reason(disabled)}]}))}],
+   empty:{title:this.#search?'Loading emoji…':!this.#api.searchEmoji||!this.#api.releaseEmojiSearch?'Emoji unavailable':'No matching emoji',description:'Search the offline catalogue or choose another category. At most 100 results are shown. Nothing is copied or pasted automatically.'},
+   status:this.#status??{kind:'info',message:!this.#api.copyEmoji?`Clipboard copying is unavailable. Reopen Linuxcast to reconnect. ${DISCLOSURE}`:this.#unknown?UNKNOWN:DISCLOSURE},
+   actions:[{id:CATEGORY,title:'Choose category',kind:'invoke',effect:'read',...reason(busy||this.#actualCopy?'Wait for the current request to settle.':!this.#groups.length?'Load emoji before choosing a category.':undefined)},
+    {id:this.#density==='comfortable'?COMPACT:COMFORTABLE,title:this.#density==='comfortable'?'Use compact grid':'Use comfortable grid',kind:'invoke',effect:'read',...reason(busy||this.#actualCopy?'Wait for the current request to settle.':undefined)},
+    {id:RELOAD,title:'Reload emoji',kind:'invoke',effect:'read',...reason(busy||this.#actualCopy?'Wait for the current request to settle.':!this.#api.searchEmoji||!this.#api.releaseEmojiSearch?'Emoji search is unavailable. Reopen Linuxcast to reconnect.':undefined)},
+    {id:BACK,title:'Back',kind:'invoke',effect:'read'}]};
+ }
+ #publish(){if(this.active)this.#session.update(this.#gridId,{protocolVersion:1,kind:'snapshot',view:this.#grid()});}
+ #searchCurrent(context:Search){const frame=this.#top();return this.#gridCurrent()&&this.#search===context&&context.generation===this.#generation&&!context.controller.signal.aborted&&this.#query===context.query&&this.#group===context.group&&frame?.query===context.query&&frame.view.revision===context.viewRevision;}
+ async #load(){
+  if(!this.#gridCurrent())return;const input={revision:this.#revision,query:this.#query,...(this.#group?{group:this.#group}:{})};
+  if(!emojiSearchInputSchema.safeParse(input).success){this.#status={kind:'error',message:'Keep searches to 512 characters and 2048 UTF-8 bytes, without control or directional formatting characters.'};this.#publish();return;}
+  if(!this.#api.searchEmoji||!this.#api.releaseEmojiSearch){this.#status={kind:'error',message:'Emoji search is unavailable. Reopen Linuxcast to reconnect.'};this.#publish();return;}
+  const context:Search={generation:++this.#generation,query:this.#query,group:this.#group,controller:new AbortController(),viewRevision:this.#viewRevision+1};this.#search=context;this.#status={kind:'info',message:'Searching the offline emoji catalogue…'};this.#publish();
+  try{
+   if(!this.#searchCurrent(context))return;
+   const actual=this.#api.searchEmoji(input).then(reply=>{const parsed=emojiSearchReplySchema.safeParse(reply);if(parsed.success&&parsed.data.ok&&this.#matches(parsed.data.value,context)){context.received=parsed.data.value;if(!this.#searchCurrent(context))this.#release(parsed.data.value.searchId);}return reply;});
+   const parsed=emojiSearchReplySchema.safeParse(await bounded(actual,context.controller.signal));if(!this.#searchCurrent(context)){if(parsed.success&&parsed.data.ok&&this.#matches(parsed.data.value,context))this.#release(parsed.data.value.searchId);return;}
+   if(!parsed.success||!parsed.data.ok||!this.#matches(parsed.data.value,context))throw new Error('unconfirmed');
+   this.#data=parsed.data.value;this.#groups=parsed.data.value.groups;this.#unknown=!!this.#actualCopy;this.#status=this.#unknown?{kind:'warning',message:UNKNOWN}:undefined;
+  }catch{if(this.#searchCurrent(context))this.#status={kind:'error',message:'Emoji could not be loaded. Reload emoji or enter a new search; nothing was copied.'};}
+  finally{if(context.received&&this.#data?.searchId!==context.received.searchId)this.#release(context.received.searchId);if(this.#search===context){const current=this.#searchCurrent(context);this.#search=undefined;if(current)this.#publish();}}
+ }
+ #matches(value:EmojiSearchValue,context:Search){return value.revision===this.#revision&&value.query===context.query&&value.group===context.group;}
+ #category():ViewModel{return{protocolVersion:1,viewId:this.#categoryId,revision:++this.#viewRevision,kind:'form',title:'Emoji category',fields:[{id:'group',kind:'enum',title:'Category',required:true,value:this.#group??'*',description:'Choose an offline Unicode category. Cancel preserves the current search and selection.',options:[{value:'*',label:'All categories'},...this.#groups.map(group=>({value:group.id,label:`${group.name} (${group.count})`}))]}],submitActionId:APPLY,cancelActionId:CANCEL,actions:[{id:APPLY,title:'Apply category',kind:'invoke',effect:'read'},{id:CANCEL,title:'Cancel',kind:'invoke',effect:'read'}]};}
+ async handle(intent:ActionIntent){
+  const top=this.#top();if(!this.active||!this.#originCurrent()||!top||!this.owns(intent.viewId)||top.view.viewId!==intent.viewId||top.view.revision!==intent.revision||Object.keys(intent).some(key=>!['viewId','revision','actionId','itemId','values'].includes(key)))return;
+  if(intent.viewId===this.#categoryId){
+   if(!this.#categoryOpen||intent.itemId!==undefined||top.selection!==null)return;
+   if(intent.actionId===CANCEL&&intent.values===undefined){this.#session.pop();return;}
+   if(intent.actionId!==APPLY||!intent.values||Object.keys(intent.values).length!==1||typeof intent.values.group!=='string'||!['*',...this.#groups.map(group=>group.id)].includes(intent.values.group))return;
+   const group=intent.values.group==='*'?null:intent.values.group;if(group===this.#group){this.#session.pop();return;}this.#group=group;this.#session.pop();if(this.#gridCurrent())this.#replace();return;
+  }
+  if(!this.#gridCurrent()||intent.values!==undefined||intent.itemId!==(top.selection??undefined))return;
+  const action=top.view.actions?.find(action=>action.id===intent.actionId);if(action?.disabledReason)return;
+  if(intent.actionId===BACK){this.#session.pop();return;}
+  if(intent.actionId===RELOAD){if(!this.#copy&&!this.#actualCopy&&!this.#search)this.#replace();return;}
+  if(intent.actionId===CATEGORY){if(this.#copy||this.#actualCopy||this.#search||!this.#groups.length)return;this.#categoryOpen=true;if(!this.#session.navigate({protocolVersion:1,kind:'push',fromViewId:this.#gridId,view:this.#category()}))this.#categoryOpen=false;return;}
+  if(intent.actionId===COMPACT||intent.actionId===COMFORTABLE){if(this.#copy||this.#actualCopy||this.#search)return;this.#density=intent.actionId===COMPACT?'compact':'comfortable';this.#preferred=top.selection;this.#publish();return;}
+  if(intent.actionId!==COPY||this.#disabledCopy()||!this.#data||!this.#api.copyEmoji)return;const row=this.#data.records.find(row=>row.id===top.selection);if(!row)return;
+  const context:Copy={generation:this.#generation,data:this.#data,row,controller:new AbortController(),viewRevision:this.#viewRevision+1,queryRevision:top.queryRevision};this.#copy=context;this.#status={kind:'info',message:`Copying ${row.name}…`};this.#publish();
+  try{
+   if(!this.#copyContext(context))return;const actualToken={};this.#actualCopy=actualToken;
+   let actual:Promise<unknown>;try{actual=this.#api.copyEmoji({revision:this.#revision,searchId:context.data.searchId,query:context.data.query,...(context.data.group?{group:context.data.group}:{}),id:row.id});}catch{this.#actualCopy=undefined;throw new Error('unconfirmed');}
+   const settled=()=>{if(this.#actualCopy===actualToken){this.#actualCopy=undefined;if(this.active&&!this.#copy&&!this.#search&&this.#gridCurrent())this.#publish();}};void actual.then(settled,settled);
+   const parsed=emojiCopyReplySchema.safeParse(await bounded(actual,context.controller.signal));if(!this.#copyContext(context))return;
+   if(!parsed.success)throw new Error('receipt');if(!parsed.data.ok){if(['invalid-request','capability-unavailable','permission-denied','conflict','cancelled'].includes(parsed.data.error.code)){this.#status={kind:'error',message:'The emoji was not copied. Check clipboard access or Reload emoji, then choose Copy emoji explicitly. Nothing is pasted automatically.'};return;}throw new Error('unknown');}
+   const value=parsed.data.value;if(value.revision!==this.#revision||value.searchId!==context.data.searchId||value.query!==context.data.query||value.group!==context.data.group||value.id!==row.id||value.value!==row.value)throw new Error('receipt');
+   this.#status={kind:'info',message:`Copied ${row.name}. Paste it explicitly where you need it; nothing was inserted automatically.`};
+  }catch{if(this.#copyContext(context)){this.#unknown=true;this.#status={kind:'error',message:UNKNOWN};}}
+  finally{if(this.#copy===context){const current=this.#copyContext(context);this.#copy=undefined;if(current)this.#publish();else this.#unknown=true;}}
+ }
+ #copyContext(context:Copy,revision=true){const top=this.#top();return this.#gridCurrent()&&this.#copy===context&&!context.controller.signal.aborted&&this.#generation===context.generation&&this.#data===context.data&&top?.query===context.data.query&&this.#group===context.data.group&&top.selection===context.row.id&&top.queryRevision===context.queryRevision&&(!revision||top.view.revision===context.viewRevision);}
+ closed(viewId:string){if(!this.owns(viewId))return false;if(viewId===this.#categoryId){this.#categoryOpen=false;return true;}this.#opened=false;this.#categoryOpen=false;this.#abandon();this.#origin=undefined;return true;}
+ dispose(){if(this.#disposed)return;this.#disposed=true;this.#opened=false;this.#categoryOpen=false;this.#unsubscribe();this.#abandon();this.#origin=undefined;}
+}
+function reason(message:string|undefined){return message?{disabledReason:message}:{};}
+function bounded<T>(promise:Promise<T>,signal:AbortSignal):Promise<T>{return new Promise((resolve,reject)=>{const finish=(run:()=>void)=>{clearTimeout(timer);signal.removeEventListener('abort',abort);run();},abort=()=>finish(()=>reject(new Error('cancelled'))),timer=setTimeout(()=>finish(()=>reject(new Error('deadline'))),5000);signal.addEventListener('abort',abort,{once:true});if(signal.aborted){abort();return;}void promise.then(value=>finish(()=>resolve(value)),()=>finish(()=>reject(new Error('unavailable'))));});}

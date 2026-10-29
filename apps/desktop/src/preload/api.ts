@@ -1,3 +1,4 @@
+import {createEmojiApi} from './emoji.ts';
 import {createLauncherNotesApi} from './notes.ts';
 import {
   SHELL_CHANNELS, desktopShellStateSchema, shellCommandReplySchema, shellStateReplySchema,
@@ -26,6 +27,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    ...createEmojiApi(transport),
     ...createQuicklinkApi(transport),
     ...createLauncherNotesApi(transport),
     ...createRateApi(transport),

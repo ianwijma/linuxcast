@@ -3169,7 +3169,7 @@
     {
       "id": "L2-06",
       "title": "Implement dictionary and emoji datasets",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "L2",
       "dependsOn": [
@@ -3219,7 +3219,14 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "LINUXCAST_PRIVATE_DISPLAY=1 LINUXCAST_TEST_FILES='[\"apps/desktop/tests/emoji.integration.test.ts\"]' xvfb-run -a node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts; bun run test:ui -- L2-06",
+              "outcome": "Partial unfinished Emoji increment: apps/desktop/evidence/emoji-application.md records actual exact canonical Unicode Copy and injected unsupported capability recovery/manual paste explanation; full supported desktop matrix and task evidence still pending.",
+              "platform": "Pop!_OS22.04 amd64, Node24.22.1/Bun1.4.4/Electron45.0.0/privateXvfb/xclip; componentChromium. No target Debian/native desktop/AT acceptance.",
+              "reference": "apps/desktop/evidence/emoji-application.md and packages/builtins/emoji/UI.md"
+            }
+          ]
         },
         {
           "id": "L2-06-UI",
@@ -3227,7 +3234,14 @@
           "status": "pending",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "LINUXCAST_PRIVATE_DISPLAY=1 LINUXCAST_TEST_FILES='[\"apps/desktop/tests/emoji.integration.test.ts\"]' xvfb-run -a node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts; bun run test:ui -- L2-06",
+              "outcome": "Partial shared Grid/category/density keyboard,19component/4actualdark/light/200percent/recovery captures,12browser/axe0; see packages/builtins/emoji/UI.md and apps/desktop/evidence/emoji-application.md. NativeAT/highcontrast/fulltask remains pending.",
+              "platform": "Pop!_OS22.04 amd64, Node24.22.1/Bun1.4.4/Electron45.0.0/privateXvfb/xclip; componentChromium. No target Debian/native desktop/AT acceptance.",
+              "reference": "apps/desktop/evidence/emoji-application.md and packages/builtins/emoji/UI.md"
+            }
+          ]
         },
         {
           "id": "L2-06-PRIVACY",
@@ -3235,17 +3249,30 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "LINUXCAST_PRIVATE_DISPLAY=1 LINUXCAST_TEST_FILES='[\"apps/desktop/tests/emoji.integration.test.ts\"]' xvfb-run -a node node_modules/vitest/vitest.mjs run --config scripts/test-runner/vitest.config.ts; bun run test:ui -- L2-06",
+              "outcome": "Partial public-only Emoji fixtures/captures and actual aggregate usage export/query exclusion/rendererrequest observation; main networking not instrumented and dictionary/fulltask coverage remains pending. See apps/desktop/evidence/emoji-application.md.",
+              "platform": "Pop!_OS22.04 amd64, Node24.22.1/Bun1.4.4/Electron45.0.0/privateXvfb/xclip; componentChromium. No target Debian/native desktop/AT acceptance.",
+              "reference": "apps/desktop/evidence/emoji-application.md and packages/builtins/emoji/UI.md"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:ui -- L2-06"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "29October2026 bounded Emoji application increment on codex/emoji-search, base42afa6ba397f77f079fc057ac2c2f9f3d08d87cc. Full pinned Unicode17.0 3944 fully-qualified rows/9groups/98subgroups plus compatible CLDR48 English metadata, source assets/notices/provenance. Actual registered Emoji opens existing shared Grid; bounded local name/alias/keyword/glyph search, category Form, comfortable/compact density, Arrow selection and explicit canonical-ID Copy through existing main clipboard writer. Renderer receives at most100 records, never full catalogue or arbitrary clipboard authority. Licences/provenance included in desktop build. This is an unfinished L2-06 application increment; full task/prerequisite/release acceptance remains pending.",
+        "Author data22focused tests PASS; presentation45focused and12shared-browser cases14.1s PASS with19publicdark/light/200%/recovery captures/axe0; boundary78focused tests PASS. Parent integrated initial545tests542PASS/3stale max5607 expectations failed; new twelfth fixed builtin raises aggregate cap to5608 without changing provider caps. Updated only affected boundary expectations; targeted70tests across4files PASS. Parent full directNodeTypeScript and scopedproduction/testlint PASS. Independent data/contracts/glyph and UI/root/capture reviews clean; mainreviewP2 genericExecute fallback corrected and tested (Emoji must use local flow/named APIs), forbidden control/directional Unicode rejection before encoding verified. Final production Electron45 privateXvfb native-xclip scenario PASS6.51s/7.47s total, exact ZWJ/modifier/VS16/keycap/flag copy plus injected unsupported recovery, category/density, Back/Hide/reopen/Quit/restart, aggregate-only5successfulcopy usage and3builtlicense/provenancebytechecks. Four actual dark/light captures/axe0 reviewed. Final integrated directNodeTypeScript PASS; required bun run test:ui -- L2-06 PASS12cases16.2s; scopedactualtestlint PASS. Same16productionfiles and frozen11data/27UI/6actual artifact hashes preserved. Three recaptured component PNGs restored to the reviewed author artifacts after browser rerun; no source changes. Final actualassertion/capture and three captest review clean. See apps/desktop/evidence/emoji-application.md and packages/builtins/emoji/UI.md. No native desktop claim."
+      ],
+      "owner": "coordinator with SOL/high Emoji data, presentation and boundary review lanes",
+      "branch": "codex/emoji-search",
+      "limitations": [
+        "Unfinished bounded increment. Implemented offline Unicode/CLDR aliases, category selection and shared comfortable/compact density; full dictionary/Hunspell discovery/definitions/missing-language guidance, Emoji tone picker/custom keywords/favourites/frecency/native paste and configured semantic assistance remain required. Copy is explicit, and UI instructs explicit manual paste; no automatic insertion or simulated backend success.",
+        "Actual integrated L1/D1/shared UI used under user-authorized partial application increments. Full prerequisite, Debian13 GNOME/KDE Wayland/X11/nativeAT/highcontrast/performance/package/release evidence remains pending. No unlicensed or silent dictionary dataset download."
+      ]
     },
     {
       "id": "P1-01",
@@ -7061,13 +7088,14 @@
         "29October2026 launcher Notes search/exact-open integration applied to merged PR63, isolated codex/notes-launcher-integrate. Every application/test/capture hash matches the independently reviewed60-file launcher-only snapshot770b62c6be11c3b2e9dd033f231d25291c8785f09456735212eb68b2bb73435a; only coordinator registry/generatedcards/checkpoint reconciled to retain integrated PR62/63 references. No source changes or repeated passing suites; current-head CI/reviews/merge still required. Complete task/native/session/AT/release acceptance remains pending.",
         "29October2026 launcher Notes search/exact navigation integrated via PR64 https://github.com/ianwijma/linuxcast/pull/64, mergef6585ed2c14faed6558e4e661995152cd695e986; exact independently reviewed signed headf648313c095be938555c09d8c474a83bf5a629b8 locally verified against configured signing key. Current-head CI40818690887 validate PASS13s; no requested/submitted GitHub reviews/comments/threads; normal expected-head merge. Primary develop clean fast-forwarded; pinned Bun1.4.4 frozen dependency install and production desktop build PASS69packagedrendererassets. All reviewed application/test/capture hashes preserved; integration changed only coordinator records. Signing repaired; no unsigned fallback/configuration change. All broader task/prerequisite/nativeAT/desktop/performance/package/release acceptance remains pending.",
         "29October2026 integration records PR65 https://github.com/ianwijma/linuxcast/pull/65 merged0be9eaba8a9cedcbc1bbeb43e79f519ace2b9dc2, signed reviewed headd049af36dc265f1282e1994fb28c3216c8b057d5, CI40826288650 PASS13s; independent documentation review clean, no requested/submitted GitHub reviews/comments/threads; normal expected-head merge. Preserves all PR62/63/64 source/evidence and unchanged task/acceptance statuses.",
-        "29October2026 bounded reviewed/tested unfinished one-note permanent deletion increment on mergedPR65/PR64 application: explicit capturedtrashedCAS confirmation Keep/Escape/noeffect, once-only owner source+savedrevision cascade, exactreceipt, unknownactualslot/Close/export/freshGet-null/no replay, currentfilter/emptyselection/no fallback, unrelatedsourcepreserved.395mappedunits/32contracts/238security PASS;27actualowner PASS separately; actualproduction app-only38.17s PASS including retainedpriorflows/confirmation600ms/cancelEscape+Keep/historypreservation/delete/nativeClose/Quit/restart/rootsearch/privacy. Author216units/10newbrowser25.2s and55existingbrowser1.2m PASS.21ownedUIpatch90bdfe8bb0cf793fb037951efcf7bb9323f2fd4034b2e34992a81f5eaf31c161 reconciled;14component+4actual captures/source/backend/production assertions independentlyclean after uncertaintyandtypenarrowingfixes. FullNodeTypeScript/scoped18lintPASS. apps/desktop/evidence/notes-delete-application.md. Signedpublication/currentheadCI/configuredreviews/normalmergepending; fullU1/D1/nativeAT/desktop/release acceptance remains pending."
+        "29October2026 bounded reviewed/tested unfinished one-note permanent deletion increment on mergedPR65/PR64 application: explicit capturedtrashedCAS confirmation Keep/Escape/noeffect, once-only owner source+savedrevision cascade, exactreceipt, unknownactualslot/Close/export/freshGet-null/no replay, currentfilter/emptyselection/no fallback, unrelatedsourcepreserved.395mappedunits/32contracts/238security PASS;27actualowner PASS separately; actualproduction app-only38.17s PASS including retainedpriorflows/confirmation600ms/cancelEscape+Keep/historypreservation/delete/nativeClose/Quit/restart/rootsearch/privacy. Author216units/10newbrowser25.2s and55existingbrowser1.2m PASS.21ownedUIpatch90bdfe8bb0cf793fb037951efcf7bb9323f2fd4034b2e34992a81f5eaf31c161 reconciled;14component+4actual captures/source/backend/production assertions independentlyclean after uncertaintyandtypenarrowingfixes. FullNodeTypeScript/scoped18lintPASS. apps/desktop/evidence/notes-delete-application.md. Signedpublication/currentheadCI/configuredreviews/normalmergepending; fullU1/D1/nativeAT/desktop/release acceptance remains pending.",
+        "29October2026 confirmed single-note permanent deletion integrated via PR66 https://github.com/ianwijma/linuxcast/pull/66, merge42afa6ba397f77f079fc057ac2c2f9f3d08d87cc; exact reviewed signed head9fabb9091026a9f8d8ec506ed883034b65eb20b6 locally verified. Current-head CI40827432097 validate PASS13s; no requested/submitted GitHub reviews/comments/threads; normal expected-head merge. Primary clean develop fast-forwarded and production build69rendererassets PASS. All reviewed UI/boundary/production hashes preserved; no whole U1/native/session/AT/release acceptance promoted."
       ],
       "owner": "coordinator and manifest_review_sol (GPT-6.1 SOL/high)",
       "branch": "codex/notes-permanent-delete",
       "limitations": [
         "Implementation in progress under user-authorized reviewed/tested unfinished application increments. F2-01 accepted; reviewed shared UI/primitives reused while broader D1-02/nativeAT acceptance remains unfinished. No prerequisite completion inferred.",
-        "Recoverable Trash/restore, saved revision review/restore-as-draft and root Notes search/exact navigation are integrated in PR62/63/64 with reviewed bounded application evidence. One-note permanent deletion is locally reviewed/tested, awaiting signed integration; Empty Trash/bulk deletion and attachments remain required. Registered Quick note integrated PR61, archive PR60, export PR58 with bounded evidence. Full Markdown import/roundtrip/native chooser, U1-01, Debian13 GNOME/KDE Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance pending. Unacknowledged edits may be lost on forced crash; private SQLite is unencrypted. No full completion claim.",
+        "Recoverable Trash/restore, saved revision review/restore-as-draft and root Notes search/exact navigation are integrated in PR62/63/64 with reviewed bounded application evidence. One-note permanent deletion is integrated PR66 with bounded actual owner/application evidence; Empty Trash/bulk deletion and attachments remain required. Registered Quick note integrated PR61, archive PR60, export PR58 with bounded evidence. Full Markdown import/roundtrip/native chooser, U1-01, Debian13 GNOME/KDE Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance pending. Unacknowledged edits may be lost on forced crash; private SQLite is unencrypted. No full completion claim.",
         "Root Notes provider and exact selected-note application navigation are integrated in PR64 after Trash PR62 and saved revisions PR63. Actual owner/application/private-Xvfb checks pass; this remains partial acceptance. Full local1.0 provider/ranking/UI/nativeAT/desktop/performance/package/release acceptance remains required; local Notes queries now cross only named local broker/owner search and never enter provider traffic, command-use history or logs."
       ]
     },

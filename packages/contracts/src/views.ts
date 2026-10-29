@@ -12,6 +12,7 @@ export const assetReferenceSchema = z.discriminatedUnion('kind', [
 ]);
 export const iconReferenceSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('builtin'), name: id }),
+  z.strictObject({ kind: z.literal('glyph'), value: z.string().min(1).max(128).refine(value=>value.length<=128&&!/[\p{Cc}\p{Cs}\p{Bidi_Control}]/u.test(value)&&new TextEncoder().encode(value).length<=128&&Array.from(value).length<=32) }),
   ...assetReferenceSchema.options,
 ]);
 export const previewReferenceSchema = z.discriminatedUnion('kind', [
