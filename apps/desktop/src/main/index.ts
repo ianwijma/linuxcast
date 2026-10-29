@@ -1,3 +1,5 @@
+import {getEmoji,getEmojiGroups} from '../../../../packages/builtins/emoji/src/data.ts';
+import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
 import {createNotesWorkspace} from './notes.ts';
 import {RateConversionService} from './rate-service.ts';
 import {fetchFrankfurterRate} from './rate-http.ts';
@@ -34,6 +36,7 @@ const rates=new RateConversionService({
 startResidentShell({ resourcesDirectory: __dirname,rates,
   prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
+  emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100})},
   quicklinks:{
     async chooseExport(record){
       const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.webContents.getURL()===APP_URL);if(!owner)throw new Error('Export window unavailable.');

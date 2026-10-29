@@ -93,6 +93,12 @@
       "apps/desktop/src/features/launcher/tests/notes-routing.test.ts",
       "packages/notes/tests/launcher-open.test.ts",
       "packages/notes/tests/delete-controller.test.ts"
+    ],
+    "L2-06": [
+      "packages/builtins/emoji/tests/search.test.ts",
+      "packages/builtins/emoji/tests/presentation.test.ts",
+      "apps/desktop/src/features/launcher/tests/emoji-routing.test.ts",
+      "packages/ui/src/views/glyph.test.tsx"
     ]
   },
   "contracts": {
@@ -162,6 +168,9 @@
       "packages/contracts/tests/notes.contract.test.ts",
       "packages/contracts/tests/notes-export.contract.test.ts",
       "packages/contracts/tests/notes-launcher.contract.test.ts"
+    ],
+    "L2-06": [
+      "packages/contracts/tests/emoji.contract.test.ts"
     ]
   },
   "ui": {
@@ -207,6 +216,9 @@
       "apps/desktop/src/features/launcher/tests/notes-search.ui.test.ts",
       "packages/notes/tests/launcher-open.ui.test.ts",
       "packages/notes/tests/delete.ui.test.ts"
+    ],
+    "L2-06": [
+      "packages/builtins/emoji/tests/emoji.ui.test.ts"
     ]
   },
   "integration": {
@@ -278,6 +290,9 @@
       "packages/storage/tests/notes.integration.test.ts",
       "apps/desktop/tests/notes.integration.test.ts",
       "packages/storage/tests/notes-root-search.integration.test.ts"
+    ],
+    "L2-06": [
+      "apps/desktop/tests/emoji.integration.test.ts"
     ]
   },
   "security": {
@@ -374,6 +389,13 @@
       "apps/desktop/src/main/notes-launcher-ipc.test.ts",
       "apps/desktop/src/main/notes-open-ipc.test.ts",
       "apps/desktop/src/preload/notes.test.ts"
+    ],
+    "L2-06": [
+      "apps/desktop/src/main/emoji-ipc.test.ts",
+      "apps/desktop/src/preload/emoji.test.ts",
+      "apps/desktop/src/preload/api.test.ts",
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/main/clipboard-write.test.ts"
     ]
   },
   "perf": {}

@@ -23,6 +23,7 @@ function Image({ asset, host, description }: { asset: Asset; host: ViewHost; des
   return source && failed !== source ? <img className="lc-view-image" src={source} alt={description} onError={() => setFailed(source)} /> : <span className="lc-image-unavailable" role="img" aria-label={`${description}: image unavailable`}>▧<span>Image unavailable</span></span>;
 }
 function Icon({ icon, host }: { icon?: ActionModel['icon'] | undefined; host: ViewHost }) {
+  if(icon?.kind==='glyph')return <span aria-hidden="true" className="lc-result-icon">{icon.value}</span>;
   if (icon && icon.kind !== 'builtin') return <span aria-hidden="true" className="lc-result-icon"><Image asset={icon} host={host} description="" /></span>;
   // Fixed host vocabulary. Unknown names get an inert generic icon, never markup.
   const symbols: Record<string, string> = { file: '▤', folder: '▱', search: '⌕', star: '☆', settings: '⚙', link: '↗', copy: '▣' };

@@ -40,6 +40,7 @@
         "@linuxcast/calculator": "workspace:*",
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/data-controls": "workspace:*",
+        "@linuxcast/emoji": "workspace:*",
         "@linuxcast/file-search": "workspace:*",
         "@linuxcast/notes": "workspace:*",
         "@linuxcast/quicklinks": "workspace:*",
@@ -70,6 +71,14 @@
       "version": "0.1.0",
       "dependencies": {
         "@js-temporal/polyfill": "0.5.1",
+        "@linuxcast/contracts": "workspace:*",
+        "@linuxcast/ui": "workspace:*",
+      },
+    },
+    "packages/builtins/emoji": {
+      "name": "@linuxcast/emoji",
+      "version": "0.1.0",
+      "dependencies": {
         "@linuxcast/contracts": "workspace:*",
         "@linuxcast/ui": "workspace:*",
       },
@@ -450,6 +459,8 @@
     "@linuxcast/data-controls": ["@linuxcast/data-controls@workspace:packages/data-controls"],
 
     "@linuxcast/desktop": ["@linuxcast/desktop@workspace:apps/desktop"],
+
+    "@linuxcast/emoji": ["@linuxcast/emoji@workspace:packages/builtins/emoji"],
 
     "@linuxcast/file-index": ["@linuxcast/file-index@workspace:packages/file-index"],
 
