@@ -351,7 +351,8 @@
       "apps/desktop/src/notes-preload/api.test.ts",
       "apps/desktop/src/main/notes-export-ipc.test.ts",
       "apps/desktop/src/main/notes-export-file.test.ts",
-      "apps/desktop/src/main/notes-quick-note-ipc.test.ts"
+      "apps/desktop/src/main/notes-quick-note-ipc.test.ts",
+      "packages/storage/tests/notes-client.test.ts"
     ]
   },
   "perf": {}
