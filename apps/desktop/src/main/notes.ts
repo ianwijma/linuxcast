@@ -1,7 +1,9 @@
-import {BrowserWindow,ipcMain,nativeTheme,screen,session} from 'electron';
+import {BrowserWindow,dialog,ipcMain,nativeTheme,screen,session} from 'electron';
 import {join} from 'node:path';
 import {NOTES_APPEARANCE,NOTES_CLOSE_REQUESTED,NOTES_CLOSE_FINISHED,notesCloseFinishedSchema} from '../../../../packages/contracts/src/notes.ts';
 import type {NotesActions} from './notes-ipc.ts';
+import {registerNotesExportIpc} from './notes-export-ipc.ts';
+import {saveNoteMarkdown} from './notes-export-file.ts';
 import {registerNotesIpc} from './notes-ipc.ts';
 import {NOTES_URL} from './assets.ts';
 import {trustedAppSender} from './ipc.ts';
@@ -14,13 +16,16 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  const finish=(value:boolean)=>{const pending=attempt;attempt=undefined;if(pending){clearTimeout(pending.timer);pending.resolve(value);}};
  const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
  const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
- const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,appearance,list:options.list,get:options.get,write:options.write,
-  close(){if(window&&alive(window)){approvedClose=true;window.close();}},
+ const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),appearance,list:options.list,get:options.get,write:options.write,
+  close(){if(window&&alive(window)&&!exporter.busy()){approvedClose=true;window.close();}},
+ });
+ const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:api.isWriting,get:options.get,publish:saveNoteMarkdown,
+  async choose(record){const owner=window;if(!owner||!alive(owner))return null;const choice=await dialog.showSaveDialog(owner,{title:'Export note — unencrypted Markdown',defaultPath:`linuxcast-note-${record.id}.md`,buttonLabel:'Save unencrypted Markdown',filters:[{name:'Markdown',extensions:['md']}],properties:['createDirectory']});if(!alive(owner)||owner.webContents.getURL()!==NOTES_URL)throw new Error('Notes export owner changed.');return choice.canceled||!choice.filePath?null:choice.filePath;},
  });
  const updated=()=>{if(window&&alive(window)){window.setBackgroundColor(tokens.themes[appearance()].background);if(window.webContents.getURL()===NOTES_URL)window.webContents.send(NOTES_APPEARANCE,appearance());}};
  nativeTheme.on('updated',updated);
  const requestClose=():Promise<boolean>=>{
-  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(attempt?.owner===owner)return attempt.promise;
+  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(exporter.busy())return Promise.resolve(false);if(attempt?.owner===owner)return attempt.promise;
   if(owner.webContents.getURL()!==NOTES_URL)return Promise.resolve(false);
   let resolve!:(value:boolean)=>void;const promise=new Promise<boolean>(done=>{resolve=done;});
   attempt={id:++sequence,owner,promise,resolve,timer:setTimeout(()=>finish(false),15000)};
@@ -32,7 +37,7 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
   if(!parsed.data.allowClose)finish(false);
   return {ok:true};
  });
- const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);api.remove();ipcMain.removeHandler(NOTES_CLOSE_FINISHED);finish(false);};
+ const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);api.remove();exporter?.remove();ipcMain.removeHandler(NOTES_CLOSE_FINISHED);finish(false);};
  return {
   async open(){
    if(stopped||stopping)throw new Error('Notes are unavailable.');if(creating)await creating;
@@ -47,7 +52,7 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
    })().finally(()=>{creating=undefined;});return creating;
   },
   prepareClose:requestClose,
-  stop(){return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Notes close preflight is incomplete.');await api.drain();dispose();})();},
-  async terminate(){dispose();if(window&&!window.isDestroyed())window.destroy();await creating?.catch(()=>{});await api.drain();},
+  stop(){return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Notes close preflight is incomplete.');await Promise.all([api.drain(),exporter?.drain()]);dispose();})();},
+  async terminate(){dispose();if(window&&!window.isDestroyed())window.destroy();await creating?.catch(()=>{});await Promise.all([api.drain(),exporter?.drain()]);},
  };
 }

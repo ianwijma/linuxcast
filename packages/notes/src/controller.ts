@@ -1,10 +1,11 @@
+import {noteExportReplySchema} from '@linuxcast/contracts';
 import { emptyNoteDocument, noteContentKey, noteContentSchema, notesListReplySchema, notesListRequestSchema, notesReadReplySchema, notesWriteReplySchema } from '@linuxcast/contracts';
 import type { NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList } from '@linuxcast/contracts';
 
 type Pending={id:string;done:Promise<boolean>;finish:(ok:boolean)=>void;cancel:AbortController};
 export interface NotesState {
  query:string; rows:NoteSummary[]; cursor:NotesList['nextCursor']; listing:boolean; listError?:string|undefined;
- id?:string|undefined; content?:NoteContent|undefined; record?:NoteRecord|undefined; busy:boolean; reading:boolean; closing:boolean;
+ id?:string|undefined; content?:NoteContent|undefined; record?:NoteRecord|undefined; busy:boolean; reading:boolean; closing:boolean; exporting:boolean;
  error?:string|undefined; message?:string|undefined; blocked:boolean; paused:boolean; reloadConfirm:boolean; closeFailed:boolean;
 }
 const copy=<T,>(value:T):T=>structuredClone(value);
@@ -14,8 +15,8 @@ async function bounded<T>(promise:Promise<T>,signal?:AbortSignal):Promise<T>{
  return await new Promise<T>((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('deadline')),5000);const abort=()=>{clearTimeout(timer);reject(new Error('cancelled'));};signal?.addEventListener('abort',abort,{once:true});promise.then(value=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);resolve(value);},()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);reject(new Error('unavailable'));});if(signal?.aborted)abort();});
 }
 export class NotesController {
- #api:NotesApi; #state:NotesState={query:'',rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
- #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false;
+ #api:NotesApi; #state:NotesState={query:'',rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
+ #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined;
  constructor(api:NotesApi){this.#api=api;}
  get snapshot(){return this.#state;} subscribe=(listener:()=>void)=>{this.#listeners.add(listener);return()=>{this.#listeners.delete(listener);};};
  #publish(patch:Partial<NotesState>){this.#state={...this.#state,...patch};for(const listener of this.#listeners)listener();}
@@ -35,7 +36,7 @@ export class NotesController {
   }catch{if(this.#active&&generation===this.#listGeneration)this.#publish({listing:false,listError:'Notes could not be loaded. Retry the local search.'});}
  }
  async select(id:string){
-  if(!this.#active||this.#state.reading||this.#state.closing||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
+  if(!this.#active||this.#state.reading||this.#state.closing||this.#state.exporting||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
   if(!await this.flush()||!this.#active||generation!==this.#navigation)return;
   this.#publish({reading:true,error:undefined});if(!this.#active||generation!==this.#navigation)return;
   try{const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(id)));if(!this.#active||generation!==this.#navigation)return;
@@ -44,13 +45,13 @@ export class NotesController {
   }catch{if(this.#active&&generation===this.#navigation)this.#publish({reading:false,error:'This note is unavailable. Reload the list and choose the note again.'});}
  }
  async newNote(){
-  if(!this.#active||this.#new||this.#state.reading||this.#state.closing)return;this.#new=true;const generation=++this.#navigation;
+  if(!this.#active||this.#new||this.#state.reading||this.#state.closing||this.#state.exporting)return;this.#new=true;const generation=++this.#navigation;
   try{if(!await this.flush()||!this.#active||generation!==this.#navigation)return;const id=crypto.randomUUID();this.#publish({id,record:undefined,content:{title:'Untitled note',document:emptyNoteDocument()},blocked:false,paused:false,error:undefined,message:undefined});if(this.#active&&generation===this.#navigation&&this.#state.id===id)await this.#write('draft');}finally{this.#new=false;}
  }
  editTitle(title:string){if(this.#state.content)this.#edit({...this.#state.content,title});}
  editDocument(document:NoteDocument){if(this.#state.content)this.#edit({...this.#state.content,document});}
  inputError(message:string){if(this.#active)this.#publish({error:message});}
- #edit(content:NoteContent){if(!this.#active||this.#state.reading||this.#state.closing||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
+ #edit(content:NoteContent){if(!this.#active||this.#state.reading||this.#state.closing||this.#state.exporting||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
  async #write(action:'draft'|'save'):Promise<boolean>{
   if(!this.#active||this.#state.closing||this.#pending||this.#state.blocked||!this.#state.id||!this.#state.content)return false;
   const valid=noteContentSchema.safeParse(this.#state.content);if(!valid.success){this.#publish({error:'Use a nonblank title of at most 256 UTF-8 bytes and a supported note body of at most 64 KiB.',paused:true});return false;}
@@ -72,7 +73,7 @@ export class NotesController {
   if(!await this.#write('draft'))return false;return this.dirty?await this.flush():true;
  }
  save():Promise<boolean>{if(this.#save)return this.#save;this.#save=this.#saveNow().finally(()=>{this.#save=undefined;});return this.#save;}
- async #saveNow(){clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#state.blocked||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
+ async #saveNow(){clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#state.blocked||this.#state.exporting||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
  retry(){if(this.#active&&!this.#state.blocked){this.#publish({paused:false});return this.flush();}return Promise.resolve(false);}
  confirmReload(){if(this.#active&&this.#state.id&&!this.#pending)this.#publish({reloadConfirm:true});}
  cancelReload(){if(this.#active)this.#publish({reloadConfirm:false});}
@@ -83,9 +84,24 @@ export class NotesController {
    this.#publish({record:result.data.value??undefined,reading:false,blocked:false,paused:true,error:undefined,message:'Stored state loaded. Your local edits are retained. Review them, then choose Retry draft or Save; no write was replayed.'});
   }catch{if(this.#active&&generation===this.#navigation)this.#publish({reading:false,error:'Stored state could not be confirmed. Local edits remain; try Reload stored note again.'});}
  }
+ exportMarkdown():Promise<boolean>{if(this.#export)return this.#export;const operation=Promise.resolve().then(()=>this.#exportNow()).finally(()=>{if(this.#export===operation)this.#export=undefined;});this.#export=operation;return operation;}
+ async #exportNow():Promise<boolean>{
+  if(!this.#active||this.#state.closing||this.#state.reading||this.#state.exporting||this.#state.blocked||this.#new||!this.#state.id||!this.#api.exportMarkdown)return false;
+  this.#publish({exporting:true,error:undefined,message:'Preparing Markdown export…'});
+  try{
+   if(!this.#active||this.#state.closing||!await this.flush()||!this.#active||this.#state.closing||!this.#state.record||this.dirty)return false;
+   const selection={id:this.#state.id!,revision:this.#state.record.revision};
+   this.#publish({message:'Choose a location for the unencrypted Markdown file.'});if(!this.#active||this.#state.closing||this.#state.id!==selection.id)return false;
+   const result=noteExportReplySchema.safeParse(await this.#api.exportMarkdown(selection));if(!this.#active||this.#state.id!==selection.id)return false;
+   if(!result.success||result.data.ok&&(result.data.value.id!==selection.id||result.data.value.revision!==selection.revision))throw new Error('Unconfirmed export.');
+   if(!result.data.ok){this.#publish({message:undefined,error:!['invalid-request','conflict','capability-unavailable','cancelled','permission-denied'].includes(result.data.error.code)?'The export could not be confirmed. Check the selected file before trying again. Your note remains stored.':result.data.error.code==='conflict'?'The note changed or the filename exists. Reload the note or choose an unused filename.':'Markdown export did not complete. Keep your note and choose another location or reopen Notes.'});return false;}
+   this.#publish({error:undefined,message:result.data.value.outcome==='exported'?'Markdown exported. The file is unencrypted.':'Export cancelled. Your note remains stored.'});return true;
+  }catch{if(this.#active)this.#publish({message:undefined,error:'The export could not be confirmed. Check the selected file before trying again. Your note remains stored.'});return false;}
+  finally{if(this.#active)this.#publish({exporting:false});}
+ }
  requestClose():Promise<boolean>{if(this.#close)return this.#close;this.#close=this.#closeNow(false).finally(()=>{this.#close=undefined;});return this.#close;}
  closeWithoutFlush(){if(this.#close)return this.#close;this.#close=this.#closeNow(true).finally(()=>{this.#close=undefined;});return this.#close;}
- async #closeNow(skip:boolean){if(!this.#active)return false;if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active)return false;
+ async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active)return false;
   this.#publish({closing:true});if(!this.#active)return false;try{await bounded(this.#api.close());return true;}catch{if(this.#active)this.#publish({closing:false,closeFailed:true,error:'The Notes window could not close. Keep editing or retry closing.'});return false;}
  }
  keepEditing(){if(this.#active)this.#publish({closeFailed:false});}

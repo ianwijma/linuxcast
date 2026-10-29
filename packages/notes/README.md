@@ -1,4 +1,4 @@
-# Notes create/edit application increment
+# Notes application increments
 
 `Notes({api: NotesApi})` is the actual Tiptap 3.32.0 OSS workspace, exported named
 and default from `src/index.tsx`. It uses shared host Button/TextField/ThemeProvider
@@ -35,6 +35,27 @@ Disposed/late/reentrant completions cannot start new writes or replace content.
 No renderer localStorage, note history, content logging, external requests,
 arbitrary HTML or generic IPC is added. Local SQLite is not encrypted at rest.
 
+## Explicit Markdown export
+
+Export Markdown flushes the latest draft without Save, then invokes a named
+id/revision-only main API. Main derives the stored content, asks for a native
+unencrypted file destination and revalidates the exact owner/draft before private
+exclusive publication. Existing names are refused. Pending export freezes editing,
+Save and navigation; Close/Quit require finishing or cancelling it. Cancellation
+preserves the note. Unknown outcomes require checking the selected file and never
+replay automatically. The UI/file notice discloses plaintext, LF normalization,
+font/color/layout/undo loss and multiline inline-code plain-text fallback.
+
+Matching MIT Tiptap Markdown3.32.0 and marked17.0.6 are pinned. Twelve bounded
+serializer fixtures check selected text/task preservation through its reader;
+full import/roundtrip acceptance is pending and its Markdown API is beta.
+The follow-on passes 202 mapped unit,13 contract,51 security,19 browser and8
+integration cases. The actual private Electron/SQLite scenario passes7.37s;
+only the native chooser choice is instrumented. Seven new affected public
+captures are inspected. See
+[application evidence](../../apps/desktop/evidence/notes-markdown-export-application.md)
+and [increment boundary](MARKDOWN-EXPORT-INCREMENT.md).
+
 ## Author verification — 29 October 2026
 
 Linux amd64, Node 24.22.1, Bun 1.4.4, installed Chromium via Playwright:
@@ -65,8 +86,9 @@ Save verified separately. Fixture requests are observed against synthetic
 in-memory data, **not** SQLite/crash/native-close evidence.
 
 This supports partial U1-01-AC01 recovery presentation, U1-01-UI and PRIVACY only.
-Coordinator production persistence/crash/restart integration remains separate.
+Coordinator production persistence/crash/restart evidence is recorded separately in
+apps/desktop/evidence/notes-create-edit-application.md and the export evidence above.
 U1-01-AC02 Markdown roundtrip is not implemented or accepted. Pin/archive/trash/
-restore/revision restore/export, root Notes provider, Quicknote and full native
+restore/revision restore, root Notes provider, Quicknote and full native
 Debian GNOME/KDE Wayland/X11/AT/session/performance/package/release acceptance
 remain required. Reviewed primitives do not establish full D1-02 acceptance.
