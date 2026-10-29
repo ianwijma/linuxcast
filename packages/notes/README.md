@@ -104,9 +104,58 @@ its request observer is not SQLite, native-close or restart evidence.
 This increment contributes partial U1-01-UI/PRIVACY and preserves the bounded
 AC01 recovery boundary. Coordinator owner migration/CAS/filter/native workspace
 and production reopen evidence remains separate. Full import/Markdown roundtrip,
-archive/trash/restore/revision restore/attachments, Quicknote/root provider,
+trash/trash restore/revision restore/attachments, Quicknote/root provider,
 Debian GNOME/KDE Wayland/X11/native AT/session/performance/package/release and
 all complete U1 acceptance remain required; no whole-task completion is claimed.
+
+## Archive/Restore and archive filtering — 29 October 2026
+
+Archive note flushes the latest draft without Save, then invokes the optional
+named metadata API. Restore note and Pin/Unpin on an archived note skip content
+writes. Exact receipts require ID, revision +1, the requested flag, unchanged other
+flag, draft/saved content and creation/modification times. One admitted metadata
+intent serializes Pin/Archive against editing, Save, export, navigation and Close;
+post-publication and post-flush checks prevent reentrant dispatch. Missing or
+known-refused capabilities give actionable manual retry. Uncertain receipts block
+writes until confirmed fresh Reload; no metadata operation replays automatically.
+
+Show archived notes requests archived-only rows from the owner; unchecked means
+active-only. It is independent of Pinned only. Both normalized echoes and every
+row are checked before publishing; filter changes reset cursor/generation. Archive
+can remove a row from Active while retaining its readonly editor. Title, task
+checkboxes, formatting, slash commands and Save cannot change archived content.
+Restore retains any local edits without sending them: the user reviews and
+explicitly retries the draft or Saves. Archived Pin is likewise metadata-only.
+
+Bounded author verification on Linux amd64 / Node24.22.1 / Bun1.4.4:
+
+- 92 focused unit cases: 85 controller and seven retained export cases. The 29
+  additions cover archive/filter identities, exact/forged receipts, shared pending
+  ownership, refusal/unknown/timeout, retained edits and no replay.
+- 32 real Tiptap Chromium cases: 25 retained and seven new Archive/Restore,
+  filters, readonly live-slash, pending/known/unknown/missing-capability cases.
+  Tested readonly states pass axe. Keyboard filters, held keys and the retained
+  IME paths remain covered; 200% checks bound reachable Archive/Restore controls.
+- Owned Notes typecheck with the existing CSS declaration, scoped ESLint,
+  plan integrity and whitespace checks pass. Full repository typecheck on this
+  frozen author base awaits coordinator-owned main/storage fixtures receiving
+  the required archived field; those paths are outside this lane.
+
+Commands use the explicit Notes unit/browser selections and existing configs
+listed above. Thirteen affected public captures are inspected: both themes
+readonly editor, archive+pin filters and restored editor; dark pending, known
+refusal and 200%; light unknown, retained readonly, restored local edits and
+missing capability. The unknown error is captured after normal editor scrolling,
+with its bounds asserted. Unrelated regenerated historical PNGs are restored.
+The fixture clearly labels synthetic in-memory persistence and observed requests;
+these checks do not establish native/SQLite/restart behaviour.
+
+This supplies partial U1-01-UI/PRIVACY and preserves bounded AC01 recovery
+presentation. Coordinator production persistence/native-close/restart evidence is
+separate. Full AC02 import/Markdown roundtrip, Trash/trash restore/revision restore,
+attachments, root Notes provider, Quicknote and Debian GNOME/KDE Wayland/X11/AT,
+session/performance/package/release acceptance remain required. This increment
+neither completes U1-01 nor establishes full D1-02 acceptance.
 
 ## Earlier create/edit author verification — 29 October 2026
 
@@ -140,7 +189,7 @@ in-memory data, **not** SQLite/crash/native-close evidence.
 This supports partial U1-01-AC01 recovery presentation, U1-01-UI and PRIVACY only.
 Coordinator production persistence/crash/restart evidence is recorded separately in
 apps/desktop/evidence/notes-create-edit-application.md and the export evidence above.
-U1-01-AC02 Markdown roundtrip is not implemented or accepted. Archive/trash/
-restore/revision restore, root Notes provider, Quicknote and full native
+U1-01-AC02 Markdown roundtrip is not implemented or accepted. Trash/
+trash restore/revision restore, root Notes provider, Quicknote and full native
 Debian GNOME/KDE Wayland/X11/AT/session/performance/package/release acceptance
 remain required. Reviewed primitives do not establish full D1-02 acceptance.

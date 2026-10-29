@@ -1,11 +1,11 @@
-import {noteExportReplySchema,notePinSchema} from '@linuxcast/contracts';
+import {noteExportReplySchema,notePinSchema,noteArchiveSchema} from '@linuxcast/contracts';
 import { emptyNoteDocument, noteContentKey, noteContentSchema, notesListReplySchema, notesListRequestSchema, notesReadReplySchema, notesWriteReplySchema } from '@linuxcast/contracts';
 import type { NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList } from '@linuxcast/contracts';
 
 type Pending={id:string;done:Promise<boolean>;finish:(ok:boolean)=>void;cancel:AbortController};
 export interface NotesState {
- query:string; pinnedOnly:boolean; rows:NoteSummary[]; cursor:NotesList['nextCursor']; listing:boolean; listError?:string|undefined;
- id?:string|undefined; content?:NoteContent|undefined; record?:NoteRecord|undefined; busy:boolean; reading:boolean; closing:boolean; exporting:boolean; pinning:boolean;
+ query:string; pinnedOnly:boolean; showArchived:boolean; rows:NoteSummary[]; cursor:NotesList['nextCursor']; listing:boolean; listError?:string|undefined;
+ id?:string|undefined; content?:NoteContent|undefined; record?:NoteRecord|undefined; busy:boolean; reading:boolean; closing:boolean; exporting:boolean; pinning:boolean; archiving:boolean;
  error?:string|undefined; message?:string|undefined; blocked:boolean; paused:boolean; reloadConfirm:boolean; closeFailed:boolean;
 }
 const copy=<T,>(value:T):T=>structuredClone(value);
@@ -15,46 +15,48 @@ async function bounded<T>(promise:Promise<T>,signal?:AbortSignal):Promise<T>{
  return await new Promise<T>((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('deadline')),5000);const abort=()=>{clearTimeout(timer);reject(new Error('cancelled'));};signal?.addEventListener('abort',abort,{once:true});promise.then(value=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);resolve(value);},()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);reject(new Error('unavailable'));});if(signal?.aborted)abort();});
 }
 export class NotesController {
- #api:NotesApi; #state:NotesState={query:'',pinnedOnly:false,rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,pinning:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
- #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #pin:Promise<boolean>|undefined;
+ #api:NotesApi; #state:NotesState={query:'',pinnedOnly:false,showArchived:false,rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,pinning:false,archiving:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
+ #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #metadata:Promise<boolean>|undefined;
  constructor(api:NotesApi){this.#api=api;}
  get snapshot(){return this.#state;} subscribe=(listener:()=>void)=>{this.#listeners.add(listener);return()=>{this.#listeners.delete(listener);};};
  #publish(patch:Partial<NotesState>){this.#state={...this.#state,...patch};for(const listener of this.#listeners)listener();}
+ get #metadataBusy(){return this.#state.pinning||this.#state.archiving;}
  get dirty(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.draft);}
  get unsaved(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.saved);}
  start(){void this.reloadList();}
- setQuery(query:string){if(!this.#active||this.#pin||this.#state.pinning)return;this.#listGeneration++;clearTimeout(this.#searchTimer);this.#publish({query,cursor:null});this.#searchTimer=setTimeout(()=>void this.reloadList(),150);}
- setPinnedOnly(pinnedOnly:boolean){if(!this.#active||this.#pin||this.#state.pinning||typeof pinnedOnly!=='boolean'||pinnedOnly===this.#state.pinnedOnly)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({pinnedOnly,rows:[],cursor:null,listError:undefined});void this.reloadList();}
+ setQuery(query:string){if(!this.#active||this.#metadata||this.#metadataBusy)return;this.#listGeneration++;clearTimeout(this.#searchTimer);this.#publish({query,cursor:null});this.#searchTimer=setTimeout(()=>void this.reloadList(),150);}
+ setPinnedOnly(pinnedOnly:boolean){if(!this.#active||this.#metadata||this.#metadataBusy||typeof pinnedOnly!=='boolean'||pinnedOnly===this.#state.pinnedOnly)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({pinnedOnly,rows:[],cursor:null,listError:undefined});void this.reloadList();}
+ setShowArchived(showArchived:boolean){if(!this.#active||this.#metadata||this.#metadataBusy||typeof showArchived!=='boolean'||showArchived===this.#state.showArchived)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showArchived,rows:[],cursor:null,listError:undefined});void this.reloadList();}
  async reloadList(more=false){
-  if(!this.#active)return;const query=this.#state.query,pinnedOnly=this.#state.pinnedOnly,cursor=more?this.#state.cursor:null;if(more&&!cursor)return;
-  const input={query,...(pinnedOnly?{pinnedOnly:true}:{}),...(cursor?{cursor}: {})};if(!notesListRequestSchema.safeParse(input).success){this.#publish({listing:false,listError:'Search is limited to 256 UTF-8 bytes.'});return;}
+  if(!this.#active)return;const query=this.#state.query,pinnedOnly=this.#state.pinnedOnly,archived=this.#state.showArchived,cursor=more?this.#state.cursor:null;if(more&&!cursor)return;
+  const input={query,...(archived?{archived:true}:{}),...(pinnedOnly?{pinnedOnly:true}:{}),...(cursor?{cursor}: {})};if(!notesListRequestSchema.safeParse(input).success){this.#publish({listing:false,listError:'Search is limited to 256 UTF-8 bytes.'});return;}
   const generation=++this.#listGeneration;this.#publish({listing:true,listError:undefined});if(!this.#active||generation!==this.#listGeneration)return;
   try{const parsed=notesListReplySchema.safeParse(await bounded(this.#api.list(input)));if(!this.#active||generation!==this.#listGeneration)return;
-   if(!parsed.success||!parsed.data.ok||parsed.data.value.query!==query||(parsed.data.value.pinnedOnly??false)!==pinnedOnly||pinnedOnly&&parsed.data.value.records.some(row=>!row.pinned))throw new Error('invalid');const value=parsed.data.value;
+   if(!parsed.success||!parsed.data.ok||parsed.data.value.query!==query||(parsed.data.value.pinnedOnly??false)!==pinnedOnly||(parsed.data.value.archived??false)!==archived||parsed.data.value.records.some(row=>row.archived!==archived)||pinnedOnly&&parsed.data.value.records.some(row=>!row.pinned))throw new Error('invalid');const value=parsed.data.value;
    if(value.nextCursor){const last=value.records.at(-1);if(!last||last.id!==value.nextCursor.id||last.updatedAt!==value.nextCursor.updatedAt)throw new Error('cursor');}
    const rows=more?[...this.#state.rows,...value.records]:value.records;if(new Set(rows.map(row=>row.id)).size!==rows.length)throw new Error('duplicate');
    this.#publish({rows,cursor:value.nextCursor,listing:false,listError:undefined});
   }catch{if(this.#active&&generation===this.#listGeneration)this.#publish({listing:false,listError:'Notes could not be loaded. Retry the local search.'});}
  }
  async select(id:string){
-  if(!this.#active||this.#pin||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.pinning||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
-  if(!await this.flush()||!this.#active||generation!==this.#navigation||this.#pin||this.#state.pinning||this.#state.exporting||this.#state.closing)return;
-  this.#publish({reading:true,error:undefined});if(!this.#active||generation!==this.#navigation||this.#pin||this.#state.pinning||this.#state.exporting||this.#state.closing)return;
+  if(!this.#active||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||this.#new||id===this.#state.id)return;const generation=++this.#navigation;
+  if(!await this.flush()||!this.#active||generation!==this.#navigation||this.#metadata||this.#metadataBusy||this.#state.exporting||this.#state.closing)return;
+  this.#publish({reading:true,error:undefined});if(!this.#active||generation!==this.#navigation||this.#metadata||this.#metadataBusy||this.#state.exporting||this.#state.closing)return;
   try{const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(id)));if(!this.#active||generation!==this.#navigation)return;
    if(!result.success||!result.data.ok||result.data.value?.id!==id)throw new Error('missing');const record=result.data.value;
    this.#publish({id,record,content:copy(record.draft),reading:false,blocked:false,paused:false,reloadConfirm:false,error:undefined,message:key(record.draft)!==key(record.saved)?'Recovered draft. Save explicitly to replace the last saved version.':undefined});
   }catch{if(this.#active&&generation===this.#navigation)this.#publish({reading:false,error:'This note is unavailable. Reload the list and choose the note again.'});}
  }
  async newNote(){
-  if(!this.#active||this.#pin||this.#new||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.pinning)return;this.#new=true;const generation=++this.#navigation;
+  if(!this.#active||this.#metadata||this.#new||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy)return;this.#new=true;const generation=++this.#navigation;
   try{if(!await this.flush()||!this.#active||generation!==this.#navigation)return;const id=crypto.randomUUID();this.#publish({id,record:undefined,content:{title:'Untitled note',document:emptyNoteDocument()},blocked:false,paused:false,error:undefined,message:undefined});if(this.#active&&generation===this.#navigation&&this.#state.id===id)await this.#write('draft');}finally{this.#new=false;}
  }
  editTitle(title:string){if(this.#state.content)this.#edit({...this.#state.content,title});}
  editDocument(document:NoteDocument){if(this.#state.content)this.#edit({...this.#state.content,document});}
  inputError(message:string){if(this.#active)this.#publish({error:message});}
- #edit(content:NoteContent){if(!this.#active||this.#pin||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.pinning||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
+ #edit(content:NoteContent){if(!this.#active||this.#state.record?.archived||this.#metadata||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||!this.#state.id)return;if(noteContentSchema.safeParse(content).success&&noteContentSchema.safeParse(this.#state.content).success&&key(content)===key(this.#state.content))return;clearTimeout(this.#timer);this.#publish({content:copy(content),error:this.#state.blocked?this.#state.error:undefined,message:undefined});if(!this.#active||this.#state.blocked||this.#state.paused)return;this.#timer=setTimeout(()=>void this.flush(),500);}
  async #write(action:'draft'|'save'):Promise<boolean>{
-  if(!this.#active||this.#state.closing||this.#pending||this.#state.blocked||!this.#state.id||!this.#state.content)return false;
+  if(!this.#active||this.#state.record?.archived||this.#state.closing||this.#pending||this.#state.blocked||!this.#state.id||!this.#state.content)return false;
   const valid=noteContentSchema.safeParse(this.#state.content);if(!valid.success){this.#publish({error:'Use a nonblank title of at most 256 UTF-8 bytes and a supported note body of at most 64 KiB.',paused:true});return false;}
   const id=this.#state.id,content=copy(valid.data),record=this.#state.record,expectedRevision=record?.revision??0;
   let finish!:(ok:boolean)=>void;const done=new Promise<boolean>(resolve=>{finish=resolve;});const pending:Pending={id,done,finish,cancel:new AbortController()};this.#pending=pending;
@@ -62,7 +64,7 @@ export class NotesController {
   if(!this.#current(pending)){if(this.#pending===pending)this.#pending=undefined;finish(false);if(this.#active)this.#publish({busy:false});return false;}
   try{const reply=notesWriteReplySchema.safeParse(await bounded(this.#api.write({id,expectedRevision,action,content}),pending.cancel.signal));if(!this.#current(pending))return false;
    if(!reply.success)throw new Error('receipt');if(!reply.data.ok){const code=reply.data.error.code;if(['invalid-request','capability-unavailable','permission-denied'].includes(code)){this.#publish({paused:true,error:'The note was not accepted. Check the title and body or restore the Notes capability, then retry explicitly.',message:undefined});return false;}throw new Error('unknown');}
-   const value=reply.data.value;if(value.id!==id||value.revision!==expectedRevision+1||value.pinned!==(record?.pinned??false)||key(value.draft)!==key(content)||key(value.saved)!==(action==='save'?key(content):key(record?.saved))||record&&value.createdAt!==record.createdAt)throw new Error('receipt');
+   const value=reply.data.value;if(value.id!==id||value.revision!==expectedRevision+1||value.pinned!==(record?.pinned??false)||value.archived!==(record?.archived??false)||key(value.draft)!==key(content)||key(value.saved)!==(action==='save'?key(content):key(record?.saved))||record&&value.createdAt!==record.createdAt)throw new Error('receipt');
    this.#publish({record:value,paused:false,error:undefined,message:action==='save'?'Saved version updated.':undefined});void this.reloadList();return true;
   }catch{if(this.#current(pending))this.#publish({blocked:true,paused:true,error:failed,message:undefined});return false;}
   finally{const current=this.#pending===pending;if(current)this.#pending=undefined;const ok=this.#active&&!this.#state.blocked&&!this.#state.paused&&this.#state.id===id&&key(this.#state.record?.draft)===key(content);finish(ok);if(current&&this.#active)this.#publish({busy:false});}
@@ -70,41 +72,51 @@ export class NotesController {
  #current(pending:Pending){return this.#active&&!this.#state.closing&&this.#pending===pending&&this.#state.id===pending.id&&!pending.cancel.signal.aborted;}
  async flush():Promise<boolean>{
   clearTimeout(this.#timer);if(!this.#active)return false;if(this.#pending&&!await this.#pending.done)return false;
-  if(this.#state.blocked)return false;if(!this.dirty)return true;
+  if(this.#state.blocked)return false;if(!this.dirty)return true;if(this.#state.record?.archived){this.#publish({error:'Restore this note to review and store retained local edits before navigating or closing.'});return false;}
   if(!await this.#write('draft'))return false;return this.dirty?await this.flush():true;
  }
  save():Promise<boolean>{if(this.#save)return this.#save;this.#save=this.#saveNow().finally(()=>{this.#save=undefined;});return this.#save;}
- async #saveNow(){if(this.#pin||this.#state.pinning)return false;clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#pin||this.#state.blocked||this.#state.exporting||this.#state.pinning||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
- retry(){if(this.#active&&!this.#pin&&!this.#state.pinning&&!this.#state.blocked){this.#publish({paused:false});return this.flush();}return Promise.resolve(false);}
- confirmReload(){if(this.#active&&!this.#pin&&!this.#state.pinning&&this.#state.id&&!this.#pending)this.#publish({reloadConfirm:true});}
+ async #saveNow(){if(this.#state.record?.archived||this.#metadata||this.#metadataBusy)return false;clearTimeout(this.#timer);if(this.#pending&&!await this.#pending.done)return false;if(!this.#active||this.#metadata||this.#state.blocked||this.#state.exporting||this.#metadataBusy||!this.#state.content)return false;if(!this.unsaved)return true;return await this.#write('save');}
+ retry(){if(this.#active&&!this.#state.record?.archived&&!this.#metadata&&!this.#metadataBusy&&!this.#state.blocked){this.#publish({paused:false});return this.flush();}return Promise.resolve(false);}
+ confirmReload(){if(this.#active&&!this.#metadata&&!this.#metadataBusy&&this.#state.id&&!this.#pending)this.#publish({reloadConfirm:true});}
  cancelReload(){if(this.#active)this.#publish({reloadConfirm:false});}
  async reconcile(){
-  if(!this.#active||this.#pin||!this.#state.reloadConfirm||!this.#state.id||this.#state.pinning||this.#pending)return;const id=this.#state.id,generation=++this.#navigation;clearTimeout(this.#timer);this.#publish({reading:true,reloadConfirm:false});if(!this.#active||generation!==this.#navigation)return;
+  if(!this.#active||this.#metadata||!this.#state.reloadConfirm||!this.#state.id||this.#metadataBusy||this.#pending)return;const id=this.#state.id,generation=++this.#navigation;clearTimeout(this.#timer);this.#publish({reading:true,reloadConfirm:false});if(!this.#active||generation!==this.#navigation)return;
   try{const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(id)));if(!this.#active||generation!==this.#navigation||this.#state.id!==id)return;
    if(!result.success||!result.data.ok||result.data.value&&result.data.value.id!==id||!result.data.value&&this.#state.record)throw new Error('read');
-   this.#publish({record:result.data.value??undefined,reading:false,blocked:false,paused:true,error:undefined,message:'Stored state loaded. Your local edits are retained. Review them, then choose Retry draft or Save; no write was replayed.'});
+   this.#publish({record:result.data.value??undefined,reading:false,blocked:false,paused:true,error:undefined,message:'Stored state loaded. Your local edits are retained. Review them, then choose Retry draft or Save; no write was replayed.'});void this.reloadList();
   }catch{if(this.#active&&generation===this.#navigation)this.#publish({reading:false,error:'Stored state could not be confirmed. Local edits remain; try Reload stored note again.'});}
  }
- setPinned(pinned:boolean):Promise<boolean>{if(this.#pin)return this.#pin;if(!this.#active||typeof pinned!=='boolean'||!this.#api.setPinned||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#export||this.#close||this.#new)return Promise.resolve(false);const generation=++this.#navigation;const operation=Promise.resolve().then(()=>this.#pinNow(pinned,generation)).finally(()=>{if(this.#pin===operation)this.#pin=undefined;});this.#pin=operation;return operation;}
- async #pinNow(pinned:boolean,generation:number):Promise<boolean>{
-  if(!this.#active||generation!==this.#navigation||typeof pinned!=='boolean'||!this.#api.setPinned||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.pinning||this.#new)return false;
-  const id=this.#state.id;this.#publish({pinning:true,error:undefined,message:'Preparing pin change…'});
+ setPinned(pinned:boolean):Promise<boolean>{return this.#admitMetadata('pin',pinned);}
+ setArchived(archived:boolean):Promise<boolean>{return this.#admitMetadata('archive',archived);}
+ #admitMetadata(kind:'pin'|'archive',desired:boolean):Promise<boolean>{
+  if(this.#metadata)return this.#metadata;
+  if(!this.#active||typeof desired!=='boolean'||!(kind==='pin'?this.#api.setPinned:this.#api.setArchived)||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#export||this.#close||this.#new)return Promise.resolve(false);
+  const generation=++this.#navigation;const operation=Promise.resolve().then(()=>this.#changeMetadata(kind,desired,generation)).finally(()=>{if(this.#metadata===operation)this.#metadata=undefined;});this.#metadata=operation;return operation;
+ }
+ async #changeMetadata(kind:'pin'|'archive',desired:boolean,generation:number):Promise<boolean>{
+  if(!this.#active||generation!==this.#navigation||!(kind==='pin'?this.#api.setPinned:this.#api.setArchived)||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#metadataBusy||this.#new)return false;
+  const id=this.#state.id,noun=kind==='pin'?'pin':'archive';clearTimeout(this.#timer);this.#publish({pinning:kind==='pin',archiving:kind==='archive',error:undefined,message:`Preparing ${noun} change…`});
   let pending:Pending|undefined,accepted=false;
   try{
-   if(!this.#active||this.#state.closing||!await this.flush()||!this.#active||this.#state.closing||this.#state.id!==id||generation!==this.#navigation||!this.#state.record||this.dirty)return false;
-   const record=copy(this.#state.record),input=notePinSchema.parse({id,expectedRevision:record.revision,pinned});
-   let finish!:(ok:boolean)=>void;const done=new Promise<boolean>(resolve=>{finish=resolve;});pending={id:input.id,done,finish,cancel:new AbortController()};this.#pending=pending;
-   this.#publish({busy:true,message:pinned?'Pinning note…':'Unpinning note…'});if(!this.#current(pending)||generation!==this.#navigation||!this.#state.pinning)return false;
-   const result=notesWriteReplySchema.safeParse(await bounded(this.#api.setPinned(input),pending.cancel.signal));if(!this.#current(pending)||generation!==this.#navigation||!this.#state.pinning)return false;
-   if(!result.success)throw new Error('receipt');if(!result.data.ok){if(['invalid-request','capability-unavailable','permission-denied','cancelled'].includes(result.data.error.code)){this.#publish({message:undefined,error:'The pin change was not accepted. Reload the stored note or reconnect Notes, then retry explicitly.'});return false;}throw new Error('unknown');}
-   const value=result.data.value;if(value.id!==input.id||value.revision!==record.revision+1||value.pinned!==pinned||key(value.draft)!==key(record.draft)||key(value.saved)!==key(record.saved)||value.createdAt!==record.createdAt||value.updatedAt!==record.updatedAt)throw new Error('receipt');
-   accepted=true;this.#publish({record:value,error:undefined,message:pinned?'Note pinned.':'Note unpinned.'});void this.reloadList();return this.#current(pending);
-  }catch{if(this.#active&&this.#state.id===id)this.#publish({blocked:true,paused:true,message:undefined,error:'The pin change could not be confirmed. It may already be stored. Confirm Reload stored note before another write; nothing will be replayed.'});return false;}
-  finally{if(pending&&this.#pending===pending)this.#pending=undefined;pending?.finish(accepted&&this.#active);if(this.#active)this.#publish({pinning:false,busy:false});}
+   const needsFlush=!this.#state.record.archived&&!(kind==='archive'&&!desired);
+   if(needsFlush){if(!await this.flush())return false;}else if(this.#pending&&!await this.#pending.done)return false;
+   if(!this.#active||this.#state.closing||this.#state.id!==id||generation!==this.#navigation||!this.#state.record||needsFlush&&this.dirty)return false;
+   const record=copy(this.#state.record),selection={id:record.id,expectedRevision:record.revision};
+   const send=kind==='pin'?()=>this.#api.setPinned!(notePinSchema.parse({...selection,pinned:desired})):()=>this.#api.setArchived!(noteArchiveSchema.parse({...selection,archived:desired}));
+   let finish!:(ok:boolean)=>void;const done=new Promise<boolean>(resolve=>{finish=resolve;});pending={id:record.id,done,finish,cancel:new AbortController()};this.#pending=pending;
+   this.#publish({busy:true,message:kind==='pin'?(desired?'Pinning note…':'Unpinning note…'):(desired?'Archiving note…':'Restoring note…')});if(!this.#current(pending)||generation!==this.#navigation||!this.#metadataBusy)return false;
+   const result=notesWriteReplySchema.safeParse(await bounded(send(),pending.cancel.signal));if(!this.#current(pending)||generation!==this.#navigation||!this.#metadataBusy)return false;
+   if(!result.success)throw new Error('receipt');if(!result.data.ok){if(['invalid-request','capability-unavailable','permission-denied','cancelled'].includes(result.data.error.code)){this.#publish({message:undefined,error:`The ${noun} change was not accepted. Reload the stored note or reconnect Notes, then retry explicitly.`});return false;}throw new Error('unknown');}
+   const value=result.data.value;if(value.id!==record.id||value.revision!==record.revision+1||value.pinned!==(kind==='pin'?desired:record.pinned)||value.archived!==(kind==='archive'?desired:record.archived)||key(value.draft)!==key(record.draft)||key(value.saved)!==key(record.saved)||value.createdAt!==record.createdAt||value.updatedAt!==record.updatedAt)throw new Error('receipt');
+   accepted=true;const retained=this.dirty;const message=kind==='pin'?(desired?'Note pinned.':'Note unpinned.'):(desired?'Note archived. Restore it before editing.':'Note restored.');
+   this.#publish({record:value,...(retained?{paused:true}:{}),error:undefined,message:retained?`${message} Retained local edits are unchanged. ${value.archived?'Restore the note before choosing Retry draft or Save.':'Review them, then choose Retry draft or Save.'} No content was replayed.`:message});void this.reloadList();return this.#current(pending);
+  }catch{if(this.#active&&this.#state.id===id)this.#publish({blocked:true,paused:true,message:undefined,error:`The ${noun} change could not be confirmed. It may already be stored. Confirm Reload stored note before another write; nothing will be replayed.`});return false;}
+  finally{if(pending&&this.#pending===pending)this.#pending=undefined;pending?.finish(accepted&&this.#active);if(this.#active)this.#publish({pinning:false,archiving:false,busy:false});}
  }
- exportMarkdown():Promise<boolean>{if(this.#export)return this.#export;if(this.#pin)return Promise.resolve(false);const operation=Promise.resolve().then(()=>this.#exportNow()).finally(()=>{if(this.#export===operation)this.#export=undefined;});this.#export=operation;return operation;}
+ exportMarkdown():Promise<boolean>{if(this.#export)return this.#export;if(this.#metadata)return Promise.resolve(false);const operation=Promise.resolve().then(()=>this.#exportNow()).finally(()=>{if(this.#export===operation)this.#export=undefined;});this.#export=operation;return operation;}
  async #exportNow():Promise<boolean>{
-  if(!this.#active||this.#state.closing||this.#state.reading||this.#state.exporting||this.#state.pinning||this.#state.blocked||this.#new||!this.#state.id||!this.#api.exportMarkdown)return false;
+  if(!this.#active||this.#state.closing||this.#state.reading||this.#state.exporting||this.#metadataBusy||this.#state.blocked||this.#new||!this.#state.id||!this.#api.exportMarkdown)return false;
   this.#publish({exporting:true,error:undefined,message:'Preparing Markdown export…'});
   try{
    if(!this.#active||this.#state.closing||!await this.flush()||!this.#active||this.#state.closing||!this.#state.record||this.dirty)return false;
@@ -120,7 +132,7 @@ export class NotesController {
  requestClose():Promise<boolean>{return this.#beginClose(false);}
  closeWithoutFlush():Promise<boolean>{return this.#beginClose(true);}
  #beginClose(skip:boolean):Promise<boolean>{if(this.#close)return this.#close;let finish!:(ok:boolean)=>void;const operation=new Promise<boolean>(resolve=>{finish=resolve;});this.#close=operation;void this.#closeNow(skip).then(result=>{if(this.#close===operation)this.#close=undefined;finish(result);},()=>{if(this.#close===operation)this.#close=undefined;finish(false);});return operation;}
- async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#pin||this.#state.pinning){this.#publish({error:'Wait for the pin change to finish before closing Notes.'});return false;}if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active||this.#pin||this.#state.pinning||this.#state.exporting)return false;
+ async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#metadata||this.#metadataBusy){this.#publish({error:this.#state.archiving?'Wait for the archive change to finish before closing Notes.':'Wait for the pin change to finish before closing Notes.'});return false;}if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active||this.#metadata||this.#metadataBusy||this.#state.exporting)return false;
   this.#publish({closing:true});if(!this.#active)return false;try{await bounded(this.#api.close());return true;}catch{if(this.#active)this.#publish({closing:false,closeFailed:true,error:'The Notes window could not close. Keep editing or retry closing.'});return false;}
  }
  keepEditing(){if(this.#active)this.#publish({closeFailed:false});}

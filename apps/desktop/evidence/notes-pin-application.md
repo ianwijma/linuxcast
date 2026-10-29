@@ -1,7 +1,10 @@
 # U1-01 — pin/unpin and Pinned filter application increment
 
-29 October 2026. Reviewed/tested follow-on on integrated PR58/develop
-b945289012c53a05a71193f9650df5a12ce06dfc. Coordinator branch codex/notes-pin;
+29 October 2026. Integrated in [PR59](https://github.com/ianwijma/linuxcast/pull/59),
+merge2aa49e540c8be6ea1fba1e0e85e945975fa88542, reviewed signed head
+b25b2f8d9c77f7833d9cc91c342b8726de5ea0dd, CI40800718606 PASS. No requested or
+submitted GitHub reviews/comments/threads. Based on integrated PR58/develop
+b945289012c53a05a71193f9650df5a12ce06dfc. Coordinator codex/notes-pin;
 UI author codex/notes-pin-ui. Full U1-01 and all four acceptance criteria remain
 pending; this is another user-approved small unfinished application increment.
 
