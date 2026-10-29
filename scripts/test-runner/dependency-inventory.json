@@ -1,7 +1,7 @@
 {
   "scope": "F1-01 development dependencies, not the packaged 1.0 SBOM. Missing platform or non-registry manifest metadata has null licenses; re-inventory shipped contents at R1-03.",
   "lockfileSha256": {
-    "bun.lock": "841a02728997bcce777083de5550e247465676d462f2270a55f4eb3ae0dc8ebb",
+    "bun.lock": "752fbdae53f2bcf7270606427f8be26858f003390a2309b3464dba16b5ddfe7b",
     "Cargo.lock": "07693a75d13e9d180b86583aee18c5946fe9eedfc67eb74ba52fe1c8b8fe3031",
     "rust-toolchain.toml": "24ef3b9d3edbd850aa386cb0a98e10450b0030991a4537cb359f54d49dbbb33a"
   },
@@ -518,6 +518,27 @@
       "license": "MIT"
     },
     {
+      "key": "@floating-ui/core",
+      "resolved": "@floating-ui/core@1.8.0",
+      "integrity": "sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@floating-ui/dom",
+      "resolved": "@floating-ui/dom@1.8.0",
+      "integrity": "sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@floating-ui/utils",
+      "resolved": "@floating-ui/utils@0.2.12",
+      "integrity": "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "@fontsource/inter",
       "resolved": "@fontsource/inter@5.3.0",
       "integrity": "sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==",
@@ -721,6 +742,27 @@
       "license": "MIT"
     },
     {
+      "key": "@js-temporal/polyfill",
+      "resolved": "@js-temporal/polyfill@0.5.1",
+      "integrity": "sha512-hloP58zRVCRSpgDxmqCWJNlizAlUgJFqG2ypq79DCvyv9tHjRYMDOcPFjzfl/A1/YxDvRCZz8wvZvmapQnKwFQ==",
+      "manifestMetadataPresent": true,
+      "license": "ISC"
+    },
+    {
+      "key": "@linuxcast/applications",
+      "resolved": "@linuxcast/applications@workspace:packages/builtins/applications",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/calculator",
+      "resolved": "@linuxcast/calculator@workspace:packages/builtins/calculator",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
       "key": "@linuxcast/contracts",
       "resolved": "@linuxcast/contracts@workspace:packages/contracts",
       "integrity": null,
@@ -749,6 +791,20 @@
       "license": null
     },
     {
+      "key": "@linuxcast/file-search",
+      "resolved": "@linuxcast/file-search@workspace:packages/builtins/file-search",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/notes",
+      "resolved": "@linuxcast/notes@workspace:packages/notes",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
       "key": "@linuxcast/permissions",
       "resolved": "@linuxcast/permissions@workspace:packages/permissions",
       "integrity": null,
@@ -758,6 +814,13 @@
     {
       "key": "@linuxcast/platform-contracts",
       "resolved": "@linuxcast/platform-contracts@workspace:packages/platform-contracts",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/quicklinks",
+      "resolved": "@linuxcast/quicklinks@workspace:packages/builtins/quicklinks",
       "integrity": null,
       "manifestMetadataPresent": false,
       "license": null
@@ -784,8 +847,29 @@
       "license": null
     },
     {
+      "key": "@linuxcast/templates",
+      "resolved": "@linuxcast/templates@workspace:packages/templates",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
       "key": "@linuxcast/ui",
       "resolved": "@linuxcast/ui@workspace:packages/ui",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/universal-actions",
+      "resolved": "@linuxcast/universal-actions@workspace:packages/builtins/universal-actions",
+      "integrity": null,
+      "manifestMetadataPresent": false,
+      "license": null
+    },
+    {
+      "key": "@linuxcast/workflows",
+      "resolved": "@linuxcast/workflows@workspace:packages/workflows",
       "integrity": null,
       "manifestMetadataPresent": false,
       "license": null
@@ -1169,6 +1253,216 @@
       "license": "MIT"
     },
     {
+      "key": "@tiptap/core",
+      "resolved": "@tiptap/core@3.32.0",
+      "integrity": "sha512-Ghh2h02GKSqzytQGcLV4espYOG4EHxjj0MsrUB2Vnr47xmlZYRf6r7k2J09H+JpBdaGrWwrTkyBEi5i3c3yy2Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-blockquote",
+      "resolved": "@tiptap/extension-blockquote@3.32.0",
+      "integrity": "sha512-wmuthEdlYVArNoUbqFPH35giutBABFu7fqEB0lTD1k0UXJUs4dFvcbRyGWWgnHFZgP3TT4u8e+xiayYw0eQ0NQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-bold",
+      "resolved": "@tiptap/extension-bold@3.32.0",
+      "integrity": "sha512-SQYewnYDoIBN+8oH53IDcD8p+Pz+Jnyq3hrxjy/FAo5ctc+96d3ZLdqc9gzLVSqFFo/SUINv2FVGoq9PvU7yqw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-bubble-menu",
+      "resolved": "@tiptap/extension-bubble-menu@3.32.0",
+      "integrity": "sha512-X3ll8i9Z8QNvt7+tcqlwopJG+68ugO13Av0Ox4Ico+jXcTnFdDuKQJBSI9sLuMR5vTQOeTHhKYXhjF88aahMSA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-bullet-list",
+      "resolved": "@tiptap/extension-bullet-list@3.32.0",
+      "integrity": "sha512-Y5P/l06pVCUG46vXpBl3z0fW2b6JpSMX4Cvr+5sfQh8zB3TxwSiLQaaPwI3R5MFD1KfRk3AjiPRieEyXdWcNHw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-code",
+      "resolved": "@tiptap/extension-code@3.32.0",
+      "integrity": "sha512-I+aEVl0dTmkfnU6HzBGEefb9U7ja2MkucwBBwrmoMwU+uIKpC4xw8NcHC9X6sjAcom3Pxs2HX+8WEo4Vp13R/Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-code-block",
+      "resolved": "@tiptap/extension-code-block@3.32.0",
+      "integrity": "sha512-9NZW/yXP9j9XKr+hRS5m58xiyZI+tQo1PJ7eLHXjGNFWaF601NG/h6741mbKh5uCY51XsbyqG+7que+RavngPA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-document",
+      "resolved": "@tiptap/extension-document@3.32.0",
+      "integrity": "sha512-GugeKE6AnZDluRXJUNBuX43TPcaJxy5wck6vT2J4a0/EnKStJ43suSZZf1IPfb1ij9EL9bYvAwg9DOcrvdEzTQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-dropcursor",
+      "resolved": "@tiptap/extension-dropcursor@3.32.0",
+      "integrity": "sha512-t4Ug8hFLt30dwwYvrh63BVUt6N1Yg5PVI3tMllhCmN3Q68oD47v4MB/i5nGfzIsQqMyXUOetwHJWcZ4MoLTx4Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-floating-menu",
+      "resolved": "@tiptap/extension-floating-menu@3.32.0",
+      "integrity": "sha512-AzKCWceL+4Q1pTc8Whw1kPqN/aYGPQ70/jXPsblWl501t/pXi6Kz0Pi/NggKkuu73VGjykh68YYf/dcOJ/mPZQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-gapcursor",
+      "resolved": "@tiptap/extension-gapcursor@3.32.0",
+      "integrity": "sha512-HUpKKWJLtthnpQY5LIjHlJJOmh562RusmOMIe/4iP/H7y+WUR9ZFiZjEs1NBkRjig9fwj8F3BfsrVPYBnM4nLA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-hard-break",
+      "resolved": "@tiptap/extension-hard-break@3.32.0",
+      "integrity": "sha512-IKUYvK+bO2hGrDWhhTVg0CSh9C2belWg9GyLzvpyd3SZyQ9EgdccLfoytNjOBKbAE/TQ4Oo3kSP+XF6RsUIKPA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-heading",
+      "resolved": "@tiptap/extension-heading@3.32.0",
+      "integrity": "sha512-XRiZxZuhfjvbgwCvoBHj04gOsPANEXxxRwrFCQVuFi5yeTHYIzMEioc81j6iAH9pV7aQeJCwLxuh6VHNz3dXEQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-horizontal-rule",
+      "resolved": "@tiptap/extension-horizontal-rule@3.32.0",
+      "integrity": "sha512-Iry7ynsG4xgcxnH1cm+uXJnEtUzoop4sGA10NUN9I+08TOjhj/GrDiRKMQHKAiVI/R7t2MVav1MJlxFf2FdzGw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-italic",
+      "resolved": "@tiptap/extension-italic@3.32.0",
+      "integrity": "sha512-KB/i1xoHilbBGcQ+UotDWhi60KpdCde3RzRIpl2na0Yol4z4Fe2IRWg8ljIrlsssDRwel/fsHJbG7a13EP8oKA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-link",
+      "resolved": "@tiptap/extension-link@3.32.0",
+      "integrity": "sha512-DRdQSgWPSEjrDg5EDBB5yxRygHtUVLhceVGzAsTz8RziiFyvcwAvzBHCO9hd9jutjCXQ2DLIuZB8P+aHhFWnpg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-list",
+      "resolved": "@tiptap/extension-list@3.32.0",
+      "integrity": "sha512-QdzS5nFz9agAQhBgIuQluobWib39W2cMKx1XB6tYSue7bHMJdgPFP0EnGfFajaeVX42CG6RXtQWrNfyQGKhBvg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-list-item",
+      "resolved": "@tiptap/extension-list-item@3.32.0",
+      "integrity": "sha512-FdJTCAeALixzyyGSSEmroXmkIEclbo/4t2Pl03aRERqpPOSPJcC3evDtIhLazTuP6v+FjCmJ+pXNql6ov7qitA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-list-keymap",
+      "resolved": "@tiptap/extension-list-keymap@3.32.0",
+      "integrity": "sha512-vXFre18Dk2m5N/gjo408C02GSrolZ8ZIf0wz6/U8lNC4FcYOISgZFj3BND6uabVntGh2GCSPrVFuNpVPhFnn/A==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-ordered-list",
+      "resolved": "@tiptap/extension-ordered-list@3.32.0",
+      "integrity": "sha512-htZ5hoMLBkGiDP6M5mGemjOoaBmkrj911wiGoTmMMKzO7qJq9QxUBkLY7ILPaKlUWL8U3ccLdDV2TB/nysp4Jg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-paragraph",
+      "resolved": "@tiptap/extension-paragraph@3.32.0",
+      "integrity": "sha512-afKLMc7fWMkkar9H5FilizStSbhFzUoCzdwwdZf6DDsn3LUt8tJlFHACK78cAyx/TzMJBo0N8/8T1u9bL+N67Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-strike",
+      "resolved": "@tiptap/extension-strike@3.32.0",
+      "integrity": "sha512-J9Vw6wmh/wV6SxSsN9RhurvAGcXSY5J3p4EQrROD5PARBl0VOnDFi7/UVoz1RkSdqOKPgAiqDZpaLRgtdBO9Rg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-task-item",
+      "resolved": "@tiptap/extension-task-item@3.32.0",
+      "integrity": "sha512-lClO5QlqCtsYSmbVbFUXsazBgF91vPEHLVehWT7YaED1Uh/EYyKsa+Y/BuS9+y2rhl7Nx4I6iamlTAr3PQBdnw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-task-list",
+      "resolved": "@tiptap/extension-task-list@3.32.0",
+      "integrity": "sha512-9GK67dL0tjmVJd7S1vTg+3FO02nsci6GrFbrI0E1GXe9kRnhMDEy6L9uf3fJzmCSAHkRfiVHVRCDw6Zc3V+F8g==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-text",
+      "resolved": "@tiptap/extension-text@3.32.0",
+      "integrity": "sha512-sF0jIK67IHdZMnzv2mz5vPTyK7R0ui6/YZgFg+/bLnFCNmweVAoYcHZLlC7ISRnwu0mqJr+epNtzJepY1ZDCjg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extension-underline",
+      "resolved": "@tiptap/extension-underline@3.32.0",
+      "integrity": "sha512-rMLdd4vg6sed/JnaXnaupLbCtYiWikTnQ8qir9ItKOXwf1Ui9P1Y4G0bYU4+gcnMsFzaSGtrOhMqG4/c66AogQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/extensions",
+      "resolved": "@tiptap/extensions@3.32.0",
+      "integrity": "sha512-qO+ndNvlOjzU2MWCtQHoRg1tIortCXLvqPjDx58F1pUYFNCOVZegXi+jqLGDODUA31er+TVz66umzRbbN1bO1Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/pm",
+      "resolved": "@tiptap/pm@3.32.0",
+      "integrity": "sha512-H9eN+xHFboJybE7KPGVsu24S8aBlCIgYz38vCHRSnNv17nwmqm06owq/IQ5scza0n3Y7IfUfpgPOtm9SgeHmNQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/react",
+      "resolved": "@tiptap/react@3.32.0",
+      "integrity": "sha512-+iS9RKj6Ve8SXqJ49xptDiifF7PQXmUOh4cjMu+BCXXqKphQkiUccvbWYAeOJCTceM01wWgFhrpfy8qG+CHJYw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@tiptap/starter-kit",
+      "resolved": "@tiptap/starter-kit@3.32.0",
+      "integrity": "sha512-aPYxaevci4PgMrTLsg+baiqI7M1ICd4V9H+zTTdrqs8OUZIbAvj/pNDuHU8uWZyKMu3Dh72t2D6ZdqRu/6aSWw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "@tootallnate/once",
       "resolved": "@tootallnate/once@2.0.1",
       "integrity": "sha512-HqmEUIGRJ5fSXchkVgR5F7qn48bDBzv0kWj/Kfu5e6uci4UlEeng4331LnBkWffb++Ei3FOVLxo8JJWMFBDMeQ==",
@@ -1361,6 +1655,13 @@
       "key": "@types/unist",
       "resolved": "@types/unist@3.0.3",
       "integrity": "sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "@types/use-sync-external-store",
+      "resolved": "@types/use-sync-external-store@0.0.6",
+      "integrity": "sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -2583,6 +2884,13 @@
       "license": "MIT"
     },
     {
+      "key": "fast-equals",
+      "resolved": "fast-equals@5.4.5",
+      "integrity": "sha512-yKEpcFuRPu/pTQL2VB8YKE2yFldrLlIsoWtJeBnAdqEhvu21OgkFT0C8njf/xYc2LSZGEr3K9JGjthHJxnVLvQ==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "fast-glob",
       "resolved": "fast-glob@3.3.3",
       "integrity": "sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==",
@@ -3164,6 +3472,13 @@
       "license": "MIT"
     },
     {
+      "key": "jsbi",
+      "resolved": "jsbi@4.3.2",
+      "integrity": "sha512-9fqMSQbhJykSeii05nxKl4m6Eqn2P6rOlYiS+C5Dr/HPIU/7yZxu5qzbs40tgaFORiw2Amd0mirjxatXYMkIew==",
+      "manifestMetadataPresent": true,
+      "license": "Apache-2.0"
+    },
+    {
       "key": "jsdom",
       "resolved": "jsdom@30.1.3",
       "integrity": "sha512-hQMUPvRgN7KxsfIytDQji7bimuJeRQa6Qo5+iuiZQk5CafeRxLIA10/cG5YCBFNpD9RO3oqIiN4CO1Y44kxqXg==",
@@ -3309,6 +3624,13 @@
       "integrity": "sha512-Amq9B/SoZYdDi1kFrojnoqPLxYhQ4Wo5XiL8EVJrVsB8ARoC1PWW6VGtT0WKCemjy8aC+louJnjS7U18x3b06Q==",
       "manifestMetadataPresent": false,
       "license": null
+    },
+    {
+      "key": "linkifyjs",
+      "resolved": "linkifyjs@4.4.0",
+      "integrity": "sha512-InTexvtbai+2c+dEVGcc6O6P2DMVIiwD9a/i4zFroazOIYLOS6FSVmAJ7kFeumnCMx6/gQqNAkbUvgMubV4+MA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
     },
     {
       "key": "listr2",
@@ -3920,6 +4242,13 @@
       "license": "MIT"
     },
     {
+      "key": "orderedmap",
+      "resolved": "orderedmap@2.1.1",
+      "integrity": "sha512-TvAWxi0nDe1j/rtMcWcIj94+Ffe6n7zhow33h40SKxmsmozs6dz/e+EajymfoFcHd7sxNn8yHM8839uixMOV6g==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "os-tmpdir",
       "resolved": "os-tmpdir@1.0.2",
       "integrity": "sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==",
@@ -4186,6 +4515,97 @@
       "license": "MIT"
     },
     {
+      "key": "prosemirror-changeset",
+      "resolved": "prosemirror-changeset@2.4.4",
+      "integrity": "sha512-Gyuz9jYdrAeA9I7AholyOes9KUmv/lEwsC5O9s5xF5VB3EgTPsXMGUxz4+H1B+wKVPdZbvRcg1Cp3x8qX+8ofA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-commands",
+      "resolved": "prosemirror-commands@1.7.2",
+      "integrity": "sha512-q6Q6szxqdu9Xd6EcdKsqXghu5nQdZTpB4Q9yd04WRc7/jt763e/rT60Owh0L1GYY+T46o5rD+9lEN36dZS43tw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-dropcursor",
+      "resolved": "prosemirror-dropcursor@1.8.4",
+      "integrity": "sha512-VmKxhcA6a+h5oPSYmfF1ZNeQqPbyYaIxqZsKqeYCyTlPtrjUgNaHL3P8vVaO19oqAV0zuaM/axkowZHrB1P3Tg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-gapcursor",
+      "resolved": "prosemirror-gapcursor@1.4.1",
+      "integrity": "sha512-pMdYaEnjNMSwl11yjEGtgTmLkR08m/Vl+Jj443167p9eB3HVQKhYCc4gmHVDsLPODfZfjr/MmirsdyZziXbQKw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-history",
+      "resolved": "prosemirror-history@1.5.1",
+      "integrity": "sha512-onlwnqKvgtFg6srZOmDOAhlAy1FIHQpOExORybX0S+DvJepE5tPALrB9iGet/2sqqqrelSnB10OoiOJqAvu2DA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-inputrules",
+      "resolved": "prosemirror-inputrules@1.5.1",
+      "integrity": "sha512-7wj4uMjKaXWAQ1CDgxNzNtR9AlsuwzHfdFH1ygEHA2KHF2DOEaXl1CJfNPAKCg9qNEh4rum975QLaCiQPyY6Fw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-keymap",
+      "resolved": "prosemirror-keymap@1.2.3",
+      "integrity": "sha512-4HucRlpiLd1IPQQXNqeo81BGtkY8Ai5smHhKW9jjPKRc2wQIxksg7Hl1tTI2IfT2B/LgX6bfYvXxEpJl7aKYKw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-model",
+      "resolved": "prosemirror-model@1.25.12",
+      "integrity": "sha512-Ue2gTmXMa7EhpLNhC7J+h4+ykD8ha12K6rrZFFKKJHBForfIStw5gJ6Zrf1mqqAa9NmpmEB4wp9bKmA4eUVjWg==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-schema-list",
+      "resolved": "prosemirror-schema-list@1.5.1",
+      "integrity": "sha512-927lFx/uwyQaGwJxLWCZRkjXG0p48KpMj6ueoYiu4JX05GGuGcgzAy62dfiV8eFZftgyBUvLx76RsMe20fJl+Q==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-state",
+      "resolved": "prosemirror-state@1.4.4",
+      "integrity": "sha512-6jiYHH2CIGbCfnxdHbXZ12gySFY/fz/ulZE333G6bPqIZ4F+TXo9ifiR86nAHpWnfoNjOb3o5ESi7J8Uz1jXHw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-tables",
+      "resolved": "prosemirror-tables@1.8.5",
+      "integrity": "sha512-V/0cDCsHKHe/tfWkeCmthNUcEp1IVO3p6vwN8XtwE9PZQLAZJigbw3QoraAdfJPir4NKJtNvOB8oYGKRl+t0Dw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-transform",
+      "resolved": "prosemirror-transform@1.12.4",
+      "integrity": "sha512-2/WuPum3pn+O/Vi2vzpi8210ICUe2kIPXdLYjQ09Pv5DtT5bcKWMJhAKPBwvpPjpp5iOYUVwVEr0gOM1BY1Mgw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "prosemirror-view",
+      "resolved": "prosemirror-view@1.42.8",
+      "integrity": "sha512-ftDZjCs9AjAekXmCfJRn2U3IdlRCl0Yc4tZT1/jJWCsz4DiSifEBXtWmpJpw/4f1Rg328uAUQ+u2lCJ0+AVZkw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
       "key": "pump",
       "resolved": "pump@3.0.4",
       "integrity": "sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==",
@@ -4385,6 +4805,13 @@
       "key": "rollup",
       "resolved": "rollup@4.65.0",
       "integrity": "sha512-QVCvQUTGDN6JRwi3jVGCY3H4aTHvi9rX0LyoBMkGUvdh/Z6O51CzcLz85BWZaTCDGhl6ySGqYZs+xI1jmPqGcw==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "rope-sequence",
+      "resolved": "rope-sequence@1.3.4",
+      "integrity": "sha512-UT5EDe2cu2E/6O4igUr5PSFs23nvvukicWHx6GnOPlHAiiYbzNuCRQCuiUdHJQcqKalLKlrYJnjY0ySGsXNQXQ==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },
@@ -4994,6 +5421,13 @@
       "key": "vitest",
       "resolved": "vitest@4.1.12",
       "integrity": "sha512-5eWdz2yb3ajxWF3C8C4TjkXl7FGm3n2E/VlazALrQHzK7nYMSGFnCZto0bbPNl77AwkOZVLk0YnBAejUu0NiWA==",
+      "manifestMetadataPresent": true,
+      "license": "MIT"
+    },
+    {
+      "key": "w3c-keyname",
+      "resolved": "w3c-keyname@2.2.8",
+      "integrity": "sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==",
       "manifestMetadataPresent": true,
       "license": "MIT"
     },

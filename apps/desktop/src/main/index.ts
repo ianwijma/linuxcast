@@ -1,3 +1,4 @@
+import {createNotesWorkspace} from './notes.ts';
 import {RateConversionService} from './rate-service.ts';
 import {fetchFrankfurterRate} from './rate-http.ts';
 import {RATE_ENDPOINT} from '@linuxcast/contracts';
@@ -15,6 +16,7 @@ import { startResidentShell } from './shell.ts';
 import { startStorage } from '../services/storage.ts';
 import { APP_URL } from './assets.ts';
 
+let notes:ReturnType<typeof createNotesWorkspace>|undefined;
 let workflowEditor:ReturnType<typeof createWorkflowEditorWorkspace>|undefined;
 let fileSearch:ReturnType<typeof createFileSearchWorkspace>|undefined;
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
@@ -30,7 +32,7 @@ const rates=new RateConversionService({
  fetch:fetchFrankfurterRate,
 });
 startResidentShell({ resourcesDirectory: __dirname,rates,
-  prepareQuit:async()=>workflowEditor?workflowEditor.prepareClose():true,
+  prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
   quicklinks:{
     async chooseExport(record){
@@ -81,6 +83,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
   loadWorkflowCommands:async()=>{if(!storage?.isReady())throw new Error('Workflow commands unavailable.');return storage.repository.request('workflows.editor.get',{});},
   openWorkflowEntry:async(selection,trusted)=>{if(!workflowEditor)throw new Error('Workflow editor unavailable.');await workflowEditor.open(selection,trusted);},
   openWorkflowEditor:async()=>{if(!workflowEditor)throw new Error('Workflow editor unavailable.');await workflowEditor.open();},
+  openNotes:async()=>{if(!notes)throw new Error('Notes unavailable.');await notes.open();},
   openFileSearch:async()=>{if(!fileSearch)throw new Error('File search unavailable.');await fileSearch.open();},
   openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
@@ -96,6 +99,12 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
     write:input=>currentStorage.repository.request('workflows.editor.write',input),
   });
   const currentWorkflow=workflowEditor;
+  notes=createNotesWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
+    list:input=>currentStorage.repository.request('notes.list',input,{timeoutMs:2000}),
+    get:id=>currentStorage.repository.request('notes.get',{id},{timeoutMs:2000}),
+    write:input=>currentStorage.repository.request('notes.write',input,{timeoutMs:2000}),
+  });
+  const currentNotes=notes;
   const controls=new DataControls(currentStorage.repository);
   const fileService=createFileSearchService({
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
@@ -121,7 +130,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
   });
   const currentSettings=dataSettings;
   // Index jobs and data operations must finish while their sole repository owner is still alive.
-  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop()]);await currentStorage.stop();},
-    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate()]);await currentStorage.terminate();}};
-  return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow];
+  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop()]);await currentStorage.stop();},
+    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate()]);await currentStorage.terminate();}};
+  return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow,currentNotes];
 } });

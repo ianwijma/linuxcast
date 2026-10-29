@@ -18,7 +18,8 @@
     "@linuxcast/universal-actions": "workspace:*",
     "@linuxcast/quicklinks": "workspace:*",
     "@linuxcast/workflows": "workspace:*",
-    "zod": "4.6.7"
+    "zod": "4.6.7",
+    "@linuxcast/notes": "workspace:*"
   },
   "devDependencies": {
     "electron": "45.0.0",

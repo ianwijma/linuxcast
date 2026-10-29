@@ -80,6 +80,12 @@
     ],
     "W2-03": [
       "apps/desktop/src/features/workflows/debugger/tests/controller.test.ts"
+    ],
+    "U1-01": [
+      "packages/notes/tests/controller.test.ts",
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "packages/search/tests/search.test.ts",
+      "apps/desktop/src/features/launcher/tests/catalogue.test.ts"
     ]
   },
   "contracts": {
@@ -143,6 +149,9 @@
     ],
     "W1-02": [
       "packages/contracts/tests/workflow-run.contract.test.ts"
+    ],
+    "U1-01": [
+      "packages/contracts/tests/notes.contract.test.ts"
     ]
   },
   "ui": {
@@ -180,6 +189,9 @@
     ],
     "W2-03": [
       "apps/desktop/src/features/workflows/debugger/tests/run-panel.ui.test.ts"
+    ],
+    "U1-01": [
+      "packages/notes/tests/notes.ui.test.ts"
     ]
   },
   "integration": {
@@ -244,6 +256,10 @@
     ],
     "W2-03": [
       "apps/desktop/tests/workflow-launcher.integration.test.ts"
+    ],
+    "U1-01": [
+      "packages/storage/tests/notes.integration.test.ts",
+      "apps/desktop/tests/notes.integration.test.ts"
     ]
   },
   "security": {
@@ -326,6 +342,10 @@
     ],
     "W2-03": [
       "apps/desktop/src/main/workflow-intent-ipc.test.ts"
+    ],
+    "U1-01": [
+      "apps/desktop/src/main/notes-ipc.test.ts",
+      "apps/desktop/src/notes-preload/api.test.ts"
     ]
   },
   "perf": {}

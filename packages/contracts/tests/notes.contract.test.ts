@@ -1,0 +1,19 @@
+import {expect,it} from 'vitest';
+import {emptyNoteDocument,noteDocumentSchema,notePlainText,noteContentKey,noteWriteSchema,notesListRequestSchema} from '../src/notes.ts';
+it('accepts the closed rich Tiptap grammar with tasks and literal Unicode search projection',()=>{
+ const value={type:'doc',content:[{type:'heading',attrs:{level:2},content:[{type:'text',text:'Public 雪',marks:[{type:'bold'}]}]},{type:'taskList',content:[{type:'taskItem',attrs:{checked:true},content:[{type:'paragraph',content:[{type:'text',text:'<script>literal</script>'}]}]}]},{type:'orderedList',attrs:{start:2,type:null},content:[{type:'listItem',content:[{type:'paragraph'}]}]},{type:'codeBlock',attrs:{language:null},content:[{type:'text',text:'public()'}]}]};
+ const document=noteDocumentSchema.parse(value);expect(notePlainText(document)).toBe('Public 雪\n<script>literal</script>\n\npublic()');expect(noteDocumentSchema.parse(emptyNoteDocument())).toEqual(emptyNoteDocument());
+});
+it.each(['image','iframe','html','script','link','table','unknown'])('rejects unapproved %s nodes and content authority',type=>{expect(noteDocumentSchema.safeParse({type:'doc',content:[{type,attrs:{src:'https://private.invalid/'}}]}).success).toBe(false);});
+it('rejects arbitrary attributes, URLs, malformed structural content and control payloads',()=>{
+ for(const content of [[{type:'paragraph',attrs:{style:'color:red'}}],[{type:'paragraph',content:[{type:'text',text:'public',marks:[{type:'link',attrs:{href:'javascript:private'}}]}]}],[{type:'heading',attrs:{level:4}}],[{type:'bulletList',content:[{type:'paragraph'}]}],[{type:'taskList',content:[{type:'taskItem',attrs:{checked:'yes'},content:[{type:'paragraph'}]}]}],[{type:'paragraph',content:[{type:'text',text:'a\0b'}]}],[{type:'paragraph',content:[{type:'text',text:'\ud800'}]}]])expect(noteDocumentSchema.safeParse({type:'doc',content}).success).toBe(false);
+});
+it('bounds bytes, graph depth and cycles before recursive consumers',()=>{
+ const text=(value:string)=>({type:'doc',content:[{type:'paragraph',content:[{type:'text',text:value}]}]});expect(noteDocumentSchema.safeParse(text('é'.repeat(32768))).success).toBe(true);expect(noteDocumentSchema.safeParse(text('é'.repeat(32769))).success).toBe(false);
+ const deep:{type:string;content:unknown[]}={type:'blockquote',content:[]};deep.content=[deep];expect(noteDocumentSchema.safeParse({type:'doc',content:[deep]}).success).toBe(false);expect(noteDocumentSchema.safeParse({type:'doc',content:Array.from({length:2049},()=>({type:'paragraph'}))}).success).toBe(false);
+});
+it('keeps exact content under stable object ordering, with strict write and query identities',()=>{
+ const first={title:'Public',document:emptyNoteDocument()},other={document:{content:[{type:'paragraph'}],type:'doc' as const},title:'Public'};expect(noteContentKey(first)).toBe(noteContentKey(other));
+ const input={id:'11111111-1111-4111-8111-111111111111',expectedRevision:0,action:'draft',content:first};expect(noteWriteSchema.safeParse(input).success).toBe(true);for(const value of [{...input,path:'/private'},{...input,action:'delete'},{...input,expectedRevision:-1},{...input,content:{...first,text:'caller index'}}])expect(noteWriteSchema.safeParse(value).success).toBe(false);
+ expect(notesListRequestSchema.safeParse({query:'Public',sql:'SELECT private'}).success).toBe(false);
+});
