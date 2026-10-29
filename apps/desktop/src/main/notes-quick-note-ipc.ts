@@ -45,7 +45,7 @@ export function registerQuickNoteIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,
    return operation;
   },
   committed(input:NoteWrite,record:NoteRecord){
-   const attempt=pending;if(!attempt?.sent||!active()||!ownerValid(attempt.owner)||input.action!=='draft'||input.expectedRevision!==0||record.revision!==1||record.saved!==null||record.archived||record.pinned)return;
+   const attempt=pending;if(!attempt?.sent||!active()||!ownerValid(attempt.owner)||input.action!=='draft'||input.expectedRevision!==0||record.revision!==1||record.saved!==null||record.archived||record.trashed||record.pinned)return;
    if(noteContentKey(record.draft)!==noteContentKey({title:'Untitled note',document:emptyNoteDocument()}))return;
    attempt.created=true;
   },

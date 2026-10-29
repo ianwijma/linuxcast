@@ -14,7 +14,7 @@ function fixture(){
  const actions={contents:()=>owner,active:()=>true,ready:()=>true,closeBusy:()=>false,exportBusy:()=>false,open:vi.fn(async()=>{})};
  const api=registerQuickNoteIpc({handle:(channel,handler)=>handlers.set(channel,handler),removeHandler:channel=>handlers.delete(channel)},actions,100);cleanups.push(api.remove);
  const invoke=(channel:string,payload:unknown={protocolVersion:1},sender=event)=>Promise.resolve(handlers.get(channel)!(sender,payload));
- const committed=()=>{const input:NoteWrite={id:randomUUID(),expectedRevision:0,action:'draft',content:{title:'Untitled note',document:emptyNoteDocument()}};const record:NoteRecord={id:input.id,documentVersion:1,revision:1,pinned:false,archived:false,draft:input.content,saved:null,createdAt:'2026-10-29T00:00:00.000Z',updatedAt:'2026-10-29T00:00:00.000Z'};api.committed(input,record);return {input,record};};
+ const committed=()=>{const input:NoteWrite={id:randomUUID(),expectedRevision:0,action:'draft',content:{title:'Untitled note',document:emptyNoteDocument()}};const record:NoteRecord={id:input.id,documentVersion:1,revision:1,pinned:false,archived:false,trashed:false,draft:input.content,saved:null,createdAt:'2026-10-29T00:00:00.000Z',updatedAt:'2026-10-29T00:00:00.000Z'};api.committed(input,record);return {input,record};};
  return {api,actions,frame,contents,event,send,handlers,invoke,committed,replace:(value:WebContents|undefined)=>{owner=value;}};
 }
 it('waits for the registered receiver, sends once, and confirms only an observed initial owner draft',async()=>{

@@ -1,6 +1,9 @@
 # U1-01 — registered Quick note application increment
 
-29 October 2026; based on integrated PR60/develop
+29 October 2026; integrated in PR61 https://github.com/ianwijma/linuxcast/pull/61,
+merge f00984e09b08adbccd9c37ca7a5f5d46b2f1c596; exact reviewed signed head
+ad062ae3032cb4dafb4aaef7ca99bf9186be2a24, CI40805621008 validate PASS.
+No requested/submitted GitHub reviews/comments/threads. Based on PR60/develop
 b79f9ddbc1f690bdd87920d5a4487319c86b35a2. Coordinator codex/notes-quick-note;
 UI author codex/notes-quick-note-ui. User-authorized reviewed/tested unfinished
 application increment, not full U1/D1/native desktop/AT/release acceptance.
@@ -84,8 +87,9 @@ Debian13 GNOME/KDE Wayland/X11/native AT/session/performance/package acceptance.
   main Quick IPCdb7e9e93e7a0ca6550eed4fd1def6e698b3322155e3ac697109337015b4e0948.
   Copied coordinator contract/freeze unchanged. Independent backend, UI, actual
   scenario and all nine new capture reviews clean; all actionable findings closed.
-  Final render/plan/status/diff checks PASS. Current-head CI/configured GitHub
-  review inspection and normal merge precede integration.
+  Final render/plan/status/diff and current-head CI PASS. Configured GitHub reviews
+  inspected before normal expected-head merge. Local signature verifies against
+  exact configured key; GitHub unknown_key is not claimed as verified.
 
 Actual new images: notes-quick-note-launcher-{dark,light}.png and
 notes-quick-note-application-{dark,light}.png in this directory. Component images

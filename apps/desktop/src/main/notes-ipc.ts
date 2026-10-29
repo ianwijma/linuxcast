@@ -1,12 +1,12 @@
 import type {IpcMain,IpcMainInvokeEvent,WebContents} from 'electron';
-import {NOTES_CHANNELS,notesRequestSchema,notesGetRequestSchema,notesQueryRequestSchema,notesWriteRequestSchema,notesPinRequestSchema,notesArchiveRequestSchema,noteRecordSchema,noteContentKey,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema} from '../../../../packages/contracts/src/notes.ts';
-import type {NoteRecord,NoteWrite,NotePin,NoteArchive,NotesList,NotesListRequest} from '../../../../packages/contracts/src/notes.ts';
+import {NOTES_CHANNELS,notesRequestSchema,notesGetRequestSchema,notesQueryRequestSchema,notesWriteRequestSchema,notesPinRequestSchema,notesArchiveRequestSchema,notesTrashRequestSchema,noteRecordSchema,noteContentKey,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema} from '../../../../packages/contracts/src/notes.ts';
+import type {NoteRecord,NoteWrite,NotePin,NoteArchive,NoteTrash,NotesList,NotesListRequest} from '../../../../packages/contracts/src/notes.ts';
 import {NOTES_URL} from './assets.ts';
 import {trustedAppSender} from './ipc.ts';
 export interface NotesActions{
  exportBusy?():boolean;closeBusy?():boolean;committed?(input:NoteWrite,record:NoteRecord):void;
  contents():WebContents|undefined;active():boolean;ready():boolean;appearance():'dark'|'light';close():void;
- list(input:NotesListRequest):Promise<NotesList>;get(id:string):Promise<NoteRecord|null>;write(input:NoteWrite):Promise<NoteRecord>;setPinned(input:NotePin):Promise<NoteRecord>;setArchived(input:NoteArchive):Promise<NoteRecord>;
+ list(input:NotesListRequest):Promise<NotesList>;get(id:string):Promise<NoteRecord|null>;write(input:NoteWrite):Promise<NoteRecord>;setPinned(input:NotePin):Promise<NoteRecord>;setArchived(input:NoteArchive):Promise<NoteRecord>;setTrashed(input:NoteTrash):Promise<NoteRecord>;
 }
 const failure=(code:'invalid-request'|'conflict'|'unavailable'|'unknown-outcome')=>({ok:false as const,error:{code:({'invalid-request':'invalid-request',conflict:'conflict',unavailable:'capability-unavailable','unknown-outcome':'internal'} as const)[code],retryable:false,message:{
  'invalid-request':'Review this note’s title and supported content before saving.',conflict:'This note changed. Reload before saving again.',unavailable:'Notes storage is unavailable. Keep your edits and try again.',
@@ -21,14 +21,14 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
  for(const channel of Object.values(NOTES_CHANNELS))ipc.handle(channel,async(event:IpcMainInvokeEvent,payload:unknown)=>{
   const owner=actions.contents(),valid=()=>!disposed&&actions.active()&&actions.contents()===owner&&trustedAppSender(event,owner,NOTES_URL);
   if(!valid())return failure('unavailable');
-  const schema=channel===NOTES_CHANNELS.list?notesQueryRequestSchema:channel===NOTES_CHANNELS.get?notesGetRequestSchema:channel===NOTES_CHANNELS.write?notesWriteRequestSchema:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema:notesRequestSchema;
+  const schema=channel===NOTES_CHANNELS.list?notesQueryRequestSchema:channel===NOTES_CHANNELS.get?notesGetRequestSchema:channel===NOTES_CHANNELS.write?notesWriteRequestSchema:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema:channel===NOTES_CHANNELS.setTrashed?notesTrashRequestSchema:notesRequestSchema;
   if(!schema.safeParse(payload).success)return failure('invalid-request');
   if(channel===NOTES_CHANNELS.appearance)return actions.appearance();
   if(channel===NOTES_CHANNELS.close){if(write||actions.exportBusy?.()||actions.closeBusy?.())return failure('unavailable');setImmediate(()=>{if(valid()&&!write&&!actions.exportBusy?.()&&!actions.closeBusy?.())actions.close();});return {ok:true};}
   if(!actions.ready())return failure('unavailable');
-  const mutating=channel===NOTES_CHANNELS.write||channel===NOTES_CHANNELS.setPinned||channel===NOTES_CHANNELS.setArchived;
+  const mutating=channel===NOTES_CHANNELS.write||channel===NOTES_CHANNELS.setPinned||channel===NOTES_CHANNELS.setArchived||channel===NOTES_CHANNELS.setTrashed;
   if(mutating?!!write||!!actions.exportBusy?.():reads>=4)return failure('unavailable');
-  const input=channel===NOTES_CHANNELS.write?notesWriteRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema.parse(payload).input:undefined;
+  const input=channel===NOTES_CHANNELS.write?notesWriteRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setTrashed?notesTrashRequestSchema.parse(payload).input:undefined;
   if(input&&(uncertain.has(input.id)||uncertain.size>=100))return failure('unknown-outcome');
   if(input)writeGeneration++;
   let dispatched=false,expired=false;
@@ -43,13 +43,14 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
      if(!current())return failure('unavailable');
      if(before&&before.id!==input.id)return failure('unavailable');
      if((before?.revision??0)!==input.expectedRevision||!('content'in input)&&!before)return failure('conflict');
+     if(before?.trashed&&!('trashed'in input))return failure('invalid-request');
      if('content'in input&&before?.archived)return failure('invalid-request');
      dispatched=true;
-     const value=await('content'in input?actions.write(input):'pinned'in input?actions.setPinned(input):actions.setArchived(input)),parsed=notesWriteReplySchema.safeParse({ok:true,value});
+     const value=await('content'in input?actions.write(input):'pinned'in input?actions.setPinned(input):'archived'in input?actions.setArchived(input):actions.setTrashed(input)),parsed=notesWriteReplySchema.safeParse({ok:true,value});
      if(!current()||!parsed.success||!parsed.data.ok){uncertain.add(input.id);return failure('unknown-outcome');}
      const row=parsed.data.value;
-     const content='content'in input?input.content:before!.draft,saved='content'in input&&input.action==='save'?input.content:before?.saved??null,pinned='pinned'in input?input.pinned:before?.pinned??false,archived='archived'in input?input.archived:before?.archived??false;
-     if(row.id!==input.id||row.revision!==input.expectedRevision+1||row.pinned!==pinned||row.archived!==archived||noteContentKey(row.draft)!==noteContentKey(content)||
+     const content='content'in input?input.content:before!.draft,saved='content'in input&&input.action==='save'?input.content:before?.saved??null,pinned='pinned'in input?input.pinned:before?.pinned??false,archived='archived'in input?input.archived:before?.archived??false,trashed='trashed'in input?input.trashed:before?.trashed??false;
+     if(row.id!==input.id||row.revision!==input.expectedRevision+1||row.pinned!==pinned||row.archived!==archived||row.trashed!==trashed||noteContentKey(row.draft)!==noteContentKey(content)||
       (before&&row.createdAt!==before.createdAt)||!('content'in input)&&row.updatedAt!==before!.updatedAt||
       (saved?row.saved===null||noteContentKey(row.saved)!==noteContentKey(saved):row.saved!==null)){
       uncertain.add(input.id);return failure('unknown-outcome');
@@ -68,7 +69,7 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
     const reply=notesListReplySchema.safeParse({ok:true,value:await actions.list(request)});
     if(!current()||!reply.success||!reply.data.ok)return failure('unavailable');
     const page=reply.data.value;let before=request.cursor;
-    if(page.query!==request.query||!!page.pinnedOnly!==!!request.pinnedOnly||!!page.archived!==!!request.archived||!page.records.every(row=>{const ordered=!before||row.updatedAt<before.updatedAt||row.updatedAt===before.updatedAt&&row.id<before.id;before={updatedAt:row.updatedAt,id:row.id};return ordered&&row.archived===!!request.archived&&(!request.pinnedOnly||row.pinned);})||
+    if(page.query!==request.query||!!page.pinnedOnly!==!!request.pinnedOnly||!!page.archived!==!!request.archived||!!page.trashed!==!!request.trashed||!page.records.every(row=>{const ordered=!before||row.updatedAt<before.updatedAt||row.updatedAt===before.updatedAt&&row.id<before.id;before={updatedAt:row.updatedAt,id:row.id};return ordered&&row.trashed===!!request.trashed&&(!!request.trashed||row.archived===!!request.archived)&&(!request.pinnedOnly||row.pinned);})||
      page.nextCursor!==null&&(page.records.length!==100||page.nextCursor.id!==page.records.at(-1)?.id||page.nextCursor.updatedAt!==page.records.at(-1)?.updatedAt))return failure('unavailable');
     return reply.data;
    }catch(error){
