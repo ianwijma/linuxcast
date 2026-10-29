@@ -20,7 +20,7 @@ it('persists pause and reset with exact CAS through restart using only existing 
  await owner.confirmSuccessfulLaunch();await owner.close();const next=(await open(dir)).owner;expect(ask(next,'settings.get',{id:'emoji.frecency'})).toMatchObject({revision:2,value:paused});
  expect(()=>ask(next,'settings.set',{id:'emoji.frecency',expectedRevision:1,value})).toThrow('conflict');
  const cleared=JSON.stringify({enabled:false,entries:[]});ask(next,'settings.set',{id:'emoji.frecency',expectedRevision:2,value:cleared});await next.close();const reopened=(await open(dir)).owner;expect(ask(reopened,'settings.get',{id:'emoji.frecency'})).toMatchObject({revision:3,value:cleared});expect(ask(reopened,'settings.get',{id:'ui.theme'})).toEqual(theme);
- const db=new Database(join(dir,'linuxcast.db'),{readonly:true});try{expect(db.pragma('user_version',{simple:true})).toBe(17);expect(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%emoji%'").all()).toEqual([]);}finally{db.close();}
+ const db=new Database(join(dir,'linuxcast.db'),{readonly:true});try{expect(db.pragma('user_version',{simple:true})).toBe(18);expect(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%emoji%'").all()).toEqual([]);}finally{db.close();}
 });
 it('rejects malformed aggregate values and stale writes without changing stored ranking',async()=>{
  const {owner}=await open(),saved=ask(owner,'settings.set',{id:'emoji.frecency',expectedRevision:0,value});

@@ -1,125 +1,115 @@
 # Coordinator checkpoint — 30 October 2026
 
-Full local1.0/all97/R1-03/release Goal active/unfinished, no scope reduction.
-Previous Goal turn PROGRESS: PR71 definitions and PR72 customkeywords merged.
-Current turn PROGRESS: bounded Emoji local ranking implemented/reviewed/tested
-and merged in PR73.
-User wants small reviewed/tested unfinished application merges; native/release
-acceptance remains explicit. All subagents GPT6.1SOL/high, assignments finished.
+Full local1.0/all97/R1-03/release Goal active and unfinished. No scope reduction.
+User requests small reviewed/tested unfinished application merges promptly; keep
+remaining native/UI/release acceptance explicit. All subagents GPT6.1SOL/high.
+No further signing unlock question is pending: unchanged1Password signer worked.
 
 ## Integrated baseline
 
-Primary develop/origin c881a662a66b5eecb0014e57eeafee70920c42f3, clean/openPR[]
-verified before implementation. PR71 https://github.com/ianwijma/linuxcast/pull/71
-signeda39c5796c435a826eb8fc3f55b7c1f588bc22fe8, merge9a482cd9379cc9b5455292a1850df41b7da35b14;
-planningCI40866425616 PASS15s. PR72 https://github.com/ianwijma/linuxcast/pull/72
-signedc85c416154d09e4e14a1b04e23b211c07f54a1c9, mergec881a662a66b5eecb0014e57eeafee70920c42f3;
-planningCI40866726611 PASS15s. No requested/submittedreviews/comments/threads,
-develop unprotected/rules[] checked, no bypass. Unchanged1Password signer works.
-Earlier Notes/application/Dictionary/Emoji flows and all old worktrees retained.
+Primary develop/origin633ca9fa79218956af072b6d76fa62fb6784a70a, clean; freshfetch
+and openPR[] checked this turn. PR74 https://github.com/ianwijma/linuxcast/pull/74
+merged29October13:55:26UTC, exact signedhead8f4b5334bf754397245935c0c4c3d41e6bbadc08
+locally cryptographically verified. PlanningCI40886141062 validatePASS14s; no
+requested/submittedreviews/comments/threads, developunprotected/rules[], nobypass.
+Actual installed-language Dictionary spelling/Arrow/suggestionCopy/Back/dirtyCancel/
+Hide/restart/privateexports integrated;847unit/54contracts/416security/78browser/
+34integration13files/12nativechecks passed. Prior PR71definitions/72emojikeywords/
+73emojifrecency also integrated. Evidence in respective app reports/registry.
+All prior worktrees/frozen deliverables retained. Full acceptance remains pending.
 
-## Integrated increment
+## Active bounded application increment — L2-05
 
-Coordinator .worktrees/linuxcast-emoji-frecency, codex/emoji-frecency, basec881a66.
-Actual Emoji ranks within relevance by favourite/decayed localfrequency/source
-order, beforecap; canonicalvalues/selectedID retained. Shared ranking Form pauses/
-resumes tracking and ranking; Reset has separate defaultfalse confirmation.
-Existing private settingsCAS only, no new table/migration/dependency/model/network.
-Global usageclear resets privatecounts and always advances epoch, even absent/
-empty; staleinflightCAS cannot restore counts. Known Copy success stays confirmed
-when ranking persistence cannot be confirmed. No event/query/key history.
+Coordinator .worktrees/linuxcast-quicklink-time, codex/quicklink-time/base633ca9f.
+Create/edit a saved date/time/timezone Quicklink → actual registered root search →
+fresh saved entry → explicit Review captures one public value → separate Open
+uses exact reviewed encoded URL via existing native browser. Same snapshot even
+across midnight; explicit new Review refreshes. No typing/save/navigation native
+Open, raw templates/expressions/context framework/new service/provider/network,
+snapshot/expandedURL history or dependency. Full scope/prerequisites preserved.
 
-Finalmapped701unit PASS2.42s/50contract PASS0.536s/393security PASS1.79s/67browser
-PASS31.2s/32integration across11files PASS70.46s. Integration=7actual sandboxed
-Electron scenarios+17realowner+8syntheticclient cases. Newactual9.49s verifies real
-milk resultreorder/selectedID/query,3nativecanonicalCopy but2recordeduses, Hide,
-4Quitrestarts, privatecount2/timestamp inspected beforeReset, Pause/Resume/Reset
-Cancel+confirm/restart and exportprivacy. Full finaldirectNodeTS/scopedlint PASS.
-Finalwording-onlycorrection additionally62controllers/1browser PASS1.03s/2.4s.
-Initial finalcontract49/50 failed old5channel expectation; exact6named update/full
-50rerun PASS. Oldget spies cleared after newcanonicalreads, no production policy
-relaxed. No live test/signer sessions after finalhandle closure.
+Frozen integration contract packages/builtins/quicklinks/CLOCK-INCREMENT.md.
+Coordinator owns optional exclusive config/contracts/narrow existing Open payload,
+exact acknowledgements, fresh ID/revision/hidden checks, actual host-zone check
+both before and after awaited visibility, sole-owner repository/client/migration018.
+Config only persists/exports. Old definitions/snapshot/clear/reopen/CAS preserved.
+Production helper clock.ts a98a5b40e441ecf4fbe8d5e3802c44b015939af2872f8f06c308407d9308617a.
+Builder delivered3files /tmp/linuxcast-quicklink-clock-builder.patch (cc8b06d7),
+manifest sameprefix;86newhelper+39parser PASS125, fullTS/lint/browserbundle/plan.
+Parent changed only constructible Intl test mock to remove Vitest warnings.
 
-Independent source/contracts/storage/search/IPC/UI/actualassertions/report and
-12newPNG review CLEAN. Findings fixed/regressed: Clear absent/empty epoch race;
-aggregate recording after privateCASfailure; unknown saved favourite ID poisoning
-publicsearch; misleading tracking-uncertainty wording.8component+4actualPNG/axe0,
-691historicalPNG retained. Report apps/desktop/evidence/emoji-frecency-application.md.
+UI lane notes_merge_record_review_sol, .worktrees/linuxcast-quicklink-time-ui,
+codex/quicklink-time-ui/base633ca9f, owns presentation/newclockfixture/tests/NEW
+clockcaptures/CLOCK-UI.md only. No authorcommit/shared edits. Production source
+4d5e7a1c77b1605067569ea69ebfedaa02fe5fb230f038bdf0426cf6b6df52f0 copied parent:
+existing5editorfields/6clockchoices, sharedDetail explicitReview/Open, exactreceipts,
+actual unsettled clock promise retained through deadline/Hide/navigation/newflow,
+settlement only enables manual Reload, never effect replay. Browser found Review
+ID retained asprimary after capture: distinct refresh-clock ID closes issue; new
+controller checks both phases.306controller PASS(55new+251old);11browser cases/
+8newcaptures/full finalfreeze still being finished. Don't claim complete UI yet.
 
-Frozen /tmp linuxcast-emoji-frecency-{search,ipc,ui}.patch +manifests:
-search3 SHA4ad02a64068006f7a379156e1c8395ab3d1d90dc0cd2fc4e04b32851bbcf1447;
-IPC4 SHA2cbaa6da2bb514d51b0066bfd98f62c6e20bc17636f079f6e8e6956ae74e7bcf;
-UI14 SHAeda6b3614419c551ea1a750c5ba3b1ee3e04f4cba29fc10bfd92fd787b83684b.
-SOLowners manifest_notes_delete_sol(search),notes_delete_boundary_sol(IPC),
-notes_merge_record_review_sol(UI), isolated .worktrees/linuxcast-emoji-frecency-
-{search,ipc,ui}, matchingcodexbranches. Reviewer hashes /tmp/linuxcast-frecency-
-{ui,actual}-reviewed-hashes.json. No author commits or shared ownership changes.
+## Current checks and reviews
 
-## PR73 merged and next application work
+Parent preUI448unit1.80s/19contracts651ms/57security2.02s PASS.100actualstorage/
+repository/migration+notes/emoji/definitions checks8files2.92s PASS outside default
+execution sandbox (abstract owner socket blocked there). Latest-schema regression
+assertions updated18; historical17snapshot remains17. Independent P2closed:
+historical11→12 usesSQL/snapshot first, confirms/closes then upgrades18 before
+current repository use; new17→18 seedsSQL whileoldownerclosed. No prod issue.
+Full directNodeTS/scopedlint/plan PASS beforelastUIassembly; rerun finalscope.
 
-https://github.com/ianwijma/linuxcast/pull/73
-Signedhead25909f9614515558853d3d158384df2f778200c2 crypto-verified, normal
-expected-head merge9ae4bc4f12fd70b577e6eb6ae84b36af0b0d86db. Currenthead
-planningCI40879011598 PASS14s. No requested/submittedreviews/comments/threads;
-develop unprotected/rules[] inspected; no bypass. Unchanged1Password signer works.
-Primary develop/origin now at mergedhead, clean; verify openPR[] after sync.
+Final mappedL2-05 integration PASS50checks/5files28.28s:2actual sandboxedElectron
+(olderflow19.098s,newclock5.995s),31repository/14owner-client/3webstorage checks.
+Newactualtest distinct Enter→Review and later distinct Enter→Open after renderer-
+only clock advance, literal independent nativeGIOhandlerargv/emptystdin, no effects
+Save/Review/Cancel, registeredtagsearch/Arrow/exactentry,hidden/stale refusal,
+Hide/reopen/Quit/restart dropped snapshot, selected0600configonlyexport,usage1/
+privateexports.0observedrendererHTTP(S). Renderer clock and chooser instrumented;
+real GIO handler/storage/sandbox actual, no hostwallclock/native-session proof.
+Actualtest first failed passing wholeSummary to strictget; corrected exactID/rev,
+production boundary correctly refused extras. Source testcb3e387 final reviewed.
 
-## Reviewed spelling increment ready to publish
+Boundary reviewer notes_delete_boundary_sol clean after P2closure; final reviews
+/tmp/linuxcast-quicklink-clock-independent-{code-review,final-tests-review,actual-review}.json.
+Six actual dark/light form/launcher/review PNGs independently inspected including
+lastrequiredsuite recapture;Openfooter correct, exact hashmanifest frozen. Helper/
+source hashes checked; testmock/finalactual differences recorded. UI independent
+review manifest_notes_delete_sol current4d5e7a1/controller/browser/fixture +7captures
+clean;await final200%capture/report/hashfreeze. No review author edits.
+715historicalPNG baseline /tmp/linuxcast-quicklink-clock-historical-png.json;
+18oldactualrecaptures restored exactly afterrequiredsuite. Preserve all baseline.
 
-Coordinator .worktrees/linuxcast-dictionary-spelling, codex/dictionary-spelling,
-base9ae4bc4. No commit/PR/signing blocker. No live test sessions remain.
-Explicit selected installed-language Check spelling Form → native recognised/
-suggestions List → explicit canonical Copy implemented. Back/Cancel retains base
-language/query/selection; Hide/restart clears transient word/results. Existing
-packaged Rust helper/systemHunspell1.7 only; pinned descriptors/sealed memfds,
-mandatory Landlock/seccomp/resources, strict framing/UUID/source/owner authority.
-Readslots4 and clipboard reservation survive timeout/late actual settlement;
-no download/network/history/Paste/fallback/dependency/table/migration added.
-Debian libhunspell-1.7-0 runtime requirement recorded; F1-03 packaging still stub.
+## Immediate next
 
-Final mapped847unit PASS6.30s/54contract PASS0.942s/416security PASS2.55s/
-78browser PASS33.6s/34integration across13files PASS73.80s. Integration includes
-8actual sandboxedElectron flows+25storage-owner/client+1real native-reader-IPC
-source replacement. New actual11.927s en_GB cats affixcheck/native suggestions,
-ArrowDown canonical cart Copy/realxclip2, dirtyCancelKeepDiscard/Back/language/query,
-Hide/reopen/Quit/restart blankForm, usage2/privateexports/0rendererHTTP(S).
-Actual source replacement refuses oldCopy twice even though cats still recognised;
-freshUUID snapshot changes, no copy/usage. Rust12real native/containment tests
-PASS3.01s; full directNodeTS/lockedClippy/scopedlint/plan PASS.
-Default exec sandbox controlled scripts exited beforecode; outside actual-process
-36transport tests/mappedunit PASS without productionrelaxation. Initial actual
-race pressed a briefly disabled Check action afterBack; final helper waits exact
-enabled palettebutton. Temporary renderer/key diagnostics removed, renderer=HEAD.
+Get final UI ownedpatch/hashmanifest, copy/verify onlyownedfiles; mapped finalunit/
+contracts/security/UI +TS/scopedlint/plan/diff; preserve historicalimages. No further
+actual rerun needed unless production changes (finalactualsource tested already).
+Write concise app evidence/accurate registry, regeneratecards; finalindependent
+source/report/capture review. Normal signedcommit, cryptoverify/push/focusedPR+
+attach; current-head CI/requestedreviews/comments/branchrules; normalexpectedhead
+merge promptly. Record integration and select next bounded application flow.
+No stagedchanges/commit/PR yet. No blocker or additional user approval required.
 
-Independent native/source/transport/contracts/IPC/preload/wrapper/sharedForm/sourceUI/
-actualassertions/report and12newPNG review CLEAN; all fixes regressed: BOM/SETcomment,
-duplicateJSONkeys, settled Form focus, dirtyCancel and misleading base-read no-copy
-wording while spelling Copy pending. Parent reviewed authored wrapper regression.
-8component+4actual dark/light/200% captures axe0;703historicalPNG preserved.
-Report apps/desktop/evidence/dictionary-spelling-application.md, native/source/UI
-reports under packages/builtins/dictionary. No full criterion/task promotion.
+HostPop!_OS22.04amd64/Linux7.1.1/privateXvfbX11/GIO2.72.4/SQLite3.53.4,
+Node24.22.1/Bun1.4.4/Electron45embeddedNode24.22.0. Full Debian13/GNOME/KDE/
+Wayland/X11/nativeAT,allplaceholders/context/targets/browser/openwith/prerequisites/
+performance/package/release acceptance still pending. Full97/R1-03 required.
+Totals unchanged8done/20inprogress/69planned;56passed/325pending/8notapplicable.
 
-Existing GPT6.1SOL/high lane worktrees/branches all delivered/reviewed/done:
-manifest_notes_delete_sol .worktrees/linuxcast-dictionary-spelling-native,
-codex/dictionary-spelling-native; source3 patchSHA6f8363ed366b3693a5a9ebb698db84843f1fd2bcb2ea53fa683f4eeebba0884b.
-notes_delete_boundary_sol .worktrees/linuxcast-dictionary-spelling-reader,
-codex/dictionary-spelling-reader; source5 patchSHAf31c29397a311eeeb6264cd02f87036d015924e1802ed6911529972f0469f452.
-notes_merge_record_review_sol .worktrees/linuxcast-dictionary-spelling-ui,
-codex/dictionary-spelling-ui; UI14 patchSHAf9ac0b4f6f3ac694038ae5ad6dc0828695d73ad79dcd657be6e78cecc046e27c;
-wrapper regression patchSHA415d084fca442b3f87f3fd07dd2a8bf69d7dd5dbba4960b6c53d9f348552245a.
-All /tmp corresponding manifests/frozen reviewed hashes retained; parent verified
-all22owned hashes exact. No author commits/shared ownership changes.
+### Final assembly ready for normal signed PR
 
-Immediate next: final scopedlint/diff/stage review, normal configured signedcommit,
-crypto verify/push/focusedPR+attach; inspect current-head CI/requested reviews/
-comments/protections and normal expected-head merge promptly. Authenticated ghCLI
-works outside network sandbox; connector repository lookup argumentbinding failed.
-Develop unprotected/rules[] and openPR[] verified at9ae4bc4. Preserve old worktrees.
-After integration record merge evidence and select next bounded application flow;
-no research/proof/infrastructure lane or user task-choice question.
-
-HostPop!_OS22.04amd64/Linux7.1.1/privateXvfbX11/xclip, Node24.22.1/Bun1.4.4/
-Electron45 embeddedNode24.22.0; no Debian13/GNOME/KDE/Wayland/nativeAT acceptance.
-All supported languages/encodings, fullStarDict/thesaurus/nativePaste/global-provider
-semantic/predecessor/performance/package/release requirements remain. Totals8done/
-20inprogress/69planned;56passed/325pending/8N/A. Full97/R1-03 Goal unfinished.
+UI14 authorfreeze ef164857/manifest72cc788a independently reviewed exact; copied
+and verified. Final mapped503unit1.52s/19contracts535ms/57security1.64s/63browser
+1.0min/50integration5files28.28s PASS, plus100overlappingstorage/regressions8files
+2.92s. Full directNodeTypeScript and scopedlint PASS; plan/render/status/diff final
+run now. App report apps/desktop/evidence/quicklink-clock-application.md and registry
+accurately recordunfinished increment; AC01/AC02/UI stillpending; PRIVACYpassonly
+additionalregressionevidence. Totalsunchanged8done/20inprogress/69planned,
+56passed/325pending/8notapplicable. No new prerequisite/task completion claims.
+All715historicalPNG exact; UI8 restored to exactindependentlyreviewedauthorfreeze
+afterrequiredsuite recapture. Six actualcaptures finalreview hashes match final
+integrationrun, including Openfooter. Independent finaldocs/metadata review next.
+Production UI4d5e7a1/helpera98a5b40 unchangedfromactualtestedsource. No further
+checks justified unless a newfinding/change appears; proceed sign/push/PR/CI/
+reviews/normalexpectedheadmerge promptly. No signing/configurationchange needed.

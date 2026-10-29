@@ -1,3 +1,4 @@
+import { buildClockLinkUrl,captureClockSnapshot,ClockLinkBuildError } from '@linuxcast/quicklinks/clock';
 import { buildPathArgumentUrl,PathArgumentBuildError } from '@linuxcast/quicklinks/path-argument';
 import type { IpcMain,IpcMainInvokeEvent } from 'electron';
 import {
@@ -72,7 +73,7 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
         const {protocolVersion,...input}=quicklinkSaveRequestSchema.parse(payload);void protocolVersion;
         attempted=true;const record=await backend.save(input);
         const reply=quicklinkRecordReplySchema.parse({ok:true,value:{record}});
-        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch)||JSON.stringify(reply.value.record.pathArgument)!==JSON.stringify(input.pathArgument)||JSON.stringify(reply.value.record.tags??[])!==JSON.stringify(input.tags??[])||(reply.value.record.pinned??false)!==(input.pinned??false)||(reply.value.record.hidden??false)!==(input.hidden??false))throw new Error('Mismatched save receipt.');
+        if(!reply.ok||reply.value.record.revision!==input.expectedRevision+1||input.id!==undefined&&reply.value.record.id!==input.id||reply.value.record.name!==input.name||reply.value.record.url!==input.url||JSON.stringify(reply.value.record.webSearch)!==JSON.stringify(input.webSearch)||JSON.stringify(reply.value.record.pathArgument)!==JSON.stringify(input.pathArgument)||JSON.stringify(reply.value.record.clock)!==JSON.stringify(input.clock)||JSON.stringify(reply.value.record.tags??[])!==JSON.stringify(input.tags??[])||(reply.value.record.pinned??false)!==(input.pinned??false)||(reply.value.record.hidden??false)!==(input.hidden??false))throw new Error('Mismatched save receipt.');
         return reply;
       }
       const selection=quicklinkGetRequestSchema.parse(operation==='open'?{protocolVersion:1,id:(payload as QuicklinkSelection).id,revision:(payload as QuicklinkSelection).revision}:payload);
@@ -122,8 +123,16 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       const opening=quicklinkOpenRequestSchema.parse(payload),definition=checked.value.record;
       if(definition.hidden)return failed('permission-denied','Show this Quicklink before opening it. No browser request was sent.');
       let pathArgument:{query:string;url:string}|undefined;
+      let clock:{capturedAt:string;timeZone:string;url:string;value:string}|undefined;
       let url=definition.url,webSearch:{query:string;url:string}|undefined;
-      if(definition.webSearch){
+      if(opening.clock!==undefined&&!definition.clock)return failed('invalid-request','This Quicklink does not accept a clock snapshot. Reload Quicklinks.');
+      if(definition.clock){
+        if(opening.clock===undefined)return failed('invalid-request','Review the current value before opening this time link.');
+        const zone=definition.clock.timeZone==='UTC'?'UTC':Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const snapshot=captureClockSnapshot(Date.parse(opening.clock.capturedAt),zone);
+        if(snapshot.timeZone!==opening.clock.timeZone)return failed('conflict','The system timezone changed. Review the current value again before opening this time link.','conflict');
+        const built=buildClockLinkUrl(definition.url,definition.clock,snapshot);url=built.url;clock={...snapshot,...built};
+      }else if(definition.webSearch){
         if(opening.query===undefined)return failed('invalid-request','Enter and review a query before opening this web search.');
         url=buildWebSearchUrl(definition.url,definition.webSearch,opening.query);
         webSearch={query:opening.query,url};
@@ -133,10 +142,15 @@ export function registerQuicklinksIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>
       const freshBlocked=await gate.checkVisibility(event,expectedRevision);if(freshBlocked)return freshBlocked;
       if(!gate.trusted(event))return denied();
       if(!alive()||gate.revision()!==expectedRevision)return running();
+      if(definition.clock&&clock){
+        const zone=definition.clock.timeZone==='UTC'?'UTC':Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if(captureClockSnapshot(Date.parse(clock.capturedAt),zone).timeZone!==clock.timeZone)return failed('conflict','The system timezone changed. Review the current value again before opening this time link.','conflict');
+      }
       attempted=true;const outcome=await gate.openUrl(url);
-      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome,...(webSearch?{webSearch}:{}),...(pathArgument?{pathArgument}:{})}});
+      const reply=quicklinkOpenReplySchema.parse({ok:true,value:{...target,outcome,...(webSearch?{webSearch}:{}),...(pathArgument?{pathArgument}:{}),...(clock?{clock}:{})}});
       await gate.recordUse();return reply;
     }catch(error){
+      if(error instanceof ClockLinkBuildError)return failed('invalid-request','This time link or snapshot is invalid or too large. Review the current value again, or edit the saved link.');
       if(error instanceof PathArgumentBuildError)return failed('invalid-request','This path argument or target is invalid or too large. Use a non-empty argument other than . or .., or edit the saved link.');
       if(error instanceof WebSearchBuildError)return failed('invalid-request','This search target is invalid or too large. Edit the search or shorten the query, then review it again.');
       if(error instanceof StorageRequestError&&error.effectOutcome==='not-dispatched'){

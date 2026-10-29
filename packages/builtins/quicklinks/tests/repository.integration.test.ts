@@ -16,7 +16,7 @@ afterEach(async()=>{vi.restoreAllMocks();for(const db of databases.splice(0))if(
 function request<M extends QuicklinkStorageMethod>(db:Database.Database,method:M,input:unknown):QuicklinkStorageMethods[M]['result'] {
   return db.transaction(()=>parseContract(quicklinkRepositoryContracts.get(method)!.result,dispatchQuicklinks(db,method,input))).immediate() as QuicklinkStorageMethods[M]['result'];
 }
-async function fixture(version:6|7|10|11|12=12){
+async function fixture(version:6|7|10|11|12|18=18){
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-quicklinks-repository-'));directories.push(directory);
   const path=join(directory,'data.db'),db=new Sqlite(path);databases.push(db);
   db.pragma('foreign_keys=ON');db.pragma('journal_mode=WAL');db.pragma('trusted_schema=OFF');
@@ -28,6 +28,7 @@ async function fixture(version:6|7|10|11|12=12){
   if(version>=10)db.transaction(()=>db.exec(tagsMigration)).immediate();
   if(version>=11)db.transaction(()=>db.exec(presentationMigration)).immediate();
   if(version>=12)db.transaction(()=>db.exec(pathMigration)).immediate();
+  if(version>=18)db.transaction(()=>db.exec(clockMigration)).immediate();
   return {db,path};
 }
 const schema=await readFile(new URL('../../../storage/src/migrations/006-quicklinks.sql',import.meta.url),'utf8');
@@ -35,6 +36,7 @@ const webSearchMigration=await readFile(new URL('../../../storage/src/migrations
 const tagsMigration=await readFile(new URL('../../../storage/src/migrations/010-quicklink-tags.sql',import.meta.url),'utf8');
 const presentationMigration=await readFile(new URL('../../../storage/src/migrations/011-quicklink-presentation.sql',import.meta.url),'utf8');
 const pathMigration=await readFile(new URL('../../../storage/src/migrations/012-quicklink-path-argument.sql',import.meta.url),'utf8');
+const clockMigration=await readFile(new URL('../../../storage/src/migrations/018-quicklink-clock.sql',import.meta.url),'utf8');
 const create=(db:Database.Database,name='Public Link',url='https://example.com/public')=>request(db,'quicklinks.save',{expectedRevision:0,name,url});
 const selection=(value:QuicklinkRecord)=>({id:value.id,revision:value.revision});
 
@@ -122,7 +124,7 @@ it('rejects overflowing revision and overfilled catalogues; owner transaction ro
 it('upgrades actual literal schema6 rows without changing identity/version/base/timestamps and persists optional search configuration after reopen',async()=>{
   const {db,path}=await fixture(6),literal={id:randomUUID(),revision:4,name:'Existing Literal',url:'https://example.org/public?q=literal',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-02-01T00:00:00.000Z'};
   db.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(literal.id,literal.revision,literal.name,'existing literal',literal.url,literal.createdAt,literal.updatedAt);
-  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);db.exec(presentationMigration);db.exec(pathMigration);}).immediate();
+  db.transaction(()=>{db.exec(webSearchMigration);db.exec(tagsMigration);db.exec(presentationMigration);db.exec(pathMigration);db.exec(clockMigration);}).immediate();
   expect(request(db,'quicklinks.get',selection(literal))).toEqual(literal);
   expect(db.prepare('SELECT web_search FROM quicklinks').get()).toEqual({web_search:null});
   expect(request(db,'quicklinks.list',{})).toEqual([{id:literal.id,revision:4,name:literal.name,host:'example.org'}]);
@@ -198,4 +200,22 @@ it('persists typed path config, labels and preferences through reopen and explic
 });
 it('rejects corrupt path configuration and dual stored kinds before publishing or overwriting source',async()=>{
  const {db}=await fixture(),saved=create(db);db.prepare('UPDATE quicklinks SET path_argument=? WHERE id=?').run('{"component":"host","template":"{{vars.query}}"}',saved.id);for(const operation of [()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.save',{id:saved.id,expectedRevision:1,name:saved.name,url:saved.url})])expect(operation).toThrow(ContractError);db.prepare('UPDATE quicklinks SET path_argument=? WHERE id=?').run(JSON.stringify(pathConfig),saved.id);expect(()=>db.prepare('UPDATE quicklinks SET web_search=? WHERE id=?').run(JSON.stringify({queryParameter:'q',template:WEB_SEARCH_TEMPLATE}),saved.id)).toThrow();
+});
+
+const clockConfig={queryParameter:'when',source:'date' as const,timeZone:'UTC' as const};
+it('persists typed clock definitions through reopen, preserves flags/labels and converts exclusively with exact CAS',async()=>{
+ const {db,path}=await fixture(),base={name:'Public date',url:'https://example.invalid/calendar?keep=yes#part',tags:['Work'],pinned:true,hidden:true},saved=request(db,'quicklinks.save',{...base,expectedRevision:0,clock:clockConfig});
+ expect(saved.clock).toEqual(clockConfig);expect(request(db,'quicklinks.list',{})).toEqual([{...selection(saved),name:saved.name,host:'example.invalid',tags:['Work'],pinned:true,hidden:true,clock:true}]);expect(db.prepare('SELECT clock_link FROM quicklinks').get()).toEqual({clock_link:JSON.stringify(clockConfig)});
+ db.close();const next=new Sqlite(path);databases.push(next);expect(request(next,'quicklinks.get',selection(saved))).toEqual(saved);
+ const pathLink=request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:1,pathArgument:pathConfig});expect(pathLink).not.toHaveProperty('clock');expect(pathLink).toMatchObject({...base,revision:2,createdAt:saved.createdAt,pathArgument:pathConfig});expect(next.prepare('SELECT clock_link FROM quicklinks').get()).toEqual({clock_link:null});
+ expect(()=>request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:1,clock:clockConfig})).toThrow(QuicklinkRepositoryError);
+ const clockLink=request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:2,clock:{...clockConfig,source:'time',timeZone:'system'}});expect(clockLink).not.toHaveProperty('pathArgument');expect(clockLink.revision).toBe(3);
+ const search=request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:3,webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE}});expect(search).not.toHaveProperty('clock');
+ const literal=request(next,'quicklinks.save',{...base,id:saved.id,expectedRevision:4});expect(literal).not.toHaveProperty('clock');expect(request(next,'quicklinks.list',{})[0]).not.toHaveProperty('clock');
+});
+it('refuses snapshots in definitions and corrupt/dual clock rows without overwriting owner data or publishing partial lists',async()=>{
+ const {db}=await fixture(),saved=create(db),input={id:saved.id,expectedRevision:1,name:saved.name,url:saved.url,clock:clockConfig};
+ for(const patch of [{capturedAt:'2026-12-31T23:59:59.123Z'},{snapshot:{timeZone:'UTC'}},{clock:{...clockConfig,value:'2026-12-31'}},{webSearch:{queryParameter:'q',template:WEB_SEARCH_TEMPLATE}}])expect(()=>request(db,'quicklinks.save',{...input,...patch})).toThrow(ContractError);
+ for(const stored of ['{','null','{}','{"queryParameter":"when","source":"clipboard","timeZone":"UTC"}']){db.prepare('UPDATE quicklinks SET clock_link=? WHERE id=?').run(stored,saved.id);for(const operation of [()=>request(db,'quicklinks.list',{}),()=>request(db,'quicklinks.get',selection(saved)),()=>request(db,'quicklinks.save',input)])expect(operation).toThrow(ContractError);expect(db.prepare('SELECT revision,name FROM quicklinks').get()).toEqual({revision:1,name:saved.name});}
+ db.prepare('UPDATE quicklinks SET clock_link=? WHERE id=?').run(JSON.stringify(clockConfig),saved.id);expect(()=>db.prepare('UPDATE quicklinks SET path_argument=? WHERE id=?').run(JSON.stringify(pathConfig),saved.id)).toThrow();expect(()=>db.prepare('UPDATE quicklinks SET web_search=? WHERE id=?').run(JSON.stringify({queryParameter:'q',template:WEB_SEARCH_TEMPLATE}),saved.id)).toThrow();
 });
