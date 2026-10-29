@@ -1,9 +1,11 @@
 import type {IpcMain,IpcMainInvokeEvent,WebContents} from 'electron';
-import {NOTES_CHANNELS,notesRequestSchema,notesGetRequestSchema,notesQueryRequestSchema,notesWriteRequestSchema,notesPinRequestSchema,notesArchiveRequestSchema,notesTrashRequestSchema,notesDeleteRequestSchema,notesDeleteReplySchema,notesHistoryRequestSchema,notesRevisionRequestSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,noteRecordSchema,noteContentKey,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema} from '../../../../packages/contracts/src/notes.ts';
-import type {NoteRecord,NoteWrite,NotePin,NoteArchive,NoteTrash,NoteDelete,NoteDeleted,NotesList,NotesListRequest,NoteHistoryRequest,NoteRevisionSelection,NoteHistory,NoteRevisionRead} from '../../../../packages/contracts/src/notes.ts';
+import {notesTrashSnapshotReplySchema,notesEmptyTrashRequestSchema,notesEmptyTrashReplySchema,NOTES_CHANNELS,notesRequestSchema,notesGetRequestSchema,notesQueryRequestSchema,notesWriteRequestSchema,notesPinRequestSchema,notesArchiveRequestSchema,notesTrashRequestSchema,notesDeleteRequestSchema,notesDeleteReplySchema,notesHistoryRequestSchema,notesRevisionRequestSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,noteRecordSchema,noteContentKey,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema} from '../../../../packages/contracts/src/notes.ts';
+import type {NotesTrashSnapshot,NotesEmptyTrash,NotesTrashEmptied,NoteRecord,NoteWrite,NotePin,NoteArchive,NoteTrash,NoteDelete,NoteDeleted,NotesList,NotesListRequest,NoteHistoryRequest,NoteRevisionSelection,NoteHistory,NoteRevisionRead} from '../../../../packages/contracts/src/notes.ts';
 import {NOTES_URL} from './assets.ts';
 import {trustedAppSender} from './ipc.ts';
 export interface NotesActions{
+ trashSnapshot?():Promise<NotesTrashSnapshot>;
+ emptyTrash?(input:NotesEmptyTrash):Promise<NotesTrashEmptied>;
  observedRead?(record:NoteRecord):void;
  exportBusy?():boolean;closeBusy?():boolean;committed?(input:NoteWrite,record:NoteRecord):void;
  contents():WebContents|undefined;active():boolean;ready():boolean;appearance():'dark'|'light';close():void;
@@ -17,31 +19,50 @@ const failure=(code:'invalid-request'|'conflict'|'unavailable'|'unknown-outcome'
 /** Local Notes authority only. The actual owner operation retains its slot even if
  * the caller deadline expires; uncertain writes are never automatically replayed. */
 export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,actions:NotesActions){
- let disposed=false,write:Promise<unknown>|undefined,reads=0,writeGeneration=0;
+ let disposed=false,write:Promise<unknown>|undefined,batchWrite:Promise<unknown>|undefined,reads=0,writeGeneration=0,uncertainTrash=false;
  const uncertain=new Set<string>(),uncertainDeletes=new Set<string>();
  const pending=new Set<Promise<unknown>>();
  for(const channel of Object.values(NOTES_CHANNELS))ipc.handle(channel,async(event:IpcMainInvokeEvent,payload:unknown)=>{
   const owner=actions.contents(),valid=()=>!disposed&&actions.active()&&actions.contents()===owner&&trustedAppSender(event,owner,NOTES_URL);
   if(!valid())return failure('unavailable');
-  const schema=channel===NOTES_CHANNELS.list?notesQueryRequestSchema:channel===NOTES_CHANNELS.get?notesGetRequestSchema:channel===NOTES_CHANNELS.write?notesWriteRequestSchema:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema:channel===NOTES_CHANNELS.setTrashed?notesTrashRequestSchema:channel===NOTES_CHANNELS.deletePermanently?notesDeleteRequestSchema:channel===NOTES_CHANNELS.history?notesHistoryRequestSchema:channel===NOTES_CHANNELS.getRevision||channel===NOTES_CHANNELS.restoreRevision?notesRevisionRequestSchema:notesRequestSchema;
+  const schema=channel===NOTES_CHANNELS.emptyTrash?notesEmptyTrashRequestSchema:channel===NOTES_CHANNELS.list?notesQueryRequestSchema:channel===NOTES_CHANNELS.get?notesGetRequestSchema:channel===NOTES_CHANNELS.write?notesWriteRequestSchema:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema:channel===NOTES_CHANNELS.setTrashed?notesTrashRequestSchema:channel===NOTES_CHANNELS.deletePermanently?notesDeleteRequestSchema:channel===NOTES_CHANNELS.history?notesHistoryRequestSchema:channel===NOTES_CHANNELS.getRevision||channel===NOTES_CHANNELS.restoreRevision?notesRevisionRequestSchema:notesRequestSchema;
   if(!schema.safeParse(payload).success)return failure('invalid-request');
   if(channel===NOTES_CHANNELS.appearance)return actions.appearance();
-  if(channel===NOTES_CHANNELS.close){if(write||uncertainDeletes.size||actions.exportBusy?.()||actions.closeBusy?.())return failure('unavailable');setImmediate(()=>{if(valid()&&!write&&!uncertainDeletes.size&&!actions.exportBusy?.()&&!actions.closeBusy?.())actions.close();});return {ok:true};}
+  if(channel===NOTES_CHANNELS.close){if(write||uncertainTrash||uncertainDeletes.size||actions.exportBusy?.()||actions.closeBusy?.())return failure('unavailable');setImmediate(()=>{if(valid()&&!write&&!uncertainTrash&&!uncertainDeletes.size&&!actions.exportBusy?.()&&!actions.closeBusy?.())actions.close();});return {ok:true};}
   if(!actions.ready())return failure('unavailable');
-  const mutating=channel===NOTES_CHANNELS.deletePermanently||channel===NOTES_CHANNELS.write||channel===NOTES_CHANNELS.setPinned||channel===NOTES_CHANNELS.setArchived||channel===NOTES_CHANNELS.setTrashed||channel===NOTES_CHANNELS.restoreRevision;
-  if(mutating?!!write||uncertainDeletes.size>0||!!actions.exportBusy?.():reads>=4)return failure('unavailable');
+  const mutating=channel===NOTES_CHANNELS.emptyTrash||channel===NOTES_CHANNELS.deletePermanently||channel===NOTES_CHANNELS.write||channel===NOTES_CHANNELS.setPinned||channel===NOTES_CHANNELS.setArchived||channel===NOTES_CHANNELS.setTrashed||channel===NOTES_CHANNELS.restoreRevision;
+  if(mutating?!!write||uncertainTrash||uncertainDeletes.size>0||!!actions.exportBusy?.():reads>=4)return failure('unavailable');
+  const batch=channel===NOTES_CHANNELS.emptyTrash?notesEmptyTrashRequestSchema.parse(payload).input:undefined;
+  if(batch&&uncertain.size>0)return failure('unknown-outcome');
   const deletion=channel===NOTES_CHANNELS.deletePermanently?notesDeleteRequestSchema.parse(payload).input:undefined;
   const input=channel===NOTES_CHANNELS.write?notesWriteRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setPinned?notesPinRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setArchived?notesArchiveRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.setTrashed?notesTrashRequestSchema.parse(payload).input:channel===NOTES_CHANNELS.restoreRevision?notesRevisionRequestSchema.parse(payload).input:undefined;
   const mutation=deletion??input;
-  const markUncertain=()=>{if(mutation){uncertain.add(mutation.id);if(deletion)uncertainDeletes.add(mutation.id);}};
+  const markUncertain=()=>{if(batch)uncertainTrash=true;if(mutation){uncertain.add(mutation.id);if(deletion)uncertainDeletes.add(mutation.id);}};
   if(mutation&&(uncertain.has(mutation.id)||uncertain.size>=100))return failure('unknown-outcome');
-  if(mutation)writeGeneration++;
+  if(mutation||batch)writeGeneration++;
   let dispatched=false,expired=false;
   const deadline=performance.now()+4000;
-  const current=()=>!expired&&performance.now()<deadline&&valid()&&actions.ready()&&(channel!==NOTES_CHANNELS.deletePermanently||!actions.closeBusy?.());
+  const current=()=>!expired&&performance.now()<deadline&&valid()&&actions.ready()&&(channel!==NOTES_CHANNELS.deletePermanently&&channel!==NOTES_CHANNELS.emptyTrash||!actions.closeBusy?.());
   const operation=Promise.resolve().then(async()=>{
    try{
     if(!current())return failure('unavailable');
+    if(batch){
+     if(!actions.trashSnapshot||!actions.emptyTrash)return failure('unavailable');
+     const before=notesTrashSnapshotReplySchema.parse({ok:true,value:await actions.trashSnapshot()});
+     if(!current())return failure('unavailable');
+     if(!before.ok||before.value.count!==batch.expectedCount||before.value.fingerprint!==batch.expectedFingerprint)return failure('conflict');
+     dispatched=true;const reply=notesEmptyTrashReplySchema.safeParse({ok:true,value:await actions.emptyTrash(batch)});
+     if(!current()||!reply.success||!reply.data.ok||reply.data.value.deletedCount!==batch.expectedCount||reply.data.value.fingerprint!==batch.expectedFingerprint){markUncertain();return failure('unknown-outcome');}
+     return reply.data;
+    }
+    if(channel===NOTES_CHANNELS.trashSnapshot){
+     if(!actions.trashSnapshot)return failure('unavailable');
+     const mayReconcile=!write,generation=writeGeneration,reply=notesTrashSnapshotReplySchema.safeParse({ok:true,value:await actions.trashSnapshot()});
+     if(!current()||!reply.success||!reply.data.ok)return failure('unavailable');
+     if(uncertainTrash&&(!mayReconcile||write||generation!==writeGeneration))return failure('unknown-outcome');
+     if(mayReconcile&&!write&&generation===writeGeneration)uncertainTrash=false;
+     return reply.data;
+    }
     if(mutation){
      const beforeRaw=await actions.get(mutation.id);
      const before=beforeRaw===null?null:noteRecordSchema.parse(beforeRaw);
@@ -99,16 +120,16 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
    }catch(error){
     const reason=error&&typeof error==='object'&&'reasonCode'in error?error.reasonCode:undefined;
     if(reason==='conflict'||reason==='invalid-request')return failure(reason);
-    if(mutation&&dispatched){markUncertain();return failure('unknown-outcome');}
+    if((mutation||batch)&&dispatched){markUncertain();return failure('unknown-outcome');}
     return failure('unavailable');
    }
   });
-  if(mutating)write=operation;else reads++;
+  if(mutating){write=operation;if(batch)batchWrite=operation;}else reads++;
   pending.add(operation);
-  void operation.finally(()=>{pending.delete(operation);if(write===operation)write=undefined;if(!mutating)reads--;});
+  void operation.finally(()=>{pending.delete(operation);if(write===operation)write=undefined;if(batchWrite===operation)batchWrite=undefined;if(!mutating)reads--;});
   let timer:ReturnType<typeof setTimeout>|undefined;
-  try{return await Promise.race([operation,new Promise<ReturnType<typeof failure>>(resolve=>{timer=setTimeout(()=>{expired=true;if(mutation&&dispatched)markUncertain();resolve(failure(mutation&&dispatched?'unknown-outcome':'unavailable'));},4000);})]);}
+  try{return await Promise.race([operation,new Promise<ReturnType<typeof failure>>(resolve=>{timer=setTimeout(()=>{expired=true;if((mutation||batch)&&dispatched)markUncertain();resolve(failure((mutation||batch)&&dispatched?'unknown-outcome':'unavailable'));},4000);})]);}
   finally{clearTimeout(timer);}
  });
- return {isWriting:()=>!!write||uncertainDeletes.size>0,remove(){disposed=true;for(const channel of Object.values(NOTES_CHANNELS))ipc.removeHandler(channel);},async drain(){await Promise.allSettled([...pending]);}};
+ return {isEmptyingTrash:()=>!!batchWrite||uncertainTrash,isWriting:()=>!!write||uncertainTrash||uncertainDeletes.size>0,remove(){disposed=true;for(const channel of Object.values(NOTES_CHANNELS))ipc.removeHandler(channel);},async drain(){await Promise.allSettled([...pending]);}};
 }

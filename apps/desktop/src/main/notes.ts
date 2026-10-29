@@ -13,13 +13,13 @@ import {trustedAppSender} from './ipc.ts';
 import {restrictContents,securePreferences} from './security.ts';
 import type {ResidentService} from './lifecycle.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
-export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'list'|'get'|'write'|'setPinned'|'setArchived'|'setTrashed'|'deletePermanently'|'history'|'getRevision'|'restoreRevision'>):ResidentService&{open():Promise<void>;quickNote():Promise<void>;openNote(selection:NotesLauncherSelection,current:()=>boolean):Promise<void>;prepareClose():Promise<boolean>}{
+export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'trashSnapshot'|'emptyTrash'|'list'|'get'|'write'|'setPinned'|'setArchived'|'setTrashed'|'deletePermanently'|'history'|'getRevision'|'restoreRevision'>):ResidentService&{open():Promise<void>;quickNote():Promise<void>;openNote(selection:NotesLauncherSelection,current:()=>boolean):Promise<void>;prepareClose():Promise<boolean>}{
  let window:BrowserWindow|undefined,creating:Promise<void>|undefined,stopped=false,stopping=false,approvedClose=false,stopPromise:Promise<void>|undefined,sequence=0;
  let attempt:{id:number;owner:BrowserWindow;promise:Promise<boolean>;resolve(value:boolean):void;timer:ReturnType<typeof setTimeout>}|undefined;
  const finish=(value:boolean)=>{const pending=attempt;attempt=undefined;if(pending){clearTimeout(pending.timer);pending.resolve(value);}};
  const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
  const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
- const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),closeBusy:()=>quick.busy()||opener.busy(),observedRead:record=>opener.read(record),committed:(input,record)=>quick.committed(input,record),appearance,list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,deletePermanently:options.deletePermanently,history:options.history,getRevision:options.getRevision,restoreRevision:options.restoreRevision,
+ const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),closeBusy:()=>quick.busy()||opener.busy(),observedRead:record=>opener.read(record),committed:(input,record)=>quick.committed(input,record),appearance,...(options.trashSnapshot?{trashSnapshot:options.trashSnapshot}:{}),...(options.emptyTrash?{emptyTrash:options.emptyTrash}:{}),list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,deletePermanently:options.deletePermanently,history:options.history,getRevision:options.getRevision,restoreRevision:options.restoreRevision,
   close(){if(window&&alive(window)&&!exporter.busy()&&!api.isWriting()&&!quick.busy()&&!opener.busy()){approvedClose=true;window.close();}},
  });
  const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:()=>api.isWriting()||quick.busy()||opener.busy(),get:options.get,publish:saveNoteMarkdown,
@@ -43,8 +43,8 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
   return {ok:true};
  });
  const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);api.remove();quick.remove();opener.remove();exporter?.remove();ipcMain.removeHandler(NOTES_CLOSE_FINISHED);finish(false);};
- const quick=registerQuickNoteIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||opener.busy(),exportBusy:()=>exporter.busy(),open:openWorkspace});
- const opener=registerNotesOpenIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt,exportBusy:()=>exporter.busy(),quickBusy:()=>quick.busy(),open:openWorkspace});
+ const quick=registerQuickNoteIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||opener.busy()||api.isEmptyingTrash(),exportBusy:()=>exporter.busy(),open:openWorkspace});
+ const opener=registerNotesOpenIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||api.isEmptyingTrash(),exportBusy:()=>exporter.busy(),quickBusy:()=>quick.busy(),open:openWorkspace});
  async function openWorkspace(){
    if(stopped||stopping)throw new Error('Notes are unavailable.');if(creating)await creating;
    if(stopped||stopping||attempt)throw new Error('Notes are closing.');
