@@ -210,3 +210,38 @@ it('projects fallback metadata only for shown saved web searches without target 
  const rows=[{...selection,name:'Public literal',host:'example.invalid'},{id:'00000000-0000-4000-8000-000000000002',revision:1,name:'Public search',host:'example.invalid',webSearch:true},{id:'00000000-0000-4000-8000-000000000003',revision:1,name:'Public path',host:'example.invalid',pathArgument:true},{id:'00000000-0000-4000-8000-000000000004',revision:1,name:'Public hidden search',host:'example.invalid',webSearch:true,hidden:true}];
  const commands=compileQuicklinkCommands(rows,true);expect(commands.map(row=>row.quicklink)).toEqual([{...selection},{id:rows[1]!.id,revision:1,webSearch:true},{id:rows[2]!.id,revision:1}]);expect(JSON.stringify(commands)).not.toContain(record.url);expect(compileQuicklinkCommands(rows,false).every(row=>!row.enabled)).toBe(true);
 });
+
+const clockConfig={queryParameter:'when',source:'time' as const,timeZone:'UTC' as const};
+const clockSnapshot={capturedAt:'2026-12-31T23:59:59.123Z',timeZone:'UTC'};
+it('opens the exact captured clock instant across midnight without recapturing, using only the fresh owner definition',async()=>{
+ const f=fixture(),launcherRevision=await f.version(),base='https://example.invalid/calendar?fixed=two%20words&when=old&when=duplicate#part',url='https://example.invalid/calendar?fixed=two+words&when=23%3A59%3A59#part';f.backend.get.mockResolvedValue({...record,url:base,clock:clockConfig});
+ const now=vi.spyOn(Date,'now').mockReturnValue(Date.parse('2027-01-01T12:00:00.000Z'));
+ try{expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,clock:clockSnapshot})).toEqual({ok:true,value:{...selection,outcome:'dispatched',clock:{...clockSnapshot,url,value:'23:59:59'}}});}finally{now.mockRestore();}
+ expect(f.actions.openUrl).toHaveBeenCalledExactlyOnceWith(url);expect(f.actions.recordUse).toHaveBeenCalledExactlyOnceWith('linuxcast:open-quicklinks');expect(f.actions.hide).not.toHaveBeenCalled();
+});
+it('refuses missing/mixed/invalid clock snapshots, changed kind, hidden links and timezone disagreement before native dispatch',async()=>{
+ const f=fixture(),launcherRevision=await f.version(),request={protocolVersion:1,...selection,launcherRevision};f.backend.get.mockResolvedValue({...record,clock:clockConfig});
+ for(const patch of [{},{query:'private'},{clock:clockSnapshot,query:'private'},{clock:{...clockSnapshot,capturedAt:'2026-02-30T00:00:00.000Z'}},{clock:{...clockSnapshot,timeZone:'Etc/UTC'}},{clock:{...clockSnapshot,timeZone:'UTC',url:record.url}}])expect(await f.invoke(QUICKLINK_CHANNELS.open,{...request,...patch})).toMatchObject({ok:false});
+ f.backend.get.mockResolvedValueOnce({...record,clock:clockConfig,hidden:true});expect(await f.invoke(QUICKLINK_CHANNELS.open,{...request,clock:clockSnapshot})).toMatchObject({ok:false,error:{code:'permission-denied'}});
+ for(const configuration of [{},{webSearch},{pathArgument:pathConfig}]){f.backend.get.mockResolvedValueOnce({...record,...configuration});expect(await f.invoke(QUICKLINK_CHANNELS.open,{...request,clock:clockSnapshot})).toMatchObject({ok:false,error:{code:'invalid-request'}});}
+ expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});
+it('checks the actual system timezone again after awaited visibility work and refuses a changed zone without an effect',async()=>{
+ const f=fixture(),launcherRevision=await f.version(),system=new Intl.DateTimeFormat().resolvedOptions().timeZone,other=system==='Pacific/Honolulu'?'UTC':'Pacific/Honolulu';f.backend.get.mockResolvedValue({...record,clock:{...clockConfig,timeZone:'system'}});
+ const original=Intl.DateTimeFormat.prototype.resolvedOptions;let changed=false;
+ const hidden=vi.mocked(f.actions.listHidden);hidden.mockImplementation(async()=>{if(f.backend.get.mock.calls.length)changed=true;return [];});
+ const spy=vi.spyOn(Intl.DateTimeFormat.prototype,'resolvedOptions').mockImplementation(function(this:Intl.DateTimeFormat){const options=original.call(this);return options.calendar==='gregory'?{...options,timeZone:changed?other:system}:options;});
+ try{expect(await f.invoke(QUICKLINK_CHANNELS.open,{protocolVersion:1,...selection,launcherRevision,clock:{...clockSnapshot,timeZone:system}})).toMatchObject({ok:false,error:{code:'conflict'}});}finally{spy.mockRestore();}
+ expect(f.actions.openUrl).not.toHaveBeenCalled();
+});
+it('holds the shared effect reservation for an actual unsettled clock dispatch and never replays unknown handoff',async()=>{
+ const effect=deferred<'dispatched'>(),f=fixture({openUrl:vi.fn(()=>effect.promise)}),launcherRevision=await f.version();f.backend.get.mockResolvedValue({...record,clock:clockConfig});const request={protocolVersion:1,...selection,launcherRevision,clock:clockSnapshot},pending=f.invoke(QUICKLINK_CHANNELS.open,request);await vi.waitFor(()=>expect(f.actions.openUrl).toHaveBeenCalledOnce());
+ expect(await f.invoke(QUICKLINK_CHANNELS.open,request)).toMatchObject({ok:false,error:{code:'cancelled'}});expect(await f.invoke(QUICKLINK_CHANNELS.list)).toMatchObject({ok:false,error:{code:'cancelled'}});effect.resolve('dispatched');expect(await pending).toMatchObject({ok:true});
+ vi.mocked(f.actions.openUrl).mockRejectedValueOnce(new Error('PRIVATE_CLOCK_HANDOFF'));const reply=await f.invoke(QUICKLINK_CHANNELS.open,request);expect(reply).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(JSON.stringify(reply)).not.toContain('PRIVATE_CLOCK_HANDOFF');expect(f.actions.openUrl).toHaveBeenCalledTimes(2);expect(f.actions.recordUse).toHaveBeenCalledTimes(1);
+});
+it('checks exact saved clock configuration, deliberate conversions and configuration-only selected export',async()=>{
+ const f=exporting();await f.version();const input={protocolVersion:1,expectedRevision:0,name:record.name,url:record.url,clock:clockConfig};expect(await f.invoke(QUICKLINK_CHANNELS.save,input)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+ f.backend.save.mockResolvedValueOnce({...record,clock:clockConfig});expect(await f.invoke(QUICKLINK_CHANNELS.save,input)).toMatchObject({ok:true});f.backend.save.mockResolvedValueOnce({...record,clock:{...clockConfig,source:'date'}});expect(await f.invoke(QUICKLINK_CHANNELS.save,input)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+ f.backend.save.mockResolvedValueOnce({...record,clock:clockConfig});expect(await f.invoke(QUICKLINK_CHANNELS.save,{protocolVersion:1,expectedRevision:0,name:record.name,url:record.url})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+ f.backend.get.mockResolvedValue({...record,clock:clockConfig});expect(await f.invoke(QUICKLINK_CHANNELS.export,{protocolVersion:1,...selection})).toMatchObject({ok:true});expect(f.writeExport.mock.calls[0]![1]).toEqual({format:'linuxcast.quicklinks',formatVersion:1,records:[{...record,clock:clockConfig}]});expect(f.actions.openUrl).not.toHaveBeenCalled();expect(f.actions.recordUse).not.toHaveBeenCalled();
+});

@@ -47,7 +47,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   else if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;
   else if(method==='quicklinks.save'){
     const expected=quicklinkSaveSchema.parse(params);
-    valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch)&&JSON.stringify(row.pathArgument)===JSON.stringify(expected.pathArgument)&&JSON.stringify(row.tags??[])===JSON.stringify(expected.tags??[])&&(row.pinned??false)===(expected.pinned??false)&&(row.hidden??false)===(expected.hidden??false);
+    valid=(expected.id===undefined||row.id===expected.id)&&row.revision===expected.expectedRevision+1&&row.name===expected.name&&row.url===expected.url&&JSON.stringify(row.webSearch)===JSON.stringify(expected.webSearch)&&JSON.stringify(row.pathArgument)===JSON.stringify(expected.pathArgument)&&JSON.stringify(row.clock)===JSON.stringify(expected.clock)&&JSON.stringify(row.tags??[])===JSON.stringify(expected.tags??[])&&(row.pinned??false)===(expected.pinned??false)&&(row.hidden??false)===(expected.hidden??false);
   }
   else if(method==='rates.cache.get')valid=row.base===params.base&&row.quote===params.quote;
   else if(method==='rates.cache.put'){const expected=params.snapshot as Record<string,unknown>;valid=['provider','base','quote','rate','asOfDate','fetchedAt'].every(key=>row[key]===expected[key]);}

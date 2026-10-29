@@ -68,7 +68,9 @@
       "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
       "packages/templates/tests/templates.test.ts",
       "packages/builtins/quicklinks/tests/web-search.test.ts",
-      "packages/builtins/quicklinks/tests/path-argument.test.ts"
+      "packages/builtins/quicklinks/tests/path-argument.test.ts",
+      "packages/builtins/quicklinks/tests/clock.test.ts",
+      "packages/builtins/quicklinks/tests/clock-presentation.test.ts"
     ],
     "W1-01": [
       "packages/workflows/src/graph/tests/graph.test.ts",
@@ -171,7 +173,8 @@
     ],
     "L2-05": [
       "packages/contracts/tests/quicklinks.contract.test.ts",
-      "packages/contracts/tests/web-search.contract.test.ts"
+      "packages/contracts/tests/web-search.contract.test.ts",
+      "packages/contracts/tests/quicklink-clock.contract.test.ts"
     ],
     "W1-01": [
       "packages/contracts/tests/workflow-graph.contract.test.ts"
@@ -226,7 +229,8 @@
       "packages/builtins/file-search/tests/file-search.ui.test.ts"
     ],
     "L2-05": [
-      "packages/builtins/quicklinks/tests/quicklinks.ui.test.ts"
+      "packages/builtins/quicklinks/tests/quicklinks.ui.test.ts",
+      "packages/builtins/quicklinks/tests/clock.ui.test.ts"
     ],
     "W2-01": [
       "apps/desktop/src/features/workflows/canvas/tests/editor.ui.test.ts"
@@ -300,7 +304,8 @@
       "packages/builtins/quicklinks/tests/repository.integration.test.ts",
       "packages/storage/tests/quicklinks.integration.test.ts",
       "packages/storage/tests/web-search.integration.test.ts",
-      "apps/desktop/tests/quicklinks.integration.test.ts"
+      "apps/desktop/tests/quicklinks.integration.test.ts",
+      "apps/desktop/tests/quicklink-clock.integration.test.ts"
     ],
     "W2-01": [
       "packages/storage/tests/workflow-editor.integration.test.ts",

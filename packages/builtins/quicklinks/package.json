@@ -8,7 +8,8 @@
     "./presentation": "./src/presentation.ts",
     "./repository": "./src/repository.ts",
     "./web-search": "./src/web-search.ts",
-    "./path-argument": "./src/path-argument.ts"
+    "./path-argument": "./src/path-argument.ts",
+    "./clock": "./src/clock.ts"
   },
   "dependencies": {
     "@linuxcast/contracts": "workspace:*",
