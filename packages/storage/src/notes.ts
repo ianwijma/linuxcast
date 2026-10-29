@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
-import {noteRecordSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,noteTrashSchema,notesListRequestSchema,noteContentKey,notePlainText} from '../../contracts/src/notes.ts';
-import type {NoteRecord,NotesList,NoteContent,NotesStorageMethods} from '../../contracts/src/notes.ts';
+import {noteRecordSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryRequestSchema,noteRevisionSelectionSchema,noteHistorySchema,noteRevisionReadSchema,noteSavedRevisionSchema,notesListRequestSchema,noteContentKey,notePlainText} from '../../contracts/src/notes.ts';
+import type {NoteRecord,NotesList,NoteContent,NotesStorageMethods,NoteHistoryRequest,NoteHistory,NoteRevisionRead} from '../../contracts/src/notes.ts';
 import {StorageError} from './errors.ts';
 type Row={trashed:number;archived:number;pinned:number;id:string;revision:number;document_version:number;draft:string;saved:string|null;created_at:string;updated_at:string};
 function record(row:Row):NoteRecord{
@@ -64,7 +64,30 @@ export function setNoteTrashed(db:Database.Database,value:unknown):NoteRecord{
  const result=db.prepare('UPDATE notes SET trashed=?,revision=? WHERE id=? AND revision=?').run(input.trashed?1:0,next.revision,input.id,input.expectedRevision);
  if(result.changes!==1)throw new StorageError('conflict');return next;
 }
+function historyCurrent(db:Database.Database,input:NoteHistoryRequest):NoteRecord{
+ const current=getNote(db,input.id);if(!current||current.revision!==input.expectedRevision)throw new StorageError('conflict');return current;
+}
+/** Summaries only: do not put fifty complete bodies into a single RPC reply. */
+export function noteHistory(db:Database.Database,value:unknown):NoteHistory{
+ const input=noteHistoryRequestSchema.parse(value),current=historyCurrent(db,input);
+ const revisions=db.prepare("SELECT revision,created_at AS createdAt,json_extract(content,'$.title') AS title FROM note_saved_revisions WHERE note_id=? ORDER BY revision DESC,minute DESC LIMIT 51").all(input.id);
+ try{return noteHistorySchema.parse({id:input.id,currentRevision:current.revision,revisions});}catch{throw new StorageError('corrupt-database');}
+}
+export function readNoteRevision(db:Database.Database,value:unknown):NoteRevisionRead{
+ const input=noteRevisionSelectionSchema.parse(value),current=historyCurrent(db,input);
+ const rows=db.prepare('SELECT revision,created_at,content FROM note_saved_revisions WHERE note_id=? AND revision=? LIMIT 2').all(input.id,input.revision) as {revision:number;created_at:string;content:string}[];
+ if(!rows.length)throw new StorageError('conflict');if(rows.length!==1)throw new StorageError('corrupt-database');const row=rows[0]!;
+ try{const savedRevision=noteSavedRevisionSchema.parse({revision:row.revision,createdAt:row.created_at,content:JSON.parse(row.content)});return noteRevisionReadSchema.parse({id:input.id,currentRevision:current.revision,savedRevision});}catch{throw new StorageError('corrupt-database');}
+}
+/** Restore is an owner-derived draft write; Save and saved history stay separate. */
+export function restoreNoteRevision(db:Database.Database,value:unknown):NoteRecord{
+ const input=noteRevisionSelectionSchema.parse(value),current=historyCurrent(db,input);if(current.archived||current.trashed)throw new StorageError('invalid-request');
+ const source=readNoteRevision(db,input);return writeNote(db,{id:input.id,expectedRevision:input.expectedRevision,action:'draft',content:source.savedRevision.content});
+}
 export function dispatchNotes(db:Database.Database,method:keyof NotesStorageMethods,value:unknown):unknown{
+ if(method==='notes.history')return noteHistory(db,value);
+ if(method==='notes.getRevision')return readNoteRevision(db,value);
+ if(method==='notes.restoreRevision')return restoreNoteRevision(db,value);
  if(method==='notes.list')return listNotes(db,value);
  if(method==='notes.setTrashed')return setNoteTrashed(db,value);
  if(method==='notes.setArchived')return setNoteArchived(db,value);

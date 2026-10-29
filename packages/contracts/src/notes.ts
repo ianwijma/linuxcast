@@ -79,7 +79,22 @@ export const notesListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:
 export type NotesReadReply=z.infer<typeof notesReadReplySchema>;
 export type NotesWriteReply=z.infer<typeof notesWriteReplySchema>;
 export type NotesListReply=z.infer<typeof notesListReplySchema>;
-export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',setArchived:'notes:set-archived',setTrashed:'notes:set-trashed',close:'notes:close',appearance:'notes:appearance'} as const;
+/** Saved history is bounded metadata; fetch one closed content document for review. */
+export const noteHistoryRequestSchema=z.strictObject({id:z.uuid(),expectedRevision:revision.positive()});
+export type NoteHistoryRequest=z.infer<typeof noteHistoryRequestSchema>;
+export const noteRevisionSelectionSchema=noteHistoryRequestSchema.extend({revision:revision.positive()});
+export type NoteRevisionSelection=z.infer<typeof noteRevisionSelectionSchema>;
+export const noteSavedRevisionSummarySchema=z.strictObject({revision:revision.positive(),createdAt:z.iso.datetime(),title:noteTitleSchema});
+export const noteSavedRevisionSchema=z.strictObject({revision:revision.positive(),createdAt:z.iso.datetime(),content:noteContentSchema});
+export const noteHistorySchema=z.strictObject({id:z.uuid(),currentRevision:revision.positive(),revisions:z.array(noteSavedRevisionSummarySchema).max(50)}).refine(value=>value.revisions.every((row,index)=>row.revision<=value.currentRevision&&(index===0||row.revision<value.revisions[index-1]!.revision)));
+export type NoteHistory=z.infer<typeof noteHistorySchema>;
+export const noteRevisionReadSchema=z.strictObject({id:z.uuid(),currentRevision:revision.positive(),savedRevision:noteSavedRevisionSchema}).refine(value=>value.savedRevision.revision<=value.currentRevision);
+export type NoteRevisionRead=z.infer<typeof noteRevisionReadSchema>;
+export const noteHistoryReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteHistorySchema}),failure]);
+export const noteRevisionReadReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteRevisionReadSchema}),failure]);
+export type NoteHistoryReply=z.infer<typeof noteHistoryReplySchema>;
+export type NoteRevisionReadReply=z.infer<typeof noteRevisionReadReplySchema>;
+export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',setArchived:'notes:set-archived',setTrashed:'notes:set-trashed',history:'notes:history',getRevision:'notes:get-revision',restoreRevision:'notes:restore-revision',close:'notes:close',appearance:'notes:appearance'} as const;
 export const NOTES_QUICK_NOTE_READY='notes:quick-note-ready',NOTES_QUICK_NOTE_REQUESTED='notes:quick-note-requested',NOTES_QUICK_NOTE_FINISHED='notes:quick-note-finished';
 export const NOTES_APPEARANCE='notes:appearance-changed',NOTES_CLOSE_REQUESTED='notes:close-requested',NOTES_CLOSE_FINISHED='notes:close-finished';
 export const notesRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
@@ -89,10 +104,15 @@ export const notesWriteRequestSchema=notesRequestSchema.extend({input:noteWriteS
 export const notesPinRequestSchema=notesRequestSchema.extend({input:notePinSchema});
 export const notesArchiveRequestSchema=notesRequestSchema.extend({input:noteArchiveSchema});
 export const notesTrashRequestSchema=notesRequestSchema.extend({input:noteTrashSchema});
+export const notesHistoryRequestSchema=notesRequestSchema.extend({input:noteHistoryRequestSchema});
+export const notesRevisionRequestSchema=notesRequestSchema.extend({input:noteRevisionSelectionSchema});
 export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.number().int().positive().safe()});
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export const notesQuickNoteFinishedSchema=notesCloseAttemptSchema.extend({created:z.boolean()});
 export interface NotesApi{
+ history?(input:NoteHistoryRequest):Promise<NoteHistoryReply>;
+ getRevision?(input:NoteRevisionSelection):Promise<NoteRevisionReadReply>;
+ restoreRevision?(input:NoteRevisionSelection):Promise<NotesWriteReply>;
  onQuickNoteRequested?(listener:()=>boolean|Promise<boolean>):()=>void;
  setTrashed?(input:NoteTrash):Promise<NotesWriteReply>;
  setArchived?(input:NoteArchive):Promise<NotesWriteReply>;
@@ -113,8 +133,11 @@ export interface NotesStorageMethods{
  'notes.setPinned':{params:NotePin;result:NoteRecord};
  'notes.setArchived':{params:NoteArchive;result:NoteRecord};
  'notes.setTrashed':{params:NoteTrash;result:NoteRecord};
+ 'notes.history':{params:NoteHistoryRequest;result:NoteHistory};
+ 'notes.getRevision':{params:NoteRevisionSelection;result:NoteRevisionRead};
+ 'notes.restoreRevision':{params:NoteRevisionSelection;result:NoteRecord};
 }
-export const NOTES_STORAGE_METHODS=['notes.list','notes.get','notes.write','notes.setPinned','notes.setArchived','notes.setTrashed'] as const;
+export const NOTES_STORAGE_METHODS=['notes.list','notes.get','notes.write','notes.setPinned','notes.setArchived','notes.setTrashed','notes.history','notes.getRevision','notes.restoreRevision'] as const;
 export const notesRepositoryContracts:RepositoryContracts=new Map([
  ['notes.list',{params:notesListRequestSchema,result:notesListSchema}],
  ['notes.get',{params:z.strictObject({id:z.uuid()}),result:noteRecordSchema.nullable()}],
@@ -122,4 +145,7 @@ export const notesRepositoryContracts:RepositoryContracts=new Map([
  ['notes.setPinned',{params:notePinSchema,result:noteRecordSchema}],
  ['notes.setArchived',{params:noteArchiveSchema,result:noteRecordSchema}],
  ['notes.setTrashed',{params:noteTrashSchema,result:noteRecordSchema}],
+ ['notes.history',{params:noteHistoryRequestSchema,result:noteHistorySchema}],
+ ['notes.getRevision',{params:noteRevisionSelectionSchema,result:noteRevisionReadSchema}],
+ ['notes.restoreRevision',{params:noteRevisionSelectionSchema,result:noteRecordSchema}],
 ]);

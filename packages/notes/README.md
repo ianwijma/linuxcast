@@ -257,6 +257,61 @@ attachments/root provider and full Debian
 GNOME/KDE Wayland/X11/native AT/session/performance/package/release acceptance
 remain required. Reviewed shared UI does not establish complete D1-02 acceptance.
 
+## Saved revision review/restore as draft — 29 October 2026
+
+Saved revisions reserves the selected context before reading at most 50 owner
+metadata entries, newest first. It waits for an already admitted Save, flushes an
+ordinary editable draft without Save and skips implicit writes for paused or
+readonly content. A blocked outcome keeps existing recovery. Editing, navigation,
+New/Quick, metadata, export and native Close remain fenced until review closes.
+
+Selecting a retained revision fetches exactly that ID/current revision/saved
+revision tuple. The rich preview has distinct title/body/task labels and DOM IDs;
+checked tasks, literal markup-looking text and Unicode remain readonly. Late or
+mismatched reads never substitute another revision. Close/Escape returns focus to
+the existing Saved revisions action and preserves the current editor/draft.
+
+Restore as draft requires a separate confirmation, with Keep current draft focused
+first and explicit warning that retained local edits will be replaced. Only active,
+nontrashed notes can restore; readonly review explains the required Trash/Archive
+recovery. The named request carries selection only. Exact next-revision receipts
+match the reviewed content, preserve the saved version/pin/archive/Trash/creation
+time and change only the latest draft. Save note remains a separate action.
+Unknown/malformed/timeout outcomes close review, retain local edits and require
+explicit fresh Reload without replay. Missing/known-refused capabilities remain
+visible with manual remediation.
+
+Bounded author verification on Linux amd64 / Node24.22.1 / Bun1.4.4:
+
+- 164 focused unit cases: 157 controller and seven export; 33 additions cover
+  exact history/preview/restore receipts, queued Save, paused/readonly no replay,
+  confirmation, late generation/disposal, refusal, timeout and recovery.
+- 50 actual Tiptap Chromium cases: 43 retained plus seven new revision flows.
+  Dark/light list, rich preview, Keep/Escape, held Enter, confirmation and separate
+  Restore/Save are covered, with loading/error/missing/readonly/pending/unknown
+  states. Tested previews pass axe and duplicate-ID assertions; 200% checks bound
+  the reachable Restore control. Final verification passed 45 cases before an
+  error-capture fractional-pixel bounds failure; the test-only one-pixel rounding
+  allowance and targeted rerun passed that case plus four skipped cases.
+  Captures use normal scroll/paint and actual
+  viewport geometry, avoiding full-page resize artifacts in a fixed workspace.
+- Owned Notes typecheck, scoped ESLint, plan integrity and whitespace checks pass.
+  Full integrated type/security/owner/native lifecycle checks are coordinator-owned.
+
+Sixteen public affected captures are inspected: both themes list/preview/
+confirmation/restored draft; dark loading/pending/refusal; light error/missing/
+readonly/unknown and 200%. Historical regenerated images are restored to the
+reviewed Trash baseline. Fixture persistence and requests are labelled synthetic;
+they are not actual SQLite retention/coalescing, native-close or restart evidence.
+
+This delta is based on reviewed Trash TREE b938e51, not an unsigned baseline commit.
+It contributes partial U1-01-AC01/UI/PRIVACY presentation only. All four U1 criteria
+and full D1-02 remain pending. Full import/Markdown roundtrip, attachments/root
+provider, retention/pruning/deletion scope and Debian GNOME/KDE Wayland/X11/native
+AT/session/performance/package/release acceptance remain required. Coordinator
+integrates the frozen Trash baseline before this follow-on; no publication is
+claimed from this worktree or component evidence.
+
 ## Earlier create/edit author verification — 29 October 2026
 
 Linux amd64, Node 24.22.1, Bun 1.4.4, installed Chromium via Playwright:

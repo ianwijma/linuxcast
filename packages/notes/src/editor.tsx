@@ -23,14 +23,14 @@ const commands=[
  {label:'Divider',run:(editor:Editor)=>editor.chain().setHorizontalRule().run()},
 ];
 type Slash={from:number;to:number;query:string;index:number};
-export function RichNoteEditor({document,disabled=false,onChange,onError}:{document:NoteDocument;disabled?:boolean;onChange:(document:NoteDocument)=>void;onError:(message:string)=>void}){
+export function RichNoteEditor({document,disabled=false,label='Note body',idPrefix='notes',onChange,onError}:{document:NoteDocument;disabled?:boolean;label?:string;idPrefix?:string;onChange:(document:NoteDocument)=>void;onError:(message:string)=>void}){
  const callbacks=useRef({onChange,onError});callbacks.current={onChange,onError};const readonly=useRef(disabled);readonly.current=disabled;
  const [slash,setSlash]=useState<Slash|null>(null),[,render]=useState(0);const slashRef=useRef(slash);slashRef.current=slash;
  const rejected=()=>queueMicrotask(()=>callbacks.current.onError('This change exceeds the supported note structure or 64 KiB text limit. Keep or shorten the existing text.'));
  const editor=useEditor({
-  extensions:[StarterKit.configure({heading:{levels:[1,2,3]},link:false,underline:false,trailingNode:false}),TaskList,TaskItem.configure({nested:true,a11y:{checkboxLabel:node=>`Task: ${node.textContent||'empty task'}`}}),Extension.create({name:'boundedNote',addProseMirrorPlugins(){return[new Plugin({filterTransaction(transaction){if(!transaction.docChanged)return true;const valid=noteDocumentSchema.safeParse(transaction.doc.toJSON()).success;if(!valid)rejected();return valid;}})];}})],
+  extensions:[StarterKit.configure({heading:{levels:[1,2,3]},link:false,underline:false,trailingNode:false}),TaskList,TaskItem.configure({nested:true,a11y:{checkboxLabel:node=>`${idPrefix==='notes'?'Task':'Saved revision task'}: ${node.textContent||'empty task'}`}}),Extension.create({name:'boundedNote',addProseMirrorPlugins(){return[new Plugin({filterTransaction(transaction){if(!transaction.docChanged)return true;const valid=noteDocumentSchema.safeParse(transaction.doc.toJSON()).success;if(!valid)rejected();return valid;}})];}})],
   content:document,editable:!disabled,injectCSS:false,immediatelyRender:false,
-  editorProps:{attributes:{role:'textbox','aria-label':'Note body','aria-multiline':'true','aria-describedby':'notes-rich-guidance',spellcheck:'true'},
+  editorProps:{attributes:{role:'textbox','aria-label':label,'aria-multiline':'true','aria-describedby':`${idPrefix}-rich-guidance`,spellcheck:'true'},
    handlePaste(_view,event){event.preventDefault();if(event.clipboardData?.files.length){callbacks.current.onError('Attachments are unavailable. Paste plain text only.');return true;}insertPlain(event.clipboardData?.getData('text/plain')??'');return true;},
    handleDrop(_view,event){event.preventDefault();if(event.dataTransfer?.files.length){callbacks.current.onError('Attachments are unavailable. Drop plain text only.');return true;}insertPlain(event.dataTransfer?.getData('text/plain')??'');return true;},
    handleKeyDown(_view,event){if(readonly.current||!_view.editable||event.isComposing)return false;const current=slashRef.current;if(!current)return false;
@@ -48,16 +48,16 @@ export function RichNoteEditor({document,disabled=false,onChange,onError}:{docum
  function choose(command:typeof commands[number]){const current=slashRef.current;if(!editor||readonly.current||!editor.isEditable||!current)return;editor.chain().focus().deleteRange({from:current.from,to:current.to}).run();command.run(editor);setSlash(null);}
  useEffect(()=>{if(editor&&JSON.stringify(editor.getJSON())!==JSON.stringify(document))editor.commands.setContent(document,{emitUpdate:false});},[editor,document]);
  useLayoutEffect(()=>{if(disabled){slashRef.current=null;setSlash(null);}if(!editor)return;editor.setEditable(!disabled,false);editor.view.dom.setAttribute('aria-readonly',String(disabled));editor.view.dom.querySelectorAll<HTMLInputElement>('input[type=checkbox]').forEach(input=>{input.disabled=disabled;});},[editor,disabled]);
- useEffect(()=>{if(!editor)return;if(slash){editor.view.dom.setAttribute('aria-controls','notes-slash-menu');editor.view.dom.setAttribute('aria-activedescendant',`notes-slash-${slash.index}`);}else{editor.view.dom.removeAttribute('aria-controls');editor.view.dom.removeAttribute('aria-activedescendant');}},[editor,slash]);
+ useEffect(()=>{if(!editor)return;if(slash){editor.view.dom.setAttribute('aria-controls',`${idPrefix}-slash-menu`);editor.view.dom.setAttribute('aria-activedescendant',`${idPrefix}-slash-${slash.index}`);}else{editor.view.dom.removeAttribute('aria-controls');editor.view.dom.removeAttribute('aria-activedescendant');}},[editor,slash]);
  const filtered=slash?commands.filter(command=>command.label.toLowerCase().includes(slash.query)):[];
  return <div className="notes-rich">
-  <div role="toolbar" aria-label="Note formatting" className="notes-toolbar">
+  <div role="toolbar" aria-label={idPrefix==='notes'?'Note formatting':`${label} formatting`} className="notes-toolbar">
    {(['bold','italic','strike','code'] as const).map(mark=><Button key={mark} disabled={!editor||disabled} aria-pressed={editor?.isActive(mark)??false} onClick={()=>editor?.chain().focus().toggleMark(mark).run()}>{mark==='strike'?'Strikethrough':mark[0]!.toUpperCase()+mark.slice(1)}</Button>)}
-   <label className="notes-block-label">Block <select aria-label="Block style" disabled={disabled} value="" onChange={event=>{const command=commands.find(item=>item.label===event.target.value);if(editor&&command){editor.commands.focus();command.run(editor);}}}><option value="">Choose block</option>{commands.map(item=><option key={item.label}>{item.label}</option>)}</select></label>
+   <label className="notes-block-label">Block <select aria-label={idPrefix==='notes'?'Block style':`${label} block style`} disabled={disabled} value="" onChange={event=>{const command=commands.find(item=>item.label===event.target.value);if(editor&&command){editor.commands.focus();command.run(editor);}}}><option value="">Choose block</option>{commands.map(item=><option key={item.label}>{item.label}</option>)}</select></label>
    <Button disabled={disabled||!editor?.can().undo()} onClick={()=>editor?.chain().focus().undo().run()}>Undo</Button><Button disabled={disabled||!editor?.can().redo()} onClick={()=>editor?.chain().focus().redo().run()}>Redo</Button>
   </div>
-  <p id="notes-rich-guidance" className="lc-muted">Type / for blocks and tasks. Paste and drop plain text only; attachments and links are unavailable. Maximum 64 KiB of text.</p>
-  {!disabled&&slash&&<div id="notes-slash-menu" role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`notes-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div>}
+  <p id={`${idPrefix}-rich-guidance`} className="lc-muted">{idPrefix==='notes'?'Type / for blocks and tasks. Paste and drop plain text only; attachments and links are unavailable. Maximum 64 KiB of text.':'Read-only saved revision. Rich text and task states are shown without editing.'}</p>
+  {!disabled&&slash&&<div id={`${idPrefix}-slash-menu`} role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`${idPrefix}-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div>}
   <EditorContent editor={editor}/>
  </div>;
 }

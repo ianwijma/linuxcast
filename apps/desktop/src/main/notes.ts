@@ -11,13 +11,13 @@ import {trustedAppSender} from './ipc.ts';
 import {restrictContents,securePreferences} from './security.ts';
 import type {ResidentService} from './lifecycle.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
-export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'list'|'get'|'write'|'setPinned'|'setArchived'|'setTrashed'>):ResidentService&{open():Promise<void>;quickNote():Promise<void>;prepareClose():Promise<boolean>}{
+export function createNotesWorkspace(options:{resourcesDirectory:string;isReady():boolean}&Pick<NotesActions,'list'|'get'|'write'|'setPinned'|'setArchived'|'setTrashed'|'history'|'getRevision'|'restoreRevision'>):ResidentService&{open():Promise<void>;quickNote():Promise<void>;prepareClose():Promise<boolean>}{
  let window:BrowserWindow|undefined,creating:Promise<void>|undefined,stopped=false,stopping=false,approvedClose=false,stopPromise:Promise<void>|undefined,sequence=0;
  let attempt:{id:number;owner:BrowserWindow;promise:Promise<boolean>;resolve(value:boolean):void;timer:ReturnType<typeof setTimeout>}|undefined;
  const finish=(value:boolean)=>{const pending=attempt;attempt=undefined;if(pending){clearTimeout(pending.timer);pending.resolve(value);}};
  const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
  const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
- const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),closeBusy:()=>quick.busy(),committed:(input,record)=>quick.committed(input,record),appearance,list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,
+ const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),closeBusy:()=>quick.busy(),committed:(input,record)=>quick.committed(input,record),appearance,list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,history:options.history,getRevision:options.getRevision,restoreRevision:options.restoreRevision,
   close(){if(window&&alive(window)&&!exporter.busy()&&!api.isWriting()&&!quick.busy()){approvedClose=true;window.close();}},
  });
  const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:()=>api.isWriting()||quick.busy(),get:options.get,publish:saveNoteMarkdown,
