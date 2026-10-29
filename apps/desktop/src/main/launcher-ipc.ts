@@ -37,6 +37,7 @@ export interface LauncherActions {
   quit(): void | Promise<boolean>;
   copyCalculatorResult?: (text:string) => Promise<'written'|'unsupported'|'busy'>;
   openWorkflowEditor?: () => Promise<void>;
+  openNotes?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
@@ -79,6 +80,8 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     {id:'linuxcast:quit', title:'Quit Linuxcast', subtitle:'Stop Linuxcast and its application services', aliases:['quit','exit'], keywords:['stop','close'], enabled:true},
     {id:'linuxcast:open-url',title:'Open URL',subtitle:'Open an HTTP or HTTPS address in your default browser',aliases:['url','open url'],keywords:['web','browser','address','link'],enabled:!!actions.openUrl,
       ...(!actions.openUrl?{unavailableReason:'Browser opening is unavailable. Reopen Linuxcast to try again.'}:{})},
+    {id:'linuxcast:open-notes',title:'Notes',subtitle:'Create, search and edit local notes',aliases:['notes','note'],keywords:['write','draft','editor','tasks'],enabled:!!actions.openNotes,
+      ...(!actions.openNotes?{unavailableReason:'Notes are unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:open-file-search',title:'File search',subtitle:'Search filenames in folders you choose',aliases:['files','file search'],keywords:['folder','filename','index'],enabled:!!actions.openFileSearch,
       ...(!actions.openFileSearch?{unavailableReason:'File search is unavailable. Reopen Linuxcast to try again.'}:{})},
     {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic, units, colours or dates locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert','dates','timezones'],enabled:true},
@@ -428,6 +431,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
         await actions.openWorkflowEntry(matched.selection,trusted);
       }
       else if(command.id==='linuxcast:open-workflow-editor')await actions.openWorkflowEditor!();
+      else if(command.id==='linuxcast:open-notes')await actions.openNotes!();
       else if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
       else if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
       else actions.hide();

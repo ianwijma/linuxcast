@@ -1,3 +1,4 @@
+import {notesRepositoryContracts} from '../../contracts/src/notes.ts';
 import {rateSnapshotSchema,ratePairSchema} from '../../contracts/src/rate-conversion.ts';
 import { journalContracts } from '../../workflows/src/journal/contracts.ts';
 import { workflowEditorRecordSchema, workflowEditorWriteSchema } from '../../contracts/src/workflow-editor.ts';
@@ -32,6 +33,7 @@ export const hiddenCommandIdsSchema = z.array(visibilityId).max(MAX_LAUNCHER_COM
 /** Complete method schemas owned by storage. No database connection is imported. */
 export const storageContracts: RepositoryContracts = new Map([
   ...quicklinkRepositoryContracts,
+  ...notesRepositoryContracts,
   ['rates.cache.get',{params:ratePairSchema,result:rateSnapshotSchema.nullable()}],
   ['rates.cache.put',{params:z.strictObject({snapshot:rateSnapshotSchema,configurationRevision:revision}),result:rateSnapshotSchema}],
   ['rates.cache.clear',{params:z.strictObject({configurationRevision:revision}),result:z.strictObject({outcome:z.literal('cleared')})}],

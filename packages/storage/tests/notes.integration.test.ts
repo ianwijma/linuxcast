@@ -1,0 +1,55 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {mkdtemp,rm,readdir,readFile,stat} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {randomUUID} from 'node:crypto';
+import Database from 'better-sqlite3';
+import {StorageOwner} from '../src/owner.ts';
+import {foundationMigrations} from '../src/migrations.ts';
+import {createStorageClient} from '../src/client.ts';
+import type {StorageMethod,StorageMethods} from '../src/repositories.ts';
+import {emptyNoteDocument,noteContentKey} from '../../contracts/src/notes.ts';
+const directories:string[]=[],owners:StorageOwner[]=[];
+afterEach(async()=>{vi.useRealTimers();for(const owner of owners.splice(0))await owner.close();for(const directory of directories.splice(0))await rm(directory,{recursive:true,force:true});});
+async function open(directory?:string,count?:number){const dir=directory??await mkdtemp(join(tmpdir(),'linuxcast-notes-owner-'));if(!directory)directories.push(dir);const owner=await StorageOwner.open({dataDirectory:dir,applicationBuild:'public-notes-test',...(count?{migrations:(await foundationMigrations()).slice(0,count)}:{})});owners.push(owner);return {owner,dir};}
+function ask<M extends StorageMethod>(owner:StorageOwner,method:M,params:StorageMethods[M]['params']){return owner.request({schemaVersion:1,requestId:randomUUID(),method,params}).result as StorageMethods[M]['result'];}
+const doc=(text:string)=>({type:'doc' as const,content:[{type:'paragraph',content:[{type:'text',text}]}]});
+const content={title:'Public notes',document:doc('Public Unicode 雪 🐧 <script>literal</script>')};
+it('creates and restores separate durable saved content and pending draft across reopen and unrelated clearing',async()=>{
+ const {owner,dir}=await open(),id=randomUUID();const first=ask(owner,'notes.write',{id,expectedRevision:0,action:'draft',content});expect(first).toMatchObject({id,revision:1,saved:null,draft:content,documentVersion:1});
+ const saved=ask(owner,'notes.write',{id,expectedRevision:1,action:'save',content});const newer={title:'Public changed title',document:doc('Recover this unsaved public draft')};const draft=ask(owner,'notes.write',{id,expectedRevision:2,action:'draft',content:newer});expect(draft.saved).toEqual(saved.saved);expect(ask(owner,'notes.list',{query:'RECOVER'}).records).toMatchObject([{id,revision:3,title:newer.title,hasDraft:true}]);
+ ask(owner,'commands.recordUse',{commandId:'linuxcast:notes'});ask(owner,'dataControls.clear',{category:'command-usage'});ask(owner,'dataControls.clear',{category:'file-index'});await owner.confirmSuccessfulLaunch();await owner.close();const next=(await open(dir)).owner;
+ expect(ask(next,'notes.get',{id})).toEqual(draft);expect(noteContentKey(ask(next,'notes.get',{id})!.saved!)).toBe(noteContentKey(content));expect(ask(next,'notes.list',{query:'public changed'}).records[0]?.id).toBe(id);
+ expect((await stat(join(dir,'linuxcast.db'))).mode&0o777).toBe(0o600);expect((await stat(dir)).mode&0o777).toBe(0o700);
+ const exported=JSON.stringify(ask(next,'dataControls.export',{category:'command-usage'}));expect(exported).not.toContain('Recover this');expect(exported).not.toContain('literal');
+});
+it('migrates schema13 to14 with a consistent snapshot, preserving prior settings and refusal of stale edits',async()=>{
+ const {owner,dir}=await open(undefined,13);ask(owner,'settings.set',{id:'ui.theme',expectedRevision:0,value:'light'});await owner.confirmSuccessfulLaunch();await owner.close();const next=(await open(dir)).owner;expect(next.version).toBe(14);expect(ask(next,'settings.get',{id:'ui.theme'})).toMatchObject({value:'light',revision:1});
+ const backup=join(dir,'backups'),journals=await Promise.all((await readdir(backup)).filter(name=>name.endsWith('.json')).map(async name=>JSON.parse(await readFile(join(backup,name),'utf8')) as {id:string;fromVersion:number;toVersion:number;state:string}));const journal=journals.find(row=>row.fromVersion===13&&row.toVersion===14)!;expect(journal.state).toBe('awaiting-confirmation');const snapshot=new Database(join(backup,journal.id+'.db'),{readonly:true});try{expect(snapshot.pragma('user_version',{simple:true})).toBe(13);expect(snapshot.prepare("SELECT name FROM sqlite_master WHERE name='notes'").get()).toBeUndefined();}finally{snapshot.close();}
+ const id=randomUUID(),record=ask(next,'notes.write',{id,expectedRevision:0,action:'save',content});expect(()=>ask(next,'notes.write',{id,expectedRevision:0,action:'draft',content:{...content,title:'Unwanted'}})).toThrow('conflict');expect(ask(next,'notes.get',{id})).toEqual(record);
+});
+it('paginates real source notes with literal wildcard and Unicode title/body search',async()=>{
+ const {owner}=await open();for(let n=0;n<105;n++)ask(owner,'notes.write',{id:randomUUID(),expectedRevision:0,action:'draft',content:{title:'Public row '+n,document:doc(n===50?'100% _literal \\path 猫':'ordinary body')}});
+ const first=ask(owner,'notes.list',{query:'Public'});expect(first.records).toHaveLength(100);expect(first.nextCursor).not.toBeNull();const second=ask(owner,'notes.list',{query:'Public',cursor:first.nextCursor!});expect(second.records).toHaveLength(5);expect(second.nextCursor).toBeNull();expect(new Set([...first.records,...second.records].map(row=>row.id)).size).toBe(105);
+ for(const query of ['100%','_literal','\\path','猫'])expect(ask(owner,'notes.list',{query}).records).toHaveLength(1);expect(ask(owner,'notes.list',{query:'missing%'}).records).toEqual([]);
+});
+it('rejects malformed or executable structured documents atomically without changing sources',async()=>{
+ const {owner}=await open(),id=randomUUID(),record=ask(owner,'notes.write',{id,expectedRevision:0,action:'save',content});
+ for(const document of [{type:'doc',content:[{type:'image',attrs:{src:'https://private.invalid'}}]},{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'x'.repeat(65537)}]}]},{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'private',marks:[{type:'link',attrs:{href:'javascript:private'}}]}]}]}])expect(()=>ask(owner,'notes.write',{id,expectedRevision:1,action:'draft',content:{title:'Other',document} as never})).toThrow();
+ expect(ask(owner,'notes.get',{id})).toEqual(record);expect(ask(owner,'notes.get',{id:randomUUID()})).toBeNull();
+});
+it('coalesces saved revisions by minute, retains50, and never records pending drafts as saved revisions',async()=>{
+ const {owner,dir}=await open(),id=randomUUID();let revision=0;vi.useFakeTimers({toFake:['Date']});for(let n=0;n<55;n++){vi.setSystemTime(new Date(Date.UTC(2026,9,29,0,n)));for(let i=0;i<2;i++)revision=ask(owner,'notes.write',{id,expectedRevision:revision,action:'save',content:{title:'Public revision',document:doc(`saved ${n}-${i}`)}}).revision;}
+ vi.setSystemTime(new Date(Date.UTC(2026,9,28)));revision=ask(owner,'notes.write',{id,expectedRevision:revision,action:'save',content:{title:'Public revision',document:doc('saved after clock rollback')}}).revision;
+ revision=ask(owner,'notes.write',{id,expectedRevision:revision,action:'draft',content:{title:'Pending',document:emptyNoteDocument()}}).revision;vi.useRealTimers();const db=new Database(join(dir,'linuxcast.db'),{readonly:true});try{const rows=db.prepare('SELECT revision,content FROM note_saved_revisions WHERE note_id=? ORDER BY revision').all(id) as {revision:number;content:string}[];expect(rows).toHaveLength(50);expect(rows.at(-1)?.revision).toBe(revision-1);expect(rows.every(row=>row.content.includes('saved'))).toBe(true);expect(rows[0]?.content).toContain('saved 6-1');expect(rows.at(-1)?.content).toContain('saved after clock rollback');}finally{db.close();}
+});
+it('rejects forged note write acknowledgements without replaying a possibly committed mutation',async()=>{
+ for(const mode of ['id','revision','content','saved'] as const){let receive:(v:unknown)=>void=()=>{};const sent:unknown[]=[];const client=createStorageClient({send:value=>sent.push(value),onMessage:listener=>{receive=listener;return()=>{};}}),id=randomUUID(),input={id,expectedRevision:0,action:'save' as const,content},pending=client.request('notes.write',input),envelope=sent[0] as {request:{requestId:string;method:string}};
+ const value={id:mode==='id'?randomUUID():id,revision:mode==='revision'?2:1,documentVersion:1,draft:mode==='content'?{...content,title:'Other'}:content,saved:mode==='saved'?null:content,createdAt:'2026-10-29T00:00:00.000Z',updatedAt:'2026-10-29T00:00:00.000Z'};
+ receive({kind:'response',response:{schemaVersion:1,requestId:envelope.request.requestId,method:envelope.request.method,outcome:'completed',result:value}});await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(sent).toHaveLength(1);client.disconnect();}
+});
+
+it('rejects a first draft receipt that falsely reports explicitly saved content without replay',async()=>{
+ let receive:(value:unknown)=>void=()=>{};const sent:unknown[]=[];const client=createStorageClient({send:value=>sent.push(value),onMessage:listener=>{receive=listener;return()=>{};}}),id=randomUUID(),pending=client.request('notes.write',{id,expectedRevision:0,action:'draft',content}),envelope=sent[0] as {request:{requestId:string;method:string}};
+ receive({kind:'response',response:{schemaVersion:1,requestId:envelope.request.requestId,method:envelope.request.method,outcome:'completed',result:{id,revision:1,documentVersion:1,draft:content,saved:content,createdAt:'2026-10-29T00:00:00.000Z',updatedAt:'2026-10-29T00:00:00.000Z'}}});await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(sent).toHaveLength(1);client.disconnect();
+});

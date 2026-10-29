@@ -1,3 +1,5 @@
+import {noteContentKey,noteWriteSchema} from '../../contracts/src/notes.ts';
+import type {NoteRecord,NotesList} from '../../contracts/src/notes.ts';
 import { createWorkflowDraft } from '../../workflows/src/registry.ts';
 import { stableWorkflowJson } from './workflow-editor-json.ts';
 import { STORAGE_REASONS } from './errors.ts';
@@ -29,7 +31,10 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   if (result === null) return;
   const row = result as Record<string, unknown>;
   let valid = true;
-  if(method==='workflows.runs.put'||method==='workflows.steps.put')valid=stableWorkflowJson(row)===stableWorkflowJson(params.record);
+  if(method==='notes.get')valid=row.id===params.id;
+  else if(method==='notes.write'){const input=noteWriteSchema.parse(params),record=result as NoteRecord;valid=record.id===input.id&&record.revision===input.expectedRevision+1&&noteContentKey(record.draft)===noteContentKey(input.content)&&(input.action!=='save'||record.saved!==null&&noteContentKey(record.saved)===noteContentKey(input.content))&&(input.action!=='draft'||input.expectedRevision!==0||record.saved===null);}
+  else if(method==='notes.list'){const page=result as NotesList,cursor=params.cursor as {updatedAt:string;id:string}|undefined;let before=cursor;valid=page.query===params.query&&page.records.every(value=>{const ordered=!before||value.updatedAt<before.updatedAt||value.updatedAt===before.updatedAt&&value.id<before.id;before={updatedAt:value.updatedAt,id:value.id};return ordered;})&&(page.nextCursor===null||page.records.length===100&&page.nextCursor.updatedAt===page.records.at(-1)!.updatedAt&&page.nextCursor.id===page.records.at(-1)!.id);}
+  else if(method==='workflows.runs.put'||method==='workflows.steps.put')valid=stableWorkflowJson(row)===stableWorkflowJson(params.record);
   else if(method==='workflows.runs.recover')valid=true;
   else if(method==='workflows.editor.write')valid=row.revision===Number(params.expectedRevision)+1&&(params.action==='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(params.draft))&&(params.action!=='save'||stableWorkflowJson(row.saved)===stableWorkflowJson(params.draft))&&(params.action!=='revert'||stableWorkflowJson(row.draft)===stableWorkflowJson(row.saved??createWorkflowDraft()));
   else if(method==='quicklinks.get'||method==='quicklinks.remove')valid=row.id===params.id&&row.revision===params.revision;

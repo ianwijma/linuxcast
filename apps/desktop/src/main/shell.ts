@@ -26,6 +26,7 @@ export interface ResidentShellOptions {
   loadWorkflowCommands?:LauncherActions['loadWorkflowCommands'];
   openWorkflowEntry?:LauncherActions['openWorkflowEntry'];
   openWorkflowEditor?: () => Promise<void>;
+  openNotes?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
   openUrl?: LauncherActions['openUrl'];
@@ -153,6 +154,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.loadWorkflowCommands?{loadWorkflowCommands:options.loadWorkflowCommands}:{}),
       ...(options.openWorkflowEntry?{openWorkflowEntry:options.openWorkflowEntry}:{}),
       ...(options.openWorkflowEditor ? {openWorkflowEditor:options.openWorkflowEditor} : {}),
+      ...(options.openNotes ? {openNotes:options.openNotes} : {}),
       ...(options.openFileSearch ? {openFileSearch:options.openFileSearch} : {}),
       ...(options.copyCalculatorResult ? {copyCalculatorResult:options.copyCalculatorResult} : {}),
       ...(options.openUrl ? {openUrl:options.openUrl} : {}),

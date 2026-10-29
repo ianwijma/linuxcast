@@ -6780,7 +6780,7 @@
     {
       "id": "U1-01",
       "title": "Build notes editor and recovery",
-      "status": "planned",
+      "status": "in-progress",
       "phase": "implementation",
       "lane": "U1",
       "dependsOn": [
@@ -6821,7 +6821,14 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- U1-01",
+              "outcome": "Partial: apps/desktop/evidence/notes-create-edit-application.md records actual private-profile SQLite saved/draft owner+app crash/restart PASS; full supported-session/release evidence remains pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; private Xvfb X11 and Chromium fixtures, not supported Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-create-edit-application.md; packages/notes/README.md"
+            }
+          ]
         },
         {
           "id": "U1-01-AC02",
@@ -6837,7 +6844,14 @@
           "status": "pending",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:ui -- U1-01; bun run test:unit -- U1-01",
+              "outcome": "Partial: 14realTiptap browser cases,30controller cases,19publiccomponent/actualcaptures and independentreviews; actual nativeAT/desktop matrix remains pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; private Xvfb X11 and Chromium fixtures, not supported Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-create-edit-application.md; packages/notes/README.md"
+            }
+          ]
         },
         {
           "id": "U1-01-PRIVACY",
@@ -6845,17 +6859,31 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- U1-01; production Notes integration privacy assertions and capture/source inspection",
+              "outcome": "Partial: public synthetic-onlyfixtures/captures, owner sourceprivacy/export separation and literalno-network/noexecution assertions PASS; remaining task scope still pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; private Xvfb X11 and Chromium fixtures, not supported Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-create-edit-application.md; packages/notes/README.md"
+            }
+          ]
         }
       ],
       "validation": [
         "bun run typecheck",
         "bun run test:ui -- U1-01"
       ],
-      "evidence": [],
-      "owner": null,
-      "branch": null,
-      "limitations": []
+      "evidence": [
+        "29October2026 create/edit/autosave application increment on PR56/develop dc4f47e, codex/notes-create-edit; Tiptap3.32.0 OSS and schema014 sole-owner SQLite. Registered launcher Notes opens hardened workspace with real rich editor/slash/tasks, New/title-body search, separate saved/draft, nativeclose/Quit flush and restart/crash recovery. Reviewed/tested unfinished increment; no full task claim. Publishing awaits configured1Password signing (normal retry errors; unchanged configuration, no unsigned commit).",
+        "Final183mapped unit/11contract/28mainIPC-preloadsecurity and49existingF2-01 storage regression checks PASS; seven actual Notes owner migration/CAS/search/paging/reopen/privacy/revisionclockrollback/forgedreceipt checks PASS. Fulltype/scopedlint/plan/diff PASS. Author30controller/14realTiptap Chromium behavior/axe/state/200percent cases PASS with14 public component captures. Exact25owned UI files reconciled to author snapshot b327054c98feb3fd0d462d63475e9a2b02c1d7cdb50573c40d84098079cf8db4. Independent core/main andUI/capture reviews closed actionable findings.",
+        "Actual production Electron45/privateXvfb X11 test PASS6.17s: registeredlauncher/New/realTiptap task editing/literalUnicode/SQLite title-bodysearch/nativeclose andQuit beforedebounce/restart/forcedprivateowner+appSIGKILL afterdurabledraftACK/exactrevision andseparatesaved recovery/reopenedownerprivacy. Fivepublicactualcaptures inspected including corrected painted recovered-draft notice. HostPop!_OS22.04amd64, Node24.22.1/Bun1.4.4/SQLite3.53.4, not Debian13 GNOME/KDE Wayland/X11 acceptance. Detailed evidence apps/desktop/evidence/notes-create-edit-application.md."
+      ],
+      "owner": "coordinator and manifest_review_sol (GPT-6.1 SOL/high)",
+      "branch": "codex/notes-create-edit",
+      "limitations": [
+        "Implementation in progress under user-authorized reviewed/tested unfinished application increments. F2-01 accepted; reviewed shared UI/primitives reused while broader D1-02/nativeAT acceptance remains unfinished. No prerequisite completion inferred.",
+        "Pin/archive/trash/restore/revision restore/attachments/Markdown export and roundtrip/root Notes provider/Quick note remain required. Full U1-01, Debian13 GNOME/KDE Wayland/X11, nativeAT/highcontrast/performance/package/release acceptance remain pending. Unacknowledged local edits may be lost on forced crash. Ordinary privateSQLite is not encrypted at rest; no permanentplaintext substitute or fullcompletion claim."
+      ]
     },
     {
       "id": "U1-02",

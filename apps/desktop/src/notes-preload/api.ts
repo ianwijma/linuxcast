@@ -1,0 +1,21 @@
+import * as z from 'zod';
+import {NOTES_CHANNELS,NOTES_APPEARANCE,NOTES_CLOSE_REQUESTED,NOTES_CLOSE_FINISHED,notesCloseAttemptSchema,noteWriteSchema,notesListRequestSchema,notesGetRequestSchema,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema,noteContentKey} from '../../../../packages/contracts/src/notes.ts';
+import type {NotesApi} from '../../../../packages/contracts/src/notes.ts';
+import type {ShellTransport} from '../preload/api.ts';
+const failed=(code:'invalid-request'|'unavailable'|'unknown-outcome')=>({ok:false as const,error:{code:({'invalid-request':'invalid-request',unavailable:'capability-unavailable','unknown-outcome':'internal'} as const)[code],retryable:false,message:code==='unknown-outcome'?'The note write could not be confirmed. Keep your edits and reload before saving again.':code==='invalid-request'?'Review this note’s title and supported content.':'Notes are unavailable. Keep your edits and reopen the workspace.'}});
+const appearance=z.enum(['dark','light']),closed=z.strictObject({ok:z.literal(true)});
+export function createNotesApi(transport:Pick<ShellTransport,'invoke'|'on'|'removeListener'>):NotesApi{
+ const listen=<T>(channel:string,parse:(value:unknown)=>T|undefined,listener:(value:T)=>void)=>{
+  if(typeof listener!=='function')throw new TypeError('A listener is required.');let active=true;
+  const receive=(_event:unknown,value:unknown)=>{const parsed=parse(value);if(active&&parsed!==undefined)listener(parsed);};transport.on(channel,receive);return()=>{active=false;transport.removeListener(channel,receive);};
+ };
+ return Object.freeze<NotesApi>({
+  async list(input){const request=notesListRequestSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesListReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.list,{protocolVersion:1,...request.data}));return reply.success&&(!reply.data.ok||reply.data.value.query===request.data.query)?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
+  async get(id){const request=notesGetRequestSchema.safeParse({protocolVersion:1,id});if(!request.success)return failed('invalid-request');try{const reply=notesReadReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.get,request.data));return reply.success&&(!reply.data.ok||reply.data.value===null||reply.data.value.id===id)?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
+  async write(input){const request=noteWriteSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesWriteReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.write,{protocolVersion:1,input:request.data}));if(!reply.success)return failed('unknown-outcome');if(reply.data.ok){const row=reply.data.value;if(row.id!==request.data.id||row.revision!==request.data.expectedRevision+1||noteContentKey(row.draft)!==noteContentKey(request.data.content)||(request.data.action==='save'?row.saved===null||noteContentKey(row.saved)!==noteContentKey(request.data.content):request.data.expectedRevision===0&&row.saved!==null))return failed('unknown-outcome');}return reply.data;}catch{return failed('unknown-outcome');}},
+  async close(){if(!closed.safeParse(await transport.invoke(NOTES_CHANNELS.close,{protocolVersion:1})).success)throw new Error('Notes could not close.');},
+  onCloseRequested(listener){if(typeof listener!=='function')throw new TypeError('A listener is required.');return listen(NOTES_CLOSE_REQUESTED,value=>{const parsed=notesCloseAttemptSchema.safeParse(value);return parsed.success?parsed.data:undefined;},attempt=>{void Promise.resolve().then(()=>listener()).catch(()=>false).then(allowClose=>transport.invoke(NOTES_CLOSE_FINISHED,{...attempt,allowClose:allowClose===true})).catch(()=>{});});},
+  async getAppearance(){return appearance.parse(await transport.invoke(NOTES_CHANNELS.appearance,{protocolVersion:1}));},
+  onAppearance(listener){return listen(NOTES_APPEARANCE,value=>{const parsed=appearance.safeParse(value);return parsed.success?parsed.data:undefined;},listener);},
+ });
+}
