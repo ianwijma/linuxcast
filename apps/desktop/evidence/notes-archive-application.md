@@ -1,6 +1,9 @@
 # U1-01 — archive, search and restore application increment
 
-29 October 2026. Based on integrated PR59/develop
+29 October 2026. Integrated in PR60 https://github.com/ianwijma/linuxcast/pull/60,
+merge b79f9ddbc1f690bdd87920d5a4487319c86b35a2; reviewed signed head
+af4b3e3fe3b4e5c2e40744383f5cd4fe85930058, CI40803274853 validate PASS.
+No requested/submitted GitHub reviews/comments/threads. Based on PR59/develop
 2aa49e540c8be6ea1fba1e0e85e945975fa88542. Coordinator branch codex/notes-archive;
 UI author codex/notes-archive-ui. Reviewed, tested unfinished application increment;
 full U1-01 and all four acceptance criteria remain pending.
@@ -82,7 +85,10 @@ This is not Debian13 GNOME/KDE Wayland/X11, native AT or release acceptance.
   45197c33054f9913f7e4661e3c8360ca98ec442c20121dfe69ec01f5602de874;
   manifest SHA25638560bd8e09a4cd603ade18384a01a2b11b91bdb89f1e69783ceb307581d4fcc.
   Independent alias_review_sol final review clean; no actionable findings remain.
-  Current PR CI and configured GitHub review inspection precede normal merge.
+  Current-head CI and configured GitHub review inspection passed before normal
+  expected-head merge. Local signatures verify against the exact configured key;
+  GitHub unknown_key and absence of signing/approval rules are recorded without
+  claiming GitHub verification or bypassing any rule.
 
 ## Design and remaining acceptance
 

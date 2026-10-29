@@ -84,6 +84,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,
   openWorkflowEntry:async(selection,trusted)=>{if(!workflowEditor)throw new Error('Workflow editor unavailable.');await workflowEditor.open(selection,trusted);},
   openWorkflowEditor:async()=>{if(!workflowEditor)throw new Error('Workflow editor unavailable.');await workflowEditor.open();},
   openNotes:async()=>{if(!notes)throw new Error('Notes unavailable.');await notes.open();},
+  openQuickNote:async()=>{if(!notes)throw new Error('Notes unavailable.');await notes.quickNote();},
   openFileSearch:async()=>{if(!fileSearch)throw new Error('File search unavailable.');await fileSearch.open();},
   openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
