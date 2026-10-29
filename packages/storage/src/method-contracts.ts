@@ -1,3 +1,4 @@
+import {parseDefinitionSourceSetting} from '../../contracts/src/dictionary-definitions.ts';
 import {parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
 import {notesRootRepositoryContracts} from '../../contracts/src/notes-launcher.ts';
 import {notesRepositoryContracts} from '../../contracts/src/notes.ts';
@@ -13,12 +14,13 @@ import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/per
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 import { MAX_LAUNCHER_COMMANDS, launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
-const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites']);
+const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','dictionary.definitionSource']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
 const settingValue = z.union([z.string(), z.boolean()]);
 const validSetting = (v: {id:string;value:string|boolean}) => {
   switch(v.id) {
+    case 'dictionary.definitionSource': return parseDefinitionSourceSetting(v.value)!==undefined;
     case 'emoji.favourites': return parseEmojiFavouriteSetting(v.value)!==undefined;
     case 'calculator.rateSource': return typeof v.value==='string'&&['disabled','frankfurter'].includes(v.value);
     case 'ui.theme': return typeof v.value === 'string' && ['system','dark','light'].includes(v.value);

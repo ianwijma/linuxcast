@@ -1,72 +1,90 @@
-# Coordinator checkpoint —29 October2026
+# Coordinator checkpoint — 29 October 2026
 
-Goal active: complete agreedlocal1.0/all97tasks/R1-03/releasegates. Userauthorizes
-reviewed/tested unfinishedapplicationincrements with explicitremainingacceptance.
-All subagents SOL6.1/high. Configured1Password signing works; preserveconfiguration.
-PreviousgoalturnPROGRESS(PR69merged); currentPROGRESS(Dictionaryapplicationready).
-Primarydevelopclean at0696e1d9f7a0ef9eb44b7619b00b7a2472a965b6, remote/openPR[]
-verifiedatstart. PR67offlineEmoji/68tone/69persistentfavourites integrated; older
-Notes/applicationflowsremain. Do notreset/archiveoldworktrees/patches/branches.
+The complete local 1.0/all 97 tasks/R1-03/release-gates Goal remains active.
+User authorizes reviewed, tested unfinished application increments with explicit
+remaining acceptance. All subagents use GPT-6.1 SOL/high. Normal configured
+1Password signed commits work; preserve the signing configuration.
 
-Currentcoordinator .worktrees/linuxcast-emoji-search, codex/dictionary-headwords,
-base0696e1d. Dictionaryincrement reviewed/tested/readytonormal signedcommit+
-verify/push/PR/currentCI+configuredreviewinspection/normalexpected-headmerge.
-Allchangesunstaged atcheckpoint; noPR/signer/userquestion/liveparentprocess.
-Fixedsystem Hunspell pairedfiles/UTF8/discoverymetadata<=64, selected-source
-strictboundeddecode/wordvalidation/snapshots/opaqueIDs/search<=100. Dictionary
-registeredexistingroot; sharedList/languageForm/canonicalwordCopy/manualpaste.
-No sourcepaths/fullarraysrenderer/genericfilesystemauthority/download/network/
-newexternaldependency/migration; onlylocalworkspacepackage+lockdelta.
-13builtinsraiseaggregatecap5609, providercapsunchanged;96affectedcatalogue/search/
-QuicklinkregressionsPASS. Oldlauncher/shell74PASS; finalmain69PASS(no-effectgeneric
-DictionaryExecute regression). InitialoverlimitfixtureupdatedMAX_COMMANDS+1.
+Primary develop and origin are at PR70 merge
+13d8eb63be2e3ccd0c3c69c2d42914be0c356bb8; primary clean and open PRs empty before
+publication. PR67 offline Emoji,68 tone,69 persistent favourites and70 installed
+Dictionary base entries are integrated. Earlier Notes/application flows retained.
+Do not reset or archive old worktrees, branches, patches or unrelated changes.
 
-Mapped286unit/33contract/241securityPASS beforefinalnewmainregression; mapped34UI
-PASS24.4s. Finalmapped8integrationchecks/5filesPASS26.77s:4actualElectron scenarios
-(Dictionary8.21s/originalEmoji5.63/favourites5.27/tone5.11)+4realstorageowner checks.
-FinalfullpinnedNodeprojectTS/scopedallchangedTSlint/actual+newmainlint/plan/diffPASS.
-ActualDict:en_GB café/[63,61,66,e9] nativeXclipCopy onlyexplicitly; query/selection/
-languageCancel/Escape/readonlyApply/empty; requiredSpanishfullbodyrefusal/recovery
-andunsupportedencoding; Hide/reopen/defaultlanguagereset/Quit/restart/noreplay;
-aggregateusage1/privacy. RendererHTTP(S)0qualifiedpageonly. Fullsandboxtrue.
-InstalledSpanishheaderpassesbutoneU+200E line1746failsfullread; strictreaderunchanged,
-refusalnotsuccess. Fullspellchecking/definitions visiblyunavailable. Initialactual
-aria-busywaitassumptionfixedTESTONLYtosemanticstatus/loadedlanguageassertions.
+## Ready application increment
 
-Frozen/applied/reviewed patches/manifests in/tmp:
-- linuxcast-dictionary-headwords-data.patch f1251ed8dd141d558d1a8c71e5e875658c671f25a4fad5dbfb11a1a6a4b49a55 (3files)
-- linuxcast-dictionary-headwords-ui.patch 2c5c3a17c689240e8d34abfbf21328936c0f08ba1c11d6bfde3496eafb14ecc4 (15files/8captures)
-- linuxcast-dictionary-boundary.patch ac1433212bf64b476e82af2df2652ed740cfb6e572e24fc60a51bfe86071e7cc (4tests/82authorPASS)
-- linuxcast-dictionary-application.patch 41d26e5f862f1d5ad256ef01a351d8407c99d692fab40e3d701070f648c86fca (6files/4captures)
-Allownedhashes+16testedproductionhashes verified. Reportsapps/desktop/evidence/
-dictionary-application.md +packages/builtins/dictionary/{HEADWORDS,UI}.md. Lastreport
-coordinatorappendafterhashfreezeintentional. New8component+4actualPNG reviewed/axe0;
-47historicalEmojiPNGunchanged, recaptures restoredexactreviewedauthorartifacts.
-Independentdata/main/preload/root/sharedintegration/UI/actualassertions/report/
-capturereviews clean. Findingsfixedandregressed:preencoderbounds, ownundefined
-metadata, unknownpendingCopyfailedreadmustretainuncertainty. No remainingfinding.
+Coordinator: .worktrees/linuxcast-emoji-search, codex/dictionary-definitions,
+base13d8eb6. All source/evidence changes ready for normal signed commit, local
+crypto verification, push, focused PR, current-head CI/review inspection and normal
+expected-head merge. No signer or user question.
 
-Completedagents (existingSOL6.1/high):
-- manifest_notes_delete_sol .worktrees/linuxcast-dictionary-headwords-data,
-  codex/dictionary-headwords-data:3readerfiles then6actualfiles, frozen.
-- notes_merge_record_review_sol .worktrees/linuxcast-dictionary-headwords-ui,
-  codex/dictionary-headwords-ui:15UIfiles/49units/10browser, frozen.
-- notes_delete_boundary_sol .worktrees/linuxcast-dictionary-headwords-boundary,
-  codex/dictionary-headwords-boundary:4tests82PASS thenindependentsourcereviews.
-No additionalproof/research/infrastructureassignments. Nextaftermerge: configured
-localdefinitionlookupapplicationflow, preservecompleteHunspell/StarDict/Emoji1.0.
-Read taskcard/normativerefs before boundedimplementation; choose automatically.
+Dictionary → Local definitions → explicitly choose/confirm local StarDict source →
+search canonical entries → Read literal paginated meaning/phonetic Detail. Back
+retains query/selection; Hide clears all nested frames; saved source survives
+restart; changed source refuses; Forget clears only configuration. No definition
+Copy/Paste or source-file modification. Existing base-word Copy stays separate.
+Private source paths remain main/storage only and outside ordinary exports.
+Existing settings CAS, shared UI and bounded named IPC; no new dependency, dataset
+download, migration, arbitrary filesystem grant or source execution. Supports
+bounded plain/gzip/dictzip UTF8 meaning/phonetic and32/64-bit indexes only.
 
-RuntimeNode24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95; Pop!_OS22.04amd64/
-privateXvfbX11/xclip isrealapp evidence, notDebian13GNOME/KDEWayland/X11/nativeAT.
-PATH=.worktrees/tools:$PATH BUN_TMPDIR=/tmp. ExistingpinnedElectronoverride
-.worktrees/linuxcast-emoji-ui/node_modules/electron/dist; no --no-sandbox.
-Gitindex/sign/network/ownerlocks useauthorizedescalation ifsandboxreadonly.
-Fullcompiler directNodeproject avoids priorBuncompilerintermittentcrash.
+Final parent checks:414 mapped unit PASS1.44s;39 contracts PASS0.32s;301 security
+PASS1.67s;46 browser PASS22.9s;13 integration across7files PASS37.29s (5 real
+sandboxed Electron scenarios +8 real storage-owner checks), definitions8.24s.
+Full pinned direct Node project TypeScript, all changed TS/TSX ESLint, plan and
+whitespace pass. Actual config Cancel/CAS/restart, Unicode phrase café au lait,
+literal complete paginated definitions, Back/Hide, changed-source refusal,
+Forget/nullrev2, source preservation, clipboard sentinel and export/usage privacy
+verified. Native dialog answers are synthetic in trusted main; no real picker/AT
+acceptance claim. Renderer HTTP(S) observation is page-only.
 
-Taskstatusunchanged8done/20inprogress/69planned;56passed/325pending/8N/A. Partial
-criterion evidence updated; no fullcriterionpromoted. RemainingcompleteHunspell
-spellchecking/otherencodings/StarDictdefinitions/thesaurus, source support, Emoji
-customkeywords/frecency/nativepaste/globalproviderexplicitsemanticlookup, full
-prerequisites/nativeAT/highcontrast/performance/package/release/all97/R1-03.
-Goalcompletionunproven; keepactive, no scope downgrade.
+Independent reader/main/preload/storage/native assembly/UI/actual assertions/report
+and14 new capture reviews clean. Findings fixed/regressed: cached source identity;
+shared renderer replacing source-unavailable heading with filtered-empty. Two
+existing Emoji warning-heading assertions updated consistently. Initial finalUI
+run failed that old expectation; corrected test-only and full46 rerun passes.
+All665 historical tracked PNGs preserved; final8 component+6 actual images exact
+frozen author hashes, axe0. No remaining review finding.
+
+Frozen /tmp patches and manifests (all exact owned hashes verified):
+- linuxcast-dictionary-definitions-data.patch
+  f829f7236d6cc65c80f4ff8f96137c78cad9f7dd9eab5fe17f0ee01f4a7be2f7 (3 reader files).
+- linuxcast-dictionary-definitions-boundary.patch
+  f533dbaafe4c49ead5bf77a6f43933579188d8b40acd9d08cf1fec04f34e94a8 (6 boundary tests).
+- linuxcast-dictionary-definitions-ui.patch
+  18ff2f4431b66b19c8bb0a840c5d4cc4504fd436a5c31f308b889abb0fa904b0 (15 files).
+- linuxcast-dictionary-definitions-actual.patch
+  64c25c7b09543f5dbefa0ff06e0557c7349cb0d8d049cccbe7957153f39d1791 (8 files;19 tested inputs).
+
+Existing SOL/high agents now finished:
+- manifest_notes_delete_sol: .worktrees/linuxcast-dictionary-definitions-data,
+  codex/dictionary-definitions-data, reader3 then actual8 files.
+- notes_merge_record_review_sol: .worktrees/linuxcast-dictionary-definitions-ui,
+  codex/dictionary-definitions-ui, UI15 files.
+- notes_delete_boundary_sol: .worktrees/linuxcast-dictionary-definitions-boundary,
+  codex/dictionary-definitions-boundary, tests6 then independent reviews.
+After merging, immediately select another bounded useful application increment;
+next candidate is Emoji custom keyword edit/search/restart using existing Grid,
+Form and settings CAS. No research/proof/infrastructure expansion.
+
+Totals remain8done/20in-progress/69planned;56passed/325pending/8N/A. Complete
+Hunspell checking/encodings and StarDict formats/thesaurus, Emoji custom keywords/
+frecency/native paste/global-provider explicit semantic lookup, prerequisite/native
+AT/Debian13 GNOME/KDE Wayland/X11/performance/package/release acceptance remain
+required. No full criterion/task promoted and no scope reduction.
+
+Runtime: pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95. Actual host
+Pop!_OS22.04 amd64/private Xvfb X11/xclip is not the Debian desktop matrix.
+PATH=.worktrees/tools:$PATH BUN_TMPDIR=/tmp. Existing Electron override is
+.worktrees/linuxcast-emoji-ui/node_modules/electron/dist; chromiumSandbox:true,
+no --no-sandbox. Direct Node compiler avoids prior intermittent Bun compiler crash.
+Authorized index/sign/network/native-owner operations may need sandbox escalation.
+
+## Signing retry in progress
+
+All55files staged; first normal configured signed commit failed with
+`1Password: failed to fill whole buffer` (no commit object written). Normal
+terminal-attached retry session60866 also failed with the same error. Signing configuration
+unchanged; no unsigned fallback. No PR/push yet. All source/evidence/checks/reviews
+complete and frozen; ready once signing succeeds. Before any next stage/commit,
+include this checkpoint update. A specific user request is pending: approve a current signing prompt or run the prepared normal signed commit in their own terminal and confirm. No further repeated signer retries until new evidence/input.

@@ -44,3 +44,5 @@ export * from './notes-launcher.ts';
 export * from './emoji.ts';
 
 export * from './dictionary.ts';
+
+export * from './dictionary-definitions.ts';

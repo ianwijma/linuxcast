@@ -1,10 +1,11 @@
+import {openStarDictSource} from '../../../../packages/builtins/dictionary/src/stardict.ts';
 import {createInstalledDictionary} from '../../../../packages/builtins/dictionary/src/installed.ts';
 import {getEmoji,getEmojiGroups} from '../../../../packages/builtins/emoji/src/data.ts';
 import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
 import {createNotesWorkspace} from './notes.ts';
 import {RateConversionService} from './rate-service.ts';
 import {fetchFrankfurterRate} from './rate-http.ts';
-import {parseEmojiFavouriteSetting,emojiFavouriteSnapshotSchema,RATE_ENDPOINT} from '@linuxcast/contracts';
+import {parseDefinitionSourceSetting,definitionSourcePreferenceSchema,parseEmojiFavouriteSetting,emojiFavouriteSnapshotSchema,RATE_ENDPOINT} from '@linuxcast/contracts';
 import { saveDataExport } from './data-export.ts';
 import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
@@ -37,6 +38,21 @@ const rates=new RateConversionService({
 startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstalledDictionary(),
   prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
+  definitions:{
+    async read(){if(!storage?.isReady())throw new Error('Definition source unavailable.');const setting=await storage.repository.request('settings.get',{id:'dictionary.definitionSource'});if(!setting)return {revision:0,source:null};const source=parseDefinitionSourceSetting(setting.value);if(source===undefined)throw new Error('Definition source unavailable.');return definitionSourcePreferenceSchema.parse({revision:setting.revision,source});},
+    async write(expectedRevision,source){if(!storage?.isReady())throw new Error('Definition source unavailable.');const value=JSON.stringify(source),setting=await storage.repository.request('settings.set',{id:'dictionary.definitionSource',expectedRevision,value});if(setting.revision!==expectedRevision+1||setting.value!==value)throw new Error('Unconfirmed source configuration.');return definitionSourcePreferenceSchema.parse({revision:setting.revision,source:parseDefinitionSourceSetting(setting.value)});},
+    open:ifoPath=>openStarDictSource({ifoPath}),
+    async choose(){
+      const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.isVisible()&&window.webContents.getURL()===APP_URL);if(!owner)throw new Error('Source selection unavailable.');
+      const choice=await dialog.showOpenDialog(owner,{title:'Choose local StarDict definitions',buttonLabel:'Choose source',filters:[{name:'StarDict source',extensions:['ifo']}],properties:['openFile']});
+      if(owner.isDestroyed()||!owner.isVisible()||owner.webContents.getURL()!==APP_URL)throw new Error('Source selection changed.');return choice.canceled||choice.filePaths.length!==1?null:choice.filePaths[0]!;
+    },
+    async confirm(source){
+      const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.isVisible()&&window.webContents.getURL()===APP_URL);if(!owner)return false;
+      const choice=await dialog.showMessageBox(owner,{type:'question',title:'Use local definitions?',message:`Use “${source.name}”?`,detail:`Read ${source.wordCount} entries from this selected local source. Linuxcast saves its location so you can reopen it later. No data is downloaded or source files changed. Forget source removes the saved location.`,buttons:['Cancel','Use source'],defaultId:0,cancelId:0,noLink:true});
+      return choice.response===1&&!owner.isDestroyed()&&owner.isVisible()&&owner.webContents.getURL()===APP_URL;
+    },
+  },
   emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100}),favourites:{
     async read(){if(!storage?.isReady())throw new Error('Emoji favourites unavailable.');const setting=await storage.repository.request('settings.get',{id:'emoji.favourites'});if(!setting)return {revision:0,ids:[]};const ids=parseEmojiFavouriteSetting(setting.value);if(!ids)throw new Error('Emoji favourites unavailable.');return emojiFavouriteSnapshotSchema.parse({revision:setting.revision,ids});},
     async write(input){if(!storage?.isReady())throw new Error('Emoji favourites unavailable.');const ids=emojiFavouriteSnapshotSchema.parse({revision:input.expectedRevision,ids:input.ids}).ids,value=JSON.stringify(ids);const setting=await storage.repository.request('settings.set',{id:'emoji.favourites',expectedRevision:input.expectedRevision,value});if(setting.value!==value||setting.revision!==input.expectedRevision+1)throw new Error('Emoji favourites change unconfirmed.');return emojiFavouriteSnapshotSchema.parse({revision:setting.revision,ids});},
