@@ -1,3 +1,4 @@
+import {createDefinitionsApi} from './dictionary-definitions.ts';
 import {createDictionaryApi} from './dictionary.ts';
 import {createEmojiApi} from './emoji.ts';
 import {createLauncherNotesApi} from './notes.ts';
@@ -28,6 +29,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
     } catch { return unavailable; }
   };
   return Object.freeze({
+    ...createDefinitionsApi(transport),
     ...createDictionaryApi(transport),
     ...createEmojiApi(transport),
     ...createQuicklinkApi(transport),

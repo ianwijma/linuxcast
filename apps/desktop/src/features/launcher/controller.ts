@@ -228,7 +228,7 @@ export class LauncherController {
     this.#abortNote();this.#cancelNotesRead();this.#notes=null;this.#abortApplicationAction();this.#abortVisibility();if(this.#manager)this.session.pop();
     if(this.#alias || this.#url)this.session.pop();
     for(let depth=0;depth<2 && this.#calculator?.active;depth++)this.session.pop();
-    for(let depth=0;depth<2 && this.#dictionary?.active;depth++)this.session.pop();
+    for(let depth=0;depth<4 && this.#dictionary?.active;depth++)this.session.pop();
     this.#dictionary?.dispose();this.#dictionary=null;
     for(let depth=0;depth<2 && this.#emoji?.active;depth++)this.session.pop();
     this.#emoji?.dispose();this.#emoji=null;

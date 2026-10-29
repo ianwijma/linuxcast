@@ -1,3 +1,5 @@
+import {registerDefinitionsIpc} from './dictionary-definitions-ipc.ts';
+import type {DefinitionsBackend} from './dictionary-definitions-ipc.ts';
 import {registerDictionaryIpc} from './dictionary-ipc.ts';
 import type {DictionaryBackend} from './dictionary-ipc.ts';
 import {registerEmojiIpc} from './emoji-ipc.ts';
@@ -33,6 +35,7 @@ import { registerQuicklinksIpc } from './quicklinks-ipc.ts';
 import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
+  definitions?:DefinitionsBackend;
   dictionary?:DictionaryBackend;
   dictionaryVisible?:()=>boolean;
   emoji?:EmojiBackend;
@@ -468,6 +471,11 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }
     finally { busy = false; }
   });
+  const removeDefinitions=actions.definitions&&actions.dictionary?registerDefinitionsIpc(ipc,actions.definitions,{
+    trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.dictionaryVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
+    authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:dictionary',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.dictionaryVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:dictionary');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
+    acquire:()=>{busy=true;metadataGeneration++;return()=>{busy=false;};},recordUse:()=>recordUse('linuxcast:dictionary'),
+  }):undefined;
   const removeDictionary=actions.dictionary?registerDictionaryIpc(ipc,actions.dictionary,{
     trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.dictionaryVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
     authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:dictionary',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.dictionaryVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:dictionary');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
@@ -492,5 +500,5 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
     recordUse:()=>recordUse('linuxcast:open-quicklinks'),
   }):undefined;
-  return () => { disposed = true;removeDictionary?.();removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  return () => { disposed = true;removeDefinitions?.();removeDictionary?.();removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }
