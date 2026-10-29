@@ -5,8 +5,8 @@ const row={id:'emoji:1f469-1f3fd-200d-1f4bb',value:'👩🏽‍💻',name:'woman
 const group={id:row.group,name:row.group,count:2418};
 const search={revision:2,searchId:3,datasetVersion:'17.0',query:'coder',group:null,groups:[group],records:[row]};
 const copy={outcome:'copied',revision:2,searchId:3,query:'coder',group:null,id:row.id,value:row.value};
-it('provides only five named fixed Emoji operations with closed renderer authority',()=>{
- expect(EMOJI_CHANNELS).toEqual({search:'launcher:search-emoji',copy:'launcher:copy-emoji',release:'launcher:release-emoji-search',favourite:'launcher:set-emoji-favourite',keywords:'launcher:set-emoji-keywords'});
+it('provides only six named fixed Emoji operations with closed renderer authority',()=>{
+ expect(EMOJI_CHANNELS).toEqual({search:'launcher:search-emoji',copy:'launcher:copy-emoji',release:'launcher:release-emoji-search',favourite:'launcher:set-emoji-favourite',keywords:'launcher:set-emoji-keywords',frecency:'launcher:update-emoji-frecency'});
  expect(emojiSearchRequestSchema.parse({protocolVersion:1,revision:2,query:'coder'})).toEqual({protocolVersion:1,revision:2,query:'coder'});
  for(const extra of [{limit:3944},{value:'caller clipboard text'},{path:'/tmp/public'},{sql:'SELECT'},{provider:'hidden'},{revision:0},{revision:Number.MAX_SAFE_INTEGER+1}])expect(emojiSearchInputSchema.safeParse({revision:2,query:'coder',...extra}).success).toBe(false);
  for(const extra of [{value:row.value},{text:'caller clipboard text'},{ids:[row.id]},{permission:true}])expect(emojiCopyInputSchema.safeParse({revision:2,searchId:3,query:'coder',id:row.id,...extra}).success).toBe(false);

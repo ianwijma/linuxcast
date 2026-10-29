@@ -1,0 +1,31 @@
+import {expect,it,vi} from 'vitest';
+import {createEmojiApi} from './emoji.ts';
+import {EMOJI_CHANNELS,canonicalEmojiId} from '../../../../packages/contracts/src/emoji.ts';
+// Synthetic transport only; no native clipboard, renderer or preference persistence claim.
+const input={revision:2,searchId:3,query:'public coder',group:'People & Body',tone:'medium' as const,favouritesOnly:true as const,frecencyRevision:4,action:'pause' as const},receipt={outcome:'updated',revision:2,searchId:3,query:input.query,group:input.group,tone:input.tone,favouritesOnly:true,frecencyRevision:5,enabled:false,entryCount:2};
+function fixture(){const invoke=vi.fn<(channel:string,payload:unknown)=>Promise<unknown>>(async()=>({ok:true,value:receipt}));return{invoke,api:createEmojiApi({invoke})};}
+it('adds only the frozen sixth named method and dispatches the exact selected search context',async()=>{
+ const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite','setEmojiKeywords','updateEmojiFrecency']);expect(Object.isFrozen(f.api)).toBe(true);expect(await f.api.updateEmojiFrecency!(input)).toEqual({ok:true,value:receipt});expect(f.invoke).toHaveBeenCalledExactlyOnceWith(EMOJI_CHANNELS.frecency,{protocolVersion:1,...input});
+});
+it('rejects caller counts/IDs/clock/enabled state, malformed enums and own-undefined filters before invoking',async()=>{
+ const f=fixture();for(const patch of [{action:'clear'},{action:undefined},{action:null},{frecencyRevision:-1},{frecencyRevision:Number.MAX_SAFE_INTEGER},{entries:[]},{id:canonicalEmojiId('😀')},{enabled:false},{now:0},{tone:undefined},{favouritesOnly:undefined},{settings:'emoji.frecency'}])expect(await f.api.updateEmojiFrecency!({...input,...patch} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.invoke).not.toHaveBeenCalled();
+});
+it.each(['revision','searchId','query','group','tone','filter','nextRevision','enabled','extra','undefined'] as const)('unconfirmed frecency %s receipts are unknown with one dispatch and no replay',async fault=>{
+ const f=fixture(),patch=fault==='revision'?{revision:3}:fault==='searchId'?{searchId:4}:fault==='query'?{query:'other'}:fault==='group'?{group:null}:fault==='tone'?{tone:'dark'}:fault==='filter'?{favouritesOnly:undefined}:fault==='nextRevision'?{frecencyRevision:6}:fault==='enabled'?{enabled:true}:fault==='extra'?{entries:[]}:{tone:undefined};f.invoke.mockResolvedValue({ok:true,value:{...receipt,...patch}});const result=await f.api.updateEmojiFrecency!(input);expect(result).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false}});expect(f.invoke).toHaveBeenCalledTimes(1);
+});
+it('checks resume enabled and reset zero count, including omitted optional filter echoes',async()=>{
+ const f=fixture(),{group:_,tone:__,favouritesOnly:___,...all}=input;void _;void __;void ___;const {tone:____,favouritesOnly:_____,...base}=receipt;void ____;void _____;
+ for(const [action,enabled,entryCount] of [['resume',true,2],['reset',false,0]] as const){f.invoke.mockResolvedValueOnce({ok:true,value:{...base,group:null,enabled,entryCount}});expect(await f.api.updateEmojiFrecency!({...all,action})).toMatchObject({ok:true,value:{enabled,entryCount}});}
+ f.invoke.mockResolvedValueOnce({ok:true,value:{...receipt,entryCount:1}});expect(await f.api.updateEmojiFrecency!({...input,action:'reset'})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});f.invoke.mockResolvedValueOnce({ok:true,value:{...receipt,enabled:false}});expect(await f.api.updateEmojiFrecency!({...input,action:'resume'})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+});
+it('preserves known refusal and redacts unknown transport failure without retrying',async()=>{
+ const f=fixture(),known={ok:false,error:{code:'conflict',retryable:false,message:'Reload ranking state.'}};f.invoke.mockResolvedValueOnce(known);expect(await f.api.updateEmojiFrecency!(input)).toEqual(known);f.invoke.mockRejectedValueOnce(new Error('PUBLIC_PRIVATE_MARKER'));const reply=await f.api.updateEmojiFrecency!(input);expect(reply).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false}});expect(JSON.stringify(reply)).not.toContain('PUBLIC_PRIVATE_MARKER');for(const raw of [undefined,{ok:true,value:{...receipt,entryCount:4097}},{ok:true,value:{...receipt,entries:'x'.repeat(1048577)}}]){f.invoke.mockResolvedValueOnce(raw);expect(await f.api.updateEmojiFrecency!(input)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});}expect(f.invoke).toHaveBeenCalledTimes(5);
+});
+it('accepts only bounded frecency search metadata without raw private usage',async()=>{
+ const f=fixture(),search={revision:2,searchId:3,datasetVersion:'17.0',query:input.query,group:null,groups:[],records:[]};for(const frecency of [{available:false},{available:true,revision:0,enabled:true,entryCount:0},{available:true,revision:4,enabled:false,entryCount:2}]){f.invoke.mockResolvedValueOnce({ok:true,value:{...search,frecency}});expect(await f.api.searchEmoji!({revision:2,query:input.query})).toMatchObject({ok:true,value:{frecency}});}
+ for(const frecency of [undefined,{available:true,revision:4,enabled:true,entryCount:4097},{available:false,entries:[]},{available:true,revision:4,enabled:true,entryCount:2,entries:[]}]){f.invoke.mockResolvedValueOnce({ok:true,value:{...search,frecency}});expect(await f.api.searchEmoji!({revision:2,query:input.query})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});}
+});
+it('preserves copied with recorded/paused/unavailable tracking, rejects own undefined and never converts warning into a second Copy',async()=>{
+ const f=fixture(),value='👩🏽‍💻',selection={revision:2,searchId:3,query:input.query,id:canonicalEmojiId(value)},copied={outcome:'copied',...selection,group:null,value};for(const frecency of ['recorded','paused','unavailable']){f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,frecency}});expect(await f.api.copyEmoji!(selection)).toMatchObject({ok:true,value:{outcome:'copied',value,frecency}});}
+ for(const frecency of [undefined,'saved',{},null]){f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,frecency}});expect(await f.api.copyEmoji!(selection)).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});}expect(f.invoke).toHaveBeenCalledTimes(7);
+});

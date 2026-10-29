@@ -1,5 +1,5 @@
 import {parseDefinitionSourceSetting} from '../../contracts/src/dictionary-definitions.ts';
-import {parseEmojiKeywordSetting,parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
+import {parseEmojiFrecencySetting,parseEmojiKeywordSetting,parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
 import {searchRootNotes} from './notes-root-search.ts';
 import type {NotesRootStorageMethods} from '../../contracts/src/notes-launcher.ts';
 import {NOTES_STORAGE_METHODS} from '../../contracts/src/notes.ts';
@@ -33,7 +33,7 @@ import { storageContracts } from './method-contracts.ts';
 import { StorageError } from './errors.ts';
 
 type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
-export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource' | 'emoji.favourites' | 'emoji.keywords' | 'dictionary.definitionSource';
+export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource' | 'emoji.favourites' | 'emoji.keywords' | 'emoji.frecency' | 'dictionary.definitionSource';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
@@ -86,11 +86,12 @@ function revision(value: unknown): number {
   return value;
 }
 function settingId(value: unknown): SettingId {
-  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','dictionary.definitionSource'].includes(value)) throw new StorageError('invalid-request');
+  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource'].includes(value)) throw new StorageError('invalid-request');
   return value as SettingId;
 }
 function settingValue(id: SettingId, value: unknown): string | boolean {
   if(id==='dictionary.definitionSource'&&typeof value==='string'&&parseDefinitionSourceSetting(value)!==undefined)return value;
+  if(id==='emoji.frecency'&&typeof value==='string'&&parseEmojiFrecencySetting(value)!==undefined)return value;
   if(id==='emoji.keywords'&&typeof value==='string'&&parseEmojiKeywordSetting(value)!==undefined)return value;
   if(id==='emoji.favourites'&&typeof value==='string'&&parseEmojiFavouriteSetting(value)!==undefined)return value;
   if (id === 'calculator.rateSource' && typeof value==='string' && ['disabled','frankfurter'].includes(value))return value;

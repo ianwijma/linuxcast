@@ -110,7 +110,9 @@
       "packages/storage/tests/dictionary-definitions-client.test.ts",
       "packages/builtins/emoji/tests/custom-keywords-search.test.ts",
       "packages/builtins/emoji/tests/keywords.test.ts",
-      "packages/ui/src/views/form.test.tsx"
+      "packages/ui/src/views/form.test.tsx",
+      "packages/builtins/emoji/tests/frecency-search.test.ts",
+      "packages/builtins/emoji/tests/frecency.test.ts"
     ]
   },
   "contracts": {
@@ -185,7 +187,8 @@
       "packages/contracts/tests/emoji.contract.test.ts",
       "packages/contracts/tests/dictionary.contract.test.ts",
       "packages/contracts/tests/dictionary-definitions.contract.test.ts",
-      "packages/contracts/tests/emoji-keywords.contract.test.ts"
+      "packages/contracts/tests/emoji-keywords.contract.test.ts",
+      "packages/contracts/tests/emoji-frecency.contract.test.ts"
     ]
   },
   "ui": {
@@ -236,7 +239,8 @@
       "packages/builtins/emoji/tests/emoji.ui.test.ts",
       "packages/builtins/dictionary/tests/dictionary.ui.test.ts",
       "packages/builtins/dictionary/tests/definitions.ui.test.ts",
-      "packages/builtins/emoji/tests/keywords.ui.test.ts"
+      "packages/builtins/emoji/tests/keywords.ui.test.ts",
+      "packages/builtins/emoji/tests/frecency.ui.test.ts"
     ]
   },
   "integration": {
@@ -318,7 +322,9 @@
       "packages/storage/tests/dictionary-definitions.integration.test.ts",
       "apps/desktop/tests/dictionary-definitions.integration.test.ts",
       "packages/storage/tests/emoji-keywords.integration.test.ts",
-      "apps/desktop/tests/emoji-keywords.integration.test.ts"
+      "apps/desktop/tests/emoji-keywords.integration.test.ts",
+      "packages/storage/tests/emoji-frecency.integration.test.ts",
+      "apps/desktop/tests/emoji-frecency.integration.test.ts"
     ]
   },
   "security": {
@@ -429,7 +435,10 @@
       "apps/desktop/src/preload/dictionary-definitions.test.ts",
       "packages/storage/tests/dictionary-definitions-client.test.ts",
       "apps/desktop/src/main/emoji-keywords-ipc.test.ts",
-      "apps/desktop/src/preload/emoji-keywords.test.ts"
+      "apps/desktop/src/preload/emoji-keywords.test.ts",
+      "apps/desktop/src/main/emoji-frecency-ipc.test.ts",
+      "apps/desktop/src/preload/emoji-frecency.test.ts",
+      "packages/contracts/tests/emoji-frecency.contract.test.ts"
     ]
   },
   "perf": {}

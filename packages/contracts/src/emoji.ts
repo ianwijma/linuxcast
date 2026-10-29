@@ -29,6 +29,18 @@ export function parseEmojiKeywordSetting(value:unknown):EmojiKeywordEntry[]|unde
 }
 export const emojiKeywordSnapshotSchema=z.strictObject({revision:preferenceRevision,entries:emojiKeywordEntriesSchema});
 export type EmojiKeywordSnapshot=z.infer<typeof emojiKeywordSnapshotSchema>;
+/** Aggregate local Emoji ranking only: canonical IDs, counts and UTC instants. */
+export const emojiFrecencyEntrySchema=z.strictObject({id:emojiIdSchema,useCount:z.number().int().min(1).max(1_000_000_000),lastUsedAt:z.iso.datetime().refine(value=>{try{return new Date(value).toISOString()===value;}catch{return false;}})});
+export const emojiFrecencyEntriesSchema=z.array(emojiFrecencyEntrySchema).max(4096).refine(entries=>entries.every((entry,index)=>index===0||entries[index-1]!.id<entry.id)&&encoder.encode(JSON.stringify(entries)).length<=524288);
+export const emojiFrecencyStateSchema=z.strictObject({enabled:z.boolean(),entries:emojiFrecencyEntriesSchema});
+export const emojiFrecencySnapshotSchema=emojiFrecencyStateSchema.extend({revision:preferenceRevision});
+export type EmojiFrecencyEntry=z.infer<typeof emojiFrecencyEntrySchema>;
+export type EmojiFrecencySnapshot=z.infer<typeof emojiFrecencySnapshotSchema>;
+export function parseEmojiFrecencySetting(value:unknown):z.infer<typeof emojiFrecencyStateSchema>|undefined{
+ if(typeof value!=='string'||value.length>524320)return undefined;
+ try{const parsed=emojiFrecencyStateSchema.safeParse(JSON.parse(value));return parsed.success&&JSON.stringify(parsed.data)===value?parsed.data:undefined;}catch{return undefined;}
+}
+const frecencyAvailability=z.discriminatedUnion('available',[z.strictObject({available:z.literal(true),revision:preferenceRevision,enabled:z.boolean(),entryCount:z.number().int().min(0).max(4096)}),z.strictObject({available:z.literal(false)})]);
 export const emojiFavouriteSnapshotSchema=z.strictObject({revision:preferenceRevision,ids:emojiFavouriteIdsSchema});
 export type EmojiFavouriteSnapshot=z.infer<typeof emojiFavouriteSnapshotSchema>;
 const favouriteAvailability=z.discriminatedUnion('available',[z.strictObject({available:z.literal(true),revision:preferenceRevision}),z.strictObject({available:z.literal(false)})]);
@@ -47,23 +59,28 @@ export function emojiMatchesTone(value:string,tone:EmojiTone):boolean{
 const tonePresence=(value:{tone?:EmojiTone|undefined;favouritesOnly?:true|undefined})=>(!Object.hasOwn(value,'tone')||value.tone!==undefined)&&(!Object.hasOwn(value,'favouritesOnly')||value.favouritesOnly===true);
 export const emojiSearchInputSchema=z.strictObject({revision:positive,query:emojiQuerySchema,group:emojiGroupSchema.optional(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional()}).refine(tonePresence);
 export const emojiSearchRequestSchema=emojiSearchInputSchema.safeExtend({protocolVersion:z.literal(1)});
-export const emojiSearchValueSchema=z.strictObject({revision:positive,searchId:positive,datasetVersion:z.literal('17.0'),query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),favourites:favouriteAvailability.optional(),keywords:favouriteAvailability.optional(),groups:z.array(z.strictObject({id:emojiGroupSchema,name:emojiGroupSchema,count:z.number().int().positive().max(10000)})).max(16),records:z.array(emojiSearchRecordSchema).max(100)}).refine(value=>tonePresence(value)&&(!Object.hasOwn(value,'keywords')||value.keywords!==undefined)&&(!value.favouritesOnly||value.favourites?.available===true)&&value.records.every(row=>value.keywords?.available===true?Array.isArray(row.customKeywords):!Object.hasOwn(row,'customKeywords'))&&value.records.every(row=>value.favourites?.available===true?typeof row.favourite==='boolean'&&(!value.favouritesOnly||row.favourite):!Object.hasOwn(row,'favourite'))&&new Set(value.groups.map(row=>row.id)).size===value.groups.length&&new Set(value.records.map(row=>row.id)).size===value.records.length&&(value.group===null||value.groups.some(row=>row.id===value.group))&&value.records.every(row=>value.groups.some(group=>group.id===row.group)&&(value.group===null||row.group===value.group)&&(value.tone===undefined||emojiMatchesTone(row.value,value.tone))));
+export const emojiSearchValueSchema=z.strictObject({revision:positive,searchId:positive,datasetVersion:z.literal('17.0'),query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),favourites:favouriteAvailability.optional(),keywords:favouriteAvailability.optional(),frecency:frecencyAvailability.optional(),groups:z.array(z.strictObject({id:emojiGroupSchema,name:emojiGroupSchema,count:z.number().int().positive().max(10000)})).max(16),records:z.array(emojiSearchRecordSchema).max(100)}).refine(value=>tonePresence(value)&&(!Object.hasOwn(value,'keywords')||value.keywords!==undefined)&&(!Object.hasOwn(value,'frecency')||value.frecency!==undefined)&&(!value.favouritesOnly||value.favourites?.available===true)&&value.records.every(row=>value.keywords?.available===true?Array.isArray(row.customKeywords):!Object.hasOwn(row,'customKeywords'))&&value.records.every(row=>value.favourites?.available===true?typeof row.favourite==='boolean'&&(!value.favouritesOnly||row.favourite):!Object.hasOwn(row,'favourite'))&&new Set(value.groups.map(row=>row.id)).size===value.groups.length&&new Set(value.records.map(row=>row.id)).size===value.records.length&&(value.group===null||value.groups.some(row=>row.id===value.group))&&value.records.every(row=>value.groups.some(group=>group.id===row.group)&&(value.group===null||row.group===value.group)&&(value.tone===undefined||emojiMatchesTone(row.value,value.tone))));
 export const emojiCopyInputSchema=emojiSearchInputSchema.safeExtend({searchId:positive,id:emojiIdSchema});
 export const emojiCopyRequestSchema=emojiCopyInputSchema.safeExtend({protocolVersion:z.literal(1)});
 export const emojiFavouriteInputSchema=emojiCopyInputSchema.safeExtend({favourite:z.boolean(),favouritesRevision:preferenceRevision});
 export const emojiFavouriteRequestSchema=emojiFavouriteInputSchema.safeExtend({protocolVersion:z.literal(1)});
 export const emojiKeywordsInputSchema=emojiCopyInputSchema.safeExtend({keywords:emojiKeywordListSchema,keywordsRevision:preferenceRevision});
 export const emojiKeywordsRequestSchema=emojiKeywordsInputSchema.safeExtend({protocolVersion:z.literal(1)});
+export const emojiFrecencyInputSchema=emojiSearchInputSchema.safeExtend({searchId:positive,frecencyRevision:preferenceRevision,action:z.enum(['pause','resume','reset'])});
+export const emojiFrecencyRequestSchema=emojiFrecencyInputSchema.safeExtend({protocolVersion:z.literal(1)});
 export const emojiReleaseInputSchema=z.strictObject({revision:positive,searchId:positive});
 export const emojiReleaseRequestSchema=emojiReleaseInputSchema.extend({protocolVersion:z.literal(1)});
 const failed=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const emojiSearchReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiSearchValueSchema}),failed]);
-export const emojiCopyValueSchema=z.strictObject({outcome:z.literal('copied'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),id:emojiIdSchema,value:emojiValueSchema}).refine(row=>row.value.length<=128&&row.id.length<=230&&canonicalEmojiId(row.value)===row.id&&tonePresence(row)&&(row.tone===undefined||emojiMatchesTone(row.value,row.tone)));
+export const emojiCopyValueSchema=z.strictObject({outcome:z.literal('copied'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),id:emojiIdSchema,value:emojiValueSchema,frecency:z.enum(['recorded','paused','unavailable']).optional()}).refine(row=>row.value.length<=128&&row.id.length<=230&&canonicalEmojiId(row.value)===row.id&&tonePresence(row)&&(!Object.hasOwn(row,'frecency')||row.frecency!==undefined)&&(row.tone===undefined||emojiMatchesTone(row.value,row.tone)));
 export const emojiCopyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiCopyValueSchema}),failed]);
 export const emojiFavouriteValueSchema=z.strictObject({outcome:z.literal('updated'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),id:emojiIdSchema,favourite:z.boolean(),favouritesRevision:positive}).refine(tonePresence);
 export const emojiFavouriteReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiFavouriteValueSchema}),failed]);
 export const emojiKeywordsValueSchema=z.strictObject({outcome:z.literal('updated'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),id:emojiIdSchema,keywords:emojiKeywordListSchema,keywordsRevision:positive}).refine(tonePresence);
 export const emojiKeywordsReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiKeywordsValueSchema}),failed]);
+export const emojiFrecencyValueSchema=z.strictObject({outcome:z.literal('updated'),revision:positive,searchId:positive,query:emojiQuerySchema,group:emojiGroupSchema.nullable(),tone:emojiToneSchema.optional(),favouritesOnly:z.literal(true).optional(),frecencyRevision:positive,enabled:z.boolean(),entryCount:z.number().int().min(0).max(4096)}).refine(tonePresence);
+export const emojiFrecencyReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:emojiFrecencyValueSchema}),failed]);
+export type EmojiFrecencyReply=z.infer<typeof emojiFrecencyReplySchema>;
 export type EmojiKeywordsReply=z.infer<typeof emojiKeywordsReplySchema>;
 export type EmojiFavouriteReply=z.infer<typeof emojiFavouriteReplySchema>;
 export const emojiReleaseReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('released'),searchId:positive})}),failed]);
@@ -76,6 +93,7 @@ export interface EmojiApi{
  copyEmoji?(input:z.infer<typeof emojiCopyInputSchema>):Promise<EmojiCopyReply>;
  setEmojiFavourite?(input:z.infer<typeof emojiFavouriteInputSchema>):Promise<EmojiFavouriteReply>;
  setEmojiKeywords?(input:z.infer<typeof emojiKeywordsInputSchema>):Promise<EmojiKeywordsReply>;
+ updateEmojiFrecency?(input:z.infer<typeof emojiFrecencyInputSchema>):Promise<EmojiFrecencyReply>;
  releaseEmojiSearch?(input:z.infer<typeof emojiReleaseInputSchema>):Promise<EmojiReleaseReply>;
 }
-export const EMOJI_CHANNELS={search:'launcher:search-emoji',copy:'launcher:copy-emoji',release:'launcher:release-emoji-search',favourite:'launcher:set-emoji-favourite',keywords:'launcher:set-emoji-keywords'} as const;
+export const EMOJI_CHANNELS={search:'launcher:search-emoji',copy:'launcher:copy-emoji',release:'launcher:release-emoji-search',favourite:'launcher:set-emoji-favourite',keywords:'launcher:set-emoji-keywords',frecency:'launcher:update-emoji-frecency'} as const;
