@@ -178,3 +178,46 @@ or full task/release acceptance. All full criteria remain pending. Coordinator
 owns UI/main/preload/receipt integration, task records and actual application
 evidence. Only `src/search.ts`, `tests/search.test.ts` and this README are owned;
 the copied coordinator contract/backend/freeze files are excluded from this patch.
+
+## Favourite-ID subset — bounded data increment, 29 October 2026
+
+Based on integrated PR68 `6227ef0`, isolated `codex/emoji-favourites-data`.
+The internal main-only `EmojiSearchInput` adds `ids?: readonly string[]`. Main
+resolves these IDs from the revisioned private StorageOwner preference; this is
+not an argument accepted from the renderer. Omission searches the whole catalogue,
+while an explicit empty array returns no results. Well-formed IDs absent from the
+pinned catalogue match nothing; they cannot fabricate records or copy values.
+
+Present IDs must be a plain dense array of own string data properties, sorted
+strictly ascending and unique under `emojiFavouriteIdsSchema`, with at most4,096
+entries (enough for the complete3,944-record catalogue). Own `undefined`, `null`,
+non-arrays, holes, accessors, extra/symbol properties, duplicate/unsorted/malformed
+IDs and inherited array forms are rejected before query encoding, without running
+getters or coercion. Validation copies the accepted array. Frozen readonly arrays
+are supported. ID membership filters the full catalogue before query relevance,
+ranking and capping, alongside the existing category and tone filters; input ID
+order never changes pinned source order or relevance. Returned objects remain
+the exact immutable canonical source records, independent of later caller edits.
+
+With pinned Node24.22.1/Bun1.4.4 on Pop!_OS22.04 amd64:
+
+- `bun install --frozen-lockfile`: PASS; restricted temporary-directory `EROFS`
+  was resolved by the authorized elevated retry. No manifest/lockfile change.
+- The existing exact focused data command above ran once: PASS38 tests in1.42s
+  total /768ms test time (the existing31 unchanged plus7 new cases). New cases
+  cover empty/omitted IDs, records beyond the first100, relevance-before-limit,
+  query/category/tone interaction, full3,944 and exact4,096 ID bounds, malformed
+  or accessor input, and canonical immutable result/caller-array independence.
+- Full direct-Node project TypeScript and scoped `src/search.ts` /
+  `tests/search.test.ts` ESLint: PASS.
+- `python3 scripts/validate_plan.py` and `git diff --check`: PASS. Plan validation
+  establishes documentation integrity only.
+
+This provides partial L2-06-AC02 canonical subset/value evidence and PRIVACY input
+validation. It does not establish persistent storage/CAS, renderer authority,
+favourites UI, actual clipboard/restart, supported desktop/native AT, dictionary
+or complete task/release acceptance. Coordinator owns those integration paths and
+task records; all full criteria remain pending. Only `src/search.ts`,
+`tests/search.test.ts` and this README are owned. Catalogue/assets, copied shared
+contracts/storage/main/preload/freeze files and prior evidence remain outside
+this patch. No staging or commits.

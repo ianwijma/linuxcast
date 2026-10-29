@@ -6,8 +6,8 @@ const request={revision:2,query:'coder'},selection={...request,searchId:3,id:row
 const search={revision:2,searchId:3,datasetVersion:'17.0',query:request.query,group:null,groups:[{id:row.group,name:row.group,count:2418}],records:[row]};
 const copied={outcome:'copied',...selection,group:null,value:row.value};
 function fixture(){const invoke=vi.fn<(channel:string,payload:unknown)=>Promise<unknown>>(async()=>({ok:true,value:search}));return {invoke,api:createEmojiApi({invoke})};}
-it('exposes only three frozen named methods and refuses excess authority before transport',async()=>{
- const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji']);expect(Object.isFrozen(f.api)).toBe(true);
+it('exposes only four frozen named methods and refuses excess authority before transport',async()=>{
+ const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite']);expect(Object.isFrozen(f.api)).toBe(true);
  for(const extra of [{query:'x'.repeat(513)},{query:'\u202e'},{query:'\ud800'},{revision:0},{path:'/tmp/public'},{provider:'hidden'}])expect(await f.api.searchEmoji!({...request,...extra} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});
  for(const extra of [{text:'caller clipboard text'},{value:row.value},{searchId:0},{id:'emoji:23'},{ids:[row.id]}])expect(await f.api.copyEmoji!({...selection,...extra} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});
  expect(await f.api.releaseEmojiSearch!({revision:2,searchId:3,query:'private'} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.invoke).not.toHaveBeenCalled();
@@ -51,4 +51,27 @@ it.each(['missing','wrong','extra','own-undefined'] as const)('rejects %s tone e
 });
 it('rejects a selected-tone reply whose canonical row has a different modifier without stripping or retargeting it',async()=>{
  const f=fixture();f.invoke.mockResolvedValueOnce({ok:true,value:{...search,tone:'light'}});expect(await f.api.searchEmoji!({...request,tone:'light'})).toMatchObject({ok:false});f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,tone:'light'}});expect(await f.api.copyEmoji!({...selection,tone:'light'})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.invoke).toHaveBeenCalledTimes(2);
+});
+
+
+const favouriteInput={...selection,favourite:true,favouritesRevision:4};
+const favouriteReceipt={outcome:'updated',...selection,group:null,favourite:true,favouritesRevision:5};
+it('sends only the named favourite mutation and accepts exact filter/desired-state/revision receipts',async()=>{
+ const f=fixture(),input={...favouriteInput,group:row.group,tone:'medium' as const,favouritesOnly:true as const},receipt={...favouriteReceipt,group:row.group,tone:'medium',favouritesOnly:true};f.invoke.mockResolvedValueOnce({ok:true,value:receipt});expect(await f.api.setEmojiFavourite!(input)).toEqual({ok:true,value:receipt});expect(f.invoke).toHaveBeenCalledExactlyOnceWith(EMOJI_CHANNELS.favourite,{protocolVersion:1,...input});
+});
+it('refuses invalid favourite and filter authority before any invocation',async()=>{
+ const f=fixture();for(const patch of [{favourite:undefined},{favourite:'true'},{favouritesRevision:-1},{favouritesRevision:Number.MAX_SAFE_INTEGER},{favouritesOnly:false},{favouritesOnly:undefined},{ids:[row.id]},{value:row.value},{settings:'emoji.favourites'}])expect(await f.api.setEmojiFavourite!({...favouriteInput,...patch} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.invoke).not.toHaveBeenCalled();
+});
+it.each(['revision','searchId','query','group','tone','id','favourite','favouritesRevision','extra','own-undefined'] as const)('treats a forged favourite %s receipt as unknown with one dispatch and no replay',async mode=>{
+ const f=fixture(),patch=mode==='revision'?{revision:3}:mode==='searchId'?{searchId:4}:mode==='query'?{query:'other'}:mode==='group'?{group:row.group}:mode==='tone'?{tone:'medium'}:mode==='id'?{id:canonicalEmojiId('😀')}:mode==='favourite'?{favourite:false}:mode==='favouritesRevision'?{favouritesRevision:4}:mode==='extra'?{value:row.value}:{favouritesOnly:undefined};f.invoke.mockResolvedValue({ok:true,value:{...favouriteReceipt,...patch}});const result=await f.api.setEmojiFavourite!(favouriteInput);expect(result).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false}});expect(f.invoke).toHaveBeenCalledTimes(1);
+});
+it.each(['missing','extra','own-undefined'] as const)('rejects %s favouritesOnly echoes across search, Copy and favourite receipts',async mode=>{
+ const f=fixture(),requested=mode==='missing'?{favouritesOnly:true as const}:{},echo=mode==='extra'?{favouritesOnly:true}:mode==='own-undefined'?{favouritesOnly:undefined}:{};
+ f.invoke.mockResolvedValueOnce({ok:true,value:{...search,...echo,favourites:{available:true,revision:4},records:[{...row,favourite:true}]}});expect(await f.api.searchEmoji!({...request,...requested})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+ f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,...echo}});expect(await f.api.copyEmoji!({...selection,...requested})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});
+ f.invoke.mockResolvedValueOnce({ok:true,value:{...favouriteReceipt,...echo}});expect(await f.api.setEmojiFavourite!({...favouriteInput,...requested})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.invoke).toHaveBeenCalledTimes(3);
+});
+it('keeps unavailable ordinary browsing honest and refuses filtered unavailable empty success',async()=>{
+ const f=fixture();f.invoke.mockResolvedValueOnce({ok:true,value:{...search,favourites:{available:false}}});expect(await f.api.searchEmoji!(request)).toMatchObject({ok:true,value:{favourites:{available:false}}});f.invoke.mockResolvedValueOnce({ok:true,value:{...search,favouritesOnly:true,favourites:{available:false},records:[]}});expect(await f.api.searchEmoji!({...request,favouritesOnly:true})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+ const known={ok:false,error:{code:'conflict',retryable:false,message:'Reload stored favourites.'}};f.invoke.mockResolvedValueOnce(known);expect(await f.api.setEmojiFavourite!(favouriteInput)).toEqual(known);f.invoke.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE_FAVOURITES'));const result=await f.api.setEmojiFavourite!(favouriteInput);expect(result).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false}});expect(JSON.stringify(result)).not.toContain('SYNTHETIC_PRIVATE_FAVOURITES');
 });

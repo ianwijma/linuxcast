@@ -3,7 +3,7 @@ import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
 import {createNotesWorkspace} from './notes.ts';
 import {RateConversionService} from './rate-service.ts';
 import {fetchFrankfurterRate} from './rate-http.ts';
-import {RATE_ENDPOINT} from '@linuxcast/contracts';
+import {parseEmojiFavouriteSetting,emojiFavouriteSnapshotSchema,RATE_ENDPOINT} from '@linuxcast/contracts';
 import { saveDataExport } from './data-export.ts';
 import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
@@ -36,7 +36,10 @@ const rates=new RateConversionService({
 startResidentShell({ resourcesDirectory: __dirname,rates,
   prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
-  emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100})},
+  emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100}),favourites:{
+    async read(){if(!storage?.isReady())throw new Error('Emoji favourites unavailable.');const setting=await storage.repository.request('settings.get',{id:'emoji.favourites'});if(!setting)return {revision:0,ids:[]};const ids=parseEmojiFavouriteSetting(setting.value);if(!ids)throw new Error('Emoji favourites unavailable.');return emojiFavouriteSnapshotSchema.parse({revision:setting.revision,ids});},
+    async write(input){if(!storage?.isReady())throw new Error('Emoji favourites unavailable.');const ids=emojiFavouriteSnapshotSchema.parse({revision:input.expectedRevision,ids:input.ids}).ids,value=JSON.stringify(ids);const setting=await storage.repository.request('settings.set',{id:'emoji.favourites',expectedRevision:input.expectedRevision,value});if(setting.value!==value||setting.revision!==input.expectedRevision+1)throw new Error('Emoji favourites change unconfirmed.');return emojiFavouriteSnapshotSchema.parse({revision:setting.revision,ids});},
+  }},
   quicklinks:{
     async chooseExport(record){
       const owner=BrowserWindow.getAllWindows().find(window=>!window.isDestroyed()&&window.webContents.getURL()===APP_URL);if(!owner)throw new Error('Export window unavailable.');
