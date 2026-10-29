@@ -1,5 +1,6 @@
+import {createHash} from 'node:crypto';
 import type Database from 'better-sqlite3';
-import {noteRecordSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteDeleteSchema,noteDeletedSchema,noteHistoryRequestSchema,noteRevisionSelectionSchema,noteHistorySchema,noteRevisionReadSchema,noteSavedRevisionSchema,notesListRequestSchema,noteContentKey,notePlainText} from '../../contracts/src/notes.ts';
+import {notesTrashSnapshotSchema,notesEmptyTrashSchema,notesTrashEmptiedSchema,noteRecordSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteDeleteSchema,noteDeletedSchema,noteHistoryRequestSchema,noteRevisionSelectionSchema,noteHistorySchema,noteRevisionReadSchema,noteSavedRevisionSchema,notesListRequestSchema,noteContentKey,notePlainText} from '../../contracts/src/notes.ts';
 import type {NoteRecord,NotesList,NoteContent,NotesStorageMethods,NoteHistoryRequest,NoteHistory,NoteRevisionRead} from '../../contracts/src/notes.ts';
 import {StorageError} from './errors.ts';
 type Row={trashed:number;archived:number;pinned:number;id:string;revision:number;document_version:number;draft:string;saved:string|null;created_at:string;updated_at:string};
@@ -74,6 +75,24 @@ export function deleteNotePermanently(db:Database.Database,value:unknown){
  if(result.changes!==1)throw new StorageError('conflict');
  return noteDeletedSchema.parse({id:input.id,deletedRevision:input.expectedRevision});
 }
+/** Whole-Trash metadata, never a filtered/paginated library projection. */
+export function notesTrashSnapshot(db:Database.Database){
+ const hash=createHash('sha256').update('linuxcast.notes.trash.v1\0');let count=0;
+ for(const raw of db.prepare('SELECT id,revision FROM notes WHERE trashed=1 ORDER BY id COLLATE BINARY').iterate() as Iterable<{id:string;revision:number}>){
+  let row;try{row=noteDeleteSchema.parse({id:raw.id,expectedRevision:raw.revision});}catch{throw new StorageError('corrupt-database');}
+  hash.update(JSON.stringify([row.id,row.expectedRevision])).update('\n');count++;
+  if(!Number.isSafeInteger(count))throw new StorageError('corrupt-database');
+ }
+ return notesTrashSnapshotSchema.parse({count,fingerprint:hash.digest('hex')});
+}
+/** Recheck and delete the complete reviewed set inside the owner's transaction. */
+export function emptyNotesTrash(db:Database.Database,value:unknown){
+ const input=notesEmptyTrashSchema.parse(value),before=notesTrashSnapshot(db);
+ if(before.count!==input.expectedCount||before.fingerprint!==input.expectedFingerprint)throw new StorageError('conflict');
+ const result=db.prepare('DELETE FROM notes WHERE trashed=1').run();
+ if(result.changes!==before.count)throw new StorageError('conflict');
+ return notesTrashEmptiedSchema.parse({deletedCount:before.count,fingerprint:before.fingerprint});
+}
 function historyCurrent(db:Database.Database,input:NoteHistoryRequest):NoteRecord{
  const current=getNote(db,input.id);if(!current||current.revision!==input.expectedRevision)throw new StorageError('conflict');return current;
 }
@@ -95,6 +114,8 @@ export function restoreNoteRevision(db:Database.Database,value:unknown):NoteReco
  const source=readNoteRevision(db,input);return writeNote(db,{id:input.id,expectedRevision:input.expectedRevision,action:'draft',content:source.savedRevision.content});
 }
 export function dispatchNotes(db:Database.Database,method:keyof NotesStorageMethods,value:unknown):unknown{
+ if(method==='notes.trashSnapshot')return notesTrashSnapshot(db);
+ if(method==='notes.emptyTrash')return emptyNotesTrash(db,value);
  if(method==='notes.deletePermanently')return deleteNotePermanently(db,value);
  if(method==='notes.history')return noteHistory(db,value);
  if(method==='notes.getRevision')return readNoteRevision(db,value);

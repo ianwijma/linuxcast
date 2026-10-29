@@ -140,6 +140,8 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
     setPinned:input=>currentStorage.repository.request('notes.setPinned',input,{timeoutMs:2000}),
     setArchived:input=>currentStorage.repository.request('notes.setArchived',input,{timeoutMs:2000}),
     setTrashed:input=>currentStorage.repository.request('notes.setTrashed',input,{timeoutMs:2000}),
+    trashSnapshot:()=>currentStorage.repository.request('notes.trashSnapshot',{}, {timeoutMs:2000}),
+    emptyTrash:input=>currentStorage.repository.request('notes.emptyTrash',input,{timeoutMs:2000}),
     deletePermanently:input=>currentStorage.repository.request('notes.deletePermanently',input,{timeoutMs:2000}),
     history:input=>currentStorage.repository.request('notes.history',input,{timeoutMs:2000}),
     getRevision:input=>currentStorage.repository.request('notes.getRevision',input,{timeoutMs:2000}),

@@ -1,12 +1,14 @@
-import {noteExportReplySchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,notesLauncherSelectionSchema,notesDeleteReplySchema} from '@linuxcast/contracts';
+import {noteExportReplySchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,notesLauncherSelectionSchema,notesDeleteReplySchema,notesTrashSnapshotReplySchema,notesEmptyTrashReplySchema} from '@linuxcast/contracts';
 import { emptyNoteDocument, noteContentKey, noteContentSchema, notesListReplySchema, notesListRequestSchema, notesReadReplySchema, notesWriteReplySchema } from '@linuxcast/contracts';
-import type { NotesLauncherSelection, NoteHistory, NoteRevisionRead, NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList } from '@linuxcast/contracts';
+import type { NotesLauncherSelection, NoteHistory, NoteRevisionRead, NoteContent, NoteDocument, NoteRecord, NoteSummary, NotesApi, NotesList, NotesTrashSnapshot } from '@linuxcast/contracts';
 
+type TrashContext={id:string|undefined;revision:number|undefined;contentKey:string|null;trashed:boolean;generation:number;cancel:AbortController;basis?:NotesTrashSnapshot};
 type Pending={id:string;done:Promise<boolean>;finish:(ok:boolean)=>void;cancel:AbortController};
 export interface RevisionReview {loading:boolean;rows:NoteHistory['revisions'];preview?:NoteRevisionRead['savedRevision']|undefined;previewing?:number|undefined;error?:string|undefined;confirm:boolean;restoring:boolean}
 type ReviewContext={id:string;generation:number;previewGeneration:number;record?:NoteRecord};
 export interface NotesState {
  history?:RevisionReview|undefined;
+ trashPreparing:boolean;emptyTrashConfirm:boolean;emptyingTrash:boolean;emptyTrashUncertain:boolean;trashReconciling:boolean;trashBasis?:NotesTrashSnapshot|undefined;
  query:string; pinnedOnly:boolean; showArchived:boolean; showTrashed:boolean; rows:NoteSummary[]; cursor:NotesList['nextCursor']; listing:boolean; listError?:string|undefined;
  id?:string|undefined; content?:NoteContent|undefined; record?:NoteRecord|undefined; busy:boolean; reading:boolean; closing:boolean; exporting:boolean; pinning:boolean; archiving:boolean; trashing:boolean; trashConfirm:boolean; deleting:boolean; deleteConfirm:boolean; deleteUncertain:boolean;
  error?:string|undefined; message?:string|undefined; blocked:boolean; paused:boolean; reloadConfirm:boolean; closeFailed:boolean;
@@ -18,12 +20,13 @@ async function bounded<T>(promise:Promise<T>,signal?:AbortSignal):Promise<T>{
  return await new Promise<T>((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('deadline')),5000);const abort=()=>{clearTimeout(timer);reject(new Error('cancelled'));};signal?.addEventListener('abort',abort,{once:true});promise.then(value=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);resolve(value);},()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);reject(new Error('unavailable'));});if(signal?.aborted)abort();});
 }
 export class NotesController {
- #api:NotesApi; #state:NotesState={query:'',pinnedOnly:false,showArchived:false,showTrashed:false,rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,pinning:false,archiving:false,trashing:false,trashConfirm:false,deleting:false,deleteConfirm:false,deleteUncertain:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
- #opening:{id:string|undefined;generation:number}|undefined; #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #metadata:Promise<boolean>|undefined; #trashConfirmation:{id:string;revision:number;generation:number}|undefined; #review:ReviewContext|undefined; #revisionConfirmation:{context:ReviewContext;preview:NoteRevisionRead['savedRevision'];record:NoteRecord}|undefined; #restore:Promise<boolean>|undefined; #delete:Promise<boolean>|undefined; #deleteConfirmation:{id:string;revision:number;generation:number}|undefined; #deleteUncertainId:string|undefined;
+ #api:NotesApi; #state:NotesState={trashPreparing:false,emptyTrashConfirm:false,emptyingTrash:false,emptyTrashUncertain:false,trashReconciling:false,query:'',pinnedOnly:false,showArchived:false,showTrashed:false,rows:[],cursor:null,listing:false,busy:false,reading:false,closing:false,exporting:false,pinning:false,archiving:false,trashing:false,trashConfirm:false,deleting:false,deleteConfirm:false,deleteUncertain:false,blocked:false,paused:false,reloadConfirm:false,closeFailed:false};
+ #opening:{id:string|undefined;generation:number}|undefined; #listeners=new Set<()=>void>(); #active=true; #pending:Pending|undefined; #timer?:ReturnType<typeof setTimeout>; #searchTimer?:ReturnType<typeof setTimeout>; #listGeneration=0; #navigation=0; #save:Promise<boolean>|undefined; #close:Promise<boolean>|undefined; #new=false; #export:Promise<boolean>|undefined; #metadata:Promise<boolean>|undefined; #trashConfirmation:{id:string;revision:number;generation:number}|undefined; #review:ReviewContext|undefined; #revisionConfirmation:{context:ReviewContext;preview:NoteRevisionRead['savedRevision'];record:NoteRecord}|undefined; #restore:Promise<boolean>|undefined; #delete:Promise<boolean>|undefined; #deleteConfirmation:{id:string;revision:number;generation:number}|undefined; #deleteUncertainId:string|undefined; #emptyContext:TrashContext|undefined; #emptyCall:Promise<boolean>|undefined; #emptyActual:Promise<unknown>|undefined; #emptyRecovery:TrashContext|undefined;
  constructor(api:NotesApi){this.#api=api;}
  get snapshot(){return this.#state;} subscribe=(listener:()=>void)=>{this.#listeners.add(listener);return()=>{this.#listeners.delete(listener);};};
  #publish(patch:Partial<NotesState>){this.#state={...this.#state,...patch};for(const listener of this.#listeners)listener();}
- get #metadataBusy(){return !!this.#delete||this.#state.deleting||this.#state.deleteConfirm||this.#state.pinning||this.#state.archiving||this.#state.trashing||this.#state.trashConfirm;}
+ get #emptyBusy(){return !!(this.#emptyContext||this.#emptyCall||this.#emptyActual||this.#emptyRecovery||this.#state.emptyTrashUncertain);}
+ get #metadataBusy(){return this.#emptyBusy||!!this.#delete||this.#state.deleting||this.#state.deleteConfirm||this.#state.pinning||this.#state.archiving||this.#state.trashing||this.#state.trashConfirm;}
  get dirty(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.draft);}
  get unsaved(){return !!this.#state.content&&key(this.#state.content)!==key(this.#state.record?.saved);}
  start(){void this.reloadList();}
@@ -32,7 +35,7 @@ export class NotesController {
  setShowArchived(showArchived:boolean){if(this.#deleteUncertainId||!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||typeof showArchived!=='boolean'||showArchived===this.#state.showArchived)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showArchived,...(showArchived?{showTrashed:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
  setShowTrashed(showTrashed:boolean){if(this.#deleteUncertainId||!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||typeof showTrashed!=='boolean'||showTrashed===this.#state.showTrashed)return;clearTimeout(this.#searchTimer);++this.#listGeneration;this.#publish({showTrashed,...(showTrashed?{showArchived:false}:{}),rows:[],cursor:null,listError:undefined});void this.reloadList();}
  async reloadList(more=false){
-  if(!this.#active)return;const query=this.#state.query,pinnedOnly=this.#state.pinnedOnly,archived=this.#state.showArchived,trashed=this.#state.showTrashed,cursor=more?this.#state.cursor:null;if(more&&!cursor)return;
+  if(!this.#active||this.#emptyBusy)return;const query=this.#state.query,pinnedOnly=this.#state.pinnedOnly,archived=this.#state.showArchived,trashed=this.#state.showTrashed,cursor=more?this.#state.cursor:null;if(more&&!cursor)return;
   const input={query,...(trashed?{trashed:true}:{}),...(archived?{archived:true}:{}),...(pinnedOnly?{pinnedOnly:true}:{}),...(cursor?{cursor}: {})};if(!notesListRequestSchema.safeParse(input).success){this.#publish({listing:false,listError:'Search is limited to 256 UTF-8 bytes.'});return;}
   const generation=++this.#listGeneration;this.#publish({listing:true,listError:undefined});if(!this.#active||generation!==this.#listGeneration)return;
   try{const parsed=notesListReplySchema.safeParse(await bounded(this.#api.list(input)));if(!this.#active||generation!==this.#listGeneration)return;
@@ -108,7 +111,7 @@ export class NotesController {
  #current(pending:Pending){return this.#active&&!this.#state.closing&&this.#pending===pending&&this.#state.id===pending.id&&!pending.cancel.signal.aborted;}
  flush():Promise<boolean>{return this.#review||this.#opening?Promise.resolve(false):this.#flush();}
  async #flush():Promise<boolean>{
-  clearTimeout(this.#timer);if(!this.#active||this.#state.trashConfirm||this.#state.deleteConfirm||this.#state.deleting||this.#delete)return false;if(this.#pending&&!await this.#pending.done)return false;
+  clearTimeout(this.#timer);if(!this.#active||this.#emptyBusy||this.#state.trashConfirm||this.#state.deleteConfirm||this.#state.deleting||this.#delete)return false;if(this.#pending&&!await this.#pending.done)return false;
   if(this.#state.blocked)return false;if(!this.dirty)return true;if(this.#state.record?.trashed){this.#publish({error:'Restore from Trash to review and store retained local edits before navigating or closing.'});return false;}if(this.#state.record?.archived){this.#publish({error:'Restore this note to review and store retained local edits before navigating or closing.'});return false;}
   if(!await this.#write('draft'))return false;return this.dirty?await this.#flush():true;
  }
@@ -167,6 +170,64 @@ export class NotesController {
   }catch{if(this.#active&&this.#review===context){this.#review=undefined;this.#publish({history:undefined,blocked:true,paused:true,error:'The restored draft could not be confirmed. It may already be stored. Confirm Reload stored note before another write; no restore will be replayed.',message:undefined});}return false;}
   finally{if(this.#pending===pending)this.#pending=undefined;finish(accepted&&this.#active);if(this.#active)this.#publish({busy:false});}
  }
+ /** Whole-Trash scope is read explicitly, never inferred from filtered list pages. */
+ get emptyTrashDisabledReason():string|undefined{
+  if(!this.#active||!this.#state.showTrashed)return 'Show trashed notes before reviewing Empty Trash.';
+  if(!this.#api.trashSnapshot||!this.#api.emptyTrash)return 'Empty Trash is unavailable. Reopen Notes to reconnect.';
+  if(this.#state.emptyTrashUncertain)return 'Wait for settlement, then choose Reload Trash before another operation.';
+  if(this.#emptyBusy||this.#opening||this.#review||this.#metadata||this.#metadataBusy||this.#pending||this.#save||this.#new||this.#close||this.#export||this.#state.busy||this.#state.listing||this.#state.reading||this.#state.closing||this.#state.exporting)return 'Wait for the current Notes operation before reviewing Empty Trash.';
+  if(this.dirty||this.#state.blocked||this.#state.paused||this.#state.reloadConfirm||this.#state.closeFailed)return 'Wait for autosave or recover retained edits before reviewing Empty Trash. This action does not save or discard edits.';
+  return undefined;
+ }
+ #trashContext():TrashContext{return{id:this.#state.id,revision:this.#state.record?.revision,contentKey:key(this.#state.content),trashed:!!this.#state.record?.trashed,generation:++this.#navigation,cancel:new AbortController()};}
+ #trashCurrent(context:TrashContext){return this.#active&&!context.cancel.signal.aborted&&this.#navigation===context.generation&&this.#state.id===context.id&&this.#state.record?.revision===context.revision&&key(this.#state.content)===context.contentKey&&!this.#state.closing;}
+ async requestEmptyTrash():Promise<boolean>{
+  const reason=this.emptyTrashDisabledReason;if(reason){if(this.#active)this.#publish({error:reason});return false;}
+  clearTimeout(this.#timer);clearTimeout(this.#searchTimer);const context=this.#trashContext();this.#emptyContext=context;this.#publish({trashPreparing:true,error:undefined,message:'Reading all notes in Trash…'});
+  try{
+   if(!this.#trashCurrent(context)||this.#emptyContext!==context)return false;
+   const reply=notesTrashSnapshotReplySchema.safeParse(await bounded(this.#api.trashSnapshot!(),context.cancel.signal));
+   if(!this.#trashCurrent(context)||this.#emptyContext!==context)return false;
+   if(!reply.success||!reply.data.ok)throw new Error('read');
+   if(reply.data.value.count===0){this.#emptyContext=undefined;this.#publish({trashPreparing:false,message:'Trash is empty. No notes were deleted.'});return true;}
+   context.basis=copy(reply.data.value);this.#publish({trashPreparing:false,emptyTrashConfirm:true,trashBasis:copy(context.basis),message:undefined});return true;
+  }catch{if(this.#trashCurrent(context)&&this.#emptyContext===context){this.#emptyContext=undefined;this.#publish({trashPreparing:false,error:'Trash could not be reviewed. Reopen Notes to reconnect, then choose Empty Trash again; no deletion was requested.',message:undefined});}return false;}
+ }
+ keepTrash(){if(!this.#active||!this.#state.emptyTrashConfirm||!this.#emptyContext||this.#emptyCall)return;this.#emptyContext.cancel.abort();this.#emptyContext=undefined;this.#publish({emptyTrashConfirm:false,trashBasis:undefined,message:'Empty Trash cancelled. All notes and saved revisions are unchanged.'});}
+ confirmEmptyTrash():Promise<boolean>{
+  if(this.#emptyCall)return this.#emptyCall;const context=this.#emptyContext;
+  if(!context?.basis||!this.#state.emptyTrashConfirm||!this.#trashCurrent(context)||!this.#api.emptyTrash)return Promise.resolve(false);
+  let accepted=false;const operation=Promise.resolve().then(()=>this.#emptyTrash(context)).then(ok=>{accepted=ok;return ok;}).finally(()=>{if(this.#emptyCall===operation){this.#emptyCall=undefined;if(this.#active){this.#publish({});if(accepted)void this.reloadList();}}});this.#emptyCall=operation;return operation;
+ }
+ async #emptyTrash(context:TrashContext):Promise<boolean>{
+  if(!this.#trashCurrent(context)||this.#emptyContext!==context||!context.basis||!this.#api.emptyTrash)return false;
+  let settled=true,finished=false;this.#publish({emptyTrashConfirm:false,emptyingTrash:true,busy:true,error:undefined,message:'Permanently emptying all Trash and its saved revisions…'});
+  try{
+   if(!this.#trashCurrent(context)||this.#emptyContext!==context)return false;
+   const actual=this.#api.emptyTrash({expectedCount:context.basis.count,expectedFingerprint:context.basis.fingerprint});this.#emptyActual=actual;settled=false;
+   const onSettled=()=>{settled=true;if(this.#emptyActual===actual)this.#emptyActual=undefined;if(finished&&this.#active)this.#publish({emptyingTrash:false,busy:false});};void actual.then(onSettled,onSettled);
+   const reply=notesEmptyTrashReplySchema.safeParse(await bounded(actual,context.cancel.signal));if(!this.#trashCurrent(context)||this.#emptyContext!==context)return false;
+   if(!reply.success)throw new Error('receipt');
+   if(!reply.data.ok){if(['conflict','invalid-request','permission-denied','capability-unavailable','cancelled'].includes(reply.data.error.code)){this.#emptyContext=undefined;this.#publish({trashBasis:undefined,message:undefined,error:'Empty Trash was refused. The Trash set may have changed. Choose Empty Trash again to review the current whole set before confirming.'});return false;}throw new Error('unknown');}
+   if(reply.data.value.deletedCount!==context.basis.count||reply.data.value.fingerprint!==context.basis.fingerprint)throw new Error('receipt');
+   this.#emptyContext=undefined;const removed=context.trashed;
+   this.#publish({...(removed?{id:undefined,record:undefined,content:undefined,history:undefined}:{}),trashBasis:undefined,emptyTrashUncertain:false,error:undefined,message:`All ${reply.data.value.deletedCount} trashed notes and their saved revisions were permanently deleted. Notes outside Trash are unchanged. Backups may retain content.`});return true;
+  }catch{if(this.#trashCurrent(context)&&this.#emptyContext===context){this.#emptyContext=undefined;this.#publish({trashBasis:undefined,emptyTrashUncertain:true,message:undefined,error:'Empty Trash could not be confirmed. Trash may already be emptied. Your view is retained. Wait for settlement, then choose Reload Trash; deletion will not be replayed.'});}return false;}
+  finally{finished=true;if(this.#active)this.#publish({emptyingTrash:!settled,busy:!settled});}
+ }
+ get reloadTrashDisabled(){return !this.#active||!this.#state.emptyTrashUncertain||!!(this.#emptyActual||this.#emptyCall||this.#emptyContext||this.#emptyRecovery);}
+ async reloadTrash():Promise<boolean>{
+  if(this.reloadTrashDisabled||!this.#api.trashSnapshot)return false;const context=this.#trashContext();this.#emptyRecovery=context;this.#publish({trashReconciling:true,error:undefined,message:'Reloading the whole Trash snapshot…'});
+  try{
+   const reply=notesTrashSnapshotReplySchema.safeParse(await bounded(this.#api.trashSnapshot(),context.cancel.signal));if(!this.#trashCurrent(context)||this.#emptyRecovery!==context)return false;
+   if(!reply.success||!reply.data.ok)throw new Error('read');let record:NoteRecord|null|undefined;
+   if(context.id){const result=notesReadReplySchema.safeParse(await bounded(this.#api.get(context.id),context.cancel.signal));if(!this.#trashCurrent(context)||this.#emptyRecovery!==context)return false;if(!result.success||!result.data.ok||result.data.value&&result.data.value.id!==context.id||!result.data.value&&!context.trashed)throw new Error('read');record=result.data.value;}
+   if(!this.#trashCurrent(context)||this.#emptyRecovery!==context)return false;
+   const missing=context.id&&record===null,retained=record&&key(record.draft)!==context.contentKey;
+   this.#publish({...(missing?{id:undefined,record:undefined,content:undefined,history:undefined}:record?{record,paused:!!retained}:{}),emptyTrashUncertain:false,error:undefined,message:missing?'Trash reloaded. The selected note no longer exists. The earlier Empty Trash outcome was not acknowledged; no deletion was replayed.':`Trash reloaded: ${reply.data.value.count} notes were present at the read. The earlier Empty Trash outcome was not acknowledged; no deletion was replayed.${retained?' Retained editor content is unchanged; review recovery before writing.':''}`});return true;
+  }catch{if(this.#trashCurrent(context)&&this.#emptyRecovery===context)this.#publish({message:undefined,error:'Trash could not be reconciled. The earlier Empty Trash outcome remains uncertain. Try Reload Trash again after settlement; no deletion was replayed.'});return false;}
+  finally{if(this.#emptyRecovery===context){this.#emptyRecovery=undefined;if(this.#active){this.#publish({trashReconciling:false});if(!this.#state.emptyTrashUncertain)void this.reloadList();}}}
+ }
  requestDeletePermanently(){
   if(!this.#active||this.#opening||this.#review||this.#metadata||this.#metadataBusy||this.#pending||this.#save||this.#new||this.#close||this.#export||this.#state.reading||this.#state.closing||this.#state.exporting||this.#state.blocked||this.#state.reloadConfirm||this.#state.closeFailed||!this.#state.record?.trashed)return;
   if(!this.#api.deletePermanently){if(!this.#state.error)this.#publish({error:'Permanent deletion is unavailable. Reopen Notes to reconnect.'});return;}
@@ -208,7 +269,7 @@ export class NotesController {
  setPinned(pinned:boolean):Promise<boolean>{return this.#admitMetadata('pin',pinned);}
  setArchived(archived:boolean):Promise<boolean>{return this.#admitMetadata('archive',archived);}
  #admitMetadata(kind:'pin'|'archive'|'trash',desired:boolean):Promise<boolean>{
-  if(this.#delete||this.#state.deleteConfirm||this.#state.deleting||this.#opening||this.#review||this.#trashConfirmation||kind!=='trash'&&this.#state.record?.trashed)return Promise.resolve(false);
+  if(this.#emptyBusy||this.#delete||this.#state.deleteConfirm||this.#state.deleting||this.#opening||this.#review||this.#trashConfirmation||kind!=='trash'&&this.#state.record?.trashed)return Promise.resolve(false);
   if(this.#metadata)return this.#metadata;
   if(!this.#active||typeof desired!=='boolean'||!(kind==='pin'?this.#api.setPinned:kind==='archive'?this.#api.setArchived:this.#api.setTrashed)||!this.#state.record||this.#state.blocked||this.#state.reading||this.#state.closing||this.#state.exporting||this.#export||this.#close||this.#new)return Promise.resolve(false);
   const generation=++this.#navigation;const operation=Promise.resolve().then(()=>this.#changeMetadata(kind,desired,generation)).finally(()=>{if(this.#metadata===operation)this.#metadata=undefined;});this.#metadata=operation;return operation;
@@ -251,9 +312,9 @@ export class NotesController {
  requestClose():Promise<boolean>{return this.#beginClose(false);}
  closeWithoutFlush():Promise<boolean>{return this.#beginClose(true);}
  #beginClose(skip:boolean):Promise<boolean>{if(this.#opening)return Promise.resolve(false);if(this.#review){if(this.#active&&!this.#state.error)this.#publish({error:'Close Saved revisions before closing Notes.'});return Promise.resolve(false);}if(this.#new){if(this.#active)this.#publish({error:'Wait for the new note to finish before closing Notes.'});return Promise.resolve(false);}if(this.#close)return this.#close;let finish!:(ok:boolean)=>void;const operation=new Promise<boolean>(resolve=>{finish=resolve;});this.#close=operation;void this.#closeNow(skip).then(result=>{if(this.#close===operation)this.#close=undefined;finish(result);},()=>{if(this.#close===operation)this.#close=undefined;finish(false);});return operation;}
- async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#deleteUncertainId){this.#publish({error:'Permanent deletion remains uncertain. Wait for the operation to settle and Reload stored note before closing Notes.'});return false;}if(this.#new){this.#publish({error:'Wait for the new note to finish before closing Notes.'});return false;}if(this.#metadata||this.#metadataBusy){this.#publish({error:this.#state.deleting||this.#delete?'Wait for permanent deletion to finish before closing Notes.':this.#state.deleteConfirm?'Keep the note or finish permanent deletion confirmation before closing Notes.':this.#state.trashing||this.#state.trashConfirm?'Finish or cancel the Trash operation before closing Notes.':this.#state.archiving?'Wait for the archive change to finish before closing Notes.':'Wait for the pin change to finish before closing Notes.'});return false;}if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active||this.#metadata||this.#metadataBusy||this.#state.exporting)return false;
+ async #closeNow(skip:boolean){if(!this.#active)return false;if(this.#emptyBusy){this.#publish({error:this.#state.emptyTrashUncertain?'Empty Trash remains uncertain. Wait for settlement, then choose Reload Trash before closing Notes.':'Keep notes or finish the Empty Trash operation before closing Notes.'});return false;}if(this.#deleteUncertainId){this.#publish({error:'Permanent deletion remains uncertain. Wait for the operation to settle and Reload stored note before closing Notes.'});return false;}if(this.#new){this.#publish({error:'Wait for the new note to finish before closing Notes.'});return false;}if(this.#metadata||this.#metadataBusy){this.#publish({error:this.#state.deleting||this.#delete?'Wait for permanent deletion to finish before closing Notes.':this.#state.deleteConfirm?'Keep the note or finish permanent deletion confirmation before closing Notes.':this.#state.trashing||this.#state.trashConfirm?'Finish or cancel the Trash operation before closing Notes.':this.#state.archiving?'Wait for the archive change to finish before closing Notes.':'Wait for the pin change to finish before closing Notes.'});return false;}if(this.#state.exporting){this.#publish({error:'Finish or cancel the Markdown export before closing Notes.'});return false;}if(!skip&&!await this.flush()){if(this.#active)this.#publish({closeFailed:true});return false;}if(!this.#active||this.#metadata||this.#metadataBusy||this.#state.exporting)return false;
   this.#publish({closing:true});if(!this.#active)return false;try{await bounded(this.#api.close());return true;}catch{if(this.#active)this.#publish({closing:false,closeFailed:true,error:'The Notes window could not close. Keep editing or retry closing.'});return false;}
  }
  keepEditing(){if(this.#active)this.#publish({closeFailed:false});}
- dispose(){if(!this.#active)return;this.#active=false;this.#opening=undefined;this.#review=undefined;this.#revisionConfirmation=undefined;this.#trashConfirmation=undefined;this.#deleteConfirmation=undefined;++this.#navigation;++this.#listGeneration;clearTimeout(this.#timer);clearTimeout(this.#searchTimer);const pending=this.#pending;this.#pending=undefined;pending?.cancel.abort();pending?.finish(false);this.#listeners.clear();}
+ dispose(){if(!this.#active)return;this.#active=false;this.#opening=undefined;this.#review=undefined;this.#revisionConfirmation=undefined;this.#trashConfirmation=undefined;this.#deleteConfirmation=undefined;this.#emptyContext?.cancel.abort();this.#emptyRecovery?.cancel.abort();this.#emptyContext=undefined;this.#emptyRecovery=undefined;++this.#navigation;++this.#listGeneration;clearTimeout(this.#timer);clearTimeout(this.#searchTimer);const pending=this.#pending;this.#pending=undefined;pending?.cancel.abort();pending?.finish(false);this.#listeners.clear();}
 }
