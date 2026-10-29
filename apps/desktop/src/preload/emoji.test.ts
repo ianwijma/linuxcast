@@ -32,3 +32,23 @@ it('preserves known unsupported refusals, redacts exceptions and refuses malform
 it('does not accept a release acknowledgement for another issued search',async()=>{
  const f=fixture();f.invoke.mockResolvedValueOnce({ok:true,value:{outcome:'released',searchId:4}});expect(await f.api.releaseEmojiSearch!({revision:2,searchId:3})).toMatchObject({ok:false});expect(f.invoke).toHaveBeenCalledTimes(1);
 });
+
+it('rejects invalid tone enum, own undefined and unknown tone properties before dispatch',async()=>{
+ const f=fixture();for(const tone of [null,undefined,'all','Light','medium_dark',0,{},['medium']]){expect(await f.api.searchEmoji!({...request,tone} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(await f.api.copyEmoji!({...selection,tone} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});}
+ expect(await f.api.searchEmoji!({...request,skinTone:'medium'} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.invoke).not.toHaveBeenCalled();
+});
+it('preserves tone presence and exact canonical values for All, unmodified and each modifier',async()=>{
+ for(const [tone,value] of [[undefined,'👩🏽‍💻'],['unmodified','👩‍💻'],['light','👍🏻'],['medium-light','👍🏼'],['medium','👍🏽'],['medium-dark','👍🏾'],['dark','👍🏿']] as const){
+  const f=fixture(),record={...row,id:canonicalEmojiId(value),value},filter=tone?{tone}:{},input={...request,...filter},copyInput={...selection,...filter,id:record.id};
+  f.invoke.mockResolvedValueOnce({ok:true,value:{...search,...filter,records:[record]}});expect(await f.api.searchEmoji!(input)).toEqual({ok:true,value:{...search,...filter,records:[record]}});expect(f.invoke).toHaveBeenLastCalledWith(EMOJI_CHANNELS.search,{protocolVersion:1,...input});expect(Object.hasOwn(f.invoke.mock.calls[0]![1] as object,'tone')).toBe(tone!==undefined);
+  const receipt={...copied,...filter,id:record.id,value:record.value};f.invoke.mockResolvedValueOnce({ok:true,value:receipt});expect(await f.api.copyEmoji!(copyInput)).toEqual({ok:true,value:receipt});expect(f.invoke).toHaveBeenLastCalledWith(EMOJI_CHANNELS.copy,{protocolVersion:1,...copyInput});
+ }
+});
+it.each(['missing','wrong','extra','own-undefined'] as const)('rejects %s tone echoes in search and Copy even when the mixed sequence fits both filters',async mode=>{
+ const value='🫱🏻‍🫲🏿',record={...row,id:canonicalEmojiId(value),value},requested=mode==='missing'||mode==='wrong'?{tone:'light' as const}:{},echo=mode==='wrong'?{tone:'dark'}:mode==='extra'?{tone:'light'}:mode==='own-undefined'?{tone:undefined}:{};
+ const f=fixture();f.invoke.mockResolvedValueOnce({ok:true,value:{...search,...echo,records:[record]}});expect(await f.api.searchEmoji!({...request,...requested})).toMatchObject({ok:false,error:{code:'capability-unavailable'}});
+ f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,...echo,id:record.id,value}});expect(await f.api.copyEmoji!({...selection,...requested,id:record.id})).toMatchObject({ok:false,error:{code:'deadline-exceeded',retryable:false}});expect(f.invoke).toHaveBeenCalledTimes(2);
+});
+it('rejects a selected-tone reply whose canonical row has a different modifier without stripping or retargeting it',async()=>{
+ const f=fixture();f.invoke.mockResolvedValueOnce({ok:true,value:{...search,tone:'light'}});expect(await f.api.searchEmoji!({...request,tone:'light'})).toMatchObject({ok:false});f.invoke.mockResolvedValueOnce({ok:true,value:{...copied,tone:'light'}});expect(await f.api.copyEmoji!({...selection,tone:'light'})).toMatchObject({ok:false,error:{code:'deadline-exceeded'}});expect(f.invoke).toHaveBeenCalledTimes(2);
+});

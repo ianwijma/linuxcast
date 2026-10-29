@@ -36,3 +36,14 @@ it('releases a late search after Hide and does not publish it into a reopened ro
 });
 it.each(['hidden','disabled'] as const)('does not open an Emoji command that is %s',async state=>{const f=setup();await settle();if(state==='hidden')f.commands[0]!.hidden=true;else {f.commands[0]!.enabled=false;f.commands[0]!.unavailableReason='Synthetic unavailable.';}await f.controller.refresh();await open(f);expect(top(f).view.kind).toBe('list');expect(f.api.searchEmoji).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();});
 it('rejects extra root payload and selection mismatch before opening the local flow',async()=>{const f=setup();await settle();await open(f,{values:{text:'forged'}});expect(top(f).view.kind).toBe('list');const frame=top(f);await f.controller.execute({viewId:frame.view.viewId,revision:frame.view.revision,actionId:'linuxcast:emoji',itemId:'not-selected'});expect(f.api.searchEmoji).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();});
+it('applies a read-only tone filter through the shared Form before a separate tone-bound Copy',async()=>{
+ const f=setup();await settle();await open(f);await action(f,'emoji:tone');const form=top(f);expect(form.view).toMatchObject({kind:'form',title:'Skin tone'});
+ await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:apply-tone',values:{tone:'unmodified'}});await settle();
+ expect(top(f).view.kind).toBe('grid');expect(f.api.searchEmoji).toHaveBeenLastCalledWith({revision:1,query:'',tone:'unmodified'});expect(f.api.copyEmoji).not.toHaveBeenCalled();
+ await action(f,'emoji:copy');expect(f.api.copyEmoji).toHaveBeenCalledExactlyOnceWith({revision:1,searchId:2,query:'',tone:'unmodified',id:record.id});expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+});
+it('clears the tone Form and filter on Hide and opens All tones with an omitted key after reopen',async()=>{
+ const f=setup();await settle();await open(f);await action(f,'emoji:tone');let form=top(f);await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:apply-tone',values:{tone:'unmodified'}});await settle();await action(f,'emoji:tone');form=top(f);
+ f.controller.setVisible(false);await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);f.nextRevision();f.controller.setVisible(true);await settle();await open(f);
+ expect(f.api.searchEmoji).toHaveBeenLastCalledWith({revision:2,query:''});await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:apply-tone',values:{tone:'dark'}});expect(top(f).view.kind).toBe('grid');expect(f.api.copyEmoji).not.toHaveBeenCalled();
+});

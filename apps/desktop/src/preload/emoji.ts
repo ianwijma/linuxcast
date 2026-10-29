@@ -9,13 +9,13 @@ export function createEmojiApi(transport:Pick<ShellTransport,'invoke'>):EmojiApi
   async searchEmoji(input){
    const request=emojiSearchInputSchema.safeParse(input);if(!request.success)return failed('invalid-request');
    try{const raw=await transport.invoke(EMOJI_CHANNELS.search,{protocolVersion:1,...request.data});if(!bounded(raw))return failed('capability-unavailable');const reply=emojiSearchReplySchema.safeParse(raw);
-    if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)))return failed('capability-unavailable');return reply.data;
+    if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)||reply.data.value.tone!==request.data.tone))return failed('capability-unavailable');return reply.data;
    }catch{return failed('capability-unavailable');}
   },
   async copyEmoji(input){
    const request=emojiCopyInputSchema.safeParse(input);if(!request.success)return failed('invalid-request');
    try{const raw=await transport.invoke(EMOJI_CHANNELS.copy,{protocolVersion:1,...request.data});if(!bounded(raw))return failed('deadline-exceeded');const reply=emojiCopyReplySchema.safeParse(raw);
-    if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.searchId!==request.data.searchId||reply.data.value.id!==request.data.id||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)))return failed('deadline-exceeded');return reply.data;
+    if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.searchId!==request.data.searchId||reply.data.value.id!==request.data.id||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)||reply.data.value.tone!==request.data.tone))return failed('deadline-exceeded');return reply.data;
    }catch{return failed('deadline-exceeded');}
   },
   async releaseEmojiSearch(input){
