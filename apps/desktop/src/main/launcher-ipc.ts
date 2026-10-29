@@ -1,6 +1,7 @@
 import {registerDefinitionsIpc} from './dictionary-definitions-ipc.ts';
 import type {DefinitionsBackend} from './dictionary-definitions-ipc.ts';
 import {registerDictionaryIpc} from './dictionary-ipc.ts';
+import {registerSpellingIpc} from './dictionary-spelling-ipc.ts';
 import type {DictionaryBackend} from './dictionary-ipc.ts';
 import {registerEmojiIpc} from './emoji-ipc.ts';
 import type {EmojiBackend} from './emoji-ipc.ts';
@@ -481,6 +482,11 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:dictionary',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.dictionaryVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:dictionary');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
     acquire:()=>{busy=true;metadataGeneration++;return()=>{busy=false;};},recordUse:()=>recordUse('linuxcast:dictionary'),...(actions.copyCalculatorResult?{copy:actions.copyCalculatorResult}:{}),
   }):undefined;
+  const removeSpelling=actions.dictionary?registerSpellingIpc(ipc,actions.dictionary,{
+    trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.dictionaryVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
+    authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:dictionary',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.dictionaryVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:dictionary');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
+    acquire:()=>{busy=true;metadataGeneration++;return()=>{busy=false;};},recordUse:()=>recordUse('linuxcast:dictionary'),...(actions.copyCalculatorResult?{copy:actions.copyCalculatorResult}:{}),
+  }):undefined;
   const removeEmoji=actions.emoji?registerEmojiIpc(ipc,actions.emoji,{
     trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&(actions.emojiVisible?.()??true),busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
     authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:emoji',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending||!(actions.emojiVisible?.()??true))return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:emoji');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
@@ -500,5 +506,5 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
     recordUse:()=>recordUse('linuxcast:open-quicklinks'),
   }):undefined;
-  return () => { disposed = true;removeDefinitions?.();removeDictionary?.();removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  return () => { disposed = true;removeDefinitions?.();removeDictionary?.();removeSpelling?.();removeEmoji?.();removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }

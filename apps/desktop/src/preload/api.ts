@@ -1,5 +1,6 @@
 import {createDefinitionsApi} from './dictionary-definitions.ts';
 import {createDictionaryApi} from './dictionary.ts';
+import {createSpellingApi} from './dictionary-spelling.ts';
 import {createEmojiApi} from './emoji.ts';
 import {createLauncherNotesApi} from './notes.ts';
 import {
@@ -31,6 +32,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
   return Object.freeze({
     ...createDefinitionsApi(transport),
     ...createDictionaryApi(transport),
+    ...createSpellingApi(transport),
     ...createEmojiApi(transport),
     ...createQuicklinkApi(transport),
     ...createLauncherNotesApi(transport),

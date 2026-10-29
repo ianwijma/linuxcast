@@ -27,7 +27,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
     // batch into one host revision. Recover only lost document focus; preserve
     // deliberate field/Cancel focus. Pending forms receive inert container focus so
     // Escape stays reachable without placing a held submit key on Cancel.
-    const focused=document.activeElement,lost=focused===document.body||focused instanceof HTMLElement&&formElement.current?.contains(focused)&&focused.matches(':disabled');
+    const focused=document.activeElement,lost=focused===document.body||focused===formElement.current||focused instanceof HTMLElement&&formElement.current?.contains(focused)&&focused.matches(':disabled');
     if(active&&lost){
       if(busy||view.loading)formElement.current?.focus();
       else formElement.current?.querySelector<HTMLElement>('input:not(:disabled), textarea:not(:disabled), select:not(:disabled), button:not(:disabled)')?.focus();

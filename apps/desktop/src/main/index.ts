@@ -1,4 +1,5 @@
 import {openStarDictSource} from '../../../../packages/builtins/dictionary/src/stardict.ts';
+import {createNativeSpeller} from '../../../../packages/builtins/dictionary/src/native-spelling.ts';
 import {createInstalledDictionary} from '../../../../packages/builtins/dictionary/src/installed.ts';
 import {getEmoji,getEmojiGroups} from '../../../../packages/builtins/emoji/src/data.ts';
 import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
@@ -35,7 +36,7 @@ const rates=new RateConversionService({
  async clear(configurationRevision){if(!storage?.isReady())throw new Error('Rates storage unavailable.');await storage.repository.request('rates.cache.clear',{configurationRevision});},
  fetch:fetchFrankfurterRate,
 });
-startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstalledDictionary(),
+startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstalledDictionary({speller:createNativeSpeller(join(__dirname,'platform'))}),
   prepareQuit:async()=>{if(notes&&!await notes.prepareClose())return false;return workflowEditor?workflowEditor.prepareClose():true;},
   copyCalculatorResult:copyText,
   definitions:{

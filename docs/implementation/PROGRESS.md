@@ -2,7 +2,8 @@
 
 Full local1.0/all97/R1-03/release Goal active/unfinished, no scope reduction.
 Previous Goal turn PROGRESS: PR71 definitions and PR72 customkeywords merged.
-Current turn PROGRESS: bounded Emoji local ranking implemented/reviewed/tested.
+Current turn PROGRESS: bounded Emoji local ranking implemented/reviewed/tested
+and merged in PR73.
 User wants small reviewed/tested unfinished application merges; native/release
 acceptance remains explicit. All subagents GPT6.1SOL/high, assignments finished.
 
@@ -17,7 +18,7 @@ planningCI40866726611 PASS15s. No requested/submittedreviews/comments/threads,
 develop unprotected/rules[] checked, no bypass. Unchanged1Password signer works.
 Earlier Notes/application/Dictionary/Emoji flows and all old worktrees retained.
 
-## Ready increment
+## Integrated increment
 
 Coordinator .worktrees/linuxcast-emoji-frecency, codex/emoji-frecency, basec881a66.
 Actual Emoji ranks within relevance by favourite/decayed localfrequency/source
@@ -54,17 +55,71 @@ notes_merge_record_review_sol(UI), isolated .worktrees/linuxcast-emoji-frecency-
 {search,ipc,ui}, matchingcodexbranches. Reviewer hashes /tmp/linuxcast-frecency-
 {ui,actual}-reviewed-hashes.json. No author commits or shared ownership changes.
 
-## Immediate next actions and limits
+## PR73 merged and next application work
 
-Stage/normal configured signedcommit/cryptoverify/push/focusedPR+attach. Inspect
-current-head checks/requestedreviews/protections; normal expected-head merge
-promptly. Record integration and select next bounded useful application flow:
-installed-language Dictionary spelling checks using existing Dictionary UI/source
-selection. Not implemented yet; read full L2-06/normative contract before code.
-No new proof/research/infrastructure task, no need user task choice.
+https://github.com/ianwijma/linuxcast/pull/73
+Signedhead25909f9614515558853d3d158384df2f778200c2 crypto-verified, normal
+expected-head merge9ae4bc4f12fd70b577e6eb6ae84b36af0b0d86db. Currenthead
+planningCI40879011598 PASS14s. No requested/submittedreviews/comments/threads;
+develop unprotected/rules[] inspected; no bypass. Unchanged1Password signer works.
+Primary develop/origin now at mergedhead, clean; verify openPR[] after sync.
 
-HostPop!_OS22.04amd64/private XvfbX11/xclip, Node24.22.1/Bun1.4.4/Electron45,
-embeddedNode24.22.0/ICU78.2; no Debian13/GNOME/KDE/Wayland/nativeAT acceptance.
-FullHunspell/StarDict/thesaurus/nativePaste/global-provider-semantic/predecessor/
-performance/package/release required. Totals8done/20inprogress/69planned,
-56passed/325pending/8N/A. No fullcriterion/task promoted; fullGoal unfinished.
+## Reviewed spelling increment ready to publish
+
+Coordinator .worktrees/linuxcast-dictionary-spelling, codex/dictionary-spelling,
+base9ae4bc4. No commit/PR/signing blocker. No live test sessions remain.
+Explicit selected installed-language Check spelling Form → native recognised/
+suggestions List → explicit canonical Copy implemented. Back/Cancel retains base
+language/query/selection; Hide/restart clears transient word/results. Existing
+packaged Rust helper/systemHunspell1.7 only; pinned descriptors/sealed memfds,
+mandatory Landlock/seccomp/resources, strict framing/UUID/source/owner authority.
+Readslots4 and clipboard reservation survive timeout/late actual settlement;
+no download/network/history/Paste/fallback/dependency/table/migration added.
+Debian libhunspell-1.7-0 runtime requirement recorded; F1-03 packaging still stub.
+
+Final mapped847unit PASS6.30s/54contract PASS0.942s/416security PASS2.55s/
+78browser PASS33.6s/34integration across13files PASS73.80s. Integration includes
+8actual sandboxedElectron flows+25storage-owner/client+1real native-reader-IPC
+source replacement. New actual11.927s en_GB cats affixcheck/native suggestions,
+ArrowDown canonical cart Copy/realxclip2, dirtyCancelKeepDiscard/Back/language/query,
+Hide/reopen/Quit/restart blankForm, usage2/privateexports/0rendererHTTP(S).
+Actual source replacement refuses oldCopy twice even though cats still recognised;
+freshUUID snapshot changes, no copy/usage. Rust12real native/containment tests
+PASS3.01s; full directNodeTS/lockedClippy/scopedlint/plan PASS.
+Default exec sandbox controlled scripts exited beforecode; outside actual-process
+36transport tests/mappedunit PASS without productionrelaxation. Initial actual
+race pressed a briefly disabled Check action afterBack; final helper waits exact
+enabled palettebutton. Temporary renderer/key diagnostics removed, renderer=HEAD.
+
+Independent native/source/transport/contracts/IPC/preload/wrapper/sharedForm/sourceUI/
+actualassertions/report and12newPNG review CLEAN; all fixes regressed: BOM/SETcomment,
+duplicateJSONkeys, settled Form focus, dirtyCancel and misleading base-read no-copy
+wording while spelling Copy pending. Parent reviewed authored wrapper regression.
+8component+4actual dark/light/200% captures axe0;703historicalPNG preserved.
+Report apps/desktop/evidence/dictionary-spelling-application.md, native/source/UI
+reports under packages/builtins/dictionary. No full criterion/task promotion.
+
+Existing GPT6.1SOL/high lane worktrees/branches all delivered/reviewed/done:
+manifest_notes_delete_sol .worktrees/linuxcast-dictionary-spelling-native,
+codex/dictionary-spelling-native; source3 patchSHA6f8363ed366b3693a5a9ebb698db84843f1fd2bcb2ea53fa683f4eeebba0884b.
+notes_delete_boundary_sol .worktrees/linuxcast-dictionary-spelling-reader,
+codex/dictionary-spelling-reader; source5 patchSHAf31c29397a311eeeb6264cd02f87036d015924e1802ed6911529972f0469f452.
+notes_merge_record_review_sol .worktrees/linuxcast-dictionary-spelling-ui,
+codex/dictionary-spelling-ui; UI14 patchSHAf9ac0b4f6f3ac694038ae5ad6dc0828695d73ad79dcd657be6e78cecc046e27c;
+wrapper regression patchSHA415d084fca442b3f87f3fd07dd2a8bf69d7dd5dbba4960b6c53d9f348552245a.
+All /tmp corresponding manifests/frozen reviewed hashes retained; parent verified
+all22owned hashes exact. No author commits/shared ownership changes.
+
+Immediate next: final scopedlint/diff/stage review, normal configured signedcommit,
+crypto verify/push/focusedPR+attach; inspect current-head CI/requested reviews/
+comments/protections and normal expected-head merge promptly. Authenticated ghCLI
+works outside network sandbox; connector repository lookup argumentbinding failed.
+Develop unprotected/rules[] and openPR[] verified at9ae4bc4. Preserve old worktrees.
+After integration record merge evidence and select next bounded application flow;
+no research/proof/infrastructure lane or user task-choice question.
+
+HostPop!_OS22.04amd64/Linux7.1.1/privateXvfbX11/xclip, Node24.22.1/Bun1.4.4/
+Electron45 embeddedNode24.22.0; no Debian13/GNOME/KDE/Wayland/nativeAT acceptance.
+All supported languages/encodings, fullStarDict/thesaurus/nativePaste/global-provider
+semantic/predecessor/performance/package/release requirements remain. Totals8done/
+20inprogress/69planned;56passed/325pending/8N/A. Full97/R1-03 Goal unfinished.

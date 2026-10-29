@@ -1,4 +1,5 @@
 import type {DictionaryDefinitionsApi} from './dictionary-definitions.ts';
+import type {DictionarySpellingApi} from './dictionary-spelling.ts';
 import * as z from 'zod';
 import {rpcFailureSchema} from './protocol.ts';
 const encoder=new TextEncoder();
@@ -31,7 +32,7 @@ export const dictionaryReleaseInputSchema=z.strictObject({revision:positive,sear
 export const dictionaryReleaseRequestSchema=dictionaryReleaseInputSchema.extend({protocolVersion:z.literal(1)});
 export const dictionaryReleaseReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:z.strictObject({outcome:z.literal('released'),searchId:positive})}),failure]);
 export type DictionaryReleaseReply=z.infer<typeof dictionaryReleaseReplySchema>;
-export interface DictionaryApi extends DictionaryDefinitionsApi{
+export interface DictionaryApi extends DictionaryDefinitionsApi,DictionarySpellingApi{
  searchDictionary?(input:z.infer<typeof dictionarySearchInputSchema>):Promise<DictionarySearchReply>;
  copyDictionaryWord?(input:z.infer<typeof dictionaryCopyInputSchema>):Promise<DictionaryCopyReply>;
  releaseDictionarySearch?(input:z.infer<typeof dictionaryReleaseInputSchema>):Promise<DictionaryReleaseReply>;
