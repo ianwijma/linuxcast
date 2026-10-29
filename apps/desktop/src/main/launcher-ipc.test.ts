@@ -25,7 +25,7 @@ describe('trusted launcher registry and action dispatch',()=>{
     const f=fixture();
     expect([...f.handlers.keys()].sort()).toEqual(Object.values(LAUNCHER_CHANNELS).sort());
     const reply=await f.invoke(LAUNCHER_CHANNELS.getCommands);
-    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'},{id:'linuxcast:open-notes',enabled:false},{id:'linuxcast:open-file-search'},{id:'linuxcast:calculator'}]}});
+    expect(reply).toMatchObject({ok:true,value:{revision:1,rankingAvailable:true,commands:[{id:'linuxcast:open-local-data',usage:{useCount:4}},{id:'linuxcast:hide'},{id:'linuxcast:quit'},{id:'linuxcast:open-url'},{id:'linuxcast:open-notes',enabled:false},{id:'linuxcast:quick-note',enabled:false},{id:'linuxcast:open-file-search'},{id:'linuxcast:calculator'}]}});
     expect(JSON.stringify(reply)).not.toContain('commandId');
     expect(await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,query:'SYNTHETIC_PRIVATE'})).toMatchObject({ok:false,error:{code:'invalid-request'}});
     f.remove();expect(f.handlers.size).toBe(0);
@@ -62,7 +62,7 @@ describe('trusted launcher registry and action dispatch',()=>{
   });
   it('reports unavailable commands and rejects execution during shutdown',async()=>{
     const f=fixture({},false);
-    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true},{enabled:false},{enabled:true},{enabled:true}]}});
+    expect(await f.invoke(LAUNCHER_CHANNELS.getCommands)).toMatchObject({ok:true,value:{revision:2,commands:[{enabled:false,unavailableReason:expect.any(String)},{enabled:true},{enabled:true},{enabled:true},{enabled:false},{enabled:false},{enabled:true},{enabled:true}]}});
     expect(await f.execute('linuxcast:open-local-data',2)).toMatchObject({ok:false,error:{code:'permission-denied'}});
     const stopped=fixture({quitting:()=>true});
     expect(await stopped.execute()).toMatchObject({ok:false,error:{code:'cancelled'}});
@@ -177,7 +177,7 @@ it('acknowledges only stored visibility at exactly the next revision with a full
   const f=visibilityFixture(),before=await catalogue(f),commandId='linuxcast:open-local-data';
   const reply=await f.invoke(LAUNCHER_CHANNELS.setHidden,{protocolVersion:1,revision:before.revision,commandId,hidden:true}) as LauncherCommandsReply;
   expect(reply).toMatchObject({ok:true,value:{revision:before.revision+1,visibilityAvailable:true,nextCursor:null}});
-  if(!reply.ok)throw new Error('Missing acknowledgement.');expect(reply.value.updateOnly).toBeUndefined();expect(reply.value.commands).toHaveLength(7);
+  if(!reply.ok)throw new Error('Missing acknowledgement.');expect(reply.value.updateOnly).toBeUndefined();expect(reply.value.commands).toHaveLength(8);
   expect(reply.value.commands.find(row=>row.id===commandId)).toEqual({...before.commands.find(row=>row.id===commandId),hidden:true});
   expect(f.actions.setHidden).toHaveBeenCalledExactlyOnceWith(commandId,true);expect(f.actions.recordUse).not.toHaveBeenCalled();expect(f.actions.openDataSettings).not.toHaveBeenCalled();
   expect(await f.execute(commandId,before.revision)).toMatchObject({ok:false,error:{code:'invalid-request'}});
@@ -294,7 +294,7 @@ it('pages a complete registered application catalogue and rejects obsolete curso
   const f=fixture({listApplications:async()=>records,launchApplication}),first=await catalogue(f);
   expect(first.commands).toHaveLength(100);expect(first.nextCursor).toBe(`${first.revision}:100`);
   const second=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:first.nextCursor}) as LauncherCommandsReply;
-  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(37);
+  expect(second).toMatchObject({ok:true,value:{revision:first.revision,nextCursor:null}});if(!second.ok)throw new Error();expect(second.value.commands).toHaveLength(38);
   const selected=first.commands.find(command=>command.provider==='applications')!;
   expect(await f.execute(`application:${'f'.repeat(64)}`,first.revision)).toMatchObject({ok:false,error:{code:'permission-denied'}});
   expect(await f.execute(selected.id,first.revision)).toEqual({ok:true,value:{outcome:'dispatched'}});
@@ -312,7 +312,7 @@ it('caps public page bytes and keeps paginating large saved aliases without drop
     const next=await f.invoke(LAUNCHER_CHANNELS.getCommands,{protocolVersion:1,cursor:page.nextCursor}) as LauncherCommandsReply;
     if(!next.ok)throw new Error();page=next.value;
   }
-  expect(ids).toHaveLength(137);expect(new Set(ids).size).toBe(137);
+  expect(ids).toHaveLength(138);expect(new Set(ids).size).toBe(138);
 });
 it('returns a one-command authoritative pin acknowledgement for an application beyond page one',async()=>{
   const f=fixture({listApplications:async()=>Array.from({length:130},(_,i)=>applicationFixture(i))}),first=await catalogue(f);
@@ -514,3 +514,5 @@ it('refuses malformed duration or invalid calendar result before any copy or use
 });
 
 it('registers Notes as a real fixed command and awaits its workspace before recording use',async()=>{const openNotes=vi.fn(async()=>{}),f=fixture({openNotes});const current=await catalogue(f);expect(current.commands.find(row=>row.id==='linuxcast:open-notes')).toMatchObject({enabled:true,title:'Notes'});expect(await f.execute('linuxcast:open-notes',current.revision)).toMatchObject({ok:true,value:{outcome:'completed'}});expect(openNotes).toHaveBeenCalledTimes(1);expect(f.actions.recordUse).toHaveBeenCalledWith('linuxcast:open-notes');});
+
+it('registers actual Quick note and records usage only after confirmed workspace creation',async()=>{const openQuickNote=vi.fn(async()=>{}),f=fixture({openQuickNote}),current=await catalogue(f);expect(current.commands.find(row=>row.id==='linuxcast:quick-note')).toMatchObject({enabled:true,title:'Quick note'});expect(await f.execute('linuxcast:quick-note',current.revision)).toMatchObject({ok:true,value:{outcome:'completed'}});expect(openQuickNote).toHaveBeenCalledTimes(1);expect(f.actions.recordUse).toHaveBeenCalledWith('linuxcast:quick-note');openQuickNote.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE'));vi.mocked(f.actions.recordUse!).mockClear();expect(await f.execute('linuxcast:quick-note',current.revision)).toMatchObject({ok:false});expect(f.actions.recordUse).not.toHaveBeenCalled();});

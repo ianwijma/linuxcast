@@ -11,7 +11,7 @@ export interface NotesProps{api:NotesApi}
 export function Notes({api}:NotesProps){
  const titleRef=useRef<HTMLInputElement>(null),recoveryRef=useRef<HTMLElement>(null);
  const controller=useMemo(()=>new NotesController(api),[api]);const state=useSyncExternalStore(controller.subscribe,()=>controller.snapshot);const metadataPending=state.pinning||state.archiving;const [appearance,setAppearance]=useState<'dark'|'light'>('dark');
- useEffect(()=>{let active=true;void api.getAppearance().then(value=>{if(active&&['dark','light'].includes(value))setAppearance(value);}).catch(()=>{});const theme=api.onAppearance(value=>{if(active)setAppearance(value);});const close=api.onCloseRequested(()=>controller.requestClose());controller.start();return()=>{active=false;controller.dispose();theme();close();};},[api,controller]);
+ useEffect(()=>{let active=true;void api.getAppearance().then(value=>{if(active&&['dark','light'].includes(value))setAppearance(value);}).catch(()=>{});const theme=api.onAppearance(value=>{if(active)setAppearance(value);});const close=api.onCloseRequested(()=>controller.requestClose());const quick=api.onQuickNoteRequested?.(()=>controller.newNote());controller.start();return()=>{active=false;controller.dispose();theme();close();quick?.();};},[api,controller]);
  useLayoutEffect(()=>{titleRef.current?.focus();},[state.id]);
  useFocusRestore(state.reloadConfirm||state.closeFailed,recoveryRef);
  useLayoutEffect(()=>{if(state.reloadConfirm||state.closeFailed)recoveryRef.current?.querySelector<HTMLButtonElement>('button')?.focus();},[state.reloadConfirm,state.closeFailed]);
@@ -38,7 +38,7 @@ export function Notes({api}:NotesProps){
    {state.message&&<p role="status">{state.message}</p>}{state.error&&<p role="alert" className="notes-error">{state.error}</p>}
    {state.reloadConfirm&&<section ref={recoveryRef} role="alertdialog" aria-labelledby="notes-reload-title" className="notes-recovery"><h2 id="notes-reload-title">Reload stored note?</h2><p>Confirm the current stored revision. Your local edits stay here for review; no Save or draft is replayed. A previous write may already have been stored.</p><Button onClick={()=>controller.cancelReload()}>Keep editing</Button><Button onClick={()=>void controller.reconcile()}>Reload stored note now</Button></section>}
    {state.closeFailed&&<section ref={recoveryRef} role="alertdialog" aria-labelledby="notes-close-title" className="notes-recovery"><h2 id="notes-close-title">Latest changes could not be confirmed</h2><p>Keep editing or retry closing after recovery. Closing without latest changes does not undo earlier writes; they may already be stored.</p><Button onClick={()=>controller.keepEditing()}>Keep editing</Button><Button onClick={()=>void controller.requestClose()}>Retry close</Button><Button variant="danger" onClick={()=>void controller.closeWithoutFlush()}>Close without latest changes</Button></section>}
-  </section></div><footer className="notes-footer">Local notes · Trash, trash restore, revision restore, Quicknote and Markdown roundtrip are not available in this increment.</footer>
+  </section></div><footer className="notes-footer">Local notes · Trash, trash restore, revision restore and Markdown roundtrip are not available in this increment.</footer>
  </main></ThemeProvider>;
 }
 export default Notes;

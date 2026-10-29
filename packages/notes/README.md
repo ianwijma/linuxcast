@@ -104,7 +104,7 @@ its request observer is not SQLite, native-close or restart evidence.
 This increment contributes partial U1-01-UI/PRIVACY and preserves the bounded
 AC01 recovery boundary. Coordinator owner migration/CAS/filter/native workspace
 and production reopen evidence remains separate. Full import/Markdown roundtrip,
-trash/trash restore/revision restore/attachments, Quicknote/root provider,
+trash/trash restore/revision restore/attachments, root Notes provider,
 Debian GNOME/KDE Wayland/X11/native AT/session/performance/package/release and
 all complete U1 acceptance remain required; no whole-task completion is claimed.
 
@@ -153,9 +153,57 @@ these checks do not establish native/SQLite/restart behaviour.
 This supplies partial U1-01-UI/PRIVACY and preserves bounded AC01 recovery
 presentation. Coordinator production persistence/native-close/restart evidence is
 separate. Full AC02 import/Markdown roundtrip, Trash/trash restore/revision restore,
-attachments, root Notes provider, Quicknote and Debian GNOME/KDE Wayland/X11/AT,
+attachments, root Notes provider and Debian GNOME/KDE Wayland/X11/AT,
 session/performance/package/release acceptance remain required. This increment
 neither completes U1-01 nor establishes full D1-02 acceptance.
+
+## Registered Quick note presentation — 29 October 2026
+
+The optional host Quick-note request subscribes to the existing New note path and
+unsubscribes on disposal. `newNote()` now returns true only after the new UUID's
+initial Untitled note / empty-document draft receives an exact confirmed owner
+receipt. Normal Notes opening and subscription do not create anything. A later
+deliberate request creates a different UUID; no launcher query enters note content.
+
+The outgoing local draft flushes without Save before switching. An admitted New
+serializes against duplicate New, metadata, Close, Save and export; already admitted
+Close/export prevent creation before their pending state publishes. Post-flush,
+publication and disposal fences prevent late dispatch. Busy, failed/uncertain
+flushes and archived retained edits return false, retain existing content/recovery
+and never recreate or replay automatically. Fresh title focus uses the existing
+layout effect. Main/preload attempt IDs and launcher registration are coordinator
+work; the component does not invent an event broker or report synthetic durability.
+
+Bounded author checks on Linux amd64 / Node24.22.1 / Bun1.4.4:
+
+- 105 unit cases: 98 controller and seven export; 13 additions cover confirmed
+  creation, outgoing draft/no Save, distinct/duplicate UUID requests, known/unknown
+  failure, archived retained edits, admitted/reentrant Close/export/Save and disposal.
+  A queued explicit Save settles before Quick flushes or changes the outgoing ID.
+- 37 actual Tiptap Chromium cases: 32 retained plus five host-callback cases.
+  Both themes verify focused empty-draft creation, prior draft preservation and
+  deliberate later creation; pending duplicates/Close, unknown no-replay and
+  readonly retained-edit refusal are covered. Tested new states pass axe.
+  Final-source verification passed 26 cases before a retained initial editor-mount
+  timeout; the unchanged-source rerun passed that case and ten skipped cases.
+  The earlier pre-review-fix complete run passed all 37 in 25.6 seconds.
+- Owned Notes typecheck, scoped ESLint, plan integrity and whitespace checks pass.
+  The complete integrated tree and production main/preload/native lifecycle are
+  validated by the coordinator separately.
+
+The existing explicit unit/browser selections above run these cases. Five public
+captures are inspected: dark/light confirmed Quick draft, dark pending/refused
+Close, light unknown outgoing flush and retained archived refusal. The final
+readonly refusal uses a taller viewport with bounds assertions so Restore and the
+error remain visible. Historical regenerated PNGs are restored. All fixture host
+callbacks and persistence are explicitly synthetic observers, not native launcher,
+SQLite, restart or supported-session evidence.
+
+This contributes partial U1-01-AC01/UI/PRIVACY presentation evidence. All four U1
+criteria remain pending, including full import/Markdown roundtrip, Trash/revision
+restore/attachments/root provider and complete Debian GNOME/KDE Wayland/X11,
+native AT/session/performance/package/release scope. Integrated shared primitives
+do not establish full D1-02 acceptance.
 
 ## Earlier create/edit author verification — 29 October 2026
 
@@ -190,6 +238,6 @@ This supports partial U1-01-AC01 recovery presentation, U1-01-UI and PRIVACY onl
 Coordinator production persistence/crash/restart evidence is recorded separately in
 apps/desktop/evidence/notes-create-edit-application.md and the export evidence above.
 U1-01-AC02 Markdown roundtrip is not implemented or accepted. Trash/
-trash restore/revision restore, root Notes provider, Quicknote and full native
+trash restore/revision restore, root Notes provider and full native
 Debian GNOME/KDE Wayland/X11/AT/session/performance/package/release acceptance
 remain required. Reviewed primitives do not establish full D1-02 acceptance.

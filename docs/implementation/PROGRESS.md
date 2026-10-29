@@ -57,7 +57,7 @@ capture reviews clean. Clean primary develop fast-forwarded2aa49e5. No taskdonec
 EarlierPR56previewCopy dc4f47e,PR55textpreview26c54818,PR54rates2d82863,PR53calendar
 dbafd815,PR52zoned7aa0d91 integrated; registry retains partial evidence/limitations.
 
-## Active next bounded application flow: archive/restore
+## Archive/restore integrated; active next flow: Quick note
 
 Coordinator reused clean `.worktrees/linuxcast-application-controls`, branch
 `codex/notes-archive` from integratedPR59. UI agent manifest_review_sol reused
@@ -96,9 +96,47 @@ closed with transition/current-editability guards and real browser regression.
 Exact21ownedfiles from full authorpatch45197c33054f9913f7e4661e3c8360ca98ec442c20121dfe69ec01f5602de874
 reconciled all hashes; shared contract/freeze unchanged. Author92focusedunits and
 32Chromium23.0s PASS. Integrated257mappedunits/fulltype/scopedlint/diff PASS.
-Next: final plan validation; normal signedcommit/push/focused PR, currentheadCI and
-configured GitHub reviews, normal expectedhead merge and registryintegration record.
-Then next small concrete Notes application flow (Trash/restore), no proof expansion.
+PR60 https://github.com/ianwijma/linuxcast/pull/60 normally merged
+b79f9ddbc1f690bdd87920d5a4487319c86b35a2, reviewed signed head
+af4b3e3fe3b4e5c2e40744383f5cd4fe85930058, CI40803274853 PASS; no requested/submitted
+GitHub reviews/comments/threads. Primary clean develop fast-forwarded.
+
+Active: coordinator .worktrees/linuxcast-application-controls codex/notes-quick-note;
+author .worktrees/linuxcast-text-preview-native codex/notes-quick-note-ui. Before
+reuse all21owned+2shared author files byte-identical to mergedPR60, safely reconciled
+clean; no unintegrated work lost. QUICK-NOTE-INCREMENT.md and notes.ts optional
+onQuickNoteRequested boolean callback frozen/copied UNCOMMITTED. Existing New is
+used for flush-outgoing-draft without Save and confirmed initial write/title focus.
+Main fixed Quick note command, named ready/request/finished handshake/one intent,
+monotonic IDs/strict sender+owner checks, no READY replay, delivered-timeout slot,
+observed validated initial owner draft before created:true, native Close/Quit/export
+gates implemented. Fixed missing strict launcher ID/schema registration and shared
+aggregate cap5606→5607 with exact boundary fixtures. Main lifecycle type fixes done.
+Final101security PASS including closeBusy/monotonicdeadline regressions. Initial app/unit run
+failed BEFORE Notes due missinglauncherID; fixed, not counted as acceptance.
+
+Final author105focusedunits/37distinct Chromium cases PASS. Browser final run26PASS
+thenretainedArchive initial mountfailure; all11failed/notrun cases PASS unchanged
+8.5s targeted retry, explicitly split. Pre-fix37complete25.6s historical. Five public
+component plusfour actual launcher/new-note captures independently clean. Queued
+Save→Quick P2 fixed by awaiting admitted#save with lifetime/generation/outgoingID
+checks; deferred draft/Save regression confirms oldselection/Save receipt thennewID.
+Exact revised11owned patch f40850e73cb47c5227b989573d2ff72950ca90169d8d809c247b0c84e0b0508f
+and manifest0566cffa2e5c5af7ba31353238f3ab7b5d67f283fa75a24e21a9c9e0aeaf9fb7
+reconciled allhashes, sharedcopies unchanged. Controller1fa4fc5b59cb227a15a19a995dbe27eaf03c6eee6366e6bf529f4b0418c0e982.
+
+Actual finalapp-onlyPASS11.81s/Vitest12.55s after incomplete mappedrun15ownerPASS
+thenappworkerexit beforecompletion; no failure countedpass. Earliercandidatefull16
+PASS10.79s. Exact currentruntime appchecks cold/warmQuick/outgoingflush/noSave/two
+UUIDs/normalopen+restartnoautocreate andexistingArchive/Pin/export/Close/Quit/crash/
+reopen/privacy PASS. No active root tests. Final271mappedunits/101security/15Notes
+contracts/10changedsharedQuicklinkcontracts/49storage regressions/fulltype/scopedlint/
+render/plan/status/diff PASS. Independent backend/UI/actualsource/capture reviews clean.
+MainQuickIPCdb7e9e93e7a0ca6550eed4fd1def6e698b3322155e3ac697109337015b4e0948.
+All findings closed: reverseexport/Close/monotonicdeadlines/aggregatecap/queuedSave.
+Next: normal signedcommit/push/focusedPR/currentheadCI+configuredreviews/expectedhead
+merge, thenrecordintegration andselectnextbounded applicationflow (Trash/restore).
+All4criteria/fullU1/D1/nativeAT/session/release staypending. Complete97/R1goalactive.
 Do not mark U1/D1/Goal complete or report simulatedarchive success.
 
 ## Signing/runtime and preserved branches
@@ -129,7 +167,7 @@ no moreportal/FUSE/VM/proof work assigned. Preview is not nativeOpenreplacement.
 
 ## Still required
 
-U1inprogress/all4criteria pendingwithstructuredpartial evidence. Archive/restore reviewed/tested pending normalPRmerge; Trash/restore/revisionrestore/attachments/Quicknote/rootprovider,
+U1inprogress/all4criteria pendingwithstructuredpartial evidence. Archive/restore integratedPR60; Quicknotereviewed/testedpendingnormalPRmerge. Trash/restore/revisionrestore/attachments/rootprovider,
 fullMarkdownimport/roundtrip/nativechooserinteraction andfullD1/nativeAT remain.
 HostPop!_OS22.04amd64/privateXvfb/Chromium evidence is not Debian13GNOME/KDEWayland/
 X11/nativeAT/highcontrast/performance/package/release acceptance. Ordinaryprivate

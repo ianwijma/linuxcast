@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import {NOTES_EXPORT_CHANNEL,noteExportSelectionSchema,noteExportReplySchema} from '../../../../packages/contracts/src/notes-export.ts';
-import {NOTES_CHANNELS,NOTES_APPEARANCE,NOTES_CLOSE_REQUESTED,NOTES_CLOSE_FINISHED,notesCloseAttemptSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,notesListRequestSchema,notesGetRequestSchema,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema,noteContentKey} from '../../../../packages/contracts/src/notes.ts';
+import {NOTES_CHANNELS,NOTES_QUICK_NOTE_READY,NOTES_QUICK_NOTE_REQUESTED,NOTES_QUICK_NOTE_FINISHED,NOTES_APPEARANCE,NOTES_CLOSE_REQUESTED,NOTES_CLOSE_FINISHED,notesCloseAttemptSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,notesListRequestSchema,notesGetRequestSchema,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema,noteContentKey} from '../../../../packages/contracts/src/notes.ts';
 import type {NotesApi} from '../../../../packages/contracts/src/notes.ts';
 import type {ShellTransport} from '../preload/api.ts';
 const failed=(code:'invalid-request'|'unavailable'|'unknown-outcome')=>({ok:false as const,error:{code:({'invalid-request':'invalid-request',unavailable:'capability-unavailable','unknown-outcome':'internal'} as const)[code],retryable:false,message:code==='unknown-outcome'?'The note write could not be confirmed. Keep your edits and reload before saving again.':code==='invalid-request'?'Review this note’s title and supported content.':'Notes are unavailable. Keep your edits and reopen the workspace.'}});
@@ -10,7 +10,17 @@ export function createNotesApi(transport:Pick<ShellTransport,'invoke'|'on'|'remo
   if(typeof listener!=='function')throw new TypeError('A listener is required.');let active=true;
   const receive=(_event:unknown,value:unknown)=>{const parsed=parse(value);if(active&&parsed!==undefined)listener(parsed);};transport.on(channel,receive);return()=>{active=false;transport.removeListener(channel,receive);};
  };
+ let quickListener=false,latestQuickAttempt=0;
  return Object.freeze<NotesApi>({
+  onQuickNoteRequested(listener){
+   if(typeof listener!=='function')throw new TypeError('A listener is required.');if(quickListener)throw new Error('Quick note listener is already registered.');quickListener=true;let active=true;
+   const remove=listen(NOTES_QUICK_NOTE_REQUESTED,value=>{const parsed=notesCloseAttemptSchema.safeParse(value);return parsed.success?parsed.data:undefined;},attempt=>{
+    if(!active||attempt.attemptId<=latestQuickAttempt)return;latestQuickAttempt=attempt.attemptId;
+    void Promise.resolve().then(()=>active?listener():false).catch(()=>false).then(created=>transport.invoke(NOTES_QUICK_NOTE_FINISHED,{...attempt,created:created===true})).catch(()=>{});
+   });
+   void transport.invoke(NOTES_QUICK_NOTE_READY,{protocolVersion:1}).catch(()=>{});
+   return()=>{if(!active)return;active=false;quickListener=false;remove();};
+  },
   async setArchived(input){const request=noteArchiveSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesWriteReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.setArchived,{protocolVersion:1,input:request.data}));if(!reply.success)return failed('unknown-outcome');if(reply.data.ok&&(reply.data.value.id!==request.data.id||reply.data.value.revision!==request.data.expectedRevision+1||reply.data.value.archived!==request.data.archived))return failed('unknown-outcome');return reply.data;}catch{return failed('unknown-outcome');}},
   async setPinned(input){const request=notePinSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesWriteReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.setPinned,{protocolVersion:1,input:request.data}));if(!reply.success)return failed('unknown-outcome');if(reply.data.ok&&(reply.data.value.id!==request.data.id||reply.data.value.revision!==request.data.expectedRevision+1||reply.data.value.pinned!==request.data.pinned))return failed('unknown-outcome');return reply.data;}catch{return failed('unknown-outcome');}},
   async exportMarkdown(input){const selection=noteExportSelectionSchema.safeParse(input);if(!selection.success)return failed('invalid-request');try{const reply=noteExportReplySchema.safeParse(await transport.invoke(NOTES_EXPORT_CHANNEL,{protocolVersion:1,...selection.data}));if(!reply.success)return {ok:false,error:{code:'deadline-exceeded',message:'The export could not be confirmed. Check the selected file before trying again.',retryable:false}};if(reply.data.ok&&(reply.data.value.id!==selection.data.id||reply.data.value.revision!==selection.data.revision))return {ok:false,error:{code:'deadline-exceeded',message:'The export could not be confirmed. Check the selected file before trying again.',retryable:false}};return reply.data;}catch{return {ok:false,error:{code:'deadline-exceeded',message:'The export could not be confirmed. Check the selected file before trying again.',retryable:false}};}},

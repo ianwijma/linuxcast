@@ -78,6 +78,7 @@ export type NotesReadReply=z.infer<typeof notesReadReplySchema>;
 export type NotesWriteReply=z.infer<typeof notesWriteReplySchema>;
 export type NotesListReply=z.infer<typeof notesListReplySchema>;
 export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',setArchived:'notes:set-archived',close:'notes:close',appearance:'notes:appearance'} as const;
+export const NOTES_QUICK_NOTE_READY='notes:quick-note-ready',NOTES_QUICK_NOTE_REQUESTED='notes:quick-note-requested',NOTES_QUICK_NOTE_FINISHED='notes:quick-note-finished';
 export const NOTES_APPEARANCE='notes:appearance-changed',NOTES_CLOSE_REQUESTED='notes:close-requested',NOTES_CLOSE_FINISHED='notes:close-finished';
 export const notesRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 export const notesGetRequestSchema=notesRequestSchema.extend({id:z.uuid()});
@@ -87,7 +88,9 @@ export const notesPinRequestSchema=notesRequestSchema.extend({input:notePinSchem
 export const notesArchiveRequestSchema=notesRequestSchema.extend({input:noteArchiveSchema});
 export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.number().int().positive().safe()});
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
+export const notesQuickNoteFinishedSchema=notesCloseAttemptSchema.extend({created:z.boolean()});
 export interface NotesApi{
+ onQuickNoteRequested?(listener:()=>boolean|Promise<boolean>):()=>void;
  setArchived?(input:NoteArchive):Promise<NotesWriteReply>;
  setPinned?(input:NotePin):Promise<NotesWriteReply>;
  exportMarkdown?(input:NoteExportSelection):Promise<NoteExportReply>;
