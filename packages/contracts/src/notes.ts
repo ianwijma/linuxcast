@@ -66,6 +66,11 @@ export const noteArchiveSchema=z.strictObject({id:z.uuid(),expectedRevision:revi
 export type NoteArchive=z.infer<typeof noteArchiveSchema>;
 export const noteTrashSchema=z.strictObject({id:z.uuid(),expectedRevision:revision.positive(),trashed:z.boolean()});
 export type NoteTrash=z.infer<typeof noteTrashSchema>;
+/** Permanent logical deletion is limited to one existing trashed CAS revision. */
+export const noteDeleteSchema=z.strictObject({id:z.uuid(),expectedRevision:revision.positive()});
+export type NoteDelete=z.infer<typeof noteDeleteSchema>;
+export const noteDeletedSchema=z.strictObject({id:z.uuid(),deletedRevision:revision.positive()});
+export type NoteDeleted=z.infer<typeof noteDeletedSchema>;
 export const noteSummarySchema=z.strictObject({id:z.uuid(),revision:revision.positive(),title:noteTitleSchema,pinned:z.boolean(),archived:z.boolean(),trashed:z.boolean(),excerpt:sized(1024),hasDraft:z.boolean(),updatedAt:z.iso.datetime()});
 export type NoteSummary=z.infer<typeof noteSummarySchema>;
 export const notesCursorSchema=z.strictObject({updatedAt:z.iso.datetime(),id:z.uuid()});
@@ -75,6 +80,8 @@ export const notesListSchema=z.strictObject({query:sized(256),pinnedOnly:z.boole
 export type NotesList=z.infer<typeof notesListSchema>;
 const failure=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const notesReadReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteRecordSchema.nullable()}),failure]);
+export const notesDeleteReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteDeletedSchema}),failure]);
+export type NotesDeleteReply=z.infer<typeof notesDeleteReplySchema>;
 export const notesWriteReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteRecordSchema}),failure]);
 export const notesListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:notesListSchema}),failure]);
 export type NotesReadReply=z.infer<typeof notesReadReplySchema>;
@@ -95,7 +102,7 @@ export const noteHistoryReplySchema=z.discriminatedUnion('ok',[z.strictObject({o
 export const noteRevisionReadReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteRevisionReadSchema}),failure]);
 export type NoteHistoryReply=z.infer<typeof noteHistoryReplySchema>;
 export type NoteRevisionReadReply=z.infer<typeof noteRevisionReadReplySchema>;
-export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',setArchived:'notes:set-archived',setTrashed:'notes:set-trashed',history:'notes:history',getRevision:'notes:get-revision',restoreRevision:'notes:restore-revision',close:'notes:close',appearance:'notes:appearance'} as const;
+export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',setArchived:'notes:set-archived',setTrashed:'notes:set-trashed',deletePermanently:'notes:delete-permanently',history:'notes:history',getRevision:'notes:get-revision',restoreRevision:'notes:restore-revision',close:'notes:close',appearance:'notes:appearance'} as const;
 export const NOTES_QUICK_NOTE_READY='notes:quick-note-ready',NOTES_QUICK_NOTE_REQUESTED='notes:quick-note-requested',NOTES_QUICK_NOTE_FINISHED='notes:quick-note-finished';
 export const NOTES_APPEARANCE='notes:appearance-changed',NOTES_CLOSE_REQUESTED='notes:close-requested',NOTES_CLOSE_FINISHED='notes:close-finished';
 export const notesRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
@@ -105,12 +112,14 @@ export const notesWriteRequestSchema=notesRequestSchema.extend({input:noteWriteS
 export const notesPinRequestSchema=notesRequestSchema.extend({input:notePinSchema});
 export const notesArchiveRequestSchema=notesRequestSchema.extend({input:noteArchiveSchema});
 export const notesTrashRequestSchema=notesRequestSchema.extend({input:noteTrashSchema});
+export const notesDeleteRequestSchema=notesRequestSchema.extend({input:noteDeleteSchema});
 export const notesHistoryRequestSchema=notesRequestSchema.extend({input:noteHistoryRequestSchema});
 export const notesRevisionRequestSchema=notesRequestSchema.extend({input:noteRevisionSelectionSchema});
 export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.number().int().positive().safe()});
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export const notesQuickNoteFinishedSchema=notesCloseAttemptSchema.extend({created:z.boolean()});
 export interface NotesApi{
+ deletePermanently?(input:NoteDelete):Promise<NotesDeleteReply>;
  onOpenNoteRequested?(listener:(selection:NotesLauncherSelection)=>boolean|Promise<boolean>):()=>void;
  history?(input:NoteHistoryRequest):Promise<NoteHistoryReply>;
  getRevision?(input:NoteRevisionSelection):Promise<NoteRevisionReadReply>;
@@ -129,6 +138,7 @@ export interface NotesApi{
  onAppearance(listener:(value:'dark'|'light')=>void):()=>void;
 }
 export interface NotesStorageMethods{
+ 'notes.deletePermanently':{params:NoteDelete;result:NoteDeleted};
  'notes.list':{params:NotesListRequest;result:NotesList};
  'notes.get':{params:{id:string};result:NoteRecord|null};
  'notes.write':{params:NoteWrite;result:NoteRecord};
@@ -139,8 +149,9 @@ export interface NotesStorageMethods{
  'notes.getRevision':{params:NoteRevisionSelection;result:NoteRevisionRead};
  'notes.restoreRevision':{params:NoteRevisionSelection;result:NoteRecord};
 }
-export const NOTES_STORAGE_METHODS=['notes.list','notes.get','notes.write','notes.setPinned','notes.setArchived','notes.setTrashed','notes.history','notes.getRevision','notes.restoreRevision'] as const;
+export const NOTES_STORAGE_METHODS=['notes.deletePermanently','notes.list','notes.get','notes.write','notes.setPinned','notes.setArchived','notes.setTrashed','notes.history','notes.getRevision','notes.restoreRevision'] as const;
 export const notesRepositoryContracts:RepositoryContracts=new Map([
+ ['notes.deletePermanently',{params:noteDeleteSchema,result:noteDeletedSchema}],
  ['notes.list',{params:notesListRequestSchema,result:notesListSchema}],
  ['notes.get',{params:z.strictObject({id:z.uuid()}),result:noteRecordSchema.nullable()}],
  ['notes.write',{params:noteWriteSchema,result:noteRecordSchema}],

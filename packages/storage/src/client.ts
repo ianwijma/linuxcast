@@ -33,6 +33,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
   let valid = true;
   if(method==='notes.searchRoot')valid=row.query===params.query;
   else if(method==='notes.get')valid=row.id===params.id;
+  else if(method==='notes.deletePermanently')valid=row.id===params.id&&row.deletedRevision===params.expectedRevision;
   else if(method==='notes.write'){const input=noteWriteSchema.parse(params),record=result as NoteRecord;valid=record.id===input.id&&record.revision===input.expectedRevision+1&&noteContentKey(record.draft)===noteContentKey(input.content)&&(input.action!=='save'||record.saved!==null&&noteContentKey(record.saved)===noteContentKey(input.content))&&(input.action!=='draft'||input.expectedRevision!==0||record.saved===null)&&(input.expectedRevision!==0||record.pinned===false)&&record.archived===false&&record.trashed===false;}
   else if(method==='notes.setPinned'){const input=notePinSchema.parse(params),record=result as NoteRecord;valid=record.id===input.id&&record.revision===input.expectedRevision+1&&record.pinned===input.pinned;}
   else if(method==='notes.setArchived'){const input=noteArchiveSchema.parse(params),record=result as NoteRecord;valid=record.id===input.id&&record.revision===input.expectedRevision+1&&record.archived===input.archived;}

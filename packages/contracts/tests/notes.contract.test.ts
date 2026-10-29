@@ -1,6 +1,7 @@
 import {expect,it} from 'vitest';
 import {emptyNoteDocument,noteDocumentSchema,notePlainText,noteContentKey,noteWriteSchema,notesListRequestSchema} from '../src/notes.ts';
 import {NOTES_CHANNELS,noteHistorySchema,noteRevisionReadSchema,noteHistoryRequestSchema,noteRevisionSelectionSchema,notesHistoryRequestSchema,notesRevisionRequestSchema,notesRepositoryContracts} from '../src/notes.ts';
+import {noteDeleteSchema,noteDeletedSchema,notesDeleteRequestSchema,notesDeleteReplySchema,NOTES_STORAGE_METHODS} from '../src/notes.ts';
 it('accepts the closed rich Tiptap grammar with tasks and literal Unicode search projection',()=>{
  const value={type:'doc',content:[{type:'heading',attrs:{level:2},content:[{type:'text',text:'Public 雪',marks:[{type:'bold'}]}]},{type:'taskList',content:[{type:'taskItem',attrs:{checked:true},content:[{type:'paragraph',content:[{type:'text',text:'<script>literal</script>'}]}]}]},{type:'orderedList',attrs:{start:2,type:null},content:[{type:'listItem',content:[{type:'paragraph'}]}]},{type:'codeBlock',attrs:{language:null},content:[{type:'text',text:'public()'}]}]};
  const document=noteDocumentSchema.parse(value);expect(notePlainText(document)).toBe('Public 雪\n<script>literal</script>\n\npublic()');expect(noteDocumentSchema.parse(emptyNoteDocument())).toEqual(emptyNoteDocument());
@@ -26,6 +27,17 @@ it('limits archive mutation authority and distinguishes active/archive filters w
 it('limits recoverable Trash authority and preserves the cross-filter refinement in the wire schema',async()=>{const {noteTrashSchema,notesTrashRequestSchema,notesQueryRequestSchema,noteRecordSchema}=await import('../src/notes.ts');const id='11111111-1111-4111-8111-111111111111',input={id,expectedRevision:1,trashed:true};expect(noteTrashSchema.parse(input)).toEqual(input);for(const extra of [{expectedRevision:0},{trashed:'true'},{content:{title:'Public',document:emptyNoteDocument()}},{pinned:true},{archived:true}])expect(notesTrashRequestSchema.safeParse({protocolVersion:1,input:{...input,...extra}}).success).toBe(false);expect(notesQueryRequestSchema.parse({protocolVersion:1,query:'',trashed:true,pinnedOnly:true})).toEqual({protocolVersion:1,query:'',trashed:true,pinnedOnly:true});expect(notesQueryRequestSchema.safeParse({protocolVersion:1,query:'',trashed:true,archived:true}).success).toBe(false);expect(noteRecordSchema.safeParse({id,documentVersion:1,revision:1,pinned:false,archived:false,draft:{title:'Public',document:emptyNoteDocument()},saved:null,createdAt:'2026-10-29T00:00:00.000Z',updatedAt:'2026-10-29T00:00:00.000Z'}).success).toBe(false);});
 
 const historyId='11111111-1111-4111-8111-111111111111',historyTime='2026-10-29T00:00:00.000Z';
+it('limits permanent deletion to one exact existing revision and a content-free strict receipt',()=>{
+ const input={id:historyId,expectedRevision:3},value={id:historyId,deletedRevision:3};
+ expect(NOTES_CHANNELS.deletePermanently).toBe('notes:delete-permanently');
+ expect(NOTES_STORAGE_METHODS.filter(method=>method==='notes.deletePermanently')).toHaveLength(1);
+ expect(notesDeleteRequestSchema.parse({protocolVersion:1,input})).toEqual({protocolVersion:1,input});
+ expect(notesDeleteReplySchema.parse({ok:true,value})).toEqual({ok:true,value});
+ for(const extra of [{expectedRevision:0},{expectedRevision:Number.MAX_SAFE_INTEGER+1},{expectedRevision:'3'},{id:'not-id'},{ids:[historyId]},{content:{title:'Public',document:emptyNoteDocument()}},{trashed:true},{path:'/tmp/public'},{sql:'DELETE FROM notes'}])expect(noteDeleteSchema.safeParse({...input,...extra}).success).toBe(false);
+ for(const extra of [{deletedRevision:0},{deletedRevision:3.5},{deletedRevision:Number.MAX_SAFE_INTEGER+1},{revision:3},{content:'SYNTHETIC_PRIVATE'},{path:'/tmp/public'}])expect(noteDeletedSchema.safeParse({...value,...extra}).success).toBe(false);
+ for(const reply of [{ok:true,value:null},{ok:true,value:{...value,content:'SYNTHETIC_PRIVATE'}},{ok:true,value,request:input}])expect(notesDeleteReplySchema.safeParse(reply).success).toBe(false);
+ const repository=notesRepositoryContracts.get('notes.deletePermanently')!;expect(repository.params.parse(input)).toEqual(input);expect(repository.result.parse(value)).toEqual(value);
+});
 const savedSummary=(revision:number)=>({revision,createdAt:historyTime,title:'Public saved '+revision});
 it('admits exactly fifty descending saved summaries and keeps the current revision inclusive',()=>{
  const value={id:historyId,currentRevision:50,revisions:Array.from({length:50},(_,index)=>savedSummary(50-index))};

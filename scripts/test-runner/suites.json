@@ -91,7 +91,8 @@
       "packages/notes/tests/markdown.test.ts",
       "packages/notes/tests/export-controller.test.ts",
       "apps/desktop/src/features/launcher/tests/notes-routing.test.ts",
-      "packages/notes/tests/launcher-open.test.ts"
+      "packages/notes/tests/launcher-open.test.ts",
+      "packages/notes/tests/delete-controller.test.ts"
     ]
   },
   "contracts": {
@@ -204,7 +205,8 @@
     "U1-01": [
       "packages/notes/tests/notes.ui.test.ts",
       "apps/desktop/src/features/launcher/tests/notes-search.ui.test.ts",
-      "packages/notes/tests/launcher-open.ui.test.ts"
+      "packages/notes/tests/launcher-open.ui.test.ts",
+      "packages/notes/tests/delete.ui.test.ts"
     ]
   },
   "integration": {

@@ -356,3 +356,43 @@ The optional host subscription calls `NotesController.openSelected({id,revision}
 Seventeen new controller cases and five actual-Tiptap Chromium component cases cover explicit selection, outgoing draft preservation, queued draft→Save→open ordering, identity/active-state refusals, strict extra-field rejection, pending/reentrant/dispose/deadline boundaries, title focus, rich tasks and Unicode. The combined owned launcher/Notes selection run passed 391 checks; a final targeted 17-case run adds one reentrant completion regression (392 distinct checks, 42 new total); seven launcher browser cases and the five Notes browser cases passed separately. A redundant final five-case recheck failed before executing cases because its worker exited SIGSEGV. The final Notes controller additionally avoids a redundant success publication after releasing open ownership; its focused regression passes. Fixtures/browser tests and captures remain those of the successful five-case run; no final browser pass is claimed for that one-line lifecycle correction. Initial full typecheck passed; subsequent final compiler attempts exited 139 without diagnostics, so final integrated typecheck is coordinator-owned outstanding verification. Scoped lint/planning results accompany the delivered patch.
 
 Four inspected public captures: `dark-notes-launcher-selected.png`, `light-notes-launcher-selected.png`, `dark-notes-launcher-pending.png`, `light-notes-launcher-stale.png`. Synthetic in-memory APIs observe requests; they do not prove native window selection, actual SQLite persistence or production clipboard/filesystem effects. This partially supports U1-01 AC01/UI/PRIVACY and L1-01 navigation, not Markdown roundtrip AC02 or full task acceptance. Import/roundtrip, other complete Notes scope, prerequisite D1, supported Debian desktop/AT/session/performance/package/release evidence remain required. Prior Trash/revision snapshots and captures remain unchanged; this patch is relative to coordinator TREE15d2db5, with no unsigned commit or shared-file staging.
+
+## Confirmed deletion of one trashed note — 29 October 2026
+
+The selected trashed note now exposes **Delete permanently** through the optional
+named API. The existing shared Button/TextField/focus primitives and semantic
+styles implement DESIGN.md Tokens, Results and actions, List/detail/form,
+Chat and notes, States and motion, Accessibility, and Review gate. No new design
+system, dependency, service, bulk deletion or attachment work is introduced.
+
+Confirmation copies the selected ID/revision synchronously, focuses **Keep note**
+first, and supports Escape. Keep/Escape performs no write or draft flush. The
+confirmation states that deletion removes the note, its saved revisions and
+retained local edits, cannot be undone here, may leave content in backups, and is
+not secure erasure. Trashed Tiptap content remains readonly. Explicit confirmation
+may discard paused retained edits without storing them first.
+
+One `deletePermanently({id,expectedRevision})` call must return the strict exact
+`{id,deletedRevision}` receipt before the controller clears that selection and its
+local/review state. The current search/Trash/pin filters refresh unchanged, with
+no automatic selection of another row. Confirmation and dispatch reserve all
+competing navigation, New/Quick note, selected open, Save, metadata, history,
+export, filter and Close paths. Disposal prevents queued dispatch and ignores
+late receipts. The library scroll region remains keyboard reachable while its
+controls are disabled, including 200% text scaling.
+
+A known refusal retains the note with manual recovery. Missing capability is
+visible and actionable. Invalid, mismatched, timed-out or rejected receipts retain
+the exact local state and require explicit fresh Reload after the actual call
+settles. Late success never acknowledges or replays deletion. Until that fresh
+read, Close (including close without flush) and other effects stay fenced. A
+fresh existing record retains local edits for review; owner-null clears the
+obsolete selection and local edits with an informational missing-note message,
+without claiming the earlier unacknowledged deletion succeeded.
+
+Author evidence and limitations: [permanent-delete-ui.md](evidence/permanent-delete-ui.md).
+The new controller and browser files are not implicitly added to coordinator task
+maps; use the exact focused commands recorded there. This increment partially
+supports U1-01-AC01, UI and PRIVACY. It does not close AC02 Markdown roundtrip,
+full Notes/task/dependency, Debian desktop/session/native AT or release acceptance.
+Coordinator owns the real storage/main/preload/application evidence and registry.
