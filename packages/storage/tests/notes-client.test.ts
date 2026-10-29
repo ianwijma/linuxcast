@@ -41,3 +41,15 @@ it('rejects malformed history and unsafe preview bodies at the actual response s
  const f=fixture(),pending=f.client.request('notes.getRevision',selection);f.reply({...preview,savedRevision:{...preview.savedRevision,content:{...content,document:{type:'doc',content:[{type:'image',attrs:{src:'https://example.invalid'}}]}}}});
  await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(f.sent).toHaveLength(1);f.client.disconnect();
 });
+
+it('accepts only the exact permanent-delete receipt and sends one named mutation',async()=>{
+ const f=fixture(),params={id,expectedRevision:4},result={id,deletedRevision:4};
+ const pending=f.client.request('notes.deletePermanently',params);f.reply(result);expect(await pending).toEqual(result);
+ expect(f.sent).toHaveLength(1);expect(f.sent[0]).toMatchObject({request:{method:'notes.deletePermanently',params}});f.client.disconnect();
+});
+it.each(['id','deletedRevision','extra','null'] as const)('treats a forged permanent-delete %s receipt as unknown without replay',async mode=>{
+ const f=fixture(),pending=f.client.request('notes.deletePermanently',{id,expectedRevision:4});
+ f.reply(mode==='null'?null:{id,deletedRevision:4,...(mode==='id'?{id:otherId}:mode==='deletedRevision'?{deletedRevision:5}:mode==='extra'?{content:'SYNTHETIC_PRIVATE'}:{})});
+ await expect(pending).rejects.toMatchObject({effectOutcome:'unknown',automaticReplay:false});expect(f.sent).toHaveLength(1);
+ await expect(f.client.request('notes.deletePermanently',{id,expectedRevision:4})).rejects.toMatchObject({effectOutcome:'not-dispatched',automaticReplay:false});expect(f.sent).toHaveLength(1);f.client.disconnect();
+});
