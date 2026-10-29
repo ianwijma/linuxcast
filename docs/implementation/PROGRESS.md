@@ -1,215 +1,128 @@
 # Coordinator checkpoint
 
-Updated29October2026. Full Goal active and unfinished: all97 local1.0 tasks
-through R1-03/all release gates. Objective attachment:
+Updated 29 October 2026. Complete local 1.0 Goal remains active and unfinished:
+all97 tasks through R1-03 and every release gate. Objective attachment:
 `/home/ian/.codex/attachments/78a55eec-f708-4e08-b951-d8db53af7f4f/goal-objective.md`.
 
-## Constraints
+## Working constraints
 
-All subagents GPT-6.1 SOL/high. Small reviewed/tested application increments,
-prompt normal merges and explicit unfinished acceptance. No task-choice questions.
-No infrastructure/research/proof expansion for manifest_review_sol. Full scope,
-security/dependency/native/AT/performance/package/release gates remain. Existing
-1Password SSH signing works without configuration changes. Owned private Xvfb
-/profile only, no user display/devices/--no-sandbox.
+All subagents GPT-6.1 SOL/high. Use small reviewed/tested application increments,
+normal prompt merges and explicit unfinished acceptance. No task-choice questions;
+no infrastructure/research/proof expansion for manifest_review_sol. Complete scope,
+security, supported desktop, native AT, performance, packaging and release gates
+remain required. No unsigned commits or permanent signing configuration change.
+Private application fixtures use owned Xvfb/profile only, never the user display,
+profile, devices or --no-sandbox. Coordinator owns shared interfaces/integration.
 
-## Integrated base
+## Integrated application increments
 
-PR54 https://github.com/ianwijma/linuxcast/pull/54 normally merged into develop
-2d82863be08ec6f565c78a2fce70387523efd177, exact reviewed signed head
-b315c236519a718cb2428d13dc2adbb0419a3f0f, CI40715640918 validatePASS12s,
-no requested reviews/submissions/comments/threads. Primary develop clean; frozen
-install/build66assetsPASS. Explicit named-source configured fiat conversion,
-main-owned quote Copy, bounded sole-owner offline cache and public HTTPS boundary.
-907selectedunits/19contracts/172security,49storage,56presentation/6routing/12Form/
-11sharedbrowser/15ratesChromium/96searchcatalogueQuicklink PASS. Actual production
-privateXvfb/nativeclipboard final5.64s real publicUSD/EURrequest, subsequent injected
-transportfailure→matchingcache,Clear/Disable/Hide/reopen/nativeCopy/ownerprivacy.
-24captures independently inspected. Evidence calculator-rates-application.md and
-RATES-INCREMENT.md. Full L2-04 crypto/securekeys/paste/nativeAT/release unfinished.
-PR53calendar dbafd815 and PR52zoned7aa0d91 remain integrated; registry has history.
+Latest [PR57](https://github.com/ianwijma/linuxcast/pull/57) normally merged as
+fd39fde16081a6b3c40a5e57ceef66a13897a9c0, exact reviewed signed head
+bf1e7530aee0bc06448f1c22fbe034b06a97400a. CI40797407999 validatePASS; no requested
+or submitted GitHub reviews, comments or threads. Independent source/main andUI/
+capture reviews closed findings. Clean primary develop fast-forwarded to merge.
 
-## Preserved unfinished native Open (unmerged)
+Registered launcher Notes now opens real Tiptap3.32.0 OSS workspace: create/edit,
+slash/tasks, stored title/body search, transactional autosave draft and separate
+explicit saved version, nativeClose/Quit flush, restart/forcedprivateowner+app
+crash recovery. Sole-owner SQLite schema014, closed bounded JSON, exact revision/
+content receipts, named sender/frame-checked preload; no renderer Node/HTML/network.
+Original increment passed183units/11contracts/28security/7actualNotesowner and49
+existing storage regressions,14Chromium cases and real privateElectron scenario
+6.17s, with14component+5actual public captures. Evidence:
+`apps/desktop/evidence/notes-create-edit-application.md`, `packages/notes/README.md`.
 
-Root prior branch codex/indexed-file-open at8fdc37d, freeze2939191, UIauthor
-af07a32f4c5cc690d5491bce94c71ee011b3e865 integrated3d0f06f, main153ffed.
-Normal GIO original pathname handoff was removed after TOCTOU review. Fixed
-Documents portal candidate is stored with hard safe_handoff_available=false,
-no original path fallback. Independent source review found upstream O_NOFOLLOW
-consumer path readlink/reopen can follow replaced host ancestors. Open remains
-unavailable/unmerged, PR55 contains only the independent text-preview flow, no safe native success claimed.
-No additional portal/FUSE/VM/proof work assigned. /dev/fuse is available under
-proper permissions; no private portal or mount was created. Do not claim absence
-from default sandbox visibility. Complete native Open remains REQUIRED; text
-preview is an independently required flow, not its replacement. UIauthor branch
-codex/l2-03-indexed-file-open-ui safely preserved ataf07a32.
+Prior PR56 previewCopy merged dc4f47e1714780349213c81ee7953be735a96c7e,
+reviewed d6f563bc971f892a4f37e4a2ed073d3f2e58a9fa, CI40729166196PASS;
+PR55 read-only textpreview merged26c54818ec8f91c52d64af05ee51177d98c2cf07,
+reviewed6df006ca04ea7cc3d4f57b66942b86b08dd0a794, CI40725225471PASS.
+These are independent required flows, not replacements for native Open.
+PR54 rates2d82863, PR53 calendar dbafd815 and PR52 zoned7aa0d91 integrated;
+registry retains detailed partial evidence and limitations.
 
-## Active bounded required read-only text preview
+## Active separate Notes Markdown export follow-on
 
-Root `.worktrees/linuxcast-application-controls`, codex/indexed-text-preview
-from PR54. Frozen contracts afdf8d6 in universal-actions/TEXT-PREVIEW-INCREMENT.md.
-Named optional previewText takes only admitted resultId/rootId/generation; main
-derives current selected root/file metadata, strict foreground/session/query/root
-fences before dispatch and after read/finalstateawait. Existing applications
-helper fixed preview-text method, same2.5s process deadline; no newservice/deps.
-Main/preload/transport c049274. Native author86a45c2 integrated5a8f14f: same FD
-openat2BENEATH/NOSYMLINKS/NOXDEV bounded64KiB UTF8/nonexec/regular file read,
-closedextensions, exact dev/ino/size/mtime/ctime beforeafter checks, no reopening,
-external handoff, contentindex/cache/history/network/mutation. Native20checksPASS.
-Main review P2 fixedb9dd63f: elapsed/expired4s preflight cannot initiate a new
-late read; slot retained until settlement;28main/59tasksecurityPASS,166taskunits/
-6contracts/type/scopedlint/plan/diff/build66assetsPASS.
+Worktree `.worktrees/linuxcast-text-preview-native`, branch
+`codex/notes-markdown-export`, now based on integrated PR57/fd39fde. Original
+69-path staged seed matched merged tree exactly; soft-reset changed branch base
+only, preserving all follow-on bytes/untracked files. Index was empty afterward.
+No duplicate prerequisite work in this PR. Original seed backup
+`/tmp/linuxcast-notes-reviewed-baseline.patch` SHA256
+2ce4a35e795e42eb4b84d6330b78ebc3a1fcfcc16b4df47939bb54f75cfd5578.
+Historical pre-reconciliation delta/tar/sidecar remain in /tmp under
+`linuxcast-notes-markdown-export.*`; do not blindly reapply the old seed.
 
-UIauthor1251b354 integratedd655af2, exactownedtree independently reconciled.
-Final202mappedunits/6contracts/59security/fulltype/scopedlint/plan/diff PASS.
-Author47Chromiumkeyboard/axe and native20checksPASS. Actual productionprivateXvfb
-13.04sPASS: native literalUnicode/script/Markdown-looking read, no remote requests
-or script/link rendering/clipboard mutation, Escape exactquery/selection/focus,
-pausedchangedsource refusal, restartpaused, loadedpreview clear/discard and old
-identity denial, originalbytespreserved, retainedfilters/Browse/Copy/watch/removal/
-Quitwithwatcher. Initialharness waits corrected for debouncedrowreplacement and
-asyncstateevent publication; finalno unresolved failure. Eightcomponent andfive
-actualpublic captures, latter includeupdatedDetailsguidance. Evidence
-apps/desktop/evidence/indexed-text-preview-application.md.
+Explicit Export Markdown flushes latest draft without Save; main derives bounded
+Markdown from exact stored id/revision, native chooser labelled unencrypted,
+current owner/draft revalidation, held non-symlink directory objects/private0700
+stage/0600 file, exclusive atomic destination publication. Existing names refused;
+cancel/sourcechange checked before publish; unknown requires check-file/no replay.
+Publication deadline aborts and retains actual operation slot until settlement.
+Pending editing/Save/navigation/nativeClose/Quit gated. No caller path/content,
+generic FS API, new service/helper, network, AI or source deletion. MIT Markdown
+Tiptap3.32.0+marked17.0.6 pinned/locked/inventoried. API beta; text/tasks tested,
+styling/undo/LF/plaintext and multiline-inline-code plain-text fallback disclosed.
 
-Nativeagentcompletedclean. UIagentcompletedclean/noexpansion. alias_review_sol
-main/native/exactUI/eightcomponentcapture reviewclean afterP2timeoutrepair; final
-actualtest/captures/docs review clean at6df006ca04ea7cc3d4f57b66942b86b08dd0a794.
-PR55 https://github.com/ianwijma/linuxcast/pull/55 normally merged26c54818ec8f91c52d64af05ee51177d98c2cf07; CI40725225471 success, no requestedreviews/submissions/comments/unresolvedthreads.
-Primary develop clean fastforwarded26c54818; frozeninstall unchanged/build66assetsPASS. Root nextbranch codex/indexed-preview-copy
-frommergedPR55; frozen PREVIEW-COPY-INCREMENT.md adds optionalpreviewId and
-named token-only copyPreviewText with bounded ephemeralmaintext. Next UIagent
-assignment is explicit Copy text in existingreadonlypreview, no infrastructure/
-research/proof work. Main/preload/realnativeclipboard integration coordinatorowned.
-No fulltask/desktop/AT/releaseacceptanceclaim.
+Final mapped202unit/13contract/51security/19Chromium/8integration PASS; actual
+production Electron/SQLite export/search/nativeClose/Quit/forcedcrash recovery
+scenario7.37s. Only native chooser choice instrumented; writer/serializer/IPC/
+storage/renderer/processes real. Seven new affected public captures inspected
+(4component+3actual); original19 baseline captures regenerated for visible export
+UI. Full typecheck/scoped ESLint/plan/diff PASS. file_search_service_sol closed
+stage substitution P1, mainClose gate P2, whitespacebacktracking P2 and multiline
+code textloss P2; alias_review_sol closed unknownerror classification and pending
+control alignment, all7 captures clean. No remaining bounded review finding.
+Evidence `apps/desktop/evidence/notes-markdown-export-application.md` and
+`packages/notes/MARKDOWN-EXPORT-INCREMENT.md`. Source/application behavior unchanged
+while reconciling onto byte-identical integrated base; only current documentation
+and integration references updated. Publish signed follow-on, inspect exacthead
+CI/configured reviews, merge normally, then record integration and select next
+bounded Notes application action using existing shell/storage/UI.
 
-Registry8done/18in-progress/71planned;56passed/325pending/8N/A. L2-02/03 remain
-unfinished; broad prerequisites/native Debian13 GNOME/KDEWayland/X11/AT/
-performance/packages/release remain. No completed task inferred from increment.
+## Signing recovery
 
-PATH `.worktrees/tools:$PATH`, BUN_TMPDIR=/tmp, Node24.22.1/Bun1.4.4/Electron45/
-SQLite3.53.4/Rust1.95/GIO2.72.4. Git/network/signing/privateapp/owner sockets and
-ownedfixturechildprocess tests need escalation; default EPERM is sandbox, not
-backend regression. Serialize application tests sharingdist. No running signprompt.
+Repeated configured-helper failures and standard exact-key1Passwordagent signing
+failure were terminal, not live waits. Goal was blocked after repeated turns.
+User fully restarted and unlocked1Password; normal configured signer immediately
+succeeded for bf1e753. Saved settings unchanged: gpg.format=ssh,
+gpg.ssh.program=/opt/1Password/op-ssh-sign, commit.gpgsign=true. Signature verified
+cryptographically against the exact configured key. GitHub reports unknown_key,
+also for preceding bookkeeping; branch rules API[] and protected=false. No signed
+commit/approval rule was bypassed; merge used normal API and expected reviewedSHA.
+Full Goal resumed; prior signing blocker is resolved. Do not repeat unlock prompts
+or use an unsigned fallback. If it recurs, inspect actual live handle first.
 
-## Integrated follow-on Copy text increment (PR56)
+## Preserved work and required unfinished acceptance
 
-Root codex/indexed-preview-copy from26c54818, freeze0b1b55c, main/preload
-4e2588a, actualscenario+mocktypefix221b3d8. NamedcopyPreviewText accepts only
-issuedresult/root/generation/previewId UUID, nevercallertext/path. Mainkeepsone
-64KiB5minmonotonic memorylease; source is not reread onCopy. Cleared onnewpreview/
-query/servicegeneration/windowclose/disposal/expiry, nohistory/storage/network.
-UItextclearedonBack; mainlease hasboundedexplicit lifetime. Nativeclipboard
-write usesexistingwriter/sharedCopygate;4sdeadline retainsactualslot, no late
-preflightwrite, exactcurrentreceiptonly, truthfulunknown/no replay. SharedPathCopy
-preflightdeadline repairedtoo.85mappedsecurity/7contracts/fulltype/scopedlintPASS;
-independent file_search_service_sol sourceclean4e2588a+testliteralcorrection.
-Native readerunchanged20checksfromPR55, not rerun as newevidence.
+Original coordinator `.worktrees/linuxcast-application-controls`,
+`codex/notes-create-edit`, signed bf1e753 clean after merge; reusable after current
+export integration. manifest_review_sol UI author `.worktrees/linuxcast-l1-01`,
+`codex/notes-create-edit-ui`, HEADf193f157 has25stagedowned files plus10old uncommitted
+sharedfreeze copies; do not blindly reset. Reviewed source was integrated exactly.
+Author patch `/tmp/linuxcast-notes-create-edit-ui-owned.patch` SHA256
+b327054c98feb3fd0d462d63475e9a2b02c1d7cdb50573c40d84098079cf8db4; activationdelta
+`/tmp/linuxcast-notes-activation-ui.delta.patch` SHA256
+f3331f3049412affe2666ecfa62fa8bbf16d041bf4c5e33fcb41a68bf88c9b1f integrated.
 
-UIauthor7bfed5c23cad2f2be0a0f1983d7281593891fb5c integrated03e49d7,
-worktree .worktrees/linuxcast-l1-01 clean codex/indexed-preview-copy-ui.
-Final232mappedunits/7contracts/85security/fulltype/scopedlint/plan/diffPASS,
-author150focusedunits/57ChromiumkeyboardaxePASS. Sevennewpubliccomponentcaptures
-inspected. alias_review_sol founddisposalreentryP2: fixedinactive/disposedbefore
-publication+two directregressions; exactUI/source/capture reconciliation clean.
-Core independentserviceagent clean, no newnativecode/proofwork.
+Native Open remains unavailable/unmerged, root codex/indexed-file-open at8fdc37d,
+UIauthorcodex/l2-03-indexed-file-open-ui ataf07a32. Original GIO pathname fallback
+removed for TOCTOU; portal candidate hard safe_handoff_available=false because
+upstream O_NOFOLLOW consumer readlink/reopen can follow changed host ancestors.
+No more portal/FUSE/VM/proof work assigned. /dev/fuse exists with properpermissions.
 
-Actual productionprivateXvfb/nativeclipboard16.02sPASS, build66assetsPASS.
-ExactUnicode/literalclipboard/xclip, unsupportedhintmanualretry, pausedchanged
-sourcecopiesdisplayedsnapshot/no reread, clear+savedtokenrefusal, emptyCopy
-clearsactualElectron45read/type andX11TARGETS, sourcespreserved, retainedfile
-flow/Quit. Initialharness ambiguousresult/emptySTRING/removedformatAPI assumptions
-corrected; finalno unresolvedfailure. Fiveactualpubliccaptures inspected, unrelated
-DetailsPNGchurn restored. Finalactualtest/captures/evidencereview clean at signedhead
-d6f563bc971f892a4f37e4a2ed073d3f2e58a9fa. PR56 normally merged
-dc4f47e1714780349213c81ee7953be735a96c7e; CI40729166196 success, no requested
-reviews/submissions/comments/unresolvedthreads. Primary clean develop refreshed,
-frozeninstall unchanged/build66assetsPASS. Evidence indexed-preview-copy-application.md.
-No fulltask/nativeOpen/supporteddesktop/AT/performance/package/release claim.
+U1-01 stays in progress, all4criteria pending with structured partial evidence.
+Full Markdown import/roundtrip and actual chooser, pin/archive/trash/restore,
+revisionrestore/attachments/rootNotesprovider/Quicknote remain required. Full
+D1-02/nativeAT prerequisite not inferred complete. Debian13 amd64 GNOME/KDE
+Wayland/X11, nativeAT/highcontrast/performance/package/release acceptance pending.
+Host evidence is Pop!_OS22.04 amd64, Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4,
+private Xvfb/Chromium; no supported-session claim. Ordinary SQLite not encrypted
+at rest; unacknowledged local edits may be lost on forced crash.
+Registry8done/19inprogress/70planned;56passed/325pending/8N/A. No scope reduction.
 
-## Next selected bounded application work
-
-Root .worktrees/linuxcast-application-controls now NEWcodex/notes-create-edit
-frommergedPR56/developdc4f47e. Next selected U1-01 (card read): registered Notes
-workspace with real local create/edit/save/title-content search and restart
-persistence, using existing resident shell, sole-owner storage and shared UI
-styles. Required TiptapOSS editor/slash/tasks/autosave/draftrecovery/pin/archive/
-trash/restore/Markdownexport remain full scope; do not replace with a permanent
-plaintext substitute. No Notes implementation or acceptance yet; task remains
-planned until implementation begins. Read normative data/builtins/testing/design
-Chat-and-notes/security and verify dependencies before freezing interfaces.
-F2-01 done; broader D1-02/nativeAT unfinished under existing authorized
-smallincrement sequencing. Storage domain/interface must be implemented and
-reviewed, not assumed from documentation; current packages/storage/src search
-found no notes implementation. Coordinator owns contracts/migration/manifests/
-registration. manifest_review_sol is clean completedCopyUI, awaiting nextbounded
-concreteapplication contract; no infrastructure/research/proof assignment.
-All agents remain SOL6.1/high, reviewscompletedclean. No running app/tests/sign
-prompts; normal1Password signing works. No external input needed. FullGoalactive.
-
-## Active U1-01 Notes create/edit increment — reviewed, tested, awaiting signing
-
-29October2026 root .worktrees/linuxcast-application-controls branch
-codex/notes-create-edit atop f193f157 (PR56bookkeeping)/developdc4f47e.
-Actual Notes implementation is integrated in this isolated WORKTREE, not GitHub.
-No Notes commit/PR/merge yet. Normal1Password SSH signing repeatedly returned
-failed-to-fill-buffer or agent-error evenafterunlock; config unchanged, no unsigned
-commit. Pending userquestion asks approval of actualGit signingrequest. No running
-signing process at checkpoint. FinalnormalTTYapplicationcommit attempt33630
-failedagain`1Password: failed to fill whole buffer`; all69taskfilesremainstaged,
-HEADstillf193f157. Pendinguserinputmustunblockconfiguredsigner; donotrepeat
-unchangedfailedattemptsormakeunsignedcommits. PreparedPRbody
-/tmp/linuxcast-notes-create-edit-pr.md. Retryfinaltestedapplicationcommitwhenready.
-
-Required Tiptap3.32.0 OSS frozen/locked, actual schema014 single-owner SQLite,
-closed NotesDocument/named NotesAPI/repository, nativeworkspace/main/preload/
-launcher/assets/build/lifecycle integration all implemented. New/richformat/slash/
-tasks/titlebodysearch/500msdraft/separateSave/nativeclose+Quitflush/restart/crash
-recoverysavedvDraft. Main exactreceipts, boundedunknownfences, no latepreflightwrite,
-noautomaticreplay. Tenfixedcommands raisecompletecatalogueceilingto5606. Existing
-inventory regenerated1020lockedresolutions,927registrymetadata;54newregistryrows
-MIT52/ISC1/Apache2.0one, no missingmetadata (notreleaseSBOM).
-
-Final183mappedunits (30Notescontroller),11contracts,28IPC/preloadsecurity,
-7actualNotesowner and49existingF2-01storage regressions PASS. Finalfulltype/scoped
-lint PASS. Final14realTiptapbrowsercases PASS10.9s includingactivation650ms/
-noimplicitwrite/nativeTaskexit regression andaxe/200percent;14componentcaptures.
-Actual production Electron45/privateXvfb X11 finalPASS6.17s, fivepaintedpublic
-captures inspected: registeredlauncher/New/realTiptaptasks/SQLite titlebodysearch/
-nativeclosebefore500ms/Quitflush/restart/forceSIGKILLonlyprivateowner+appafterACK/
-exactrevisionandseparatesavedrecovery/reopenedownerprivacy. Initialharnessrequired
-fieldlabel/slashoptionlocatorscorrected. QA caughtunpaintedrecoveredframe (nowfont+
-twoRAFcapture) andactualTiptapactivationcallback/trailingNode (fixednoemitUpdate/
-trailingNodefalse/identicaldocnoop, thenfinalPASSnoticevisiblyretained).
-HostPop!_OS22.04amd64 Node24.22.1/Bun1.4.4/SQLite3.53.4, notsupportedDebianmatrix.
-Evidence apps/desktop/evidence/notes-create-edit-application.md andNotesREADME.
-
-Independentfile_search_service_sol core/mainreviewclosedP2revisionclockrollback/
-initialdraftsavednull/RPCshape/cataloguebound/pernoteunknownandGetgenerationfences.
-Independentalias_review_sol finalUI/activation/source+14componentcapturesclean;
-lastactualtest/evidence+fiveactualcapture consistencyreviewCLEAN. Rootfinalbrowser
-rerungenerateda differentvisuallyreviewed200percentPNG; restoredtheexactreviewed
-authorPNGsoall25ownedfilehashesmatchagain.
-No furtherauthorworkassigned. BothagentsremainSOL6.1/high.
-
-manifest_review_sol completedin .worktrees/linuxcast-l1-01 branch
-codex/notes-create-edit-ui fromf193f15. Exactly25ownedstagedfiles source/tests/
-fixtures/README/14captures, no sharedfilesstaged or unsignedcommit. Exactfullpatch
-/tmp/linuxcast-notes-create-edit-ui-owned.patch SHA256
-b327054c98feb3fd0d462d63475e9a2b02c1d7cdb50573c40d84098079cf8db4;
-rootreconciledall25bytehashesbeforefinalidenticalbrowserrerun. Latestactivationdelta
-/tmp/linuxcast-notes-activation-ui.delta.patch SHA256
-f3331f3049412affe2666ecfa62fa8bbf16d041bf4c5e33fcb41a68bf88c9b1f alreadyappliedroot.
-UIworktreealsohasTENoldfreeze/sharedfiles copiedUNCOMMITTED; don'tsilentlyreset/
-rebase/committhose. Rootalltasksourcechangesreviewed/stageforfinalsignedapplication
-commit; no need separatefreezecommit nowfeatureassembled.
-
-U1-01 registryinprogress/allfourcriteriastillpendingwithstructuredpartialevidence.
-No fulltask/D1completionclaim. Pin/archive/trash/restore/revisionrestore/attachments/
-Markdownroundtrip/export/rootNotesprovider/Quicknote/fullDebian13GNOMEKDEWaylandX11/
-nativeAT/highcontrast/performance/package/release remainREQUIRED. Unacknowledged
-localeditscanbelost onforcedcrash; ordinaryprivateSQLite notencryptedatrest.
-Planvalidated/regenerated8done/19inprogress/70planned;56passed/325pending/8N/A.
-FullGoalactive. Freshorigin/developunchanged; noopenPRs. Nextactionfinishreview,
-normal signedcommit/push/PR/CI+configuredreview/mergepromptly, recordmerge, then
-nextboundedapplicationflow. Donotexpandfoundationalprooforresearch.
+Use absolute PATH `/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH`,
+BUN_TMPDIR=/tmp. Git/network/signing/privatefixture processes need escalation;
+default EPERM/read-only .git is sandbox denial, not backend regression. Serialize
+application builds/tests per worktree. Never repeat passed tests without new
+changes/failures/unresolved concerns. After each merge refresh readiness and
+continue bounded application work without accumulating unrelated foundation work.

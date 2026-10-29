@@ -7,7 +7,7 @@ import {notePlainText} from '../../../packages/contracts/src/notes.ts';
 import {StorageOwner} from '../../../packages/storage/src/owner.ts';
 import AxeBuilder from '@axe-core/playwright';
 import {execFileSync} from 'node:child_process';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,statSync,rmSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {randomUUID} from 'node:crypto';
 import {tmpdir} from 'node:os';
@@ -39,7 +39,16 @@ it('opens registered Notes, edits real Tiptap, searches actual SQLite and recove
  await title.focus();await title.press('Control+s');await expect.poll(async()=>JSON.stringify((await stored(editor,id))?.saved?.document)).toContain('"checked":true');
  expect(await editor.locator('script:not([src])').count()).toBe(0);expect(await editor.getByRole('link').count()).toBe(0);expect(remote).toEqual([]);
  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},theme)=>{nativeTheme.themeSource=theme;},theme);await expect.poll(()=>editor.locator('[data-lc-theme]').last().getAttribute('data-lc-theme')).toBe(theme);await capture(editor,`notes-application-${theme}-saved.png`);expect((await new AxeBuilder({page:editor}).setLegacyMode().analyze()).violations).toEqual([]);}
- const search=editor.getByRole('searchbox',{name:'Search notes',exact:true});await search.fill('useful');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(1);await search.fill('absent public phrase');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(0);await search.fill('launch');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(1);await search.fill('');
+ // Only the native chooser choice is instrumented; publication is the real writer.
+ const exportPath=join(temporary,'public-note.md');
+ await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},exportPath);
+ await title.fill('Public export draft');await editor.getByRole('button',{name:'Export Markdown',exact:true}).click();await editor.getByText('Markdown exported. The file is unencrypted.',{exact:true}).waitFor();
+ const exported=readFileSync(exportPath,'utf8');expect(exported).toContain('# Public export draft');expect(exported).toContain('- [x] Review useful application');// Unicode remains literal in the owner-derived file.
+ expect(exported).toContain('雪');expect(exported).toContain('&lt;script&gt;literal&lt;/script&gt;');expect(statSync(exportPath).mode&0o777).toBe(0o600);expect((await stored(editor,id))?.saved?.title).toBe('Public launch plan');
+ for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>editor.locator('[data-lc-theme]').last().getAttribute('data-lc-theme')).toBe(theme);await capture(editor,`notes-export-application-${theme}.png`);expect((await new AxeBuilder({page:editor}).setLegacyMode().analyze()).violations).toEqual([]);}
+ await editor.getByRole('button',{name:'Export Markdown',exact:true}).click();await editor.getByRole('alert').filter({hasText:'filename exists'}).waitFor();expect(readFileSync(exportPath,'utf8')).toBe(exported);await capture(editor,'notes-export-application-existing-name.png');
+ await app.evaluate(({dialog})=>{dialog.showSaveDialog=async()=>({canceled:true,filePath:''});});await editor.getByRole('button',{name:'Export Markdown',exact:true}).click();await editor.getByText('Export cancelled. Your note remains stored.',{exact:true}).waitFor();expect(readFileSync(exportPath,'utf8')).toBe(exported);expect(remote).toEqual([]);
+ const search=editor.getByRole('searchbox',{name:'Search notes',exact:true});await search.fill('useful');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(1);await search.fill('absent public phrase');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(0);await search.fill('export');await expect.poll(()=>editor.getByRole('list',{name:'Saved notes',exact:true}).getByRole('button').count()).toBe(1);await search.fill('');
  const saved=(await stored(editor,id))!.saved;await title.fill('Public close-flushed draft');const closed=editor.waitForEvent('close');await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(owner=>owner.webContents.getURL()==='linuxcast-app://shell/notes.html')!.close());await closed;
  editor=await open();await editor.getByRole('list',{name:'Saved notes'}).getByRole('button').click();await expect.poll(()=>editor.getByRole('textbox',{name:'Note title (required)',exact:true}).inputValue()).toBe('Public close-flushed draft');expect((await stored(editor,id))?.saved).toEqual(saved);
  const quit=async()=>{const process=app.process(),exited=process.exitCode===null?new Promise(resolve=>process.once('exit',resolve)):Promise.resolve();const result=await page.evaluate(async()=>(window as unknown as {linuxcast:DesktopShellApi}).linuxcast.quit());expect(result.ok).toBe(true);await exited;expect(process.exitCode).toBe(0);application=undefined;};

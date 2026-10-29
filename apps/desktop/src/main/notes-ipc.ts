@@ -4,6 +4,7 @@ import type {NoteRecord,NoteWrite,NotesList,NotesListRequest} from '../../../../
 import {NOTES_URL} from './assets.ts';
 import {trustedAppSender} from './ipc.ts';
 export interface NotesActions{
+ exportBusy?():boolean;
  contents():WebContents|undefined;active():boolean;ready():boolean;appearance():'dark'|'light';close():void;
  list(input:NotesListRequest):Promise<NotesList>;get(id:string):Promise<NoteRecord|null>;write(input:NoteWrite):Promise<NoteRecord>;
 }
@@ -23,10 +24,10 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
   const schema=channel===NOTES_CHANNELS.list?notesQueryRequestSchema:channel===NOTES_CHANNELS.get?notesGetRequestSchema:channel===NOTES_CHANNELS.write?notesWriteRequestSchema:notesRequestSchema;
   if(!schema.safeParse(payload).success)return failure('invalid-request');
   if(channel===NOTES_CHANNELS.appearance)return actions.appearance();
-  if(channel===NOTES_CHANNELS.close){setImmediate(()=>{if(valid())actions.close();});return {ok:true};}
+  if(channel===NOTES_CHANNELS.close){if(actions.exportBusy?.())return failure('unavailable');setImmediate(()=>{if(valid()&&!actions.exportBusy?.())actions.close();});return {ok:true};}
   if(!actions.ready())return failure('unavailable');
   const mutating=channel===NOTES_CHANNELS.write;
-  if(mutating?!!write:reads>=4)return failure('unavailable');
+  if(mutating?!!write||!!actions.exportBusy?.():reads>=4)return failure('unavailable');
   const input=mutating?notesWriteRequestSchema.parse(payload).input:undefined;
   if(input&&(uncertain.has(input.id)||uncertain.size>=100))return failure('unknown-outcome');
   if(input)writeGeneration++;
@@ -81,5 +82,5 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
   try{return await Promise.race([operation,new Promise<ReturnType<typeof failure>>(resolve=>{timer=setTimeout(()=>{expired=true;if(input&&dispatched)uncertain.add(input.id);resolve(failure(input&&dispatched?'unknown-outcome':'unavailable'));},4000);})]);}
   finally{clearTimeout(timer);}
  });
- return {remove(){disposed=true;for(const channel of Object.values(NOTES_CHANNELS))ipc.removeHandler(channel);},async drain(){await Promise.allSettled([...pending]);}};
+ return {isWriting:()=>!!write,remove(){disposed=true;for(const channel of Object.values(NOTES_CHANNELS))ipc.removeHandler(channel);},async drain(){await Promise.allSettled([...pending]);}};
 }

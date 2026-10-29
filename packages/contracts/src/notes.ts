@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type {NoteExportSelection,NoteExportReply} from './notes-export.ts';
 import { rpcFailureSchema } from './protocol.ts';
 import type { RepositoryContracts } from './repositories.ts';
 const encoder=new TextEncoder();
@@ -81,6 +82,7 @@ export const notesWriteRequestSchema=notesRequestSchema.extend({input:noteWriteS
 export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.number().int().positive().safe()});
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export interface NotesApi{
+ exportMarkdown?(input:NoteExportSelection):Promise<NoteExportReply>;
  list(input:NotesListRequest):Promise<NotesListReply>;
  get(id:string):Promise<NotesReadReply>;
  write(input:NoteWrite):Promise<NotesWriteReply>;
