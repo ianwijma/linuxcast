@@ -1,3 +1,4 @@
+import {parseEmojiFrecencySetting} from '../../contracts/src/emoji.ts';
 import type Database from 'better-sqlite3';
 import { MAX_ENVELOPE_BYTES } from '../../contracts/src/index.ts';
 import { localSettingIdSchema } from '@linuxcast/platform-contracts/data-controls';
@@ -13,7 +14,21 @@ export function clearLocalData(db: Database.Database, params: DataClearParams): 
   if (params.category === 'command-usage') {
     const filter=selected('command_id',params.ids);
     const changed=db.prepare(`UPDATE command_usage SET use_count=0,last_used_at=NULL WHERE (${filter.sql}) AND (use_count!=0 OR last_used_at IS NOT NULL)`).run(...filter.values).changes;
-    return {category:params.category,removed:changed,complete:true};
+    let emojiChanged=0;
+    if(params.ids===undefined||params.ids.includes('linuxcast:emoji')){
+      const row=db.prepare("SELECT revision,value FROM settings WHERE id='emoji.frecency'").get() as {revision:number;value:string}|undefined;
+      let state={enabled:true,entries:[]} as {enabled:boolean;entries:unknown[]};
+      if(row){
+        let raw:unknown;try{raw=JSON.parse(row.value);}catch{throw new StorageError('invalid-request');}
+        const parsed=parseEmojiFrecencySetting(raw);if(!parsed||!Number.isSafeInteger(row.revision)||row.revision<1||row.revision>=Number.MAX_SAFE_INTEGER-1)throw new StorageError('invalid-request');state=parsed;
+      }
+      // Always advance the epoch, even for absent/empty state, to fence a Copy
+      // that captured the old revision before this explicit clear.
+      emojiChanged=state.entries.length;
+      db.prepare("INSERT INTO settings(id,revision,value,modified_at) VALUES('emoji.frecency',?,?,?) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,value=excluded.value,modified_at=excluded.modified_at")
+        .run((row?.revision??0)+1,JSON.stringify(JSON.stringify({enabled:state.enabled,entries:[]})),new Date().toISOString());
+    }
+    return {category:params.category,removed:changed+emojiChanged,complete:true};
   }
   if (params.category === 'ai-conversations') {
     const filter=selected('id',params.ids);

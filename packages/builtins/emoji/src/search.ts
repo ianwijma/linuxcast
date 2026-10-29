@@ -1,11 +1,11 @@
 import {emojiData,emojiGroups,EmojiInputError} from './data.ts';
-import {emojiFavouriteIdsSchema,emojiKeywordEntriesSchema,emojiMatchesTone,emojiToneSchema} from '@linuxcast/contracts';
+import {emojiFavouriteIdsSchema,emojiFrecencyEntriesSchema,emojiKeywordEntriesSchema,emojiMatchesTone,emojiToneSchema} from '@linuxcast/contracts';
 import {types} from 'node:util';
-import type {EmojiTone} from '@linuxcast/contracts';
+import type {EmojiFrecencyEntry,EmojiTone} from '@linuxcast/contracts';
 import type {Emoji} from './data.ts';
 
-/** ids and customKeywords are main-owned snapshots, never renderer search arguments. */
-export interface EmojiSearchInput {query:string;group?:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];limit?:number;}
+/** Subsets, custom keywords and ranking are main-owned snapshots, never renderer arguments. */
+export interface EmojiSearchInput {query:string;group?:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];favouriteIds?:readonly string[];frecency?:{entries:readonly EmojiFrecencyEntry[];now:number};limit?:number;}
 const encoder=new TextEncoder();
 const groups=new Set(emojiGroups.map(group=>group.id));
 const canonicalIds=new Set(emojiData.map(entry=>entry.id));
@@ -56,13 +56,27 @@ function validatedKeywords(value:unknown):readonly {id:string;keywords:readonly 
  const parsed=emojiKeywordEntriesSchema.safeParse(entries);if(!parsed.success)throw new EmojiInputError();
  return Object.freeze(parsed.data.map(entry=>Object.freeze({id:entry.id,keywords:Object.freeze(entry.keywords)})));
 }
-function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];limit:number} {
+function validatedFrecency(value:unknown):{entries:readonly EmojiFrecencyEntry[];now:number}{
+ if(types.isProxy(value)||value===null||typeof value!=='object'||Array.isArray(value)||![Object.prototype,null].includes(Object.getPrototypeOf(value))||Reflect.ownKeys(value).length!==2)throw new EmojiInputError();
+ const now=Object.getOwnPropertyDescriptor(value,'now'),raw=Object.getOwnPropertyDescriptor(value,'entries');
+ if(!now||!('value'in now)||typeof now.value!=='number'||!Number.isSafeInteger(now.value)||!raw||!('value'in raw))throw new EmojiInputError();
+ const entries:EmojiFrecencyEntry[]=[];let bytes=2;
+ for(const value of arrayValues(raw.value,4096)){
+  if(types.isProxy(value)||value===null||typeof value!=='object'||Array.isArray(value)||![Object.prototype,null].includes(Object.getPrototypeOf(value))||Reflect.ownKeys(value).length!==3)throw new EmojiInputError();
+  const id=Object.getOwnPropertyDescriptor(value,'id'),count=Object.getOwnPropertyDescriptor(value,'useCount'),used=Object.getOwnPropertyDescriptor(value,'lastUsedAt');
+  if(!id||!('value'in id)||typeof id.value!=='string'||id.value.length>230||!canonicalIds.has(id.value)||!count||!('value'in count)||typeof count.value!=='number'||!Number.isInteger(count.value)||count.value<1||count.value>1_000_000_000||!used||!('value'in used)||typeof used.value!=='string'||used.value.length>32)throw new EmojiInputError();
+  const entry={id:id.value,useCount:count.value,lastUsedAt:used.value};bytes+=encoder.encode(JSON.stringify(entry)).byteLength+(entries.length?1:0);if(bytes>524288)throw new EmojiInputError();entries.push(entry);
+ }
+ const parsed=emojiFrecencyEntriesSchema.safeParse(entries);if(!parsed.success)throw new EmojiInputError();
+ return{now:now.value,entries:Object.freeze(parsed.data.map(entry=>Object.freeze(entry)))};
+}
+function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];favouriteIds?:readonly string[];frecency?:{entries:readonly EmojiFrecencyEntry[];now:number};limit:number} {
  if(types.isProxy(value)||value===null||typeof value!=='object'||Array.isArray(value))throw new EmojiInputError();
  const prototype=Object.getPrototypeOf(value);
  if(prototype!==Object.prototype&&prototype!==null)throw new EmojiInputError();
  const fields=new Map<string,unknown>();
  for(const key of Reflect.ownKeys(value)){
-  if(typeof key!=='string'||!['query','group','tone','ids','customKeywords','limit'].includes(key))throw new EmojiInputError();
+  if(typeof key!=='string'||!['query','group','tone','ids','customKeywords','favouriteIds','frecency','limit'].includes(key))throw new EmojiInputError();
   const field=Object.getOwnPropertyDescriptor(value,key);
   if(!field||!('value'in field))throw new EmojiInputError();
   fields.set(key,field.value);
@@ -76,13 +90,17 @@ function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids
  if(typeof group!=='string'||group.length>64||fields.has('group')&&!groups.has(group))throw new EmojiInputError();
  if(typeof limit!=='number'||!Number.isSafeInteger(limit)||limit<1||limit>100)throw new EmojiInputError();
  const customKeywords=fields.has('customKeywords')?validatedKeywords(fields.get('customKeywords')):undefined;
- return {query,group,limit,...(tone?.success?{tone:tone.data}:{}),...(ids?{ids}:{}),...(customKeywords?{customKeywords}:{})};
+ const favouriteIds=fields.has('favouriteIds')?validatedIds(fields.get('favouriteIds')):undefined;
+ if(favouriteIds?.some(id=>!canonicalIds.has(id)))throw new EmojiInputError();
+ const frecency=fields.has('frecency')?validatedFrecency(fields.get('frecency')):undefined;
+ return {query,group,limit,...(tone?.success?{tone:tone.data}:{}),...(ids?{ids}:{}),...(customKeywords?{customKeywords}:{}),...(favouriteIds?{favouriteIds}:{}),...(frecency?{frecency}:{})};
 }
 
 /** Pure bounded offline search. All query terms match literally, without regex,
  * shell, SQL or network interpretation. Ties keep pinned Unicode source order. */
 export function searchEmoji(input:EmojiSearchInput):readonly Emoji[] {
- const {query,group,tone,ids,customKeywords,limit}=validated(input),included=ids?new Set(ids):undefined,trimmed=query.trim(),parts=[...segments.segment(trimmed)].map(part=>part.segment);
+ const {query,group,tone,ids,customKeywords,favouriteIds,frecency,limit}=validated(input),included=ids?new Set(ids):undefined,favourites=new Set(favouriteIds),trimmed=query.trim(),parts=[...segments.segment(trimmed)].map(part=>part.segment);
+ const scores=new Map(frecency?.entries.map(entry=>[entry.id,entry.useCount/(1+Math.max(0,frecency.now-Date.parse(entry.lastUsedAt))/604800000)]));
  const custom=new Map(customKeywords?.map(entry=>[entry.id,{phrases:entry.keywords.map(customPhraseKey),words:entry.keywords.flatMap(words),glyphs:entry.keywords.flatMap(value=>[...segments.segment(value)].filter(part=>emojiGlyph.test(part.segment)).map(part=>glyphKey(part.segment)))}]));
  const glyphs=parts.filter(part=>emojiGlyph.test(part)).map(glyphKey);
  // Emoji such as ㊗️ have compatibility decompositions into letters. Do not make
@@ -101,6 +119,6 @@ export function searchEmoji(input:EmojiSearchInput):readonly Emoji[] {
   const rank=item.glyph===queryGlyph?0:item.name===queryPhrase?1:item.aliases.includes(queryPhrase)?2:item.keywords.includes(queryPhrase)||extra?.phrases.includes(queryCustomPhrase)?3:item.name.startsWith(queryPhrase)?4:5;
   matches.push({entry:item.entry,rank});
  }
- matches.sort((left,right)=>left.rank-right.rank);
+ matches.sort((left,right)=>left.rank-right.rank||Number(favourites.has(right.entry.id))-Number(favourites.has(left.entry.id))||(scores.get(right.entry.id)??0)-(scores.get(left.entry.id)??0));
  return Object.freeze(matches.slice(0,limit).map(match=>match.entry));
 }

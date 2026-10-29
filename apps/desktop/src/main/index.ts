@@ -5,7 +5,7 @@ import {searchEmoji} from '../../../../packages/builtins/emoji/src/search.ts';
 import {createNotesWorkspace} from './notes.ts';
 import {RateConversionService} from './rate-service.ts';
 import {fetchFrankfurterRate} from './rate-http.ts';
-import {parseDefinitionSourceSetting,definitionSourcePreferenceSchema,parseEmojiKeywordSetting,emojiKeywordSnapshotSchema,parseEmojiFavouriteSetting,emojiFavouriteSnapshotSchema,RATE_ENDPOINT} from '@linuxcast/contracts';
+import {parseEmojiFrecencySetting,emojiFrecencySnapshotSchema,parseDefinitionSourceSetting,definitionSourcePreferenceSchema,parseEmojiKeywordSetting,emojiKeywordSnapshotSchema,parseEmojiFavouriteSetting,emojiFavouriteSnapshotSchema,RATE_ENDPOINT} from '@linuxcast/contracts';
 import { saveDataExport } from './data-export.ts';
 import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
@@ -53,7 +53,10 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
       return choice.response===1&&!owner.isDestroyed()&&owner.isVisible()&&owner.webContents.getURL()===APP_URL;
     },
   },
-  emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100}),keywords:{
+  emoji:{groups:getEmojiGroups(),get:getEmoji,search:input=>searchEmoji({...input,limit:100}),frecency:{
+    async read(){if(!storage?.isReady())throw new Error('Emoji ranking unavailable.');const setting=await storage.repository.request('settings.get',{id:'emoji.frecency'});if(!setting)return {revision:0,enabled:true,entries:[]};const state=parseEmojiFrecencySetting(setting.value);if(!state)throw new Error('Emoji ranking unavailable.');return emojiFrecencySnapshotSchema.parse({revision:setting.revision,...state});},
+    async write(input){if(!storage?.isReady())throw new Error('Emoji ranking unavailable.');const snapshot=emojiFrecencySnapshotSchema.parse({revision:input.expectedRevision,enabled:input.enabled,entries:input.entries}),value=JSON.stringify({enabled:snapshot.enabled,entries:snapshot.entries});const setting=await storage.repository.request('settings.set',{id:'emoji.frecency',expectedRevision:input.expectedRevision,value});if(setting.value!==value||setting.revision!==input.expectedRevision+1)throw new Error('Emoji ranking save unconfirmed.');return emojiFrecencySnapshotSchema.parse({revision:setting.revision,enabled:snapshot.enabled,entries:snapshot.entries});},
+  },keywords:{
     async read(){if(!storage?.isReady())throw new Error('Emoji keywords unavailable.');const setting=await storage.repository.request('settings.get',{id:'emoji.keywords'});if(!setting)return {revision:0,entries:[]};const entries=parseEmojiKeywordSetting(setting.value);if(!entries)throw new Error('Emoji keywords unavailable.');return emojiKeywordSnapshotSchema.parse({revision:setting.revision,entries});},
     async write(input){if(!storage?.isReady())throw new Error('Emoji keywords unavailable.');const entries=emojiKeywordSnapshotSchema.parse({revision:input.expectedRevision,entries:input.entries}).entries,value=JSON.stringify(entries);const setting=await storage.repository.request('settings.set',{id:'emoji.keywords',expectedRevision:input.expectedRevision,value});if(setting.value!==value||setting.revision!==input.expectedRevision+1)throw new Error('Emoji keyword save unconfirmed.');return emojiKeywordSnapshotSchema.parse({revision:setting.revision,entries});},
   },favourites:{

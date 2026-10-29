@@ -7,7 +7,7 @@ const input={revision:2,searchId:3,query:'public café',group:row.group,tone:'me
 const receipt={outcome:'updated',...input,keywordsRevision:5};
 function fixture(){const invoke=vi.fn<(channel:string,payload:unknown)=>Promise<unknown>>(async()=>({ok:true,value:receipt}));return{invoke,api:createEmojiApi({invoke})};}
 it('exposes the frozen fifth named Emoji method and dispatches only the selected-context replacement including clear',async()=>{
- const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite','setEmojiKeywords']);expect(Object.isFrozen(f.api)).toBe(true);expect(await f.api.setEmojiKeywords!(input)).toEqual({ok:true,value:receipt});expect(f.invoke).toHaveBeenCalledExactlyOnceWith(EMOJI_CHANNELS.keywords,{protocolVersion:1,...input});
+ const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite','setEmojiKeywords','updateEmojiFrecency']);expect(Object.isFrozen(f.api)).toBe(true);expect(await f.api.setEmojiKeywords!(input)).toEqual({ok:true,value:receipt});expect(f.invoke).toHaveBeenCalledExactlyOnceWith(EMOJI_CHANNELS.keywords,{protocolVersion:1,...input});
  f.invoke.mockResolvedValueOnce({ok:true,value:{...receipt,keywords:[]}});expect(await f.api.setEmojiKeywords!({...input,keywords:[]})).toMatchObject({ok:true,value:{keywords:[]}});expect(f.invoke).toHaveBeenLastCalledWith(EMOJI_CHANNELS.keywords,{protocolVersion:1,...input,keywords:[]});
 });
 it('rejects invalid phrases, revisions, excess authority and own undefined before invoke',async()=>{

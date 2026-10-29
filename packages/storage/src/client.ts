@@ -97,7 +97,7 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
       actual.declarationHash === expected.declarationHash && actual.permissionId === expected.permissionId &&
       scopeKeyMaterial(actual.scope) === scopeKeyMaterial(expected.scope) && actual.decision === expected.decision &&
       actual.updatedAt === expected.updatedAt;
-  } else if (method.startsWith('settings.')) {valid=row.id===params.id;if(method==='settings.set'&&['emoji.favourites','emoji.keywords','dictionary.definitionSource'].includes(String(params.id)))valid&&=row.revision===Number(params.expectedRevision)+1&&row.value===params.value;}
+  } else if (method.startsWith('settings.')) {valid=row.id===params.id;if(method==='settings.set'&&['emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource'].includes(String(params.id)))valid&&=row.revision===Number(params.expectedRevision)+1&&row.value===params.value;}
   else if (method === 'commands.setPinned') valid = row.commandId === params.commandId && row.pinned === params.pinned;
   else if (method === 'commands.setAlias') valid = row.commandId === params.commandId && row.alias === params.alias;
   else if (method === 'commands.setHidden') valid = row.commandId === params.commandId && row.hidden === params.hidden;
