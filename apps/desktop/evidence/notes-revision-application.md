@@ -1,5 +1,7 @@
 # U1-01 — saved revision review and restore as draft
 
+Integration update, 29 October 2026: merged [PR63](https://github.com/ianwijma/linuxcast/pull/63) at `89d91af034b327a6ce3621c33cce3d661cb33dac`. Configured signing is repaired. The original review-time baseline/publication statements below are historical; PR62/63/64 are now all integrated. Validation limits and outstanding full task/desktop/release acceptance remain unchanged.
+
 29 October 2026. User-authorized reviewed/tested unfinished application increment.
 Coordinator `codex/notes-revision-restore`; UI `codex/notes-revision-ui`. Based on
 PR61/develop f00984e plus the separate reviewed Trash snapshot TREE

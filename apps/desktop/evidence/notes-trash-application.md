@@ -1,5 +1,7 @@
 # U1-01 — recoverable Trash/restore application increment
 
+Integration update, 29 October 2026: merged [PR62](https://github.com/ianwijma/linuxcast/pull/62) at `351d797b5335f096409c6fbb76e891fb2d6529fb`. Configured signing is repaired. The original review-time baseline/publication statements below are historical; PR62/63/64 are now all integrated. Validation limits and outstanding full task/desktop/release acceptance remain unchanged.
+
 29 October 2026. Based on integrated PR61/develop
 f00984e09b08adbccd9c37ca7a5f5d46b2f1c596. Coordinator codex/notes-trash;
 UI author codex/notes-trash-ui. User-authorized reviewed/tested unfinished application

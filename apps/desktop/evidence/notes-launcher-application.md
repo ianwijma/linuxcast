@@ -1,5 +1,7 @@
 # L1-01 / U1-01 — search and open stored Notes from the launcher
 
+Integration update, 29 October 2026: merged [PR64](https://github.com/ianwijma/linuxcast/pull/64) at `f6585ed2c14faed6558e4e661995152cd695e986`. Configured signing is repaired. The original review-time baseline/publication statements below are historical; PR62/63/64 are now all integrated. Validation limits and outstanding full task/desktop/release acceptance remain unchanged.
+
 29 October2026. Reviewed/tested unfinished application increment. Coordinator
 codex/notes-launcher-search, UI codex/notes-launcher-ui. Baseline TREE
 15d2db5ee706535bd0b9385c596b84013e975887 contains the separate reviewed local Trash
