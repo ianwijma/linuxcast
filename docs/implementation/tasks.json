@@ -6833,6 +6833,12 @@
               "outcome": "Partial: pin metadata/owner filter and exact saved/draft recovery pass production Electron7.91s; 228units/67security/12integration and25authorbrowser cases pass,11new affected public captures independently reviewed. Full supported desktop/AT/task/release acceptance remains pending.",
               "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
               "reference": "apps/desktop/evidence/notes-pin-application.md; packages/notes/README.md"
+            },
+            {
+              "command": "bun run test:unit -- U1-01; bun run test:security -- U1-01; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- U1-01; exact author real Tiptap browser suite",
+              "outcome": "Partial: archive/find/restore, preserved pin/saved/draft and crash/reopen pass actual production10.27s;257units/85security/16integration/32browser pass.13newcomponent+4actual captures independently reviewed; readonly slash finding closed. Full supported desktop/AT/task/release acceptance pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-archive-application.md; packages/notes/ARCHIVE-INCREMENT.md; packages/notes/README.md"
             }
           ]
         },
@@ -6875,6 +6881,12 @@
               "outcome": "Partial: pin metadata/owner filter and exact saved/draft recovery pass production Electron7.91s; 228units/67security/12integration and25authorbrowser cases pass,11new affected public captures independently reviewed. Full supported desktop/AT/task/release acceptance remains pending.",
               "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
               "reference": "apps/desktop/evidence/notes-pin-application.md; packages/notes/README.md"
+            },
+            {
+              "command": "bun run test:unit -- U1-01; bun run test:security -- U1-01; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- U1-01; exact author real Tiptap browser suite",
+              "outcome": "Partial: archive/find/restore, preserved pin/saved/draft and crash/reopen pass actual production10.27s;257units/85security/16integration/32browser pass.13newcomponent+4actual captures independently reviewed; readonly slash finding closed. Full supported desktop/AT/task/release acceptance pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-archive-application.md; packages/notes/ARCHIVE-INCREMENT.md; packages/notes/README.md"
             }
           ]
         },
@@ -6902,6 +6914,12 @@
               "outcome": "Partial: pin metadata/owner filter and exact saved/draft recovery pass production Electron7.91s; 228units/67security/12integration and25authorbrowser cases pass,11new affected public captures independently reviewed. Full supported desktop/AT/task/release acceptance remains pending.",
               "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
               "reference": "apps/desktop/evidence/notes-pin-application.md; packages/notes/README.md"
+            },
+            {
+              "command": "bun run test:unit -- U1-01; bun run test:security -- U1-01; LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a bun run test:integration -- U1-01; exact author real Tiptap browser suite",
+              "outcome": "Partial: archive/find/restore, preserved pin/saved/draft and crash/reopen pass actual production10.27s;257units/85security/16integration/32browser pass.13newcomponent+4actual captures independently reviewed; readonly slash finding closed. Full supported desktop/AT/task/release acceptance pending.",
+              "platform": "Pop!_OS22.04 Linux amd64; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4; owned private Xvfb X11/Chromium, not Debian/session/AT acceptance.",
+              "reference": "apps/desktop/evidence/notes-archive-application.md; packages/notes/ARCHIVE-INCREMENT.md; packages/notes/README.md"
             }
           ]
         }
@@ -6917,13 +6935,15 @@
         "29October2026 separate codex/notes-markdown-export follow-on locally reviewed/tested: explicit latest-draft export, native chooser, owner-derived Markdown, exclusive private file publication and truthful cancellation/unknown recovery. 202units/13contracts/51security/19browser/8integration PASS; actual production scenario7.37s. Seven new public export captures independently inspected; source/security andUI findings closed. Separate export PR prepared on integrated PR57; signing recovered after 1Password restart, unchanged saved setup/no unsigned commit. Detailed evidence apps/desktop/evidence/notes-markdown-export-application.md.",
         "PR57 https://github.com/ianwijma/linuxcast/pull/57 normally merged fd39fde16081a6b3c40a5e57ceef66a13897a9c0; exact reviewed signed head bf1e7530aee0bc06448f1c22fbe034b06a97400a, CI40797407999 validate PASS, no requested/submitted reviews/comments/threads. Create/edit/autosave/search/nativeClose/Quit/crash recovery increment is integrated. Configured 1Password signer succeeded after desktop restart; local signature verifies against exact configured key. GitHub reports unknown_key (also prior bookkeeping), branch has no signed-commit/approval rules; no signing or protection bypass. Export remains separate reviewed follow-on; all U1 acceptance criteria stay pending.",
         "PR58 https://github.com/ianwijma/linuxcast/pull/58 normally merged b945289012c53a05a71193f9650df5a12ce06dfc; exact reviewed signed head844dfe766ba85cdde87d497111871727513b8848, CI40798022496 validate PASS, no requested/submitted GitHub reviews/comments/threads. Explicit latest-draft Markdown export increment integrated on PR57;202unit/13contract/51security/19browser/8integration checks and independent source/UI/capture reviews pass. Actual native chooser choice instrumented; no complete import/roundtrip/desktop/AT/release acceptance claim.",
-        "29October2026 bounded codex/notes-pin application follow-on on integrated PR58: actual Pin/Unpin/Pinned-only owner query preserves saved/draft/timestamps/history via schema015 CAS. Reviewed root/source and UI; exact16owned author patch1f018a755e10a772973b454c2953fdb3dc4199f61840961163f27d016feb46db. 228mappedunits/14contracts/67security/49storage regressions/12integration PASS; production scenario7.91s and25authorbrowser19.3s PASS. Nine new component andtwo actual captures; fulltype/scopedlint/plan/diff PASS. All U1 criteria remainpending. Detailed apps/desktop/evidence/notes-pin-application.md. PR integration reference recorded after normal merge."
+        "29October2026 bounded codex/notes-pin application follow-on on integrated PR58: actual Pin/Unpin/Pinned-only owner query preserves saved/draft/timestamps/history via schema015 CAS. Reviewed root/source and UI; exact16owned author patch1f018a755e10a772973b454c2953fdb3dc4199f61840961163f27d016feb46db. 228mappedunits/14contracts/67security/49storage regressions/12integration PASS; production scenario7.91s and25authorbrowser19.3s PASS. Nine new component andtwo actual captures; fulltype/scopedlint/plan/diff PASS. All U1 criteria remainpending. Detailed apps/desktop/evidence/notes-pin-application.md. Normally integrated in PR59 as recorded below.",
+        "PR59 https://github.com/ianwijma/linuxcast/pull/59 normally merged2aa49e540c8be6ea1fba1e0e85e945975fa88542; exact reviewed signed headb25b2f8d9c77f7833d9cc91c342b8726de5ea0dd, CI40800718606 validate PASS, no requested/submitted GitHub reviews/comments/threads. Pin/Unpin and owner-backed Pinned filter are integrated with schema015 and preserved content/history. Primary develop clean/fast-forwarded. Next bounded archive/restore flow started on codex/notes-archive and codex/notes-archive-ui with explicit coordinator contract freeze only so far; no archive implementation/acceptance claim.",
+        "29October2026 reviewed/tested unfinished codex/notes-archive application increment on integrated PR59: Archive flushes latest draft withoutSave, selected editor/title/tasks readonly, actual owner archive+pinned title/body query, Restore preserves content/pin/timestamps/history and enables editing; schema016 defaultactive migration/CAS, exact receipts and shared actual mutation/export/Close/uncertainty/freshread/no-replay gates. 257mappedunits/15contracts/85security/49storage regressions/16integration PASS; actual production Electron10.27s; author92focusedunits/32Chromium23.0s PASS. Exact21owned UI patch45197c33054f9913f7e4661e3c8360ca98ec442c20121dfe69ec01f5602de874 reconciled;13newcomponent+4actual affected public captures independentlyclean. Readonly slash P2 fixed/currenteditability regression passes. Independent backend/UI/actual source+capture reviews clean; fulltype/scopedlint/diff PASS. apps/desktop/evidence/notes-archive-application.md. Signed publication/currentheadCI+configuredreviews/merge pending; all U1 criteria staypending."
       ],
       "owner": "coordinator and manifest_review_sol (GPT-6.1 SOL/high)",
-      "branch": "codex/notes-pin",
+      "branch": "codex/notes-archive",
       "limitations": [
         "Implementation in progress under user-authorized reviewed/tested unfinished application increments. F2-01 accepted; reviewed shared UI/primitives reused while broader D1-02/nativeAT acceptance remains unfinished. No prerequisite completion inferred.",
-        "Archive/trash/restore/revision restore/attachments/root Notes provider/Quick note remain required. Explicit Markdown export is integrated in PR58; full import/roundtrip and native chooser acceptance remain pending. Full U1-01, Debian13 GNOME/KDE Wayland/X11, nativeAT/highcontrast/performance/package/release acceptance remain pending. Unacknowledged local edits may be lost on forced crash. Ordinary privateSQLite is not encrypted at rest; no permanentplaintext substitute or fullcompletion claim."
+        "Trash/trash restore/revision restore/attachments/root Notes provider/Quick note remain required. Archive/restore bounded increment reviewed/tested; signed PR integration pending. Explicit Markdown export is integrated in PR58; full import/roundtrip and native chooser acceptance remain pending. Full U1-01, Debian13 GNOME/KDE Wayland/X11, nativeAT/highcontrast/performance/package/release acceptance remain pending. Unacknowledged local edits may be lost on forced crash. Ordinary privateSQLite is not encrypted at rest; no permanentplaintext substitute or fullcompletion claim."
       ]
     },
     {
