@@ -1,3 +1,4 @@
+import {notesRootRepositoryContracts} from '../../contracts/src/notes-launcher.ts';
 import {notesRepositoryContracts} from '../../contracts/src/notes.ts';
 import {rateSnapshotSchema,ratePairSchema} from '../../contracts/src/rate-conversion.ts';
 import { journalContracts } from '../../workflows/src/journal/contracts.ts';
@@ -34,6 +35,7 @@ export const hiddenCommandIdsSchema = z.array(visibilityId).max(MAX_LAUNCHER_COM
 export const storageContracts: RepositoryContracts = new Map([
   ...quicklinkRepositoryContracts,
   ...notesRepositoryContracts,
+  ...notesRootRepositoryContracts,
   ['rates.cache.get',{params:ratePairSchema,result:rateSnapshotSchema.nullable()}],
   ['rates.cache.put',{params:z.strictObject({snapshot:rateSnapshotSchema,configurationRevision:revision}),result:rateSnapshotSchema}],
   ['rates.cache.clear',{params:z.strictObject({configurationRevision:revision}),result:z.strictObject({outcome:z.literal('cleared')})}],

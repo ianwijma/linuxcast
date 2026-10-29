@@ -4,6 +4,7 @@ import type {NoteRecord,NoteWrite,NotePin,NoteArchive,NoteTrash,NotesList,NotesL
 import {NOTES_URL} from './assets.ts';
 import {trustedAppSender} from './ipc.ts';
 export interface NotesActions{
+ observedRead?(record:NoteRecord):void;
  exportBusy?():boolean;closeBusy?():boolean;committed?(input:NoteWrite,record:NoteRecord):void;
  contents():WebContents|undefined;active():boolean;ready():boolean;appearance():'dark'|'light';close():void;
  list(input:NotesListRequest):Promise<NotesList>;get(id:string):Promise<NoteRecord|null>;write(input:NoteWrite):Promise<NoteRecord>;setPinned(input:NotePin):Promise<NoteRecord>;setArchived(input:NoteArchive):Promise<NoteRecord>;setTrashed(input:NoteTrash):Promise<NoteRecord>;history(input:NoteHistoryRequest):Promise<NoteHistory>;getRevision(input:NoteRevisionSelection):Promise<NoteRevisionRead>;restoreRevision(input:NoteRevisionSelection):Promise<NoteRecord>;
@@ -72,7 +73,7 @@ export function registerNotesIpc(ipc:Pick<IpcMain,'handle'|'removeHandler'>,acti
      const mayReconcile=!write,generation=writeGeneration,request=notesGetRequestSchema.parse(payload),value=await actions.get(request.id),reply=notesReadReplySchema.safeParse({ok:true,value});
      if(!current()||!reply.success||!reply.data.ok||reply.data.value&&reply.data.value.id!==request.id)return failure('unavailable');
      // An explicit fresh read can reconcile only once the original write settled.
-     if(mayReconcile&&!write&&generation===writeGeneration)uncertain.delete(request.id);
+     if(mayReconcile&&!write&&generation===writeGeneration){uncertain.delete(request.id);if(reply.data.value)actions.observedRead?.(reply.data.value);}
      return reply.data;
     }
     const {protocolVersion:_,...request}=notesQueryRequestSchema.parse(payload);void _;

@@ -1,3 +1,6 @@
+import {registerLauncherNotesIpc} from './notes-launcher-ipc.ts';
+import type {NotesLauncherSelection,NotesRootSearch} from '../../../../packages/contracts/src/notes-launcher.ts';
+import type {NoteRecord} from '../../../../packages/contracts/src/notes.ts';
 import { compileQuicklinkCommands } from './quicklink-commands.ts';
 import { compileWorkflowCommands,matchWorkflowCommand,WorkflowCommandUnavailable } from './workflow-commands.ts';
 import type { WorkflowCommand,WorkflowCommandSelection } from './workflow-commands.ts';
@@ -26,6 +29,9 @@ import { registerQuicklinksIpc } from './quicklinks-ipc.ts';
 import type { QuicklinkBackend } from './quicklinks-ipc.ts';
 
 export interface LauncherActions {
+  searchNotes?:(query:string)=>Promise<NotesRootSearch>;
+  getNote?:(id:string)=>Promise<NoteRecord|null>;
+  openNote?:(selection:NotesLauncherSelection,current:()=>boolean)=>Promise<void>;
   rates?:RateConversionService;
   rateVisible?:()=>boolean;
   quicklinks?:QuicklinkBackend;
@@ -452,6 +458,11 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     }
     finally { busy = false; }
   });
+  const removeNotes=actions.searchNotes&&actions.getNote&&actions.openNote?registerLauncherNotesIpc(ipc,{search:actions.searchNotes,get:actions.getNote,open:actions.openNote},{
+    trusted:event=>trustedShellSender(event,actions.contents()),active,busy:()=>busy||metadataPending||calculatorPending||urlPending||applicationActionPending||quicklinksPending,revision:()=>revision,generation:()=>metadataGeneration,
+    authorize:async(event,expected)=>{const denied=await checkVisibility(event,'linuxcast:open-notes',expected);if(denied)return denied;if(!trustedShellSender(event,actions.contents()))return failure('permission-denied');if(!active()||metadataPending)return failure('cancelled');if(expected!==revision)return failure('invalid-request');const parent=descriptors().find(command=>command.id==='linuxcast:open-notes');return !parent?.enabled||parent.hidden?failure('permission-denied'):undefined;},
+    acquire:()=>{busy=true;metadataGeneration++;return()=>{busy=false;};},recordUse:()=>recordUse('linuxcast:open-notes'),
+  }):undefined;
   const removeRates=actions.rates?registerRateIpc(ipc,actions.rates,{trusted:event=>trustedShellSender(event,actions.contents()),active:()=>active()&&!busy&&(actions.rateVisible?.()??true),revision:()=>revision,checkVisibility:(event,expected)=>checkVisibility(event,'linuxcast:currency-conversion',expected),...(actions.copyCalculatorResult?{copy:actions.copyCalculatorResult}:{}),recordUse:()=>recordUse('linuxcast:currency-conversion')}):undefined;
   const removeQuicklinks=actions.quicklinks?registerQuicklinksIpc(ipc,actions.quicklinks,{
     trusted:event=>trustedShellSender(event,actions.contents()),active,busy:()=>busy||calculatorPending,
@@ -461,5 +472,5 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     openUrl:async url=>{if(!actions.openUrl)throw new ApplicationsUnavailable('unavailable','not-dispatched');return actions.openUrl(url);},
     recordUse:()=>recordUse('linuxcast:open-quicklinks'),
   }):undefined;
-  return () => { disposed = true;removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
+  return () => { disposed = true;removeNotes?.();removeQuicklinks?.();removeRates?.(); for (const channel of Object.values(LAUNCHER_CHANNELS)) ipc.removeHandler(channel); };
 }

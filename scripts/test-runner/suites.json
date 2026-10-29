@@ -29,7 +29,9 @@
       "apps/desktop/src/main/workflow-commands.test.ts",
       "apps/desktop/src/features/launcher/tests/quicklinks-routing.test.ts",
       "apps/desktop/src/features/launcher/tests/calculator-routing.test.ts",
-      "apps/desktop/src/features/launcher/tests/rates-routing.test.ts"
+      "apps/desktop/src/features/launcher/tests/rates-routing.test.ts",
+      "apps/desktop/src/features/launcher/tests/notes-routing.test.ts",
+      "packages/notes/tests/launcher-open.test.ts"
     ],
     "L1-02": [
       "packages/search/tests/search.test.ts",
@@ -87,7 +89,9 @@
       "packages/search/tests/search.test.ts",
       "apps/desktop/src/features/launcher/tests/catalogue.test.ts",
       "packages/notes/tests/markdown.test.ts",
-      "packages/notes/tests/export-controller.test.ts"
+      "packages/notes/tests/export-controller.test.ts",
+      "apps/desktop/src/features/launcher/tests/notes-routing.test.ts",
+      "packages/notes/tests/launcher-open.test.ts"
     ]
   },
   "contracts": {
@@ -137,7 +141,8 @@
     ],
     "L1-01": [
       "packages/contracts/tests/launcher-visibility.contract.test.ts",
-      "packages/contracts/tests/quicklinks.contract.test.ts"
+      "packages/contracts/tests/quicklinks.contract.test.ts",
+      "packages/contracts/tests/notes-launcher.contract.test.ts"
     ],
     "L2-05": [
       "packages/contracts/tests/quicklinks.contract.test.ts",
@@ -154,7 +159,8 @@
     ],
     "U1-01": [
       "packages/contracts/tests/notes.contract.test.ts",
-      "packages/contracts/tests/notes-export.contract.test.ts"
+      "packages/contracts/tests/notes-export.contract.test.ts",
+      "packages/contracts/tests/notes-launcher.contract.test.ts"
     ]
   },
   "ui": {
@@ -168,7 +174,9 @@
       "packages/ui/src/views/views.test.ts"
     ],
     "L1-01": [
-      "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
+      "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts",
+      "apps/desktop/src/features/launcher/tests/notes-search.ui.test.ts",
+      "packages/notes/tests/launcher-open.ui.test.ts"
     ],
     "L1-02": [
       "apps/desktop/src/features/launcher/tests/launcher.ui.test.ts"
@@ -194,7 +202,9 @@
       "apps/desktop/src/features/workflows/debugger/tests/run-panel.ui.test.ts"
     ],
     "U1-01": [
-      "packages/notes/tests/notes.ui.test.ts"
+      "packages/notes/tests/notes.ui.test.ts",
+      "apps/desktop/src/features/launcher/tests/notes-search.ui.test.ts",
+      "packages/notes/tests/launcher-open.ui.test.ts"
     ]
   },
   "integration": {
@@ -224,7 +234,9 @@
     "L1-01": [
       "packages/storage/tests/command-pins.integration.test.ts",
       "packages/storage/tests/command-aliases.integration.test.ts",
-      "packages/storage/tests/command-visibility.integration.test.ts"
+      "packages/storage/tests/command-visibility.integration.test.ts",
+      "packages/storage/tests/notes-root-search.integration.test.ts",
+      "apps/desktop/tests/notes.integration.test.ts"
     ],
     "L1-02": [
       "apps/desktop/tests/shell.integration.test.ts"
@@ -262,7 +274,8 @@
     ],
     "U1-01": [
       "packages/storage/tests/notes.integration.test.ts",
-      "apps/desktop/tests/notes.integration.test.ts"
+      "apps/desktop/tests/notes.integration.test.ts",
+      "packages/storage/tests/notes-root-search.integration.test.ts"
     ]
   },
   "security": {
@@ -305,7 +318,10 @@
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",
       "apps/desktop/src/preload/api.test.ts",
-      "apps/desktop/src/main/quicklinks-ipc.test.ts"
+      "apps/desktop/src/main/quicklinks-ipc.test.ts",
+      "apps/desktop/src/main/notes-launcher-ipc.test.ts",
+      "apps/desktop/src/main/notes-open-ipc.test.ts",
+      "apps/desktop/src/preload/notes.test.ts"
     ],
     "L1-02": [
       "packages/builtins/applications/tests/transport.test.ts",
@@ -352,7 +368,10 @@
       "apps/desktop/src/main/notes-export-ipc.test.ts",
       "apps/desktop/src/main/notes-export-file.test.ts",
       "apps/desktop/src/main/notes-quick-note-ipc.test.ts",
-      "packages/storage/tests/notes-client.test.ts"
+      "packages/storage/tests/notes-client.test.ts",
+      "apps/desktop/src/main/notes-launcher-ipc.test.ts",
+      "apps/desktop/src/main/notes-open-ipc.test.ts",
+      "apps/desktop/src/preload/notes.test.ts"
     ]
   },
   "perf": {}

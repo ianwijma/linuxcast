@@ -1,3 +1,4 @@
+import {createLauncherNotesApi} from './notes.ts';
 import {
   SHELL_CHANNELS, desktopShellStateSchema, shellCommandReplySchema, shellStateReplySchema,
 } from '../../../../packages/contracts/src/desktop-shell.ts';
@@ -26,6 +27,7 @@ export function createShellApi(transport: ShellTransport): DesktopShellApi {
   };
   return Object.freeze({
     ...createQuicklinkApi(transport),
+    ...createLauncherNotesApi(transport),
     ...createRateApi(transport),
     executeApplicationAction:async(request:Parameters<NonNullable<DesktopShellApi['executeApplicationAction']>>[0])=>{
       try{

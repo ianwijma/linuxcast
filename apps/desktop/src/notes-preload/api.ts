@@ -1,3 +1,4 @@
+import {NOTES_LAUNCHER_CHANNELS,notesOpenAttemptSchema} from '../../../../packages/contracts/src/notes-launcher.ts';
 import * as z from 'zod';
 import {NOTES_EXPORT_CHANNEL,noteExportSelectionSchema,noteExportReplySchema} from '../../../../packages/contracts/src/notes-export.ts';
 import {NOTES_CHANNELS,NOTES_QUICK_NOTE_READY,NOTES_QUICK_NOTE_REQUESTED,NOTES_QUICK_NOTE_FINISHED,NOTES_APPEARANCE,NOTES_CLOSE_REQUESTED,NOTES_CLOSE_FINISHED,notesCloseAttemptSchema,noteWriteSchema,notePinSchema,noteArchiveSchema,noteTrashSchema,noteHistoryRequestSchema,noteRevisionSelectionSchema,noteHistoryReplySchema,noteRevisionReadReplySchema,notesListRequestSchema,notesGetRequestSchema,notesReadReplySchema,notesWriteReplySchema,notesListReplySchema,noteContentKey} from '../../../../packages/contracts/src/notes.ts';
@@ -10,8 +11,17 @@ export function createNotesApi(transport:Pick<ShellTransport,'invoke'|'on'|'remo
   if(typeof listener!=='function')throw new TypeError('A listener is required.');let active=true;
   const receive=(_event:unknown,value:unknown)=>{const parsed=parse(value);if(active&&parsed!==undefined)listener(parsed);};transport.on(channel,receive);return()=>{active=false;transport.removeListener(channel,receive);};
  };
- let quickListener=false,latestQuickAttempt=0;
+ let quickListener=false,latestQuickAttempt=0,openListener=false,latestOpenAttempt=0;
  return Object.freeze<NotesApi>({
+  onOpenNoteRequested(listener){
+   if(typeof listener!=='function')throw new TypeError('A listener is required.');if(openListener)throw new Error('Open note listener is already registered.');openListener=true;let active=true;
+   const remove=listen(NOTES_LAUNCHER_CHANNELS.requested,value=>{const parsed=notesOpenAttemptSchema.safeParse(value);return parsed.success?parsed.data:undefined;},attempt=>{
+    if(!active||attempt.attemptId<=latestOpenAttempt)return;latestOpenAttempt=attempt.attemptId;
+    void Promise.resolve().then(()=>active?listener({...attempt.selection}):false).catch(()=>false).then(opened=>transport.invoke(NOTES_LAUNCHER_CHANNELS.finished,{protocolVersion:1,attemptId:attempt.attemptId,opened:active&&opened===true})).catch(()=>{});
+   });
+   void transport.invoke(NOTES_LAUNCHER_CHANNELS.ready,{protocolVersion:1}).catch(()=>{});
+   return()=>{if(!active)return;active=false;openListener=false;remove();};
+  },
   async history(input){const request=noteHistoryRequestSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=noteHistoryReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.history,{protocolVersion:1,input:request.data}));return reply.success&&(!reply.data.ok||reply.data.value.id===request.data.id&&reply.data.value.currentRevision===request.data.expectedRevision)?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
   async getRevision(input){const request=noteRevisionSelectionSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=noteRevisionReadReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.getRevision,{protocolVersion:1,input:request.data}));return reply.success&&(!reply.data.ok||reply.data.value.id===request.data.id&&reply.data.value.currentRevision===request.data.expectedRevision&&reply.data.value.savedRevision.revision===request.data.revision)?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
   async restoreRevision(input){const request=noteRevisionSelectionSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesWriteReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.restoreRevision,{protocolVersion:1,input:request.data}));return reply.success&&(!reply.data.ok||reply.data.value.id===request.data.id&&reply.data.value.revision===request.data.expectedRevision+1&&!reply.data.value.archived&&!reply.data.value.trashed)?reply.data:failed('unknown-outcome');}catch{return failed('unknown-outcome');}},

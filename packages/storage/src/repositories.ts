@@ -1,3 +1,5 @@
+import {searchRootNotes} from './notes-root-search.ts';
+import type {NotesRootStorageMethods} from '../../contracts/src/notes-launcher.ts';
 import {NOTES_STORAGE_METHODS} from '../../contracts/src/notes.ts';
 import type {NotesStorageMethods} from '../../contracts/src/notes.ts';
 import {dispatchNotes} from './notes.ts';
@@ -33,7 +35,7 @@ export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
-export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods,JournalMethods,NotesStorageMethods {
+export interface StorageMethods extends NotesRootStorageMethods,FileIndexMethods,QuicklinkStorageMethods,JournalMethods,NotesStorageMethods {
   'workflows.editor.get': {params: Record<string,never>; result: WorkflowEditorRecord|null};
   'workflows.editor.write': {params: WorkflowEditorWrite; result: WorkflowEditorRecord};
   'dataControls.clear': {params: DataClearParams; result: DataClearResult};
@@ -62,7 +64,7 @@ export interface StorageMethods extends FileIndexMethods,QuicklinkStorageMethods
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...NOTES_STORAGE_METHODS,...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'rates.cache.get','rates.cache.put','rates.cache.clear', 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...NOTES_STORAGE_METHODS,'notes.searchRoot',...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'rates.cache.get','rates.cache.put','rates.cache.clear', 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -113,6 +115,7 @@ export class Repositories {
   }
   private execute(method: StorageMethod, input: unknown): unknown {
     const db = this.db;
+    if(method==='notes.searchRoot')return searchRootNotes(db,input);
     if((NOTES_STORAGE_METHODS as readonly string[]).includes(method))return dispatchNotes(db,method as keyof NotesStorageMethods,input);
     if((JOURNAL_METHODS as readonly string[]).includes(method))return dispatchWorkflowJournal(db,method as keyof JournalMethods,input);
     if((QUICKLINK_STORAGE_METHODS as readonly string[]).includes(method)){
