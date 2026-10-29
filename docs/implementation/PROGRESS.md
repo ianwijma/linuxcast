@@ -1,90 +1,60 @@
 # Coordinator checkpoint — 29 October 2026
 
-The complete local 1.0/all 97 tasks/R1-03/release-gates Goal remains active.
-User authorizes reviewed, tested unfinished application increments with explicit
-remaining acceptance. All subagents use GPT-6.1 SOL/high. Normal configured
-1Password signed commits work; preserve the signing configuration.
+Full local1.0/all97/R1-03/release Goal remains unfinished, no scope reduction.
+User prioritizes smaller reviewed/tested application merges with outstanding
+acceptance explicit. All subagents SOL6.1/high; prior bounded assignments finished.
 
-Primary develop and origin are at PR70 merge
-13d8eb63be2e3ccd0c3c69c2d42914be0c356bb8; primary clean and open PRs empty before
-publication. PR67 offline Emoji,68 tone,69 persistent favourites and70 installed
-Dictionary base entries are integrated. Earlier Notes/application flows retained.
-Do not reset or archive old worktrees, branches, patches or unrelated changes.
+## Integrated
 
-## Ready application increment
+Configured local Dictionary definitions PR71:
+https://github.com/ianwijma/linuxcast/pull/71
+Signed a39c5796c435a826eb8fc3f55b7c1f588bc22fe8, crypto verified; exact reviewed
+staged tree. Normal expected-head merge9a482cd9379cc9b5455292a1850df41b7da35b14.
+PlanningCI40866425616 PASS15s. No requested/submitted reviews/comments/threads;
+develop unprotected/rules[] verified, no bypass. Configured1Password signing
+recovered after latest unlock; unchanged signing setup. Primary develop clean at
+merge. PR67–70 and earlier Notes/application flows retained.
 
-Coordinator: .worktrees/linuxcast-emoji-search, codex/dictionary-definitions,
-base13d8eb6. All source/evidence changes ready for normal signed commit, local
-crypto verification, push, focused PR, current-head CI/review inspection and normal
-expected-head merge. No signer or user question.
+Dictionary now configures a local private StarDict source, searches and reads
+literal paginated meanings/phonetics, restores Back state, resets Hide state,
+keeps source configuration across restart, refuses changed source, and Forgets
+without source-file modification. Full Dictionary capability remains unfinished.
+Independent414unit/39contract/301security/46browser/13integration PASS, full
+TypeScript/lint and reviews clean; reports/captures in source.14new PNG reviewed.
 
-Dictionary → Local definitions → explicitly choose/confirm local StarDict source →
-search canonical entries → Read literal paginated meaning/phonetic Detail. Back
-retains query/selection; Hide clears all nested frames; saved source survives
-restart; changed source refuses; Forget clears only configuration. No definition
-Copy/Paste or source-file modification. Existing base-word Copy stays separate.
-Private source paths remain main/storage only and outside ordinary exports.
-Existing settings CAS, shared UI and bounded named IPC; no new dependency, dataset
-download, migration, arbitrary filesystem grant or source execution. Supports
-bounded plain/gzip/dictzip UTF8 meaning/phonetic and32/64-bit indexes only.
+## Next publication — already reviewed and tested
 
-Final parent checks:414 mapped unit PASS1.44s;39 contracts PASS0.32s;301 security
-PASS1.67s;46 browser PASS22.9s;13 integration across7files PASS37.29s (5 real
-sandboxed Electron scenarios +8 real storage-owner checks), definitions8.24s.
-Full pinned direct Node project TypeScript, all changed TS/TSX ESLint, plan and
-whitespace pass. Actual config Cancel/CAS/restart, Unicode phrase café au lait,
-literal complete paginated definitions, Back/Hide, changed-source refusal,
-Forget/nullrev2, source preservation, clipboard sentinel and export/usage privacy
-verified. Native dialog answers are synthetic in trusted main; no real picker/AT
-acceptance claim. Renderer HTTP(S) observation is page-only.
+.worktrees/linuxcast-emoji-keywords-integrate, codex/emoji-keywords-integrate,
+base9a482cd. Exact keyword-only delta applied from preserved joint tree
+c77f5c08c784fa7415bb6e80df8ae5466120f64b; only this checkpoint/registry/card then
+updated, no source/test/capture changes. Publish this focused application PR next.
+Emoji Actions opens shared multiline keyword Form; explicit Save/Clear writes
+private revisioned settings, aliases search real canonical rows, explicit Copy
+alone records usage. Cancel/dirty discard/unknown recovery/Hide/restart verified.
 
-Independent reader/main/preload/storage/native assembly/UI/actual assertions/report
-and14 new capture reviews clean. Findings fixed/regressed: cached source identity;
-shared renderer replacing source-unavailable heading with filtered-empty. Two
-existing Emoji warning-heading assertions updated consistently. Initial finalUI
-run failed that old expectation; corrected test-only and full46 rerun passes.
-All665 historical tracked PNGs preserved; final8 component+6 actual images exact
-frozen author hashes, axe0. No remaining review finding.
+Joint final575unit/47contract/341security/56browser/25integration PASS47.42s
+(6actual sandboxed Electron scenarios+12real storage-owner+7syntheticclient).
+Full pinned direct Node TypeScript/scoped ESLint PASS; independent shared union
+review clean.59 frozen owned hashes match except intentionally combined APItest;
+reviewed26newPNG retained;665historical PNG unchanged. No test/signer running.
+Independent keyword447unit/41contract/282security/44browser/20integration PASS.
 
-Frozen /tmp patches and manifests (all exact owned hashes verified):
-- linuxcast-dictionary-definitions-data.patch
-  f829f7236d6cc65c80f4ff8f96137c78cad9f7dd9eab5fe17f0ee01f4a7be2f7 (3 reader files).
-- linuxcast-dictionary-definitions-boundary.patch
-  f533dbaafe4c49ead5bf77a6f43933579188d8b40acd9d08cf1fec04f34e94a8 (6 boundary tests).
-- linuxcast-dictionary-definitions-ui.patch
-  18ff2f4431b66b19c8bb0a840c5d4cc4504fd436a5c31f308b889abb0fa904b0 (15 files).
-- linuxcast-dictionary-definitions-actual.patch
-  64c25c7b09543f5dbefa0ff06e0557c7349cb0d8d049cccbe7957153f39d1791 (8 files;19 tested inputs).
+Original definitions .worktrees/linuxcast-emoji-search now signed/merged; original
+keyword .worktrees/linuxcast-emoji-keywords47staged and local-only combined
+.worktrees/linuxcast-application-integration93staged preserved. Frozen patches/
+manifests in /tmp; linuxcast-application-integration-ready.json records exact
+tested combined tree/delta/hashes. Never overwrite old sources/branches/patches.
 
-Existing SOL/high agents now finished:
-- manifest_notes_delete_sol: .worktrees/linuxcast-dictionary-definitions-data,
-  codex/dictionary-definitions-data, reader3 then actual8 files.
-- notes_merge_record_review_sol: .worktrees/linuxcast-dictionary-definitions-ui,
-  codex/dictionary-definitions-ui, UI15 files.
-- notes_delete_boundary_sol: .worktrees/linuxcast-dictionary-definitions-boundary,
-  codex/dictionary-definitions-boundary, tests6 then independent reviews.
-After merging, immediately select another bounded useful application increment;
-next candidate is Emoji custom keyword edit/search/restart using existing Grid,
-Form and settings CAS. No research/proof/infrastructure expansion.
+## Limits and immediate next action
 
-Totals remain8done/20in-progress/69planned;56passed/325pending/8N/A. Complete
-Hunspell checking/encodings and StarDict formats/thesaurus, Emoji custom keywords/
-frecency/native paste/global-provider explicit semantic lookup, prerequisite/native
-AT/Debian13 GNOME/KDE Wayland/X11/performance/package/release acceptance remain
-required. No full criterion/task promoted and no scope reduction.
+Commit/signature verify/push/create+attach focused keywordPR; inspect current-head
+CI/reviews/protections; normal expected-head merge. Record that integration and
+select next bounded useful application flow using existing shell/storage/UI.
+No more signing questions unless an actual failure requires user input.
 
-Runtime: pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Rust1.95. Actual host
-Pop!_OS22.04 amd64/private Xvfb X11/xclip is not the Debian desktop matrix.
-PATH=.worktrees/tools:$PATH BUN_TMPDIR=/tmp. Existing Electron override is
-.worktrees/linuxcast-emoji-ui/node_modules/electron/dist; chromiumSandbox:true,
-no --no-sandbox. Direct Node compiler avoids prior intermittent Bun compiler crash.
-Authorized index/sign/network/native-owner operations may need sandbox escalation.
-
-## Signing retry in progress
-
-All55files staged; first normal configured signed commit failed with
-`1Password: failed to fill whole buffer` (no commit object written). Normal
-terminal-attached retry session60866 also failed with the same error. Signing configuration
-unchanged; no unsigned fallback. No PR/push yet. All source/evidence/checks/reviews
-complete and frozen; ready once signing succeeds. Before any next stage/commit,
-include this checkpoint update. A specific user request is pending: approve a current signing prompt or run the prepared normal signed commit in their own terminal and confirm. No further repeated signer retries until new evidence/input.
+Pop!_OS22.04amd64/private XvfbX11/xclip, Electron45; native chooser answers
+synthetic in trustedmain, no Debian13/GNOME/KDE/Wayland/nativepicker/AT acceptance.
+Complete Hunspell/StarDict/thesaurus, Emoji frecency/nativePaste/explicit global
+provider semantic lookup, prerequisite/performance/package/release gates pending.
+Totals8done/20inprogress/69planned;56passed/325pending/8N/A, no full criterion
+promoted. No proof/research/infrastructure expansion or scope reduction.

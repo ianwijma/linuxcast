@@ -6,8 +6,8 @@ const request={revision:2,query:'coder'},selection={...request,searchId:3,id:row
 const search={revision:2,searchId:3,datasetVersion:'17.0',query:request.query,group:null,groups:[{id:row.group,name:row.group,count:2418}],records:[row]};
 const copied={outcome:'copied',...selection,group:null,value:row.value};
 function fixture(){const invoke=vi.fn<(channel:string,payload:unknown)=>Promise<unknown>>(async()=>({ok:true,value:search}));return {invoke,api:createEmojiApi({invoke})};}
-it('exposes only four frozen named methods and refuses excess authority before transport',async()=>{
- const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite']);expect(Object.isFrozen(f.api)).toBe(true);
+it('exposes only five frozen named methods and refuses excess authority before transport',async()=>{
+ const f=fixture();expect(Object.keys(f.api).sort()).toEqual(['copyEmoji','releaseEmojiSearch','searchEmoji','setEmojiFavourite','setEmojiKeywords']);expect(Object.isFrozen(f.api)).toBe(true);
  for(const extra of [{query:'x'.repeat(513)},{query:'\u202e'},{query:'\ud800'},{revision:0},{path:'/tmp/public'},{provider:'hidden'}])expect(await f.api.searchEmoji!({...request,...extra} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});
  for(const extra of [{text:'caller clipboard text'},{value:row.value},{searchId:0},{id:'emoji:23'},{ids:[row.id]}])expect(await f.api.copyEmoji!({...selection,...extra} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});
  expect(await f.api.releaseEmojiSearch!({revision:2,searchId:3,query:'private'} as never)).toMatchObject({ok:false,error:{code:'invalid-request'}});expect(f.invoke).not.toHaveBeenCalled();

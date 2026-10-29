@@ -1,12 +1,14 @@
 import {emojiData,emojiGroups,EmojiInputError} from './data.ts';
-import {emojiFavouriteIdsSchema,emojiMatchesTone,emojiToneSchema} from '@linuxcast/contracts';
+import {emojiFavouriteIdsSchema,emojiKeywordEntriesSchema,emojiMatchesTone,emojiToneSchema} from '@linuxcast/contracts';
+import {types} from 'node:util';
 import type {EmojiTone} from '@linuxcast/contracts';
 import type {Emoji} from './data.ts';
 
-/** ids is an internal main-owned subset, never a renderer search argument. */
-export interface EmojiSearchInput {query:string;group?:string;tone?:EmojiTone;ids?:readonly string[];limit?:number;}
+/** ids and customKeywords are main-owned snapshots, never renderer search arguments. */
+export interface EmojiSearchInput {query:string;group?:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];limit?:number;}
 const encoder=new TextEncoder();
 const groups=new Set(emojiGroups.map(group=>group.id));
+const canonicalIds=new Set(emojiData.map(entry=>entry.id));
 // Text normalization affects matching only; canonical Unicode values stay intact.
 const textKey=(text:string)=>text.normalize('NFKD').toLowerCase().replace(/\p{M}/gu,'');
 const words=(text:string)=>textKey(text).match(/[+-][0-9]+|[\p{L}\p{N}]+/gu)??[];
@@ -14,13 +16,21 @@ const phrase=(text:string)=>words(text).join(' ');
 const glyphKey=(text:string)=>text.replace(/\uFE0F/gu,'');
 const emojiGlyph=/\p{Extended_Pictographic}|\p{Regional_Indicator}|\u20E3/u;
 const segments=new Intl.Segmenter('en',{granularity:'grapheme'});
+// Preserve glyph placement in exact custom phrases while normalizing text words.
+function customPhraseKey(value:string):string {
+ const tokens:string[]=[];let text='';
+ for(const {segment} of segments.segment(value)){
+  if(emojiGlyph.test(segment)){tokens.push(...words(text).map(word=>`text:${word}`),`glyph:${glyphKey(segment)}`);text='';}else text+=segment;
+ }
+ tokens.push(...words(text).map(word=>`text:${word}`));return JSON.stringify(tokens);
+}
 const index=emojiData.map(entry=>({
  entry,glyph:glyphKey(entry.value),name:phrase(entry.name),aliases:entry.aliases.map(phrase),
  keywords:entry.keywords.map(phrase),words:[...new Set([entry.name,...entry.aliases,...entry.keywords].flatMap(words))],
 }));
 
 function validatedIds(value:unknown):readonly string[] {
- if(!Array.isArray(value)||Object.getPrototypeOf(value)!==Array.prototype||value.length>4096||Reflect.ownKeys(value).length!==value.length+1)throw new EmojiInputError();
+ if(types.isProxy(value)||!Array.isArray(value)||Object.getPrototypeOf(value)!==Array.prototype||value.length>4096||Reflect.ownKeys(value).length!==value.length+1)throw new EmojiInputError();
  const ids:string[]=[];
  for(let index=0;index<value.length;index++){
   const field=Object.getOwnPropertyDescriptor(value,String(index));
@@ -30,13 +40,29 @@ function validatedIds(value:unknown):readonly string[] {
  const parsed=emojiFavouriteIdsSchema.safeParse(ids);if(!parsed.success)throw new EmojiInputError();
  return Object.freeze(parsed.data);
 }
-function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids?:readonly string[];limit:number} {
- if(value===null||typeof value!=='object'||Array.isArray(value))throw new EmojiInputError();
+function arrayValues(value:unknown,maximum:number):unknown[]{
+ if(types.isProxy(value)||!Array.isArray(value)||Object.getPrototypeOf(value)!==Array.prototype||value.length>maximum||Reflect.ownKeys(value).length!==value.length+1)throw new EmojiInputError();
+ const entries:unknown[]=[];for(let index=0;index<value.length;index++){const field=Object.getOwnPropertyDescriptor(value,String(index));if(!field||!('value'in field))throw new EmojiInputError();entries.push(field.value);}return entries;
+}
+function validatedKeywords(value:unknown):readonly {id:string;keywords:readonly string[]}[]{
+ const entries:{id:string;keywords:string[]}[]=[];let bytes=2;
+ for(const raw of arrayValues(value,4096)){
+  if(types.isProxy(raw)||raw===null||typeof raw!=='object'||Array.isArray(raw)||![Object.prototype,null].includes(Object.getPrototypeOf(raw))||Reflect.ownKeys(raw).length!==2)throw new EmojiInputError();
+  const id=Object.getOwnPropertyDescriptor(raw,'id'),keywords=Object.getOwnPropertyDescriptor(raw,'keywords');
+  if(!id||!('value'in id)||typeof id.value!=='string'||id.value.length>230||!canonicalIds.has(id.value)||!keywords||!('value'in keywords))throw new EmojiInputError();
+  const phrases=arrayValues(keywords.value,16);if(!phrases.every((entry):entry is string=>typeof entry==='string'&&entry.length<=128))throw new EmojiInputError();
+  const entry={id:id.value,keywords:phrases};bytes+=encoder.encode(JSON.stringify(entry)).byteLength+(entries.length?1:0);if(bytes>524288)throw new EmojiInputError();entries.push(entry);
+ }
+ const parsed=emojiKeywordEntriesSchema.safeParse(entries);if(!parsed.success)throw new EmojiInputError();
+ return Object.freeze(parsed.data.map(entry=>Object.freeze({id:entry.id,keywords:Object.freeze(entry.keywords)})));
+}
+function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids?:readonly string[];customKeywords?:readonly {id:string;keywords:readonly string[]}[];limit:number} {
+ if(types.isProxy(value)||value===null||typeof value!=='object'||Array.isArray(value))throw new EmojiInputError();
  const prototype=Object.getPrototypeOf(value);
  if(prototype!==Object.prototype&&prototype!==null)throw new EmojiInputError();
  const fields=new Map<string,unknown>();
  for(const key of Reflect.ownKeys(value)){
-  if(typeof key!=='string'||!['query','group','tone','ids','limit'].includes(key))throw new EmojiInputError();
+  if(typeof key!=='string'||!['query','group','tone','ids','customKeywords','limit'].includes(key))throw new EmojiInputError();
   const field=Object.getOwnPropertyDescriptor(value,key);
   if(!field||!('value'in field))throw new EmojiInputError();
   fields.set(key,field.value);
@@ -49,18 +75,20 @@ function validated(value:unknown):{query:string;group:string;tone?:EmojiTone;ids
  if(typeof query!=='string'||query.length>512||/[\p{Cc}\p{Cs}\p{Bidi_Control}]/u.test(query)||encoder.encode(query).byteLength>2048)throw new EmojiInputError();
  if(typeof group!=='string'||group.length>64||fields.has('group')&&!groups.has(group))throw new EmojiInputError();
  if(typeof limit!=='number'||!Number.isSafeInteger(limit)||limit<1||limit>100)throw new EmojiInputError();
- return {query,group,limit,...(tone?.success?{tone:tone.data}:{}),...(ids?{ids}:{})};
+ const customKeywords=fields.has('customKeywords')?validatedKeywords(fields.get('customKeywords')):undefined;
+ return {query,group,limit,...(tone?.success?{tone:tone.data}:{}),...(ids?{ids}:{}),...(customKeywords?{customKeywords}:{})};
 }
 
 /** Pure bounded offline search. All query terms match literally, without regex,
  * shell, SQL or network interpretation. Ties keep pinned Unicode source order. */
 export function searchEmoji(input:EmojiSearchInput):readonly Emoji[] {
- const {query,group,tone,ids,limit}=validated(input),included=ids?new Set(ids):undefined,trimmed=query.trim(),parts=[...segments.segment(trimmed)].map(part=>part.segment);
+ const {query,group,tone,ids,customKeywords,limit}=validated(input),included=ids?new Set(ids):undefined,trimmed=query.trim(),parts=[...segments.segment(trimmed)].map(part=>part.segment);
+ const custom=new Map(customKeywords?.map(entry=>[entry.id,{phrases:entry.keywords.map(customPhraseKey),words:entry.keywords.flatMap(words),glyphs:entry.keywords.flatMap(value=>[...segments.segment(value)].filter(part=>emojiGlyph.test(part.segment)).map(part=>glyphKey(part.segment)))}]));
  const glyphs=parts.filter(part=>emojiGlyph.test(part)).map(glyphKey);
  // Emoji such as ㊗️ have compatibility decompositions into letters. Do not make
  // their literal glyph searches depend on an English keyword for that letter.
  const text=parts.filter(part=>!emojiGlyph.test(part)).join(''),terms=[...new Set(words(text))];
- const queryPhrase=phrase(text),queryGlyph=glyphKey(trimmed);
+ const queryPhrase=phrase(text),queryGlyph=glyphKey(trimmed),queryCustomPhrase=customPhraseKey(trimmed);
  const matches:{entry:Emoji;rank:number}[]=[];
  for(const item of index){
   if(included&&!included.has(item.entry.id))continue;
@@ -68,8 +96,9 @@ export function searchEmoji(input:EmojiSearchInput):readonly Emoji[] {
   if(tone!==undefined&&!emojiMatchesTone(item.entry.value,tone))continue;
   if(!trimmed){matches.push({entry:item.entry,rank:0});continue;}
   if(!terms.length&&!glyphs.length)continue;
-  if(!glyphs.every(glyph=>item.glyph.includes(glyph))||!terms.every(term=>item.words.some(word=>word.startsWith(term))))continue;
-  const rank=item.glyph===queryGlyph?0:item.name===queryPhrase?1:item.aliases.includes(queryPhrase)?2:item.keywords.includes(queryPhrase)?3:item.name.startsWith(queryPhrase)?4:5;
+  const extra=custom.get(item.entry.id);
+  if(!glyphs.every(glyph=>item.glyph.includes(glyph)||extra?.glyphs.some(candidate=>candidate.includes(glyph)))||!terms.every(term=>item.words.some(word=>word.startsWith(term))||extra?.words.some(word=>word.startsWith(term))))continue;
+  const rank=item.glyph===queryGlyph?0:item.name===queryPhrase?1:item.aliases.includes(queryPhrase)?2:item.keywords.includes(queryPhrase)||extra?.phrases.includes(queryCustomPhrase)?3:item.name.startsWith(queryPhrase)?4:5;
   matches.push({entry:item.entry,rank});
  }
  matches.sort((left,right)=>left.rank-right.rank);

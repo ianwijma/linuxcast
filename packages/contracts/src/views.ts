@@ -37,7 +37,7 @@ export const itemModelSchema = z.strictObject({
 });
 const field = { id, title: text, description: text.optional(), required: z.boolean(), error: text.optional() };
 export const formFieldSchema = z.discriminatedUnion('kind', [
-  z.strictObject({ ...field, kind: z.literal('text'), value: text }),
+  z.strictObject({ ...field, kind: z.literal('text'), value: text, multiline: z.literal(true).optional() }),
   // Secret values never arrive in a published ViewModel or its fixtures.
   z.strictObject({ ...field, kind: z.literal('secret') }),
   z.strictObject({ ...field, kind: z.literal('number'), value: z.number().nullable(), min: z.number().optional(), max: z.number().optional() }),

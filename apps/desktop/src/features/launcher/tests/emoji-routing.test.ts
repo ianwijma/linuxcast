@@ -47,3 +47,14 @@ it('clears the tone Form and filter on Hide and opens All tones with an omitted 
  f.controller.setVisible(false);await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);f.nextRevision();f.controller.setVisible(true);await settle();await open(f);
  expect(f.api.searchEmoji).toHaveBeenLastCalledWith({revision:2,query:''});await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:apply-tone',values:{tone:'dark'}});expect(top(f).view.kind).toBe('grid');expect(f.api.copyEmoji).not.toHaveBeenCalled();
 });
+
+it('routes custom keyword editing through the selected shared Form and clears the Form on Hide without generic execution or clipboard work',async()=>{
+ const f=setup();let keywords:string[]=[],preferenceRevision=0,searchId=0;
+ vi.mocked(f.api.searchEmoji!).mockImplementation(async input=>({ok:true,value:{...input,searchId:++searchId,datasetVersion:'17.0',group:input.group??null,keywords:{available:true,revision:preferenceRevision},groups:[{id:record.group,name:record.group,count:1}],records:[{...record,customKeywords:keywords}]}}));
+ f.api.setEmojiKeywords=vi.fn(async (input:Parameters<NonNullable<LauncherApi['setEmojiKeywords']>>[0])=>{keywords=input.keywords;preferenceRevision++;return {ok:true as const,value:{...input,outcome:'updated' as const,group:input.group??null,keywordsRevision:preferenceRevision}};});
+ await settle();await open(f);await action(f,'emoji:keywords');let form=top(f);expect(form.view).toMatchObject({kind:'form',title:'Emoji search keywords',fields:[{id:'keywords',kind:'text',multiline:true,value:''}]});
+ await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:save-keywords',values:{keywords:'public café\npublic family'}});await settle();expect(f.api.setEmojiKeywords).toHaveBeenCalledExactlyOnceWith({revision:1,query:'',searchId:1,id:record.id,keywords:['public café','public family'],keywordsRevision:0});
+ expect(top(f).view.kind).toBe('grid');expect(f.api.releaseEmojiSearch).toHaveBeenCalledWith({revision:1,searchId:1});expect(f.api.copyEmoji).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+ await action(f,'emoji:keywords');form=top(f);expect(form.view).toMatchObject({kind:'form',fields:[{value:'public café\npublic family'}]});f.controller.setVisible(false);await settle();expect(f.controller.session.getSnapshot().frames).toHaveLength(1);f.controller.setVisible(true);await settle();await open(f);
+ await f.controller.execute({viewId:form.view.viewId,revision:form.view.revision,actionId:'emoji:save-keywords',values:{keywords:'stale'}});expect(top(f).view.kind).toBe('grid');expect(f.api.setEmojiKeywords).toHaveBeenCalledTimes(1);expect(f.api.copyEmoji).not.toHaveBeenCalled();expect(f.api.executeLauncherCommand).not.toHaveBeenCalled();
+});

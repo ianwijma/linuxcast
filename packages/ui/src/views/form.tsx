@@ -13,7 +13,7 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
     if (!generated) { generated = `${prefix}-field-${fieldIds.current.size}`; fieldIds.current.set(id, generated); }
     return generated;
   };
-  useEffect(() => { if (active) formElement.current?.querySelector<HTMLElement>('input, select, button')?.focus(); }, []);
+  useEffect(() => { if (active) formElement.current?.querySelector<HTMLElement>('input, textarea, select, button')?.focus(); }, []);
   const [drafts, setDrafts] = useState<Record<string, { kind: Field['kind']; value: DraftValue; revision: number; validation: string }>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -21,13 +21,18 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
   // Loading/status rows shrink the viewport; keep Cancel reachable without
   // moving focus onto an action that a held submit key could activate.
   useLayoutEffect(() => { if(active&&(busy||view.loading))formElement.current?.querySelector<HTMLElement>('.lc-form-actions')?.scrollIntoView?.({block:'nearest'}); },[active,busy,view.loading]);
-  const wasLoading=useRef(Boolean(view.loading));
   useLayoutEffect(()=>{
-    const finished=wasLoading.current&&!view.loading;wasLoading.current=Boolean(view.loading);
-    // A native disabled input loses focus to the document. Recover only that
-    // lost focus after a host operation, never steal focus from Cancel/Actions.
-    if(active&&finished&&document.activeElement===document.body)formElement.current?.querySelector<HTMLElement>('input:not(:disabled), textarea:not(:disabled), select:not(:disabled)')?.focus();
-  },[active,view.loading]);
+    // A disabled native submit/field can retain focus until after layout, then
+    // lose it even when loading transitions
+    // batch into one host revision. Recover only lost document focus; preserve
+    // deliberate field/Cancel focus. Pending forms receive inert container focus so
+    // Escape stays reachable without placing a held submit key on Cancel.
+    const focused=document.activeElement,lost=focused===document.body||focused instanceof HTMLElement&&formElement.current?.contains(focused)&&focused.matches(':disabled');
+    if(active&&lost){
+      if(busy||view.loading)formElement.current?.focus();
+      else formElement.current?.querySelector<HTMLElement>('input:not(:disabled), textarea:not(:disabled), select:not(:disabled), button:not(:disabled)')?.focus();
+    }
+  },[active,busy,view.loading,view.revision]);
   const current = useRef({ view, active }); current.current = { view, active };
   const lifetime = useRef(new AbortController());
   useEffect(() => { const controller = new AbortController(); lifetime.current = controller; return () => controller.abort(); }, []);
@@ -91,11 +96,18 @@ export function ViewForm({ view, host, active, onDirty, requestCancel, isCurrent
     } catch { if (!lifetime.current.signal.aborted) setFailure(true); }
     finally { if (!transferred) handles.forEach(handle => host.releaseSecret?.(handle)); if (!lifetime.current.signal.aborted) setBusy(false); }
   };
-  return <form ref={formElement} noValidate className="lc-view-form" onSubmit={event => { event.preventDefault(); void submit(); }} aria-label={view.title}>
+  return <form ref={formElement} tabIndex={-1} noValidate className="lc-view-form" onSubmit={event => { event.preventDefault(); void submit(); }} aria-label={view.title}>
     {view.fields.map(field => {
       const id = fieldId(field.id);
       const value = valueOf(field);
       const error = (Object.hasOwn(errors, field.id) ? errors[field.id] : undefined) || hostError(field);
+      if (field.kind === 'text' && field.multiline) return <div className="lc-field" key={field.id}>
+        <label className="lc-field-label" htmlFor={id}>{field.title}{field.required && ' (required)'}</label>
+        <textarea className="lc-input lc-focus" id={id} rows={6} required={field.required} disabled={busy || view.loading} value={String(value)} autoComplete="off" maxLength={65536}
+          aria-describedby={[field.description ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(error)} onChange={event => change(field, event.target.value)} />
+        {field.description && <p className="lc-field-hint" id={`${id}-hint`}>{field.description}</p>}
+        {error && <p className="lc-field-error" id={`${id}-error`}>{error}</p>}
+      </div>;
       if (field.kind === 'text' || field.kind === 'secret' || field.kind === 'number') return <TextField key={field.id} id={id} label={field.title} type={field.kind === 'secret' ? 'password' : field.kind === 'number' ? 'number' : 'text'} required={field.required} disabled={busy || view.loading} value={value === null ? '' : String(value)}
         {...(field.description ? { hint: field.description } : {})} {...(error ? { error } : {})} autoComplete="off" maxLength={65536}
         {...(field.kind === 'number' ? { min: field.min, max: field.max, step: 'any' } : {})}

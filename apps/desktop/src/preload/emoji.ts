@@ -1,3 +1,4 @@
+import {emojiKeywordsInputSchema,emojiKeywordsReplySchema} from '../../../../packages/contracts/src/emoji.ts';
 import {EMOJI_CHANNELS,emojiSearchInputSchema,emojiSearchReplySchema,emojiCopyInputSchema,emojiCopyReplySchema,emojiReleaseInputSchema,emojiReleaseReplySchema,MAX_ENVELOPE_BYTES,emojiFavouriteInputSchema,emojiFavouriteReplySchema} from '../../../../packages/contracts/src/index.ts';
 import type {EmojiApi} from '../../../../packages/contracts/src/emoji.ts';
 import type {ShellTransport} from './api.ts';
@@ -23,6 +24,13 @@ export function createEmojiApi(transport:Pick<ShellTransport,'invoke'>):EmojiApi
    const unknown=()=>({ok:false as const,error:{code:'deadline-exceeded' as const,retryable:false,message:'Favourite change could not be confirmed. Reload emoji to read stored favourites before another explicit change. Nothing is replayed.'}});
    try{const raw=await transport.invoke(EMOJI_CHANNELS.favourite,{protocolVersion:1,...request.data});if(!bounded(raw))return unknown();const reply=emojiFavouriteReplySchema.safeParse(raw);
     if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.searchId!==request.data.searchId||reply.data.value.id!==request.data.id||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)||reply.data.value.tone!==request.data.tone||reply.data.value.favouritesOnly!==request.data.favouritesOnly||reply.data.value.favourite!==request.data.favourite||reply.data.value.favouritesRevision!==request.data.favouritesRevision+1))return unknown();return reply.data;
+   }catch{return unknown();}
+  },
+  async setEmojiKeywords(input){
+   const request=emojiKeywordsInputSchema.safeParse(input);if(!request.success)return failed('invalid-request');
+   const unknown=()=>({ok:false as const,error:{code:'deadline-exceeded' as const,retryable:false,message:'Keyword save could not be confirmed. Wait for the pending save, then Reload emoji to read saved keywords before another explicit change. Nothing is replayed.'}});
+   try{const raw=await transport.invoke(EMOJI_CHANNELS.keywords,{protocolVersion:1,...request.data});if(!bounded(raw))return unknown();const reply=emojiKeywordsReplySchema.safeParse(raw);
+    if(!reply.success||reply.data.ok&&(reply.data.value.revision!==request.data.revision||reply.data.value.searchId!==request.data.searchId||reply.data.value.id!==request.data.id||reply.data.value.query!==request.data.query||reply.data.value.group!==(request.data.group??null)||reply.data.value.tone!==request.data.tone||reply.data.value.favouritesOnly!==request.data.favouritesOnly||JSON.stringify(reply.data.value.keywords)!==JSON.stringify(request.data.keywords)||reply.data.value.keywordsRevision!==request.data.keywordsRevision+1))return unknown();return reply.data;
    }catch{return unknown();}
   },
   async releaseEmojiSearch(input){
