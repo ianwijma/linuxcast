@@ -102,10 +102,10 @@ it('multiline text preserves Unicode and newlines locally until explicit form su
  const value='café au lait\npublic family 👨‍👩‍👧‍👦';fireEvent.change(input,{target:{value}});fireEvent.keyDown(input,{key:'Enter'});expect(input.value).toBe(value);expect(action).not.toHaveBeenCalled();expect(dirty).toHaveBeenCalledWith(true);submit();await waitFor(()=>expect(action).toHaveBeenCalledTimes(1));expect(action.mock.calls[0]![0].values).toEqual({keywords:value});
 });
 
-it.each(['body','disabled submit'] as const)('recovers %s focus after a host failure revision even when loading transitions were batched away',origin=>{
+it.each(['body','disabled submit','pending form'] as const)('recovers %s focus after a host failure revision even when loading transitions were batched away',origin=>{
  const props={host:{action:vi.fn()},active:true,onDirty:()=>{},requestCancel:()=>{}},view={...simple,fields:[{id:'keywords',kind:'text' as const,title:'Search keywords',required:false,value:'public',multiline:true as const}]};
  const rendered=render(<ViewForm view={view} {...props}/>);const input=screen.getByRole('textbox',{name:'Search keywords'});expect(document.activeElement).toBe(input);
- if(origin==='body'){document.body.tabIndex=-1;document.body.focus();document.body.removeAttribute('tabindex');}else screen.getByRole('button',{name:view.actions!.find(action=>action.id===view.submitActionId)!.title}).focus();
+ if(origin==='body'){document.body.tabIndex=-1;document.body.focus();document.body.removeAttribute('tabindex');}else if(origin==='pending form')screen.getByRole('form').focus();else screen.getByRole('button',{name:view.actions!.find(action=>action.id===view.submitActionId)!.title}).focus();
  const failed={...view,revision:view.revision+1,status:{kind:'error' as const,message:'The save outcome is unknown.'},actions:view.actions!.map(action=>action.id===view.submitActionId?{...action,disabledReason:'Reload before another save.'}:action)};
  rendered.rerender(<ViewForm view={failed} {...props}/>);expect(document.activeElement).toBe(input);const cancel=screen.getByRole('button',{name:'Cancel'});cancel.focus();rendered.rerender(<ViewForm view={{...failed,revision:failed.revision+1}} {...props}/>);expect(document.activeElement).toBe(cancel);
 });

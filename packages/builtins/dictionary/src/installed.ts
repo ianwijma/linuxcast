@@ -3,6 +3,9 @@ import type {BigIntStats} from 'node:fs';
 import type {FileHandle} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {basename,dirname,join,resolve,isAbsolute} from 'node:path';
+import {types} from 'node:util';
+import {dictionaryWordSchema} from '../../../contracts/src/dictionary.ts';
+import {nativeSpellingEventSchema} from '../../../contracts/src/dictionary-spelling.ts';
 
 export const INSTALLED_DICTIONARY_DISCLOSURE='Installed dictionary base entries only. Affix, forbidden-word and compound flags are not interpreted. Results do not establish spelling correctness; definitions and generated inflections are not included. Copy a selected source word explicitly.';
 export const MISSING_DICTIONARY_GUIDANCE='No readable UTF-8 Hunspell language was found. Install the appropriate Hunspell language package using your system package manager, then reload Dictionary. Linuxcast does not download language data.';
@@ -22,6 +25,9 @@ export interface InstalledLanguage {id:string;name:string;state:'available'|'uns
 export interface InstalledLanguages {languages:InstalledLanguage[];truncated:boolean;}
 export interface InstalledWord {id:string;word:string;}
 export interface InstalledSearch {language:InstalledLanguage;snapshotId:string;query:string;words:InstalledWord[];truncated:boolean;}
+export interface SpellingResult {correct:boolean;suggestions:string[];truncated:boolean;backend:'hunspell-1.7';}
+export interface InstalledSpeller {check(input:{affFd:number;dicFd:number;word:string;signal:AbortSignal}):Promise<SpellingResult>;}
+export interface InstalledSpelling extends SpellingResult {language:InstalledLanguage;snapshotId:string;word:string;}
 const SYSTEM_ROOTS=['/usr/share/hunspell','/usr/share/myspell/dicts'] as const;
 const MAX_LANGUAGES=64,MAX_DIRECTORY_ENTRIES=2048,MAX_AFF_BYTES=1024*1024,MAX_DIC_BYTES=16*1024*1024,MAX_ENTRIES=500000,MAX_LINE_BYTES=8192;
 const languageName=/^[A-Za-z][A-Za-z0-9_-]{0,63}$/u,languageId=/^language:[a-f0-9]{64}$/u;
@@ -124,9 +130,23 @@ function checkedInput(input:unknown):{languageId:string;query:string}{
  return{languageId:language.value,query:query.value};
 }
 const key=(text:string)=>text.normalize('NFKD').toLowerCase().replace(/\p{M}/gu,'');
+function checkedSpellingInput(input:unknown):{languageId:string;word:string;signal:AbortSignal}{
+ if(types.isProxy(input)||input===null||typeof input!=='object'||Array.isArray(input)||![Object.prototype,null].includes(Object.getPrototypeOf(input)))throw new InstalledDictionaryError('invalid-request');
+ const keys=Reflect.ownKeys(input);if(keys.length!==3||!['languageId','word','signal'].every(key=>keys.includes(key)))throw new InstalledDictionaryError('invalid-request');
+ const values=Object.fromEntries(keys.map(key=>{const field=Object.getOwnPropertyDescriptor(input,key);if(!field||!('value'in field))throw new InstalledDictionaryError('invalid-request');return[key,field.value];}));
+ if(typeof values.languageId!=='string'||!languageId.test(values.languageId)||typeof values.word!=='string'||values.word.length>256||!dictionaryWordSchema.safeParse(values.word).success||types.isProxy(values.signal)||!(values.signal instanceof AbortSignal))throw new InstalledDictionaryError('invalid-request');
+ return{languageId:values.languageId,word:values.word,signal:values.signal};
+}
+function spellingResult(value:unknown,word:string):SpellingResult{
+ if(types.isProxy(value)||value===null||typeof value!=='object'||Array.isArray(value)||![Object.prototype,null].includes(Object.getPrototypeOf(value)))throw new InstalledDictionaryError('unavailable');
+ const keys=Reflect.ownKeys(value);if(keys.length!==4||!['correct','suggestions','truncated','backend'].every(key=>keys.includes(key)))throw new InstalledDictionaryError('unavailable');
+ const fields=Object.fromEntries(keys.map(key=>{const field=Object.getOwnPropertyDescriptor(value,key);if(!field||!('value'in field))throw new InstalledDictionaryError('unavailable');return[key,field.value];}));
+ const result=nativeSpellingEventSchema.safeParse({protocolVersion:1,kind:'result',word,...fields});if(!result.success||result.data.kind!=='result')throw new InstalledDictionaryError('unavailable');
+ return{correct:result.data.correct,suggestions:result.data.suggestions,truncated:result.data.truncated,backend:result.data.backend};
+}
 /** Node-only installed base-word reader. roots is trusted fixture assembly only;
  * no renderer/IPC caller chooses paths, encodings or filesystem operations. */
-export function createInstalledDictionary(options:{roots?:readonly string[]}={}){
+export function createInstalledDictionary(options:{roots?:readonly string[];speller?:InstalledSpeller}={}){
  const paths=[...(options.roots??SYSTEM_ROOTS)];if(paths.length>2||paths.some(path=>typeof path!=='string'||!isAbsolute(path)||path.length>4096))throw new InstalledDictionaryError('invalid-request');
  const rootsPaths=[...new Set(paths.map(path=>resolve(path)))];let cache:{identity:string;snapshot:Snapshot}|undefined;
  async function withRoots<T>(run:(roots:Root[])=>Promise<T>):Promise<T>{const roots=await openRoots(rootsPaths);try{return await run(roots);}finally{await Promise.all(roots.map(root=>root.handle.close()));}}
@@ -141,6 +161,23 @@ export function createInstalledDictionary(options:{roots?:readonly string[]}={})
   }catch(error){throw failure(error);}finally{await aff?.handle.close();await dic?.handle.close();}
  }
  return{
+  async checkSpelling(input:{languageId:string;word:string;signal:AbortSignal}):Promise<InstalledSpelling>{
+   const request=checkedSpellingInput(input);if(request.signal.aborted||!options.speller)throw new InstalledDictionaryError('unavailable');
+   return withRoots(async roots=>{
+    const {candidates}=await discover(roots),candidate=candidates.find(candidate=>candidate.id===request.languageId);if(!candidate)throw new InstalledDictionaryError('unavailable');
+    let aff:OpenFile|undefined,dic:OpenFile|undefined;
+    try{
+     aff=await openFile(candidate,'aff',roots);dic=await openFile(candidate,'dic',roots);
+     // Validate and hash the same descriptors handed to the engine. Do not close
+     // or reopen the pair between validation, native work and freshness checks.
+     const snapshot=parse(await read(aff),await read(dic));await Promise.all([fileCurrent(aff),fileCurrent(dic)]);
+     if(request.signal.aborted)throw new InstalledDictionaryError('unavailable');
+     const result=spellingResult(await options.speller!.check({affFd:aff.handle.fd,dicFd:dic.handle.fd,word:request.word,signal:request.signal}),request.word);
+     await Promise.all([fileCurrent(aff),fileCurrent(dic)]);if(request.signal.aborted)throw new InstalledDictionaryError('unavailable');
+     return{language:{id:candidate.id,name:candidate.name,state:'available',encoding:snapshot.encoding},snapshotId:snapshot.snapshotId,word:request.word,...result};
+    }catch(error){throw failure(error);}finally{await aff?.handle.close();await dic?.handle.close();}
+   });
+  },
   async languages():Promise<InstalledLanguages>{return withRoots(async roots=>{const {candidates,truncated}=await discover(roots),summaries=new Map<string,Summary>(),languages:InstalledLanguage[]=[];
    for(const candidate of candidates){try{const snapshot=await load(candidate,roots,summaries);languages.push({id:candidate.id,name:candidate.name,state:'available',encoding:snapshot.encoding});}
     catch(error){const safe=failure(error);languages.push({id:candidate.id,name:candidate.name,state:safe.code==='unsupported-encoding'?'unsupported-encoding':safe.code==='malformed'?'invalid':'unavailable',...(safe.encoding?{encoding:safe.encoding}:{}),message:safe.message});}}

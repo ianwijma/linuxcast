@@ -4,6 +4,7 @@ import type {DictionaryLanguage,DictionaryCopyReply,DictionarySearchValue} from 
 export interface DictionaryBackend{
  languages():Promise<{languages:readonly DictionaryLanguage[];truncated:boolean}>;
  search(input:{languageId:string;query:string}):Promise<{language:DictionaryLanguage;snapshotId:string;query:string;words:readonly {id:string;word:string}[];truncated:boolean}>;
+ checkSpelling?(input:{languageId:string;word:string;signal:AbortSignal}):Promise<{language:DictionaryLanguage;snapshotId:string;word:string;correct:boolean;suggestions:string[];truncated:boolean;backend:'hunspell-1.7'}>;
 }
 interface Context{
  trusted(event:IpcMainInvokeEvent):boolean;active():boolean;busy():boolean;revision():number;generation():number;

@@ -42,6 +42,7 @@ export * from './notes-export.ts';
 export * from './notes-launcher.ts';
 
 export * from './emoji.ts';
+export * from './dictionary-spelling.ts';
 
 export * from './dictionary.ts';
 

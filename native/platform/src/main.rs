@@ -1,5 +1,12 @@
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
+    if arguments == ["dictionary-spell"] {
+        if linuxcast_platform::dictionary_spelling::run_stdio().is_err() {
+            eprintln!("PLATFORM_SPELLING_UNAVAILABLE");
+            std::process::exit(1);
+        }
+        return;
+    }
     if arguments == ["applications"] {
         if linuxcast_platform::applications::run_stdio().is_err() {
             eprintln!("PLATFORM_APPLICATIONS_UNAVAILABLE");
