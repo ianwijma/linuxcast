@@ -2,9 +2,11 @@
 
 29 October 2026. Reviewed and tested follow-on based on the integrated Notes
 create/edit prerequisite: [PR57](https://github.com/ianwijma/linuxcast/pull/57),
-develop fd39fde16081a6b3c40a5e57ceef66a13897a9c0. Export branch
-`codex/notes-markdown-export` is prepared for its separate PR; integration is
-recorded in the coordinator checkpoint and task registry after GitHub confirms it.
+develop fd39fde16081a6b3c40a5e57ceef66a13897a9c0. Export is integrated in [PR58](https://github.com/ianwijma/linuxcast/pull/58),
+merge b945289012c53a05a71193f9650df5a12ce06dfc, reviewed signed head
+844dfe766ba85cdde87d497111871727513b8848, CI40798022496 PASS. No requested or
+submitted GitHub reviews/comments/threads; independent source/UI/capture reviews
+are clean. The configured 1Password signer succeeded after desktop restart.
 The complete U1-01 task and every acceptance criterion remain pending.
 
 ## Concrete behavior

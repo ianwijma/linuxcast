@@ -56,7 +56,59 @@ captures are inspected. See
 [application evidence](../../apps/desktop/evidence/notes-markdown-export-application.md)
 and [increment boundary](MARKDOWN-EXPORT-INCREMENT.md).
 
-## Author verification — 29 October 2026
+## Pin/Unpin and Pinned only — 29 October 2026
+
+Selected notes expose Pin note / Unpin note through the optional named API.
+The latest local draft is flushed without Save first. No state changes
+optimistically: the receipt must have the same ID, revision +1, requested pin,
+unchanged draft/saved content and exactly unchanged creation/modification times.
+Normal draft/Save acknowledgements must preserve the current pin too. Older
+hosts without pin capability show a disabled action and reconnect guidance.
+
+One synchronously admitted Pin promise freezes editing, search/filter/navigation,
+New, Save and export. Native Close/Quit are refused while it is pending. Intent
+and post-flush fences prevent same-turn Pin/selection/Close races; pending
+publication/disposal cannot dispatch another operation. Known refusal permits
+explicit retry. Uncertain, conflict, timeout or malformed receipts block writes
+until confirmed fresh Reload, retain local content and never replay Pin.
+
+Pinned only is a labelled native checkbox using shared field/focus classes. It
+requests owner filtering before pagination, checks the normalized filter echo and
+requires every returned filtered row to be pinned. Search/filter changes fence
+old pages and reset the cursor; UUID selection stays stable. A confirmed Unpin
+can remove the row from filtered results while retaining its exact open editor.
+Pinning changes no note content, saved version, history or timestamps.
+
+Current bounded author checks on Linux amd64 / Node24.22.1 / Bun1.4.4:
+
+- 63 focused unit cases: 56 controller (26 new Pin/filter/CAS/race cases) and
+  seven retained export cases.
+- 25 real Tiptap Chromium cases: 19 retained create/edit/export cases and six
+  new keyboard/filter/Pin/Unpin/pending/known/unknown/unavailable cases. Tested
+  filter states pass axe; the retained 200% case checks reachable Pin geometry.
+- Owned Notes typecheck with existing CSS declarations, scoped ESLint,
+  plan integrity and diff checks pass. Full repository typecheck on this frozen
+  author base reports only coordinator-owned main/storage fixtures still needing
+  the required pinned field; coordinator verifies the integrated complete tree.
+
+Unit selection is
+`LINUXCAST_TEST_FILES='["packages/notes/tests/controller.test.ts","packages/notes/tests/export-controller.test.ts"]'`
+with the existing Vitest config. Browser selection is the existing notes.ui test
+with the existing Playwright config. No dependencies, shared files or test maps
+were changed in this lane. Nine affected public images are inspected: both themes
+Pinned filter and Unpin-empty with retained editor, dark pending/known refusal,
+light unknown/reconciled and missing capability. Existing unrelated regenerated
+captures are restored. The fixture is labelled synthetic in-memory persistence;
+its request observer is not SQLite, native-close or restart evidence.
+
+This increment contributes partial U1-01-UI/PRIVACY and preserves the bounded
+AC01 recovery boundary. Coordinator owner migration/CAS/filter/native workspace
+and production reopen evidence remains separate. Full import/Markdown roundtrip,
+archive/trash/restore/revision restore/attachments, Quicknote/root provider,
+Debian GNOME/KDE Wayland/X11/native AT/session/performance/package/release and
+all complete U1 acceptance remain required; no whole-task completion is claimed.
+
+## Earlier create/edit author verification — 29 October 2026
 
 Linux amd64, Node 24.22.1, Bun 1.4.4, installed Chromium via Playwright:
 
@@ -88,7 +140,7 @@ in-memory data, **not** SQLite/crash/native-close evidence.
 This supports partial U1-01-AC01 recovery presentation, U1-01-UI and PRIVACY only.
 Coordinator production persistence/crash/restart evidence is recorded separately in
 apps/desktop/evidence/notes-create-edit-application.md and the export evidence above.
-U1-01-AC02 Markdown roundtrip is not implemented or accepted. Pin/archive/trash/
+U1-01-AC02 Markdown roundtrip is not implemented or accepted. Archive/trash/
 restore/revision restore, root Notes provider, Quicknote and full native
 Debian GNOME/KDE Wayland/X11/AT/session/performance/package/release acceptance
 remain required. Reviewed primitives do not establish full D1-02 acceptance.

@@ -126,3 +126,56 @@ default EPERM/read-only .git is sandbox denial, not backend regression. Serializ
 application builds/tests per worktree. Never repeat passed tests without new
 changes/failures/unresolved concerns. After each merge refresh readiness and
 continue bounded application work without accumulating unrelated foundation work.
+
+
+## PR58 integrated; next bounded pin/filter flow active
+
+PR58 normally merged b945289012c53a05a71193f9650df5a12ce06dfc, exact reviewed
+signed844dfe766ba85cdde87d497111871727513b8848, CI40798022496 validatePASS;
+no requested/submitted reviews/comments/threads. Clean primary develop updated.
+Both Notes increments are now integrated; signing recovered with saved configured
+1Password signer after user restart/unlock. No unsigned/configuration workaround.
+
+Coordinator reused clean .worktrees/linuxcast-application-controls, branch
+codex/notes-pin from PR58; manifest_review_sol(SOL6.1/high) reused clean completed
+export worktree .worktrees/linuxcast-text-preview-native, codex/notes-pin-ui.
+Exact root-owned contract and PIN-INCREMENT.md copied to UI worktree explicitly,
+UNCOMMITTED and excluded from agent staging. Do not reset old notes-create-edit-ui
+worktree with its preserved staged source/oldsharedcopies. New flow is actual
+Pin note/Unpin note and owner-backed Pinned-only filter; no infrastructure/proof.
+
+Root added schema015 pinned defaultfalse, required pinned metadata in records/
+summaries, typedCAS notes.setPinned and ownerfilter echo/paging. Metadata operation
+increments revision only, retains draft/saved/timestamps/history. Main shares
+existing write/unknown/reconciliation gate; sets admission before backend dispatch,
+blocks close/export overlap and verifies exact content+pin receipts. Preload named
+id/expectedRevision/pinned method. Initial 11actualowner/67security/14contracts and
+scopedlint PASS; finalassembled/UI/nativechecks still pending. UIagent owns only
+packages/notes src/tests/fixtures/evidence/README, reports60controller/export cases
+passing, browser/captures in progress. file_search_service_sol reviewing root
+source read-only. Production pin/filter/reopen/export/recovery case authored but
+not yet run before UI integration. All U1 criteria remain pending.
+
+Next: receive exact owned UI patch, finish review findings, run assembled checks
+and actual owned privateElectron scenario, record affected captures and explicit
+desktop/AT/release limits, signedPR/CI/reviews/normalmerge promptly. Do not infer
+full U1 or D1 completion. Full local1.0/97tasks/release objective unchanged/active.
+
+
+## Pin/filter assembled verification ready for signed PR
+
+Exact16owned UI patch1f018a755e10a772973b454c2953fdb3dc4199f61840961163f27d016feb46db
+applied and per-file hashes matched.63authorfocusedunits/25realbrowser19.3s PASS;
+9new publiccaptures independentlyclean. Alias P2 queuedPin vsselect/Close afterflush
+fixed with intentreservation/postawait ownership/generation checks and3regressions.
+Root final228mappedunit/14contracts/67security/11actualowner+1production=12integration,
+49F2-01storage regressions/fulltype/scopedlint/plan/diff PASS. Production7.91s proves
+actual Pin→ownerPinnedfilter→Unpin empty/retainededitor→Pin→realexport/nooverwrite/
+cancel/search/nativeClose/Quit/restart/forcedowner+appcrash exactsaved/draft/rev/
+pinnedtrue recovery andownerprivacy. Two actual dark/lightcaptures inspected;8prior
+actual captures regenerated. Exactsource notes-ipc ce28e091...; controller8b32af8e...
+independentlyreviewed clean. Defaultrestricted compiler process segfaults were not
+passes; escalated fullcompiler PASS afterassembledUI. No unexplained appfailure.
+Evidence apps/desktop/evidence/notes-pin-application.md. Stage/sign/pushfocusedPR,
+currentheadCI+configuredreview/normalmerge, thenrecordintegration. No taskcompletion;
+remainingarchive/trash/restore/etc andfullsession/AT/perf/package/release remain.

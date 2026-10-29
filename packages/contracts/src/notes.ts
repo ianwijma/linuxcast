@@ -55,16 +55,18 @@ export function noteContentKey(content:NoteContent):string{
  const sort=(value:unknown):unknown=>Array.isArray(value)?value.map(sort):plain(value)?Object.fromEntries(Object.keys(value).sort().map(key=>[key,sort(value[key])])):value;
  return JSON.stringify(sort(noteContentSchema.parse(content)));
 }
-export const noteRecordSchema=z.strictObject({id:z.uuid(),documentVersion:z.literal(1),revision:revision.positive(),draft:noteContentSchema,saved:noteContentSchema.nullable(),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()});
+export const noteRecordSchema=z.strictObject({id:z.uuid(),documentVersion:z.literal(1),revision:revision.positive(),pinned:z.boolean(),draft:noteContentSchema,saved:noteContentSchema.nullable(),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime()});
 export type NoteRecord=z.infer<typeof noteRecordSchema>;
 export const noteWriteSchema=z.strictObject({id:z.uuid(),expectedRevision:revision,action:z.enum(['draft','save']),content:noteContentSchema});
 export type NoteWrite=z.infer<typeof noteWriteSchema>;
-export const noteSummarySchema=z.strictObject({id:z.uuid(),revision:revision.positive(),title:noteTitleSchema,excerpt:sized(1024),hasDraft:z.boolean(),updatedAt:z.iso.datetime()});
+export const notePinSchema=z.strictObject({id:z.uuid(),expectedRevision:revision.positive(),pinned:z.boolean()});
+export type NotePin=z.infer<typeof notePinSchema>;
+export const noteSummarySchema=z.strictObject({id:z.uuid(),revision:revision.positive(),title:noteTitleSchema,pinned:z.boolean(),excerpt:sized(1024),hasDraft:z.boolean(),updatedAt:z.iso.datetime()});
 export type NoteSummary=z.infer<typeof noteSummarySchema>;
 export const notesCursorSchema=z.strictObject({updatedAt:z.iso.datetime(),id:z.uuid()});
-export const notesListRequestSchema=z.strictObject({query:sized(256),cursor:notesCursorSchema.optional()});
+export const notesListRequestSchema=z.strictObject({query:sized(256),pinnedOnly:z.boolean().optional(),cursor:notesCursorSchema.optional()});
 export type NotesListRequest=z.infer<typeof notesListRequestSchema>;
-export const notesListSchema=z.strictObject({query:sized(256),records:z.array(noteSummarySchema).max(100),nextCursor:notesCursorSchema.nullable()}).refine(value=>new Set(value.records.map(row=>row.id)).size===value.records.length);
+export const notesListSchema=z.strictObject({query:sized(256),pinnedOnly:z.boolean().optional(),records:z.array(noteSummarySchema).max(100),nextCursor:notesCursorSchema.nullable()}).refine(value=>new Set(value.records.map(row=>row.id)).size===value.records.length);
 export type NotesList=z.infer<typeof notesListSchema>;
 const failure=z.strictObject({ok:z.literal(false),error:rpcFailureSchema});
 export const notesReadReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:z.literal(true),value:noteRecordSchema.nullable()}),failure]);
@@ -73,15 +75,17 @@ export const notesListReplySchema=z.discriminatedUnion('ok',[z.strictObject({ok:
 export type NotesReadReply=z.infer<typeof notesReadReplySchema>;
 export type NotesWriteReply=z.infer<typeof notesWriteReplySchema>;
 export type NotesListReply=z.infer<typeof notesListReplySchema>;
-export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',close:'notes:close',appearance:'notes:appearance'} as const;
+export const NOTES_CHANNELS={list:'notes:list',get:'notes:get',write:'notes:write',setPinned:'notes:set-pinned',close:'notes:close',appearance:'notes:appearance'} as const;
 export const NOTES_APPEARANCE='notes:appearance-changed',NOTES_CLOSE_REQUESTED='notes:close-requested',NOTES_CLOSE_FINISHED='notes:close-finished';
 export const notesRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 export const notesGetRequestSchema=notesRequestSchema.extend({id:z.uuid()});
 export const notesQueryRequestSchema=notesListRequestSchema.extend({protocolVersion:z.literal(1)});
 export const notesWriteRequestSchema=notesRequestSchema.extend({input:noteWriteSchema});
+export const notesPinRequestSchema=notesRequestSchema.extend({input:notePinSchema});
 export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.number().int().positive().safe()});
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export interface NotesApi{
+ setPinned?(input:NotePin):Promise<NotesWriteReply>;
  exportMarkdown?(input:NoteExportSelection):Promise<NoteExportReply>;
  list(input:NotesListRequest):Promise<NotesListReply>;
  get(id:string):Promise<NotesReadReply>;
@@ -95,10 +99,12 @@ export interface NotesStorageMethods{
  'notes.list':{params:NotesListRequest;result:NotesList};
  'notes.get':{params:{id:string};result:NoteRecord|null};
  'notes.write':{params:NoteWrite;result:NoteRecord};
+ 'notes.setPinned':{params:NotePin;result:NoteRecord};
 }
-export const NOTES_STORAGE_METHODS=['notes.list','notes.get','notes.write'] as const;
+export const NOTES_STORAGE_METHODS=['notes.list','notes.get','notes.write','notes.setPinned'] as const;
 export const notesRepositoryContracts:RepositoryContracts=new Map([
  ['notes.list',{params:notesListRequestSchema,result:notesListSchema}],
  ['notes.get',{params:z.strictObject({id:z.uuid()}),result:noteRecordSchema.nullable()}],
  ['notes.write',{params:noteWriteSchema,result:noteRecordSchema}],
+ ['notes.setPinned',{params:notePinSchema,result:noteRecordSchema}],
 ]);
