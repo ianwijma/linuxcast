@@ -1684,6 +1684,612 @@
      ]
     }
    ]
+  },
+  {
+   "name": "comma-joined key impersonating font.emoji and mono",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "font",
+      "emoji"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "font",
+      "mono"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "font",
+      "emoji,mono"
+     ],
+     "value": "\"Noto Color Emoji\", \"Twemoji Mozilla\", sans-serif"
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating fontFeature.numeric and ui",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "fontFeature",
+      "numeric"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "fontFeature",
+      "ui"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "fontFeature",
+      "numeric,ui"
+     ],
+     "value": "tabular-nums"
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating fontWeight.medium and regular",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "fontWeight",
+      "medium"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "fontWeight",
+      "regular"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "fontWeight",
+      "medium,regular"
+     ],
+     "value": 500
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating fontSize.body and caption",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "fontSize",
+      "body"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "fontSize",
+      "caption"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "body,caption"
+     ],
+     "value": 14
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating lineHeight.body and caption",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "lineHeight",
+      "body"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "lineHeight",
+      "caption"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "lineHeight",
+      "body,caption"
+     ],
+     "value": 20
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating letterSpacingEm.caption and groupCaption",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "letterSpacingEm",
+      "caption"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "letterSpacingEm",
+      "groupCaption"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "letterSpacingEm",
+      "caption,groupCaption"
+     ],
+     "value": 0.02
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating radius.keycap and popover",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "radius",
+      "keycap"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "radius",
+      "popover"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "radius",
+      "keycap,popover"
+     ],
+     "value": 4
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating layout.actionFilterHeight and actionPanelWidth",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "layout",
+      "actionFilterHeight"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "layout",
+      "actionPanelWidth"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "actionFilterHeight,actionPanelWidth"
+     ],
+     "value": 44
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating ratio.listDetail and listDetailMax",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "ratio",
+      "listDetail"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "ratio",
+      "listDetailMax"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetail,listDetailMax"
+     ],
+     "value": 0.42
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating strokePx.edge and glyph",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "strokePx",
+      "edge"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "strokePx",
+      "glyph"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "strokePx",
+      "edge,glyph"
+     ],
+     "value": 1.5
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating motion.easing and panelMs",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "motion",
+      "easing"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "motion",
+      "panelMs"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing,panelMs"
+     ],
+     "value": [
+      0.2,
+      0,
+      0,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating glyphTiles.ai and clipboard",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "glyphTiles",
+      "ai"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "glyphTiles",
+      "clipboard"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "glyphTiles",
+      "ai,clipboard"
+     ],
+     "value": "#B83E66"
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating themes.dark and light",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "dark"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "light"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark,light"
+     ],
+     "value": {
+      "background": "#111216",
+      "surface": "#1C1D22",
+      "raised": "#25262D",
+      "selection": "#35363F",
+      "border": "#454751",
+      "text": "#F5F5F7",
+      "muted": "#ADB0BB",
+      "accent": "#FF786E",
+      "accentText": "#151519",
+      "focus": "#A6B9FF",
+      "danger": "#FF8F91",
+      "warning": "#F4C779",
+      "success": "#8AD8AE",
+      "divider": "#2C2E35",
+      "controlBorder": "#7D808E",
+      "selectionRail": "#FF786E",
+      "userMessage": "#2A2B33",
+      "toolSurface": "#202127",
+      "canvas": "#16171B",
+      "canvasDot": "#2E3038",
+      "scrim": "#0A0B0EB3",
+      "tintDanger": "#2C2124",
+      "tintWarning": "#2A2620",
+      "tintSuccess": "#1E2A24",
+      "tintInfo": "#20243A",
+      "glyphOnTile": "#FFFFFF"
+     }
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating themes.dark.accent and accentText",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "dark",
+      "accent"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "dark",
+      "accentText"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark",
+      "accent,accentText"
+     ],
+     "value": "#FF786E"
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating themes.light.accent and accentText",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "light",
+      "accent"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "light",
+      "accentText"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "light",
+      "accent,accentText"
+     ],
+     "value": "#B92F32"
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating elevation.dark and light",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "dark"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "light"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark,light"
+     ],
+     "value": {
+      "shell": [
+       {
+        "y": 0,
+        "blur": 0,
+        "spread": 1,
+        "color": "#00000066"
+       },
+       {
+        "y": 24,
+        "blur": 64,
+        "spread": 0,
+        "color": "#0000008C"
+       },
+       {
+        "y": 4,
+        "blur": 12,
+        "spread": 0,
+        "color": "#00000066"
+       }
+      ],
+      "popover": [
+       {
+        "y": 16,
+        "blur": 40,
+        "spread": 0,
+        "color": "#00000080"
+       },
+       {
+        "y": 2,
+        "blur": 6,
+        "spread": 0,
+        "color": "#00000066"
+       }
+      ],
+      "highlight": [
+       {
+        "y": 1,
+        "blur": 0,
+        "spread": 0,
+        "color": "#FFFFFF0F",
+        "inset": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating elevation.light.highlight and popover",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "light",
+      "highlight"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "light",
+      "popover"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "highlight,popover"
+     ],
+     "value": [
+      {
+       "y": 1,
+       "blur": 0,
+       "spread": 0,
+       "color": "#FFFFFFCC",
+       "inset": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "comma-joined key impersonating elevation.dark.popover.0.blur and color",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "dark",
+      "popover",
+      0,
+      "blur"
+     ]
+    },
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "dark",
+      "popover",
+      0,
+      "color"
+     ]
+    },
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "popover",
+      0,
+      "blur,color"
+     ],
+     "value": 40
+    }
+   ]
   }
  ]
 }

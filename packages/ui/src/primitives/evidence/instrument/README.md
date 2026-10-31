@@ -31,7 +31,7 @@ The earlier `../*.png` captures describe the previous appearance and are history
 
 | Command | Result |
 | --- | --- |
-| `bun run test:unit -- D1-01` (`tokens.test.ts`) | 26/26 pass: binding drift, baseline preservation, unit handling, contrast for base and every Instrument role/tint/tile, 19 malformed-variant rejections |
+| `bun run test:unit -- D1-01` (`tokens.test.ts`) | 26/26 pass at the original increment: binding drift, baseline preservation, unit handling, contrast for base and every Instrument role/tint/tile, 19 malformed-variant rejections. After review corrections: 152/152, including 125 shared schema cases |
 | `bun run test:ui -- D1-01` (`primitives.test.ts`) | 11/11 pass: dark/light axe scans, controlBorder, rows/rail/focus/activedescendant, multi-select, state plates, ghost/keycaps/aria-keyshortcuts, forms, keyboard focus return, reduced motion, 200% text, forced colours |
 | `python3 scripts/validate_plan.py` | Pass (schema v2 mirror) |
 | `python3 scripts/test_validate_plan.py` | 30/30 pass (9 new token-schema rejections) |
@@ -64,8 +64,13 @@ Incidental downstream screenshot recaptures were restored; only this directory h
 2. The row trailing group, accessory words and individual keycaps wrap within the row; the 480 px /
    200% case passes with `scrollWidth <= clientWidth` and every child inside the row (b40: 508 px).
 3. `scripts/validate_plan.py` `token_errors` mirrors `validateTokens` exactly; both run the shared
-   cases in `packages/ui/src/tokens/schema-cases.json` (20 valid, 87 invalid). b40 Python disagreed on
+   cases in `packages/ui/src/tokens/schema-cases.json` (20 valid, 105 invalid). b40 Python disagreed on
    24 cases; b40 TypeScript accepted a string spacing scale.
+5. Final token-gate correction: the TypeScript exact-key check compared a comma-joined key list, so a
+   single key such as `"medium,regular"` passed for two required keys. It now compares key counts and
+   individual sorted keys. 18 shared comma-collision cases cover every exact-key group; the ecfd891
+   validator falsely accepted 15 of them (the ratio, motion and shadow-layer cases were already rejected
+   by value checks). Python used set comparison and already rejected all 18.
 4. `UnavailableState` without `reason` is the unclassified `unavailable` plate (“Unavailable”), not
    “Unsupported in this session”; the credential needs-review regression is in
    `packages/secrets/src/ui/credentials.test.tsx`.
