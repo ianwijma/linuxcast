@@ -85,3 +85,12 @@ Coordinator executed D1-02's existing session/form/loading unit baseline before
 renderer adoption:27/27pass on pinned Node24.22.1/Bun1.4.4 atb9fefd2. This is behavior preparation, not Instrument visual or native
 acceptance. The current Opus D1-01 lane remains the only UI implementation writer;
 renderer implementation waits for its shared API/token freeze.
+
+The unchanged renderer browser baseline also passes: `bun run test:ui -- D1-02`,
+11/11 tests in10.9s at290d7f0, Node24.22.1/Bun1.4.4/Playwright1.64.1. It covers
+dark/light views, async selection, action filtering/focus/Enter, nested return,
+grid arrows and disabled actions, draft and transient-secret cleanup, adversarial
+Markdown/model denial, states,200% text, forced colours, reduced motion and IME
+repeat guards. Incidental screenshot recaptures were restored to their exact Git
+blobs; no historical evidence was replaced. This establishes the existing browser
+behavior only, not Instrument appearance, native Electron or supported-session AT.
