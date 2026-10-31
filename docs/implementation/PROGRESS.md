@@ -1,5 +1,25 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Current coordinator state — workflow verification after PR93
+
+Goal ACTIVE: full97/local1.0 throughR1-03, registry states unchanged.
+PR93 Notes merged279a3a41ccbd5290ac0517c01f29082781401f3b from901226b;
+CI41237501043 SUCCESS, GitHub reviews/requests/comments empty, normal exact-head
+merge. Tiny merge blurb sent immediately and watch removed. Notes sourcee5a5b8c
+and all28captures retained; all native/full-task gates remain pending.
+
+Root codex/w2-instrument-workflow-integration integrates original Opus0fa31fc
+on069669e and approvedPR93. Initial Standards7e116647 clear; Spec2ef28b07 sole
+held-drag/text-resize coordinate P2 corrected by locking the display and inverse
+frame for the entire gesture, including final release. Parent verification passes: both new cases fail original069669e and pass fixed;
+current24+24browser/61unit/5contract/17security/type/lint/plan, three actual
+Electron flows(6.140s/5.245s/8.93s) pass. Publishing focused workflow PR next;
+no second independent final clean review claimed. Parent test-only v7 fixture
+fix60667ab retained, no production storage/controller/engine/shared changes.
+AT adapter9c77978 separatebranch Spec0098261d clear; initial Standards pending.
+Actual native/Orca runs0; no guest/namespace/hostbus/keyring/provider actions.
+
+
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
 native desktop/AT, performance, packaging and publication gates remain required.
 Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.
@@ -964,3 +984,39 @@ parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
 cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
 integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
 unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.
+
+Notes Spec fa38a7fc completed/read clear atfrozenec55310:301focusedunits,14
+synthetic Chromiumprobes,25newcaptures+selecteddesigninspected,semanticattrs/
+alloldproductexpectassertions preserved,36ownedpaths exactcleanbeforeafter.
+Some initialprivateprobe assumptions corrected beforefinal14pass, inherited
+parentfulllocalresults distinguished. Standards00e3b125 stillpending; no polls.
+Notes PR body prepared /tmp/linuxcast-instrument-notes-pr.md withthatpending
+review explicit; no NotesPR published yet. RootNotesbranch excludes savedtest
+fixf94df0d and unreviewedATadapter. Workflow originalOpusfollowup7b821f60
+active on200%canvas andedge-label fixes, no schema/engine/controllerauthority
+changes approved. No activePRwatch/rootprocess, allnative/full97 gates remain.
+
+Notes Standards00e3b125 completed/read: oneP2 unboundedverticalslashpopover
+selectsParagraphoutsideeditorclip at150%; correctBASEcomparison,200%BASEalso
+failsnotclassifiednew. All25newPNGs/36paths/346historicalunchanged/ASThandlers/
+gates/refs/plan/whitespacechecked, no materialsmeIls. OptionalfreshinstallENOSPC
+failedthenremoved; privateChromiumprobes completedafterharnessalias corrections.
+Original Opus authorfollowup23cbeeb5 active, samee896branch; Specclear, no final
+Standardsclaimed. ParentprovidedexactReactchecklistpath; modelunchanged.
+
+/homeonly363MiBfree/inodeshealthy causedreviewinstallfailure. ParentremovedONLY
+node_modulesfromknownTERMINALreviewcheckouts e2b591df,da57380a,d8e3a584,172df7b6,
+0148f524,a3b2eb22. Eachcanonicalownerchecked, no trackednode_modules, cleanbefore/
+afterandidenticalgitindexlisting/HEAD, nosources/evidenceoractiveUI/rootdeps
+removed. Free/home2.7GiBafter. RootNotescheckoutclean, no processes/PRwatches.
+Notes23cbeeb5+workflow7b821f60 Opusmedium fixesactive; no polling. Savedtestfix
+f94df0d remains separateforworkflow, ATadaptera9bbb33 remains unreviewedunused.
+
+Offline ATadapter currentreconciliation9c77978832008513af76bf28a9aae4aafdc2d75d,
+base8de8612, exactly5ownedpaths/3unchangedsource-testhashesfrom5eca/a9. Current
+37unit2.33s/fulltype/scopedlint/plan/whitespacepass, no driver/nativeexecution.
+FreshinitialSpec0098261d-87c7-4f13-ae18-6130be5e429c runsSOLhigh isolated from
+exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
+23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
+occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
+recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
