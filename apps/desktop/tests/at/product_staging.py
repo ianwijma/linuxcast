@@ -7,7 +7,7 @@ Preparation is separate from (and never starts) a native/display/reader run.
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import stat
 from collections import Counter
@@ -17,6 +17,140 @@ from session_owner import Deadline, SessionOwner
 
 OUTPUTS = ("apps/desktop/dist/main.cjs", "apps/desktop/dist/preload.cjs", "apps/desktop/dist/platform",
            "apps/desktop/dist/sqlite/better_sqlite3.node", "apps/desktop/dist/renderer/index.html")
+BUILD_INPUTS = "node_modules/.cache/f102-offline-build"
+BUILD_INPUT_LIMIT = 512 * 1024 * 1024
+
+
+def _read_offline_inputs(staging, deadline):
+    """Validate public pre-provisioned caches, never a caller HOME or credentials.
+
+    The cache manifest is an independently prepared input, not proof of compiler
+    identity. The caller still pins/inventories the actual Debian toolchain.
+    Its bytes and all cache inputs also enter the existing immutable receipt.
+    """
+    root = Path(staging) / BUILD_INPUTS
+    info = root.lstat()
+    if (root.resolve(strict=True) != root or not stat.S_ISDIR(info.st_mode)
+            or info.st_uid != os.getuid() or info.st_mode & 0o222):
+        raise ControllerRejected("prerequisite")
+    manifest = root / "manifest.json"
+    descriptor = os.open(manifest, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        info = os.fstat(descriptor)
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1
+                or info.st_mode & 0o222 or not 0 < info.st_size <= 4 * 1024 * 1024):
+            raise ControllerRejected("prerequisite")
+        raw = bytearray()
+        while chunk := os.read(descriptor, 65536):
+            deadline.remaining()
+            raw.extend(chunk)
+            if len(raw) > 4 * 1024 * 1024:
+                raise ControllerRejected("prerequisite")
+    finally:
+        os.close(descriptor)
+
+    def pairs(items):
+        value = {}
+        for key, item in items:
+            if key in value:
+                raise ControllerRejected("prerequisite")
+            value[key] = item
+        return value
+
+    try:
+        value = json.loads(raw, object_pairs_hook=pairs)
+    except (ValueError, UnicodeError):
+        raise ControllerRejected("prerequisite") from None
+    if (type(value) is not dict or set(value) != {"schema", "rustVersion", "electronVersion", "files"}
+            or type(value["schema"]) is not int or value["schema"] != 1
+            or value["rustVersion"] != "1.95.0" or value["electronVersion"] != "45.0.0"
+            or type(value["files"]) is not dict or not 1 <= len(value["files"]) <= 30000):
+        raise ControllerRejected("prerequisite")
+    for name, item in value["files"].items():
+        if (type(name) is not str or type(item) is not dict or set(item) != {"sha256", "executable"}
+                or type(item["sha256"]) is not str or not re.fullmatch(r"[0-9a-f]{64}", item["sha256"])
+                or type(item["executable"]) is not bool):
+            raise ControllerRejected("prerequisite")
+    entries = inventory(root, deadline, omit_receipt=False)
+    files = {}
+    total = 0
+    for name, hashed in entries.items():
+        path = root / name
+        info = path.lstat()
+        if (info.st_uid != os.getuid() or info.st_mode & 0o222 or path.is_symlink()
+                or len(name.encode("utf-8")) > 1024
+                or any(part in {"", ".", ".."} for part in name.split("/"))
+                or any(ord(character) < 32 or ord(character) == 127 for character in name)):
+            raise ControllerRejected("prerequisite")
+        if name == "manifest.json":
+            continue
+        allowed = (name == ".cargo" or name.startswith(".cargo/registry/") or name == ".cargo/registry"
+                   or name == ".electron-gyp" or name == ".electron-gyp/45.0.0"
+                   or name.startswith(".electron-gyp/45.0.0/"))
+        if not allowed:
+            raise ControllerRejected("prerequisite")
+        if name in {".cargo", ".cargo/registry", ".electron-gyp", ".electron-gyp/45.0.0"} and hashed != "directory":
+            raise ControllerRejected("prerequisite")
+        if hashed == "directory":
+            continue
+        total += info.st_size
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or total > BUILD_INPUT_LIMIT:
+            raise ControllerRejected("prerequisite")
+        files[name] = {"sha256": hashed, "executable": bool(info.st_mode & 0o111)}
+    required = {".electron-gyp/45.0.0/include/node/node.h", ".electron-gyp/45.0.0/include/node/config.gypi",
+                ".electron-gyp/45.0.0/include/node/common.gypi"}
+    if (files != value["files"] or not required.issubset(files)
+            or not any(name.startswith(".cargo/registry/") for name in files)):
+        raise ControllerRejected("prerequisite")
+    return root, files, entries
+
+
+def offline_inputs(staging, deadline):
+    """Keep filesystem/JSON input failures in the fixed prerequisite category."""
+    try:
+        return _read_offline_inputs(staging, deadline)
+    except (OSError, ValueError, TypeError, RecursionError):
+        raise ControllerRejected("prerequisite") from None
+
+
+def seed_build_home(owner, source, files, deadline):
+    """Copy only verified caches into the newly owned profile before children."""
+    home = Path(owner.env["HOME"])
+    if home != owner.root / "home" or home.resolve(strict=True) != home or any(home.iterdir()):
+        raise ControllerRejected("prerequisite")
+    for name, expected in files.items():
+        deadline.remaining()
+        target = home / PurePosixPath(name)
+        target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        source_fd = os.open(source / name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        try:
+            info = os.fstat(source_fd)
+            if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o222:
+                raise ControllerRejected("prerequisite")
+            output = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o700 if expected["executable"] else 0o600)
+            try:
+                hashed = hashlib.sha256()
+                size = 0
+                while chunk := os.read(source_fd, 65536):
+                    deadline.remaining()
+                    size += len(chunk)
+                    if size > BUILD_INPUT_LIMIT:
+                        raise ControllerRejected("prerequisite")
+                    hashed.update(chunk)
+                    view = memoryview(chunk)
+                    while view:
+                        written = os.write(output, view)
+                        if written <= 0:
+                            raise ControllerRejected("prerequisite")
+                        view = view[written:]
+                if hashed.hexdigest() != expected["sha256"]:
+                    raise ControllerRejected("prerequisite")
+            finally:
+                os.close(output)
+        finally:
+            os.close(source_fd)
+    owner.env.update(CARGO_HOME=str(home / ".cargo"), CARGO_NET_OFFLINE="true",
+                     npm_config_nodedir=str(home / ".electron-gyp/45.0.0"), npm_config_offline="true")
 
 
 def digest(path, deadline=None):
@@ -29,7 +163,7 @@ def digest(path, deadline=None):
     return hashed.hexdigest()
 
 
-def inventory(root, deadline=None):
+def inventory(root, deadline=None, *, omit_receipt=True):
     result = {}
     inode_counts = Counter()
     link_counts = {}
@@ -38,7 +172,7 @@ def inventory(root, deadline=None):
         if deadline:
             deadline.remaining()
         relative = str(path.relative_to(root))
-        if relative == "f102-build-receipt.json":
+        if omit_receipt and relative == "f102-build-receipt.json":
             continue
         if path.is_symlink():
             if not path.resolve().is_relative_to(root) or path.resolve() == receipt:
@@ -76,16 +210,25 @@ def prepare(staging, node, source_tree, archive_sha256):
         raise ControllerRejected("prerequisite")
     total = Deadline(360)
     before = inventory(staging, total)
+    inputs, input_files, input_inventory = offline_inputs(staging, total)
+    if {name[len(BUILD_INPUTS) + 1:]: hashed for name, hashed in before.items()
+            if name.startswith(BUILD_INPUTS + "/")} != input_inventory:
+        raise ControllerRejected("prerequisite")
     # Product build uses the staging cwd/module resolution. No parent dist/addon.
     owner = SessionOwner()
     owner.env.update(PATH=str(Path(node).parent) + ":/usr/bin:/bin", CARGO_NET_OFFLINE="true")
     try:
+        seed_build_home(owner, inputs, input_files, total)
+        if inventory(inputs, total, omit_receipt=False) != input_inventory:
+            raise ControllerRejected("prerequisite")
         for script in ("apps/desktop/setup-sqlite.ts", "apps/desktop/build.ts"):
             owner.run([str(node), script], Deadline(180, total), cwd=staging)
     finally:
         if not owner.cleanup():
             raise ControllerRejected("cleanup")
     after = inventory(staging, total)
+    if offline_inputs(staging, total)[2] != input_inventory:
+        raise ControllerRejected("prerequisite")
     # Source and lockfiles must survive the build unchanged. Only known build
     # output/dependency rebuild locations may change.
     mutable = ("node_modules/", "packages/storage/node_modules/", "target/", "apps/desktop/dist/")

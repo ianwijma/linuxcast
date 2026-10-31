@@ -1,33 +1,36 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline AT adapter publication after PR94
+## Current coordinator state — offline cache correction publication
 
-Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. All seven selected Instrument surfaces are
-integrated as bounded increments: foundationPR87, Localdata88, Credentials89,
-Permissions90, sharedrenderer91, Notes93 and workflows94. Native/full-task gates
-remain pending. Latestapproveddevelop96ac9fb is PR94 merge from91864e8;
-CI41237862351 SUCCESS, GitHubreviewrequests/reviews/comments empty, normalexact
-headmerge, immediate tinymergeblurb delivered. NotesPR93 merge279a3a4 from901226b,
-CI41237501043 SUCCESS, watchremoved. Allreviewedsource/28Notes+39workflowcaptures
-preserved. No active PRwatch/rootprocess.
+Goal ACTIVE: full97/local1.0 throughR1-03; registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. Approveddevelopbbbe813/mergedPR95 includesall
+seven Instrument surfaces, Notes93/workflows94. No actualnative/Orca runs.
 
-Rootcodex/f1-02-instrument-at-integration reconciles9c77978 ontoapprovedPR94
-at84f11aa. Bothinitialreviews clear: Spec0098261d37mapped+44synthetic,
-Standards073a5af737mapped/fulltype/scopedlint/plan/3hashes. Both completed/read,
-noactivechild. Parentcurrent37units2.28s/55security13.18s(all114offlinePython)/
-fulltype/scopedlint/plan pass. Adapterthreefiles matchreviewed9c byte-for-byte;
-no nativeobserver/controller/parser/namespace/pinchanges. PublishingfocusedPRnext.
+Rootcodex/f1-02-offline-build-inputs: initial Standards3c306e10 clear, Spec14cf1b4f
+twoP2s parent-verified resolved. Cacheinventory nowincludesreceipt-namedentries;
+file+symlinkregressions fail2312/passfixed. Correctedmutationfixturefailswithonly
+postcacheguarddisabled/passrestored. Final12staging/120offlinePython/55security
+14.11s/2AST/plan/hash/whitespace pass. No secondindependent finalcleanclaim.
+PublishfocusedPRnext/currentheadCI/reviews/normalmerge. No product/Node/Rustbuild,
+installer/guest/native invocation, no namespace/observer/controller/pin changes.
 
-Actualnativeproduct/Orca runs0. Fresh currentapprovedarchive/immutableDebianbuild/
-receipt, nativeENTRYvsCOMBO_BOXidentity, PID1metadatafeasibility, reviewedouter
-reservation/shutdown/recovery and actualcontainment/AT remain pending. Read-only
-hostDockerinventory freshlyconfirmed v4 exactID674cd884..5098/imagea1805464..c4d10
-exitedfalse/PID0/exit0, nonprivileged/read-onlyroot/capdropALL/no-new-privileges,
-onlyprivate-labRWbind/nohostports. No start/exec/SSH/guest/native/bus/input/audio.
-Next implement bounded outerowner and provision only reviewed current sources,
-without loosening historical gates. Fullnative/physical/performance/release scope
-remains mandatory; no overallcompletionclaim.
+Publiccachecandidate outsideGit:420files/22861050bytes, manifestSHA
+ d733fe37559bac91c95c24ccea09b0993a25de604243e03e33063793f7e90db3.
+All152lockedcratearchives+selectedsparseindexrecordsmatchCargo.lock;125locally
+cachedElectron45headers haveunverifiedupstreamarchiveprovenance. HostCargo1.95
+metadata --offline --locked resolvesall152/fourworkspace fromnewprivateprofile;
+no compileroutput, lock/candidateunchanged/profile+rawmetadataremoved. No actual
+Debian compiler/ABI/build evidence. Exactv4freshstoppedfalse/PID0/exit0 before/
+aftercacheprep, no Dockerstart/exec/SSH/guest/native/bus/input/audio/provider.
+
+Outerowner task6ec25f18 from7abb845 remains assigned/disjoint; awaitcompletionwake,
+no polls. Savedcodex/f1-02-lab-owner-preparation holdsparentcontract+inventory and
+sourcearchiveproof, excludedfromthiscacheincrement. CurrentBBBEarchive121180160B/
+SHA732f7bcc..436dc/tree5a85d525..62dfb/all2789blobs-modes verified;0400outsideGit,
+signatureheaderpresent/unverified. Oldguestwrapperstillrejectsnewsource. Actual
+Debianbuild/receipt, reviewedouterreservation/shutdown/recovery, PID1metadata and
+nativecomboboxidentity remain pending. No scope/acceptance/fallback changes.
+Allphysical/performance/release gates remain mandatory. No activePRwatch/process.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
