@@ -56,5 +56,7 @@ directly inspected actual dark/light saved and native200% focused captures.
 Initial independent Security/Spec review `fa38a7fc` of frozen `ec55310` is
 clear:301 focused units,14 synthetic Chromium boundary probes, all25 captures
 and semantic/product-assertion comparisons independently pass. Standards review
-`00e3b125` remains pending; no clean Standards conclusion, publication or additional
-acceptance is inferred.
+`00e3b125` found one P2: at150% root text the new unbounded slash menu puts
+the selected option outside the editor clipping region. The original Opus author
+is correcting that boundary with targeted regressions. No clean final Standards
+conclusion, publication or additional acceptance is inferred.

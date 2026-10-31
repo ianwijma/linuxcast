@@ -15,8 +15,11 @@ Trash5.558s/import5.555s. PR91 fixes both oldbase search-limit assertions and
 mechanicalcombobox selectors;166incidentalPNGs restored,25newauthorcaptures
 unchanged, actualdark/light/native200focus inspected. SecuritySpecfa38a7fc completed/read clear on exactec55310/base8de8612,
 independently301units/14Chromiumprobes/all25PNGs/semantic-productassertions.
-Standards00e3b125-c8a2-46fb-a64a-281300a9a058 remains active freshSOLhigh,
-read-only; do notpoll.
+Standards00e3b125 completed/read with oneP2 slashpopovervisibility at150%text.
+Original NotesOpusmedium followup23cbeeb5-8b0b-4153-895f-a0af1f03cab8 ACTIVE
+onexacte896a13; boundmenuactualclipping/scrollactiveselection, keepeditorcaret/
+IME/readonlyguards. No controller/API/shared changes, no secondreviewrequested.
+No NotesPR yet; sourcefrozenec untilauthorcorrectionarrives.
 
 Original workflow Opusmedium author8e4a9591 finished8e3d1116, cleanownedlane
 t3-93b7f756/codex/w2-instrument-workflow. Followup7b821f60-5231-49e4-a1c9-
@@ -1013,3 +1016,19 @@ review explicit; no NotesPR published yet. RootNotesbranch excludes savedtest
 fixf94df0d and unreviewedATadapter. Workflow originalOpusfollowup7b821f60
 active on200%canvas andedge-label fixes, no schema/engine/controllerauthority
 changes approved. No activePRwatch/rootprocess, allnative/full97 gates remain.
+
+Notes Standards00e3b125 completed/read: oneP2 unboundedverticalslashpopover
+selectsParagraphoutsideeditorclip at150%; correctBASEcomparison,200%BASEalso
+failsnotclassifiednew. All25newPNGs/36paths/346historicalunchanged/ASThandlers/
+gates/refs/plan/whitespacechecked, no materialsmeIls. OptionalfreshinstallENOSPC
+failedthenremoved; privateChromiumprobes completedafterharnessalias corrections.
+Original Opus authorfollowup23cbeeb5 active, samee896branch; Specclear, no final
+Standardsclaimed. ParentprovidedexactReactchecklistpath; modelunchanged.
+
+/homeonly363MiBfree/inodeshealthy causedreviewinstallfailure. ParentremovedONLY
+node_modulesfromknownTERMINALreviewcheckouts e2b591df,da57380a,d8e3a584,172df7b6,
+0148f524,a3b2eb22. Eachcanonicalownerchecked, no trackednode_modules, cleanbefore/
+afterandidenticalgitindexlisting/HEAD, nosources/evidenceoractiveUI/rootdeps
+removed. Free/home2.7GiBafter. RootNotescheckoutclean, no processes/PRwatches.
+Notes23cbeeb5+workflow7b821f60 Opusmedium fixesactive; no polling. Savedtestfix
+f94df0d remains separateforworkflow, ATadaptera9bbb33 remains unreviewedunused.
