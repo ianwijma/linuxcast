@@ -692,6 +692,36 @@ continue on frozen944c1f7 without polling. Private probe copied to
 and removed from repo; no source/evidence/index changed by probe, no native/keyring/
 provider/hostbus action. No PR yet; full task/UI/native acceptance unchanged.
 
+PR89 merged on 31 October at 18:31:10 UTC into develop63c958115d3efec4505efad12f3898aa0003bb93,
+from exact6b421d5097068c5b230ae04724c551441ae12899 after current Planning CI
+41229616116 passed. No GitHub reviews, comments or requests; mergeable/clean,
+no rulesets/develop protection at inspection. Initial two independent reviews'
+sole cancellation-wording P2 was corrected by Opus and verified by parent as
+documented above; no invented final independent re-review. Tiny merge blurb sent
+immediately and PR89 watch removed. Root merged approved develop into D1 branch
+at8fc6cdd; only PROGRESS conflicted, both histories preserved. Credentials test
+combobox selector and neutral cancellation assertions merged together correctly.
+
+D1 extension-query correction returned clean5197d94c0e43ed7be6d9b3d0e4904a46ff6406a7,
+tree4b35848801d4e1363580d3d20ade1d6940604740, unsigned authorized fallback after
+1Password error/no config change. Opus adds query-echo settlement check before
+one-shot reveal; unchanged controller/session/contracts. Browser delayed-host
+regression and the parent's real Electron assertion failcf12 and passfixed.
+Root integrates author unchanged at1e4682b2e0a69fd90dfa4a12c1c3db95130f3c09.
+Current parent validation:24 D1 browser cases28.7s,28 D1units,323 L1units,
+typecheck/lint; four actual sandboxed private-Xvfb Electron flows F122.17s and
+F214.83s, including the previously failing selection-clear case, all pass.
+Incidental screenshots restored and transient legacy data-settings captures
+removed; application source remains byte-identical to author5197d94.
+
+Fresh initial D1 reviews are active against frozen1e4682b/base63c9581:
+Standards865866cd-5732-4587-bf36-007d05fcda64 and Security/Spec
+b7c9ef93-4e6d-44ac-b774-686b96cab3cf, isolated GPT6.1SOL/high. No D1 PR yet.
+Completion wakes parent; don't poll. F3 Instrument UIffa91bc1 continues separately
+in Opus5.5medium from approvedPR88. No root process or PR watch remains active.
+Saved sourcehelper0aa7e3f and DOMadapter5eca891 remain unintegrated/unreviewed/
+unused. No native/lab/keyring/provider/host-input actions or acceptance promotion.
+
 Both credential initial reviews completed/read: Standards eebf4024 and
 Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
 wording P2; no other actionable findings/smells. Both85units/3contracts/type/lint/
