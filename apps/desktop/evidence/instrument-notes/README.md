@@ -53,5 +53,8 @@ privacy assertions. All166 incidental tracked screenshot recaptures were restore
 All25 new component/product captures remain author-identical; the coordinator
 directly inspected actual dark/light saved and native200% focused captures.
 
-Initial independent Standards and Security/Spec reviews are active on frozen
-`ec55310`; no clean conclusion, publication or additional acceptance is inferred.
+Initial independent Security/Spec review `fa38a7fc` of frozen `ec55310` is
+clear:301 focused units,14 synthetic Chromium boundary probes, all25 captures
+and semantic/product-assertion comparisons independently pass. Standards review
+`00e3b125` remains pending; no clean Standards conclusion, publication or additional
+acceptance is inferred.

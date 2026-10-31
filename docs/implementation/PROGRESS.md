@@ -13,9 +13,10 @@ e896a13 unchanged on approved8de8612). Current482units/36contracts/258security/
 97browser70+27/40integration47.75s/type/full-lint/plan pass; actualNotes31.262s,
 Trash5.558s/import5.555s. PR91 fixes both oldbase search-limit assertions and
 mechanicalcombobox selectors;166incidentalPNGs restored,25newauthorcaptures
-unchanged, actualdark/light/native200focus inspected. Initial Standards00e3b125-
-c8a2-46fb-a64a-281300a9a058 and SecuritySpecfa38a7fc-d6b3-4265-af9b-5737420468fe
-run on exactec55310/base8de8612, freshSOLhigh read-only; do notpoll.
+unchanged, actualdark/light/native200focus inspected. SecuritySpecfa38a7fc completed/read clear on exactec55310/base8de8612,
+independently301units/14Chromiumprobes/all25PNGs/semantic-productassertions.
+Standards00e3b125-c8a2-46fb-a64a-281300a9a058 remains active freshSOLhigh,
+read-only; do notpoll.
 
 Original workflow Opusmedium author8e4a9591 finished8e3d1116, cleanownedlane
 t3-93b7f756/codex/w2-instrument-workflow. Followup7b821f60-5231-49e4-a1c9-
@@ -23,8 +24,12 @@ ca111012637d ACTIVE sameOpusmedium: fix200%canvas overlap and restoretypededge
 labels with inertUIgeometry mapping, no controller/engine/owner edits without
 concreteAPIapproval. Parentreproduced7-case storage migration suite1failure at
 oldfixture calling currentquicklinks.save on schema7; allrelevant production
-files byte-identical to approvedparent. Fix that test separately before workflow
-integration; don't mix storagechange intoNotes. Reactchecklist exactpath supplied.
+files byte-identical to approvedparent. Separate test-only fixf94df0df63330979fce8607b13be77dd07fe85bf is saved on
+codex/w2-01-migration-fixture fromapproved8de8612: seedrealv7columns after
+closingsoleowner, migrate toactualSTORAGE_SCHEMA_VERSION18, preserveoriginal
+source/backup asserts. All7cases pass710ms vsoriginal1failed6passed685ms;
+scopedlint/whitespace pass, no productionchanges. Carry into workflow later,
+don't mix it intoNotes. Reactchecklist exactpath supplied.
 
 Saved ATadaptera9bbb33 remains separate/unreviewed/unexecuted; no newreview
 started to preserve Notesreview capacity. Sourcehelper accepted inPR92; small
@@ -997,3 +1002,14 @@ parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
 cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
 integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
 unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.
+
+Notes Spec fa38a7fc completed/read clear atfrozenec55310:301focusedunits,14
+synthetic Chromiumprobes,25newcaptures+selecteddesigninspected,semanticattrs/
+alloldproductexpectassertions preserved,36ownedpaths exactcleanbeforeafter.
+Some initialprivateprobe assumptions corrected beforefinal14pass, inherited
+parentfulllocalresults distinguished. Standards00e3b125 stillpending; no polls.
+Notes PR body prepared /tmp/linuxcast-instrument-notes-pr.md withthatpending
+review explicit; no NotesPR published yet. RootNotesbranch excludes savedtest
+fixf94df0d and unreviewedATadapter. Workflow originalOpusfollowup7b821f60
+active on200%canvas andedge-label fixes, no schema/engine/controllerauthority
+changes approved. No activePRwatch/rootprocess, allnative/full97 gates remain.
