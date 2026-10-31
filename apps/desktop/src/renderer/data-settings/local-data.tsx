@@ -71,6 +71,7 @@ export function LocalDataSettings({ api }: LocalDataSettingsProps) {
 
   const search = useRef<HTMLInputElement>(null);
   const content = useRef<HTMLElement>(null);
+  const status = useRef<HTMLDivElement>(null);
   const navItems = useRef(new Map<string, HTMLDivElement>());
   const sections = useRef(new Map<string, HTMLElement>());
   const mounted = useRef(false);
@@ -117,6 +118,28 @@ export function LocalDataSettings({ api }: LocalDataSettingsProps) {
     else content.current?.scrollTo?.({ top: 0 });
   }, [query, currentVisible, visibleIds]);
 
+  // The sticky status band has a dynamic height (busy/error/long text, window width, text size, zoom).
+  // Mirror its measured height into the scroller's scroll-padding so focus and in-page navigation land
+  // below it, and keep a focused content control visible when the band resizes while focus stays put.
+  useLayoutEffect(() => {
+    const scroller = content.current, band = status.current;
+    if (!scroller || !band) return;
+    const sync = () => {
+      const sticky = getComputedStyle(band).position === 'sticky';
+      scroller.style.setProperty('--ld-status-block-size', `${sticky ? band.getBoundingClientRect().height : 0}px`);
+      const focused = document.activeElement;
+      if (!sticky || !(focused instanceof HTMLElement) || !scroller.contains(focused) || band.contains(focused)) return;
+      const target = focused.matches('.ld-category') ? focused.querySelector('h2') ?? focused : focused;
+      if (target.getBoundingClientRect().top < band.getBoundingClientRect().bottom) target.scrollIntoView({ block: 'nearest' });
+    };
+    sync();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(sync);
+    observer.observe(band);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, []);
+
   const run = (kind: LocalDataActionKind, category: LocalDataCategory) => {
     if (!api || !ready || inFlight.current) return;
     const action: CapturedAction = { token: ++tokens.current, kind, categoryId: category.id, title: category.title };
@@ -147,6 +170,7 @@ export function LocalDataSettings({ api }: LocalDataSettingsProps) {
   const activate = (id: string) => {
     setCurrent(id);
     const section = sections.current.get(id);
+    // Honours the scroller's scroll-padding, so the heading lands below the sticky status band.
     section?.scrollIntoView?.({ block: 'start' });
     section?.focus({ preventScroll: true });
   };
@@ -195,7 +219,7 @@ export function LocalDataSettings({ api }: LocalDataSettingsProps) {
               <LineIcon name="info" />
               <p>Exports are unencrypted JSON. Choose a new filename; existing files are kept. Deletion is local and does not securely erase disk contents. Existing backups may retain earlier data.</p>
             </aside>
-            <div className="ld-status" role="status" aria-live="polite" aria-atomic="true" data-active={(plate || (!ready && !failed)) ? true : undefined}>
+            <div className="ld-status" ref={status} role="status" aria-live="polite" aria-atomic="true" data-active={(plate || (!ready && !failed)) ? true : undefined}>
               {plate ? <StatePlate layout="band" headingLevel={2} kind={plate.kind} eyebrow={plate.eyebrow} title={plate.title} description={plate.description} detail={plate.detail} />
                 : !ready && !failed ? <LoadingState announce={false} label="Opening data controls…" /> : null}
             </div>

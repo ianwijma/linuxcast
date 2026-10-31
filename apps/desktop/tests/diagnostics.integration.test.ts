@@ -111,6 +111,46 @@ it('manages actual private diagnostic categories through the production Local da
   expect(await data.locator('body').textContent()).not.toContain('SYNTHETIC_PRIVATE_CANARY');
   expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
   await data.screenshot({path:join(evidence,'local-data-error-light.png')});
+  // Keyboard focus is never hidden under the sticky status band (wide layout): measured against the actual band.
+  const exposure=(selector:string)=>data.evaluate(value=>{
+    const target=document.querySelector(value)!,rect=target.getBoundingClientRect(),band=document.querySelector('.ld-status')!.getBoundingClientRect();
+    const inset=4,points=[[rect.left+inset,rect.top+inset],[rect.right-inset,rect.top+inset],[rect.left+rect.width/2,rect.top+rect.height/2],[rect.left+inset,rect.bottom-inset],[rect.right-inset,rect.bottom-inset]] as const;
+    const hits=points.map(([x,y])=>document.elementFromPoint(x,y));
+    return {focused:document.activeElement===target||document.activeElement?.getAttribute('aria-labelledby')===target.id,
+      covered:hits.some(hit=>Boolean(hit?.closest('.ld-status'))),visible:hits.every(hit=>Boolean(hit)&&target.contains(hit)),
+      inWindow:rect.top>=0&&rect.bottom<=innerHeight&&rect.left>=0&&rect.right<=innerWidth,bandHeight:Math.round(band.height)};
+  },selector);
+  const unobscured={focused:true,covered:false,visible:true,inWindow:true};
+  await navigation().getByRole('button',{name:'Settings',exact:true}).click();
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Settings');
+  expect(await outcome()).toMatchObject({kind:'error'});
+  expect(await exposure('#category-settings')).toMatchObject(unobscured);
+  await data.keyboard.press('Tab');
+  expect(await exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  expect(data.url()).toBe(pageUrl);
+  await data.screenshot({path:join(evidence,'local-data-status-focus-light.png')});
+  const errorBand=(await exposure('[aria-label="Export settings"]')).bandHeight;
+  // Busy band replaces the error band while focus stays on the invoking control.
+  await app.evaluate(({dialog})=>{dialog.showSaveDialog=()=>new Promise<Electron.SaveDialogReturnValue>(resolve=>{(globalThis as unknown as {releaseSave:(value:Electron.SaveDialogReturnValue)=>void}).releaseSave=resolve;});});
+  await data.keyboard.press('Enter');
+  await expect.poll(async()=>(await outcome()).title).toBe('Exporting settings…');
+  await expect.poll(async()=>(await exposure('[aria-label="Export settings"]')).bandHeight).not.toBe(errorBand);
+  expect(await exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  // The busy band grows when a narrower (still wide-layout) window rewraps it while focus stays in content.
+  const resize=(width:number,height:number)=>app.evaluate(({BrowserWindow},[w,h])=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/data-settings.html')!.setContentSize(w!,h!);},[width,height]);
+  const before=(await exposure('[aria-label="Export settings"]')).bandHeight;
+  await resize(640,720);
+  await expect.poll(async()=>(await exposure('[aria-label="Export settings"]')).bandHeight).toBeGreaterThan(before);
+  await expect.poll(()=>exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  expect(await outcome()).toMatchObject({kind:'loading',title:'Exporting settings…'});
+  await resize(1000,720);
+  await app.evaluate(()=>{(globalThis as unknown as {releaseSave:(value:{canceled:boolean;filePath:string})=>void}).releaseSave({canceled:true,filePath:''});});
+  await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title];}).toEqual(['interrupted','Action cancelled.']);
+  await expect.poll(()=>exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  // Restore the Tool diagnostics selection before the existing recovery assertions.
+  await navigation().getByRole('button',{name:'Tool diagnostics',exact:true}).click();
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Tool diagnostics');
+  expect(await exposure('#category-tool-diagnostics')).toMatchObject(unobscured);
   // Recovery is the user's explicit, separately confirmed clear of only this category; nothing is replayed.
   await data.getByRole('button',{name:'Clear tool diagnostics',exact:true}).click();await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes('Tool diagnostics: cleared.')];}).toEqual(['success','Data cleared.',true]);
   await data.screenshot({path:join(evidence,'local-data-recovered-light.png')});
