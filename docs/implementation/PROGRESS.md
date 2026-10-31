@@ -903,3 +903,64 @@ Parent current323L1unit/55F1security/177L1security pass1.32s/13.16s/1.59s. Six
 actualElectron flows F125.76s/F322.54s/F214.88s pass; previous firstF3race remains
 honestly disclosed. Focused D1publication/currentCI/merge next. Notes04657eb9 and
 workflow8e4a9591 remainactive Opusmedium; finalreview terminal, no new delegation.
+
+
+PR91 MERGED at432fa6a4b129b66bb064816c004f21ddd71971b4 on31Oct19:09:47UTC,
+heada96fec55028c1196f3bdc9630ec609bd6b7e4dfe, currentPlanningCI41232815675
+SUCCESS. Bothreviewaxes clear; no requested/submitted GitHubreviews/comments,
+rulesets[] and developunprotected404 atinspection. Exact-head normalmerge.
+Immediate tinymergeblurb sent; PR91 unwatch confirmed, no watches remain.
+Root fast-forwarded approveddevelop then created coordinator-only continuation
+codex/instrument-existing-ui-continuation. All97/8done20inprogress69planned and
+56passed325pending8N/A unchanged. Next UI acceptance not inferred.
+
+Notes04657eb9 and workflow8e4a9591 both received material approved-upstream
+notifications; no model change or statuspoll. Both continue Opus5.5medium in
+isolated ownedlanes. Root has no live tests/processes/PRwatch. Prepared nonUI
+sourcehelper86abb64 and ATadapter5eca891 remain unreviewed/unused; no native
+product/Orca runs, labguest/namespace actions or hostbus/keyring/provider traffic.
+Next integrate/review existing Notes/workflows on their actual completion; use
+spare coordinator time for bounded nonUI native preparation without starting lab.
+
+Offline adapter reconciliation is saved separately at
+a9bbb33b5db19b2c9f8b3c21cb6e29ebba171741, codex/f1-02-instrument-at-reconcile,
+clean. It carries approvedPR91 and saved adapter5eca891 with unchanged3source
+hashes,37currentF1units2.48s/fulltype/scopedlint/plan/hash pass. Native observer's
+ENTRY-versus-COMBO_BOX identity remains explicitly unresolved; no role/pin/parser
+change or actual execution. Needs its own independent review beforeuse. Root
+returned to this approved-source coordinator continuation (no adapter additions).
+Notes04657eb9 and workflow8e4a9591 still follow asynccompletion callbacks; don't
+poll. No running rootprocess/PRwatch. Full97task/native/physical/release goalactive.
+
+Current source-helper reconciliation on codex/f1-02-source-build-reconcile from
+approvedPR91 plus coordinator22ab1c9: copies only4ownedfiles from saved86abb64,
+2executable/testhashes unchanged. Complete113offlinePythonchecks/no skips,2AST/
+hashes/plan/whitespace pass. No sourcearchive/build/guest/namespace/native actions;
+legacy PR85archive is historical and cannot serve Instrumentbuild. Initial
+independent review of full extraction/custody/cleanup remains required beforeuse.
+Separate ATadaptera9bbb33 excluded. Notes/workflow lanes remain disjoint and
+async, no statuspoll. All full97task/native/physical/release gates remain active.
+
+Sourcehelper Security/Spec fe26bfff completed/read oncf0453a: oneP2 sparsePAX
+regular member logicalsize lets trailer scan seekbeyondarchive and accept
+nonzero trailer. Parent deterministic10255-bytefixture reproduces exact
+BundleRejected-notraised onoriginal; minimal sparse/knownGNU-PAXheader rejection
+beforeaccounting/output fixesit.17source/114fullofflinePython/no skips,2AST/hash/
+plan/whitespace pass; manifestrefreshed. No clean secondindependentSpecclaim;
+separate initialStandardsreview next. Reviewer independently16originaltests and
+real-file/memfd/CLI/size/path/node/faultprobes/historicalnegativecontrols, old113
+andhistoricrealarchive smoke inherited. Existing native sources/pins untouched.
+Read-only outer-lab inventory also reconfirmed exactv4container stopped/exited
+PID0exit0, imageandQEMUargv/fixedmounts; no start/exec/SSH/guest/namespace/product.
+Root-ownedPID1namespace-stat requirement remains unresolved fornonrootpayload;
+no controller/wrappergate change. Notes/workflowUI stilldisjoint Opusmedium.
+
+Initial Standards f4322f84 completed/read clear on443c9ca/base22ab1c9; no hardrule
+or actionable materialsmell. Independently17source/fivecontrolledprobes (exact
+sparsehistoricalnegativecontrolincluded)/2AST/hash/plan/whitespacepass; full114
+andpreviousSpec/historicarchive smoke inheritedhonestly. Parent55mappedF1security
+nowpasses with all114Pythonautomaticallydiscovered, no runneredit. SoleSpecP2
+parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
+cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
+integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
+unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.

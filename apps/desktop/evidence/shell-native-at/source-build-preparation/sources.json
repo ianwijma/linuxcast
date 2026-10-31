@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "beb0d716557c80c5c7e8d63a2527d6de61baa141",
+  "archiveSha256": "3d67f4b7c43d7cee7020a39572accfdc03400853eea7201199d9bf9cffecee9a",
+  "files": {
+    "apps/desktop/tests/at/source_bundle.py": "d8f9d359349293761f59cba32858e17dfb3222cb25377cdcf9e47249889054f8",
+    "apps/desktop/tests/at/test_source_bundle.py": "23be2d956f55ce1df91565bf5e2091a16d5e42aeb3b6162973dd47ecf43f9827"
+  }
+}
