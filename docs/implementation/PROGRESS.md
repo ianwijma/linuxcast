@@ -376,3 +376,34 @@ the provisional API development freeze preserves API names, but integration and
 downstream implementation now wait for this bounded correction checkpoint.
 Next: fixes/regressions, fresh independent final recheck, current-head CI/merge
 promptly, then Opusmedium renderer lane. Full97task/R1-03 scope/status unchanged.
+
+Opusmedium implementation follow-up5b79159c completed/read: signedecfd891d234e667d4cffd692caede7191e0f59c4,
+parentb40bce0, treebabc5d6b33d6c02f5edfd101dcadde1e7c66772b, clean original
+UIcheckout. FourP2 corrected with original-source negative controls. Shared
+schema107cases (20valid/87invalid), additional TS string-spacing gap closed,
+both shortcut dictionaries own-property guarded,480px200% trailing wrapping,
+generic unavailability preserves credential review uncertainty. Coordinator
+ratifies additive unclassifiedUnavailable union/table, no wire/effect authority.
+Integrated unchanged as6868fae; configured-public-key SSHsignature verified;
+push87 updated to6868fae and link refreshed. Watch remains active, no re-watch.
+
+Coordinator independent current134token/28renderer/52credentialUI/33Python tests
+pass. Actual F1Electron2/2 pass18.81s (10.988s+6.482s), actualF2credential/diagnostics
+2/2 pass11.63s (5.452s+5.368s) with synthetic observer/denied-keyring fixtures.
+Thirteen current product captures saved under instrument-foundation;29historical
+recaptures restored. New component narrow480px200% capture inspected; caps/body
+fit and row grows. Current type/lint/plan/whitespace and55F1security(97Python)
+pass13.25s; all coordinator check processes completed. Fresh final recheck next;
+renderer may develop against
+the corrected frozen additive APIs while foundation review/CI completes, but
+cannot integrate or claim acceptance until upstream PR87 merges.
+
+Independent nonUI interval corrected the unused source extractor on its separate
+saved branchcodex/f1-02-native-build-staging: signedce13987b9a2abcfab9ff01c5bf05600ddd4b4a18,
+clean before returning to UIbranch. Opened-root identity is checked before FD-
+anchored cleanup; replacement/unknown/bounded failure preserves root and first
+reason. One real private-file regression fails on originalaa31; a post-open
+custody control stays passing.12extractor/65full offline tests pass11.944s,
+syntax/2hashes/plan/whitespace pass. Entire helper still unintegrated/unused and
+requires independent review; no new PR or guest/build/native action. UI priority
+and full97-task/R1-03 objective remain unchanged.
