@@ -468,3 +468,26 @@ cleanup-bound faults preserve sentinel/root/firstfailure and reportcleanupfalse;
 no repository change or guest/native action, not independent acceptance.
 Next integrate/review/test these existing UI increments, then credential/
 permission/file/notes/workflow surfaces, preserving all97tasks/full1.0 gates.
+
+LocalData Opusmediuma4c30760 completed/read: clean t3-8ebbb31c,
+codex/f2-02-instrument-local-data, unsignedacead29415fc669c5511d5b2a3551c154b022ba1
+(tree2fb22b13d8e42624eb88d602a382abc8277def67), including approveddevelop031f78e.
+18owned files add Instrument sidebar/status composition,15component tests and
+11actualcaptures. API/main/preload/backend unchanged, fixedURL/navigation intact.
+Parent created codex/f2-02-instrument-local-data-integration froma82b524 and merged
+authorunchanged as63790672. Coordinator maps new local-data.test.tsx toF2unit.
+Independent parent67F2unit/3contract/144security/type/lint pass. FouractualElectron
+flows pass F121.72s+F214.96s after mechanical old-status assertion integration:
+band exacttitle+semantic kind, all original file/category/privacy assertions kept.
+Original F1 wrapper-text assertion reproduced expected failure after new band.
+D1renderer72448bb9 notified reserved LocalData status hunks in shell test.
+
+Additional REAL private-Xvfb geometry probe after Errorband, selecting Settings,
+finds focusedheading118–142px behind stickyband56–196px; elementFromPoint confirms
+covered=true, focusedcategory-settings. New probe fails5.80s before recovery.
+This is a real visible-focus defect, not native/Orca evidence. Temporary probe
+removed and incidental historical/newrecaptures restored to frozenauthorblobs.
+Route focusedsticky/status navigation correction+permanent regression to original
+Opusmedium implementation before formal reviews/PR. UI source remains author-
+identical; parent changes only runner mapping/QA/checkpoint. Initialload/credential
+outcomes remain component-only, no supported desktop/AT acceptance. No PRwatch.

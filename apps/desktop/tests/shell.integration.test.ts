@@ -287,8 +287,15 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // Native choices are instrumented; storage, renderer IPC and saved files are actual production paths.
   const exportFile=join(temporary,'usage-before.json');
   await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});},exportFile);
-  await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Action cancelled.');
-  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
+  // The band adds an eyebrow and captured-category description. Verify its
+  // semantic outcome and exact title, rather than concatenating all that text.
+  const dataOutcome=async(title:string,kind:'interrupted'|'success'|'error')=>{
+    const status=data.getByRole('status');
+    await expect.poll(()=>status.getByRole('heading',{name:title,exact:true}).isVisible()).toBe(true);
+    expect(await status.locator('.lc-plate').getAttribute('data-kind')).toBe(kind);
+  };
+  await data.getByRole('button',{name:'Clear command usage'}).click();await dataOutcome('Action cancelled.','interrupted');
+  await data.getByRole('button',{name:'Export command usage'}).click();await dataOutcome('Export saved.','success');
   const before=JSON.parse(await readFile(exportFile,'utf8'));
   expect(before).toMatchObject({encrypted:false,data:{category:'command-usage'}});
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:1}));
@@ -299,11 +306,12 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   expect(JSON.stringify(before)).not.toContain(publicUrl);
   expect(before.data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
-  await data.getByRole('button',{name:'Clear command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
+  await data.getByRole('button',{name:'Clear command usage'}).click();await dataOutcome('Data cleared.','success');
   const afterFile=join(temporary,'usage-after.json');await app.evaluate(({dialog},file)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:file});},afterFile);
-  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');
+  await data.getByRole('button',{name:'Export command usage'}).click();await dataOutcome('Export saved.','success');
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'builtin.public-fixture',useCount:0,lastUsedAt:null}));
-  await data.getByRole('button',{name:'Export command usage'}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('The data action could not be completed. Check the category before trying again.');
+  await data.getByRole('button',{name:'Export command usage'}).click();await dataOutcome('Export command usage did not complete.','error');
+  expect(await data.getByRole('status').textContent()).toContain('The data action could not be completed. Check the category before trying again.');
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:hide',pinned:true,useCount:0,lastUsedAt:null,alias:'public-hide'}));
   expect(JSON.parse(await readFile(afterFile,'utf8')).data.records.every((record:{useCount:number})=>record.useCount===0)).toBe(true);
   expect(await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):null;})).toMatchObject({hidden:true,usage:{pinned:true,alias:'public-application',useCount:0,lastUsedAt:null}});
