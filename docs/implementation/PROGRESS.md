@@ -1,5 +1,32 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Current coordinator state — Notes publication
+
+Goal ACTIVE: all97 tasks/full local1.0 throughR1-03; registry8done/20inprogress/
+69planned and56passed/325pending/8N/A unchanged. Approved develop8de8612(PR92).
+Root codex/u1-01-instrument-notes-integration integrates original Opus e5a5b8c
+at041f723. Initial Specfa38a7fc clear; Standards00e3b125 sole slash-menu P2
+parent-verified resolved: each100/150/200/narrow test fails on original e896a13,
+all four pass fixed source. Current482unit/36contract/258security/101browser/
+40integration46.54s/type/lint/plan pass. Actual Notes30.564s/Trash5.557s/import
+5.512s;28newauthor-identical captures, incidental recaptures restored. Publishing
+focused Notes PR next, then current-head CI/reviews/normal exact-head merge.
+No second independent final review or native/full-task acceptance claimed.
+
+Workflow initial Standards7e116647 clear; Spec2ef28b07 sole P2 held-drag resize
+coordinate corruption. Original Opus fix0fa31fcb on069669e is completed; read
+terminal report and integrate into saved codex/w2-instrument-workflow-integration
+(e7d54fb). Includes parent test-only legacy v7 migration fixture fixf94df0d.
+Verify focused old-source negative controls/current regressions and publish next.
+No current workflow PR, no source/controller/owner change authorized by this fix.
+
+AT adapter9c77978 saved on codex/f1-02-instrument-at-integration: initial Spec
+0098261d clear(37mapped+44synthetic/type/lint/plan/hashes), initial Standards
+still required. No driver/native execution; actual native/Orca runs0. Fresh
+approved source/archive/build/pins, native query identity, PID1 feasibility and
+outer ownership remain pending; lab stopped, no native gate changes.
+
+
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
 native desktop/AT, performance, packaging and publication gates remain required.
 Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.
@@ -964,3 +991,39 @@ parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
 cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
 integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
 unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.
+
+Notes Spec fa38a7fc completed/read clear atfrozenec55310:301focusedunits,14
+synthetic Chromiumprobes,25newcaptures+selecteddesigninspected,semanticattrs/
+alloldproductexpectassertions preserved,36ownedpaths exactcleanbeforeafter.
+Some initialprivateprobe assumptions corrected beforefinal14pass, inherited
+parentfulllocalresults distinguished. Standards00e3b125 stillpending; no polls.
+Notes PR body prepared /tmp/linuxcast-instrument-notes-pr.md withthatpending
+review explicit; no NotesPR published yet. RootNotesbranch excludes savedtest
+fixf94df0d and unreviewedATadapter. Workflow originalOpusfollowup7b821f60
+active on200%canvas andedge-label fixes, no schema/engine/controllerauthority
+changes approved. No activePRwatch/rootprocess, allnative/full97 gates remain.
+
+Notes Standards00e3b125 completed/read: oneP2 unboundedverticalslashpopover
+selectsParagraphoutsideeditorclip at150%; correctBASEcomparison,200%BASEalso
+failsnotclassifiednew. All25newPNGs/36paths/346historicalunchanged/ASThandlers/
+gates/refs/plan/whitespacechecked, no materialsmeIls. OptionalfreshinstallENOSPC
+failedthenremoved; privateChromiumprobes completedafterharnessalias corrections.
+Original Opus authorfollowup23cbeeb5 active, samee896branch; Specclear, no final
+Standardsclaimed. ParentprovidedexactReactchecklistpath; modelunchanged.
+
+/homeonly363MiBfree/inodeshealthy causedreviewinstallfailure. ParentremovedONLY
+node_modulesfromknownTERMINALreviewcheckouts e2b591df,da57380a,d8e3a584,172df7b6,
+0148f524,a3b2eb22. Eachcanonicalownerchecked, no trackednode_modules, cleanbefore/
+afterandidenticalgitindexlisting/HEAD, nosources/evidenceoractiveUI/rootdeps
+removed. Free/home2.7GiBafter. RootNotescheckoutclean, no processes/PRwatches.
+Notes23cbeeb5+workflow7b821f60 Opusmedium fixesactive; no polling. Savedtestfix
+f94df0d remains separateforworkflow, ATadaptera9bbb33 remains unreviewedunused.
+
+Offline ATadapter currentreconciliation9c77978832008513af76bf28a9aae4aafdc2d75d,
+base8de8612, exactly5ownedpaths/3unchangedsource-testhashesfrom5eca/a9. Current
+37unit2.33s/fulltype/scopedlint/plan/whitespacepass, no driver/nativeexecution.
+FreshinitialSpec0098261d-87c7-4f13-ae18-6130be5e429c runsSOLhigh isolated from
+exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
+23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
+occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
+recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
