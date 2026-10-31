@@ -99,3 +99,91 @@ is unavailable; Copy inspector explains the separate approval step. The optional
 component fixture without a run API continues to show explicit unavailable state.
 See ../debugger/README.md and desktop/evidence/workflow-run-application.md for
 actual worker/clipboard evidence and unfinished full-scope acceptance.
+
+## Instrument presentation refresh (existing UI, no new features)
+
+The existing workspace now uses the selected Instrument composition (DESIGN.md: Workflows, Shell and
+navigation, Results and actions, Controls/keycaps/line icons, List/grid/detail/form, States and motion,
+Accessibility) with shared `Button`, `TextField`, `GlyphTile`, `LineIcon`, `GroupCaption`, `StatePlate`
+and state primitives; `editor.css` uses semantic tokens only. Controller, registry, graph, storage,
+run and permission semantics are unchanged.
+
+- **Header**: workflow tile, `Workflow editor` title, bounded workflow name and the existing quiet save
+  status. Keycaps appear only where the editor actually binds them: Save `Ctrl` `S`, Close `Escape`
+  (Run, Revert, Reload, Undo and Redo carry none). Header is in normal flow, never sticky.
+- **Palette (240)**: flush captions with live counts per category; rows with a closed-vocabulary tile
+  (Keyword `command`, Transform `system`, Copy `clipboard`), name, description and `+` verb. Name stays
+  "Add …" for assistive technology. Empty categories show the dotted (not-yet-available) or filtered
+  shape with the existing copy. A scoped grid replaces the shared Row here so a 240 px sidebar never
+  overflows (the shared Row's `12em` text basis does; see shared requests).
+- **Canvas**: controlled React Flow 12.12 on `canvas` with a 16-unit `canvasDot` grid in flow
+  coordinates; 208 px `raised` node cards (tile, uppercase category, title, one configuration line,
+  typed port line). Nodes are `role="button"` with `aria-pressed` and are named from their visible text;
+  the selected node uses `selection` plus the rail. Edges use `controlBorder`. Positions/viewport remain
+  presentation only. With no nodes the canvas shows an empty plate.
+- **Structured path** stays directly under the canvas: numbered node rows (tile, `label · id`, category,
+  "in … from … · out … to …", `aria-pressed`, rail) and the unchanged connection chooser/edge list.
+- **Inspector (300)**: tile + name, ID/Type/Input/Output/Declared effects facts ("clipboard.write ·
+  declaration only, not a grant"), then the unchanged configuration controls and Delete node last.
+- **Notices** keep their single `alert` region each. Fixed controller copy is classified only by exact
+  string: Save/Revert receipts (after exact CAS) are a neutral notice, never a success plate; validator
+  rejections are error bands; write/load/close uncertainty is the unclassified unavailable band.
+- **Layout**: panels share hairline separators and wrap (rather than overflow) for narrow windows and
+  200% text; forced colors map selection to `Highlight` outline/rail and the pane to `Canvas`.
+
+Verification (Linux amd64, Node 24.22.1, Bun 1.4.4, Chromium via Playwright; pinned tools PATH):
+`bun run test:ui -- W2-01` 19 passed (13 existing unchanged plus 6 new: node keyboard selection
+persistence and visible-text names, bound-only shortcuts and Ctrl+S receipt classification, 240 px palette
+/inspector geometry at 1440/1000@200%/600, dark/light forced colors + reduced motion, 200% focused row).
+`test:unit -- W2-01` 24, `test:contracts -- W2-01` 5, `test:security -- W2-01` 15 passed. Actual Electron
+`apps/desktop/tests/workflow-editor.integration.test.ts` passed on owned private Xvfb (captures in
+`apps/desktop/evidence/instrument-workflows/`). Captures: `evidence/instrument/README.md`.
+
+## Text-size projection and typed edge labels (follow-up)
+
+Card width follows the rem `workflowNodeWidth` token (208 px at 100% text) while persisted
+`editor.positions` are numeric flow units laid out by the controller (`x: index * 240`). The canvas now
+renders through a UI-only projection (`ui/projection.ts`): each stored position is multiplied by one
+measured factor `f = max(1, (measured card width + measured typed-label slot) / 240)` and every
+pointer/keyboard move from React Flow is stored with the exact inverse (`÷ f`). A hidden probe measures
+layout CSS px (`offsetWidth`), so root text size changes `f` while native Electron zoom (uniform CSS-px
+scaling) and transforms do not. Text resizing never writes: stored positions, viewport, undo/redo
+history and the execution graph stay byte-identical; only an explicit user move writes, and Undo
+restores the stored (unprojected) position. Card width, labels/tooltips, ports, pan/zoom, selection,
+focus and the structured no-drag controls are unchanged.
+
+Typed edge labels are restored as a custom `typed` edge (controlBorder curve plus the registry's
+actual output kind, e.g. `text`, in a monospace label with a `title`). The kind is also appended to the
+focusable edge's accessible name (`Connection … in · text`), and card port lines, handles, selects and
+the inspector now read the registry's port kinds instead of a literal.
+
+Ports remain left (input) / right (output). Canonical constraint: the controller persists new nodes on
+one horizontal row (`y: 80`, `x: index * 240`), so top/bottom ports would make every default edge leave
+the bottom of one card and climb into the top of a card on the same row, folding the curve and its label
+across both cards. Adopting top/bottom without that would require transposing persisted coordinates,
+which changes what stored layout means for every other consumer. Proposed (not implemented) pure-layout
+helper if the coordinator wants the design's vertical flow: a `defaultPosition(index)` in the controller
+that places new nodes in a column; manual positions would be untouched.
+
+Verification for this follow-up (same toolchain): `test:ui -- W2-01` 22 passed, including three new
+cases that fail on 8e3d1116 (100%: typed labels absent; 200%: "cards overlap") and pass here: default
+cards and labels never intersect at 100%/200% with labels titled and the edge focusable/named; and text
+resizing leaves writes, stored positions/viewport/nodes/edges and Undo/Redo unchanged while a 200%
+pointer drag stores exactly `screen delta / zoom / f` and Undo restores the stored position (the third
+case also needs the new fixture observation, so on 8e3d it fails for that reason). The actual Electron
+editor flow now also sets `webContents.setZoomFactor(2)`: the projection factor is unchanged, five
+visible sized card/label boxes inside the canvas do not intersect, and stored state is unchanged
+(`apps/desktop/evidence/instrument-workflows/workflow-editor-application-light-zoom-200.png`, captured
+with `webContents.capturePage()` because Playwright element capture ignores Electron zoom).
+
+Remaining limitations and shared requests (coordinator-owned):
+
+1. Shared `Row`: `.lc-row-text` `flex: 1 1 12em` overflows a 240 px sidebar at normal text. Request a
+   sidebar/compact Row variant in D1-01; this lane uses a scoped palette grid meanwhile.
+2. Manually dragged positions may still be placed close together by the user; the projection scales
+   them uniformly and never rearranges them. At 200% a wide chain can extend past the canvas viewport
+   and is reached by panning or Fit view (the persisted viewport is not changed automatically).
+3. No invalid-edge rendering: the validator rejects invalid connections before an edge exists.
+4. New cases live in the mapped `tests/editor.ui.test.ts`; no runner mapping change needed. The fixture
+   adds a hidden labelled `pre[data-observe="stored-graph"]` observation of the synthetic owner record.
+5. The mapped storage integration migration case is outside this lane (parent verifies its baseline).
