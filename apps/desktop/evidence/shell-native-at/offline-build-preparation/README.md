@@ -129,3 +129,16 @@ No guest/container-start/exec, dependency download, build, namespace, display,
 reader, input/audio, keyring or provider action occurred. The separate outer-owner
 implementation remains unreviewed and unused. Actual immutable Debian build and
 all previously listed native/full-task/release gates remain outstanding.
+
+## Supplemental upstream header verification after PR96
+
+The coordinator later retrieved the pinned [official Electron45 checksum list](https://www.electronjs.org/headers/v45.0.0/SHASUMS256.txt)
+and header archive over HTTPS. The350,098-byte archive SHA256 is
+`bf3ec8efe30aa2d66759f2e9e8afd05182f656edb09478424d8fb5bcddfae4f6`, matching
+that published digest. Read-only tar comparison matches all124upstream header
+files against the frozen cache candidate. Its sole extra file, `installVersion`,
+matches the locked node-gyp12.4.0 installation metadata. No archive code was
+executed or installed. The original cache/provenance remain unchanged; a separate
+private0400supplement records the new verification. This closes the bounded
+upstream-header-content gap noted at initial snapshot time, not signed-release,
+actual Debian compiler/ABI/build or native acceptance.

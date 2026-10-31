@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-outer-owner-preparation-not-containment-acceptance",
+  "checkout": "/home/ian/.t3/worktrees/linuxcast/t3-4b110c33",
+  "branch": "codex/f1-02-outer-lab-owner",
+  "baseCommit": "7abb8459f3af028328246d2304a3d85508ed1533",
+  "baseTree": "ee863d72bffd42c5339f034b52fe1f58a247e92e",
+  "finalCommitAndTree": "reported in final handoff; cannot be self-referential",
+  "platform": {
+    "python": "3.10.12",
+    "distribution": "Pop!_OS 22.04 LTS",
+    "architecture": "x86_64",
+    "kernel": "7.1.1-76070101-generic"
+  },
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_owner.py -v",
+      "result": "pass",
+      "count": 59,
+      "seconds": 3.268,
+      "skipped": 0,
+      "scope": "injected native adapters; real dedicated ordinary-Python lifetime and reaping fixtures"
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py'",
+      "result": "pass",
+      "count": 173,
+      "seconds": 15.216,
+      "skipped": 0,
+      "scope": "complete offline AT discovery; no native execution"
+    },
+    {
+      "command": "AST parse lab_owner.py and test_lab_owner.py with Python3.10.12",
+      "result": "pass",
+      "count": 2
+    },
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "result": "pass",
+      "scope": "local documentation integrity; final evidence revalidated before commit"
+    },
+    {
+      "command": "git diff --cached --check; git diff --check",
+      "result": "pass",
+      "scope": "staged additive five-file change and working tree"
+    },
+    {
+      "command": "SHA256 verify flat wrapper manifest and nested source-build/Instrument adapter manifests",
+      "result": "pass",
+      "manifests": 3,
+      "matchingFiles": 9
+    },
+    {
+      "command": "compare existing AT and shell-native-at evidence bytes with exact prepared base using git show",
+      "result": "pass",
+      "matchingExistingFiles": 43
+    }
+  ],
+  "developmentFailures": [
+    "Initial noncooperative guardian probe timed out: inherited blocked SIGALRM mask. Fixed explicit guardian unmask and kept hard alarm unblocked during spawn; permanent actual-Python regressions pass.",
+    "Initial pre-marker Children.run could not inspect without lease.state. Fixed read-only preflight path; permanent actual-Python regression passes.",
+    "Caller fallback previously allocated sequential cleanup budgets. It now shares one45s budget across exact guardian termination/reaping and identity-bound fallback.",
+    "Two early12s alarm timeouts predate outer fixture supervision. Historical descendant absence was not established; no unrelated-process scan or broad cleanup was attempted.",
+    "Initial full172 offline run22.139s exceeded the existing mapped wrapper's18s limit; only private fixture timer constants were shortened. Final173 run15.216s passes; mapped Node wrapper remains unexecuted."
+  ],
+  "signing": "UNSIGNED preparation fallback: configured /opt/1Password/op-ssh-sign attempt timed out30s, exit124, no commit. User-authorized per-command git -c commit.gpgsign=false; no configuration writes issued and no signed release/tag requirement change.",
+  "completeGitConfigurationFingerprintBefore": "814df46a56df131bdcd92c8fb54898286dfeef2ca8eeba0f2c4bfda4125b9377",
+  "completeGitConfigurationFingerprintAfterSigningAttempt": "104545d09b4e4a0bed6b03f14826769ca658eb1c6b4531eee83cf658033ecfcc",
+  "configurationObservation": "Broader fingerprint changed for an unattributed reason; no automatic revert. Three original settings verified unchanged: commit.gpgsign=true; gpg.format=ssh; gpg.ssh.program=/opt/1Password/op-ssh-sign. No Git configuration write command was issued.",
+  "executed": {
+    "realOwnerCli": false,
+    "dockerCommands": 0,
+    "sshConnectivity": false,
+    "privateKeyReads": false,
+    "labMutations": false,
+    "guestNativeProductBuildActions": 0,
+    "nativeRunsInThisPreparation": 0,
+    "dependencyInstall": false,
+    "ordinaryPythonFixtures": true
+  },
+  "inheritedOnly": {
+    "stoppedBaseline": "parent freshly observed exact v4 running=false PID0 exit0; not rerun here",
+    "approvedProductCommit": "bbbe8137105c0973e0f8a3a9ad8cca7e73a21937",
+    "approvedProductTree": "5a85d5251101716b338e820f23f78eef5e162dfb",
+    "archiveBytes": 121180160,
+    "archiveSha256": "732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc",
+    "parentVerifiedBlobsAndModes": 2789,
+    "newBuildReceiptOrSignatureVerification": false
+  },
+  "mapping": {
+    "F1-02-AC01": "historical evidence/status unchanged",
+    "F1-02-AC02": "historical evidence/status unchanged",
+    "F1-02-PRIVACY": "historical evidence/status unchanged; actual containment remains pending",
+    "F1-02-UI": "pending; no UI changes or new screenshots"
+  },
+  "pending": [
+    "independent review before any real owner invocation",
+    "historical early synthetic-fixture descendant-absence gap",
+    "coordinator mapped integration validation; node_modules absent here",
+    "actual daemon/SSH/account/sudo/read-probe facts and explicit immutable owner permit",
+    "fresh immutable guest build/receipt/Node/wrapper source pins",
+    "unchanged guest wrapper rejects newer approved tree",
+    "ENTRY versus COMBO_BOX native identity and PID1 metadata feasibility",
+    "actual start/stop/kill/cancellation/owner-loss/recovery and descendant absence",
+    "native AT/UI/full F1-02/four-session desktop/all97tasks/local1.0 acceptance"
+  ],
+  "acceptance": "pending",
+  "statusPromotion": false,
+  "pushPrWatchPublication": false
+}

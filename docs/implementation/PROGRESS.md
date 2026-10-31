@@ -1,36 +1,38 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline cache correction publication
+## Current coordinator state — outer owner initial review preparation
 
-Goal ACTIVE: full97/local1.0 throughR1-03; registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. Approveddevelopbbbe813/mergedPR95 includesall
-seven Instrument surfaces, Notes93/workflows94. No actualnative/Orca runs.
+Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. Approveddevelopb3bea80 is mergedPR96 fromdf840d4;
+CI41241160063 SUCCESS, GitHubreviews/requests/comments empty, normalexactheadmerge,
+immediate tinymergeblurb. Allseven Instrument surfaces retained, no full/native
+acceptance. No openPR/watch or rootprocess.
 
-Rootcodex/f1-02-offline-build-inputs: initial Standards3c306e10 clear, Spec14cf1b4f
-twoP2s parent-verified resolved. Cacheinventory nowincludesreceipt-namedentries;
-file+symlinkregressions fail2312/passfixed. Correctedmutationfixturefailswithonly
-postcacheguarddisabled/passrestored. Final12staging/120offlinePython/55security
-14.11s/2AST/plan/hash/whitespace pass. No secondindependent finalcleanclaim.
-PublishfocusedPRnext/currentheadCI/reviews/normalmerge. No product/Node/Rustbuild,
-installer/guest/native invocation, no namespace/observer/controller/pin changes.
+Rootcodex/f1-02-outer-owner-integration integrates frozenworker43a811e from7abb845
+ontoPR96, resolvingonlycoordinatormetadata. Newowner1002lines/tests1034lines and
+3evidencefiles, parentfrozenouter-owner-protocol/inventory. Worker59owned/173base
+Python/no skips/AST/hashes/planpass; inheritedcontextnotcurrentparentruntimeproof.
+ActualownerCLI/Docker/SSH/guest/native neverinvoked. Initialindependentreviewsnext.
+Twoearlydeadlinefixturesfromworker lacksretainedhistoricaldescendantabsence;
+readonlyexactinvocationcheck0readablematches/3unreadablecandidates/no signals,
+sohistoricalreapingremainsunverified. Do not claimretroactivecleanup orsignal
+unattributedprocesses. Review/hardenindependentfixturecustody beforenewfaultprobes.
+Currentbase's120Python plus59owned means179discoveredcases; combinedexecution
+notyetclaimed. Existing18s mappedPythonbudget requiresactualmeasurement,noauto
+widening/skips. Native/build/transport/permit/outerrecoveryremainunaccepted.
 
-Publiccachecandidate outsideGit:420files/22861050bytes, manifestSHA
- d733fe37559bac91c95c24ccea09b0993a25de604243e03e33063793f7e90db3.
-All152lockedcratearchives+selectedsparseindexrecordsmatchCargo.lock;125locally
-cachedElectron45headers haveunverifiedupstreamarchiveprovenance. HostCargo1.95
-metadata --offline --locked resolvesall152/fourworkspace fromnewprivateprofile;
-no compileroutput, lock/candidateunchanged/profile+rawmetadataremoved. No actual
-Debian compiler/ABI/build evidence. Exactv4freshstoppedfalse/PID0/exit0 before/
-aftercacheprep, no Dockerstart/exec/SSH/guest/native/bus/input/audio/provider.
-
-Outerowner task6ec25f18 from7abb845 remains assigned/disjoint; awaitcompletionwake,
-no polls. Savedcodex/f1-02-lab-owner-preparation holdsparentcontract+inventory and
-sourcearchiveproof, excludedfromthiscacheincrement. CurrentBBBEarchive121180160B/
-SHA732f7bcc..436dc/tree5a85d525..62dfb/all2789blobs-modes verified;0400outsideGit,
-signatureheaderpresent/unverified. Oldguestwrapperstillrejectsnewsource. Actual
-Debianbuild/receipt, reviewedouterreservation/shutdown/recovery, PID1metadata and
-nativecomboboxidentity remain pending. No scope/acceptance/fallback changes.
-Allphysical/performance/release gates remain mandatory. No activePRwatch/process.
+Currentpubliccache420files/22861050B manifestd733fe37..0db3: all152lockedcrate
+archives+selectedsparseindexmetadata verified, hostCargo1.95 offline metadata
+resolves152/fourworkspace withoutcompileroutput; privateprofile/rawmetadataremoved.
+NewupstreamElectron45headers download350098B SHA bf3ec8ef..ae4f6 verifiedagainst
+officialHTTPS SHASUMS256; all124upstreamfilesmatchcandidate, solelocalinstallVersion
+matchespinnednode-gyp. Supplemental0400provenanceoutsideGit, originalunverified-
+atcreationrecord preserved. Not signedreleaseverification, DebianABI orbuildproof.
+FrozenBBBEproductsource/tree5a85d525/archive732f7bcc..436dc remainsapprovedbaseline;
+oldguestwrapperrejectsnewtree, actualDebianbuild/receipt, PID1metadata andnative
+comboboxidentity unresolved. No native/Orca runs; physical/performance/release
+scope remains required. /homeabout2GiBfree; cleanup onlyderivedconfirmedterminal
+worktrees ifneeded, preserve all sources/evidence/disks/keys/archives.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

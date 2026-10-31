@@ -181,3 +181,32 @@ This final source differs from the independently reviewed `443c9ca` only in
 evidence/registry/checkpoint metadata. Current-head CI and GitHub review inspection
 remain publication/integration gates. No actual native attempt is authorized by
 this extraction helper alone.
+
+## Fresh approved Instrument source snapshot after PR95
+
+The coordinator reserved the existing lab lock and freshly verified the exact v4
+container stopped/exited, running=false, PID0, exit0 before and after host-only
+source preparation. No container start/exec, guest, dependency install, build,
+namespace, display, reader or native action occurred.
+
+Approved revision `bbbe8137105c0973e0f8a3a9ad8cca7e73a21937` is merged PR95,
+including Instrument foundation, renderer, Local data, Credentials, Saved
+permissions, Notes, workflows and the independently reviewed adapter. Its Git
+tree is `5a85d5251101716b338e820f23f78eef5e162dfb`. Fresh private tar:
+121,180,160 bytes, SHA256
+`732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc`.
+All2,789 tracked source entries are regular files. The coordinator used the
+reviewed extractor in a bounded child, independently compared every extracted
+Git blob hash and executable flag/private mode against `git ls-tree`, and
+removed the temporary extraction. All2,789 match exactly. The private archive
+and provenance are mode0400 outside Git; the historical PR85 snapshot is retained
+unchanged. A Git signature header is present; signer identity/signature were
+not verified for this snapshot, and no signed release provenance is claimed.
+Reviewed unsigned preparation remains allowed by the controller protocol.
+
+This is current source-custody evidence, not an immutable Debian build receipt,
+native namespace authority or execution. Guest provisioning/runtime/cache,
+actual build/staging receipt, wrapper approved-tree reconciliation, native query
+identity, PID1 access and reviewed outer reservation/shutdown remain pending.
+The existing wrapper still rejects this newer tree. All full-task/desktop/AT/
+physical/performance/release criteria remain unchanged.

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "scope": "host-read-only-lab-inventory-not-execution-permit",
+  "containerId": "674cd884c30e07cdaa12e8d238209adbb1af03fb18e92ea9fa80586d0c7f5098",
+  "containerName": "/linuxcast-native-lab-v4",
+  "imageId": "sha256:a1805464d68589e26be87a26cf7f8577a0b0dc494c88b1d14cb9cf7f155c4d10",
+  "configSha256": "2c34738dfccd30f370f5507e648a3899678c134a91a7f8e2ee8afa6b06a07191",
+  "hostConfigSha256": "1cb0aa71932bd96b4613c9c88817de72bd74b30e5bdfa86fc226629108a1c4fd",
+  "mountsSha256": "147b91c68d60af94688d0dd42576e54aa45136a3312732c1caff84d5fe9476ec",
+  "configUser": "1000:1000",
+  "entrypoint": [
+    "docker-entrypoint.sh"
+  ],
+  "command": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "10800",
+    "/usr/bin/qemu-system-x86_64",
+    "-accel",
+    "tcg,thread=multi",
+    "-cpu",
+    "max",
+    "-smp",
+    "2",
+    "-m",
+    "2048",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "file:/lab/serial.log",
+    "-drive",
+    "file=/lab/guest.qcow2,format=qcow2,if=virtio",
+    "-drive",
+    "file=/lab/seed.iso,format=raw,if=virtio,readonly=on",
+    "-netdev",
+    "user,id=n0,hostfwd=tcp:127.0.0.1:2222-:22",
+    "-device",
+    "virtio-net-pci,netdev=n0",
+    "-device",
+    "virtio-rng-pci",
+    "-no-reboot"
+  ],
+  "networkMode": "bridge",
+  "privileged": false,
+  "readonlyRootfs": true,
+  "capDrop": [
+    "ALL"
+  ],
+  "securityOpt": [
+    "no-new-privileges"
+  ],
+  "hostPortBindings": {},
+  "devices": [],
+  "deviceRequests": null,
+  "mounts": [
+    {
+      "Type": "bind",
+      "Source": "/home/ian/Projects/ianwijma/linuxcast/.worktrees/private-lab",
+      "Destination": "/lab",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+    }
+  ],
+  "stoppedBaselineObserved": true,
+  "nativeRuns": 0
+}
