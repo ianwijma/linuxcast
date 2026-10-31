@@ -89,6 +89,44 @@ class PlanningGateTests(PlanningFixture):
         self.assertNotEqual(result.returncode,0)
         self.assertIn("done without evidence",result.stdout)
 
+    def mutate_tokens(self,fn):
+        path=self.root/"docs/design/tokens.json"
+        data=json.loads(path.read_text());fn(data)
+        path.write_text(json.dumps(data))
+
+    def assert_token_rejection(self,fn,message):
+        self.mutate_tokens(fn)
+        result=self.run_gate()
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn(message,result.stdout)
+
+    def test_token_extra_theme_role_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["themes"]["dark"].update(brandGlow="#FF00FF"),"tokens dark: semantic colour roles differ ['brandGlow']")
+
+    def test_token_missing_instrument_role_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["themes"]["light"].pop("controlBorder"),"tokens light: semantic colour roles differ ['controlBorder']")
+
+    def test_token_alpha_is_limited_to_scrim(self):
+        self.assert_token_rejection(lambda t:t["themes"]["dark"].update(surface="#1C1D2280"),"invalid hex #1C1D2280 for surface")
+
+    def test_token_scrim_requires_alpha(self):
+        self.assert_token_rejection(lambda t:t["themes"]["light"].update(scrim="#1C1D24"),"invalid hex #1C1D24 for scrim")
+
+    def test_token_unknown_glyph_category_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["glyphTiles"].update(custom="#123456"),"tokens glyphTiles: keys differ")
+
+    def test_token_ratio_bounds_are_enforced(self):
+        self.assert_token_rejection(lambda t:t["ratio"].update(listDetail=0.9),"tokens ratio.listDetail: outside min/max")
+
+    def test_token_raw_shadow_string_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["elevation"]["dark"].update(shell="0 0 4px red"),"tokens elevation.dark.shell: expected 1-4 layers")
+
+    def test_token_unsafe_font_stack_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["font"].update(ui="Inter; } body { display: none"),"tokens font.ui: unsafe value")
+
+    def test_token_unknown_group_is_rejected(self):
+        self.assert_token_rejection(lambda t:t.update(gradients={}),"tokens top level: keys differ")
+
 if __name__=="__main__":
     # Keep the established CI entry point while including all planning regressions.
     unittest.main(module=None, argv=[sys.argv[0], "discover", "-s", str(ROOT / "scripts"), "-p", "test_*.py"])

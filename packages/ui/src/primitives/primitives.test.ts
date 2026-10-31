@@ -8,7 +8,8 @@ import { mkdir } from 'node:fs/promises';
 test.describe.configure({ mode: 'serial' });
 let server: ViteDevServer;
 let url: string;
-const evidence = fileURLToPath(new URL('./evidence/', import.meta.url));
+// Instrument adoption evidence; historical captures in ./evidence/ are not rewritten.
+const evidence = fileURLToPath(new URL('./evidence/instrument/', import.meta.url));
 test.beforeAll(async () => {
   server = await createServer({ configFile: false, root: fileURLToPath(new URL('./examples/', import.meta.url)),
     esbuild: { jsx: 'automatic' }, server: { host: '127.0.0.1', port: 0, fs: { allow: [fileURLToPath(new URL('../../../../', import.meta.url))] } }, logLevel: 'silent' });
@@ -38,9 +39,103 @@ for (const appearance of ['dark', 'light'] as const) {
     expect(violations).toEqual([]);
     await page.getByLabel('Collection name', { exact: false }).focus();
     await expect(page.getByLabel('Collection name', { exact: false })).toHaveCSS('outline-style', 'solid');
+    await expect(page.getByLabel('Collection name', { exact: false })).toHaveCSS('border-top-color', hex(appearance === 'dark' ? '#7D808E' : '#7F8492'));
     await page.screenshot({ path: `${evidence}/${appearance}-opaque.png`, fullPage: true });
   });
 }
+
+const hex = (value: string) => `rgb(${[1, 3, 5].map(offset => parseInt(value.slice(offset, offset + 2), 16)).join(', ')})`;
+
+test('rows: hanging alignment, neutral selection plus rail, independent focus and activedescendant', async ({ page }) => {
+  await page.getByRole('button', { name: 'Dark', exact: true }).click();
+  const query = page.getByRole('combobox', { name: 'Filter example rows' });
+  const listbox = page.getByRole('listbox', { name: 'Example results' });
+  await expect(listbox.getByRole('group', { name: 'Commands' })).toBeVisible();
+  const first = listbox.getByRole('option', { name: /Search files/ });
+  await expect(first).toHaveAttribute('aria-selected', 'true');
+  await expect(first).toHaveCSS('background-color', hex('#35363F'));
+  expect(await first.evaluate(element => getComputedStyle(element, '::before').backgroundColor)).toBe(hex('#FF786E'));
+  expect(await first.evaluate(element => getComputedStyle(element, '::before').width)).toBe('2px');
+  // Keycaps: one cap per key, Linux names, display only.
+  await expect(first.locator('kbd')).toHaveText(['Alt', 'Shift', 'F']);
+  // Caption starts on the title column: caption text left edge equals row title left edge.
+  const captionX = await listbox.locator('.lc-group-caption-label').first().evaluate(element => element.getBoundingClientRect().left);
+  const titleX = await first.locator('.lc-row-title').evaluate(element => element.getBoundingClientRect().left);
+  expect(Math.abs(captionX - titleX)).toBeLessThanOrEqual(1);
+  await query.focus();
+  await query.press('ArrowDown');
+  const second = listbox.getByRole('option', { name: /Clipboard history/ });
+  await expect(second).toHaveAttribute('aria-selected', 'true');
+  await expect(query).toHaveAttribute('aria-activedescendant', (await second.getAttribute('id'))!);
+  await expect(query).toBeFocused();
+  await expect(query).toHaveCSS('outline-style', 'solid');
+  // Truncated title keeps its full value as tooltip and accessible name.
+  const long = listbox.getByRole('option', { name: /deliberately long title that must truncate/ });
+  expect(await long.locator('.lc-row-title').evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  await expect(long).toHaveAttribute('title', /deliberately long title that must truncate/);
+  // Unknown extension category is coerced to the closed system tile; no caller colour reaches the DOM.
+  const fallback = listbox.getByRole('option', { name: /Extension command/ }).locator('.lc-glyph-tile');
+  await expect(fallback).toHaveAttribute('data-category', 'system');
+  await expect(fallback).toHaveCSS('background-color', hex('#5A5E6B'));
+  await query.fill('zzz');
+  await expect(page.getByRole('heading', { name: 'No rows match “zzz”' })).toBeVisible();
+  await expect(page.locator('.lc-plate[data-kind="filtered"]').first()).toContainText('No matches');
+  await page.getByRole('button', { name: 'Clear filter', exact: true }).first().click();
+  await expect(first).toBeVisible();
+  await page.screenshot({ path: `${evidence}/rows-dark.png`, clip: (await page.locator('.preview-wide').first().boundingBox())! });
+});
+
+test('multi-selection checkboxes stay distinct from the cursor rail', async ({ page }) => {
+  const group = page.getByRole('group', { name: 'Multi-selection' });
+  const clipboard = group.getByRole('checkbox', { name: 'Clipboard history' });
+  const search = group.getByRole('checkbox', { name: 'Search files' });
+  await expect(clipboard).toBeChecked();
+  await expect(group.locator('.lc-row[data-current]')).toHaveCount(0);
+  await search.focus();
+  await expect(group.locator('.lc-row[data-current]')).toHaveCount(1);
+  await expect(group.locator('.lc-row[data-current]')).toContainText('Search files');
+  await search.press('Space');
+  await expect(search).toBeChecked();
+  await expect(clipboard).toBeChecked();
+  await expect(group.locator('.lc-group-caption-count')).toHaveText('2');
+  await page.keyboard.press('Tab');
+  await expect(clipboard).toBeFocused();
+  await expect(group.locator('.lc-row[data-current]')).toContainText('Clipboard history');
+});
+
+test('state plates: shape, eyebrow word and tone for every kind; caller-owned actions only', async ({ page }) => {
+  const expected: Record<string, string> = { filtered: 'No matches', error: 'Error', denied: 'Permission denied', unsupported: 'Unsupported in this session', interrupted: 'Interrupted', pending: 'Approval needed', success: 'Done', empty: 'Empty' };
+  for (const [kind, word] of Object.entries(expected)) {
+    const plate = page.locator(`.lc-plate[data-kind="${kind}"]`).first();
+    await expect(plate.locator('.lc-plate-eyebrow')).toHaveText(word);
+    await expect(plate.locator('.lc-plate-glyph svg')).toHaveAttribute('aria-hidden', 'true');
+  }
+  await expect(page.locator('.lc-plate[data-layout="band"][data-kind="error"]')).toHaveCSS('background-color', /rgb/);
+  // Errors are not live-announced unless the caller opts in.
+  await expect(page.locator('.lc-plate[data-kind="error"] [role="status"]')).toHaveCount(0);
+  await expect(page.getByText('Loading example commands…')).toHaveAttribute('role', 'status');
+  await expect(page.locator('.lc-loading .lc-loading-mark svg')).toBeVisible();
+  for (const appearance of ['dark', 'light'] as const) {
+    await page.getByRole('button', { name: appearance === 'dark' ? 'Dark' : 'Light', exact: true }).click();
+    const band = page.locator('.preview-bands');
+    await band.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${evidence}/states-${appearance}.png`, clip: (await page.locator('.preview-bands').locator('..').boundingBox())! });
+  }
+});
+
+test('buttons: ghost variant, primary keycaps and aria-keyshortcuts without registering handlers', async ({ page }) => {
+  const save = page.getByRole('button', { name: 'Save changes', exact: true });
+  await expect(save).toHaveAttribute('aria-keyshortcuts', 'Enter');
+  await expect(save.locator('kbd')).toHaveText(['Enter']);
+  const actions = page.getByRole('button', { name: 'Actions', exact: true });
+  await expect(actions).toHaveAttribute('data-variant', 'ghost');
+  await expect(actions).toHaveAttribute('aria-keyshortcuts', 'Control+K');
+  await expect(actions.locator('kbd')).toHaveText(['Ctrl', 'K']);
+  await expect(actions).toHaveCSS('border-top-color', 'rgba(0, 0, 0, 0)');
+  // Display-only: pressing the advertised chord elsewhere does nothing in the primitives.
+  await page.locator('body').press('Control+k');
+  await expect(page.getByText('No changes saved.', { exact: true })).toBeVisible();
+});
 
 test('native labels, validation descriptions, submit and cancellation are functional', async ({ page }) => {
   const field = page.getByLabel('Collection name', { exact: false });
@@ -79,6 +174,8 @@ test('system theme changes and reduced motion update without remounting controls
   const button = page.getByRole('button', { name: 'Save changes', exact: true });
   await expect(button).toHaveCSS('transition-duration', '0s');
   await expect(button).toHaveCSS('transform', 'none');
+  await expect(page.locator('.lc-loading .lc-spin')).toHaveCSS('animation-name', 'none');
+  await expect(page.locator('.lc-row').first()).toHaveCSS('transition-duration', '0s');
   await page.emulateMedia({ colorScheme: 'light' });
   await expect(page.locator('.lc-theme')).toHaveAttribute('data-lc-theme', 'light');
   await page.screenshot({ path: `${evidence}/light-reduced-motion.png`, fullPage: true });
@@ -88,6 +185,13 @@ test('200 percent text scaling and narrow viewport preserve labels, wrapping and
   await page.setViewportSize({ width: 720, height: 1100 });
   await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
   await expect(page.getByLabel('Collection name', { exact: false })).toHaveCSS('font-size', '28px');
+  // Rows and captions grow with text (minimum, not fixed, heights) and do not clip vertically.
+  for (const element of await page.locator('.lc-row, .lc-group-caption').all()) {
+    const metrics = await element.evaluate(node => ({ height: node.getBoundingClientRect().height, clipped: node.scrollHeight > node.clientHeight + 1 }));
+    expect(metrics.clipped).toBe(false);
+    expect(metrics.height).toBeGreaterThanOrEqual(56);
+  }
+  for (const option of await page.getByRole('option').all()) expect(await option.evaluate(node => node.getBoundingClientRect().height)).toBeGreaterThanOrEqual(80);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const names = ['Save changes', 'Cancel loading', 'Open settings', 'Try again'];
   for (const name of names) {
@@ -106,5 +210,9 @@ test('forced colors retain native control boundaries and visible keyboard focus'
   await field.focus();
   await expect(field).toHaveCSS('outline-style', 'solid');
   await expect(field).toHaveCSS('border-top-style', 'solid');
+  const selected = page.getByRole('option', { selected: true });
+  await expect(selected).toHaveCSS('outline-style', 'solid');
+  await expect(page.locator('.lc-glyph-tile').first()).toHaveCSS('border-top-style', 'solid');
+  await expect(page.locator('.lc-plate[data-layout="band"]').first()).toHaveCSS('border-top-style', 'solid');
   await page.screenshot({ path: `${evidence}/forced-colors.png`, fullPage: true });
 });
