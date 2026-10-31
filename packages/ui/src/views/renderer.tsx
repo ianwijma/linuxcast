@@ -76,21 +76,41 @@ function ActionPanel({ actions, context, invoke, close, host }: { actions: Actio
   const active = filtered.find(action => action.id === selected) ?? filtered[0];
   const id = useId();
   useLayoutEffect(() => { const prior = document.activeElement; const element = dialog.current; element?.showModal(); element?.querySelector<HTMLInputElement>('input[type="search"]')?.focus(); return () => { element?.close(); if (prior instanceof HTMLElement && prior.isConnected) prior.focus(); }; }, []);
+  // Anchor above the footer hint, bounded by the shell and viewport. The list scrolls so the
+  // header and bottom filter stay reachable in compact windows, at 200% zoom and when a live
+  // snapshot grows or shrinks the actions while the panel is open. Placement only: it never
+  // moves focus, the highlight or the list scroll position.
+  const place = useRef(() => {});
+  place.current = () => {
+    const element = dialog.current; const view = element?.closest('.lc-view'); const shell = element?.closest('.lc-view-shell');
+    if (!element || !shell) return;
+    const bounds = shell.getBoundingClientRect(); const footer = view?.querySelector('.lc-view-footer')?.getBoundingClientRect();
+    const gap = parseFloat(getComputedStyle(element).getPropertyValue('--lc-panel-gap')) || 8;
+    const anchor = Math.min(footer && footer.height ? footer.top : bounds.bottom, window.innerHeight) - gap;
+    // Prefer the shell space above the footer; if even header + one row + filter cannot fit
+    // there, fall back to the viewport so every control stays reachable.
+    const parts = ['.lc-panel-header', '.lc-panel-filter', '.lc-panel-action, .lc-panel-empty'].map(selector => element.querySelector<HTMLElement>(selector)?.offsetHeight ?? 0);
+    const edges = element.offsetHeight - element.clientHeight;
+    const minimum = parts.reduce((total, value) => total + value, edges);
+    const ceiling = Math.max(gap, bounds.top + gap), fits = anchor - ceiling >= minimum;
+    const cap = Math.max(0, fits ? anchor - ceiling : window.innerHeight - gap * 2);
+    if (element.style.maxBlockSize !== `${cap}px`) element.style.maxBlockSize = `${cap}px`;
+    const size = element.getBoundingClientRect();
+    element.style.left = `${Math.max(gap, Math.min(bounds.right - size.width - gap, window.innerWidth - size.width - gap))}px`;
+    element.style.top = `${Math.max(fits ? ceiling : gap, Math.min(anchor - size.height, window.innerHeight - gap - size.height))}px`;
+  };
+  // Every render (new actions, filter, revision) re-anchors synchronously before paint.
+  useLayoutEffect(() => { place.current(); });
   useLayoutEffect(() => {
-    // Anchor above the footer hint, inside the shell and viewport. The list scrolls so the
-    // header and bottom filter stay reachable in compact windows and at 200% zoom.
-    const position = () => {
-      const element = dialog.current; const view = element?.closest('.lc-view'); const shell = element?.closest('.lc-view-shell');
-      if (!element || !shell) return;
-      const bounds = shell.getBoundingClientRect(); const footer = view?.querySelector('.lc-view-footer')?.getBoundingClientRect();
-      const gap = parseFloat(getComputedStyle(element).getPropertyValue('--lc-panel-gap')) || 8;
-      const size = element.getBoundingClientRect();
-      const anchor = Math.min(footer && footer.height ? footer.top : bounds.bottom, window.innerHeight) - gap;
-      element.style.left = `${Math.max(gap, Math.min(bounds.right - size.width - gap, window.innerWidth - size.width - gap))}px`;
-      element.style.top = `${Math.max(gap, anchor - size.height)}px`;
-    };
-    position(); window.addEventListener('resize', position); return () => window.removeEventListener('resize', position);
-  }, [query]);
+    const element = dialog.current; const view = element?.closest('.lc-view');
+    let frame = 0;
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; place.current(); }); };
+    // Environments without ResizeObserver still re-anchor on every render and window resize.
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(schedule);
+    for (const target of [element, element?.querySelector('.lc-action-list'), view?.querySelector('.lc-view-footer'), element?.closest('.lc-view-shell')]) if (target) observer?.observe(target);
+    window.addEventListener('resize', schedule);
+    return () => { cancelAnimationFrame(frame); observer?.disconnect(); window.removeEventListener('resize', schedule); };
+  }, []);
   const keys = (event: KeyboardEvent) => {
     if (event.nativeEvent.isComposing) return;
     event.stopPropagation();
@@ -164,6 +184,7 @@ function useGridColumns(grid: RefObject<HTMLDivElement | null>, enabled: boolean
       setColumns(width > 0 && cell > 0 ? Math.max(1, Math.floor((width + gap) / (cell + gap))) : 1);
     };
     measure();
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(measure); observer.observe(element);
     return () => observer.disconnect();
   }, [grid, enabled, density]);
@@ -186,6 +207,12 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   const [discard, setDiscard] = useState<'back' | 'cancel' | null>(null);
   const [text, setText] = useState(view.kind === 'text' ? view.text : '');
   const [split, setSplit] = useState(SPLIT.initial);
+  // Enter/Ctrl+Enter are not view chords while an editable control (other than the collection
+  // query) has focus: there they keep native editing behaviour. Footer hints follow that context.
+  const [editing, setEditing] = useState(false);
+  // One-shot: after a nonempty root query is cleared, reveal the preserved selection once the
+  // settled (non-loading) unfiltered results render. Ordinary revisions never scroll.
+  const reveal = useRef(false);
   const collection = view.kind === 'list' || view.kind === 'grid';
   const grid = view.kind === 'grid';
   const items = visibleItems(frame);
@@ -214,6 +241,7 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   };
   const changeQuery = (value: string) => {
     if (!collection || !uiTextSchema.safeParse(value).success) return;
+    reveal.current = !canBack && value === '' && frame.query !== '';
     session.setQuery(view.viewId, value);
     host.queryChanged?.(view.viewId, value, session.getSnapshot().frames.find(entry => entry.view.viewId === view.viewId)!.queryRevision);
   };
@@ -230,6 +258,18 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
     }
     else setPanel(false);
   }, [active, frame.view.viewId, view.kind]); // Ordinary revisions never steal focus.
+  useLayoutEffect(() => {
+    if (!reveal.current || !active || !collection) return;
+    if (frame.query !== '') { reveal.current = false; return; }
+    if (view.loading || !selected) return;
+    reveal.current = false;
+    const row = document.getElementById(itemId(selected)); const box = scroller.current;
+    if (!row || !box || !box.contains(row)) return;
+    // Adjust only the result viewport: no focus change, no document scroll, no invocation.
+    const rowBox = row.getBoundingClientRect(), port = box.getBoundingClientRect();
+    if (rowBox.top < port.top) box.scrollTop -= port.top - rowBox.top;
+    else if (rowBox.bottom > port.bottom) box.scrollTop += rowBox.bottom - port.bottom;
+  });
   const select = (id: string) => { session.select(view.viewId, id); host.selectionChanged?.(view.viewId, id); };
   const invoke = (id: string) => {
     // Re-read current state at the user event, not the action panel's opening revision.
@@ -339,7 +379,8 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   else content = <UnavailableState title="PDF preview unavailable" description="Connect the sandboxed document viewer to preview this file. Available document actions remain below." />;
   const secondary = view.kind !== 'form' ? actions[1] : undefined;
   const footerPrimary = view.kind !== 'form' ? actions[0] : undefined;
-  return <div ref={root} hidden={!active} className="lc-view" tabIndex={-1} onKeyDown={keyboard} onFocusCapture={event => { previousFocus.current = event.target; }}>
+  return <div ref={root} hidden={!active} className="lc-view" tabIndex={-1} onKeyDown={keyboard} onFocusCapture={event => { previousFocus.current = event.target; setEditing(editable(event.target) && !(event.target instanceof HTMLInputElement && event.target.dataset.viewQuery === 'true') && !(event.target instanceof HTMLElement && event.target.closest('dialog'))); }}
+    onBlurCapture={event => { if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) setEditing(false); }}>
     <header className="lc-view-header" data-loading={view.loading || undefined}>
       {canBack ? <IconButton label="Back" aria-keyshortcuts="Escape" onClick={() => requestClose('back')}><LineIcon name="back" /></IconButton> : collection ? <span className="lc-view-search-glyph" aria-hidden="true"><LineIcon name="search" /></span> : null}
       {collection ? <TextField label={view.title} type="search" role="combobox" data-view-query="true" value={frame.query} placeholder={view.search.placeholder}
@@ -360,8 +401,8 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
         <span className="lc-footer-title" dir="auto">{selected?.title ?? view.title}</span>
       </span>
       <div className="lc-footer-actions">
-        {footerPrimary && <Button variant="ghost" className="lc-footer-verb" aria-disabled={Boolean(footerPrimary.disabledReason)} title={footerPrimary.disabledReason} onClick={() => invoke(footerPrimary.id)}><span className="lc-footer-label">{footerPrimary.title}</span><ShortcutHint keys={['Enter']} /></Button>}
-        {secondary && <><span className="lc-footer-separator" aria-hidden="true" /><Button variant="ghost" className="lc-footer-verb" aria-disabled={Boolean(secondary.disabledReason)} title={secondary.disabledReason} onClick={() => invoke(secondary.id)}><span className="lc-footer-label">{secondary.title}</span><ShortcutHint keys={['Ctrl', 'Enter']} /></Button></>}
+        {footerPrimary && <Button variant="ghost" className="lc-footer-verb" aria-disabled={Boolean(footerPrimary.disabledReason)} title={footerPrimary.disabledReason} onClick={() => invoke(footerPrimary.id)}><span className="lc-footer-label">{footerPrimary.title}</span>{!editing && <ShortcutHint keys={['Enter']} />}</Button>}
+        {secondary && <><span className="lc-footer-separator" aria-hidden="true" /><Button variant="ghost" className="lc-footer-verb" aria-disabled={Boolean(secondary.disabledReason)} title={secondary.disabledReason} onClick={() => invoke(secondary.id)}><span className="lc-footer-label">{secondary.title}</span>{!editing && <ShortcutHint keys={['Ctrl', 'Enter']} />}</Button></>}
         {footerPrimary && <span className="lc-footer-separator" aria-hidden="true" />}
         <Button variant="ghost" className="lc-footer-verb" aria-haspopup="dialog" aria-expanded={panel && active} onClick={() => setPanel(true)}><span className="lc-footer-label">Actions</span> <ShortcutHint keys={['Ctrl', 'K']} /></Button>
       </div>

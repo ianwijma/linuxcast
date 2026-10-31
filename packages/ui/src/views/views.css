@@ -164,8 +164,9 @@
   .lc-collection-layout[data-detail='true'] { display: flex; flex-direction: column; gap: var(--lc-space-8); }
   .lc-split { display: none; }
   .lc-item-preview { position: static; padding: var(--lc-space-12) var(--lc-space-8); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
-  /* Labels hide visually; accessible names keep them. */
-  .lc-footer-label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* Labels hide visually behind their keycaps; accessible names keep them. A verb without a
+     keycap in the current context keeps its visible label. */
+  .lc-footer-verb:has(.lc-shortcut) .lc-footer-label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 
 .lc-view-announcement { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

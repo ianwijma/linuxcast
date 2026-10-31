@@ -60,11 +60,21 @@ user intent; the UI never displays operation success based on that return.
   with an accessible “(destructive)” suffix), and the “Find an action” filter at the
   bottom. Arrows move, Enter dispatches the highlighted action, Escape or Ctrl+K close
   and focus returns. The list scrolls so header and filter stay reachable in compact
-  windows and at 200% zoom. Grouping is visual only: the initial highlight is the
+  windows and at 200% zoom, and placement re-anchors on every render and on panel/footer/
+  shell resize, so a live snapshot that grows or shrinks the actions keeps the panel inside
+  the shell and viewport above the footer without moving focus, highlight or scroll.
+  Grouping is visual only: the initial highlight is the
   current primary and dispatch re-reads the latest view/revision/selection.
 - The footer status line shows the selected item's small glyph and title, the bound
   primary (Enter) and secondary (Ctrl+Enter) verbs only when supplied, and Actions
-  (Ctrl+K). No type label is inferred (the ViewModel has no type field).
+  (Ctrl+K). Enter/Ctrl+Enter keycaps appear only while those chords are bound: while an
+  editable control other than the collection query has focus (for example an editable
+  text view) the verbs stay as plain buttons and the keys keep native editing behaviour.
+  No object type label is shown: the frozen ViewModel has no type field, so the selected
+  footer type remains a pending contract/adoption limit rather than an inferred value.
+- After a nonempty root query is cleared (Escape or editing), the preserved selection is
+  scrolled into the result viewport once the settled unfiltered results render; focus
+  stays in the query, nothing is invoked, and ordinary later revisions never scroll.
 - Root Escape closes the action panel, then clears a nonempty query, then pops the
   root (the broker owns actual dismissal). Nested Escape closes the panel, then pops
   with the parent's query/selection/focus. Dirty forms/text request explicit discard
@@ -156,8 +166,10 @@ physical input, privileged service or real filesystem operation was exercised.
 
 Selected Opus Instrument presentation (DESIGN.md: Shell and navigation; Results and
 actions; List, grid, detail and form; States and motion; Accessibility) on the merged
-D1-01 primitives. `views.test.ts` now covers 19 Chromium cases including the combobox/
-listbox relationship, root/nested Escape order, footer verbs, action-panel geometry and
+D1-01 primitives. `views.test.ts` now covers 23 Chromium cases including the combobox/
+listbox relationship, root/nested Escape order, footer verbs and context-scoped chord
+hints, selection reveal after clearing the root query, live action growth/shrink panel
+re-anchoring, action-panel geometry and
 destructive grouping, stale-snapshot dispatch, grid rows/columns/Home/End, separator
 keys/pointer, truthful state bands, 480 px at 200% text, forced colours and reduced
 motion. Captures are in `evidence/instrument/` (see its README); earlier files in
