@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-graceful-shutdown-and-independent-fixture-custody-correction",
+  "checkout": "/home/ian/.t3/worktrees/linuxcast/t3-4b110c33",
+  "branch": "codex/f1-02-outer-lab-owner",
+  "baseCommit": "43a811e29f97ab5846416a678927015dfccebf34",
+  "baseTree": "5fc4cd9f5ad94cbf21997e9ccf40211474617fbe",
+  "finalCommitAndTree": "reported in final handoff; cannot be self-referential",
+  "platform": {
+    "python": "3.10.12",
+    "distribution": "Pop!_OS 22.04 LTS",
+    "architecture": "x86_64",
+    "kernel": "7.1.1-76070101-generic"
+  },
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_owner.py -v",
+      "result": "pass",
+      "count": 82,
+      "seconds": 4.086,
+      "skipped": 0,
+      "scope": "59 existing plus23 added; mocked guest operations and real independently supervised ordinary-Python fixtures"
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py'",
+      "result": "pass",
+      "count": 196,
+      "seconds": 16.181,
+      "skipped": 0,
+      "scope": "114 non-owned base cases plus82 owned; no skips or native execution"
+    },
+    {
+      "command": "existing at-preparation.security.test.ts Python payload via subprocess.run timeout=18, capture_output=True",
+      "result": "pass",
+      "count": 196,
+      "pythonSeconds": 16.181,
+      "wallSeconds": 16.294,
+      "timeoutSeconds": 18,
+      "complete": true,
+      "nativeRun": false,
+      "skipped": 0,
+      "scope": "exact Python payload and timeout, not Node/Vitest shell; no dependency install"
+    },
+    {
+      "command": "AST parse lab_owner.py and test_lab_owner.py with Python3.10.12",
+      "result": "pass",
+      "count": 2
+    },
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "result": "pass",
+      "scope": "local documentation integrity; final evidence revalidated before commit"
+    },
+    {
+      "command": "git diff --cached --check; git diff --check",
+      "result": "pass",
+      "scope": "staged additive five-file change and working tree"
+    },
+    {
+      "command": "SHA256 verify flat wrapper manifest and nested source-build/Instrument adapter manifests",
+      "result": "pass",
+      "manifests": 3,
+      "matchingFiles": 9
+    },
+    {
+      "command": "compare existing AT and shell-native-at evidence bytes with exact prepared base using git show",
+      "result": "pass",
+      "matchingExistingFiles": 43
+    }
+  ],
+  "signing": "UNSIGNED continuation: normal configured /opt/1Password/op-ssh-sign attempt timed out30s, exit124, no commit. User-authorized per-command git -c commit.gpgsign=false fallback; no configuration writes or release/tag rule changes.",
+  "configurationObservation": "Complete before/after fingerprint unchanged during this continuation; original commit.gpgsign=true, gpg.format=ssh and gpg.ssh.program=/opt/1Password/op-ssh-sign verified unchanged. No Git configuration writes. Historical initial43a broader fingerprint observation remains explicit.",
+  "executed": {
+    "realOwnerCli": false,
+    "dockerCommands": 0,
+    "sshConnectivity": false,
+    "privateKeyReads": false,
+    "labMutations": false,
+    "guestNativeProductBuildActions": 0,
+    "nativeRunsInThisPreparation": 0,
+    "dependencyInstall": false,
+    "ordinaryPythonFixtures": true
+  },
+  "inheritedOnly": {
+    "stoppedBaseline": "parent freshly observed exact v4 running=false PID0 exit0; not rerun here",
+    "approvedProductCommit": "bbbe8137105c0973e0f8a3a9ad8cca7e73a21937",
+    "approvedProductTree": "5a85d5251101716b338e820f23f78eef5e162dfb",
+    "archiveBytes": 121180160,
+    "archiveSha256": "732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc",
+    "parentVerifiedBlobsAndModes": 2789,
+    "newBuildReceiptOrSignatureVerification": false,
+    "parentIntegration": "1e8623079f7cd46f36a98670f12c193a5a0857ec with approved PR96; not imported",
+    "entrypointSha256": "a15ac9589c04baf9da95b08e0e79b5cf1d75ab8dc64e06a5e68e4ceb0ad7c8ea",
+    "entrypointBehavior": "parent copied pinned-image entrypoint read-only; ends exec configured timeout/QEMU command",
+    "hostTimeoutProbe": "parent ordinary timeout+sleep externalTERM returned-15/container-style143; owned probe children reaped; not actualv4shutdown proof",
+    "publicCargoCache": "parent verified152locked public crates/offline metadata; not worker build proof",
+    "electronHeaders": "parent verified Electron45 upstream checksums; not worker build proof",
+    "historicalScan": {
+      "readableLiveExactKnownMatches": 0,
+      "unreadableSameUidCandidates": 3,
+      "signals": 0,
+      "fullAbsenceProven": false,
+      "performedBy": "parent only; not rerun; no broad cleanup attempted"
+    }
+  },
+  "mapping": {
+    "F1-02-AC01": "historical evidence/status unchanged",
+    "F1-02-AC02": "historical evidence/status unchanged",
+    "F1-02-PRIVACY": "historical evidence/status unchanged; actual containment remains pending",
+    "F1-02-UI": "pending; no UI changes or new screenshots"
+  },
+  "pending": [
+    "independent review before any real owner invocation",
+    "historical early synthetic-fixture descendant-absence gap",
+    "coordinator Node/Vitest mapped validation; exact Python payload passed within unchanged18s bound",
+    "actual daemon/SSH/account/sudo/read-probe/poweroff-authority facts and explicit immutable owner permit",
+    "fresh immutable guest build/receipt/Node/wrapper source pins",
+    "unchanged guest wrapper rejects newer approved tree",
+    "ENTRY versus COMBO_BOX native identity and PID1 metadata feasibility",
+    "actual start/stop/kill/cancellation/owner-loss/recovery and descendant absence",
+    "native AT/UI/full F1-02/four-session desktop/all97tasks/local1.0 acceptance",
+    "actual graceful poweroff/SSH-disconnect wording, fallback exit status and real host-child absence remain unverified"
+  ],
+  "acceptance": "pending",
+  "statusPromotion": false,
+  "pushPrWatchPublication": false,
+  "initial43a": {
+    "commit": "43a811e29f97ab5846416a678927015dfccebf34",
+    "tree": "5fc4cd9f5ad94cbf21997e9ccf40211474617fbe",
+    "ownedTests": 59,
+    "fullOfflineTests": 173,
+    "fullSeconds": 15.216,
+    "signing": "UNSIGNED preparation fallback: configured /opt/1Password/op-ssh-sign attempt timed out30s, exit124, no commit. User-authorized per-command git -c commit.gpgsign=false; no configuration writes issued and no signed release/tag requirement change.",
+    "configurationObservation": "Broader fingerprint changed for an unattributed reason; no automatic revert. Three original settings verified unchanged: commit.gpgsign=true; gpg.format=ssh; gpg.ssh.program=/opt/1Password/op-ssh-sign. No Git configuration write command was issued.",
+    "completeConfigurationFingerprintBefore": "814df46a56df131bdcd92c8fb54898286dfeef2ca8eeba0f2c4bfda4125b9377",
+    "completeConfigurationFingerprintAfter": "104545d09b4e4a0bed6b03f14826769ca658eb1c6b4531eee83cf658033ecfcc"
+  },
+  "originalPreparedBase": {
+    "commit": "7abb8459f3af028328246d2304a3d85508ed1533",
+    "tree": "ee863d72bffd42c5339f034b52fe1f58a247e92e"
+  },
+  "coordinatorContract": {
+    "revision": "745bf7f941d0db0255ab91301c5b730097b3f142",
+    "path": "apps/desktop/tests/at/outer-owner-protocol.md",
+    "sha256": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "access": "git show only; no contract or other parent commit imported; local older copy unchanged"
+  },
+  "historicalDevelopmentFailures": [
+    "Initial noncooperative guardian probe timed out: inherited blocked SIGALRM mask. Fixed explicit guardian unmask and kept hard alarm unblocked during spawn; permanent actual-Python regressions pass.",
+    "Initial pre-marker Children.run could not inspect without lease.state. Fixed read-only preflight path; permanent actual-Python regression passes.",
+    "Caller fallback previously allocated sequential cleanup budgets. It now shares one45s budget across exact guardian termination/reaping and identity-bound fallback.",
+    "Two early12s alarm timeouts predate outer fixture supervision. Historical descendant absence was not established; no unrelated-process scan or broad cleanup was attempted.",
+    "Initial full172 offline run22.139s exceeded the existing mapped wrapper's18s limit; only private fixture timer constants were shortened. Final173 run15.216s passes; mapped Node wrapper remains unexecuted."
+  ],
+  "developmentNotes": [
+    "Parent identified direct Docker stop normal-shutdown gap before any independent initial owner review. Fixed cleanup-only poweroff and fresh-state wait before forced fallback; no143-to0 normalization.",
+    "Graceful phase capped11s and shrunk against cleanup end minus28s fallback reservation; CLEAN45/TOTAL600 unchanged. No wrapper replay or timeout increase.",
+    "Initial correction62-test run had four old cleanup-expectation failures with a1s mock budget. Updated state/phase fixtures preserve first failure/dirty/absence assertions and test actual bounded graceful/fallback semantics.",
+    "Independent kernel guard replaces owner.Children/own_children/subreaper dependencies in fixture supervisor. Deliberately broken shared owner helpers are patched in both supervisor and worker; real detached ordinary children are independently reaped.",
+    "Failed/unknown kill replies receive fresh inspection while earlier failure is retained."
+  ],
+  "completeGitConfigurationFingerprintBeforeCurrentSigningAttempt": "3457aea9a73318dd85294df45c20e1e61cd22421af5d8efc870b89d879ee1992",
+  "localNonOwnedBaseCases": 114,
+  "parentReportedNonOwnedBaseCases": 120,
+  "independentReview": "Parent reported initial independent review had not started when correction was assigned; no independent review result claimed.",
+  "completeGitConfigurationFingerprintAfterCurrentSigningAttempt": "3457aea9a73318dd85294df45c20e1e61cd22421af5d8efc870b89d879ee1992",
+  "coordinatorCorrections": {
+    "reviewedHead": "40adf937aeef8aaee7da0a5dc29e7d857c807dc1",
+    "base": "b3bea80bb7243d6801c3c44870b0c8cd1df3d013",
+    "initialReviews": {
+      "Standards1e654a49": "one P2: unbounded permit FIFO open",
+      "SecuritySpec80f02ab5": "two P2: same FIFO and final-close result loss"
+    },
+    "parentOwnedTests": 88,
+    "parentOfflineCases": 208,
+    "parentMappedSecurityChecks": 55,
+    "mappedWallSeconds": 17.76,
+    "pythonPayloadSeconds": 16.686,
+    "unchangedPythonDeadlineSeconds": 18,
+    "negativeControls": "four behavioral cases fail exact reviewed40adf937 and pass current source; independent fixture custody retained",
+    "secondIndependentCleanReviewClaimed": false,
+    "actualOwnerCli": false,
+    "actualDockerGuestNativeBuildActions": 0,
+    "acceptance": "pending"
+  }
+}

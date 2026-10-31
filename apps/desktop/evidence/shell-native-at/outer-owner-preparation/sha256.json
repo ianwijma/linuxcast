@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-graceful-shutdown-and-independent-fixture-custody-not-permit",
+  "files": {
+    "apps/desktop/tests/at/lab_owner.py": "fbebe2fb0907e76a31a5507a0767c9cc9f4d31dc999054b8cc49957ac7429ed6",
+    "apps/desktop/tests/at/test_lab_owner.py": "4a0711cc7ceb8d830174ce6ed2e0e49c84774ab792c4879921f46670cfa46620",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "ef763f4d80ee726e68f942e70ec65b57a699dbe017bf1f5050aa9fe5c1009fcc",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "c806d26f1b78d3f9225d3795f8f14b531cfdfa185ca56afd04a352d38ce226a1"
+  },
+  "unchangedInputs": {
+    "apps/desktop/tests/at/outer-owner-protocol.md": "b005609e94ea214509bbefbc86b31e44100514555a44d54abd29d69e699642aa",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410"
+  },
+  "coordinatorContract": {
+    "revision": "745bf7f941d0db0255ab91301c5b730097b3f142",
+    "path": "apps/desktop/tests/at/outer-owner-protocol.md",
+    "sha256": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "access": "git show only; no contract or other parent commit imported; local older copy unchanged"
+  }
+}

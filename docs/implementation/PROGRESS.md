@@ -1,36 +1,37 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline cache correction publication
+## Current coordinator state — outer owner corrections ready for publication
 
-Goal ACTIVE: full97/local1.0 throughR1-03; registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. Approveddevelopbbbe813/mergedPR95 includesall
-seven Instrument surfaces, Notes93/workflows94. No actualnative/Orca runs.
+Goal ACTIVE, all97/local1.0 throughR1-03; no status/criterion promotion. Approved
+b3bea80/PR96, seven Instrument surfaces retained. No real native/guest/build runs.
+Both initial owner reviews on40adf937 completed/read: Standards1e654a49 soleP2
+FIFO preflight; Security/Spec80f02ab5 same plus final-close dispatch/first-failure
+loss. Parent fixes both directly: nonblocking source/permit opens, preflight hard
+alarm/shared budget, final descriptor errors retain known result/first cause.
+88owner tests4.480s; four actual behavioral cases fail old40adf937/passcurrent.
+55mapped security17.76s includes208Python/payload16.686s under unchanged18s bound.
+AST/hash/plan/whitespace pass, no second independent clean-review claim. Publish
+focused owner PR/currentCI/review inspection/normal merge next. Actual permit,
+transport, graceful/forced shutdown/recovery and native proof remain outstanding;
+historical two-timeout fixture absence remains honestly unverified.
 
-Rootcodex/f1-02-offline-build-inputs: initial Standards3c306e10 clear, Spec14cf1b4f
-twoP2s parent-verified resolved. Cacheinventory nowincludesreceipt-namedentries;
-file+symlinkregressions fail2312/passfixed. Correctedmutationfixturefailswithonly
-postcacheguarddisabled/passrestored. Final12staging/120offlinePython/55security
-14.11s/2AST/plan/hash/whitespace pass. No secondindependent finalcleanclaim.
-PublishfocusedPRnext/currentheadCI/reviews/normalmerge. No product/Node/Rustbuild,
-installer/guest/native invocation, no namespace/observer/controller/pin changes.
+Independent AI author ef66ad7c continues GPT6.1SOL/high from8b0b88e; no polling.
+Coordinator configuration work saved clean on codex/a1-01-global-configuration,
+95d9f185: atomic SQLite profile/model/CAS record with dedicated contracts/client,
+no migration/new writer/renderer/export access.15contracts/10privateSQLite/7client
+and43existing storage regressions/type/scopedlint/plan pass. No integration/review
+or production credential snapshot wiring claimed. A1staysplanned. Parent sent
+material note about existing private session-only references and use/fresh seam;
+worker must propose exact captured-credential glue without importing parent work.
 
-Publiccachecandidate outsideGit:420files/22861050bytes, manifestSHA
- d733fe37559bac91c95c24ccea09b0993a25de604243e03e33063793f7e90db3.
-All152lockedcratearchives+selectedsparseindexrecordsmatchCargo.lock;125locally
-cachedElectron45headers haveunverifiedupstreamarchiveprovenance. HostCargo1.95
-metadata --offline --locked resolvesall152/fourworkspace fromnewprivateprofile;
-no compileroutput, lock/candidateunchanged/profile+rawmetadataremoved. No actual
-Debian compiler/ABI/build evidence. Exactv4freshstoppedfalse/PID0/exit0 before/
-aftercacheprep, no Dockerstart/exec/SSH/guest/native/bus/input/audio/provider.
-
-Outerowner task6ec25f18 from7abb845 remains assigned/disjoint; awaitcompletionwake,
-no polls. Savedcodex/f1-02-lab-owner-preparation holdsparentcontract+inventory and
-sourcearchiveproof, excludedfromthiscacheincrement. CurrentBBBEarchive121180160B/
-SHA732f7bcc..436dc/tree5a85d525..62dfb/all2789blobs-modes verified;0400outsideGit,
-signatureheaderpresent/unverified. Oldguestwrapperstillrejectsnewsource. Actual
-Debianbuild/receipt, reviewedouterreservation/shutdown/recovery, PID1metadata and
-nativecomboboxidentity remain pending. No scope/acceptance/fallback changes.
-Allphysical/performance/release gates remain mandatory. No activePRwatch/process.
+Host public build inputs are pinned outsideGit: BBBE source/archive,152locked
+Cargo crates and124upstream-verifiedElectron headers; five Rust1.95 archives
+127772720B with official manifest checksums and263-member nonexecuting layout
+inventory. No extraction/install/compiler/guest execution.13GiBfree, no further
+cleanup. Separate reviewed build-provisioning ownership remains necessary: native
+owner requires an actual receipt, never a placeholder. Old wrapper tree, PID1
+metadata, native combo identity, four desktop sessions/AT/physical/performance/
+release and all remaining tasks remain pending.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
@@ -1033,3 +1034,14 @@ exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
 23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
 occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
 recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
+
+Outer-owner shutdown correction selected before initial review: pinnedimage's
+entrypoint read-onlycopied (no start/exec), SHAa15ac958..7c8ea, ends exec "$@";
+configuredtimeout lacks --preserve-status. Ordinaryhosttimeout+boundedsleepprobe
+sameflags exits-15 afterexternalTERM, allownedchildrenreaped. DirectDockerstop
+therefore risks nonzero143 and cannot establish mandated cleanexit0; actualguest
+behavior remains unmeasured. Coordinatorprotocol now permits only fixedguest
+systemctl poweroff --no-block in cleanup, same verifiedaccount/sudo, freshidentity,
+existing45s budget withreserved stop/kill fallback. No arbitraryguestjobs ornew
+scope grant. Originalauthor followup next forownedsource/tests/evidence; no native
+invocation or marker/permit created. Early historicalcleanupgap stays explicit.
