@@ -78,6 +78,7 @@ def _members(contents, source_revision, expected_files):
         if (not name or len(name.encode("utf-8")) > 1024 or any(part in {"", ".", "..", ".git", "node_modules"}
                 or len(part.encode("utf-8")) > 255 for part in pieces) or name in result
                 or PurePosixPath(name).is_absolute() or member.type not in {tarfile.DIRTYPE, tarfile.REGTYPE, tarfile.AREGTYPE}
+                or member.issparse() or any(key.startswith("GNU.sparse.") for key in member.pax_headers)
                 or any(ord(character) < 32 or ord(character) == 127 for character in name)
                 or member.size < 0 or member.size > MAX_FILE_BYTES or member.isdir() and member.size != 0
                 or name == "target" or name.startswith("target/") or name == "f102-build-receipt.json"

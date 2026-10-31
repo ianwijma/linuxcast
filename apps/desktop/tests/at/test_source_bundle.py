@@ -156,6 +156,26 @@ class SourceBundleTests(unittest.TestCase):
             self.extract(changed)
         self.assertEqual(list(self.output.iterdir()), [])
 
+    def test_sparse_pax_regular_members_cannot_hide_nonzero_trailers(self):
+        # tarfile exposes a PAX sparse encoding as a regular member, but its
+        # logical size exceeds the stored payload. Never use that logical size
+        # to position a trailer check, even when the archive hash is correct.
+        info, data = self.member("sparse-source", data=b"x")
+        info.pax_headers = {"GNU.sparse.map": "0,1", "GNU.sparse.size": "32768"}
+        raw = self.archive_bytes([(info, data)]) + b"NONZERO TRAILER"
+        self.archive.write_bytes(raw)
+        self.archive.chmod(0o600)
+        with tarfile.open(self.archive, mode="r:") as archive:
+            sparse = archive.getmember("sparse-source")
+            self.assertTrue(sparse.isfile())
+            self.assertTrue(sparse.issparse())
+            self.assertEqual(sparse.size, 32768)
+        with self.assertRaises(bundle.BundleRejected) as caught:
+            self.extract(hashlib.sha256(raw).hexdigest(), expected_files=len(bundle.REQUIRED) + 1)
+        self.assertEqual(caught.exception.reason, "layout")
+        self.assertTrue(caught.exception.cleanup)
+        self.assertEqual(list(self.output.iterdir()), [])
+
     def test_entry_bound_includes_implicit_parent_directories_before_output(self):
         digest = self.prepare()
         # Five file members also require apps/ and apps/desktop/ output nodes.

@@ -136,7 +136,7 @@ display, reader or native product run occurred during this reconciliation.
 
 The same four-file helper increment is now reconciled onto approved Instrument
 renderer PR91, revision `432fa6a4b129b66bb064816c004f21ddd71971b4`, with the
-coordinator merge checkpoint. Both executable/test files remain byte-identical to
+coordinator merge checkpoint. At that checkpoint both executable/test files remained byte-identical to
 the saved `86abb64` and the source manifest; no extractor behavior changed. The
 complete offline AT discovery suite again passes113 tests without skips. Both
 source hashes and Python parses, planning validation and whitespace checks pass.
@@ -147,3 +147,27 @@ Instrument product source or build. Independent review of this helper is still
 required before use; native observer role reconciliation, current approved source
 archive, immutable Debian build/receipt and reviewed outer lifecycle ownership
 remain separate gates. The saved Instrument DOM adapter is excluded here.
+
+## Initial Security/Spec review and sparse-member correction
+
+Independent review `fe26bfff` of `cf0453a` found one P2: Python tarfile exposes
+a PAX sparse member as a regular file, but its logical size can move this helper's
+trailer scan beyond the physical archive. A correctly pinned10255-byte synthetic
+archive with one stored byte, GNU sparse map0,1/logical size32768 and a nonzero
+trailer was incorrectly extracted, contradicting nonzero-trailer rejection.
+
+The coordinator reproduced that exact failure with a permanent behavioural test:
+17 source cases, one failed on `cf0453a` (BundleRejected was not raised). The
+helper now rejects parsed sparse members and GNU sparse PAX headers before
+member-size accounting, offset calculation or output creation. The same test
+passes, confirms the rejection is layout/cleanupVerified and leaves output empty.
+All17 source tests and the complete114-test offline AT suite pass without skips;
+both AST/hash checks, plan and whitespace checks pass. The two manifest hashes
+are updated; no native/controller/observer/parser/wrapper source or pins changed.
+
+The reviewer independently ran16 original source tests and additional real-file/
+memfd fault, CLI-redaction, size/path/node-bound and historical-source negative
+controls. The earlier113-test run and historic real-archive smoke were inherited
+evidence. The small P2 correction is coordinator-validated; no second clean
+independent Security/Spec review is claimed. The separate Standards axis remains
+pending. No archive/build/guest/namespace/product/native acceptance is added.

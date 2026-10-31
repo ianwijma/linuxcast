@@ -940,3 +940,17 @@ legacy PR85archive is historical and cannot serve Instrumentbuild. Initial
 independent review of full extraction/custody/cleanup remains required beforeuse.
 Separate ATadaptera9bbb33 excluded. Notes/workflow lanes remain disjoint and
 async, no statuspoll. All full97task/native/physical/release gates remain active.
+
+Sourcehelper Security/Spec fe26bfff completed/read oncf0453a: oneP2 sparsePAX
+regular member logicalsize lets trailer scan seekbeyondarchive and accept
+nonzero trailer. Parent deterministic10255-bytefixture reproduces exact
+BundleRejected-notraised onoriginal; minimal sparse/knownGNU-PAXheader rejection
+beforeaccounting/output fixesit.17source/114fullofflinePython/no skips,2AST/hash/
+plan/whitespace pass; manifestrefreshed. No clean secondindependentSpecclaim;
+separate initialStandardsreview next. Reviewer independently16originaltests and
+real-file/memfd/CLI/size/path/node/faultprobes/historicalnegativecontrols, old113
+andhistoricrealarchive smoke inherited. Existing native sources/pins untouched.
+Read-only outer-lab inventory also reconfirmed exactv4container stopped/exited
+PID0exit0, imageandQEMUargv/fixedmounts; no start/exec/SSH/guest/namespace/product.
+Root-ownedPID1namespace-stat requirement remains unresolved fornonrootpayload;
+no controller/wrappergate change. Notes/workflowUI stilldisjoint Opusmedium.
