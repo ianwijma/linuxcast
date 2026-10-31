@@ -26,6 +26,7 @@ ran for each themed capture.
 |---|---|
 | `notes-application-dark-saved.png`, `notes-application-light-saved.png` | After an explicit confirmed Save: neutral controller message band, selected row with rail, bound `Ctrl` `S` keycap |
 | `notes-application-native-zoom-200-light.png` | `webContents.setZoomFactor(2)` on the actual window, captured with `capturePage()`. Asserted: devicePixelRatio 2, stacked single-column panes, no horizontal overflow, the title keeps focus and stays in view; zoom reset to 1 |
+| `notes-application-slash-native-zoom-200.png` | Open slash menu, then `setZoomFactor(2)`: the menu repositions on the zoom resize and is clamped inside the actual clipping region with internal scrolling. Asserted: active option and whole menu inside the region, hit-testable, body keeps focus; also asserted at zoom 1 before and after; captured with `capturePage()` |
 | `notes-trash-confirm-application-dark.png` | Inline Trash confirmation, Keep note with `Escape` keycap |
 | `notes-trash-application-light.png` | Trashed read-only note in the trashed collection |
 | `notes-revision-preview-application-light.png`, `notes-revision-confirm-application-dark.png` | Saved revision preview and Restore-as-draft confirmation |

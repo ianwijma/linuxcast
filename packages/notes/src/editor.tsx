@@ -24,6 +24,7 @@ const commands=[
 ];
 type Slash={from:number;to:number;query:string;index:number};
 export function RichNoteEditor({document,disabled=false,label='Note body',idPrefix='notes',previewKind='revision',onChange,onError}:{document:NoteDocument;disabled?:boolean;label?:string;idPrefix?:string;previewKind?:'revision'|'import';onChange:(document:NoteDocument)=>void;onError:(message:string)=>void}){
+ const richRef=useRef<HTMLDivElement>(null),popoverRef=useRef<HTMLDivElement>(null);
  const callbacks=useRef({onChange,onError});callbacks.current={onChange,onError};const readonly=useRef(disabled);readonly.current=disabled;
  const [slash,setSlash]=useState<Slash|null>(null),[,render]=useState(0);const slashRef=useRef(slash);slashRef.current=slash;
  const rejected=()=>queueMicrotask(()=>callbacks.current.onError('This change exceeds the supported note structure or 64 KiB text limit. Keep or shorten the existing text.'));
@@ -50,14 +51,30 @@ export function RichNoteEditor({document,disabled=false,label='Note body',idPref
  useLayoutEffect(()=>{if(disabled){slashRef.current=null;setSlash(null);}if(!editor)return;editor.setEditable(!disabled,false);editor.view.dom.setAttribute('aria-readonly',String(disabled));editor.view.dom.querySelectorAll<HTMLInputElement>('input[type=checkbox]').forEach(input=>{input.disabled=disabled;});},[editor,disabled]);
  useEffect(()=>{if(!editor)return;if(slash){editor.view.dom.setAttribute('aria-controls',`${idPrefix}-slash-menu`);editor.view.dom.setAttribute('aria-activedescendant',`${idPrefix}-slash-${slash.index}`);}else{editor.view.dom.removeAttribute('aria-controls');editor.view.dom.removeAttribute('aria-activedescendant');}},[editor,slash]);
  const filtered=slash?commands.filter(command=>command.label.toLowerCase().includes(slash.query)):[];
- return <div className="notes-rich">
+ // Anchor the slash menu to the caret, bounded by every actual clipping ancestor and the viewport, so the active
+ // option stays reachable at any text size or zoom. Only the menu's own scrollTop moves; focus, caret and the
+ // document scroll position are left alone.
+ useLayoutEffect(()=>{const popover=popoverRef.current,rich=richRef.current;if(!editor||!slash||!popover||!rich)return;
+  const place=()=>{let caret:{top:number;bottom:number;left:number};try{caret=editor.view.coordsAtPos(Math.min(slash.to,editor.state.doc.content.size));}catch{return;}
+   let top=0,bottom=innerHeight;for(let node=rich.parentElement;node;node=node.parentElement){const style=getComputedStyle(node);if(/(auto|scroll|hidden|clip)/u.test(style.overflowY)){const box=node.getBoundingClientRect();top=Math.max(top,box.top+node.clientTop);bottom=Math.min(bottom,box.top+node.clientTop+node.clientHeight);}}
+   const gap=parseFloat(getComputedStyle(window.document.documentElement).fontSize)/4,below=bottom-caret.bottom-gap,above=caret.top-top-gap;
+   // A caret scrolled outside the region (zoom/resize) clamps the menu into the region instead of following it out.
+   popover.style.maxBlockSize='none';const natural=popover.scrollHeight,region=Math.max(0,Math.floor(bottom-top)),downward=below>=natural||below>=above,space=Math.min(region,Math.max(0,Math.floor(downward?below:above))),height=Math.min(natural,space);
+   const anchored=downward?caret.bottom+gap:caret.top-gap-height,placed=Math.min(Math.max(anchored,top),bottom-height);
+   popover.style.maxBlockSize=`${space}px`;const box=rich.getBoundingClientRect();popover.style.top=`${placed-box.top}px`;popover.style.left=`${Math.max(0,Math.min(caret.left-box.left,box.width-popover.offsetWidth))}px`;
+   const active=popover.querySelector<HTMLElement>('[aria-selected="true"]');if(active){const offset=active.offsetTop,size=active.offsetHeight;if(offset<popover.scrollTop)popover.scrollTop=offset;else if(offset+size>popover.scrollTop+popover.clientHeight)popover.scrollTop=offset+size-popover.clientHeight;}};
+  const onScroll=(event:Event)=>{if(event.target!==popover)place();};
+  place();addEventListener('scroll',onScroll,{capture:true,passive:true});addEventListener('resize',place,{passive:true});
+  return()=>{removeEventListener('scroll',onScroll,{capture:true});removeEventListener('resize',place);};
+ },[editor,slash,filtered.length]);
+ return <div ref={richRef} className="notes-rich">
   <div role="toolbar" aria-label={idPrefix==='notes'?'Note formatting':`${label} formatting`} className="notes-toolbar">
    {(['bold','italic','strike','code'] as const).map(mark=><Button key={mark} variant="ghost" className="notes-tool" disabled={!editor||disabled} aria-pressed={editor?.isActive(mark)??false} onClick={()=>editor?.chain().focus().toggleMark(mark).run()}>{mark==='strike'?'Strikethrough':mark[0]!.toUpperCase()+mark.slice(1)}</Button>)}
    <span className="notes-tool-divider" aria-hidden="true"/><label className="notes-block-label">Block <select className="lc-focus" aria-label={idPrefix==='notes'?'Block style':`${label} block style`} disabled={disabled} value="" onChange={event=>{const command=commands.find(item=>item.label===event.target.value);if(editor&&command){editor.commands.focus();command.run(editor);}}}><option value="">Choose block</option>{commands.map(item=><option key={item.label}>{item.label}</option>)}</select></label><span className="notes-tool-divider" aria-hidden="true"/>
    <Button variant="ghost" className="notes-tool" disabled={disabled||!editor?.can().undo()} onClick={()=>editor?.chain().focus().undo().run()}>Undo</Button><Button variant="ghost" className="notes-tool" disabled={disabled||!editor?.can().redo()} onClick={()=>editor?.chain().focus().redo().run()}>Redo</Button>
   </div>
   <p id={`${idPrefix}-rich-guidance`} className="lc-muted notes-guidance">{idPrefix==='notes'?'Type / for blocks and tasks. Paste and drop plain text only; attachments and links are unavailable. Maximum 64 KiB of text.':previewKind==='import'?'Read-only Markdown import preview. Rich text and task states are shown without editing.':'Read-only saved revision. Rich text and task states are shown without editing.'}</p>
-  {!disabled&&slash&&<div className="notes-slash-popover"><p className="notes-slash-caption" aria-hidden="true">Insert block</p><div id={`${idPrefix}-slash-menu`} role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`${idPrefix}-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div><p className="notes-slash-hint"><Keycap>Up</Keycap><Keycap>Down</Keycap> move <Keycap>Enter</Keycap> insert <Keycap>Escape</Keycap> close</p></div>}
+  {!disabled&&slash&&<div ref={popoverRef} className="notes-slash-popover"><p className="notes-slash-caption" aria-hidden="true">Insert block</p><div id={`${idPrefix}-slash-menu`} role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`${idPrefix}-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div><p className="notes-slash-hint"><Keycap>Up</Keycap><Keycap>Down</Keycap> move <Keycap>Enter</Keycap> insert <Keycap>Escape</Keycap> close</p></div>}
   <EditorContent editor={editor}/>
  </div>;
 }

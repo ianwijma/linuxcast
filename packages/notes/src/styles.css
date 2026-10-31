@@ -69,7 +69,7 @@
 .notes-capabilities .notes-glyph{margin-block-start:0}
 
 /* Rich editor: restrained ghost tools, divider-separated; the prose itself is unboxed. */
-.notes-rich{display:flex;flex-direction:column;gap:var(--lc-space-8);min-inline-size:0}
+.notes-rich{position:relative;display:flex;flex-direction:column;gap:var(--lc-space-8);min-inline-size:0}
 .notes-rich>*{margin-block:0}
 .notes-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--lc-space-4)}
 .notes-tool{padding-inline:var(--lc-space-8)}
@@ -99,8 +99,9 @@
 .notes-rich ul[data-type=taskList]>li[data-checked=true]>div{color:var(--lc-muted)}
 .notes-rich input[type=checkbox]{accent-color:var(--lc-accent)}
 
-/* Slash menu: the action-panel row language, in flow (no overlay that can clip at 200%). */
-.notes-slash-popover{display:grid;gap:var(--lc-space-4);max-inline-size:min(100%,var(--lc-action-panel-width));box-sizing:border-box;padding:var(--lc-space-4);background:var(--lc-raised);border:var(--lc-hairline) solid var(--lc-border);border-radius:var(--lc-radius-popover);box-shadow:var(--lc-elevation-popover),var(--lc-elevation-highlight)}
+/* Slash menu: the action-row language in a caret-anchored layer. Its block size is bounded at runtime by the actual
+   clipping ancestors and viewport; the menu scrolls internally so the active option stays reachable at 200%. */
+.notes-slash-popover{position:absolute;z-index:1;top:0;left:0;display:grid;align-content:start;gap:var(--lc-space-4);inline-size:var(--lc-action-panel-width);max-inline-size:100%;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;padding:var(--lc-space-4);background:var(--lc-raised);border:var(--lc-hairline) solid var(--lc-border);border-radius:var(--lc-radius-popover);box-shadow:var(--lc-elevation-popover),var(--lc-elevation-highlight)}
 .notes-slash-caption{margin:0;padding:var(--lc-space-4) var(--lc-space-8);color:var(--lc-muted);font-size:var(--lc-text-caption);line-height:var(--lc-leading-caption);border-block-end:var(--lc-hairline) solid var(--lc-divider)}
 .notes-slash{display:grid;gap:0}
 .notes-slash p{margin:0;padding:var(--lc-space-8);color:var(--lc-muted)}
