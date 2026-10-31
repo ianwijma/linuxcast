@@ -33,7 +33,7 @@ navigation, and it does not set up a provider or model.
 | --- | --- |
 | `credentials-dark.png`, `credentials-light.png` | Initialized empty workspace. Shows the header (system tile, “Credentials”, Close with the bound `Escape` keycap), the page title (focused on open, as before), the Empty plate, and the session/storage rows: Unlocked, Refused · `basic_text`, Session-only Available. Neither radio is selected and Persistent is disabled with its reason. |
 | `credentials-keyboard-focus-light.png` | Keyboard only. Tab order from the title is Recheck status → New API key → Session only radio → Cancel entry → policy checkbox. Disabled Remove and Save are skipped. The capture shows the focused radio. |
-| `cancelled-light.png` | Native confirmation cancelled. The Cancelled plate says “Nothing was changed”, the input is cleared, the store still reports `none`, and nothing is claimed as success. |
+| `cancelled-light.png` | Native confirmation cancelled. The Cancelled plate says “Operation cancelled” and asks you to review the current status below before acting again; nothing is replayed. It makes no claim that anything was preserved or rolled back, because main does not guarantee rollback. The input is cleared and the confirmed refresh reports `none`. Nothing is claimed as success. Recaptured in the wording correction; the other 8 captures are unchanged from `2ea07e8`. |
 | `saved-session-light.png` | Confirmed session-only save. The Done plate says “local save confirmed, provider authentication has not been checked”, and the stored plate repeats that saved status is not authentication. |
 | `locked-light.png` | Lock reported. Unsubmitted input is cleared, the field is read-only, the Session row shows Locked, both storage modes are Unavailable with reasons, and the policy checkbox is disabled. |
 | `removed-light.png` | Keyboard `Enter` on Remove key…, then the instrumented confirmation. The Done plate appears only after the `removed` reply, and the confirmed snapshot shows Empty. |
@@ -44,8 +44,10 @@ navigation, and it does not set up a provider or model.
 
 Pop!_OS 22.04 amd64 development host. Pinned Node 24.22.1 and Bun 1.4.4, Electron 45.0.0, Vitest 4.1.12.
 
-- `bun run test:unit -- F2-02`: 85/85 pass. That is 70 credential tests (the original 52 plus 18 new
-  Instrument regressions) and 15 Local data tests.
+- `bun run test:unit -- F2-02`: 86/86 pass. That is 71 credential tests (the original 52, 18 new
+  Instrument regressions and 1 cancelled-wording regression) and 15 Local data tests. The cancelled-wording
+  regression (a cancelled reply followed by a confirmed `none` refresh) fails against the `2ea07e8`
+  wording and passes with the fix.
 - `bun run test:contracts -- F2-02`: 3/3 pass. `bun run test:security -- F2-02`: 144/144 pass.
 - `bun run typecheck`, `bun run lint`, `python3 scripts/validate_plan.py` and `git diff --check` pass.
 - Credential product flow (`LINUXCAST_TEST_FILES=["apps/desktop/tests/credentials.integration.test.ts"]`

@@ -511,3 +511,23 @@ describe('credential settings Instrument presentation (synthetic bridge)', () =>
     expect(ack.closest('[role="status"]')).toBeTruthy();
   });
 });
+
+describe('credential settings cancelled outcome wording (synthetic bridge)', () => {
+  it('shows a neutral cancelled plate that never claims the prior key survived when the confirmed refresh reports none', async () => {
+    // Main may return `cancelled` after partial work (e.g. lock during replacement); the refreshed snapshot is authoritative.
+    const f = fixture({ stored: 'secure-persistent', clearSessionOnLock: true });
+    f.api.saveKey.mockImplementation(async () => { await f.change({ stored: 'none', revision: 5 }); return confirmed('cancelled'); });
+    await ready(f.api); enter('synthetic-replacement', 'session-only'); submit();
+    const title = await screen.findByRole('heading', { name: 'Operation cancelled' });
+    const plate = title.closest('section.lc-plate')!;
+    expect(plate.getAttribute('data-kind')).toBe('interrupted');
+    expect(plate.querySelector('.lc-plate-eyebrow')!.textContent).toBe('Cancelled');
+    expect(plate.textContent).toContain('Editable input was cleared.');
+    expect(plate.textContent).toMatch(/Review the current status/);
+    expect(plate.textContent).not.toMatch(/nothing was changed|unchanged|preserved|kept|rolled back|still saved/i);
+    await screen.findByRole('heading', { name: 'No key saved' });
+    expect(screen.queryByRole('heading', { name: 'Key saved locally' })).toBeNull();
+    expect(input().value).toBe(''); expect(f.api.saveKey).toHaveBeenCalledTimes(1);
+    expect(document.body.innerHTML).not.toContain('synthetic-replacement');
+  });
+});
