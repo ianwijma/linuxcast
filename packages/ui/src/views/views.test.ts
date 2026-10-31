@@ -365,3 +365,20 @@ test('a live snapshot growing or shrinking actions re-anchors the open panel ins
   expect(shrunk.bottom).toBeLessThanOrEqual(shrunk.footerTop); expect(shrunk.footerTop - shrunk.bottom).toBeLessThan(16); expect(shrunk.top).toBeGreaterThan(grown.top + 100);
   await expect(filter).toBeFocused(); await filter.press('Enter'); await expect(page.locator('output')).toHaveText('Requested public-action-01 at revision 4 for guide.');
 });
+
+test('extension search reveals the retained selection only after the host snapshot for the cleared query settles', async ({ page }) => {
+  await page.getByRole('button', { name: 'Extension list', exact: true }).click();
+  const box = query(page, 'Extension library'); const scroller = page.locator('.lc-view:visible .lc-view-scroll');
+  const state = () => page.getByRole('option', { name: /Public item 50/ }).evaluate(row => { const a = row.getBoundingClientRect(), port = row.closest<HTMLElement>('.lc-view-scroll')!, b = port.getBoundingClientRect(), input = document.querySelector<HTMLInputElement>('[data-view-query]')!;
+    return { selected: row.getAttribute('aria-selected') === 'true', focused: document.activeElement === input, active: input.getAttribute('aria-activedescendant') === row.id, scrolled: port.scrollTop > 0, visible: a.top >= b.top - 1 && a.bottom <= b.bottom + 1 }; });
+  await box.fill('Public item 50'); await expect(page.getByRole('option')).toHaveCount(1); // host-filtered snapshot
+  await expect(page.getByRole('option', { name: /Public item 50/ })).toHaveAttribute('aria-selected', 'true');
+  await box.press('Escape'); await expect(box).toHaveValue('');
+  await expect(page.getByRole('option')).toHaveCount(1); // the stale filtered snapshot is still current
+  await expect(page.getByRole('option')).toHaveCount(60); // the host's settled unfiltered snapshot
+  await expect.poll(state).toEqual({ selected: true, focused: true, active: true, scrolled: true, visible: true });
+  await expect(page.locator('output')).toHaveText('No action requested.');
+  // A later ordinary extension snapshot keeps the user's scroll position.
+  await scroller.evaluate(element => { element.scrollTop = 0; }); await box.fill('Public item 0'); await expect(page.getByRole('option')).toHaveCount(9); await box.fill('Public item'); await expect(page.getByRole('option')).toHaveCount(60);
+  await expect.poll(() => page.locator('.lc-view:visible .lc-view-scroll').evaluate(element => element.scrollTop)).toBe(0);
+});

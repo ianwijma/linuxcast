@@ -73,7 +73,8 @@ user intent; the UI never displays operation success based on that return.
   No object type label is shown: the frozen ViewModel has no type field, so the selected
   footer type remains a pending contract/adoption limit rather than an inferred value.
 - After a nonempty root query is cleared (Escape or editing), the preserved selection is
-  scrolled into the result viewport once the settled unfiltered results render; focus
+  scrolled into the result viewport once the settled unfiltered results render (for
+  extension search: the host's non-loading snapshot echoing the cleared query); focus
   stays in the query, nothing is invoked, and ordinary later revisions never scroll.
 - Root Escape closes the action panel, then clears a nonempty query, then pops the
   root (the broker owns actual dismissal). Nested Escape closes the panel, then pops
@@ -166,7 +167,7 @@ physical input, privileged service or real filesystem operation was exercised.
 
 Selected Opus Instrument presentation (DESIGN.md: Shell and navigation; Results and
 actions; List, grid, detail and form; States and motion; Accessibility) on the merged
-D1-01 primitives. `views.test.ts` now covers 23 Chromium cases including the combobox/
+D1-01 primitives. `views.test.ts` now covers 24 Chromium cases including the combobox/
 listbox relationship, root/nested Escape order, footer verbs and context-scoped chord
 hints, selection reveal after clearing the root query, live action growth/shrink panel
 re-anchoring, action-panel geometry and
