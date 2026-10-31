@@ -75,7 +75,10 @@
 .lc-image-unavailable { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: var(--lc-space-4); border: var(--lc-hairline) dashed var(--lc-border); border-radius: var(--lc-radius-row); color: var(--lc-muted); font-size: var(--lc-text-caption); min-block-size: var(--lc-row-height); }
 
 /* ------------------------------------------------------ list/detail split */
-.lc-collection-layout { display: block; }
+.lc-collection-layout { display: block; position: relative; }
+/* Minimum list + separator + detail width at the current text size; compared with the real container. */
+.lc-split-probe-box { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 0; block-size: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
+.lc-split-probe { display: block; inline-size: calc(var(--lc-list-min-width) + var(--lc-space-8) + var(--lc-hairline) + var(--lc-detail-min-width)); block-size: 0; }
 .lc-collection-layout[data-detail='true'] { display: grid; grid-template-columns: minmax(var(--lc-list-min-width), var(--lc-view-split, 42%)) calc(var(--lc-space-8) + var(--lc-hairline)) minmax(var(--lc-detail-min-width), 1fr); align-items: start; }
 .lc-collection-main { min-inline-size: 0; }
 .lc-split { align-self: stretch; position: relative; min-block-size: var(--lc-row-height); cursor: col-resize; touch-action: none; border-radius: var(--lc-radius-keycap); }
@@ -132,7 +135,7 @@
 .lc-panel-context { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
 .lc-panel-close { min-block-size: var(--lc-compact-control-height); min-inline-size: var(--lc-compact-control-height); }
 .lc-action-list { flex: 1 1 auto; min-block-size: var(--lc-action-row-height); overflow: auto; padding: var(--lc-space-4); }
-.lc-panel-group + .lc-panel-group { margin-block-start: var(--lc-space-4); padding-block-start: var(--lc-space-4); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
+.lc-panel-divider { margin-block: var(--lc-space-4); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
 .lc-action-panel .lc-panel-action { position: relative; display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: var(--lc-space-4) var(--lc-space-8); inline-size: 100%; min-block-size: var(--lc-action-row-height); padding: var(--lc-space-4) var(--lc-space-8); text-align: start; font-weight: var(--lc-weight-regular); background: transparent; border-color: transparent; }
 .lc-panel-action[data-current='true'] { background: var(--lc-selection); }
 .lc-panel-action[data-current='true']::before { content: ''; position: absolute; inset-inline-start: var(--lc-selection-rail-inset); inset-block: var(--lc-space-8); inline-size: var(--lc-selection-rail-width); border-radius: var(--lc-hairline); background: var(--lc-selection-rail); }
@@ -160,8 +163,12 @@
 .lc-discard-actions { display: flex; flex-wrap: wrap; gap: var(--lc-space-8); justify-content: flex-end; }
 
 /* ---------------------------------------------------------------- responsive */
+/* Stacked when the container cannot hold both scaled minima: preview below the list, no separator. */
+.lc-collection-layout[data-detail='true'][data-stacked] { display: flex; flex-direction: column; align-items: stretch; gap: var(--lc-space-8); }
+.lc-collection-layout[data-stacked] .lc-split { display: none; }
+.lc-collection-layout[data-stacked] .lc-item-preview { position: static; padding: var(--lc-space-12) var(--lc-space-8); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
 @media (max-width: 37.5rem) {
-  .lc-collection-layout[data-detail='true'] { display: flex; flex-direction: column; gap: var(--lc-space-8); }
+  .lc-collection-layout[data-detail='true'] { display: flex; flex-direction: column; align-items: stretch; gap: var(--lc-space-8); }
   .lc-split { display: none; }
   .lc-item-preview { position: static; padding: var(--lc-space-12) var(--lc-space-8); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
   /* Labels hide visually behind their keycaps; accessible names keep them. A verb without a

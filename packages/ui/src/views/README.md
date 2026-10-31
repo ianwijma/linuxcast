@@ -48,7 +48,8 @@ user intent; the UI never displays operation success based on that return.
   a stable footprint when an image fails; the selected cell has a short bottom rail.
   Compact grids show glyphs only (names stay accessible and appear in the footer).
   Optional item previews use a focusable `separator` (42% list, 30–60%, 2% arrows,
-  Home/End, pointer drag) and stack vertically below 600 px; PDF previews show an
+  Home/End, pointer drag) and stack vertically, with the separator removed, below 600 px
+  or whenever the actual container cannot fit the text-scaled list and detail minima; PDF previews show an
   unavailable band without erasing the list.
 - Detail renders CommonMark, metadata and host-resolved attachments. Text supports
   readonly and local editable drafts. Image views use host-resolved images. PDF
@@ -56,8 +57,10 @@ user intent; the UI never displays operation success based on that return.
   integrated; available declared document actions remain usable.
 - `Ctrl+K` opens the 280 px action dialog (“Actions”) anchored above the footer: a
   header with the selected title and a Close control, native buttons with line icons
-  and keycaps grouped by divider (bound primary/secondary, others, destructive last
-  with an accessible “(destructive)” suffix), and the “Find an action” filter at the
+  and keycaps in one keyed list split by semantic dividers (bound primary/secondary,
+  others, destructive last with an accessible “(destructive)” suffix); a surviving row
+  keeps its focus when a live snapshot moves it between groups, and removing the focused
+  row returns focus to the filter without invoking anything, and the “Find an action” filter at the
   bottom. Arrows move, Enter dispatches the highlighted action, Escape or Ctrl+K close
   and focus returns. The list scrolls so header and filter stay reachable in compact
   windows and at 200% zoom, and placement re-anchors on every render and on panel/footer/
@@ -167,7 +170,7 @@ physical input, privileged service or real filesystem operation was exercised.
 
 Selected Opus Instrument presentation (DESIGN.md: Shell and navigation; Results and
 actions; List, grid, detail and form; States and motion; Accessibility) on the merged
-D1-01 primitives. `views.test.ts` now covers 24 Chromium cases including the combobox/
+D1-01 primitives. `views.test.ts` now covers 30 Chromium cases including the combobox/
 listbox relationship, root/nested Escape order, footer verbs and context-scoped chord
 hints, selection reveal after clearing the root query, live action growth/shrink panel
 re-anchoring, action-panel geometry and

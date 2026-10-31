@@ -10,6 +10,7 @@ assistive-technology acceptance. Earlier captures in `../` are historical.
 | --- | --- |
 | `{dark,light}-list.png`, `-grid.png`, `-detail.png`, `-form.png` | Instrument rows/captions/tiles, grid, detail metadata, shared Form |
 | `{dark,light}-split.png`, `dark-split-pdf-band.png`, `dark-split-narrow.png` | List/detail separator at 42%, PDF unavailable band beside rows, stacked below 600 px |
+| `text-200-split-{720,800}.png` | 200% root text: the container cannot hold the scaled list + detail minima, so the preview stacks below the list without horizontal overflow |
 | `{dark,light}-glyph-grid.png` | Compact emoji grid, grouped rows, bottom selection rail, footer context |
 | `{dark,light}-action-panel.png`, `dark-actions-filtered.png` | 280 px panel, bottom filter, destructive-last group |
 | `dark-action-panel-grown.png` | Panel re-anchored inside the shell after a live revision grows the actions to 25 (800×600 viewport) |

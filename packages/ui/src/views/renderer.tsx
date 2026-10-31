@@ -71,8 +71,13 @@ function ActionPanel({ actions, context, invoke, close, host }: { actions: Actio
   const bound = actions.slice(0, 2).filter(action => action.effect !== 'destructive');
   const groups = [bound, actions.filter(action => !bound.includes(action) && action.effect !== 'destructive'), actions.filter(action => action.effect === 'destructive')];
   const match = (action: ActionModel) => action.title.toLocaleLowerCase().includes(query.toLocaleLowerCase());
-  const visibleGroups = groups.map(group => group.filter(match)).filter(group => group.length);
-  const filtered = visibleGroups.flat();
+  // Semantic group identities; rows render as one keyed sibling list (dividers are keyed by
+  // group), so a surviving action keeps its DOM node and focus when it moves between groups.
+  const visibleGroups = (['bound', 'other', 'destructive'] as const).map((name, index) => ({ name, actions: groups[index]!.filter(match) })).filter(group => group.actions.length);
+  const filtered = visibleGroups.flatMap(group => group.actions);
+  // Last focus owner inside the panel ('' = filter). Restores focus if a live snapshot removes or
+  // moves the focused row; never invokes and never takes focus from a control outside the panel.
+  const owner = useRef<string | null>(null);
   const active = filtered.find(action => action.id === selected) ?? filtered[0];
   const id = useId();
   useLayoutEffect(() => { const prior = document.activeElement; const element = dialog.current; element?.showModal(); element?.querySelector<HTMLInputElement>('input[type="search"]')?.focus(); return () => { element?.close(); if (prior instanceof HTMLElement && prior.isConnected) prior.focus(); }; }, []);
@@ -123,24 +128,30 @@ function ActionPanel({ actions, context, invoke, close, host }: { actions: Actio
     }
     if (event.key === 'Enter' && event.target instanceof HTMLInputElement) { event.preventDefault(); if (active && !active.disabledReason) invoke(active.id); }
   };
+  useLayoutEffect(() => {
+    const element = dialog.current; const focused = document.activeElement;
+    if (!element?.open || owner.current === null || (focused && focused !== document.body)) return;
+    const row = owner.current ? Array.from(element.querySelectorAll<HTMLElement>('.lc-panel-action')).find(button => button.dataset.actionId === owner.current) : undefined;
+    (row ?? element.querySelector<HTMLInputElement>('input[type="search"]'))?.focus({ preventScroll: true });
+  });
   return <dialog ref={dialog} className="lc-action-panel" aria-label="Actions" onCancel={event => { event.preventDefault(); event.stopPropagation(); close(); }} onKeyDown={keys}
     onClick={event => { if (event.target !== dialog.current) return; const box = dialog.current.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close(); }}>
     <div className="lc-panel-header"><span className="lc-panel-context" dir="auto" title={context}>{context}</span><IconButton label="Close actions" aria-keyshortcuts="Escape" className="lc-panel-close" onClick={close}><LineIcon name="close" /></IconButton></div>
     <span className="lc-view-announcement" role="status" aria-live="polite">{active ? `${active.title}${active.disabledReason ? `: ${active.disabledReason}` : ''}` : 'No matching actions.'}</span>
     <div id={id} className="lc-action-list">
-      {visibleGroups.map((group, index) => <div className="lc-panel-group" key={index}>{group.map(action => {
+      {visibleGroups.flatMap((group, index) => [...(index ? [<div className="lc-panel-divider" data-group={group.name} role="presentation" key={`divider-${group.name}`} />] : []), ...group.actions.map(action => {
         const destructive = action.effect === 'destructive';
-        return <Button key={action.id} className="lc-panel-action" data-current={active?.id === action.id} data-destructive={destructive || undefined} variant={destructive ? 'danger' : 'quiet'} aria-disabled={Boolean(action.disabledReason)} title={action.disabledReason}
-          onFocus={() => setSelected(action.id)} onClick={() => invoke(action.id)}>
+        return <Button key={`action-${action.id}`} className="lc-panel-action" data-action-id={action.id} data-group={group.name} data-current={active?.id === action.id} data-destructive={destructive || undefined} variant={destructive ? 'danger' : 'quiet'} aria-disabled={Boolean(action.disabledReason)} title={action.disabledReason}
+          onFocus={() => { owner.current = action.id; setSelected(action.id); }} onClick={() => invoke(action.id)}>
           <ActionGlyph action={action} host={host} />
           <span className="lc-panel-label"><span dir="auto">{action.title}</span>{action.disabledReason && <small>{action.disabledReason}</small>}</span>
           {action.shortcut && <ShortcutHint keys={[...action.shortcut.modifiers, action.shortcut.key]} />}
           {destructive && <span className="lc-view-announcement"> (destructive)</span>}
         </Button>;
-      })}</div>)}
+      })])}
       {!filtered.length && <p className="lc-panel-empty">No matching actions.</p>}
     </div>
-    <div className="lc-panel-filter"><LineIcon name="search" /><TextField label="Find an action" type="search" value={query} placeholder="Filter actions" onChange={event => setQuery(event.target.value)} aria-controls={id} /><ShortcutHint keys={['Ctrl', 'K']} label="Close with Ctrl+K" /></div>
+    <div className="lc-panel-filter"><LineIcon name="search" /><TextField label="Find an action" type="search" value={query} placeholder="Filter actions" onFocus={() => { owner.current = ''; }} onChange={event => setQuery(event.target.value)} aria-controls={id} /><ShortcutHint keys={['Ctrl', 'K']} label="Close with Ctrl+K" /></div>
   </dialog>;
 }
 function DiscardDialog({ discard, cancel }: { discard: () => void; cancel: () => void }) {
@@ -221,6 +232,19 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   const primary = suppliedActions.find(action => action.id === frame.primaryAction);
   const actions = primary ? [primary, ...suppliedActions.filter(action => action !== primary)] : suppliedActions;
   const columns = useGridColumns(results, grid, grid ? view.density : undefined);
+  // Stack list and preview whenever the actual container cannot fit the text-scaled list and
+  // detail minima plus the separator (for example 200% root text in a 720 px launcher).
+  const [stacked, setStacked] = useState(false);
+  const hasPreview = collection && !!visibleItems(frame).find(item => item.id === frame.selection)?.preview;
+  useLayoutEffect(() => {
+    const element = layout.current; const probe = element?.querySelector<HTMLElement>('.lc-split-probe');
+    if (!hasPreview || !element || !probe) return;
+    const measure = () => setStacked(probe.offsetWidth > element.clientWidth);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure); observer.observe(element); observer.observe(probe);
+    return () => observer.disconnect();
+  }, [hasPreview]);
   const itemId = (item: Item) => `${prefix}-item-${items.indexOf(item)}`;
   const sections = collection ? view.sections.map(section => ({ section, items: items.filter(item => section.items.some(value => value.id === item.id)) })).filter(value => value.items.length) : [];
   const gridRows = grid ? sections.flatMap(value => chunk(value.items, columns).map(row => row.map(item => items.indexOf(item)))) : [];
@@ -293,7 +317,7 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
     if (!items.length) return null;
     const current = items.findIndex(item => item.id === frame.selection);
     const last = items.length - 1;
-    if (!grid) return key === 'Home' ? 0 : key === 'End' ? last : current < 0 ? 0 : Math.min(last, Math.max(0, current + (key === 'ArrowUp' ? -1 : 1)));
+    if (!grid) return key === 'Home' ? 0 : key === 'End' ? last : current < 0 ? 0 : Math.min(last, Math.max(0, current + (key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1)));
     if (current < 0) return 0;
     const row = gridRows.findIndex(value => value.includes(current)); const cells = gridRows[row] ?? [current]; const column = cells.indexOf(current);
     if (key === 'ArrowLeft') return Math.max(0, current - 1);
@@ -315,7 +339,8 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
     const isQuery = event.target instanceof HTMLInputElement && event.target.dataset.viewQuery === 'true';
     const inCollection = collection && (isQuery || event.target instanceof HTMLElement && !!event.target.closest('[role="listbox"], [role="grid"]'));
     const navigation = ['ArrowDown', 'ArrowUp', 'Home', 'End', ...(isQuery ? [] : ['ArrowLeft', 'ArrowRight'])];
-    const gridJump = grid && !isQuery && event.ctrlKey && !event.shiftKey && (event.key === 'Home' || event.key === 'End');
+    // Exactly Ctrl+Home/Ctrl+End: any extra Alt/Shift/Super leaves the chord unhandled.
+    const gridJump = grid && !isQuery && event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey && (event.key === 'Home' || event.key === 'End');
     if (inCollection && (gridJump || (!event.ctrlKey && !event.altKey && !event.metaKey)) && navigation.includes(event.key)) {
       // Home/End and Left/Right retain native query caret semantics.
       if (isQuery && ['Home', 'End'].includes(event.key)) return;
@@ -362,14 +387,14 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
         </div>)}
       </div>;
     const preview = selected?.preview;
-    content = <div ref={layout} className="lc-collection-layout" data-detail={Boolean(preview)} style={preview ? { ['--lc-view-split' as string]: `${split}%` } : undefined}>
+    content = <div ref={layout} className="lc-collection-layout" data-detail={Boolean(preview)} data-stacked={(preview && stacked) || undefined} style={preview ? { ['--lc-view-split' as string]: `${split}%` } : undefined}>
       <div className="lc-collection-main">
         {list}
         {!items.length && view.loading && <StatePlate kind="loading" title="Loading…" announce />}
         {!items.length && !view.loading && <EmptyState filtered={filtered} title={filtered ? 'No matching results' : view.empty?.title ?? 'No items yet'} description={frame.query ? (view.search.mode === 'extension' ? view.empty?.description ?? 'Try a different search.' : 'Try a different search.') : view.empty?.description ?? 'Items will appear here when available.'} />}
         {view.nextCursor && <Button className="lc-load-more" disabled={!host.loadMore} onClick={() => host.loadMore?.(view.viewId, view.nextCursor!)}>Load more results</Button>}
       </div>
-      {preview && <><Splitter value={split} change={setSplit} controls={resultsId} layout={layout} /><aside className="lc-item-preview" aria-label="Selected item preview">
+      {preview && <><span className="lc-split-probe-box" aria-hidden="true"><span className="lc-split-probe" /></span><Splitter value={split} change={setSplit} controls={resultsId} layout={layout} /><aside className="lc-item-preview" aria-label="Selected item preview">
         {preview.kind === 'text' ? <SafeMarkdown text={preview.text} openLink={host.openLink} />
           : preview.kind === 'image' ? <Image asset={preview.source} host={host} description={selected.title} />
             : <UnavailableState layout="band" title="PDF preview unavailable" description="Open this document through a configured sandboxed document viewer." />}
