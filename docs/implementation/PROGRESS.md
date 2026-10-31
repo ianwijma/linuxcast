@@ -102,3 +102,21 @@ small fixture correction. No native desktop/keyring/provider acceptance. Origina
 worker commit/manifests remain historical. Missing Nodeclient, native CLI/library
 glue, admission/predispatch/abort/clearing, credentialsetup/status and Debianmatrix
 remain useful next work. No active delegate is being polled.
+
+
+Final safety recheck of signed7310cee completed/read: Standards no actionable
+finding; Security/Spec both partial-discovery P1 and reader-accounting P2 resolved,
+no new blocking defect in bounded scope.55security/50Python/19hashes/observerpins/
+plan/whitespace/signature independently pass. Native product/Orca runs0. Next F1:
+stronger alternate/final-row native IDs, immutable guestbuild/receipt, reviewed
+namespace/outershutdown, then actual native attempts. No acceptance promotion.
+
+F2credential worktree now implements main-only bounded stream/client, mandatory
+SecretStore session admission and consumer freshness/abort/clear policy, coalesced
+operation drain before private-directory close, and fixed native CLI/library arm.
+87mappedsecurity/38platformRust tests, offlineClippy/type/lint/plan pass; original
+native observer production source unchanged, corrected parent-death fixture6pure/
+35privatebus/nonrootpeer checks pass. Independent review of new coordinator source
+is next before runtime startup/retry/suspend/ordered shutdown/provider dispatch
+and missingcredentialsetup/status UI. Source/evidence stays in that isolated F2
+worktree; no renderer/native session/provider acceptance claimed. Fullgoal active.
