@@ -25,6 +25,7 @@ node /home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls/node_modules/.b
   --config /home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls/eslint.config.mjs \
   docs/design/proposals/raycast-refresh/verify.mjs
 python3 scripts/validate_plan.py
+python3 scripts/test_validate_plan.py
 git diff --check
 ```
 
@@ -65,6 +66,7 @@ The coordinator visually inspected launcher/action dark/light, chat, workflow, l
 - Sol's selected workflow button initially aligned differently from the other nodes; the coordinator made all canvas nodes block-level with a consistent width before final captures.
 - The harness initially checked Tab after the last footer control and hit the browser boundary. It now checks Escape's actual restored focus and Shift+Tab to a prior control.
 - Opus shortcuts are scoped to its preview stage. The harness focuses its query before exercising Escape/Ctrl+K, matching an in-app interaction rather than sending keys to the page body.
+- Initial CI exposed that the planning-gate unit tests construct a documentation-only fixture without `apps/`. The coordinator changed the two prior-app screenshot references to immutable baseline GitHub links and ran the complete planning-gate tests. No validator or fixture behaviour was changed.
 - The author's Opus validation notes predate the coordinator's forced-colours/reduced-motion smoke check. The record here supplements them; it does not establish Electron or screen-reader acceptance.
 - [Provenance](PROVENANCE.md) corroborates the requested/returned Opus `effort: high` launch option. Internal model compute is not measurable from these artifacts.
 
