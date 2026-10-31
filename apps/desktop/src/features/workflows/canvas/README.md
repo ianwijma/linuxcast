@@ -139,17 +139,51 @@ persistence and visible-text names, bound-only shortcuts and Ctrl+S receipt clas
 `apps/desktop/tests/workflow-editor.integration.test.ts` passed on owned private Xvfb (captures in
 `apps/desktop/evidence/instrument-workflows/`). Captures: `evidence/instrument/README.md`.
 
-Limitations and shared requests (coordinator-owned):
+## Text-size projection and typed edge labels (follow-up)
 
-1. Stored node spacing (`controller.add`: x step 240 flow units) ignores text scaling, while card width
-   follows rem tokens, so cards overlap on the canvas at 200% text. Request: derive placement from measured
-   card size or provide a non-overlapping layout helper. Ports stay left/right (not the design's
-   top/bottom) because that controller layout is horizontal.
-2. Shared `Row`: `.lc-row-text` `flex: 1 1 12em` overflows a 240 px sidebar at normal text. Request a
+Card width follows the rem `workflowNodeWidth` token (208 px at 100% text) while persisted
+`editor.positions` are numeric flow units laid out by the controller (`x: index * 240`). The canvas now
+renders through a UI-only projection (`ui/projection.ts`): each stored position is multiplied by one
+measured factor `f = max(1, (measured card width + measured typed-label slot) / 240)` and every
+pointer/keyboard move from React Flow is stored with the exact inverse (`÷ f`). A hidden probe measures
+layout CSS px (`offsetWidth`), so root text size changes `f` while native Electron zoom (uniform CSS-px
+scaling) and transforms do not. Text resizing never writes: stored positions, viewport, undo/redo
+history and the execution graph stay byte-identical; only an explicit user move writes, and Undo
+restores the stored (unprojected) position. Card width, labels/tooltips, ports, pan/zoom, selection,
+focus and the structured no-drag controls are unchanged.
+
+Typed edge labels are restored as a custom `typed` edge (controlBorder curve plus the registry's
+actual output kind, e.g. `text`, in a monospace label with a `title`). The kind is also appended to the
+focusable edge's accessible name (`Connection … in · text`), and card port lines, handles, selects and
+the inspector now read the registry's port kinds instead of a literal.
+
+Ports remain left (input) / right (output). Canonical constraint: the controller persists new nodes on
+one horizontal row (`y: 80`, `x: index * 240`), so top/bottom ports would make every default edge leave
+the bottom of one card and climb into the top of a card on the same row, folding the curve and its label
+across both cards. Adopting top/bottom without that would require transposing persisted coordinates,
+which changes what stored layout means for every other consumer. Proposed (not implemented) pure-layout
+helper if the coordinator wants the design's vertical flow: a `defaultPosition(index)` in the controller
+that places new nodes in a column; manual positions would be untouched.
+
+Verification for this follow-up (same toolchain): `test:ui -- W2-01` 22 passed, including three new
+cases that fail on 8e3d1116 (100%: typed labels absent; 200%: "cards overlap") and pass here: default
+cards and labels never intersect at 100%/200% with labels titled and the edge focusable/named; and text
+resizing leaves writes, stored positions/viewport/nodes/edges and Undo/Redo unchanged while a 200%
+pointer drag stores exactly `screen delta / zoom / f` and Undo restores the stored position (the third
+case also needs the new fixture observation, so on 8e3d it fails for that reason). The actual Electron
+editor flow now also sets `webContents.setZoomFactor(2)`: the projection factor is unchanged, five
+visible sized card/label boxes inside the canvas do not intersect, and stored state is unchanged
+(`apps/desktop/evidence/instrument-workflows/workflow-editor-application-light-zoom-200.png`, captured
+with `webContents.capturePage()` because Playwright element capture ignores Electron zoom).
+
+Remaining limitations and shared requests (coordinator-owned):
+
+1. Shared `Row`: `.lc-row-text` `flex: 1 1 12em` overflows a 240 px sidebar at normal text. Request a
    sidebar/compact Row variant in D1-01; this lane uses a scoped palette grid meanwhile.
-3. Typed edge labels and an invalid-edge rendering are omitted: the 32-unit gap between stored positions
-   leaves no room, and the validator rejects invalid edges before they exist.
-4. New cases live in the already-mapped `tests/editor.ui.test.ts`; no runner mapping change needed.
-5. `packages/storage/tests/workflow-editor.integration.test.ts` (mapped integration W2-01) fails one
-   version-7 migration case on the unchanged parent base (`StorageError invalid-request`); it imports no
-   UI and is outside this lane.
+2. Manually dragged positions may still be placed close together by the user; the projection scales
+   them uniformly and never rearranges them. At 200% a wide chain can extend past the canvas viewport
+   and is reached by panning or Fit view (the persisted viewport is not changed automatically).
+3. No invalid-edge rendering: the validator rejects invalid connections before an edge exists.
+4. New cases live in the mapped `tests/editor.ui.test.ts`; no runner mapping change needed. The fixture
+   adds a hidden labelled `pre[data-observe="stored-graph"]` observation of the synthetic owner record.
+5. The mapped storage integration migration case is outside this lane (parent verifies its baseline).

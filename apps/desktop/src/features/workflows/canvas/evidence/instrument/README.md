@@ -14,10 +14,10 @@ session or assistive-technology evidence. The older `../*.png` captures are hist
 | `dark-`/`light-workflow-write-error.png` | Unknown write outcome: unclassified band, Save disabled, autosave stopped, draft editable, empty-canvas plate |
 | `dark-workflow-200-percent.png` | 200% root text at 1000 px: panels wrap; structured controls reachable |
 | `dark-workflow-200-percent-focus.png` | 200% root text with keyboard focus on a structured node row |
-| `dark-`/`light-workflow-forced-colors-focus.png` | Emulated forced colors + reduced motion: Highlight selection outline/rail, focused palette row |
+| `dark-`/`light-workflow-forced-colors-focus.png` | Emulated forced colors + reduced motion: Highlight selection outline/rail, focused palette row, CanvasText typed label |
+| `dark-workflow-canvas-labels-100-percent.png`, `dark-workflow-canvas-labels-200-percent.png` | UI-only text-size projection: default chain with typed `text` edge labels; no card/label intersection at 100% and 200% |
 
-Known limitation visible at 200%: card width follows root text (rem tokens) while stored node spacing does
-not, so canvas cards overlap; the selected card is raised and the structured list stays complete. Layout
-spacing is controller-owned (see canvas README shared requests). Forced colors are Chromium emulation, not
+Canvas captures with nodes were regenerated after the projection/typed-label follow-up; at 200% a wide
+chain can extend past the canvas viewport (reached by panning) but cards never overlap. Forced colors are Chromium emulation, not
 a desktop high-contrast theme. axe runs on every non-forced state; forced-colour cases assert computed
 system-colour outlines/borders instead (axe compares authored colours with the forced canvas).

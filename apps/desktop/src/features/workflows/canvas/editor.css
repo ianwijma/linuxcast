@@ -79,6 +79,17 @@
 .wf-editor .react-flow__handle { inline-size: var(--lc-workflow-port-size); block-size: var(--lc-workflow-port-size); min-inline-size: 0; min-block-size: 0; border: var(--lc-stroke-edge) solid var(--lc-control-border); background: var(--lc-surface); }
 .wf-editor .react-flow__edge-path { stroke: var(--lc-control-border); stroke-width: var(--lc-stroke-edge); }
 .wf-editor .react-flow__edge.selected .react-flow__edge-path, .wf-editor .react-flow__edge:focus-visible .react-flow__edge-path { stroke: var(--lc-focus); }
+.wf-edge-label {
+  position: absolute; pointer-events: none; padding: 0 var(--lc-space-4); white-space: nowrap;
+  border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-keycap); background: var(--lc-canvas); color: var(--lc-muted);
+  font: var(--lc-weight-medium) var(--lc-text-caption)/var(--lc-leading-caption) var(--lc-font-mono);
+}
+/* Hidden measurement probe for the UI-only layout projection (ui/projection.ts): one token-width card and
+   one typed-label slot (label plus spacing either side). It never takes layout space or focus. */
+.wf-canvas-probe { position: absolute; inset-block-start: 0; inset-inline-start: 0; visibility: hidden; pointer-events: none; display: grid; justify-items: start; }
+.wf-canvas-probe [data-probe='card'] { display: block; inline-size: var(--lc-workflow-node-width); block-size: 0; }
+.wf-edge-label-slot { display: inline-block; padding-inline: var(--lc-space-8); }
+.wf-edge-label-slot .wf-edge-label { position: static; display: inline-block; }
 .wf-editor .react-flow__controls { box-shadow: var(--lc-elevation-popover); border-radius: var(--lc-radius-row); overflow: hidden; }
 .wf-editor .react-flow__controls-button { color: var(--lc-text); background: var(--lc-raised); border-color: var(--lc-divider); }
 .wf-editor .react-flow__controls-button:hover { background: var(--lc-selection); }
@@ -134,6 +145,7 @@
   .wf-node[data-selected]::before, .wf-step[data-current]::before { forced-color-adjust: none; background: Highlight; }
   .wf-editor .react-flow__handle { border-color: CanvasText; background: Canvas; }
   .wf-editor .react-flow__edge-path { stroke: CanvasText; }
+  .wf-edge-label { border-color: CanvasText; background: Canvas; color: CanvasText; }
   .wf-canvas, .wf-editor .react-flow, .wf-editor .react-flow__pane, .wf-editor .react-flow__background { --xy-background-color: Canvas; background: Canvas; }
 }
 /* Accessible verb prefix for palette rows whose visible label is the noun ("Add" + "Keyword"). */

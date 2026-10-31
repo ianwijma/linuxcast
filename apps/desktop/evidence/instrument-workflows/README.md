@@ -8,6 +8,7 @@ Produced by the existing production Electron flows after the Instrument presenta
 | File | State |
 | --- | --- |
 | `workflow-editor-application-{dark,light}-saved.png` | Registered launcher → editor; keyboard-built three-node graph explicitly saved (exact receipt notice), Run enabled for the saved version |
+| `workflow-editor-application-light-zoom-200.png` | Native `webContents.setZoomFactor(2)`: unchanged projection factor, typed labels between non-overlapping cards (captured with `webContents.capturePage()`) |
 | `workflow-run-application-dark-approval.png` | Explicit Run of the saved version; real PermissionBroker clipboard approval pending |
 | `workflow-run-application-light-result.png` | After real broker decision: host succeeded with clipboard receipt (clipboard of the owned private Xvfb display, seeded with a public sentinel; no host clipboard) |
 | `workflow-launcher-application-dark-open.png` | Saved Keyword opened from launcher without any run |

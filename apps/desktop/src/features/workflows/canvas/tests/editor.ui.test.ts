@@ -97,3 +97,52 @@ test('200 percent text keeps the focused structured node row and selected canvas
   expect(await row.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]); await page.screenshot({ path: `${evidence}/dark-workflow-200-percent-focus.png`, fullPage: true });
 });
+
+// Text-size projection regressions: cards follow rem tokens, stored positions stay numeric and exact.
+type Box = { left: number; top: number; right: number; bottom: number };
+async function canvasGeometry(page: Page) {
+  return page.evaluate(() => {
+    const box = (element: Element): Box => { const rect = element.getBoundingClientRect(); return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }; };
+    return { nodes: [...document.querySelectorAll('.react-flow__node')].map(box), labels: [...document.querySelectorAll('.react-flow .wf-edge-label')].map(element => ({ ...box(element), text: element.textContent, title: element.getAttribute('title') })) };
+  });
+}
+const overlaps = (a: Box, b: Box) => a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+const storedGraph = async (page: Page) => JSON.parse((await page.locator('pre[data-observe="stored-graph"]').textContent()) || 'null') as { positions: Record<string, { x: number; y: number }>; viewport: unknown; nodes: unknown[]; edges: unknown[] };
+const writes = async (page: Page) => Number(/writes: (\d+)/.exec((await page.locator('output').first().textContent()) ?? '')?.[1]);
+async function buildChain(page: Page) { await fresh(page); await add(page, 'Keyword'); await add(page, 'Transform text'); await add(page, 'Copy text'); await connect(page, 'node-1', 'node-2'); await connect(page, 'node-2', 'node-3'); }
+for (const scale of ['100%', '200%']) test(`${scale} root text: default cards and typed edge labels never overlap and labels stay reachable`, async ({ page }) => {
+  await ready(page); await page.evaluate(value => { document.documentElement.style.fontSize = value; }, scale); await buildChain(page);
+  await expect.poll(async () => { const { nodes } = await canvasGeometry(page); return nodes.length === 3 && !nodes.some((a, i) => nodes.some((b, j) => i < j && overlaps(a, b))); }, { message: 'cards overlap' }).toBe(true);
+  await expect(page.locator('.react-flow .wf-edge-label')).toHaveCount(2);
+  await expect.poll(async () => { const { nodes, labels } = await canvasGeometry(page); return nodes.length === 3 && labels.length === 2 && !nodes.some((a, i) => nodes.some((b, j) => i < j && overlaps(a, b))) && !labels.some(label => nodes.some(node => overlaps(label, node))); }).toBe(true);
+  const { labels } = await canvasGeometry(page); expect(labels.map(label => [label.text, label.title])).toEqual([['text', 'text connection'], ['text', 'text connection']]);
+  const edge = page.locator('.react-flow__edge').first(); await edge.focus(); await expect(edge).toBeFocused(); await expect(edge).toHaveAccessibleName(/^Connection node-\d out to node-\d in · text$/);
+  await expect(page.locator('.react-flow__node[data-id="node-1"] .react-flow__handle-right')).toHaveAttribute('aria-label', 'text output out');
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: `${evidence}/dark-workflow-canvas-labels-${scale === '100%' ? '100' : '200'}-percent.png`, fullPage: true });
+});
+test('text resizing never writes or changes stored layout, viewport, undo or the execution graph; pointer moves map back exactly', async ({ page }) => {
+  await ready(page); await buildChain(page); await page.waitForTimeout(700);
+  const before = await storedGraph(page), count = await writes(page), factor100 = Number(await page.locator('.wf-canvas').getAttribute('data-projection'));
+  expect(before.edges).toHaveLength(2); await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled(); await expect(page.getByRole('button', { name: 'Redo', exact: true })).toBeDisabled();
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  await expect.poll(async () => Number(await page.locator('.wf-canvas').getAttribute('data-projection'))).toBeGreaterThan(factor100 * 1.5);
+  await page.waitForTimeout(700); expect(await writes(page)).toBe(count); expect(await storedGraph(page)).toEqual(before);
+  await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled(); await expect(page.getByRole('button', { name: 'Redo', exact: true })).toBeDisabled();
+  // Pointer drag in the projected canvas stores the exact inverse (screen delta / zoom / factor).
+  const factor = Number(await page.locator('.wf-canvas').getAttribute('data-projection'));
+  const zoom = await page.locator('.react-flow__viewport').evaluate(element => new DOMMatrixReadOnly(getComputedStyle(element).transform).a);
+  const node = page.locator('.react-flow__node[data-id="node-1"]'), start = (await node.boundingBox())!;
+  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2); await page.mouse.down(); await page.mouse.move(start.x + start.width / 2 + 60, start.y + start.height / 2 + 30, { steps: 6 }); await page.mouse.move(start.x + start.width / 2 + 120, start.y + start.height / 2 + 60, { steps: 6 }); await page.mouse.up();
+  const end = (await node.boundingBox())!; await page.waitForTimeout(700);
+  const moved = await storedGraph(page);
+  expect(moved.positions['node-1']!.x - before.positions['node-1']!.x).toBeCloseTo((end.x - start.x) / zoom / factor, 0);
+  expect(moved.positions['node-1']!.y - before.positions['node-1']!.y).toBeCloseTo((end.y - start.y) / zoom / factor, 0);
+  expect(moved.positions['node-2']).toEqual(before.positions['node-2']); expect(moved.positions['node-3']).toEqual(before.positions['node-3']); expect(moved.nodes).toEqual(before.nodes); expect(moved.edges).toEqual(before.edges);
+  // Keyboard selection still works on projected nodes; Undo restores the stored (not projected) position.
+  const second = page.locator('.react-flow__node[data-id="node-2"]'); await second.focus(); await page.keyboard.press('Enter'); await expect(second).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click(); await page.waitForTimeout(700);
+  expect((await storedGraph(page)).positions).toEqual(before.positions);
+  const settled = await writes(page); await page.evaluate(() => { document.documentElement.style.fontSize = ''; }); await page.waitForTimeout(700);
+  expect(await writes(page)).toBe(settled); expect((await storedGraph(page)).positions).toEqual(before.positions);
+});
