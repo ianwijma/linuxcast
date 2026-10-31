@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-outer-owner-source-and-evidence-not-execution-permit",
+  "files": {
+    "apps/desktop/tests/at/lab_owner.py": "b5defbaf78058c706bc3d271a35efb09fe496354eda441b7449c77019e918f10",
+    "apps/desktop/tests/at/test_lab_owner.py": "8161beda4389496ac3375ea17421a612ba708583eb3351785973621c482d711f",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "976954113d5a5ec2ca21d655676933e193c9174c050a016cfc43bf6267e66699",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "664bba6300b7d309f169b19c9623456acde81763c20f265b75173cc6cb7d5c6a"
+  },
+  "unchangedInputs": {
+    "apps/desktop/tests/at/outer-owner-protocol.md": "b005609e94ea214509bbefbc86b31e44100514555a44d54abd29d69e699642aa",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410"
+  }
+}
