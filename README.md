@@ -1,3 +1,5 @@
+<img src="docs/design/assets/linuxcast-project-icon.svg" alt="Linuxcast project icon" width="96" height="96">
+
 # Linuxcast
 
 A planned Linux productivity launcher inspired by Raycast's client experience and Alfred's workflow system.
