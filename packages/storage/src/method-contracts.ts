@@ -1,3 +1,4 @@
+import {parseCredentialPreference} from '../../platform-contracts/src/credential-preferences.ts';
 import {parseDefinitionSourceSetting} from '../../contracts/src/dictionary-definitions.ts';
 import {parseEmojiFrecencySetting,parseEmojiKeywordSetting,parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
 import {notesRootRepositoryContracts} from '../../contracts/src/notes-launcher.ts';
@@ -14,12 +15,13 @@ import { permissionRepositoryContracts } from '@linuxcast/platform-contracts/per
 import { conversationRecordSchema, messageRevisionRecordSchema, createAiRepositoryContracts, uiTextSchema, commandAliasSchema } from '../../contracts/src/index.ts';
 import type { RepositoryContracts } from '../../contracts/src/index.ts';
 import { MAX_LAUNCHER_COMMANDS, launcherCommandIdSchema, isLauncherVisibilityProtected } from '../../contracts/src/launcher.ts';
-const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource']);
+const settingId = z.enum(['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource','credentials.openrouter.default']);
 const revision = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER - 1);
 const commandId = z.string().regex(/^[a-z][a-z0-9._:-]{0,199}$/u);
 const settingValue = z.union([z.string(), z.boolean()]);
 const validSetting = (v: {id:string;value:string|boolean}) => {
   switch(v.id) {
+    case 'credentials.openrouter.default': return parseCredentialPreference(v.value)!==undefined;
     case 'dictionary.definitionSource': return parseDefinitionSourceSetting(v.value)!==undefined;
     case 'emoji.frecency': return parseEmojiFrecencySetting(v.value)!==undefined;
     case 'emoji.keywords': return parseEmojiKeywordSetting(v.value)!==undefined;

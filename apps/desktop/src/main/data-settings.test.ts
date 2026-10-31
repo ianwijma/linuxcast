@@ -43,3 +43,9 @@ it('returns fixed actionable diagnostic failure and never replays or exposes raw
   expect(result).toMatchObject({ok:false,error:{message:expect.stringContaining('Clear only this diagnostic category')}});
   expect(JSON.stringify(result)).not.toContain('SYNTHETIC_PRIVATE_CANARY');expect(f.clearCategory).toHaveBeenCalledTimes(1);
 });
+
+it('opens credential settings only through the owning validated local-data window',async()=>{
+  const openCredentials=vi.fn(async()=>{}),service=createDataSettings({resourcesDirectory:'/public-resources',clearCategory:async()=>{},exportCategory:async()=>({}),isReady:()=>true,openCredentials});services.push(service);await service.open();
+  const handler=electron.handlers.get('data-settings:credentials')!;expect(await handler({sender:electron.window.webContents,senderFrame:electron.frame},{protocolVersion:1})).toEqual({ok:true,value:{outcome:'opened'}});expect(openCredentials).toHaveBeenCalledTimes(1);
+  expect(await handler({sender:{},senderFrame:electron.frame},{protocolVersion:1})).toMatchObject({ok:false});expect(openCredentials).toHaveBeenCalledTimes(1);
+});

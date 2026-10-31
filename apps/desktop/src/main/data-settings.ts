@@ -11,12 +11,13 @@ import type { ResidentService } from './lifecycle.ts';
 const labels={settings:'Settings','command-usage':'Command usage','ai-conversations':'AI conversations','file-index':'File index','application-logs':'Application logs','tool-diagnostics':'Tool diagnostics'} as const;
 export interface DataSettingsOptions {
   resourcesDirectory:string;
+  openCredentials?():Promise<void>;
   exportCategory(category:DataSettingsExportCategory,signal:AbortSignal):Promise<unknown>;
   clearCategory(category:DataSettingsClearCategory,signal:AbortSignal):Promise<void>;
   isReady():boolean;
 }
 /** Dedicated main-owned workspace. Renderer receives no records, file paths, secrets or repository client. */
-export function createDataSettings(options:DataSettingsOptions):ResidentService&{open():Promise<void>} {
+export function createDataSettings(options:DataSettingsOptions):ResidentService&{open():Promise<void>;focusExisting():void} {
   let window:BrowserWindow|undefined,creating:Promise<void>|undefined,active:Promise<unknown>|undefined,operationAbort:AbortController|undefined,stopped=false;
   const failed=(message='Local data controls are unavailable.'):DataSettingsActionReply=>({ok:false,error:{code:'internal',message,retryable:false}});
   const cancelled=():DataSettingsActionReply=>({ok:true,value:{outcome:'cancelled'}});
@@ -29,6 +30,7 @@ export function createDataSettings(options:DataSettingsOptions):ResidentService&
     const parsed=schema.safeParse(payload);if(!parsed.success)return {ok:false,error:{code:'invalid-request',message:'Invalid local data request.',retryable:false}};
     if(channel===DATA_SETTINGS_CHANNELS.close){setImmediate(()=>{if(alive(owner))owner.close();});return cancelled();}
     if(!options.isReady())return failed('Local data is still opening. Try again shortly.');
+    if(channel===DATA_SETTINGS_CHANNELS.credentials){if(!options.openCredentials)return failed();try{await options.openCredentials();return {ok:true,value:{outcome:'opened'}};}catch{return failed();}}
     if(channel===DATA_SETTINGS_CHANNELS.state)return {ok:true,value:{appearance:nativeTheme.shouldUseDarkColors?'dark':'light'}};
     if(active)return failed('Another local data action is still in progress.');
     operationAbort=new AbortController();
@@ -61,6 +63,7 @@ export function createDataSettings(options:DataSettingsOptions):ResidentService&
   nativeTheme.on('updated',appearance);
   const close=()=>{stopped=true;operationAbort?.abort();for(const channel of Object.values(DATA_SETTINGS_CHANNELS))ipcMain.removeHandler(channel);nativeTheme.off('updated',appearance);if(window&&!window.isDestroyed())window.destroy();window=undefined;};
   return {
+    focusExisting(){if(!stopped&&window&&!window.isDestroyed()){window.show();window.focus();}},
     async open(){
       if(stopped)throw new Error('Local data workspace unavailable.');
       if(creating){await creating;return;}

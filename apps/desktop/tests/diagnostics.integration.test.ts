@@ -36,7 +36,7 @@ it('manages actual private diagnostic categories through the production Local da
     await data.getByRole('button',{name:'Export application logs',exact:true}).waitFor();return {app,page,data};
   };
   let {app,page,data}=await launch();
-  expect(await data.evaluate(()=>({node:typeof(window as unknown as {process?:unknown}).process,require:typeof(window as unknown as {require?:unknown}).require,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()}))).toEqual({node:'undefined',require:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance']});
+  expect(await data.evaluate(()=>({node:typeof(window as unknown as {process?:unknown}).process,require:typeof(window as unknown as {require?:unknown}).require,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()}))).toEqual({node:'undefined',require:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance','openCredentials']});
   const search=()=>data.getByRole('searchbox',{name:'Search data categories',exact:true});
   await expect.poll(()=>search().evaluate(element=>document.activeElement===element)).toBe(true);
   const evidence=join(root,'apps/desktop/evidence');mkdirSync(evidence,{recursive:true});

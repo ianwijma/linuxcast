@@ -220,6 +220,14 @@ export class SecretStore {
     } catch {return {outcome:'unavailable',status:this.#failure('storage-failed')};}
     finally {this.#busy.delete(reference.id);}
   }
+  /** Main-only policy and metadata; never a renderer-facing secret read. */
+  setClearSessionOnLock(value:boolean):void {
+    this.#clearSessionOnLock=value;this.#readSession();
+  }
+  hasSessionReference(reference:SecretReference,owner:SecretOwner):boolean {
+    this.#readSession();const entry=this.#session.get(reference.id);
+    return !this.#closed&&reference.mode==='session-only'&&!!entry&&sameOwner(entry.owner,owner);
+  }
   setLocked(locked:boolean,options:{clearSession?:boolean}={}):void {
     if(locked && options.clearSession)this.#clearSession();
     if(this.#locked===locked)return;this.#locked=locked;this.#epoch++;

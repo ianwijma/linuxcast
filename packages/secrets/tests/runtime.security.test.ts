@@ -84,3 +84,7 @@ it('retains and stops a session created by a factory that reenters close',async(
   expect(await f.runtime.retrySession()).toEqual({outcome:'unavailable'});await closing;
   expect(created.value.stop).toHaveBeenCalledTimes(1);expect(f.runtime.sessionState()).toBe('unavailable');
 });
+it('does not start an unused observer merely because the computer resumes',async()=>{
+  const f=await fixture();f.runtime.suspend();expect(await f.runtime.resume()).toEqual({outcome:'unavailable'});expect(f.create).not.toHaveBeenCalled();
+  await f.runtime.store();expect(f.create).toHaveBeenCalledTimes(1);
+});

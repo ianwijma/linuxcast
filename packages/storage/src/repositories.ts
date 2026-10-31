@@ -1,3 +1,4 @@
+import {parseCredentialPreference} from '../../platform-contracts/src/credential-preferences.ts';
 import {parseDefinitionSourceSetting} from '../../contracts/src/dictionary-definitions.ts';
 import {parseEmojiFrecencySetting,parseEmojiKeywordSetting,parseEmojiFavouriteSetting} from '../../contracts/src/emoji.ts';
 import {searchRootNotes} from './notes-root-search.ts';
@@ -33,7 +34,7 @@ import { storageContracts } from './method-contracts.ts';
 import { StorageError } from './errors.ts';
 
 type Conversation = ReturnType<typeof conversationRecordSchema.parse>;
-export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource' | 'emoji.favourites' | 'emoji.keywords' | 'emoji.frecency' | 'dictionary.definitionSource';
+export type SettingId = 'ui.theme' | 'launcher.shortcut' | 'onboarding.completed' | 'clipboard.historyEnabled' | 'calculator.rateSource' | 'emoji.favourites' | 'emoji.keywords' | 'emoji.frecency' | 'dictionary.definitionSource' | 'credentials.openrouter.default';
 export interface Setting { id: SettingId; revision: number; value: string | boolean; modifiedAt: string }
 export interface CommandUsage { commandId: string; useCount: number; lastUsedAt: string | null; pinned: boolean; alias: string | null }
 export interface CommandVisibility { commandId: string; hidden: boolean }
@@ -88,10 +89,11 @@ function revision(value: unknown): number {
   return value;
 }
 function settingId(value: unknown): SettingId {
-  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource'].includes(value)) throw new StorageError('invalid-request');
+  if (typeof value !== 'string' || !['ui.theme', 'launcher.shortcut', 'onboarding.completed', 'clipboard.historyEnabled','calculator.rateSource','emoji.favourites','emoji.keywords','emoji.frecency','dictionary.definitionSource','credentials.openrouter.default'].includes(value)) throw new StorageError('invalid-request');
   return value as SettingId;
 }
 function settingValue(id: SettingId, value: unknown): string | boolean {
+  if(id==='credentials.openrouter.default'&&parseCredentialPreference(value))return value as string;
   if(id==='dictionary.definitionSource'&&typeof value==='string'&&parseDefinitionSourceSetting(value)!==undefined)return value;
   if(id==='emoji.frecency'&&typeof value==='string'&&parseEmojiFrecencySetting(value)!==undefined)return value;
   if(id==='emoji.keywords'&&typeof value==='string'&&parseEmojiKeywordSetting(value)!==undefined)return value;

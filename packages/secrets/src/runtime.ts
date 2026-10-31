@@ -30,6 +30,7 @@ export class CredentialRuntime {
   #restart:Promise<SessionRestart>|undefined;
   #closing:Promise<void>|undefined;
   #closed=false;
+  #started=false;
   #suspended=false;
   #transition=false;
   #epoch=0;
@@ -70,6 +71,8 @@ export class CredentialRuntime {
   }
   retrySession():Promise<SessionRestart> {
     if(this.#closed||this.#suspended)return Promise.resolve({outcome:'unavailable'});
+    try{if(!this.#options.isStorageReady())return Promise.resolve({outcome:'unavailable'});}catch{return Promise.resolve({outcome:'unavailable'});}
+    this.#started=true;
     if(this.#restart)return this.#restart;
     const epoch=++this.#epoch;this.#transition=true;
     const operation=Promise.resolve().then(async():Promise<SessionRestart>=>{
@@ -101,9 +104,14 @@ export class CredentialRuntime {
   }
   resume():Promise<SessionRestart> {
     if(this.#closed)return Promise.resolve({outcome:'unavailable'});
-    this.#suspended=false;this.#transition=true;
+    this.#suspended=false;
+    if(!this.#started){this.#transition=false;this.#emit();return Promise.resolve({outcome:'unavailable'});}
+    this.#transition=true;
     // An in-flight older attempt must drain before a new generation starts.
     return this.#restart?this.#restart.then(()=>this.retrySession()):this.retrySession();
+  }
+  setClearSessionOnLock(value:boolean):void {
+    this.#options.clearSessionOnLock=value;this.#store?.setClearSessionOnLock(value);
   }
   store():Promise<SecretStore|null> {
     if(this.#closed||this.#suspended)return Promise.resolve(null);
@@ -118,7 +126,7 @@ export class CredentialRuntime {
         const store=await SecretStore.open({dataDirectory:this.#options.dataDirectory,safeStorage:this.#options.safeStorage,
           references:this.#options.references,session:this.#access,clearSessionOnLock:this.#options.clearSessionOnLock===true});
         // Retain ownership even if close arrived while the directory opened.
-        this.#store=store;return this.#closed?null:store;
+        this.#store=store;store.setClearSessionOnLock(this.#options.clearSessionOnLock===true);return this.#closed?null:store;
       }catch{return null;}
     });
     this.#opening=operation;

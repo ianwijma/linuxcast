@@ -29,3 +29,9 @@ Screenshots remain unchanged; no new UI exists here. Parent will integrate the
 narrow credential-settings wire and actual setup/status flow before publishing
 this next bounded PR. Native/session/keyring/provider and full1.0 acceptance stay
 pending. No production instance of CredentialRuntime is wired yet.
+
+Continuation1November2026: the coordinator has now wired this runtime to main
+suspend/resume/storage-readiness/shutdown and the dedicated credential setup UI.
+The previous paragraphs record the unenabled preparation checkpoint, not the
+current application state. See apps/desktop/evidence/credential-settings/README.md
+for the bounded current application evidence and remaining native/review gates.
