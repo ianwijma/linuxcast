@@ -323,3 +323,38 @@ offline discovery already maps all test_*.py, so no shared runner edit is needed
 Published/linked draft PR86 https://github.com/ianwijma/linuxcast/pull/86 from this
 exact unsignedhead while CI and a fresh final correction recheck are pending.
 No native invocation or acceptance promotion; InstrumentUI remains primary.
+
+PR86 merged31October16:17:40UTC atae4c5b188b35cd8fcccd270a0de34b72ca1b5c4c
+after final68b6166c independent Standards and Security/Spec recheck resolvedP2,
+97offline tests and both original-source negative controls passed, planning
+CI41218474898 SUCCESS, no requested/submitted GitHub reviews/comments/protection.
+User's tiny merge blurb sent immediately; watch removed. Root merged develop.
+No actual guest/native/namespace/Orca execution or acceptance promotion.
+
+Opusmedium D1-01 taskac8ad89b completed/read: clean t3-ee5304b7,
+codex/d1-01-instrument-primitives, signedb40bce040762c9d4d94433db02a84705736fb8c8
+basedb9fefd2, tree53c43e2af88f04584682343ba7ae32e3019e46b6. Public-key signature
+verified with ephemeral allowed-signers file; persistent configuration unchanged.
+Integrated unchanged as65fe766 and merged PR86/develop atroot e268a023. All
+canonical/primitives/token/validator paths match the original Opus tree exactly.
+Opus reports26token units/11primitive browser/27renderer units/11renderer browser/
+30validator/type/lint and affected downstream component suites pass. OneL1-01
+pending-fallback fixture failure reproduces2/2 with baselineb9UI;13later serial
+cases unrun, not a complete suite pass. Downstream439recaptures restored byauthor.
+
+Coordinator independently26D1-01 units/27D1-02 units/30validator checks pass and
+actual sandboxed Electron F1integration2/2 passes20.00s (12.294s+6.427s), including
+native200% viewport/footer/lastrow/form/tab/Quit. Eight new product captures in
+apps/desktop/evidence/instrument-foundation/;19historical PNG recaptures restored
+exactly. Row/tile/renderer composition is still nextD1-02, not implemented bythese
+screenshots. Registry records bounded evidence without criterion/task promotion.
+Next: independent Standards and Security/Spec reviews of frozen foundation,
+current-head CI/merge promptly, then Opusmedium renderer adoption. No nativejob.
+
+Additional offline source-extractor fault probe against savedaa31f67 found a
+cleanup identity race: replacement between initial lstat and shutil.rmtree deletes
+the foreign replacement and returns cleanupVerified=true while originalroot stays.
+The private synthetic reproduction creates no processes or guest/native actions.
+This helper remains UNINTEGRATED/UNUSED on codex/f1-02-native-build-staging; do not
+invoke it before a corrected retained-directory cleanup boundary and independent
+review. Fix deferred below active UI priority; no affected product operation exists.
