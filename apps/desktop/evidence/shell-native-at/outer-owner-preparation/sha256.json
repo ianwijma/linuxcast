@@ -1,15 +1,21 @@
 {
   "schemaVersion": 1,
-  "kind": "offline-outer-owner-source-and-evidence-not-execution-permit",
+  "kind": "offline-graceful-shutdown-and-independent-fixture-custody-not-permit",
   "files": {
-    "apps/desktop/tests/at/lab_owner.py": "b5defbaf78058c706bc3d271a35efb09fe496354eda441b7449c77019e918f10",
-    "apps/desktop/tests/at/test_lab_owner.py": "8161beda4389496ac3375ea17421a612ba708583eb3351785973621c482d711f",
-    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "976954113d5a5ec2ca21d655676933e193c9174c050a016cfc43bf6267e66699",
-    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "664bba6300b7d309f169b19c9623456acde81763c20f265b75173cc6cb7d5c6a"
+    "apps/desktop/tests/at/lab_owner.py": "281ba6cd758aef52be402226ddd99fcdd6afc057afd7d61d8b1c2bec4a7f88b7",
+    "apps/desktop/tests/at/test_lab_owner.py": "c679aa90002b36fac342aa022efcadf47d1253719a5070a899956096a50d801c",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "90d834dd6e2da7cad32329057f6c44d1c7a7cbaf11b14c0133c712b5b96781d0",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "0cc85e4b3079ecf75f71af0c6379cae62be82c1bdffbb5fae56e91b05be7fed9"
   },
   "unchangedInputs": {
     "apps/desktop/tests/at/outer-owner-protocol.md": "b005609e94ea214509bbefbc86b31e44100514555a44d54abd29d69e699642aa",
     "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
     "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410"
+  },
+  "coordinatorContract": {
+    "revision": "745bf7f941d0db0255ab91301c5b730097b3f142",
+    "path": "apps/desktop/tests/at/outer-owner-protocol.md",
+    "sha256": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "access": "git show only; no contract or other parent commit imported; local older copy unchanged"
   }
 }

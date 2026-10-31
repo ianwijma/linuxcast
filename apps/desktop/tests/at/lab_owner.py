@@ -39,10 +39,18 @@ MAX_BYTES = 65536
 INVENTORY_SHA256 = 'a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d'
 START_SECONDS, JOB_SECONDS, CLEAN_SECONDS, TOTAL_SECONDS = 120, 360, 45, 600
 GUARDIAN_GRACE_SECONDS = 2
+# Never spend the fallback's stop8/kill/three inspections/reap allowance waiting
+# for guest shutdown. These are fixed parts of CLEAN_SECONDS, not extensions.
+FALLBACK_SECONDS, GRACEFUL_SECONDS = 28, 11
+CLEAN_INSPECT_SECONDS, POWEROFF_SECONDS = 3, 5
+SSH_SHUTDOWN_DISCONNECTS = frozenset((
+    b'Connection to 127.0.0.1 closed by remote host.\r\n',
+    b'client_loop: send disconnect: Broken pipe\r\n',
+))
 REASONS = frozenset(('none', 'prerequisite', 'reservation', 'custody', 'foreign',
                      'configuration', 'interrupted', 'caller-lost', 'guardian-lost',
                      'deadline', 'child', 'output', 'transport', 'protocol', 'stop',
-                     'kill', 'inspect', 'reap', 'cleanup', 'recovery'))
+                     'kill', 'inspect', 'reap', 'cleanup', 'recovery', 'poweroff'))
 
 
 class Rejected(Exception):
@@ -306,7 +314,7 @@ def baseline(state):
 
 
 def transport_argv(pin, probe='job'):
-    require(probe in ('job', 'permit', 'wrapper-hash'))
+    require(probe in ('job', 'permit', 'wrapper-hash', 'poweroff'))
     ssh = ('/usr/bin/ssh', '-F', '/dev/null', '-T', '-n', '-p', '2222', '-l', pin['guestAccount'],
            '-i', '/lab/guest-key', '-o', 'UserKnownHostsFile=/lab/known_hosts',
            '-o', 'GlobalKnownHostsFile=/dev/null', '-o', 'StrictHostKeyChecking=yes',
@@ -317,6 +325,7 @@ def transport_argv(pin, probe='job'):
            '-o', 'ServerAliveCountMax=2', '127.0.0.1')
     remote = {'permit': ('/usr/bin/cat', '/etc/linuxcast-f102-lab/permit.json'),
               'wrapper-hash': ('/usr/bin/sha256sum', WRAPPER),
+              'poweroff': ('/usr/bin/systemctl', 'poweroff', '--no-block'),
               'job': ('/usr/bin/python3', '-I', '-B', WRAPPER,
                       '--reviewed-wrapper', '--reviewed-controller')}[probe]
     if pin['guestPrivilege'] == 'sudo-noninteractive':
@@ -422,7 +431,7 @@ class Children:
         self.fault = False
         self.preserve_uncertain = False
 
-    def run(self, argv, budget):
+    def run(self, argv, budget, *, capture_stderr=False):
         self.check()
         budget.remaining()
         # The first read-only inspect precedes the new marker. It still has
@@ -448,6 +457,7 @@ class Children:
                     self.lease.state['children'].append(process_identity(child.pid))
                     self.lease.save()
             result = bytearray()
+            diagnostics = bytearray()
             size = 0
             with selectors.DefaultSelector() as selector:
                 for stream in (child.stdout, child.stderr):
@@ -462,11 +472,15 @@ class Children:
                         require(size <= MAX_BYTES, 'output')
                         if raw and key.fileobj is child.stdout:
                             result.extend(raw)
+                        elif raw and capture_stderr:
+                            diagnostics.extend(raw)
                         if not raw:
                             selector.unregister(key.fileobj)
                 code = child.wait(timeout=min(1, budget.remaining()))
             require(self.reap(Budget(2, budget)), 'reap')
-            return code, bytes(result)
+            # Only shutdown classification requests private bounded stderr; it
+            # never enters the public result or changes the combined byte cap.
+            return (code, bytes(result), bytes(diagnostics)) if capture_stderr else (code, bytes(result))
         except BaseException:
             # Even a successful Popen followed by failed bookkeeping is retained;
             # subreaper discovery also handles an interrupted Python return path.
@@ -597,6 +611,7 @@ class NativeLab:
         self.children = Children(lease, check)
         self.recovery_uncertain = False
         self.start_attempted = self.dispatch_attempted = False
+        self.poweroff_attempted = False
 
     def command(self, op, budget):
         if op == 'start':
@@ -646,6 +661,37 @@ class NativeLab:
         self.recovery_uncertain = self.lease.state['childrenUncertain'] or bool(self.lease.state['children'])
         self.children.preserve_uncertain = self.recovery_uncertain
 
+    def poweroff(self, budget):
+        require(not self.poweroff_attempted, 'reservation')
+        self.poweroff_attempted = True
+        self.lease.intent('mayHaveStarted')
+        # guestPrerequisitesReviewed includes authority for this exact fixed
+        # action under the updated contract; no permit/account is manufactured.
+        require(self.lease.pin['guestPrerequisitesReviewed'] is True)
+        state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
+        if not state['Running']:
+            return state  # a concurrent stop never justifies another guest action
+        self.lease.check()
+        code, raw, stderr = self.children.run(transport_argv(self.lease.pin, 'poweroff'),
+                                             Budget(POWEROFF_SECONDS, budget), capture_stderr=True)
+        # Accept only an empty acknowledgement or an exact known shutdown
+        # disconnect as an uncertain request. Auth/sudo rejection, extra text,
+        # unknown errors and failed probes remain failures even after exit0.
+        require(not raw and ((code == 0 and not stderr)
+                or (code == 255 and stderr in SSH_SHUTDOWN_DISCONNECTS)), 'poweroff')
+        return None  # neither acknowledgement nor disconnect proves shutdown
+
+    def graceful_stop(self, budget):
+        state = self.poweroff(budget)
+        while state is None or state['Running']:
+            budget.remaining()
+            state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
+            if not state['Running']:
+                break
+            # A bounded poll is not a replay of poweroff or of the native job.
+            time.sleep(min(.2, budget.remaining()))
+        return state
+
     def cleanup(self, budget):
         first = 'none'
         stopped = False
@@ -655,37 +701,60 @@ class NativeLab:
             require(self.children.reap(Budget(3, budget)), 'reap')
         except BaseException as error:
             first = reason(error, 'reap')
-        if self.lease.state['mayHaveStarted']:
-            try:
-                self.inspect(budget)  # identity/configuration before every effect
-                self.command('stop', budget)
-            except BaseException as error:
-                if first == 'none':
-                    first = reason(error, 'stop')
-            try:
-                state = self.inspect(budget)
-                if state['Running']:
-                    self.command('kill', budget)
+        state = None
+        owned = self.lease.state['mayHaveStarted']
+        try:
+            state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
+            if state['Running'] and owned:
+                try:
+                    # Shrink to the current caller/guardian cleanup budget. Do
+                    # not borrow fallback time when the caller already reaped a
+                    # lost guardian or the initial inspection was slow.
+                    available = budget.end - time.monotonic() - FALLBACK_SECONDS
+                    require(available > 0, 'deadline')
+                    state = self.graceful_stop(Budget(min(GRACEFUL_SECONDS, available), budget))
+                except BaseException as error:
+                    state = None  # no cached identity/state authorizes fallback
                     if first == 'none':
-                        first = 'kill'
-                    state = self.inspect(budget)
-                stopped = baseline(state)
-                terminated = not state['Running'] and state['Pid'] == 0
-                if not stopped and first == 'none':
-                    first = 'stop'
-            except BaseException as error:
-                if first == 'none':
-                    first = reason(error, 'inspect')
-        else:
+                        first = reason(error, 'poweroff')
+            elif state['Running'] and first == 'none':
+                first = 'foreign'
+        except BaseException as error:
+            if first == 'none':
+                first = reason(error, 'inspect')
+        if state is None and owned:
             try:
-                state = self.inspect(budget)
-                stopped = baseline(state)
-                terminated = not state['Running'] and state['Pid'] == 0
-                if not stopped and first == 'none':
-                    first = 'foreign'
+                state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
+                if state['Running']:
+                    # Direct Docker stop is forced fallback. Never normalize a
+                    # timeout/QEMU SIGTERM exit (143) or even forced exit0 into
+                    # successful graceful shutdown.
+                    try:
+                        self.command('stop', Budget(10, budget))
+                    except BaseException as error:
+                        if first == 'none':
+                            first = reason(error, 'stop')
+                    if first == 'none':
+                        first = 'stop'
+                    state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
+                    if state['Running']:
+                        try:
+                            self.command('kill', Budget(3, budget))
+                        except BaseException as error:
+                            if first == 'none':
+                                first = reason(error, 'kill')
+                        # A failed/unknown kill reply is not absence; inspect
+                        # again without replacing the earlier failure.
+                        state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
             except BaseException as error:
                 if first == 'none':
                     first = reason(error, 'inspect')
+                state = None
+        if state is not None:
+            stopped = baseline(state)
+            terminated = not state['Running'] and state['Pid'] == 0
+            if not stopped and first == 'none':
+                first = 'stop'
         absent = self.children.reap(Budget(3, budget)) and not self.recovery_uncertain
         if not absent and first == 'none':
             first = 'reap'

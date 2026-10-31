@@ -4,12 +4,15 @@ No real owner CLI, daemon/socket, lab root/key, namespace, guest or native actio
 Lifetime/process fixtures execute in disposable dedicated Python subprocesses.
 """
 import copy
+import contextlib
+import ctypes
 import importlib
 import io
 import json
 import os
 from pathlib import Path
 import signal
+import resource
 import subprocess
 import sys
 import tempfile
@@ -19,6 +22,8 @@ import unittest
 from unittest.mock import patch
 
 import lab_owner as owner
+
+FIXTURE_ENV = {'PATH': '/usr/bin:/bin', 'HOME': '/nonexistent', 'LANG': 'C', 'LC_ALL': 'C'}
 
 
 def permit(root):
@@ -345,6 +350,20 @@ class Files(unittest.TestCase):
         self.assertEqual((result['firstFailure'], result['cleanupFailure']), ('child', 'stop'))
         self.assertTrue((self.root / owner.MARKER).exists())
 
+    def test_poweroff_rejection_retains_original_failure_and_dirty_restart_custody(self):
+        lab = FakeLab(self.lease, fail='dispatch', cleanup=('poweroff', True, True, True))
+        result = owner.transact(self.lease, lab)
+        self.assertEqual((result['firstFailure'], result['cleanupFailure']), ('child', 'poweroff'))
+        self.assertFalse(result['reservationClean'])
+        self.assertTrue(result['mayHaveDispatched'])
+        self.renew()
+        recovered = FakeLab(self.lease, cleanup=('poweroff', True, True, True))
+        result = owner.transact(self.lease, recovered)
+        self.assertEqual((result['firstFailure'], result['cleanupFailure']), ('recovery', 'poweroff'))
+        self.assertEqual(recovered.calls, ['recover', 'cleanup'])
+        self.assertTrue((self.root / owner.MARKER).exists())
+        self.assertNotIn('private', owner.encoded(result).decode())
+
     def test_operation_failure_survives_cleanup_alarm_setup_failure(self):
         lab = FakeLab(self.lease, fail='dispatch')
         with patch.object(owner, 'cleanup_alarm', side_effect=OSError('private cleanup alarm')):
@@ -361,7 +380,7 @@ class Files(unittest.TestCase):
             check = lambda _: None
             preserve_uncertain = False
 
-            def run(self, argv, budget):
+            def run(self, argv, budget, *, capture_stderr=False):
                 self.check()
                 budget.remaining()
                 if argv[:len(owner.DOCKER)] != owner.DOCKER:
@@ -388,6 +407,13 @@ class Files(unittest.TestCase):
                     self.assert_intent('mayHaveDispatched')
                     calls.append('dispatch')
                     return 0, owner.encoded(wrapper())
+                if argv == owner.transport_argv(lease.pin, 'poweroff'):
+                    self.assert_intent('mayHaveStarted')
+                    if not capture_stderr:
+                        raise AssertionError('shutdown diagnostics not bounded/classified')
+                    calls.append('poweroff')
+                    obj[0]['State'] = copy.deepcopy(STOPPED)
+                    return 0, b'', b''
                 raise AssertionError('unexpected fixed command')
 
             def assert_intent(self, field):
@@ -401,7 +427,8 @@ class Files(unittest.TestCase):
         lab.children = Client()
         result = owner.transact(lease, lab)
         self.assertEqual(result['status'], 'completed')
-        self.assertEqual(calls, ['inspect', 'start', 'ready', 'wrapper-hash', 'dispatch', 'inspect', 'stop', 'inspect'])
+        self.assertEqual(calls, ['inspect', 'start', 'ready', 'wrapper-hash', 'dispatch',
+                                 'inspect', 'inspect', 'poweroff', 'inspect'])
         self.assertFalse((lease.root / owner.MARKER).exists())
 
     def test_cancellation_between_baseline_and_start_never_dispatches(self):
@@ -604,6 +631,27 @@ class Protocols(unittest.TestCase):
         self.assertIn('ClearAllForwardings=yes', job)
         self.assertEqual(set(owner.ENV), {'PATH', 'HOME', 'LANG', 'LC_ALL'})
 
+    def test_poweroff_and_read_probes_have_only_fixed_root_or_sudo_transports(self):
+        remotes = {'poweroff': ('/usr/bin/systemctl', 'poweroff', '--no-block'),
+                   'permit': ('/usr/bin/cat', '/etc/linuxcast-f102-lab/permit.json'),
+                   'wrapper-hash': ('/usr/bin/sha256sum', owner.WRAPPER)}
+        for mode, account in (('root', 'root'), ('sudo-noninteractive', 'synthetic')):
+            for probe, remote in remotes.items():
+                with self.subTest(mode=mode, probe=probe):
+                    argv = owner.transport_argv({'guestPrivilege': mode, 'guestAccount': account}, probe)
+                    prefix = ('/usr/bin/sudo', '-n', '--') if mode == 'sudo-noninteractive' else ()
+                    self.assertEqual(argv[-len(prefix + remote):], prefix + remote)
+                    self.assertEqual(argv[:len(owner.DOCKER)], owner.DOCKER)
+                    self.assertIn('IdentityAgent=none', argv)
+                    self.assertIn('StrictHostKeyChecking=yes', argv)
+                    self.assertIn('ClearAllForwardings=yes', argv)
+                    self.assertIn('BatchMode=yes', argv)
+                    self.assertEqual('/usr/bin/sudo' in argv, mode == 'sudo-noninteractive')
+                    self.assertNotIn('/bin/sh', argv)
+        for probe in ('poweroff --force', '../poweroff', '/usr/bin/systemctl', 'reboot', ''):
+            with self.subTest(probe=probe), self.assertRaises(owner.Rejected):
+                owner.transport_argv({'guestPrivilege': 'root', 'guestAccount': 'root'}, probe)
+
     def test_guest_readiness_requires_the_independently_retained_source_pins(self):
         with tempfile.TemporaryDirectory() as directory:
             pin = permit(Path(directory))
@@ -667,61 +715,229 @@ class Protocols(unittest.TestCase):
 
 
 class Cleanup(unittest.TestCase):
-    def make_lab(self, states, fail=None, absent=True):
-        lease = SimpleNamespace(state={'mayHaveStarted': True, 'childrenUncertain': False, 'children': []},
-                                check=lambda: None)
-        lab = owner.NativeLab(lease, {})
-        lab.children = SimpleNamespace(reap=lambda _budget: absent)
-        lab.calls = []
-        states = iter(states)
+    def setUp(self):
+        self.now = 100.0
+        clock = patch.object(owner.time, 'monotonic', lambda: self.now)
+        sleep = patch.object(owner.time, 'sleep', self.advance)
+        clock.start()
+        sleep.start()
+        self.addCleanup(clock.stop)
+        self.addCleanup(sleep.stop)
 
-        def inspect(_budget):
+    def advance(self, seconds):
+        self.now += seconds
+
+    def make_lab(self, states, fail=None, absent=True, reply=(0, b'', b''), owned=True):
+        lease = SimpleNamespace(state={'mayHaveStarted': True, 'childrenUncertain': False, 'children': []},
+                                check=lambda: None, intent=lambda _flag: None,
+                                pin={'guestPrerequisitesReviewed': True, 'guestAccount': 'synthetic',
+                                     'guestPrivilege': 'sudo-noninteractive'})
+        lease.state['mayHaveStarted'] = owned
+        lab = owner.NativeLab(lease, {})
+        lab.calls = []
+        lab.bounds = []
+        states = iter(states)
+        last = None
+
+        def inspect(budget):
+            nonlocal last
             lab.calls.append('inspect')
-            value = next(states)
+            lab.bounds.append(('inspect', budget.remaining()))
+            value = next(states, last)
+            last = value
             if isinstance(value, Exception):
                 raise value
             return value
 
-        def command(op, _budget):
+        def command(op, budget):
             lab.calls.append(op)
+            lab.bounds.append((op, budget.remaining()))
             if op == fail:
                 raise owner.Rejected(op)
 
+        def run(argv, budget, *, capture_stderr=False):
+            self.assertEqual(argv, owner.transport_argv(lease.pin, 'poweroff'))
+            self.assertTrue(capture_stderr)
+            lab.calls.append('poweroff')
+            lab.bounds.append(('poweroff', budget.remaining()))
+            if fail == 'poweroff':
+                raise owner.Rejected('poweroff')
+            return reply
+
+        lab.children = SimpleNamespace(reap=lambda _budget: absent, run=run)
         lab.inspect, lab.command = inspect, command
         return lab
 
     def test_success_requires_fresh_inspection_after_stop(self):
-        lab = self.make_lab([RUNNING, STOPPED])
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('none', True, True, True))
-        self.assertEqual(lab.calls, ['inspect', 'stop', 'inspect'])
+        lab = self.make_lab([RUNNING, RUNNING, STOPPED])
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('none', True, True, True))
+        self.assertEqual(lab.calls, ['inspect', 'inspect', 'poweroff', 'inspect'])
 
     def test_stop_failure_retained_even_if_later_baseline_is_clean(self):
-        lab = self.make_lab([RUNNING, STOPPED], fail='stop')
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('stop', True, True, True))
+        lab = self.make_lab([RUNNING, RUNNING, STOPPED], fail='stop')
+        lab.graceful_stop = lambda _budget: (_ for _ in ()).throw(owner.Rejected('stop'))
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('stop', True, True, True))
+        self.assertIn('stop', lab.calls)
 
     def test_kill_identity_reinspect_and_forced_exit_are_not_success(self):
-        lab = self.make_lab([RUNNING, RUNNING, dict(STOPPED, ExitCode=137)])
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('kill', True, False, True))
-        self.assertEqual(lab.calls, ['inspect', 'stop', 'inspect', 'kill', 'inspect'])
+        lab = self.make_lab([RUNNING, RUNNING, RUNNING, dict(STOPPED, ExitCode=137)])
+        lab.graceful_stop = lambda _budget: (_ for _ in ()).throw(owner.Rejected('deadline'))
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('deadline', True, False, True))
+        self.assertEqual(lab.calls, ['inspect', 'inspect', 'stop', 'inspect', 'kill', 'inspect'])
 
     def test_stop_failure_survives_failed_kill_and_inspect(self):
         lab = self.make_lab([RUNNING, RUNNING], fail='kill')
+        lab.graceful_stop = lambda _budget: (_ for _ in ()).throw(owner.Rejected('stop'))
         original = lab.command
         def command(op, budget):
             if op == 'stop':
                 raise owner.Rejected('stop')
             return original(op, budget)
         lab.command = command
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('stop', True, False, False))
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('stop', True, False, False))
 
     def test_unknown_identity_never_authorizes_stop_or_kill(self):
         lab = self.make_lab([owner.Rejected('configuration'), owner.Rejected('configuration')])
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('configuration', True, False, False))
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('configuration', True, False, False))
         self.assertEqual(lab.calls, ['inspect', 'inspect'])
 
     def test_child_absence_failure_blocks_even_clean_stop(self):
-        lab = self.make_lab([RUNNING, STOPPED], absent=False)
-        self.assertEqual(lab.cleanup(owner.Budget(1)), ('reap', False, True, True))
+        lab = self.make_lab([RUNNING, RUNNING, STOPPED], absent=False)
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('reap', False, True, True))
+
+    def test_already_clean_stopped_needs_no_guest_or_docker_effect(self):
+        lab = self.make_lab([STOPPED])
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('none', True, True, True))
+        self.assertEqual(lab.calls, ['inspect'])
+
+    def test_foreign_running_without_owned_start_never_dispatches_poweroff(self):
+        lab = self.make_lab([RUNNING], owned=False)
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('foreign', True, False, False))
+        self.assertEqual(lab.calls, ['inspect'])
+
+    def test_poweroff_itself_rechecks_identity_and_skips_concurrent_stop(self):
+        lab = self.make_lab([RUNNING, STOPPED])
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('none', True, True, True))
+        self.assertEqual(lab.calls, ['inspect', 'inspect'])
+
+    def test_invalid_identity_at_poweroff_probe_never_sends_guest_command(self):
+        lab = self.make_lab([RUNNING, owner.Rejected('configuration'), STOPPED])
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('configuration', True, True, True))
+        self.assertNotIn('poweroff', lab.calls)
+        self.assertNotIn('stop', lab.calls)
+
+    def test_delayed_graceful_stop_waits_without_replaying_any_effect(self):
+        lab = self.make_lab([RUNNING, RUNNING, RUNNING, RUNNING, STOPPED])
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('none', True, True, True))
+        self.assertEqual(lab.calls.count('poweroff'), 1)
+        self.assertNotIn('stop', lab.calls)
+        self.assertGreater(self.now, 100)
+        self.assertLessEqual(self.now, 111)
+
+    def test_exact_ssh_disconnect_needs_fresh_exit0_not_an_acknowledgement(self):
+        for message in owner.SSH_SHUTDOWN_DISCONNECTS:
+            with self.subTest(message=message):
+                lab = self.make_lab([RUNNING, RUNNING, STOPPED], reply=(255, b'', message))
+                self.assertEqual(lab.cleanup(owner.Budget(45)), ('none', True, True, True))
+                self.assertNotIn('stop', lab.calls)
+
+    def test_denial_unknown_disconnect_and_extra_output_remain_failures_after_exit0(self):
+        for reply in ((1, b'', b'sudo: denied'), (255, b'', b'Permission denied (publickey).\r\n'),
+                      (255, b'', b''), (255, b'', b'unknown private canary'),
+                      (0, b'private unexpected output', b''), (0, b'', b'private warning'),
+                      (255, b'', next(iter(owner.SSH_SHUTDOWN_DISCONNECTS)) + b'denied')):
+            with self.subTest(reply=reply):
+                lab = self.make_lab([RUNNING, RUNNING, STOPPED], reply=reply)
+                self.assertEqual(lab.cleanup(owner.Budget(45)), ('poweroff', True, True, True))
+                self.assertEqual(lab.calls.count('poweroff'), 1)
+
+    def test_stuck_guest_reserves_fallback_then_retains_nonzero_kill(self):
+        lab = self.make_lab([RUNNING])
+        original = lab.inspect
+        def inspect(budget):
+            if 'kill' in lab.calls:
+                lab.calls.append('inspect')
+                return dict(STOPPED, ExitCode=137)
+            return original(budget)
+        lab.inspect = inspect
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('deadline', True, False, True))
+        self.assertEqual(lab.calls.count('poweroff'), 1)
+        self.assertEqual(lab.calls.count('stop'), 1)
+        self.assertEqual(lab.calls.count('kill'), 1)
+        self.assertLessEqual(self.now, 111.001)
+        self.assertTrue(all(left <= (5 if op == 'poweroff' else 10 if op == 'stop' else 3)
+                            for op, left in lab.bounds))
+
+    def test_fallback_exit0_does_not_erase_failed_graceful_phase(self):
+        lab = self.make_lab([RUNNING])
+        original = lab.inspect
+        def inspect(budget):
+            return STOPPED if 'stop' in lab.calls else original(budget)
+        lab.inspect = inspect
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('deadline', True, True, True))
+        self.assertIn('stop', lab.calls)
+
+    def test_failed_kill_still_gets_fresh_absence_inspection_without_erasing_failure(self):
+        lab = self.make_lab([RUNNING], fail='kill')
+        original = lab.inspect
+        def inspect(budget):
+            if 'kill' in lab.calls:
+                lab.calls.append('inspect')
+                return dict(STOPPED, ExitCode=137)
+            return original(budget)
+        lab.inspect = inspect
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('deadline', True, False, True))
+        self.assertEqual(lab.calls[-2:], ['kill', 'inspect'])
+
+    def test_disconnect_and_acknowledgement_without_shutdown_never_succeed(self):
+        for reply in ((0, b'', b''), (255, b'', next(iter(owner.SSH_SHUTDOWN_DISCONNECTS)))):
+            lab = self.make_lab([RUNNING], reply=reply)
+            failure, absent, stopped, terminated = lab.cleanup(owner.Budget(45))
+            self.assertEqual(failure, 'deadline')
+            self.assertTrue(absent)
+            self.assertFalse(stopped or terminated)
+            self.assertIn('stop', lab.calls)
+            self.assertIn('kill', lab.calls)
+
+    def test_cleanup_does_not_borrow_fallback_reservation_from_shorter_caller_budget(self):
+        lab = self.make_lab([RUNNING, RUNNING, dict(STOPPED, ExitCode=143)])
+        self.assertEqual(lab.cleanup(owner.Budget(20)), ('deadline', True, False, True))
+        self.assertNotIn('poweroff', lab.calls)
+        self.assertIn('stop', lab.calls)
+        self.assertEqual((owner.CLEAN_SECONDS, owner.TOTAL_SECONDS), (45, 600))
+
+    def test_missing_reviewed_poweroff_authority_fails_before_guest_action(self):
+        lab = self.make_lab([RUNNING, STOPPED])
+        lab.lease.pin['guestPrerequisitesReviewed'] = False
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('prerequisite', True, True, True))
+        self.assertNotIn('poweroff', lab.calls)
+
+    def test_graceful_nonzero_exit_and_prior_reap_failure_are_not_normalized(self):
+        for absent, expected in ((True, 'stop'), (False, 'reap')):
+            lab = self.make_lab([RUNNING, RUNNING, dict(STOPPED, ExitCode=143)], absent=absent)
+            self.assertEqual(lab.cleanup(owner.Budget(45)), (expected, absent, False, True))
+            self.assertNotIn('stop', lab.calls)
+
+    def test_poweroff_is_single_attempt_even_after_uncertain_disconnect(self):
+        lab = self.make_lab([RUNNING], reply=(255, b'', next(iter(owner.SSH_SHUTDOWN_DISCONNECTS))))
+        self.assertIsNone(lab.poweroff(owner.Budget(5)))
+        with self.assertRaisesRegex(owner.Rejected, 'reservation'):
+            lab.poweroff(owner.Budget(5))
+        self.assertEqual(lab.calls.count('poweroff'), 1)
+
+    def test_interrupted_owner_descendant_uncertainty_survives_graceful_container_exit(self):
+        lab = self.make_lab([RUNNING, RUNNING, STOPPED])
+        lab.lease.state['childrenUncertain'] = True
+        lab.recover_children()
+        self.assertEqual(lab.cleanup(owner.Budget(45)), ('reap', False, True, True))
+        self.assertTrue(lab.children.preserve_uncertain)
+
+    def test_poweroff_requires_owned_durable_marker_before_any_probe(self):
+        lab = self.make_lab([RUNNING])
+        lab.lease.intent = lambda _: (_ for _ in ()).throw(owner.Rejected('custody'))
+        with self.assertRaisesRegex(owner.Rejected, 'custody'):
+            lab.poweroff(owner.Budget(5))
+        self.assertEqual(lab.calls, [])
 
 
 class ActualPython(unittest.TestCase):
@@ -729,9 +945,30 @@ class ActualPython(unittest.TestCase):
         # This test helper has no code path to NativeLab, Docker, SSH or CLI.
         command = [sys.executable, '-B', str(Path(__file__).resolve()), '--python-fixture', kind]
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                timeout=12, env=owner.ENV, cwd='/', check=False)
+                                timeout=12, env=FIXTURE_ENV, cwd='/', check=False)
         self.assertEqual(result.returncode, 0, result.stderr.decode(errors='replace'))
-        return json.loads(result.stdout)
+        value = json.loads(result.stdout)
+        self.assertTrue(value.pop('_fixtureGuardAbsent'))
+        return value
+
+    def test_independent_guard_reaps_after_false_inner_cleanup_success(self):
+        value = self.fixture('guard-broken-return')
+        self.assertTrue(value['innerClaim'])
+        self.assertGreaterEqual(value['signalled'], 1)
+        self.assertFalse(value['timedOut'])
+        self.assertTrue(value['parentImplementationBroken'])
+
+    def test_independent_parent_bounds_broken_inner_cleanup_and_lifetime(self):
+        value = self.fixture('guard-broken-hang')
+        self.assertTrue(value['innerClaim'])
+        self.assertTrue(value['timedOut'])
+        self.assertGreaterEqual(value['signalled'], 2)
+        self.assertTrue(value['parentImplementationBroken'])
+
+    def test_independent_guard_reaps_gated_bookkeeping_failure(self):
+        value = self.fixture('guard-bookkeeping')
+        self.assertTrue(value['failed'])
+        self.assertFalse(value['gateOpened'])
 
     def test_caller_sigkill_lifetime_eof_guardian_holds_lock_through_cleanup(self):
         value = self.fixture('caller-death')
@@ -764,6 +1001,11 @@ class ActualPython(unittest.TestCase):
 
     def test_output_is_bounded_without_leaving_python_child(self):
         value = self.fixture('output')
+        self.assertEqual(value['failure'], 'output')
+        self.assertTrue(value['absent'])
+
+    def test_shutdown_diagnostics_keep_combined_output_bound_and_reap(self):
+        value = self.fixture('stderr-output')
         self.assertEqual(value['failure'], 'output')
         self.assertTrue(value['absent'])
 
@@ -955,6 +1197,9 @@ def python_fixture(kind):
             if kind == 'output':
                 script = 'import os,time; os.write(1,b"x"*70000); time.sleep(8)'
                 seconds = 2
+            if kind == 'stderr-output':
+                script = 'import os,time; os.write(1,b"x"*35000); os.write(2,b"y"*35000); time.sleep(8)'
+                seconds = 2
             if kind == 'readonly':
                 script = 'print("synthetic")'
                 seconds = 2
@@ -969,7 +1214,9 @@ def python_fixture(kind):
                     lease.save = save
                 context = patch.object(owner.os, 'pidfd_open', side_effect=OSError('synthetic pidfd allocation')) if kind == 'pidfd' else __import__('contextlib').nullcontext()
                 with context:
-                    code, output = children.run([sys.executable, '-B', '-c', script], owner.Budget(seconds))
+                    reply = children.run([sys.executable, '-B', '-c', script], owner.Budget(seconds),
+                                         capture_stderr=kind == 'stderr-output')
+                    code, output = reply[:2]
             except BaseException as error:
                 failed, failure = True, owner.reason(error)
             finally:
@@ -989,42 +1236,201 @@ def python_fixture(kind):
         print(json.dumps(value))
 
 
-def supervise_fixture(kind):
-    """A test failure must not strand its deliberately interrupted descendants.
+class FixtureExpired(Exception):
+    pass
 
-    This dedicated outer subreaper owns only its fork and adopted descendants.
-    It uses files, not inherited stdout pipes, to bound a broken inner fixture.
+
+class FixtureGuard:
+    """Independent kernel custody. NO implementation-under-test cleanup/helpers.
+
+    Dedicated single-thread supervisor, initially childless. Its proc reads cover
+    only direct/adopted children. Unreaped children cannot have reused PIDs.
     """
-    owner.subreaper()
-    with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
-        pid = os.fork()
-        if pid == 0:
+    def __init__(self):
+        if ctypes.CDLL(None, use_errno=True).prctl(36, 1, 0, 0, 0) != 0 or self.children():
+            raise RuntimeError('fixture custody unavailable')
+        self.slots = {}
+        self.gate = None
+        self.attempted = self.released = False
+        self.signalled = 0
+
+    @staticmethod
+    def children():
+        with open(f'/proc/self/task/{os.getpid()}/children', 'rb') as stream:
+            raw = stream.read(4097)
+        if len(raw) > 4096:
+            raise RuntimeError('fixture child bound')
+        return [int(pid) for pid in raw.split()]
+
+    def keep(self, pid):
+        row = self.slots.setdefault(pid, {'fd': None, 'start': None})
+        if row['fd'] is None:
+            row['fd'] = os.pidfd_open(pid)
+        with open(f'/proc/{pid}/stat', 'rb') as stream:
+            raw = stream.read(4097)
+        fields = raw[raw.rindex(b')') + 2:].split()
+        if len(raw) > 4096 or int(fields[1]) != os.getpid() or int(fields[19]) <= 0:
+            raise RuntimeError('fixture child identity')
+        row['start'] = int(fields[19])
+
+    def spawn(self, operation, fail_bookkeeping=False):
+        readfd, self.gate = os.pipe2(os.O_CLOEXEC)
+        old = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM, signal.SIGINT, signal.SIGHUP})
+        try:
+            self.attempted = True  # even a lost fork return requires ECHILD
+            pid = os.fork()
+            if pid == 0:
+                os.close(self.gate)
+                try:
+                    signal.pthread_sigmask(signal.SIG_SETMASK, old)
+                    if os.read(readfd, 1) != b'G':
+                        os._exit(4)
+                    os.close(readfd)
+                    operation()
+                    sys.stdout.flush()
+                    os._exit(0)
+                except BaseException:
+                    os._exit(3)
+            self.slots[pid] = {'fd': None, 'start': None}  # before fallible work
+            self.keep(pid)
+            if fail_bookkeeping:
+                raise RuntimeError('synthetic supervisor bookkeeping failure')
+            self.released = True  # conservative if gate write itself fails
+            if os.write(self.gate, b'G') != 1:
+                raise RuntimeError('fixture gate')
+            return pid
+        finally:
+            os.close(readfd)
+            os.close(self.gate)
+            self.gate = None
+            signal.pthread_sigmask(signal.SIG_SETMASK, old)
+
+    def reaped(self, pid):
+        row = self.slots.pop(pid, None)
+        if row is not None and row['fd'] is not None:
+            os.close(row['fd'])
+
+    def cleanup(self):
+        # Independent hard cleanup alarm and monotonic bound; every outcome,
+        # including gated fork/pidfd/identity failure, reaches this method.
+        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            signal.signal(sig, signal.SIG_IGN)
+        signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(FixtureExpired()))
+        signal.setitimer(signal.ITIMER_REAL, 2)
+        end = time.monotonic() + 2
+        bad = False
+        try:
+            if self.gate is not None:
+                try:
+                    os.close(self.gate)
+                except OSError:
+                    bad = True
+                self.gate = None
+            while time.monotonic() < end:
+                try:
+                    pids = set(self.children()) | set(self.slots)
+                except BaseException:
+                    bad, pids = True, set(self.slots)
+                for pid in pids:
+                    try:
+                        self.keep(pid)
+                        signal.pidfd_send_signal(self.slots[pid]['fd'], signal.SIGKILL)
+                        self.signalled += 1
+                    except ProcessLookupError:
+                        pass
+                    except BaseException:
+                        bad = True
+                        # A retained direct/adopted child is still unreaped by
+                        # this sole waiter, so this exact PID is safe on fd error.
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+                        except BaseException:
+                            bad = True
+                echild = False
+                while True:
+                    try:
+                        pid, _ = os.waitpid(-1, os.WNOHANG)
+                        if pid == 0:
+                            break
+                        self.reaped(pid)
+                    except ChildProcessError:
+                        echild = True
+                        break
+                if echild and not self.children() and not self.slots:
+                    return not bad
+                time.sleep(.005)
+        except BaseException:
+            return False
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+        return False
+
+
+def supervise_fixture(kind):
+    """Bounded independent parent around ordinary-Python-only inner fixtures."""
+    guard = FixtureGuard()
+    for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGALRM):
+        signal.signal(sig, lambda *_: (_ for _ in ()).throw(FixtureExpired()))
+    special = kind in ('guard-broken-return', 'guard-broken-hang', 'guard-bookkeeping')
+    seconds = .2 if kind == 'guard-broken-hang' else 7
+    code, timed_out = None, False
+    with contextlib.ExitStack() as faults, tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+        if kind.startswith('guard-broken-'):
+            # Break the shared implementation in THIS supervisor too, before
+            # fork. Kernel custody below must not use either patched helper.
+            faults.enter_context(patch.object(owner.Children, 'reap', return_value=True))
+            faults.enter_context(patch.object(owner, 'own_children', return_value=[]))
+        def operation():
             os.dup2(output.fileno(), 1)
             os.dup2(errors.fileno(), 2)
-            try:
+            resource.setrlimit(resource.RLIMIT_FSIZE, (65536, 65536))
+            if kind.startswith('guard-broken-'):
+                # Deliberately false inner cleanup/discovery, plus a detached
+                # ordinary child. The independent parent must still reap both.
+                if os.fork() == 0:
+                    os.setsid()
+                    time.sleep(8)
+                    os._exit(0)
+                claimed = owner.Children(SimpleNamespace(state=None)).reap(None) and not owner.own_children()
+                print(json.dumps({'innerClaim': claimed}), flush=True)
+                if kind == 'guard-broken-hang':
+                    time.sleep(8)
+            else:
                 python_fixture(kind)
-                sys.stdout.flush()
-                os._exit(0)
-            except BaseException:
-                os._exit(3)
-        code = None
-        end = time.monotonic() + 7
-        while time.monotonic() < end:
-            found, status = os.waitpid(pid, os.WNOHANG)
-            if found:
-                code = os.waitstatus_to_exitcode(status)
-                break
-            time.sleep(.01)
-        # Reap even when the inner fixture failed before retaining a child.
-        local = owner.Children(SimpleNamespace(state=None))
-        absent = local.reap(owner.Budget(2))
-        if code != 0 or not absent:
+        try:
+            signal.setitimer(signal.ITIMER_REAL, seconds)
+            pid = guard.spawn(operation, fail_bookkeeping=kind == 'guard-bookkeeping')
+            end = time.monotonic() + seconds
+            while time.monotonic() < end:
+                found, status = os.waitpid(pid, os.WNOHANG)
+                if found:
+                    guard.reaped(pid)
+                    code = os.waitstatus_to_exitcode(status)
+                    break
+                time.sleep(.005)
+            if code is None:
+                timed_out = True
+        except FixtureExpired:
+            timed_out = True
+        except BaseException:
+            code = 3
+        finally:
+            absent = guard.cleanup()
+        if not absent or (not special and code != 0):
             raise SystemExit(3)
         output.seek(0)
         raw = output.read(4097)
         if len(raw) > 4096:
             raise SystemExit(3)
-        sys.stdout.write(raw.decode('ascii'))
+        value = json.loads(raw) if raw else {}
+        if special:
+            value.update(timedOut=timed_out, gateOpened=guard.released,
+                         signalled=guard.signalled, failed=code != 0,
+                         parentImplementationBroken=kind.startswith('guard-broken-'))
+        value['_fixtureGuardAbsent'] = absent
+        print(json.dumps(value))
 
 
 if __name__ == '__main__':
