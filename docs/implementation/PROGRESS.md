@@ -301,3 +301,16 @@ no guest, namespace, privileged, display, bus or product execution authorized.
 Do not poll these or the OpusmediumUI taskac8ad89b; completion wakes coordinator.
 No PRwatch/nativejob. UI remains primary; downstream implementation waits for
 the shared token/primitive freeze. Complete97task/R1-03 scope unchanged.
+
+Wrapper reviews completed/read: Standards edf448a1 found P2 interrupted-fork
+cleanup could skip ECHILD when Python had not retained the kernel-created child's
+PID; Security/Spec58a2d742 found no actionable issues. Both independently67offline
+tests; Security/Spec five extra synthetic probes. Coordinator corrected the
+demonstrated P2 in the original isolated wrapper checkout, now clean unsigned
+50dd81306bd5b2845c7f860b77a5112fc47c2f44 on codex/f1-02-namespace-wrapper.
+Potential fork tracked before invocation; gate close followed by bounded reaping
+through ECHILD and empty cgroup, preserving resources on unknown absence. Two
+new mocked regressions first fail on original9f6f053 and pass after correction;
+complete offline AT suite97tests passes12.102s without skips, plus69focused tests,
+AST/plan/whitespace/hash checks. No product/reader/namespace/guest execution.
+Fresh final independent recheck is next; UIac8ad89b remains primary and unpolled.
