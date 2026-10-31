@@ -18,7 +18,11 @@ milestone does not complete this Goal.
 
 IMPORTANT
 
-Any subagent used must be GPT-6.1 SOL on high.
+For UI design, implementation and updates, use Opus 5.5 on medium.
+
+For non-UI subagent work, use GPT-6.1 SOL on high.
+
+This reflects the user's updated model instruction on 1 November 2026.
 
 AUTHORIZATION AND BOUNDARIES
 

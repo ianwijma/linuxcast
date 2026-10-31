@@ -160,3 +160,106 @@ fresh inspect still false/PID0/exit0. No lab resume, native process, new checkou
 or wrapper execution. Source preparation still pending; resume after F2merge.
 Need commit fixes, publish focused draft to startCI, then one fresh independent
 bounded concurrency recheck before merging. No active delegates or watches yet.
+
+PR85 https://github.com/ianwijma/linuxcast/pull/85 published DRAFT from normally
+signedbeb0d716557c80c5c7e8d63a2527d6de61baa141; signature and41current hashes
+verified. Current-head PlanningCI41213430721 succeeds; no requested/submitted
+reviews or comments and no repository rulesets. Develop stayscd7bf0e. PR84 is an
+independent design comparison and is not this lane's work. Source corrections
+pass144security/type/lint/plan and2actualF2flows5.25s+5.65s. Final fresh bounded
+concurrency recheck is being requested before ready/merge; draft/body accurately
+retain pending review/native gates. No watches at this checkpoint. Author F2
+checkout clean; root carries this local progress note for post-merge continuity.
+Next parallel preparation: offline-only F1 guest namespace wrapper in a new
+runtime-prepared codex/ child checkout, adding only new wrapper/test/evidence
+files. Existing controller/observer/preflight contracts remain frozen. No lab,
+namespace, display, reader, keyring, input or native attempt is authorized for
+that child; outer guest ownership/shutdown and fresh guest build remain separate
+coordinator work until prepared code passes independent review. Actual native0.
+
+Active async work from frozenbeb0d71: final credential concurrency recheck852a2624
+(codex/f2-02-runtime-final-review requested); offline-only guest namespace wrapper
+75ceebb9 (codex/f1-02-namespace-wrapper requested). PR85watch is active; currentCI
+already passed, merge still waits for recheck. Do not poll delegates or unchangedPR.
+
+Host-only native input preparation completed under the exclusive existing lablock:
+private-lab/f102-production-source-beb0d71.tar, sourcebeb0d716557c80c5c7e8d63a2527d6de61baa141,
+tree6176bdd039c68324538d2f3e60414b7c6ae1edc1, SHA256
+3d67f4b7c43d7cee7020a39572accfdc03400853eea7201199d9bf9cffecee9a,
+98191360bytes. All2504tar file/symlink contents and executable modes verified
+against Git blob identities. Source SSH signature verified with configured public
+key; archive+private provenance receipt mode0400. Candidate awaits final source
+review; if source changes, create a new archive rather than reuse this one. This
+is not a product build receipt. No extraction/dependency/build/guest/native run.
+Lab remained freshlystoppedfalse/PID0/exit0; lock released after verification.
+Historicalguest Node24.22.1/Bun1.4.4 hashes exist but current actual binary paths,
+Rust/header/offlinecache readiness are not yet verified. Guest build/receipt and
+outer reservation/shutdown remain pending. Wrapper child informed of this path
+constraint without authorizing any guest action. Actual product/Orca native0.
+
+
+PR85 MERGED at6c3d9465c9045a97b8c15bef441500b50dc42197,31Oct15:22:18UTC;
+headbeb0d71 currentCI41213430721 succeeds. Ready status and exacthead/mergeable/
+clean checks confirmed, no GitHub reviewrequests/reviews/comments, no rulesets or
+legacybranchprotection. Finalreview852a2624 completed/read: Standards+Security/
+Spec noactionable findings;17settings/10runtime/26additionalprivate-file probes
+type/lint/plan/frozeninstall/41hashes independently pass. Threeoriginalfindings
+resolved, ownerindex/files/capturesunchanged. Parent144security/52UIunit/3contracts
+and latest2actualElectron flows5.25s+5.65s retained. User's tiny merge blurb sent
+immediately. PR85watch removed. AllF2/native/task/full1.0 criteria unchanged.
+Root fast-forwarded to approveddevelop6c3d946 with this coordinator checkpoint
+local; carry these records into the next focused implementation rather than a
+standalone documentation PR. PR84 designcomparison belongs to independentwork.
+Native wrapper75ceebb9 remains the only activechild; do not poll it.
+Candidate sourcebeb0d71 archive now has a clean finalreview and is the exact
+mergedPR85head; immutablearchive/privateoriginalprovenance remain unchanged.
+Actual guestbuild/receipt/outershutdown and nativeattempt stillpending; runs0.
+
+User steering1November2026: prioritize updating EXISTING UI to selected Opus
+Instrument design from threadc2307e72-fdbe-4787-8f2f-4a8bd4aed4ca/mergedPR84.
+Read full selection: Opus for ALLseven surfaces inclchat/notes/bottomactionfilter;
+prior hybrid recommendation is superseded. Every future UI implementation/update
+must use Claude Opus5.5 at MEDIUM, overriding GOAL's generalGPT6.1SOL/high rule
+for UI work only. NonUI tasks/reviews retain existing model unless instructed.
+Capabilities confirm providerclaudeAgent/modelclaude-opus-5-5/options effortmedium.
+ReassessD1foundation/sharedprimitives first, then launcher/actions, settings/files,
+notes/workflows/grid; preserve full task behavior/security/native/release gates.
+Do not add new feature UI ahead of this refresh. NativeF1prep deferred belowUI.
+
+Preserved F1source-build checkpoint: source_bundle.py +test_source_bundle.py and
+source-build-preparation evidence. Ten extraction/security checks pass; entire
+native offline suite63tests pass12.15s; source98MiB host-only smoke writes then
+independently verifies2504Gitblobs/private modes and removes its own temporary
+root. Python3.10.12, syntax/2newsourcehashes/plan/whitespace pass. No guestbuild,
+namespace, display, reader, hostbus/keyring/provider/input or nativeattempt.
+Helper still requires independent review before integration/use in guestbuild;
+no F1/task/native acceptance changed. Nativewrapper75ceebb9 can finish its bounded
+nonUI work in background but no lab start is requested. Checkpoint this branch,
+then adopt approveddevelop703ece9 in a separate codex/UI branch for prioritywork.
+
+
+UI PRIORITY UPDATE: root now codex/d1-01-instrument-adoption from approved
+develop703ece998843ce8b3db6b2f6602265c0027b344a (PR84selection+PR85credential
+flow). PR85 is merged and un-watched; review852a2624 clean, no activeF2review.
+Native source helper checkpointaa31f67af7f15a16c1bf11687e02fa6cedbda873 is preserved
+on codex/f1-02-native-build-staging, UNSIGNED under explicituserfallback after
+1Passwordfailed. Its source tests63/actual2504-blob extraction are preparation,
+not guest/native proof. Wrapper75ceebb9 completed/read atunsigned9f6f053e32cd73e74153543c0d2b8f12b4e7afb0
+(tree988cccda04f9b0065d1673235eb588421ea2b006), clean codex/f1-02-namespace-wrapper
+in /home/ian/.t3/worktrees/linuxcast/t3-a70523b6;42new+25existing offlinechecks
+passed, no runtime/guest/namespace/product/reader runs. Nativeprep intentionally
+deferred; bothsourcehelper andwrapper stillneed independentreview, guest runtime/
+UID20000/node/staging/procaccess/receipt/outerownerverification before invocation.
+No active delegates/watches at this checkpoint. Next assign UIsharedfoundation
+to providerclaudeAgent/modelclaude-opus-5-5/effortmedium as explicitly requested.
+See UI_REFRESH.md for reassessment and bounded rollout order. Existing registry
+criterion states remain unchanged; selected prototypes are not application proof.
+
+First UI assignment will be the coordinator's explicit shared adoption increment:
+D1-01 selected canonical spec/tokens, schema validation and host primitives.
+Opusmedium proposes these changes in its isolated branch; coordinator retains
+sole authority over shared contracts, review and integration. No concurrent
+canonical-token writer or downstream UI implementation starts before this freeze.
+Then D1-02 renderer/launcher update uses merged primitives, followed by existing
+feature workspaces. GOAL.md model clause now matches the user's later UI request;
+complete97task/R1-03 objective and all permissions/security/release rules unchanged.
