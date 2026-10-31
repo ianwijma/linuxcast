@@ -30,7 +30,7 @@ Pinned Node24.22.1/Bun1.4.4/Rust1.95, Electron45.0.0, Chromium156.0.8078.48,
 SQLite3.53.4; Pop!_OS22.04 amd64 development host, private authenticated Xvfb
 1920×1080. This is not a supported Debian GNOME/KDE desktop session.
 
-- `bun run test:security -- F2-02`:139mapped checks pass, including real private
+- `bun run test:security -- F2-02`:144mapped checks pass, including real private
   storage-owner opaque CAS/export/restart checks and synthetic session/keyring
   boundaries. `bun run test:unit -- F2-02`:52synthetic UI checks pass.
 - `bun run test:contracts -- F2-02`:3checks pass. Typecheck/lint/frozen install,
@@ -71,3 +71,25 @@ Independent Standards and Security/Spec review is still required before merge.
 F2-02-AC01 and UI remain pending; historical AC02/privacy evidence is unchanged.
 Actual native helper/keyring/provider flow, supported four-session Debian matrix,
 high contrast/reduced motion/native AT and complete local1.0 gates remain open.
+
+## Initial review corrections
+
+Independent Standards review of1e769ed found P2 policy weakening from denied
+sessions. Independent Security/Spec found P1 old concurrent status reads applying
+an old clear policy, and P2 save success after lock cleared the new value. Parent
+fixes fence snapshots by mutation generation/confirmed preference revision, keep
+policy floors through in-flight changes, validate policy admission and completion,
+perform only one protective stronger-policy CAS restoration after an acknowledged
+weakening races denial, and recheck save eligibility/reference existence after IO.
+Uncertain restoration/retained references stay needs-review, never auto-replayed.
+
+Five new offline regressions pass, including a single-FIFO401-record paged
+inventory interleaving, locked/inactive/unavailable policy denial, memory erased
+during preference IO, lock/unlock cycles during policy acknowledgement, and failed
+protective compensation. The three original finding regressions fail on an
+isolated copy of reviewed1e769ed and pass on the fixed source. The complete144
+security checks pass without skips; final typecheck/lint pass. Mapped actual F2
+Electron rerun passes2/2 (credential5.25s, diagnostics5.65s), using the same
+explicit synthetic observer/denied-keyring boundary. Original captures preserved
+because UI source is unchanged. Final independent concurrency recheck is pending;
+no new clean review, native, keyring, provider or acceptance claim is made.

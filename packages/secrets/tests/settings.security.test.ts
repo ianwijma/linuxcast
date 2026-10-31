@@ -23,7 +23,7 @@ async function fixture(secure=false){
     encryptString:vi.fn(value=>Buffer.concat([Buffer.from('v11'),Buffer.from(value)])),decryptString:vi.fn(value=>value.subarray(3).toString())};
   const runtime=new CredentialRuntime({dataDirectory:root,helperPath:'/fixed/unused-helper',safeStorage,references,isStorageReady:()=>true,createSession:()=>({state:()=>session,subscribe(listener){listeners.add(listener);listener(session);return()=>{listeners.delete(listener);};},invalidate(){},async stop(){}})});runtimes.push(runtime);
   const service=new CredentialSettingsService({runtime,preferences,references,appearance:()=> 'dark'});services.push(service);
-  return {runtime,service,preferences,records,safeStorage,row:()=>row,emit(value:SecretSessionState){session=value;for(const listener of listeners)listener(value);}};
+  return {runtime,service,preferences,references,records,safeStorage,row:()=>row,emit(value:SecretSessionState){session=value;for(const listener of listeners)listener(value);}};
 }
 async function save(f:Awaited<ReturnType<typeof fixture>>,persistence:'persistent'|'session-only'='session-only',value='SYNTHETIC_ENTRY_ONLY'){
   const state=await f.service.state();return f.service.save({protocolVersion:1,expectedRevision:state.revision,persistence,value},confirm,signal());
@@ -96,4 +96,51 @@ it('keeps an applied but unacknowledged pointer write uncertain until explicit r
 });
 it('offers explicit fixed-target removal for corrupt preference metadata instead of reading a key',async()=>{
   const f=await fixture();f.preferences.read=async()=>({revision:3,value:'SYNTHETIC_CORRUPT_METADATA'});expect(await f.service.state()).toMatchObject({stored:'needs-review',clearSessionOnLock:true});
+});
+
+it('cannot weaken policy from a denied session even when its current revision is supplied',async()=>{
+  for(const denied of ['locked','inactive','unavailable'] as const){
+    const f=await fixture();let state=await f.service.state();expect(await f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:true},signal())).toMatchObject({value:{outcome:'policy-updated'}});
+    f.emit(denied);state=await f.service.state();const writes=vi.mocked(f.preferences.write).mock.calls.length;
+    expect(await f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:false},signal())).toMatchObject({value:{outcome:'unavailable'}});
+    expect(vi.mocked(f.preferences.write).mock.calls).toHaveLength(writes);expect(JSON.parse(f.row()!.value).clearSessionOnLock).toBe(true);
+  }
+});
+it('does not let an overlapping older single-FIFO status read undo a confirmed clear policy',async()=>{
+  const f=await fixture();await save(f);
+  // Three inventory pages let a later old-preference read finish after the
+  // policy acknowledgement, even though all repository calls are single-FIFO.
+  for(let i=0;i<401;i++){const id=randomUUID(),now=new Date().toISOString();f.records.set(id,{id,ownerKind:'provider',ownerId:'another-provider',createdAt:now,updatedAt:now});}
+  const state=await f.service.state(),read=f.preferences.read,write=f.preferences.write,list=f.references.list;
+  let tail:Promise<unknown>=Promise.resolve(),late:Promise<Awaited<ReturnType<typeof f.service.state>>>|undefined,started=false;
+  const enqueue=<T>(operation:()=>Promise<T>):Promise<T>=>{const next=tail.then(operation);tail=next.then(()=>{},()=>{});return next;};
+  f.preferences.read=()=>enqueue(read);f.preferences.write=(expected,value)=>enqueue(()=>write(expected,value));
+  f.references.list=params=>{if(!started){started=true;queueMicrotask(()=>{late=f.service.state();});}return enqueue(()=>list(params));};
+  expect(await f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:true},signal())).toMatchObject({value:{outcome:'policy-updated'}});
+  expect(late).toBeDefined();expect((await late)!.clearSessionOnLock).toBe(true);expect(JSON.parse(f.row()!.value).clearSessionOnLock).toBe(true);
+  f.emit('locked');f.emit('observed-unlocked');const consumer=vi.fn(async()=>{});expect(await f.service.use(consumer)).toEqual({outcome:'unavailable'});expect(consumer).not.toHaveBeenCalled();
+});
+it('does not report saved after lock erased the newly created memory value during preference IO',async()=>{
+  const f=await fixture();const before=await f.service.state();await f.service.setPolicy({protocolVersion:1,expectedRevision:before.revision,clearSessionOnLock:true},signal());
+  const write=f.preferences.write;let finish!:()=>void;
+  f.preferences.write=async(expected,value)=>{const result=await write(expected,value);await new Promise<void>(resolve=>{finish=resolve;});return result;};
+  const saving=save(f);while(!finish)await new Promise(resolve=>setImmediate(resolve));f.emit('locked');finish();
+  expect(await saving).toEqual({ok:true,value:{outcome:'cancelled'}});expect(await f.service.state()).toMatchObject({stored:'none',session:'locked'});
+});
+it('restores the stronger confirmed policy when session loss races a weakening acknowledgement',async()=>{
+  for(const regain of [false,true]){
+    const f=await fixture();const before=await f.service.state();await f.service.setPolicy({protocolVersion:1,expectedRevision:before.revision,clearSessionOnLock:true},signal());
+    const state=await f.service.state(),write=f.preferences.write;let finish!:()=>void,first=true;
+    f.preferences.write=async(expected,value)=>{const result=await write(expected,value);if(first){first=false;await new Promise<void>(resolve=>{finish=resolve;});}return result;};
+    const changing=f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:false},signal());while(!finish)await new Promise(resolve=>setImmediate(resolve));
+    f.emit('locked');if(regain)f.emit('observed-unlocked');finish();expect(await changing).toMatchObject({value:{outcome:'stale'}});expect(JSON.parse(f.row()!.value).clearSessionOnLock).toBe(true);expect(await f.service.state()).toMatchObject({clearSessionOnLock:true});
+  }
+});
+it('keeps a conservative floor and explicit uncertainty if protective policy compensation fails',async()=>{
+  const f=await fixture();const before=await f.service.state();await f.service.setPolicy({protocolVersion:1,expectedRevision:before.revision,clearSessionOnLock:true},signal());
+  const state=await f.service.state(),write=f.preferences.write;let finish!:()=>void,calls=0;
+  f.preferences.write=async(expected,value)=>{calls++;if(calls===2)throw new Error('SYNTHETIC_COMPENSATION_LOSS');const result=await write(expected,value);await new Promise<void>(resolve=>{finish=resolve;});return result;};
+  const changing=f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:false},signal());while(!finish)await new Promise(resolve=>setImmediate(resolve));f.emit('inactive');finish();
+  expect(await changing).toMatchObject({value:{outcome:'unknown'}});expect(calls).toBe(2);expect(await f.service.state()).toMatchObject({stored:'needs-review',clearSessionOnLock:true,session:'inactive'});
+  f.emit('observed-unlocked');expect(await f.service.state()).toMatchObject({clearSessionOnLock:true});
 });

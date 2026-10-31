@@ -45,3 +45,14 @@ Escape, text overflow and light/dark using existing host primitives. Privacy
 fixtures are synthetic. UI unit tests are not actual Electron, keyring, Debian,
 Wayland or native AT evidence; coordinator supplies main wiring and actual product
 validation/captures after integration. No new third-party version is introduced.
+
+Status snapshots must not apply older preferences after a newer mutation. Main
+fences policy application/publication by confirmed preference revision and
+mutation generation, coalesces external metadata reads and permits only one
+bounded read-only refresh when a snapshot became stale. A denied session cannot
+weaken policy. If eligibility/cancellation changes during an acknowledged policy
+weakening, main keeps the stronger in-memory policy and attempts one exact CAS
+restoration of that stronger value. This protective compensation never repeats
+the requested weakening; failed/unconfirmed restoration is unknown/needs-review
+and keeps the conservative in-memory floor. Save success is checked again after
+pointer persistence/deletion, including memory-reference existence.

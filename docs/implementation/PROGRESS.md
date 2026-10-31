@@ -142,3 +142,21 @@ approveddevelopcd7bf0e. All listed local checks and41source pins pass; actual
 helper/keyring/provider/desktop/AT/full-task acceptance remain pending. No push or
 PR yet. Coordinator will synchronize this checkpoint to its own root checkout
 and request two fresh independent axis reviews before publication/integration.
+
+
+Reviews of frozen1e769ed completed/read: Standards9b1c0590 found P2 denied-
+session policy weakening; Specabdb932d found P1 stale read disabling clearpolicy
+and P2 saved after lock erased memory. Parent fixes now pass144F2security, final
+type/lint and mapped Electron2/2 (credential5.25s, diagnostics5.65s).5new
+regressions include exact single-FIFO paged interleaving;3finding tests fail on
+reviewed source and pass fixed source. Snapshot revision/generation fences and
+coalesced bounded metadata refresh prevent stale application/publication. Policy
+checks admission and eligibility epoch across IO, keeps stronger floor, restores
+stronger preference once by exactCAS after acknowledged weakening races denial;
+unknown restoration stays review-required. Save checks post-IO reference/lease.
+Native F1 prerequisite audit this turn only: controller preflight requires own
+network namespace distinct from guestPID1 plus matching sysfs/loopback; labv4
+fresh inspect still false/PID0/exit0. No lab resume, native process, new checkout
+or wrapper execution. Source preparation still pending; resume after F2merge.
+Need commit fixes, publish focused draft to startCI, then one fresh independent
+bounded concurrency recheck before merging. No active delegates or watches yet.
