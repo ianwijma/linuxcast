@@ -9,6 +9,8 @@ Both candidates were authored against [the same brief](BRIEF.md), source observa
 
 The Opus author had no inherited conversation and owned only `opus/`. The Sol artifact was drafted while that candidate ran. The comparison was written after both outputs existed. Later coordinator changes are limited to review integration and fixes documented in [EVIDENCE.md](EVIDENCE.md); conceptual differences are preserved.
 
+On 1 November 2026 the user selected Opus Instrument in full. [selection.json](selection.json) records the decision. Status annotations and comparison controls were updated by the coordinator; the authored visual designs were preserved. Earlier mixed-design recommendations are superseded by that selection.
+
 This is a qualitative comparison of two single samples. Different execution duration, output length and amount of prototype behaviour are not evidence of general model superiority, cost, performance or user preference. There was no blind review, repeated trial, equal compute budget or measured usability study.
 
 Sources are official public pages and product imagery documented in [RESEARCH.md](RESEARCH.md). No Raycast binary, proprietary source, logo or third-party product illustration is redistributed. The committed SVG glyphs are original inline artwork; emoji use the local platform font. No new font assets are redistributed. Both artifacts request Inter and JetBrains Mono and fall back locally; final product typography must use the licensed bundled assets from the shared host foundation.

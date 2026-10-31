@@ -1,0 +1,12 @@
+{
+  "decisionDate": "2026-11-01",
+  "selectedBy": "user",
+  "selectedCandidate": "opus",
+  "selectedName": "Instrument",
+  "scope": ["launcher", "files", "grid", "chat", "notes", "workflows", "settings"],
+  "hybridSelected": false,
+  "userInstruction": "Looking at the designs, I highly prefer what Opus came up with, so let's choose this one.",
+  "canonicalDesignAndTokenMigration": "pending",
+  "applicationRollout": "pending",
+  "implementationAcceptance": "unchanged"
+}

@@ -1,8 +1,8 @@
-# Sol and Opus: which elements to choose
+# Sol and Opus: comparison history
 
-**Recommendation:** start with Opus's launcher, shared controls, state plates and workflow structure. Consider Sol's quieter notes composition and its simpler reading hierarchy for chat. Keep the action-filter placement open for a keyboard trial: Opus's bottom filter is distinctive, but Sol's top filter follows the current layout more closely.
+**Decision, 1 November 2026:** the user selected **Opus “Instrument” in full**, including chat, notes and the bottom action filter. The [decision record](README.md#decision-record) supersedes earlier suggestions to mix Sol's reading layouts into the result. Sol remains comparison history.
 
-This is a judgment about these two proposals, not about the models in general. Both were configured at high effort; see [provenance](PROVENANCE.md). Neither changes the running application. Open the [interactive visual comparison](comparison.html) to browse matched views/themes and record a choice for each surface. Choices exist only in that page session and can be copied from its text summary.
+This compares two proposals, not the models in general. Both were configured at high effort; see [provenance](PROVENANCE.md). Neither changes the running application. The [interactive visual comparison](comparison.html) retains matched views/themes and shows the recorded Opus choice for every surface.
 
 ## What is held constant
 
@@ -12,7 +12,7 @@ Screenshots were captured with the same Chromium build and 1440px viewport. Laun
 
 ## Concrete differences
 
-| Area | Sol — Graphite / precision | Opus — Instrument | Suggested choice / tradeoff |
+| Area | Sol — Graphite / precision | Opus — Instrument (selected) | Original review tradeoff (historical) |
 | --- | --- | --- | --- |
 | Launcher hierarchy | One quiet result group; monochrome outline icons on neutral tiles; small inline sources | Typed groups with counts; hanging title/caption alignment; coloured object glyphs; denser metadata | Opus for scanning a mixed registry; Sol if minimal visual weight matters most. Test long names with either. |
 | Selection and focus | Neutral fill; separate focus outline | Neutral fill plus a coral rail; separate blue focus | Opus adds a clear non-text selection landmark. The rail adds emphasis; prefer Sol if it feels too busy. |
@@ -43,4 +43,4 @@ The [Sol prototype](sol/review.html) and [Opus prototype](opus/review.html) let 
 - The current base border role is decorative on some surfaces. Sol retains it; Opus adds a stronger `controlBorder`. Adopt a measured control-boundary treatment through shared primitives before calling a final UI accessible.
 - A mixed choice must still result in one shared row, focus, action, keycap and state language. Do not give extensions, workflows or individual features separate visual systems.
 
-No decision is recorded yet. Use the [decision table](README.md#decision-record) as the durable record once the user has selected elements. Merging this proposal PR only stores design artifacts; subsequent implementation requires the chosen direction and the normal task acceptance evidence.
+The durable [decision table](README.md#decision-record) and [selection.json](selection.json) select Opus for every surface, without a hybrid. Merging this PR stores the selected design and comparison history; the canonical design/token migration and application rollout remain separate implementation work with normal acceptance evidence.

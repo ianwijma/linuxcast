@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T15:04:46.176Z",
+  "generatedAt": "2026-10-31T15:13:56.869Z",
   "browserVersion": "156.0.8078.4",
   "nodeVersion": "v26.11.1",
   "results": [
@@ -36,6 +36,6 @@
       "screenshotCount": 24
     }
   ],
-  "comparison": "28 images load; all 7 surfaces × 2 themes at 728px and 390px; selection summary updates; no script errors",
+  "comparison": "28 images load; all 7 surfaces × 2 themes at 728px and 390px; read-only summary records Opus for all surfaces; no script errors",
   "limits": "Chromium documentation artifacts only. No Electron, native desktop, screen-reader, backend or product acceptance claim."
 }

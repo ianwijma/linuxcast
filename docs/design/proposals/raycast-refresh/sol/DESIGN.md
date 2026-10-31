@@ -1,6 +1,6 @@
 # Sol candidate — Graphite / precision
 
-Author: GPT 6.1 Sol, high reasoning effort, in the coordinating T3 Code session. Date: 1 November 2026. One design sample, not a model-quality benchmark. Status: **proposal, not adopted**.
+Author: GPT 6.1 Sol, high reasoning effort, in the coordinating T3 Code session. Date: 1 November 2026. One design sample, not a model-quality benchmark. Status: **unselected alternative, retained as comparison history**. The user selected [Opus Instrument](../opus/DESIGN.md) in full.
 
 ## Direction
 

@@ -50,7 +50,7 @@ See the machine-readable [verification results](verification-results.json) and [
 | Forced colours + reduced motion | Render smoke check; screenshot inspected | Render smoke check; screenshot inspected |
 | Committed prototype screenshots | 24 | 24 |
 
-The comparison page loads all 28 default app images, displays two matching candidate screenshots for every surface/theme, fits 728px/390px without page overflow, updates its per-surface choice summary, and produces no script exceptions. All choices are in-memory review state; closing/reloading the page resets them. There is no save, network submission or application adoption operation.
+The comparison page loads all 28 default app images, displays two matching candidate screenshots for every surface/theme, fits 728px/390px without page overflow, and produces no script exceptions. Following the user's selection, it leads with Opus and displays a read-only summary that matches [selection.json](selection.json) for every surface. There is no save, network submission or application adoption operation.
 
 Screenshots in `sol/screenshots/` and `opus/screenshots/` include:
 
@@ -67,6 +67,7 @@ The coordinator visually inspected launcher/action dark/light, chat, workflow, l
 - The harness initially checked Tab after the last footer control and hit the browser boundary. It now checks Escape's actual restored focus and Shift+Tab to a prior control.
 - Opus shortcuts are scoped to its preview stage. The harness focuses its query before exercising Escape/Ctrl+K, matching an in-app interaction rather than sending keys to the page body.
 - Initial CI exposed that the planning-gate unit tests construct a documentation-only fixture without `apps/`. The coordinator changed the two prior-app screenshot references to immutable baseline GitHub links and ran the complete planning-gate tests. No validator or fixture behaviour was changed.
+- On 1 November 2026 the user selected Opus Instrument in full. The coordinator recorded the decision, changed the comparison to lead with Opus and show the read-only selection, and reran artifact and planning-gate checks. Candidate designs, app-frame screenshots and canonical base tokens remain unchanged.
 - The author's Opus validation notes predate the coordinator's forced-colours/reduced-motion smoke check. The record here supplements them; it does not establish Electron or screen-reader acceptance.
 - [Provenance](PROVENANCE.md) corroborates the requested/returned Opus `effort: high` launch option. Internal model compute is not measurable from these artifacts.
 
@@ -76,4 +77,4 @@ No actual Electron, Orca, supported Debian desktop, Wayland/X11, clipboard backe
 
 Fixed normal-size prototype rows do not establish 200% text usability. Full text growth, CJK/RTL/long-name coverage, final font layout, screen-reader announcements and actual backend-derived recovery states remain implementation work. Sol's baseline border is not a sufficient independent control boundary on every surface; the chosen shared controls need measured contrast. The Opus proposed stronger control-border role addresses that specification issue but is not bound into the app.
 
-The current application, canonical design files, shared primitive contracts, task registry, dependencies, native integrations and feature status are unchanged. No task was marked complete. The PR is ready for design selection; rollout still requires a recorded decision and bounded implementation acceptance.
+The current application, canonical design files, shared primitive contracts, task registry, dependencies, native integrations and feature status are unchanged. No task was marked complete. Design selection is complete: Opus Instrument. Rollout still requires the coordinated canonical migration and bounded implementation acceptance.

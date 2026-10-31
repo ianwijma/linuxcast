@@ -1,6 +1,6 @@
-# Linuxcast design candidate: “Instrument” (Opus)
+# Linuxcast selected design: “Instrument” (Opus)
 
-**Status: proposal, not normative.** This is one candidate in the [raycast-refresh comparison](../BRIEF.md). It changes no application code, canonical [DESIGN.md](../../../DESIGN.md), canonical [tokens.json](../../../tokens.json), task status or manifest. The coordinator decides whether any part of it is adopted. If it is, the canonical document and tokens change together.
+**Status: selected by the user on 1 November 2026; application adoption pending.** Instrument is the chosen direction for all seven surfaces; see the [decision record](../README.md#decision-record). Sol and hybrid suggestions are comparison history. This selected specification is not yet the canonical runtime contract: it changes no application code, canonical [DESIGN.md](../../../DESIGN.md), canonical [tokens.json](../../../tokens.json), task status or manifest. The coordinator migrates the selected document and tokens together before shared implementation rollout.
 
 Files in this directory:
 

@@ -169,14 +169,19 @@ try {
   }
   assert(await comparison.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)),
     'A comparison screenshot is missing');
-  await comparison.locator('[data-choice="Mix"]').click();
-  assert((await comparison.locator('#decisions').inputValue()).includes('Settings & permission: Mix'));
+  const selection = JSON.parse(await readFile(resolve(root, 'selection.json'), 'utf8'));
+  assert.equal(selection.selectedCandidate, 'opus');
+  const summary = await comparison.locator('#decisions').inputValue();
+  for (const name of ['Launcher & actions', 'Files', 'Emoji grid', 'AI chat', 'Notes', 'Workflow editor', 'Settings & permission']) {
+    assert(summary.includes(`${name}: Opus`), 'Comparison must reflect the recorded user selection');
+  }
+  assert.equal(await comparison.locator('[data-choice]').count(), 0, 'Recorded decision must be read-only');
   assert.deepEqual(comparisonErrors, []);
   await comparison.close();
   await writeFile(resolve(root, 'verification-results.json'), JSON.stringify({
     generatedAt: new Date().toISOString(), browserVersion: browser.version(),
     nodeVersion: process.version, results,
-    comparison: '28 images load; all 7 surfaces × 2 themes at 728px and 390px; selection summary updates; no script errors',
+    comparison: '28 images load; all 7 surfaces × 2 themes at 728px and 390px; read-only summary records Opus for all surfaces; no script errors',
     limits: 'Chromium documentation artifacts only. No Electron, native desktop, screen-reader, backend or product acceptance claim.'
   }, null, 2) + '\n');
   console.log(JSON.stringify(results, null, 2));
