@@ -53,13 +53,19 @@ Expose one fixed native-wrapper job, with no caller command, shell text, path,
 container, identity, timeout or arbitrary Docker/SSH overrides. Its eventual
 transport is the existing container-local SSH connection to the guest using only
 `/lab/guest-key` and `/lab/known_hosts`, BatchMode/IdentitiesOnly/strict host-key
-checking, no agent or forwarding. The only effectful guest command is the fixed
+checking, no agent or forwarding. The only effectful guest job is the fixed
 installed `/usr/bin/python3 -I -B /usr/local/libexec/linuxcast-f102-lab/lab_namespace.py`
 with its two existing reviewed flags, via fixed noninteractive sudo if required
 by the verified guest account. Guest transport/account/executable availability
 are prerequisites, not assumptions proven by this contract. Do not add a remote
 shell script, install/build/provisioning command or generic execution endpoint.
-A fixed non-effectful readiness probe may run within a bounded startup deadline;
+A separate fixed `/usr/bin/systemctl poweroff --no-block` is permitted only for
+cleanup of this reserved guest after fresh pinned-container identity and a
+may-have-started marker. It uses the same verified guest account and fixed
+noninteractive sudo policy; there is no arbitrary shutdown command or path.
+Guest prerequisite review must include permission for this exact poweroff action.
+No container/image/configuration change or new authority over another machine
+is admitted. A fixed non-effectful readiness probe may run within a bounded startup deadline;
 never retry the guest wrapper/controller or a failed product input.
 
 Before start, acquire the exclusive reservation, validate pinned configuration
@@ -91,9 +97,27 @@ local Docker/SSH client. Importing the module is inert.
 
 ## Cleanup and interruption recovery
 
-After success or any may-have-started failure, stop only the pinned container
-with bounded grace, then identity-check and kill only that same container if
-needed. Freshly inspect both identity/configuration and stopped/exited,
+After success or any may-have-started failure, first freshly inspect the pinned
+container. If already at the clean stopped baseline, do not dispatch any guest
+action. If running, request the one fixed graceful guest poweroff, and wait for a
+fresh exact stopped baseline within a bounded part of the existing45s cleanup
+budget. Reserve time for the existing Docker stop/kill/reap fallback; do not
+increase the cleanup or total budget. Never replay the native wrapper.
+
+A poweroff may close SSH before acknowledgement. Only fresh pinned-container
+stopped/exit0 plus owned-host-child absence can establish cleanup; a dropped
+connection alone cannot. Explicit rejection/failed probes and earlier failures
+remain separately recorded. If graceful stop does not establish absence, stop
+only the pinned container with bounded grace, then identity-check and kill only
+that same container if needed. Never coerce a forced/nonzero exit into exit0.
+
+This separate graceful phase is necessary preparation: read-only inspection
+confirmed the pinned entrypoint execs the configured GNU timeout/QEMU command.
+An ordinary host GNU timeout plus bounded sleep probe, using the same wrapper
+flags, exits by SIGTERM when externally terminated; all probe children were
+reaped. That is evidence of the direct-stop risk, not an actual v4 Docker/guest
+shutdown test. Real graceful/fallback behavior still needs bounded integration.
+ Freshly inspect both identity/configuration and stopped/exited,
 running=false, PID0, exit0 before claiming clean shutdown. A forced/nonzero exit
 is a recorded failure even if subsequent absence is known; preserve first failure
 and report termination/absence separately. Reap all retained host children and

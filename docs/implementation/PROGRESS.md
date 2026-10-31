@@ -1035,3 +1035,14 @@ exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
 23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
 occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
 recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
+
+Outer-owner shutdown correction selected before initial review: pinnedimage's
+entrypoint read-onlycopied (no start/exec), SHAa15ac958..7c8ea, ends exec "$@";
+configuredtimeout lacks --preserve-status. Ordinaryhosttimeout+boundedsleepprobe
+sameflags exits-15 afterexternalTERM, allownedchildrenreaped. DirectDockerstop
+therefore risks nonzero143 and cannot establish mandated cleanexit0; actualguest
+behavior remains unmeasured. Coordinatorprotocol now permits only fixedguest
+systemctl poweroff --no-block in cleanup, same verifiedaccount/sudo, freshidentity,
+existing45s budget withreserved stop/kill fallback. No arbitraryguestjobs ornew
+scope grant. Originalauthor followup next forownedsource/tests/evidence; no native
+invocation or marker/permit created. Early historicalcleanupgap stays explicit.
