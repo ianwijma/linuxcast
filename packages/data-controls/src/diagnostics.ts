@@ -48,7 +48,7 @@ export class LocalDiagnostics {
   async #records(category:DiagnosticCategory):Promise<{record:DiagnosticRecord;size:number;name:string}[]> {
     const result:{record:DiagnosticRecord;size:number;name:string}[]=[];
     for(const name of await this.#names(category)) {
-      const file=await open(this.#path(name),constants.O_RDONLY|constants.O_NOFOLLOW);
+      const file=await open(this.#path(name),constants.O_RDONLY|constants.O_NOFOLLOW|constants.O_NONBLOCK);
       try {
         const stat=await file.stat();if(!stat.isFile() || stat.uid!==process.getuid?.() || (stat.mode&0o777)!==0o600 || stat.size>2048 || stat.nlink!==1)throw new Error();
         const value=await file.readFile('utf8');const record=recordSchema.parse(JSON.parse(value));

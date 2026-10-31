@@ -88,6 +88,8 @@ Default content actions must not depend solely on hover. Pointer cursor is reser
 
 Use the original [Linuxcast icon](assets/linuxcast-icon.svg) as the planning identity. It depicts a command prompt and rising cards; it is not a Raycast-logo variation. Lucide may supply the application UI icon vocabulary during implementation, with licence attribution. Decorative SVG diagrams/mockups are documentation artifacts, not application components.
 
+The approved [project icon](assets/linuxcast-project-icon.svg) is used for the repository identity: an original coral penguin with a command-prompt beak and diagonal casting rays. Its [asset record](assets/README.md#project-icon) includes a PNG export, provenance and dark/light previews. The earlier command-card icon remains part of the planning examples.
+
 The [asset index](assets/README.md) distinguishes original mockups from source references. Its examples cover the launcher/actions, chat/workflows, component states, and light/permission surfaces. Later screenshots must be from the implemented application and labelled with the tested session/theme.
 
 ## Review gate

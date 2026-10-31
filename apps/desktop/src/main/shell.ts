@@ -36,6 +36,7 @@ export interface ResidentShellOptions {
   openQuickNote?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
+  openPermissionSettings?: () => Promise<void>;
   openUrl?: LauncherActions['openUrl'];
   getCommandUsage?: LauncherActions['getUsage'];
   recordCommandUse?: LauncherActions['recordUse'];
@@ -158,6 +159,7 @@ export function startResidentShell(options: ResidentShellOptions): void {
       ...(options.rates?{rates:options.rates,rateVisible:()=>!!window&&!window.isDestroyed()&&window.isVisible()}:{}),
       hide: () => lifecycle.hide(), quit: () => requestQuit(),
       ...(options.openDataSettings ? {openDataSettings: options.openDataSettings} : {}),
+      ...(options.openPermissionSettings ? {openPermissionSettings:options.openPermissionSettings} : {}),
       ...(options.loadWorkflowCommands?{loadWorkflowCommands:options.loadWorkflowCommands}:{}),
       ...(options.openWorkflowEntry?{openWorkflowEntry:options.openWorkflowEntry}:{}),
       ...(options.openWorkflowEditor ? {openWorkflowEditor:options.openWorkflowEditor} : {}),

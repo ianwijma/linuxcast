@@ -86,9 +86,9 @@ function checkIdentity(method: string, params: Record<string, unknown>, result: 
     const candidates = result as FileCandidate[],options=params.options===undefined?undefined:fileSearchOptionsSchema.parse(params.options);
     valid = candidates.length <= Number(params.limit) && candidates.every(candidate =>
       (params.rootId === undefined || candidate.rootId === params.rootId) && candidate.id === `${candidate.rootId}:${candidate.path}`&&fileSearchMatchesOptions(candidate,options)&&fileSearchMatchesDirectory(candidate,params.directory as string|undefined));
-  } else if (method === 'permissions.list') {
+  } else if (method === 'permissions.list' || method === 'permissions.inventory') {
     const page = result as {records: DecisionRecord[]; nextCursor: string | null};
-    valid = page.records.every(record => createHash('sha256').update(principalKeyMaterial(record.principal)).digest('hex') === params.principalKey) &&
+    valid = (method === 'permissions.inventory' || page.records.every(record => createHash('sha256').update(principalKeyMaterial(record.principal)).digest('hex') === params.principalKey)) &&
       page.records.length <= Number(params.limit) &&
       page.records.every((record, index) => record.id > (index === 0 ? (params.afterId as string | undefined) ?? '' : page.records[index - 1]!.id)) &&
       (page.nextCursor === null || page.nextCursor === page.records.at(-1)?.id);

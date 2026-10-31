@@ -59,6 +59,7 @@ export interface LauncherActions {
   openQuickNote?: () => Promise<void>;
   openFileSearch?: () => Promise<void>;
   openDataSettings?: () => Promise<void>;
+  openPermissionSettings?: () => Promise<void>;
   openUrl?: (url:string) => Promise<'dispatched'>;
   getUsage?: (commandId: string) => Promise<CommandUsage | null>;
   recordUse?: (commandId: string) => Promise<unknown>;
@@ -108,6 +109,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
     {id:'linuxcast:calculator',title:'Calculator',subtitle:'Evaluate arithmetic, units, colours or dates locally',aliases:['calc','calculator'],keywords:['math','arithmetic','calculate','units','convert','dates','timezones'],enabled:true},
   ];
   if(actions.dictionary)builtins.push({id:'linuxcast:dictionary',title:'Dictionary',subtitle:'Browse installed language base entries and copy a selected word',aliases:['dictionary','spelling'],keywords:['word','language','hunspell','headword'],enabled:true});
+  if(actions.openPermissionSettings)builtins.push({id:'linuxcast:saved-permissions',title:'Saved permissions',subtitle:'Review and remove remembered allow or deny choices',aliases:['permissions'],keywords:['access','consent','revoke','privacy'],enabled:true});
   if(actions.emoji)builtins.push({id:'linuxcast:emoji',title:'Emoji',subtitle:'Search offline Unicode emoji and copy a selected result',aliases:['emoji','emoticon'],keywords:['unicode','symbol','smile','copy','character'],enabled:true});
   const active = () => !disposed && !actions.quitting() && !quitDispatched;
   if(actions.openWorkflowEditor)builtins.push({id:'linuxcast:open-workflow-editor',title:'Workflow draft',subtitle:'Build and save a local workflow draft',aliases:['workflow','workflows'],keywords:['graph','editor','automation','draft'],enabled:true});
@@ -458,6 +460,7 @@ export function registerLauncherIpc(ipc: Pick<IpcMain,'handle'|'removeHandler'>,
       else if(command.id==='linuxcast:quick-note')await actions.openQuickNote!();
       else if(command.id==='linuxcast:open-file-search')await actions.openFileSearch!();
       else if (command.id === 'linuxcast:open-local-data') await actions.openDataSettings!();
+      else if (command.id === 'linuxcast:saved-permissions') await actions.openPermissionSettings!();
       else actions.hide();
       await recordUse(command.id);
       return {ok:true,value:{outcome:'completed'}};

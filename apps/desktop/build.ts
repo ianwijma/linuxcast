@@ -14,12 +14,12 @@ await cp(join(root,'target/release/linuxcast-platform'),join(output,'platform'))
 await mkdir(join(output,'licenses/emoji'),{recursive:true});
 for(const name of ['LICENSE-UNICODE.txt','LICENSE-CLDR-48.txt','provenance.json'])
   await cp(join(root,'packages/builtins/emoji/data',name),join(output,'licenses/emoji',name));
-for (const entry of ['main', 'preload', 'data-preload', 'file-preload', 'workflow-preload', 'notes-preload']) {
+for (const entry of ['main', 'preload', 'permission-preload', 'data-preload', 'file-preload', 'workflow-preload', 'notes-preload']) {
   await build({ absWorkingDir: root, entryPoints: [`apps/desktop/src/${entry}/index.ts`],
     outfile: join(output, `${entry}.cjs`), platform: 'node', format: 'cjs', bundle: true,
     external: ['electron'], target: 'node24', legalComments: 'linked' });
 }
-await build({ absWorkingDir: root, entryPoints: ['apps/desktop/src/renderer/index.tsx', 'apps/desktop/src/renderer/data-settings.tsx', 'apps/desktop/src/renderer/file-search.tsx', 'apps/desktop/src/renderer/workflow-editor.tsx', 'apps/desktop/src/renderer/notes.tsx'],
+await build({ absWorkingDir: root, entryPoints: ['apps/desktop/src/renderer/permission-settings.tsx', 'apps/desktop/src/renderer/index.tsx', 'apps/desktop/src/renderer/data-settings.tsx', 'apps/desktop/src/renderer/file-search.tsx', 'apps/desktop/src/renderer/workflow-editor.tsx', 'apps/desktop/src/renderer/notes.tsx'],
   outdir: join(output, 'renderer'), platform: 'browser', format: 'esm', bundle: true, jsx: 'automatic',
   minify: true, target: 'chrome145', define: { 'process.env.NODE_ENV': '"production"' },
   loader: { '.woff2': 'file', '.woff': 'file' }, assetNames: 'fonts/[name]-[hash]', legalComments: 'linked' });
@@ -35,7 +35,7 @@ for (const name of STORAGE_MIGRATION_ASSETS)
   await cp(join(root, 'packages/storage/src/migrations', name), join(output, 'migrations', name));
 await mkdir(join(output, 'sqlite'), { recursive: true });
 await cp(join(root, 'packages/storage/node_modules/better-sqlite3/build/Release/better_sqlite3.node'), join(output, 'sqlite/better_sqlite3.node'));
-for (const name of ['index', 'data-settings', 'file-search', 'workflow-editor', 'notes'])
+for (const name of ['index', 'permission-settings', 'data-settings', 'file-search', 'workflow-editor', 'notes'])
   await cp(join(root, `apps/desktop/src/renderer/${name}.html`), join(output, `renderer/${name}.html`));
 const resources = await readdir(join(output, 'renderer'), { recursive: true, withFileTypes: true });
 const assets = resources.filter(entry => entry.isFile() && !entry.name.endsWith('.LEGAL.txt'))

@@ -1,148 +1,88 @@
-# Coordinator checkpoint —31October2026
+# Coordinator checkpoint — 1 November 2026
 
-Full local1.0 GOAL remains active,97tasks/R1-03 unfinished. Registry8done,
-20inprogress/69planned;56passed/325pending/8justifiedN/A. No acceptance narrowed.
-All agents GPT6.1SOL/high. Normal1Password signing recovered; configured signer
-unchanged, SSH signatures verified against configured publickey via temporary
-allowedSigners. No unsignedcommit fallback. Prior failure notes are historical.
+The complete local1.0 goal remains active:97tasks through R1-03 and every native,
+physical recovery, accessibility, performance and package/release gate remain.
+Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A.
+User prioritizes prompt PR integration. Reviewed bounded increments integrate on
+their own checks/reviews/CI; full task/release criteria remain explicitly pending.
+Do not hold a complete increment for unrelated future work or mark a task done.
 
-F1-02 current parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
-codex/f1-02-shell-accessibility, draftPR80 https://github.com/ianwijma/linuxcast/pull/80.
-Published signed source292767a + the current lifecycle descriptor/docs follow-up.
-Both normal Git signing and configured public-key verification now work. Initial nativecontroller stagedtree1f5fce5 in t3-1c57ce87 preserved
-unchanged. Standardsreview foundP1discoveryfailure skipsknownchildkill/P2unsupported
-signedtestprep requirement. Specreview foundP1unsafeEnter andexternalpathreplacement,
-P2buildsourceadditions andreceiptaliases. Root fixes: kill retainedPopen/pidfds before
-falliblediscovery, keep unverifiedprivate roots, exact alias DOM+nativeguards, bind
-Xlock/socket inode/type/UID/PID/SO_PEERCRED, bidirectional file/dir inventory and
-receiptalias rejection+independentdigestpin.23unit/55security (48Python inwrapper),
-fulltype/lint/plan pass. ActualElectron integration2/2 passes17.76s (newguard6.181/legacy10.433);
-guard excludes canonical aria-hidden decorative icon, exactlabel retained. Six
-historical PNG recaptures restored unchanged. No native AT evidence inferred.
-Next: publish the final small follow-up/linkimmediately, independent final
-security recheck before nativeattempt. No native product/Orca run:0. Stoppedlab
-freshDebian13.7/Orca48.1/13sourcehash baseline verified, shutdownexit0/PID0.
-Testprep may use reviewed frozen-tree/archive with honest unsignedstatus; release
-signing unchanged. Missingalternate/finalrow IDs, freshguestbuild, reviewednamespace
-wrapper and outerfinally remain. Evidence controller-preparation/README.md.
+PR82 diagnostics https://github.com/ianwijma/linuxcast/pull/82 MERGED todevelop
+ate568b4d61b88cdb48bd5a5626bb18ba1284edb4e,31Oct13:09:35UTC. Head e31b3e5 had
+68security/actualElectron5.93s/5captures/type/lint/plan/21Python, independent review
+with small findings fixed/validated, CI41198787692 passed and no requested reviews
+or outstanding comments/rulesets. No F2 criterion promoted. Native dialogs were
+instrumented; supported native/credential/UI/release acceptance remains open.
 
-F3-01 /home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui,
-codex/f3-01-permissions-ui, published draftPR81 https://github.com/ianwijma/linuxcast/pull/81,
-verifiedsignedhead79f056a658ae3d75b2a48c1f913bcaf1ed178be0. Source exactly matches
-independent finalc6b83bc5 review, no blocker.75unit/2contract/72security/2actualElectron
-integration/9captures pass. Current-head planningCI41198685600 passed; reviewrequests,
-submissions/comments empty; rulesets[]. Notmerged: AC02/UI/native acceptance pending.
+PR81 Saved permissions https://github.com/ianwijma/linuxcast/pull/81 is next.
+Worktree /home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui,
+codex/f3-01-permissions-ui. Signedhead79f056a; finalsource matches independent
+c6b83bc5 review with no blocker.75unit/2contract/72security/2actualElectron17.51s/
+9captures and CI41198685600 previously pass. Merging newdevelop diagnostics now;
+resolve shared main shutdown by retaining permission registry and diagnostics
+cleanup before storage stop, plus both integration test mappings. Revalidate
+combined UI/lifecycle and source before pushing, then merge on current CI.
+FullF3 AC02/UI/native and generic host consent/remediation remain pending.
 
-F2 diagnostics /home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls,
-codex/f2-02-diagnostic-controls, draftPR82 https://github.com/ianwijma/linuxcast/pull/82,
-verifiedsignedheade31b3e5c35785b707a88c2d390232f2ba748ef00.68security/actualElectron
-1flow5.93s/5captures/type/lint/plan/21Python pass. InitialStandards clean, SpecP2idle
-retention fixed andFIFOguard parent-validated, no secondcleanfinalreviewclaim.
-PlanningCI41198787692 passed, no requested/submitted reviews/comments. Notmerged;
-credential/native/task acceptance pending. No channel/dependency/migration added.
+PR80 shell zoom/native preparation https://github.com/ianwijma/linuxcast/pull/80,
+parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
+codex/f1-02-shell-accessibility, signed41c3260. v2 independent Standards and Spec
+review completed/read clean within bounded scope.32unit/55security including53
+Python without skips/type/lint/plan/19hashes/signature and30extra pure boundaries
+independently pass. CI41203762504 passes. Update on develop after PR81 and integrate
+reviewed sizing/preparation increment once its own integration checks pass.
+No product/Orca native execution:0. Native IDs and15-step schema are preparation,
+not actual evidence; freshimmutableDebianbuild/receipt, reviewednamespace/outer
+shutdown, supporteddesktop/AT and fulltask/release gates remain mandatory. Earlier
+2actual private-Xvfb flows17.76s cover unchanged product behavior, not v2 execution.
 
-Credential/session /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
-codex/f2-02-credential-storage, stagedpolicytree6ed5dc0.4syntheticgate/62mappedsecurity/
-type/lint/plan pass; no productionroute/UI enabled. Read-only nativeobserver returned
-signedd89d05eea1937616a6f3fa72b0079266a61fe1cd, treeeea838c78a4878cfb0c4ddf84d12d363bfd277db,
-in /home/ian/.t3/worktrees/linuxcast/t3-3dc194dc, codex/f2-02-session-observer, clean.
-12newownedfiles,6pure/35privatebus/nonrootpeer rejection reported, no hostbus/device/
-desktop action. Read evidence/nativeREADME for glue; not yet integrated/reviewed.
-Nodeclient/admission/predispatch/abortstale/lock/loss andcredentialsetup/status remain
-coordinator work. The AT P1 fixes tookpriority before Nodeclient implementation.
+F2 credential /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
+codex/f2-02-credential-storage: signed06373ba afterf18efab. Native d89d05e unchanged,
+review no production defect; P3 parent-death fixture strengthened. Coordinator
+stream/client/mandatorystore session gating, cancellation/clear and drain implemented;
+87security/38Rust/6pure/35privatebus/nonrootpeer checked initially. Standards clean;
+Spec2P2 corrected at06373ba: fresh check after blobIO/beforedecrypt, denial status
+on all failures.90security/type/lint/plan/hash pass; smallfixes parent-validated,
+no additional clean finalSpec claim. Runtime startup/retry/suspend/ordered shutdown,
+actual provider predispatch and credentialsetup/status UI remain next after merging
+these PRs. Do not expand another branch while ready increments await integration.
 
-Do not poll live background delegates; all three most recent workers/reviews now
-completed and read. Next finalATrecheck must be a NEWdelegate_task, no reviewthread
-send. Keep bodies/docs precise, draftCIgreen is not mergeacceptance. Full native
-GNOME/KDE Wayland/X11/AT, physical recovery, allfeaturefamilies, performance,
-packages/artifacts/publication remain mandatory. No privilegedservice enabled.
-
-Current publication: signed source292767a pushed to PR80 and linked immediately;
-PR81/82 published+linked, PlanningCI41198685600/41198787692 pass respectively,
-no requested/submitted reviews/comments/rulesets at inspection. No merges because
-native/task acceptance remains pending. Final AT recheck must cover current
-P1/P2 fixes and descriptor follow-up. Separate d89d05e credential observer source
-copied exactly into credential worktree as staged additions; no CLI/lib or runtime
-wire enabled, no independent review yet. Next two read-only review delegates cover
-AT final safety and the native credential observer while coordinator resumes the
-Nodeclient/freshness/lifecycle and missingcredentialUI work. All previous delegates
-completed/read; no active one is being polled or replaced.
-
-Final native-preparation source a170c5896351df4abf1238334f4c27d46f758ada now pushed
-and linked immediately to PR80; normal signature verified, as is nativecredential
-worker d89d05e. This docs-only checkpoint does not alter code/artifact hashes.
-Final AT:23unit/55security (48Python) and2actualElectron17.76s/type/lint/plan pass;
-all historical PNGs unchanged. No native product/Orca runs. Fresh independent
-ATsecurity recheck and nativecredential observer security review are next, using
-immutable commits, while coordinator resumes missingNodeclient/credentialflow.
-PR81/82 remain drafts with accepted local checks and current-head planningCI as
-recorded; no requested/submitted reviews/comments or develop protection/rulesets.
-No merge before outstanding native/task acceptance. Published progress is a
-checkpoint, not completion of any unfinished task or the full local1.0 goal.
+Debian v4 lab lastverified stoppedfalse/PID0/exit0; no hostbus/desktop/input operation.
+Optional input service remains disabled/stopped. No real credentials/provider calls.
+Normal1Password signing recovered and user confirmed fixed; preserve configuration,
+no unsignedfallback. Tools PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH
+(Node24.22.1/Bun1.4.4/Rust1.95). No active delegate now; do not poll completed work.
 
 
-31October final review correction checkpoint (supersedes pending-review statements
-above): final AT recheck of67ecd632 is complete/read. Initial findings resolved,
-but P1 partial unreadable live process scan could falsely verify cleanup and P2
-post-launch refresh failure could undercount reader runs. Coordinator corrections
-now require confirmed disappearance, kernel ECHILD plus no retained live children,
-bounded discovery retry/root preservation, and launch accounting immediately after
-Popen retention.50offlinePython/55mappedsecurity pass, no skips. No TypeScript or
-production UI changed; prior23unit/2actualElectron evidence remains scoped to its
-unchanged sources. Native runs0, lab not resumed. New independent final safety
-recheck remains required; no clean review or acceptance is inferred.
-
-Native credential observer independent security/spec review ofd89d05e is complete:
-no production defect found; P3 parent-death fixture also allowed EOF and bypassed
-full output validation. Coordinator copy in f2-02-credential-storage now retains a
-separate stdin writer across parent death, requires an eligible first observation,
-reaps the exact helper and uses shared strict frame/terminal validation.6pure,
-35privatebus andnonrootpeer checks, offlineClippy/warnings/format pass after this
-small fixture correction. No native desktop/keyring/provider acceptance. Original
-worker commit/manifests remain historical. Missing Nodeclient, native CLI/library
-glue, admission/predispatch/abort/clearing, credentialsetup/status and Debianmatrix
-remain useful next work. No active delegate is being polled.
+PR81 develop-update validation completed:75unit/2contract/72F3security/68F2security,
+fulltype/lint/plan/whitespace and3actualElectron scenarios (F3two17.02s;F2one5.69s)
+pass. Restored9incidental PNG recaptures to reviewed images. Only production merge
+resolution combines already reviewed shutdown owners; no new operation/privilege.
+Next: normally signed mergecommit, push/link, inspect current CI/reviews, merge
+when green. User requests prompt bounded integration; task/native gates unchanged.
 
 
-Final safety recheck of signed7310cee completed/read: Standards no actionable
-finding; Security/Spec both partial-discovery P1 and reader-accounting P2 resolved,
-no new blocking defect in bounded scope.55security/50Python/19hashes/observerpins/
-plan/whitespace/signature independently pass. Native product/Orca runs0. Next F1:
-stronger alternate/final-row native IDs, immutable guestbuild/receipt, reviewed
-namespace/outershutdown, then actual native attempts. No acceptance promotion.
+PR81 MERGED atf4f5409c102ce1afa8c03c87dad411dfbc7dd76f,31Oct13:14:08UTC.
+Current signed a1ffb88 CI41204589655 passed; no requestedreviews/comments. Its
+combined checks above pass. PR82 andPR81 are integrated; task acceptance unchanged.
 
-F2credential worktree now implements main-only bounded stream/client, mandatory
-SecretStore session admission and consumer freshness/abort/clear policy, coalesced
-operation drain before private-directory close, and fixed native CLI/library arm.
-87mappedsecurity/38platformRust tests, offlineClippy/type/lint/plan pass; original
-native observer production source unchanged, corrected parent-death fixture6pure/
-35privatebus/nonrootpeer checks pass. Independent review of new coordinator source
-is next before runtime startup/retry/suspend/ordered shutdown/provider dispatch
-and missingcredentialsetup/status UI. Source/evidence stays in that isolated F2
-worktree; no renderer/native session/provider acceptance claimed. Fullgoal active.
+PR80 now updating todevelopf4f5409. Production source merged automatically;
+coordinator resolves registry/evidence/checkpoint conflicts preserving all three
+increments and all56passed/325pending/8N/A criteria. v2 independent review of
+41c3260 completed/read with no Standards or Security/Spec blocker;32unit/55security
+including53Python plus30extra pure boundaries/type/lint/plan/19hashes/signature
+pass independently. Need current combined F1/F2/F3 tests and actualElectron flows,
+then signed update/push/link/currentCI and merge. No additional feature work before
+closing this last ready PR. Actual product/Orca native runs remain0; all supported
+native/fulltask/release gates remain mandatory and explicitly pending.
 
 
-1November2026 checkpoint: F1 version2 native observer/controller additions prepared
-in parent. Exact public-alternate/public-final119 IDs, fresh away and final native/
-Orca events required; fixed query Public AT filler1 projects rows100–119 using the
-unchanged20-result productioncap. End guarded by exact count/title/sole selection/
-active descendant/listfocus; final geometry additionally requires overflow and
-scrollTop plus complete row/footer/native pixel bounds. v2 schema rejects legacy
-v1 reports; historical manifests preserved.32unit/55security (53Python no skips),
-fulltype/lint/plan/whitespace/19hashes pass. No productUI changed, no new captures.
-Lab authoritative statefalse/PID0/exit0. Independent review of newIDs/checkpoints,
-immutableguestbuild/receipt, reviewednamespace/outershutdown then actual native
-execution remain next F1 actions. Full native/task acceptance stays pending.
-
-F2 both independent f18efab reviews completed/read: Standards clean; Spec2P2s fixed
-in signed06373ba6ae4e30f886aef4c43b8153ca6792e0be. After private blobIO, recheck
-fresh/abort/deletion before decrypt and clearcipher even on denial; failure results
-prefer current denied status, never offer session-only whileineligible.90mapped
-security/type/lint/plan/hash pass; directfault tests prove no decrypt/consumer,
-cipherzeroing, and write status forlocked/inactive/unavailable. Smallfixes parent-
-validated, no new clean independent finalSpec claim. Worktree clean. Next useful
-F2work: main service startup/retry/suspend/ordered shutdown and actual credential
-setup/status UI and provider predispatch contract, while newF1review runs. F2
-native session/provider/keyring/DesktopUI and full97tasks/R1-03 remain outstanding.
-Normal1Password signing recovered and user confirmed fixed; no configchange or
-unsignedfallback. PR80/81/82 remain drafts, nothingmerged or acceptancepromoted.
+PR80 combined validation PASS after developf4f5409 integration:32F1unit,55F1/
+68F2/72F3security (53Python no skips), fulltype/lint/frozeninstall/plan/whitespace,
+19unchanged native preparation source hashes. Five actual private-Xvfb Electron
+scenarios pass (F1two18.11s,F2one5.75s,F3two17.90s). Corrected legacy expected
+command count to frozen built-in IDs plus1fixture after Saved permissions addition;
+exact preload/security assertions unchanged. New affected-state zoom dark/light
+captures inspected in apps/desktop/evidence/pr80-integration/;19incidental historical
+recaptures restored. Next: signed mergecommit/push/link/currentCI/merge, retaining
+all unfinished task/native/release gates and source/evidence provenance.

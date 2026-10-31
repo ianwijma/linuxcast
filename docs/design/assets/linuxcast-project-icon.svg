@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Linuxcast project icon</title>
+  <desc id="desc">An original coral penguin with a prompt-shaped beak and three diagonal casting rays on a charcoal tile.</desc>
+  <rect x="12" y="12" width="232" height="232" rx="52" fill="#1C1D22"/>
+  <path d="M77 110C63 122 53 144 48 163Q46 172 55 169L80 153Z" fill="#FF786E"/>
+  <path d="M101 52C82 52 69 66 69 86C69 98 73 105 72 115C63 130 60 148 62 166C64 188 80 201 104 201C131 201 148 183 148 157C148 139 140 121 127 107V86C127 65 119 52 101 52Z" fill="#FF786E"/>
+  <ellipse cx="108" cy="151" rx="25" ry="34" fill="#F5F5F7"/>
+  <path d="m125 82 16 10-16 10" fill="none" stroke="#F5F5F7" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="109" cy="78" r="5" fill="#1C1D22"/>
+  <path d="M69 201H94M113 201H138" stroke="#FF786E" stroke-width="14" stroke-linecap="round"/>
+  <path d="m155 65 17-17m-6 42 27-27m-18 52 35-35" fill="none" stroke="#FF786E" stroke-width="12" stroke-linecap="round"/>
+</svg>

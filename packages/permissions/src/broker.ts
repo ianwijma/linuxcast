@@ -57,8 +57,13 @@ export class PermissionBroker {
   #audit: AuditRecord[] = [];
   #unsubscribe: () => void;
   #closed = false;
-  constructor(options:{store:DecisionStore;capabilities:CapabilityBroker;operations:readonly Operation[]}) {
+  #canAdmit: (principalKey: string) => boolean;
+  #storageFailed: (principalKey: string) => void;
+  #mutationWaiters = new Set<{key: string|undefined; resolve(): void}>();
+  constructor(options:{store:DecisionStore;capabilities:CapabilityBroker;operations:readonly Operation[];canAdmit?:(principalKey:string)=>boolean;onStorageFailure?:(principalKey:string)=>void}) {
     this.#store=options.store; this.#capabilities=options.capabilities;
+    this.#canAdmit = key => { try { return options.canAdmit?.(key) ?? true; } catch { return false; } };
+    this.#storageFailed=key=>{try{options.onStorageFailure?.(key);}catch{/* Storage quarantine cannot be vetoed. */}};
     if(options.operations.length>256) throw new Error('Too many operations.');
     for(const operation of options.operations) {
       const contract=parseContract(hostOperationContractSchema,operation.contract);
@@ -72,12 +77,12 @@ export class PermissionBroker {
     const principal=parseContract(effectPrincipalSchema,principalValue);
     const declarations=requirements(declared);
     const key=digest(principalKeyMaterial(principal));
-    if(this.#quarantined.has(key) || this.#mutations.has(key)) throw new Error('Permission storage requires recovery.');
+    if(this.#quarantined.has(key) || this.#mutations.has(key) || !this.#canAdmit(key)) throw new Error('Permission storage requires recovery.');
     const connection:Connection={identity,principal:structuredClone(principal),key,declarationHash:digest(JSON.stringify(declarations.map(requirementKey).sort())),declarations:new Set(declarations.map(requirementKey)),records:new Map(),closed:false,ready:false,epoch:0};
     this.#connections.set(identity,connection);
     try {
       const records=await this.#store.list(key);
-      if(connection.closed || connection.epoch!==0 || this.#closed || records.length>10_000 || this.#mutations.has(key) || this.#quarantined.has(key)) throw new Error();
+      if(connection.closed || connection.epoch!==0 || this.#closed || records.length>10_000 || this.#mutations.has(key) || this.#quarantined.has(key) || !this.#canAdmit(key)) throw new Error();
       const staged=new Map<string,DecisionRecord>();
       let inventoryBytes=0;
       for(const value of records) {
@@ -96,13 +101,13 @@ export class PermissionBroker {
   /** Only the trusted input/workflow/model controller chooses source/intent. */
   begin(identity:object, context:{source:Source;runId?:string;intentRef?:string}):{submit(value:unknown):Promise<BrokerOutcome>;cancel():void} {
     const connection=this.#connections.get(identity);
-    if(!connection || !connection.ready || connection.closed || this.#closed || this.#quarantined.has(connection.key) || this.#mutations.has(connection.key) || this.#invocations.size>=256) throw new Error('Connection unavailable.');
+    if(!connection || !connection.ready || connection.closed || this.#closed || this.#quarantined.has(connection.key) || this.#mutations.has(connection.key) || !this.#canAdmit(connection.key) || this.#invocations.size>=256) throw new Error('Connection unavailable.');
     const invocation:Invocation={connection,context:{schemaVersion:1,invocationId:randomUUID(),principal:structuredClone(connection.principal),source:context.source,...(context.runId?{runId:context.runId}:{}),...(context.intentRef?{intentRef:context.intentRef}:{})},generation:this.#capabilities.generation,epoch:connection.epoch,controller:new AbortController(),requirements:[],once:new Set(),busy:false,done:false,dispatched:false,remediation:'request-permission-again'};
     this.#invocations.add(invocation);
     return {submit:async value=>{const outcome=await this.#submit(invocation,value);this.#audit.push({at:new Date().toISOString(),principalKind:connection.principal.kind,outcome:outcome.outcome,permissionIds:[...new Set(invocation.requirements.map(r=>r.permissionId))]});if(this.#audit.length>1024)this.#audit.shift();return outcome;},cancel:()=>this.#cancel(invocation,'request-permission-again')};
   }
   #fresh(invocation:Invocation):boolean {
-    return !this.#closed && !invocation.connection.closed && !this.#quarantined.has(invocation.connection.key) && invocation.epoch===invocation.connection.epoch && invocation.generation===this.#capabilities.generation && !invocation.controller.signal.aborted;
+    return !this.#closed && !invocation.connection.closed && !this.#quarantined.has(invocation.connection.key) && this.#canAdmit(invocation.connection.key) && invocation.epoch===invocation.connection.epoch && invocation.generation===this.#capabilities.generation && !invocation.controller.signal.aborted;
   }
   #cancelled(invocation:Invocation):BrokerOutcome {return {outcome:'cancelled',effectOutcome:invocation.dispatched?'unknown':'not-dispatched',automaticReplay:false,requiresReview:invocation.dispatched,remediationAction:invocation.remediation};}
   #cancel(invocation:Invocation,remediation:Remediation):void {
@@ -204,8 +209,14 @@ export class PermissionBroker {
     // cleanup finish first, a read started earlier must never admit stale grants.
     for(const connection of this.#connections.values())if(connection.key===key && !connection.ready)connection.epoch++;
   }
-  #endMutation(key:string):void {const remaining=(this.#mutations.get(key)??1)-1;if(remaining)this.#mutations.set(key,remaining);else this.#mutations.delete(key);}
-  #quarantine(key:string):void {this.#quarantined.add(key);for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'retry-storage');}
+  #endMutation(key:string):void {
+    const remaining=(this.#mutations.get(key)??1)-1;
+    if(remaining)this.#mutations.set(key,remaining);else this.#mutations.delete(key);
+    for(const waiter of this.#mutationWaiters)if(waiter.key ? !this.#mutations.has(waiter.key) : this.#mutations.size===0) {
+      this.#mutationWaiters.delete(waiter); waiter.resolve();
+    }
+  }
+  #quarantine(key:string):void {this.#quarantined.add(key);this.invalidatePrincipal(key,'retry-storage');this.#storageFailed(key);}
   /** Remove access immediately, before waiting on durable deletion. Failed
    * deletion quarantines the principal for this broker lifetime. */
   async revoke(identity:object,recordId:string):Promise<boolean> {
@@ -224,6 +235,29 @@ export class PermissionBroker {
     connection.closed=true;connection.epoch++;
     for(const invocation of this.#invocations)if(invocation.connection===connection)this.#cancel(invocation,'reconnect');
     this.#connections.delete(identity);
+  }
+  /** Trusted administration only. The registry blocks admission first and
+   * waits for late persistent-write cleanup before deleting the selected row. */
+  invalidateDecision(value:DecisionRecord):boolean {
+    const record=parseContract(permissionDecisionRecordSchema,value),key=digest(principalKeyMaterial(record.principal));
+    let matched=false;
+    for(const connection of this.#connections.values())if(connection.key===key) {
+      matched=true;connection.epoch++;
+      for(const [requirement,cached] of connection.records)if(cached.id===record.id)connection.records.delete(requirement);
+    }
+    for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'request-permission-again');
+    return matched;
+  }
+  invalidatePrincipal(key:string,remediation:Remediation):boolean {
+    let matched=false;
+    for(const connection of this.#connections.values())if(connection.key===key){matched=true;connection.epoch++;connection.records.clear();}
+    for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,remediation);
+    return matched;
+  }
+  waitForMutations(principal?:Principal):Promise<void> {
+    const key=principal ? digest(principalKeyMaterial(principal)) : undefined;
+    if(key ? !this.#mutations.has(key) : this.#mutations.size===0)return Promise.resolve();
+    return new Promise(resolve=>{this.#mutationWaiters.add({key,resolve});});
   }
   audit():AuditRecord[] {return structuredClone(this.#audit);}
   close():void {this.#closed=true;this.#unsubscribe();for(const identity of this.#connections.keys())this.disconnect(identity);}

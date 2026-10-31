@@ -1,7 +1,7 @@
 import type { IpcMainInvokeEvent, WebContents } from 'electron';
 import { describe, expect, it, vi } from 'vitest';
 import { ApplicationsUnavailable } from '@linuxcast/applications';
-import { LAUNCHER_CHANNELS } from '../../../../packages/contracts/src/launcher.ts';
+import { LAUNCHER_CHANNELS,launcherCommandsReplySchema } from '../../../../packages/contracts/src/launcher.ts';
 import type { LauncherCommandsReply } from '@linuxcast/contracts';
 import { APP_URL } from './assets.ts';
 import { createWorkflowDraft } from '../../../../packages/workflows/src/registry.ts';
@@ -21,6 +21,14 @@ function fixture(overrides: Partial<LauncherActions> = {}, localData = true, fil
   return {actions,frame,event,handlers,remove,invoke,execute};
 }
 describe('trusted launcher registry and action dispatch',()=>{
+  it('validates the saved-permissions catalogue command and dispatches only its current registered handler',async()=>{
+    const openPermissionSettings=vi.fn(async()=>{}),f=fixture({openPermissionSettings});
+    const reply=launcherCommandsReplySchema.parse(await f.invoke(LAUNCHER_CHANNELS.getCommands));
+    expect(reply).toMatchObject({ok:true,value:{commands:expect.arrayContaining([expect.objectContaining({id:'linuxcast:saved-permissions',enabled:true})])}});
+    expect(await f.execute('linuxcast:saved-permissions',2)).toMatchObject({ok:false});expect(openPermissionSettings).not.toHaveBeenCalled();
+    expect(await f.execute('linuxcast:saved-permissions')).toEqual({ok:true,value:{outcome:'completed'}});
+    expect(openPermissionSettings).toHaveBeenCalledOnce();f.remove();
+  });
   it('projects only registered fixed commands and allowlisted usage, with no query IPC',async()=>{
     const f=fixture();
     expect([...f.handlers.keys()].sort()).toEqual(Object.values(LAUNCHER_CHANNELS).sort());

@@ -123,6 +123,11 @@
       "packages/builtins/dictionary/tests/spelling-source.test.ts",
       "packages/builtins/dictionary/tests/native-spelling.test.ts",
       "packages/builtins/dictionary/tests/spelling-wrapper.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/screen-controller.test.ts",
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/features/launcher/tests/permission-catalogue.test.ts"
     ]
   },
   "contracts": {
@@ -203,6 +208,9 @@
       "packages/contracts/tests/emoji-keywords.contract.test.ts",
       "packages/contracts/tests/emoji-frecency.contract.test.ts",
       "packages/contracts/tests/dictionary-spelling.contract.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/permission-settings.contract.test.ts"
     ]
   },
   "ui": {
@@ -350,6 +358,13 @@
       "apps/desktop/tests/emoji-frecency.integration.test.ts",
       "apps/desktop/tests/dictionary-spelling.integration.test.ts",
       "packages/builtins/dictionary/tests/spelling-native.integration.test.ts"
+    ],
+    "F3-01": [
+      "apps/desktop/tests/permissions.integration.test.ts",
+      "apps/desktop/tests/workflow-run.integration.test.ts"
+    ],
+    "F2-02": [
+      "apps/desktop/tests/diagnostics.integration.test.ts"
     ]
   },
   "security": {
@@ -377,7 +392,10 @@
       "packages/storage/tests/permissions.integration.test.ts",
       "packages/permissions/tests/broker.security.test.ts",
       "packages/permissions/tests/pagination.security.test.ts",
-      "packages/permissions/tests/persistence.security.test.ts"
+      "packages/permissions/tests/persistence.security.test.ts",
+      "packages/permissions/tests/registry.security.test.ts",
+      "apps/desktop/src/permission-preload/api.test.ts",
+      "apps/desktop/src/main/permission-settings.test.ts"
     ],
     "F2-02": [
       "packages/storage/tests/secrets.integration.test.ts",
@@ -388,7 +406,9 @@
       "packages/secrets/tests/persistence.security.test.ts",
       "packages/data-controls/tests/controls.security.test.ts",
       "packages/data-controls/tests/controller.security.test.ts",
-      "packages/data-controls/tests/persistence.security.test.ts"
+      "packages/data-controls/tests/persistence.security.test.ts",
+      "packages/data-controls/tests/managed-diagnostics.security.test.ts",
+      "apps/desktop/src/main/data-settings.test.ts"
     ],
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",
