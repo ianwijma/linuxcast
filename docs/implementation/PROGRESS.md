@@ -736,6 +736,31 @@ helper is still unreviewed, unintegrated and unused; independent two-axis review
 waits below UI priority. Root returned to D1 integration29e65c2. Both D1 reviews
 and F3 Opusmedium remain active without polling; no root process or PR watch.
 
+D1 initial reviews completed and read. Standards865866cd reports two P2s and
+Security/Specb7c9ef93 reports four, representing four distinct regressions: scaled
+split minimum widths overflow at200% text; surviving action focus is lost when
+groups empty or membership changes; list Left incorrectly advances; Ctrl+Alt/
+Super grid jumps are consumed despite exact Ctrl-only binding. Both inspected
+all51 captures, found no effect/security assertion weakening; no new executable
+content or Form-secret defect. Parent/author existing suites remain reported
+passes, not proof against these new reproductions. Original Opus5.5medium
+follow-up9c84499d-ab07-48f8-ad69-dc746e8fa12a now fixes exactly those four cases
+with negative controls, preserves earlier fixes and all frozen interfaces. No
+D1 PR yet, no acceptance promotion. Reviews remain tied to1e4682b/base63c9581.
+
+F3 Instrument laneffa91bc1 completed/read, clean t3-721f2a64, requested branch
+codex/f3-01-instrument-permissions, author e1db203 on b455f80/basee2b3a5a,
+tree09bd24d. Changes only UIindex/CSS/newpresentation/new8componenttests,
+permission product test and21newcaptures. Controller/broker/contracts unchanged;
+neutral receipts, full source/version/scope DOM/review, review focus and native
+fixed URL preserved. Author75units/2contracts/72security+8newunits/type/lint/plan
+and2private-Xvfb Electron checks pass. Parent must map new component test and
+integrate against current approved develop, then independently check/review.
+Existing non-StrictMode production entry retained; baseline StrictMode controller
+disposal limitation is disclosed, no new production-mode acceptance inferred.
+UI_REFRESH now distinguishes merged PR87/88/89, D1 findings, returned F3 work
+and remaining notes/workflow composition. All97 statuses/acceptance preserved.
+
 Both credential initial reviews completed/read: Standards eebf4024 and
 Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
 wording P2; no other actionable findings/smells. Both85units/3contracts/type/lint/
