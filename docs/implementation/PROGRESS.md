@@ -558,3 +558,16 @@ into saved D1renderer integration; only PROGRESS conflict, both histories retain
 F2task/criterion statuses unchanged. Opusmedium D1follow-up6fb9f0b9 remains active;
 do not poll it. Next existing workspace: bounded credential presentation refresh
 using frozen shared primitives; preserve credential contract/lifecycle/security.
+
+Next UI task3237f2ec-7b4a-4b8d-8082-8e2661f63250 is active, runtime confirmed
+claudeAgent/claude-opus-5-5/effortmedium. Isolated from approved PR88develop e2b3a5a,
+requested branch codex/f2-02-instrument-credentials; own secrets/src/ui/**,
+credentials.integration.test.ts and NEW instrument-credentials evidence only.
+Preserve consumed-once masked input, main-owned revision/confirmations, explicit
+storage choices, session eligibility, no-replay/status truthfulness and exactURL.
+No main/preload/contracts/backend/native changes; private sandboxed synthetic
+credential harness only. Existing52UI security assertions retained, no captures
+while a key is entered, no hostbus/keyring/provider/native operations. Shared
+requests stay coordinator-owned. No push/PR/status promotion. Task completion
+wakes parent; do not poll. D1follow-up6fb9f0b9 remains independently active.
+Root current clean integration branch4ce6b5e; no active root process/PRwatch.
