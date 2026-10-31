@@ -1,6 +1,13 @@
 export { ThemeProvider, useTheme } from './theme.tsx';
 export type { Appearance, ThemeProviderProps, ThemeState } from './theme.tsx';
-export { Button, IconButton, TextField, Keycap, ShortcutHint } from './controls.tsx';
+export { Button, IconButton, TextField, Keycap, ShortcutHint, linuxKeyLabel, ariaKeyShortcuts } from './controls.tsx';
 export type { ButtonProps, IconButtonProps, TextFieldProps } from './controls.tsx';
-export { EmptyState, ErrorState, LoadingState, UnavailableState } from './states.tsx';
+export { EmptyState, ErrorState, LoadingState, UnavailableState, StatePlate } from './states.tsx';
+export type { StatePlateKind, StatePlateLayout, StatePlateProps } from './states.tsx';
+export { Row, GroupCaption } from './rows.tsx';
+export type { RowProps, GroupCaptionProps } from './rows.tsx';
+export { GlyphTile, LineIcon, lineIconNames, resolveGlyphCategory } from './icons.tsx';
+export type { GlyphTileProps, LineIconName } from './icons.tsx';
+export { glyphCategories } from '../tokens/index.ts';
+export type { GlyphCategory } from '../tokens/index.ts';
 export { useFocusRestore } from './focus.ts';

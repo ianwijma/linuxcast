@@ -160,3 +160,290 @@ fresh inspect still false/PID0/exit0. No lab resume, native process, new checkou
 or wrapper execution. Source preparation still pending; resume after F2merge.
 Need commit fixes, publish focused draft to startCI, then one fresh independent
 bounded concurrency recheck before merging. No active delegates or watches yet.
+
+PR85 https://github.com/ianwijma/linuxcast/pull/85 published DRAFT from normally
+signedbeb0d716557c80c5c7e8d63a2527d6de61baa141; signature and41current hashes
+verified. Current-head PlanningCI41213430721 succeeds; no requested/submitted
+reviews or comments and no repository rulesets. Develop stayscd7bf0e. PR84 is an
+independent design comparison and is not this lane's work. Source corrections
+pass144security/type/lint/plan and2actualF2flows5.25s+5.65s. Final fresh bounded
+concurrency recheck is being requested before ready/merge; draft/body accurately
+retain pending review/native gates. No watches at this checkpoint. Author F2
+checkout clean; root carries this local progress note for post-merge continuity.
+Next parallel preparation: offline-only F1 guest namespace wrapper in a new
+runtime-prepared codex/ child checkout, adding only new wrapper/test/evidence
+files. Existing controller/observer/preflight contracts remain frozen. No lab,
+namespace, display, reader, keyring, input or native attempt is authorized for
+that child; outer guest ownership/shutdown and fresh guest build remain separate
+coordinator work until prepared code passes independent review. Actual native0.
+
+Active async work from frozenbeb0d71: final credential concurrency recheck852a2624
+(codex/f2-02-runtime-final-review requested); offline-only guest namespace wrapper
+75ceebb9 (codex/f1-02-namespace-wrapper requested). PR85watch is active; currentCI
+already passed, merge still waits for recheck. Do not poll delegates or unchangedPR.
+
+Host-only native input preparation completed under the exclusive existing lablock:
+private-lab/f102-production-source-beb0d71.tar, sourcebeb0d716557c80c5c7e8d63a2527d6de61baa141,
+tree6176bdd039c68324538d2f3e60414b7c6ae1edc1, SHA256
+3d67f4b7c43d7cee7020a39572accfdc03400853eea7201199d9bf9cffecee9a,
+98191360bytes. All2504tar file/symlink contents and executable modes verified
+against Git blob identities. Source SSH signature verified with configured public
+key; archive+private provenance receipt mode0400. Candidate awaits final source
+review; if source changes, create a new archive rather than reuse this one. This
+is not a product build receipt. No extraction/dependency/build/guest/native run.
+Lab remained freshlystoppedfalse/PID0/exit0; lock released after verification.
+Historicalguest Node24.22.1/Bun1.4.4 hashes exist but current actual binary paths,
+Rust/header/offlinecache readiness are not yet verified. Guest build/receipt and
+outer reservation/shutdown remain pending. Wrapper child informed of this path
+constraint without authorizing any guest action. Actual product/Orca native0.
+
+
+PR85 MERGED at6c3d9465c9045a97b8c15bef441500b50dc42197,31Oct15:22:18UTC;
+headbeb0d71 currentCI41213430721 succeeds. Ready status and exacthead/mergeable/
+clean checks confirmed, no GitHub reviewrequests/reviews/comments, no rulesets or
+legacybranchprotection. Finalreview852a2624 completed/read: Standards+Security/
+Spec noactionable findings;17settings/10runtime/26additionalprivate-file probes
+type/lint/plan/frozeninstall/41hashes independently pass. Threeoriginalfindings
+resolved, ownerindex/files/capturesunchanged. Parent144security/52UIunit/3contracts
+and latest2actualElectron flows5.25s+5.65s retained. User's tiny merge blurb sent
+immediately. PR85watch removed. AllF2/native/task/full1.0 criteria unchanged.
+Root fast-forwarded to approveddevelop6c3d946 with this coordinator checkpoint
+local; carry these records into the next focused implementation rather than a
+standalone documentation PR. PR84 designcomparison belongs to independentwork.
+Native wrapper75ceebb9 remains the only activechild; do not poll it.
+Candidate sourcebeb0d71 archive now has a clean finalreview and is the exact
+mergedPR85head; immutablearchive/privateoriginalprovenance remain unchanged.
+Actual guestbuild/receipt/outershutdown and nativeattempt stillpending; runs0.
+
+User steering1November2026: prioritize updating EXISTING UI to selected Opus
+Instrument design from threadc2307e72-fdbe-4787-8f2f-4a8bd4aed4ca/mergedPR84.
+Read full selection: Opus for ALLseven surfaces inclchat/notes/bottomactionfilter;
+prior hybrid recommendation is superseded. Every future UI implementation/update
+must use Claude Opus5.5 at MEDIUM, overriding GOAL's generalGPT6.1SOL/high rule
+for UI work only. NonUI tasks/reviews retain existing model unless instructed.
+Capabilities confirm providerclaudeAgent/modelclaude-opus-5-5/options effortmedium.
+ReassessD1foundation/sharedprimitives first, then launcher/actions, settings/files,
+notes/workflows/grid; preserve full task behavior/security/native/release gates.
+Do not add new feature UI ahead of this refresh. NativeF1prep deferred belowUI.
+
+Preserved F1source-build checkpoint: source_bundle.py +test_source_bundle.py and
+source-build-preparation evidence. Ten extraction/security checks pass; entire
+native offline suite63tests pass12.15s; source98MiB host-only smoke writes then
+independently verifies2504Gitblobs/private modes and removes its own temporary
+root. Python3.10.12, syntax/2newsourcehashes/plan/whitespace pass. No guestbuild,
+namespace, display, reader, hostbus/keyring/provider/input or nativeattempt.
+Helper still requires independent review before integration/use in guestbuild;
+no F1/task/native acceptance changed. Nativewrapper75ceebb9 can finish its bounded
+nonUI work in background but no lab start is requested. Checkpoint this branch,
+then adopt approveddevelop703ece9 in a separate codex/UI branch for prioritywork.
+
+
+UI PRIORITY UPDATE: root now codex/d1-01-instrument-adoption from approved
+develop703ece998843ce8b3db6b2f6602265c0027b344a (PR84selection+PR85credential
+flow). PR85 is merged and un-watched; review852a2624 clean, no activeF2review.
+Native source helper checkpointaa31f67af7f15a16c1bf11687e02fa6cedbda873 is preserved
+on codex/f1-02-native-build-staging, UNSIGNED under explicituserfallback after
+1Passwordfailed. Its source tests63/actual2504-blob extraction are preparation,
+not guest/native proof. Wrapper75ceebb9 completed/read atunsigned9f6f053e32cd73e74153543c0d2b8f12b4e7afb0
+(tree988cccda04f9b0065d1673235eb588421ea2b006), clean codex/f1-02-namespace-wrapper
+in /home/ian/.t3/worktrees/linuxcast/t3-a70523b6;42new+25existing offlinechecks
+passed, no runtime/guest/namespace/product/reader runs. Nativeprep intentionally
+deferred; bothsourcehelper andwrapper stillneed independentreview, guest runtime/
+UID20000/node/staging/procaccess/receipt/outerownerverification before invocation.
+No active delegates/watches at this checkpoint. Next assign UIsharedfoundation
+to providerclaudeAgent/modelclaude-opus-5-5/effortmedium as explicitly requested.
+See UI_REFRESH.md for reassessment and bounded rollout order. Existing registry
+criterion states remain unchanged; selected prototypes are not application proof.
+
+First UI assignment will be the coordinator's explicit shared adoption increment:
+D1-01 selected canonical spec/tokens, schema validation and host primitives.
+Opusmedium proposes these changes in its isolated branch; coordinator retains
+sole authority over shared contracts, review and integration. No concurrent
+canonical-token writer or downstream UI implementation starts before this freeze.
+Then D1-02 renderer/launcher update uses merged primitives, followed by existing
+feature workspaces. GOAL.md model clause now matches the user's later UI request;
+complete97task/R1-03 objective and all permissions/security/release rules unchanged.
+
+UI reassessment source audit maps actual component boundaries in UI_REFRESH.md:
+launcher and files share ViewRenderer, builtin presenters reuse its frames, while
+Localdata/credentials/Savedpermissions/notes/workflow compositions are separate.
+CurrentstrictViewModel has no glyphcategoryfield. Actionfilter/grid/separator
+semantics differ from selectedInstrument and require explicit keyboard/ARIA
+regressions in D1-02; don't treat this as a screenshot-only colour replacement.
+No renderer/business/IPC code changed by the coordinator. Current sharedUI
+implementation is delegatedac8ad89b via claudeAgent/claude-opus-5-5/effortmedium
+(runtime confirmed settings); no active native job or PRwatch. Other subagents
+completed and saved. Do not poll the runningUI child or start downstream UI edits
+before its shared contracts are frozen. Root remains codex/d1-01-instrument-adoption.
+
+Coordinator D1-02 behavior baseline27/27passes (6session,17form,4loading) on
+pinned Node24.22.1/Bun1.4.4, before Instrumentrenderer edits. This covers existing
+selection/revision/draft/secret lifecycle logic, not new visual/native acceptance.
+Audit conclusions sent to Opusimplementation without changing its scope or
+canonical files. Parent docs inventory/planvalidation pass; no code or screenshots
+changed. Next integration remains the running D1-01 shared foundation, not a new
+feature or another native attempt.
+
+Coordinator continuation1November: authoritative root remains clean290d7f0 before
+checks. Shared renderer browser baseline `bun run test:ui -- D1-02` passes11/11
+in10.9s on Node24.22.1/Bun1.4.4/Playwright1.64.1. Existing keyboard/action-focus,
+async selection, drafts/secrets, adversarial content, states and accessibility
+preferences pass. Twelve incidental PNG changes restored to exact tracked blobs;
+no implementation or historical screenshot changes. Baseline supports the next
+Opus renderer assignment; no Instrument/native acceptance inferred.
+
+Parallel nonUI offline wrapper reviews started against exact unsigned9f6f053,
+basebeb0d716, tree988cccda; source remains saved in t3-a70523b6. Standards task
+edf448a1-b99f-4d49-923a-d6d45edc71ca and Security/Spec task
+58a2d742-9da3-4ece-aabc-a24d9cd90b72 use separate runtime-prepared review worktrees,
+GPT6.1SOL/high confirmed. Read-only source/private mocked-fixture review only;
+no guest, namespace, privileged, display, bus or product execution authorized.
+Do not poll these or the OpusmediumUI taskac8ad89b; completion wakes coordinator.
+No PRwatch/nativejob. UI remains primary; downstream implementation waits for
+the shared token/primitive freeze. Complete97task/R1-03 scope unchanged.
+
+Wrapper reviews completed/read: Standards edf448a1 found P2 interrupted-fork
+cleanup could skip ECHILD when Python had not retained the kernel-created child's
+PID; Security/Spec58a2d742 found no actionable issues. Both independently67offline
+tests; Security/Spec five extra synthetic probes. Coordinator corrected the
+demonstrated P2 in the original isolated wrapper checkout, now clean unsigned
+50dd81306bd5b2845c7f860b77a5112fc47c2f44 on codex/f1-02-namespace-wrapper.
+Potential fork tracked before invocation; gate close followed by bounded reaping
+through ECHILD and empty cgroup, preserving resources on unknown absence. Two
+new mocked regressions first fail on original9f6f053 and pass after correction;
+complete offline AT suite97tests passes12.102s without skips, plus69focused tests,
+AST/plan/whitespace/hash checks. No product/reader/namespace/guest execution.
+Fresh final independent recheck is next; UIac8ad89b remains primary and unpolled.
+
+Wrapper validation checkpoint now10ccf270057913686c642894445f2c0cf2fa4549
+(documentation-only after source50dd813), clean isolated author branch. Frozen
+copyfile dependency install resolves absent Vitest without lock/source changes;
+55mapped F1security passes14.39s including97Python, typecheck/lint pass. Existing
+offline discovery already maps all test_*.py, so no shared runner edit is needed.
+Published/linked draft PR86 https://github.com/ianwijma/linuxcast/pull/86 from this
+exact unsignedhead while CI and a fresh final correction recheck are pending.
+No native invocation or acceptance promotion; InstrumentUI remains primary.
+
+PR86 merged31October16:17:40UTC atae4c5b188b35cd8fcccd270a0de34b72ca1b5c4c
+after final68b6166c independent Standards and Security/Spec recheck resolvedP2,
+97offline tests and both original-source negative controls passed, planning
+CI41218474898 SUCCESS, no requested/submitted GitHub reviews/comments/protection.
+User's tiny merge blurb sent immediately; watch removed. Root merged develop.
+No actual guest/native/namespace/Orca execution or acceptance promotion.
+
+Opusmedium D1-01 taskac8ad89b completed/read: clean t3-ee5304b7,
+codex/d1-01-instrument-primitives, signedb40bce040762c9d4d94433db02a84705736fb8c8
+basedb9fefd2, tree53c43e2af88f04584682343ba7ae32e3019e46b6. Public-key signature
+verified with ephemeral allowed-signers file; persistent configuration unchanged.
+Integrated unchanged as65fe766 and merged PR86/develop atroot e268a023. All
+canonical/primitives/token/validator paths match the original Opus tree exactly.
+Opus reports26token units/11primitive browser/27renderer units/11renderer browser/
+30validator/type/lint and affected downstream component suites pass. OneL1-01
+pending-fallback fixture failure reproduces2/2 with baselineb9UI;13later serial
+cases unrun, not a complete suite pass. Downstream439recaptures restored byauthor.
+
+Coordinator independently26D1-01 units/27D1-02 units/30validator checks pass and
+actual sandboxed Electron F1integration2/2 passes20.00s (12.294s+6.427s), including
+native200% viewport/footer/lastrow/form/tab/Quit. Eight new product captures in
+apps/desktop/evidence/instrument-foundation/;19historical PNG recaptures restored
+exactly. Row/tile/renderer composition is still nextD1-02, not implemented bythese
+screenshots. Registry records bounded evidence without criterion/task promotion.
+Next: independent Standards and Security/Spec reviews of frozen foundation,
+current-head CI/merge promptly, then Opusmedium renderer adoption. No nativejob.
+
+Additional offline source-extractor fault probe against savedaa31f67 found a
+cleanup identity race: replacement between initial lstat and shutil.rmtree deletes
+the foreign replacement and returns cleanupVerified=true while originalroot stays.
+The private synthetic reproduction creates no processes or guest/native actions.
+This helper remains UNINTEGRATED/UNUSED on codex/f1-02-native-build-staging; do not
+invoke it before a corrected retained-directory cleanup boundary and independent
+review. Fix deferred below active UI priority; no affected product operation exists.
+
+Foundation PR87 https://github.com/ianwijma/linuxcast/pull/87 published/linked,
+head signedeb74e81a540aa3db7b52acc66299b1d9f702c680. Planning CI41219468364
+SUCCESS, no GitHub reviews/comments/requests. Watch active; do not re-watch/poll.
+Independent Standards805a4294 and Security/Spec34f55577 completed/read on exact
+eb74/baseae4c; both inspect all16component/product PNGs and independently26/27/30
+unit/validator/type/lint/plan checks, authorindex/files/captures unchanged.
+Four distinct P2 findings: inherited shortcut dictionary properties (__proto__/
+constructor/toString) can crash/mislabel validated actions; Row trailing group
+overflows480px at200% text; Python token bounds/finite checks diverge fromruntime;
+legacy UnavailableState invents unsupported capability for credential needs-review.
+Existing L1fallback fixture failure remains honestly partial and baseline-reproduced.
+Route these UI corrections to original Opus5.5medium implementation thread; no
+parent-authored UI changes. Do not begin D1-02 against known-broken primitives;
+the provisional API development freeze preserves API names, but integration and
+downstream implementation now wait for this bounded correction checkpoint.
+Next: fixes/regressions, fresh independent final recheck, current-head CI/merge
+promptly, then Opusmedium renderer lane. Full97task/R1-03 scope/status unchanged.
+
+Opusmedium implementation follow-up5b79159c completed/read: signedecfd891d234e667d4cffd692caede7191e0f59c4,
+parentb40bce0, treebabc5d6b33d6c02f5edfd101dcadde1e7c66772b, clean original
+UIcheckout. FourP2 corrected with original-source negative controls. Shared
+schema107cases (20valid/87invalid), additional TS string-spacing gap closed,
+both shortcut dictionaries own-property guarded,480px200% trailing wrapping,
+generic unavailability preserves credential review uncertainty. Coordinator
+ratifies additive unclassifiedUnavailable union/table, no wire/effect authority.
+Integrated unchanged as6868fae; configured-public-key SSHsignature verified;
+push87 updated to6868fae and link refreshed. Watch remains active, no re-watch.
+
+Coordinator independent current134token/28renderer/52credentialUI/33Python tests
+pass. Actual F1Electron2/2 pass18.81s (10.988s+6.482s), actualF2credential/diagnostics
+2/2 pass11.63s (5.452s+5.368s) with synthetic observer/denied-keyring fixtures.
+Thirteen current product captures saved under instrument-foundation;29historical
+recaptures restored. New component narrow480px200% capture inspected; caps/body
+fit and row grows. Current type/lint/plan/whitespace and55F1security(97Python)
+pass13.25s; all coordinator check processes completed. Fresh final recheck next;
+renderer may develop against
+the corrected frozen additive APIs while foundation review/CI completes, but
+cannot integrate or claim acceptance until upstream PR87 merges.
+
+Independent nonUI interval corrected the unused source extractor on its separate
+saved branchcodex/f1-02-native-build-staging: signedce13987b9a2abcfab9ff01c5bf05600ddd4b4a18,
+clean before returning to UIbranch. Opened-root identity is checked before FD-
+anchored cleanup; replacement/unknown/bounded failure preserves root and first
+reason. One real private-file regression fails on originalaa31; a post-open
+custody control stays passing.12extractor/65full offline tests pass11.944s,
+syntax/2hashes/plan/whitespace pass. Entire helper still unintegrated/unused and
+requires independent review; no new PR or guest/build/native action. UI priority
+and full97-task/R1-03 objective remain unchanged.
+
+Fresh final PR87review c542a57a completed/read on exactaca7c0b: shortcuts/480px
+row/unclassifiedUnavailable resolved; token parity partly unresolved. P2 exact()
+compares comma-joined keys, accepting fontWeight{"medium,regular":500,"semibold":600}
+with required weights missing; Python rejects. Independent4289case sweep found
+fiveaffectedgroups.134/28/52/33unit/validator/type/lint/plan passed, all22PNGs
+inspected, no edits or acceptance promotion. Route the bounded exact-key fix and
+shared collision fixtures to original Opusmedium thread; APIs/canonical values
+stay frozen, renderer72448bb9 continues independent composition. PR87 watch active,
+currentACA planningCI41221811515 green but cannot merge until correction/recheck.
+
+Coordinator reserves a separate bounded F2-02 Local data UI lane for Opus5.5medium,
+branchcodex/f2-02-instrument-local-data. Own only data-settings renderer/CSS/local
+component tests and diagnostics product test/new instrument-local-data evidence.
+No main/preload/storage/credential/permission/contract changes. State API exposes
+appearance only; don't infer category readiness/backend status. Native action
+confirmations and category outcomes remain authoritative. Fixed window URL cannot
+gain hashes/query navigation because sender attestation is exact. Preserve current
+category action names/filter/close, no replay and confirmed effect semantics.
+This disjoint UI lane may develop against frozen corrected foundation APIs;
+integration waits for upstreamPR87. Renderer lane must not edit its reserved files.
+
+Opus original implementation follow-up6180c9d2 completed/read: unsignedb965cf8ed96e615dc02f345a1ec08d98b7048fef,
+parentecfd891, tree551de4d4e5c235eebc4c356c9126e04880a28fa3, clean original
+checkout. Normal signing timed out30s; per-command authorized fallback, no config
+change. Exact token keys now compare array lengths and individual names.18shared
+collision cases added (15fail on oldecfdTS,3already value-rejected),125sharedcases
+20valid/105invalid,152token and33Python checks pass. Root integrated unchanged as
+unsignedeeca81a and independently152token/33Python/type/lint plus the actual
+reviewer fontWeight example/canonicalpositive check pass. Canonical values/APIs/
+controls/state/geometry unchanged, so no redundant product recapture. All earlier
+current4Electron and55F1security evidence applies to unchanged visual/runtime
+paths, with gate-specific coverage now extended. Fresh narrow independent final
+recheck/current-head CI are next before promptPR87merge; no criterion promotion.
+
+Active development: D1-02Opusmedium72448bb9 against frozen foundation, plus
+F2LocalDataOpusmediuma4c30760 against parent11cb8ed. Runtime settings confirmed
+claudeAgent/claude-opus-5-5/effortmedium for both. Root sourcehelperce13987 remains
+saved and unused/unintegrated; source-extractor reviews wait below UI priority.
+No guest/native/hostbus/keyring/provider/input actions or active root processes.

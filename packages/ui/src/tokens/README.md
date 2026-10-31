@@ -8,20 +8,41 @@ value authority. `generate.ts` emits `tokens.css` and the optional Tailwind v4
 node packages/ui/src/tokens/generate.ts
 ```
 
-Type, spacing, radii, and layout dimensions use rem units relative to the user's
-root text size (canonical pixel values divided by the browser's 16 px baseline).
-Theme colors remain exact canonical values. Generated bindings are checked for
-drift. Contrast tests verify text/state colors at AA and focus at 3:1 against all
-four semantic surfaces, plus accent text against its primary-action background.
+Schema version 2 (selected Instrument direction) has exact key sets per group;
+`validateTokens` rejects unknown theme roles or groups, raw CSS colour/shadow
+strings, alpha on opaque roles, unsafe font text, off-scale spacing, out-of-range
+ratios and generated custom-property collisions. Importing the module throws if
+the canonical file is invalid, so neither generation nor the renderer can run on
+an invalid contract. `scripts/validate_plan.py` (`token_errors`) mirrors every key,
+bound and integer/finite rule for docs CI. Both validators run the shared cases
+in `schema-cases.json` (valid boundaries and malformed variants, with explicit
+`{"$nonfinite": "NaN"}` markers decoded as data) and must agree on each.
+
+Units are deliberate. Type, line heights, spacing, radii and layout dimensions
+use rem relative to the user's root text size (canonical px ÷ 16). `ratio.*` is
+dimensionless (`--lc-ratio-list-detail: 0.42`). `strokePx.*` stays px for
+non-scaling icon strokes. Elevation layers are structured `{y, blur, spread,
+color, inset?}` objects emitted as px shadows per theme. Theme colours and the
+eight closed `glyphTiles` categories are exact canonical values; only
+`themes.*.scrim` carries alpha. `glyphCategories`/`GlyphCategory` export the
+closed category enum.
+
+Generated bindings are checked for drift. Contrast tests verify text/state
+colors at AA and focus at 3:1 against all four semantic surfaces, accent text on
+accent, and the Instrument roles: `controlBorder` ≥3:1 on every surface,
+decorative `divider` below `controlBorder`, `selectionRail` ≥4.5:1 on
+`selection`, tone/text/muted ≥4.5:1 on each tint, text/muted/focus on
+`userMessage`/`toolSurface`/`canvas`, white glyph ≥4.5:1 on every tile, and a
+bounded scrim alpha. Malformed-variant tests cover each rejection class.
 
 Import `tokens.css` for CSS variables, or the primitives CSS entry which includes
 it. For Tailwind, import the installed Tailwind stylesheet, token CSS, then
 `tailwind.css`; utilities such as `bg-surface`, `text-muted`, `font-ui`, and
-`rounded-row` resolve through the same scoped `--lc-*` variables. This follows
+`rounded-row`, `bg-tile-command`, `shadow-shell`, `leading-prose` and `tracking-group-caption` resolve through the same scoped `--lc-*` variables. This follows
 the [Tailwind v4 theme-variable API](https://tailwindcss.com/docs/theme).
 
 `fonts.css` bundles locally installed, pinned Fontsource assets: Inter 5.3.0
-(normal 400/500/600) and JetBrains Mono 5.3.0 (normal 400), including their supplied
+(normal 400/500/600) and JetBrains Mono 5.3.0 (normal 400/500; keycaps use 500), including their supplied
 language subsets. System font fallbacks remain available. Bundling resolves
 the CSS font URLs into local build assets; no Google Fonts/CDN request is used.
 Both fonts use SIL OFL 1.1. Unmodified license copies are included in `licenses/`

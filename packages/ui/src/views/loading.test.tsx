@@ -18,3 +18,28 @@ it.each(['list','grid'] as const)('%s preserves unavailable/error headings for e
   expect(markup()).toContain('Local source unavailable');expect(markup()).not.toContain('No matching results');expect(markup()).toContain('Reload or choose a supported source.');expect(action).not.toHaveBeenCalled();
  }
 });
+
+// D1-01 review regression: contract-valid extension shortcut keys that collide with Object.prototype
+// names must render as plain bounded keycaps with truthful labels, never as inherited members.
+it('renders contract-valid prototype-named shortcut keys safely in the action panel and footer',async()=>{
+ const {render,screen,fireEvent,cleanup}=await import('@testing-library/react');
+ const {viewModelSchema}=await import('@linuxcast/contracts');
+ const keys=['__proto__','constructor','toString','hasOwnProperty','valueOf'] as const;
+ const actions=[{id:'open',title:'Open public item',kind:'open',effect:'read',shortcut:{key:'Enter',modifiers:[]}},{id:'copy',title:'Copy public item',kind:'copy',effect:'write',shortcut:{key:'c',modifiers:['Ctrl','Shift']}},...keys.map((key,index)=>({id:`proto-${index}`,title:`Public action ${key}`,kind:'invoke',effect:'read',shortcut:{key,modifiers:['Ctrl']}}))];
+ const view=viewModelSchema.parse({protocolVersion:1,viewId:'public-shortcuts',revision:1,kind:'list',title:'Public shortcuts',search:{query:'',placeholder:'Search',mode:'host'},sections:[{id:'s',items:[{id:'item',title:'Public item',actions}]}],selectedId:'item'});
+ const action=vi.fn(),session=new ViewSession(view);
+ // jsdom has no modal dialog implementation; scope a minimal open/close shim to this test.
+ const dialog=HTMLDialogElement.prototype as {showModal?:(()=>void)|undefined;close?:(()=>void)|undefined},original={showModal:dialog.showModal,close:dialog.close};
+ dialog.showModal=function(this:HTMLDialogElement){this.setAttribute('open','');};dialog.close=function(this:HTMLDialogElement){this.removeAttribute('open');};
+ try{
+  render(<ViewRenderer session={session} host={{action}}/>);
+  fireEvent.click(screen.getByRole('button',{name:/^Actions/}));
+  for(const key of keys){
+   const hint=screen.getByRole('img',{name:`Ctrl+${key}`});
+   expect(Array.from(hint.querySelectorAll('kbd'),cap=>cap.textContent)).toEqual(['Ctrl',key]);
+  }
+  expect(screen.getByRole('img',{name:'Ctrl+Shift+C'})).toBeTruthy();
+  expect(document.body.textContent).not.toContain('[native code]');
+  expect(action).not.toHaveBeenCalled();
+ }finally{cleanup();dialog.showModal=original.showModal;dialog.close=original.close;}
+});

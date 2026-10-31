@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Meaningful negative checks for the documentation gate, with isolated fixtures."""
 import json
+import math
 import shutil
 import subprocess
 import sys
@@ -88,6 +89,102 @@ class PlanningGateTests(PlanningFixture):
         result=self.run_gate()
         self.assertNotEqual(result.returncode,0)
         self.assertIn("done without evidence",result.stdout)
+
+    def mutate_tokens(self,fn):
+        path=self.root/"docs/design/tokens.json"
+        data=json.loads(path.read_text());fn(data)
+        path.write_text(json.dumps(data))
+
+    def assert_token_rejection(self,fn,message):
+        self.mutate_tokens(fn)
+        result=self.run_gate()
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn(message,result.stdout)
+
+    def test_token_extra_theme_role_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["themes"]["dark"].update(brandGlow="#FF00FF"),"tokens dark: semantic colour roles differ ['brandGlow']")
+
+    def test_token_missing_instrument_role_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["themes"]["light"].pop("controlBorder"),"tokens light: semantic colour roles differ ['controlBorder']")
+
+    def test_token_alpha_is_limited_to_scrim(self):
+        self.assert_token_rejection(lambda t:t["themes"]["dark"].update(surface="#1C1D2280"),"invalid hex #1C1D2280 for surface")
+
+    def test_token_scrim_requires_alpha(self):
+        self.assert_token_rejection(lambda t:t["themes"]["light"].update(scrim="#1C1D24"),"invalid hex #1C1D24 for scrim")
+
+    def test_token_unknown_glyph_category_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["glyphTiles"].update(custom="#123456"),"tokens glyphTiles: keys differ")
+
+    def test_token_ratio_bounds_are_enforced(self):
+        self.assert_token_rejection(lambda t:t["ratio"].update(listDetail=0.9),"tokens ratio.listDetail: outside min/max")
+
+    def test_token_raw_shadow_string_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["elevation"]["dark"].update(shell="0 0 4px red"),"tokens elevation.dark.shell: expected 1-4 layers")
+
+    def test_token_unsafe_font_stack_is_rejected(self):
+        self.assert_token_rejection(lambda t:t["font"].update(ui="Inter; } body { display: none"),"tokens font.ui: unsafe value")
+
+    def test_token_reviewer_numeric_examples_are_rejected_by_gate(self):
+        for mutate,message in [
+            (lambda t:t["layout"].update(rowHeight=0),"tokens layout.rowHeight: expected integer 1-4096"),
+            (lambda t:t["fontSize"].update(body=0),"tokens fontSize.body: expected integer 8-64"),
+            (lambda t:t["motion"].update(stateMs="bogus"),"tokens motion.stateMs: expected integer 1-400"),
+            (lambda t:t["motion"].update(stateMs=-100),"tokens motion.stateMs: expected integer 1-400"),
+            (lambda t:t["ratio"].update(listDetailStep=0.5),"tokens ratio.listDetailStep: too large"),
+            (lambda t:t["elevation"]["dark"]["shell"][1].update(blur=999),"tokens elevation.dark.shell[1].blur: expected integer 0-96"),
+        ]:
+            with self.subTest(message=message):
+                path=self.root/"docs/design/tokens.json"
+                original=path.read_text()
+                try:self.assert_token_rejection(mutate,message)
+                finally:path.write_text(original)
+
+    def test_token_unknown_group_is_rejected(self):
+        self.assert_token_rejection(lambda t:t.update(gradients={}),"tokens top level: keys differ")
+
+NONFINITE={"NaN":float("nan"),"Infinity":float("inf"),"-Infinity":float("-inf")}
+def decode_case_value(value):
+    """Explicit data decoding only: {"$nonfinite": "NaN"} becomes a float. Nothing is evaluated."""
+    if isinstance(value,list):return [decode_case_value(v) for v in value]
+    if isinstance(value,dict):
+        if set(value)=={"$nonfinite"}:
+            marker=value["$nonfinite"]
+            if marker not in NONFINITE:raise ValueError(f"unknown non-finite marker {marker!r}")
+            return NONFINITE[marker]
+        return {k:decode_case_value(v) for k,v in value.items()}
+    return value
+
+class SharedTokenSchemaCases(unittest.TestCase):
+    """Parity with validateTokens: tokens.test.ts runs the same shared cases."""
+    def test_shared_cases_match_expected_validity(self):
+        import copy
+        sys.path.insert(0,str(ROOT/"scripts"))
+        from validate_plan import token_errors
+        canonical=json.loads((ROOT/"docs/design/tokens.json").read_text())
+        cases=json.loads((ROOT/"packages/ui/src/tokens/schema-cases.json").read_text())["cases"]
+        self.assertGreaterEqual(sum(c["valid"] for c in cases),10)
+        self.assertGreaterEqual(sum(not c["valid"] for c in cases),50)
+        for case in cases:
+            with self.subTest(case=case["name"]):
+                candidate=copy.deepcopy(canonical)
+                for mutation in case["mutations"]:
+                    *parents,last=mutation["path"]
+                    node=candidate
+                    for key in parents:node=node[key]
+                    if mutation["op"]=="delete":del node[last]
+                    else:node[last]=decode_case_value(mutation["value"])
+                errors=token_errors(candidate)
+                if case["valid"]:self.assertEqual(errors,[])
+                else:self.assertTrue(errors,"accepted an invalid token contract")
+
+    def test_planning_gate_rejects_nonfinite_literal_in_tokens_file(self):
+        # json accepts NaN/Infinity literals; the gate must still reject them.
+        sys.path.insert(0,str(ROOT/"scripts"))
+        from validate_plan import token_errors
+        candidate=json.loads((ROOT/"docs/design/tokens.json").read_text().replace('"rowHeight": 40','"rowHeight": NaN',1))
+        self.assertTrue(math.isnan(candidate["layout"]["rowHeight"]))
+        self.assertTrue(token_errors(candidate))
 
 if __name__=="__main__":
     # Keep the established CI entry point while including all planning regressions.

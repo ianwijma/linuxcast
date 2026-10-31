@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Dependency-free validation of the planning handoff, not of the future app."""
 import json
+import math
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -59,6 +60,131 @@ def local_ref(target, base, label):
     check(path.exists(),f"{label}: missing local reference {target}")
     if path.is_file() and path.suffix==".md" and fragment:
         check(unquote(fragment) in anchors(path),f"{label}: missing anchor {target}")
+
+# Canonical token schema (version 2, selected Instrument direction). Mirrors
+# packages/ui/src/tokens/index.ts validateTokens: exact key sets per group, no
+# arbitrary roles or raw CSS values; only the modal scrim may carry alpha.
+TOKEN_BASE_ROLES=["background","surface","raised","selection","border","text","muted","accent","accentText","focus","danger","warning","success"]
+TOKEN_INSTRUMENT_ROLES=["divider","controlBorder","selectionRail","userMessage","toolSurface","canvas","canvasDot","scrim","tintDanger","tintWarning","tintSuccess","tintInfo","glyphOnTile"]
+TOKEN_GROUPS={
+    "font":["ui","mono","emoji"],"fontFeature":["ui","numeric"],"fontWeight":["regular","medium","semibold"],
+    "fontSize":["caption","body","emphasis","panelTitle","workspaceTitle"],
+    "lineHeight":["caption","body","emphasis","panelTitle","workspaceTitle","prose"],
+    "letterSpacingEm":["caption","groupCaption","workspaceTitle"],"radius":["shell","popover","row","keycap"],
+    "layout":["launcherWidth","launcherMaxHeight","headerHeight","rowHeight","footerHeight","actionPanelWidth",
+        "glyphTrack","glyphTile","glyphTileSmall","glyphInner","glyphInnerSmall","lineIcon",
+        "selectionRailWidth","selectionRailInset","focusWidth","hairline",
+        "groupCaptionHeight","keyColumn","keycapHeight","keycapMinWidth","controlHeight","compactControlHeight",
+        "actionRowHeight","actionFilterHeight","statePlateMaxWidth","listMinWidth","detailMinWidth","gridCellMin",
+        "workspaceHeaderHeight","workspaceSidebarWidth","workspaceInspectorWidth","workspaceMinWidth",
+        "proseMeasure","composerMinHeight","workflowNodeWidth","workflowPortSize","canvasDotSpacing","narrowBreakpoint"],
+    "ratio":["listDetail","listDetailMin","listDetailMax","listDetailStep"],"strokePx":["glyph","lineIcon","edge"],
+    "motion":["stateMs","panelMs","reducedMotion","easing","panelOffset"],
+    "glyphTiles":["command","files","clipboard","quicklink","ai","workflow","notes","system"],
+}
+TOKEN_TOP=["version","spacing","themes","elevation",*TOKEN_GROUPS]
+TOKEN_SPACING=[4,8,12,16,20,24,32]
+TOKEN_ALPHA_ROLES={"scrim"}
+def token_errors(tokens):
+    """Exact mirror of validateTokens in packages/ui/src/tokens/index.ts (same keys, bounds and
+    integer/finite rules). Shared cases in packages/ui/src/tokens/schema-cases.json keep both in parity."""
+    errors=[]
+    fail=errors.append
+    def is_num(v):return isinstance(v,(int,float)) and not isinstance(v,bool) and math.isfinite(v)
+    def is_int(v):return is_num(v) and float(v).is_integer()
+    def exact(path,value,keys):
+        if not isinstance(value,dict):
+            fail(f"tokens {path}: expected object");return False
+        if set(value)!=set(keys):
+            fail(f"tokens {path}: keys differ");return False
+        return True
+    def integer(path,value,low,high):
+        if not (is_int(value) and low<=value<=high):fail(f"tokens {path}: expected integer {low}-{high}")
+    def number(path,value,low,high):
+        if not (is_num(value) and low<=value<=high):fail(f"tokens {path}: expected number {low}-{high}")
+    if not exact("top level",tokens,TOKEN_TOP):return errors
+    t=tokens
+    if not (is_int(t["version"]) and t["version"]==2):fail("tokens: unsupported version")
+    safe=re.compile(r"[A-Za-z0-9 ,\"'\-.]+")
+    for group in ["font","fontFeature"]:
+        if exact(group,t[group],TOKEN_GROUPS[group]):
+            for key,value in t[group].items():
+                if not (isinstance(value,str) and safe.fullmatch(value)):fail(f"tokens {group}.{key}: unsafe value")
+    if exact("fontWeight",t["fontWeight"],TOKEN_GROUPS["fontWeight"]):
+        for key,value in t["fontWeight"].items():
+            integer(f"fontWeight.{key}",value,100,900)
+            if is_num(value) and value%100!=0:fail(f"tokens fontWeight.{key}: invalid weight")
+    sizes=t["fontSize"] if exact("fontSize",t["fontSize"],TOKEN_GROUPS["fontSize"]) else None
+    if sizes:
+        for key,value in sizes.items():integer(f"fontSize.{key}",value,8,64)
+    if exact("lineHeight",t["lineHeight"],TOKEN_GROUPS["lineHeight"]):
+        for key,value in t["lineHeight"].items():
+            integer(f"lineHeight.{key}",value,8,96)
+            size=sizes.get("body" if key=="prose" else key) if sizes else None
+            if is_num(value) and is_num(size) and value<size:fail(f"tokens lineHeight.{key}: smaller than its font size")
+    if exact("letterSpacingEm",t["letterSpacingEm"],TOKEN_GROUPS["letterSpacingEm"]):
+        for key,value in t["letterSpacingEm"].items():number(f"letterSpacingEm.{key}",value,-0.1,0.2)
+    spacing=t["spacing"]
+    if not (isinstance(spacing,list) and len(spacing)==len(TOKEN_SPACING) and all(is_num(v) and v==e for v,e in zip(spacing,TOKEN_SPACING))):
+        fail("tokens spacing: the 4 px scale is fixed")
+    if exact("radius",t["radius"],TOKEN_GROUPS["radius"]):
+        for key,value in t["radius"].items():integer(f"radius.{key}",value,0,32)
+    if exact("layout",t["layout"],TOKEN_GROUPS["layout"]):
+        for key,value in t["layout"].items():integer(f"layout.{key}",value,1,4096)
+    if exact("ratio",t["ratio"],TOKEN_GROUPS["ratio"]):
+        ratio=t["ratio"]
+        for key,value in ratio.items():number(f"ratio.{key}",value,0.01,0.99)
+        if not all(is_num(ratio[k]) for k in ["listDetail","listDetailMin","listDetailMax"]) or not (ratio["listDetailMin"]<=ratio["listDetail"]<=ratio["listDetailMax"]):
+            fail("tokens ratio.listDetail: outside min/max")
+        if not (is_num(ratio["listDetailStep"]) and ratio["listDetailStep"]<=0.1):fail("tokens ratio.listDetailStep: too large")
+    if exact("strokePx",t["strokePx"],TOKEN_GROUPS["strokePx"]):
+        for key,value in t["strokePx"].items():number(f"strokePx.{key}",value,0.5,4)
+    if exact("motion",t["motion"],TOKEN_GROUPS["motion"]):
+        motion=t["motion"]
+        integer("motion.stateMs",motion["stateMs"],1,400)
+        integer("motion.panelMs",motion["panelMs"],1,400)
+        integer("motion.panelOffset",motion["panelOffset"],0,8)
+        if motion["reducedMotion"]!="opacity-only-or-none":fail("tokens motion.reducedMotion: must be opacity-only-or-none")
+        easing=motion["easing"]
+        if not (isinstance(easing,list) and len(easing)==4 and all(is_num(v) for v in easing) and 0<=easing[0]<=1 and 0<=easing[2]<=1):
+            fail("tokens motion.easing: expected cubic-bezier control points")
+    hex6=re.compile(r"#[0-9A-Fa-f]{6}");hex8=re.compile(r"#[0-9A-Fa-f]{8}")
+    if exact("glyphTiles",t["glyphTiles"],TOKEN_GROUPS["glyphTiles"]):
+        for key,value in t["glyphTiles"].items():
+            if not (isinstance(value,str) and hex6.fullmatch(value)):fail(f"tokens glyphTiles.{key}: expected opaque hex")
+    roles=TOKEN_BASE_ROLES+TOKEN_INSTRUMENT_ROLES
+    if not (isinstance(t["themes"],dict) and set(t["themes"])=={"dark","light"}):fail("tokens: dark/light themes required")
+    else:
+        for name,theme in t["themes"].items():
+            if not isinstance(theme,dict) or set(theme)!=set(roles):
+                fail(f"tokens {name}: semantic colour roles differ {sorted(set(theme)^set(roles)) if isinstance(theme,dict) else ''}");continue
+            for role,value in theme.items():
+                pattern=hex8 if role in TOKEN_ALPHA_ROLES else hex6
+                if not (isinstance(value,str) and pattern.fullmatch(value)):fail(f"tokens {name}: invalid hex {value} for {role}")
+    if exact("elevation",t["elevation"],["dark","light"]):
+        for name,levels in t["elevation"].items():
+            if not exact(f"elevation.{name}",levels,["shell","popover","highlight"]):continue
+            for level,layers in levels.items():
+                if not (isinstance(layers,list) and 1<=len(layers)<=4):
+                    fail(f"tokens elevation.{name}.{level}: expected 1-4 layers");continue
+                for index,layer in enumerate(layers):
+                    path=f"elevation.{name}.{level}[{index}]"
+                    keys=["y","blur","spread","color"]+(["inset"] if isinstance(layer,dict) and "inset" in layer else [])
+                    if not exact(path,layer,keys):continue
+                    integer(f"{path}.y",layer["y"],-8,64)
+                    integer(f"{path}.blur",layer["blur"],0,96)
+                    integer(f"{path}.spread",layer["spread"],0,8)
+                    if not (isinstance(layer["color"],str) and hex8.fullmatch(layer["color"])):fail(f"tokens {path}: shadow colour must be #RRGGBBAA")
+                    if "inset" in layer and layer["inset"] is not True:fail(f"tokens {path}: inset must be true when present")
+    if isinstance(t["layout"],dict) and isinstance(t["themes"],dict) and isinstance(t["themes"].get("dark"),dict):
+        kebab=lambda v:re.sub(r"[A-Z]",lambda m:"-"+m.group(0).lower(),v)
+        theme_roles={kebab(r) for r in t["themes"]["dark"]}
+        for key in t["layout"]:
+            if kebab(key) in theme_roles:fail(f"tokens layout.{key}: collides with theme role --lc-{kebab(key)}")
+    return errors
+
+def validate_tokens(tokens,check):
+    for message in token_errors(tokens):check(False,message)
 
 def main():
     errors.clear()
@@ -137,12 +263,7 @@ def main():
         for match in re.finditer(r"!?\[[^\]]*\]\((<?[^\s)]+>?)\)",content):
             local_ref(match.group(1),path,str(path.relative_to(ROOT)))
     tokens=read_json("docs/design/tokens.json")
-    check(tokens.get("version")==1,"tokens: unsupported version")
-    check(set(tokens.get("themes",{}))=={"dark","light"},"tokens: dark/light themes required")
-    required={"background","surface","raised","selection","border","text","muted","accent","accentText","focus","danger","warning","success"}
-    for name,theme in tokens.get("themes",{}).items():
-        check(set(theme)==required,f"tokens {name}: semantic colour roles differ")
-        for value in theme.values():check(bool(re.fullmatch(r"#[0-9A-Fa-f]{6}",value)),f"tokens {name}: invalid hex {value}")
+    validate_tokens(tokens,check)
     assets=list((ROOT/"docs/design/assets").glob("*.svg"))
     check(len(assets)>=5,"assets: expected icon and four design boards")
     for path in assets:
