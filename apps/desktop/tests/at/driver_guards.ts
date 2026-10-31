@@ -27,8 +27,9 @@ export async function endAtFinalResult(page:Page):Promise<void> {
     const query=root?.querySelector<HTMLInputElement>('input[type="search"][data-view-query="true"]');
     const rows=list?.querySelectorAll<HTMLElement>('[role="option"]');
     const first=rows?.[0],last=rows?.[19];
-    const title=(row:HTMLElement|undefined)=>row?.querySelector('.lc-result-copy > span')?.textContent;
-    return !!list&&list===document.activeElement&&query?.value==='Public AT filler 1'&&rows?.length===20&&
+    const title=(row:HTMLElement|undefined)=>row?.querySelector('.lc-row-title')?.textContent;
+    return !!list&&!!list.id&&list===document.activeElement&&query?.getAttribute('role')==='combobox'&&
+      query.getAttribute('aria-controls')===list.id&&query.value==='Public AT filler 1'&&rows?.length===20&&
       title(first)==='Public AT filler 100'&&title(last)==='Public AT filler 119'&&
       first?.getAttribute('aria-selected')==='true'&&list.getAttribute('aria-activedescendant')===first.id&&
       list.querySelectorAll('[role="option"][aria-selected="true"]').length===1;
@@ -38,9 +39,11 @@ export async function endAtFinalResult(page:Page):Promise<void> {
   await page.getByRole('option',{name:'Public AT filler 119 Installed application',exact:true,selected:true}).waitFor({timeout:1500});
   const selected=await page.evaluate(()=>{
     const list=document.querySelector<HTMLElement>('.lc-view:not([hidden]) [role="listbox"][aria-label="Search commands"]');
+    const query=document.querySelector<HTMLInputElement>('.lc-view:not([hidden]) input[type="search"][data-view-query="true"]');
     const rows=list?.querySelectorAll<HTMLElement>('[role="option"]'),last=rows?.[19];
-    return !!list&&list===document.activeElement&&rows?.length===20&&
-      last?.querySelector('.lc-result-copy > span')?.textContent==='Public AT filler 119'&&
+    return !!list&&!!list.id&&list===document.activeElement&&query?.getAttribute('role')==='combobox'&&
+      query.getAttribute('aria-controls')===list.id&&query.value==='Public AT filler 1'&&rows?.length===20&&
+      last?.querySelector('.lc-row-title')?.textContent==='Public AT filler 119'&&
       last.getAttribute('aria-selected')==='true'&&list.getAttribute('aria-activedescendant')===last.id&&
       list.querySelectorAll('[role="option"][aria-selected="true"]').length===1;
   });
