@@ -516,8 +516,11 @@ describe('credential settings cancelled outcome wording (synthetic bridge)', () 
   it('shows a neutral cancelled plate that never claims the prior key survived when the confirmed refresh reports none', async () => {
     // Main may return `cancelled` after partial work (e.g. lock during replacement); the refreshed snapshot is authoritative.
     const f = fixture({ stored: 'secure-persistent', clearSessionOnLock: true });
-    f.api.saveKey.mockImplementation(async () => { await f.change({ stored: 'none', revision: 5 }); return confirmed('cancelled'); });
+    const saving = deferred<CredentialSettingsActionReply>();
+    f.api.saveKey.mockReturnValue(saving.promise);
     await ready(f.api); enter('synthetic-replacement', 'session-only'); submit();
+    await f.change({ stored: 'none', revision: 5 });
+    await act(async () => saving.resolve(confirmed('cancelled')));
     const title = await screen.findByRole('heading', { name: 'Operation cancelled' });
     const plate = title.closest('section.lc-plate')!;
     expect(plate.getAttribute('data-kind')).toBe('interrupted');

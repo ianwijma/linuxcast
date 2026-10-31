@@ -66,3 +66,29 @@ Pop!_OS 22.04 amd64 development host. Pinned Node 24.22.1 and Bun 1.4.4, Electro
 - F2-02 stays in progress. AC01 and the UI criterion are pending actual native observer, keyring,
   provider, Debian four-session and Orca evidence. The historical AC02 and privacy results are unchanged.
   This increment promotes neither the task nor local 1.0.
+
+## Coordinator integration and review
+
+Integrated author source unchanged at `ffc53f24`, based on approved PR88
+`e2b3a5a`. Fresh independent Standards (`eebf4024`) and Security/Spec (`de842f32`)
+reviews of `944c1f7` each found one P2: cancellation does not guarantee rollback,
+so the new title "Nothing was changed" exceeded main's contract. Both independently
+reproduced a cancelled replacement leaving no stored key and inspected all nine
+captures; no other actionable findings were reported. The qualified saved-local
+plate while locked was not classified as a defect.
+
+Opus correction `0633abb` uses "Operation cancelled" and directs users to refreshed
+status without replay; only the affected cancellation capture changed. Its new UI
+regression fails the old wording and passes the correction. Coordinator adds the
+production main-service boundary regression to `settings.security.test.ts` and
+replays the original private controller/presentation probe: old persistent key
+removed, new memory cleared, `cancelled`, current `stored:none`, neutral title.
+The probe passes after the fix. The test's metadata event and reply are awaited
+sequentially to avoid overlapping React `act()` calls; application logic is unchanged.
+
+Current coordinator validation on Node24.22.1/Bun1.4.4/Electron45.0.0:
+86 F2 units,3 contracts,145 security checks, typecheck/lint/plan/whitespace pass.
+Actual sandboxed private-Xvfb F2 flows pass2/2 in16.60s: diagnostics7.51s and
+credentials8.16s. Instrumented dialog/session/keyring limitations above remain.
+Five incidental PNG recaptures were restored. The small wording correction is
+coordinator-verified; no additional independent final re-review is claimed.

@@ -600,3 +600,27 @@ resize/reanchor and ratified narrow full-opacity rise exception. Each new browse
 regression fails eae/passesfixed; author23browser/350downstream/28D1/32F1/10glyph/
 2Electron/type/lint/plan pass. Native/AT pending; parent integrate/check then fresh
 two-axis review next, while credential small correction runs independently.
+
+Credential original Opusmedium correction6f81af85 completed/read clean0633abb53e0bc620f874f89396d8bb5ac865932e,
+tree645c73ef4f239882818b0d612593a67631ed1537, additiveunsigned on2ea07e8;
+normal signing failed within30s, authorized fallback/no config change. Neutral
+Operationcancelled/current-status/no-replay copy, newUI regressionfailsoldsource,
+product assertion/onecancelledcapture/README updated;8othercaptures unchanged.
+Parent integrated unchanged f2f4b2a and independently86units/3contracts/145security/
+type/lint, actual2F2Electron16.60s (diagnostics7.51/credential8.16), real original
+controller/presentation probe nowpasses19ms (storednone, neutralcancelledtitle).
+New UItest initially emitted overlappingact warnings; coordinator sequences its
+deferredreply/metadataevent without changing assertions or application behavior,
+86units nowpass cleanly.5incidentalPNGs restored; currentcancelledcapture inspected.
+Initial reviews' soleP2 addressed and coordinatorverified; do not claim another
+independent final re-review. Prompt focused credential PR/currentCI next.
+
+D1cf12 integration is saved at2e45107f8fe9606635965b83808c4d015737b33c, basedcc039386.
+Parent current23browser25.4s/28D1/323L1/55F1/177L1security/type/lint and4Electron
+F122.23s/F213.58s pass BEFORE new productionextensionqueryclear assertion. That
+new realElectron assertion FAILS2.62s: Publiccatalogue119 query thenEscapeclear,
+>25restoredoptions, selected/active-descendant/queryfocus preserved butscrollTop0
+andbottomVisiblefalse. Rootmechanical test is committed in2e45107; applicationUI
+source remainsauthorcf12.24incidentalPNGs+twolegacyuntrackedcaptures restored.
+Original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 now addresses this
+single real extension-mode settled-projection gap. No D1PR/review yet; don'tpoll.
