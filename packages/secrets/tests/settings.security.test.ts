@@ -127,6 +127,19 @@ it('does not report saved after lock erased the newly created memory value durin
   const saving=save(f);while(!finish)await new Promise(resolve=>setImmediate(resolve));f.emit('locked');finish();
   expect(await saving).toEqual({ok:true,value:{outcome:'cancelled'}});expect(await f.service.state()).toMatchObject({stored:'none',session:'locked'});
 });
+it('reports current storage after cancellation when lock clears a replacement after the old persistent key was removed',async()=>{
+  const f=await fixture(true);expect(await save(f,'persistent')).toMatchObject({value:{outcome:'saved'}});
+  const before=await f.service.state();expect(before.stored).toBe('secure-persistent');
+  expect(await f.service.setPolicy({protocolVersion:1,expectedRevision:before.revision,clearSessionOnLock:true},signal())).toMatchObject({value:{outcome:'policy-updated'}});
+  const oldId=[...f.records.keys()][0]!,store=(await f.runtime.store())!,remove=store.delete.bind(store);
+  vi.spyOn(store,'delete').mockImplementation(async(reference,owner)=>{
+    const result=await remove(reference,owner);if(reference.id===oldId)f.emit('locked');return result;
+  });
+  expect(await save(f,'session-only')).toMatchObject({value:{outcome:'cancelled'}});
+  expect(await f.references.get(oldId)).toBeNull();expect(f.records.size).toBe(0);
+  expect(await f.service.state()).toMatchObject({stored:'none',session:'locked',clearSessionOnLock:true});
+  // Cancellation does not promise rollback; the UI must present this refreshed state.
+});
 it('restores the stronger confirmed policy when session loss races a weakening acknowledgement',async()=>{
   for(const regain of [false,true]){
     const f=await fixture();const before=await f.service.state();await f.service.setPolicy({protocolVersion:1,expectedRevision:before.revision,clearSessionOnLock:true},signal());

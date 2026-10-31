@@ -640,3 +640,98 @@ only; no sourcehelper push/PR/integration/use, dependencies/build/guest/ns/nativ
 action. Entire helper still requires independent two-axis review before use.
 Root returned to D1renderer integration; UIpriority remains unchanged, both
 Opusmedium lanes active without polling, no root process/PRwatch.
+
+PR88 merged e2b3a5a8470a1ccd5a3e52de65f837c0febc5726 at31October18:00:09UTC,
+exact5e46071/currentCI41227182012SUCCESS, no GHreviews/comments/requests/rulesets
+or branchprotection. Tiny merge blurb sent immediately; watchremoved. D1renderer
+integration saved separately at13375e8, including approvedPR88 and coordinatorQA;
+active Opusmedium6fb9f0b9 addresses editable hints/query-clear scroll/live-panel
+growth. Do not poll. Separate native sourcehelper0aa7e3f (16source/69offline,
+four old-source negative controls) and DOMadapter5eca891 (37F1unit, realRow fixture,
+combobox/control guards, no newnative roles/pins/approvedtree) remain unintegrated,
+unused, unreviewed saved branches. No guest/native/input/hostbus/keyring actions.
+
+Credential Instrument Opusmedium3237f2ec completed/read: clean t3-63694be4,
+codex/f2-02-instrument-credentials, unsigned2ea07e8fcc4ffa2450f6d63d64923942a194d774
+treeba5a0c164d15b937374cde22fa620e66f7cbf4d0 on approvedPR88. Two commits,15owned
+files: secrets/UI presentation/CSS/70tests and dedicated product test/9newcaptures.
+1Password timed out30s; authorized per-command unsigned, no config change.
+Root integrates author unchanged asffc53f24b0758412918d5d9fd86aed917bb18a22
+on codex/f2-02-instrument-credentials-integration directly from approvede2b3a5a,
+without unreviewedD1source. No contract/backend/mapping change. Parent85F2unit/
+3contract/144security/type/lint pass; actual sandboxed private-Xvfb F2two16.21s
+(diagnostics7.63s/credential7.66s),9newcaptures. Four incidentalLocalDataPNGs
+restored. Initial two-axis independent review next. Stored-local success band
+whilelocked is explicitly distinct from session usability; review truthful
+outcome classifications against unchanged main semantics, not UI fixtures alone.
+AC01/UI/native observer/keyring/provider/Debianfour-session/Orca remain pending;
+AC02/privacy historical status unchanged. No PR/watch/rootprocess currently.
+
+Credential initial reviews now active against exact944c1f7eb54ab43a54719a097dc8fdf5bdf23ef0,
+basee2b3a5a: Standards eebf4024-bfd9-471a-8aed-fcab2a98ff9b and Security/Spec
+de842f32-f124-415e-9bdc-6847a7cd01dd, fresh isolated GPT6.1SOL/high. Both briefs
+include full task/contracts/design/security, source-only scope, independent
+validation distinction,9captures and main-authoritative notice semantics. No
+native actions/delegation/publication; completion wakes parent, do not poll.
+Root current credentials integration excludes saved D1/AT/sourcehelper branches;
+keep focused PR independent from still-running D1Opusmedium follow-up6fb9f0b9.
+
+Parent verifies a new credential notice P2 on unchanged2ea07e8 UI: the universal
+cancelled title "Nothing was changed" is false for a real main outcome. Private
+fixture uses production CredentialRuntime/SettingsService with synthetic secure
+storage/session, saves persistent key, enables clear-on-lock, then replaces with
+session-only and emitslocked after real old persistent reference deletion. Main
+returnscancelled, finalstorednone/remainingpersistentrecords0; outcomeNotice still
+saysNothingwaschanged. Tight regression title!=Nothingwaschanged fails21ms.
+No backend change needed: use neutral cancelled wording/current-status review,
+preserve interrupted kind and no replay. Original Opusmedium UI author must
+correct source/test/product assertion/affected capture before publication, after
+review slots return (do not exceed root+D1+two reviews). Both initial reviews
+continue on frozen944c1f7 without polling. Private probe copied to
+/tmp/linuxcast-credential-outcome-probe-gta2dzkm
+and removed from repo; no source/evidence/index changed by probe, no native/keyring/
+provider/hostbus action. No PR yet; full task/UI/native acceptance unchanged.
+
+Both credential initial reviews completed/read: Standards eebf4024 and
+Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
+wording P2; no other actionable findings/smells. Both85units/3contracts/type/lint/
+plan, Standards27settings/runtime andSpec34selectedsecurity plus own faultprobes,
+all9PNGs inspected; parent144security/Electron inherited honestly. Saved-local
+band whilelocked explicitly qualified, no finding. Original Opusmedium author
+follow-up6f81af85-d902-46d0-a12b-3cf92a126a45 now corrects neutral cancellation
+copy/UI regression/product assertion/one affected capture; no backend changes.
+Parent adds production settings boundary regression documenting that cancelled
+replacement can leave storednone after oldpersistent deletion/newmemory clearing.
+No another broad review requested for the small copy correction; parent will
+verify exact current changes and rerun the real failing probe before publication.
+D1Opusmedium6fb9f0b9 completed/read clean cf12fe365bf3d2b0fbd2ff7c3289113b150eb8b8,
+treead3ba1c50db71ac67ce7e5d68924411a5b5670ec, two unsigned additive commits fromeae:
+truthful editable-context hints, one-shot query-clear selection reveal, live-panel
+resize/reanchor and ratified narrow full-opacity rise exception. Each new browser
+regression fails eae/passesfixed; author23browser/350downstream/28D1/32F1/10glyph/
+2Electron/type/lint/plan pass. Native/AT pending; parent integrate/check then fresh
+two-axis review next, while credential small correction runs independently.
+
+Credential original Opusmedium correction6f81af85 completed/read clean0633abb53e0bc620f874f89396d8bb5ac865932e,
+tree645c73ef4f239882818b0d612593a67631ed1537, additiveunsigned on2ea07e8;
+normal signing failed within30s, authorized fallback/no config change. Neutral
+Operationcancelled/current-status/no-replay copy, newUI regressionfailsoldsource,
+product assertion/onecancelledcapture/README updated;8othercaptures unchanged.
+Parent integrated unchanged f2f4b2a and independently86units/3contracts/145security/
+type/lint, actual2F2Electron16.60s (diagnostics7.51/credential8.16), real original
+controller/presentation probe nowpasses19ms (storednone, neutralcancelledtitle).
+New UItest initially emitted overlappingact warnings; coordinator sequences its
+deferredreply/metadataevent without changing assertions or application behavior,
+86units nowpass cleanly.5incidentalPNGs restored; currentcancelledcapture inspected.
+Initial reviews' soleP2 addressed and coordinatorverified; do not claim another
+independent final re-review. Prompt focused credential PR/currentCI next.
+
+D1cf12 integration is saved at2e45107f8fe9606635965b83808c4d015737b33c, basedcc039386.
+Parent current23browser25.4s/28D1/323L1/55F1/177L1security/type/lint and4Electron
+F122.23s/F213.58s pass BEFORE new productionextensionqueryclear assertion. That
+new realElectron assertion FAILS2.62s: Publiccatalogue119 query thenEscapeclear,
+>25restoredoptions, selected/active-descendant/queryfocus preserved butscrollTop0
+andbottomVisiblefalse. Rootmechanical test is committed in2e45107; applicationUI
+source remainsauthorcf12.24incidentalPNGs+twolegacyuntrackedcaptures restored.
+Original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 now addresses this
+single real extension-mode settled-projection gap. No D1PR/review yet; don'tpoll.
