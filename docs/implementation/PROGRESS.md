@@ -263,3 +263,23 @@ canonical-token writer or downstream UI implementation starts before this freeze
 Then D1-02 renderer/launcher update uses merged primitives, followed by existing
 feature workspaces. GOAL.md model clause now matches the user's later UI request;
 complete97task/R1-03 objective and all permissions/security/release rules unchanged.
+
+UI reassessment source audit maps actual component boundaries in UI_REFRESH.md:
+launcher and files share ViewRenderer, builtin presenters reuse its frames, while
+Localdata/credentials/Savedpermissions/notes/workflow compositions are separate.
+CurrentstrictViewModel has no glyphcategoryfield. Actionfilter/grid/separator
+semantics differ from selectedInstrument and require explicit keyboard/ARIA
+regressions in D1-02; don't treat this as a screenshot-only colour replacement.
+No renderer/business/IPC code changed by the coordinator. Current sharedUI
+implementation is delegatedac8ad89b via claudeAgent/claude-opus-5-5/effortmedium
+(runtime confirmed settings); no active native job or PRwatch. Other subagents
+completed and saved. Do not poll the runningUI child or start downstream UI edits
+before its shared contracts are frozen. Root remains codex/d1-01-instrument-adoption.
+
+Coordinator D1-02 behavior baseline27/27passes (6session,17form,4loading) on
+pinned Node24.22.1/Bun1.4.4, before Instrumentrenderer edits. This covers existing
+selection/revision/draft/secret lifecycle logic, not new visual/native acceptance.
+Audit conclusions sent to Opusimplementation without changing its scope or
+canonical files. Parent docs inventory/planvalidation pass; no code or screenshots
+changed. Next integration remains the running D1-01 shared foundation, not a new
+feature or another native attempt.
