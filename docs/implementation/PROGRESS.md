@@ -491,3 +491,18 @@ Route focusedsticky/status navigation correction+permanent regression to origina
 Opusmedium implementation before formal reviews/PR. UI source remains author-
 identical; parent changes only runner mapping/QA/checkpoint. Initialload/credential
 outcomes remain component-only, no supported desktop/AT acceptance. No PRwatch.
+
+LocalData focus follow-up623667e9 completed/read: Opus5.5medium unsignedff81b5d,
+treec70aca9, additive onacead29; 1Password failed within30s, authorized fallback,
+no config change. Root integrates unchanged at0f192394. Dynamic measured sticky
+band scroll padding keeps sidebar headings, Tab targets and retained focus clear
+through busy/error/cancel and width changes. Permanent actual diagnostics
+regression fails oldacead29 and passes fixed source (author7.29s). Parent reruns
+on integrated source:67F2unit,3contracts,144security,typecheck,lint,plan pass;
+four actual sandboxed Electron/private-Xvfb flows pass F122.61s andF214.77s,
+including diagnostics7.56s and credential6.32s. Existing file/category/privacy,
+no-replay, URL, native viewport and Quit checks retained. All25incidental PNG
+recaptures restored; new focused capture inspected. Initial independent Standards
+and Security/Spec review is next, then focused PR/CI/merge. No task/criterion
+promotion, native/Orca/keyring/provider acceptance unchanged. D1renderer72448bb9
+continues independently; no active PRwatch or root test process.
