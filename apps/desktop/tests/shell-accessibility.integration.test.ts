@@ -68,6 +68,27 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
   const query = page.getByRole('combobox', { name: 'Search commands', exact: true });
   await expect.poll(() => query.evaluate(element => element === document.activeElement)).toBe(true);
   await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
+  // Extension-mode production search: clearing a narrow query retains and reveals
+  // its selected application after the unfiltered controller projection arrives.
+  await query.fill('Public catalogue 119');
+  await expect.poll(() => page.getByRole('option').count()).toBe(1);
+  const retained = page.getByRole('option', { name: 'Public catalogue 119 Installed application', exact: true });
+  await expect.poll(() => retained.getAttribute('aria-selected')).toBe('true');
+  await query.press('Escape');
+  await expect.poll(() => query.inputValue()).toBe('');
+  await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
+  await expect.poll(() => retained.evaluate(element => {
+    const row = element.getBoundingClientRect(), body = element.closest('.lc-view-scroll')!.getBoundingClientRect();
+    const scroller = element.closest<HTMLElement>('.lc-view-scroll')!;
+    const input = document.querySelector<HTMLInputElement>('[data-view-query]')!;
+    return { selected: element.getAttribute('aria-selected') === 'true', focused: document.activeElement === input,
+      active: input.getAttribute('aria-activedescendant') === element.id, scrolled: scroller.scrollTop > 0,
+      topVisible: row.top >= body.top, bottomVisible: row.bottom <= body.bottom + 1 };
+  })).toEqual({ selected: true, focused: true, active: true, scrolled: true, topVisible: true, bottomVisible: true });
+  // Reset through ordinary keys before the existing catalogue/alias/viewport flow.
+  await query.press('Tab');
+  await page.getByRole('listbox', { name: 'Search commands', exact: true }).press('Home');
+  await page.keyboard.press('Shift+Tab');
   await query.fill('hide');
   await expect.poll(() => page.getByRole('option').count()).toBe(1);
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.getSize()[1]!)).toBeLessThan(560);
