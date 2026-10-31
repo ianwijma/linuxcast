@@ -44,10 +44,17 @@ function fixture(overrides: Partial<CredentialSettingsState> = {}) {
   };
 }
 function input() { return screen.getByLabelText('New API key') as HTMLInputElement; }
-function mode() { return screen.getByLabelText('Keep this key') as HTMLSelectElement; }
-function enter(value = 'synthetic-new-key', persistence = 'persistent') {
+// Explicit storage choice is a native radio group (Instrument refresh; formerly a <select>).
+const choiceNames = { persistent: 'Persistent — secure system keyring', 'session-only': 'Session only — until Linuxcast quits' } as const;
+function choice(persistence: keyof typeof choiceNames) { return screen.getByRole('radio', { name: choiceNames[persistence] }) as HTMLInputElement; }
+function mode() {
+  const group = screen.getByRole('group', { name: 'Keep this key' });
+  return { value: (group.querySelector('input[type="radio"]:checked') as HTMLInputElement | null)?.value ?? '' };
+}
+function choose(persistence: keyof typeof choiceNames) { fireEvent.click(choice(persistence)); }
+function enter(value = 'synthetic-new-key', persistence: keyof typeof choiceNames | '' = 'persistent') {
   fireEvent.change(input(), { target: { value } });
-  if (persistence) fireEvent.change(mode(), { target: { value: persistence } });
+  if (persistence) choose(persistence);
 }
 function submit() { fireEvent.submit(screen.getByRole('form', { name: 'Save OpenRouter key' })); }
 async function ready(api: CredentialSettingsApi) {
@@ -105,7 +112,10 @@ describe('credential settings synthetic metadata and privacy', () => {
     expect(input().value).toBe('');
     expect(screen.getByRole('button', { name: 'Replace key…' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: /reveal|copy|show key/i })).toBeNull();
-    expect(screen.getAllByRole('combobox')).toHaveLength(1);
+    // Only the masked field and the two explicit storage radios accept input: no readback/copy control.
+    expect(screen.queryAllByRole('combobox')).toHaveLength(0);
+    expect(screen.getAllByRole('radio')).toHaveLength(2);
+    expect(document.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]), textarea, select')).toHaveLength(1);
   });
 
   it('uses the shared password input and never echoes new input into markup, messages or other methods', async () => {
@@ -132,7 +142,7 @@ describe('credential settings synthetic metadata and privacy', () => {
     submit();
     expect(f.api.saveKey).not.toHaveBeenCalled(); expect(input().value).toBe('');
     expect(screen.getByText(/Enter a new key, choose/)).toBeTruthy();
-    fireEvent.change(mode(), { target: { value: 'persistent' } }); submit();
+    choose('persistent'); submit();
     expect(f.api.saveKey).not.toHaveBeenCalled();
   });
 
@@ -147,17 +157,17 @@ describe('credential settings synthetic metadata and privacy', () => {
     const f = fixture(); await ready(f.api); enter();
     await f.change({ storage: 'insecure-backend', revision: 5 });
     expect(mode().value).toBe('persistent'); expect(input().value).toBe('synthetic-new-key');
-    expect((screen.getByRole('option', { name: 'Persistent — secure system keyring' }) as HTMLOptionElement).disabled).toBe(true);
+    expect(choice('persistent').disabled).toBe(true);
     expect((screen.getByRole('button', { name: 'Save key' }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByText(/insecure basic_text/)).toBeTruthy();
-    fireEvent.change(mode(), { target: { value: 'session-only' } }); submit();
+    choose('session-only'); submit();
     expect(f.api.saveKey).toHaveBeenCalledWith({ expectedRevision: 5, persistence: 'session-only', value: 'synthetic-new-key' });
     await screen.findByText(/local key save was confirmed/);
   });
 
   it('disables unavailable session-only storage without choosing persistence', async () => {
     const f = fixture({ sessionOnlyAvailable: false }); await ready(f.api);
-    expect((screen.getByRole('option', { name: 'Session only — until Linuxcast quits' }) as HTMLOptionElement).disabled).toBe(true);
+    expect(choice('session-only').disabled).toBe(true);
     expect(mode().value).toBe('');
     enter('synthetic-key', 'session-only'); submit();
     expect(f.api.saveKey).not.toHaveBeenCalled();
@@ -165,7 +175,7 @@ describe('credential settings synthetic metadata and privacy', () => {
 
   it.each(['unavailable', 'encryption-failed', 'storage-failed'] as const)('explains %s storage and keeps persistence disabled', async storage => {
     const f = fixture({ storage }); await ready(f.api);
-    expect((screen.getByRole('option', { name: 'Persistent — secure system keyring' }) as HTMLOptionElement).disabled).toBe(true);
+    expect(choice('persistent').disabled).toBe(true);
     enter(); submit(); expect(f.api.saveKey).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Recheck status' }));
     await waitFor(() => expect(f.api.recheck).toHaveBeenCalledTimes(1));
@@ -415,5 +425,89 @@ describe('credential settings synthetic mutation and lifecycle boundaries', () =
     const opener = document.createElement('button'); opener.textContent = 'Synthetic opener'; document.body.append(opener); opener.focus();
     const f = fixture(); const view = await ready(f.api); input().focus(); view.unmount();
     expect(document.activeElement).toBe(opener); opener.remove();
+  });
+});
+
+describe('credential settings Instrument presentation (synthetic bridge)', () => {
+  const plateFor = (text: RegExp | string) => screen.getByText(text).closest('section.lc-plate')!;
+
+  it('renders the workspace header with a genuinely bound Escape keycap and a page title', async () => {
+    const f = fixture(); await ready(f.api);
+    const close = screen.getByRole('button', { name: 'Close' });
+    expect(close.getAttribute('aria-keyshortcuts')).toBe('Escape');
+    expect(close.closest('header')?.textContent).toContain('Credentials');
+    expect(screen.getByRole('heading', { level: 1, name: 'OpenRouter API key' })).toBeTruthy();
+    // The keycap is display only: Escape is handled by the window and dispatches close exactly once.
+    fireEvent.keyDown(screen.getByRole('heading', { level: 1 }), { key: 'Escape' });
+    expect(f.api.close).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['observed-unlocked', 'available', true, ['Unlocked', 'Available', 'Available']],
+    ['observed-unlocked', 'insecure-backend', true, ['Unlocked', 'Refused', 'Available']],
+    ['observed-unlocked', 'encryption-failed', false, ['Unlocked', 'Failed', 'Unavailable']],
+    ['locked', 'unavailable', false, ['Locked', 'Unavailable', 'Unavailable']],
+    ['inactive', 'unavailable', false, ['Inactive', 'Unavailable', 'Unavailable']],
+  ] as const)('shows %s session / %s storage as glyph-plus-word rows from the confirmed snapshot', async (session, storage, sessionOnlyAvailable, words) => {
+    const f = fixture({ session, storage, sessionOnlyAvailable });
+    render(<CredentialSettings api={f.api} />);
+    const list = await screen.findByRole('list', { name: 'Session and storage' });
+    const rows = Array.from(list.querySelectorAll('li'));
+    expect(rows.map(row => row.querySelector('.cs-row-name')!.textContent)).toEqual(['Desktop session', 'Persistent storage', 'Session-only storage']);
+    expect(rows.map(row => row.querySelector('.cs-row-status')!.textContent)).toEqual(words);
+    // Shape glyph accompanies every word; colour is never the only signal.
+    for (const row of rows) expect(row.querySelector('.cs-row-status svg')).toBeTruthy();
+    if (storage === 'insecure-backend') expect(rows[1]!.querySelector('.cs-row-detail')!.textContent).toBe('basic_text');
+  });
+
+  it('offers explicit storage radios with no default and visible reasons for unavailable modes', async () => {
+    const f = fixture({ storage: 'insecure-backend', sessionOnlyAvailable: true }); await ready(f.api);
+    expect(choice('persistent').checked).toBe(false); expect(choice('session-only').checked).toBe(false);
+    expect(choice('persistent').disabled).toBe(true);
+    expect(choice('persistent').getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.getElementById(choice('persistent').getAttribute('aria-describedby')!)!.textContent).toMatch(/Unavailable now/);
+    choose('session-only');
+    expect(choice('session-only').checked).toBe(true);
+    // Choosing a mode is local presentation: nothing is sent until an explicit submit.
+    for (const method of [f.api.saveKey, f.api.setPolicy, f.api.removeKey, f.api.recheck, f.api.close]) expect(method).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel entry' }));
+    expect(choice('session-only').checked).toBe(false);
+  });
+
+  it.each([
+    ['saved', 'success', 'Done', /local key save was confirmed/],
+    ['removed', 'success', 'Done', 'Key removal was confirmed.'],
+    ['cancelled', 'interrupted', 'Cancelled', /operation was cancelled/],
+    ['stale', 'interrupted', 'Not applied', /no operation will be replayed/],
+    ['unknown', 'unavailable', 'Unavailable', /outcome is unknown/],
+    ['unavailable', 'unavailable', 'Unavailable', /operation is unavailable/],
+  ] as const)('shows a %s reply as a truthful %s plate', async (outcome, kind, eyebrow, text) => {
+    const f = fixture({ stored: 'session-only' });
+    if (outcome === 'removed') f.api.removeKey.mockResolvedValue(confirmed('removed')); else f.api.saveKey.mockResolvedValue(confirmed(outcome));
+    await ready(f.api);
+    if (outcome === 'removed') fireEvent.click(screen.getByRole('button', { name: 'Remove key…' })); else { enter(); submit(); }
+    await screen.findByText(text);
+    const plate = plateFor(text);
+    expect(plate.getAttribute('data-kind')).toBe(kind);
+    expect(plate.querySelector('.lc-plate-eyebrow')!.textContent).toBe(eyebrow);
+    expect(plate.textContent).not.toMatch(/authenticated|verified|works/i);
+    if (outcome === 'saved') expect(plate.textContent).toContain('Provider authentication has not been checked.');
+  });
+
+  it.each([
+    ['permission-denied', 'denied'], ['invalid-request', 'error'], ['unavailable', 'unavailable'], ['conflict', 'interrupted'],
+  ] as const)('shows fixed %s errors as %s plates, never success', async (code, kind) => {
+    const f = fixture(); f.api.saveKey.mockResolvedValue({ ok: false, error: { code } });
+    await ready(f.api); enter(); submit();
+    await waitFor(() => expect(document.querySelector('.cs-notice section.lc-plate')).toBeTruthy());
+    expect(document.querySelector('.cs-notice section.lc-plate')!.getAttribute('data-kind')).toBe(kind);
+  });
+
+  it('shows request acknowledgements as quiet notes, not success plates', async () => {
+    const f = fixture(); await ready(f.api);
+    fireEvent.click(screen.getByRole('button', { name: 'Recheck status' }));
+    const ack = await screen.findByText('Rechecking local credential status…');
+    expect(ack.closest('section.lc-plate')).toBeNull();
+    expect(ack.closest('[role="status"]')).toBeTruthy();
   });
 });
