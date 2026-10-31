@@ -954,3 +954,13 @@ Read-only outer-lab inventory also reconfirmed exactv4container stopped/exited
 PID0exit0, imageandQEMUargv/fixedmounts; no start/exec/SSH/guest/namespace/product.
 Root-ownedPID1namespace-stat requirement remains unresolved fornonrootpayload;
 no controller/wrappergate change. Notes/workflowUI stilldisjoint Opusmedium.
+
+Initial Standards f4322f84 completed/read clear on443c9ca/base22ab1c9; no hardrule
+or actionable materialsmell. Independently17source/fivecontrolledprobes (exact
+sparsehistoricalnegativecontrolincluded)/2AST/hash/plan/whitespacepass; full114
+andpreviousSpec/historicarchive smoke inheritedhonestly. Parent55mappedF1security
+nowpasses with all114Pythonautomaticallydiscovered, no runneredit. SoleSpecP2
+parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
+cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
+integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
+unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.

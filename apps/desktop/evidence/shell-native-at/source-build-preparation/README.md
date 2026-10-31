@@ -169,5 +169,15 @@ The reviewer independently ran16 original source tests and additional real-file/
 memfd fault, CLI-redaction, size/path/node-bound and historical-source negative
 controls. The earlier113-test run and historic real-archive smoke were inherited
 evidence. The small P2 correction is coordinator-validated; no second clean
-independent Security/Spec review is claimed. The separate Standards axis remains
-pending. No archive/build/guest/namespace/product/native acceptance is added.
+independent Security/Spec review is claimed. The separate initial Standards review `f4322f84` of `443c9ca` is clear: no
+documented-rule or actionable material smell findings. It independently passes17
+source tests, five additional synthetic probes (including the exact historical
+sparse negative control), both AST/hashes, plan and whitespace checks. This does
+not replace or claim a second clean Security/Spec review. No archive/build/guest/namespace/product/native acceptance is added.
+
+Current mapped `test:security -- F1-02` passes55checks, including automatic
+discovery of all114 offline Python cases without skips; no runner edit is needed.
+This final source differs from the independently reviewed `443c9ca` only in
+evidence/registry/checkpoint metadata. Current-head CI and GitHub review inspection
+remain publication/integration gates. No actual native attempt is authorized by
+this extraction helper alone.
