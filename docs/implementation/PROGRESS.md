@@ -624,3 +624,25 @@ andbottomVisiblefalse. Rootmechanical test is committed in2e45107; applicationUI
 source remainsauthorcf12.24incidentalPNGs+twolegacyuntrackedcaptures restored.
 Original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 now addresses this
 single real extension-mode settled-projection gap. No D1PR/review yet; don'tpoll.
+
+Saved permissions Instrument source e1db20359b2c056ede1350bc5cbb7c3e4f3acd1b
+(tree09bd24d, clean author t3-721f2a64) is integrated unchanged as1c15dfb0 on
+codex/f3-01-instrument-permissions-integration from approved develop63c9581/PR89.
+Parent maps new saved-permissions.test.tsx under unit.F3-01. Current integrated
+checks pass:83 units,2 contracts,72 security,typecheck,whole-repo lint,plan and
+whitespace; actual sandboxed private-Xvfb F3two24.42s (permissions15.30s and
+workflow7.59s), preserving real revocation/stale/cancel/quarantine/clipboard
+sentinel/noNode/narrowAPI/Quit assertions.21new author captures remain intact;
+13incidental new/historical recaptures restored. Parent inspected long-source
+review200% keyboard capture. Source remains author-identical, controller/broker/
+contracts untouched. Initial two-axis independent review next; native/session/UI
+and full-task acceptance remain pending. Existing StrictMode limitation disclosed
+by author is unchanged from baseline production (non-StrictMode entry).
+
+D1 initial reviews completed/read at1e4682b/base63c9581: four distinct P2s across
+two axes (split200%overflow, live regrouping focus, listLeft, extra grid modifiers).
+Original Opusmedium9c84499d-ab07-48f8-ad69-dc746e8fa12a is fixing them in its own
+branch. The D1 integration/adoption ledger is saved at7f4b1f8, separate from this
+F3 candidate. No sourcehelper/AT-adapter additions included. Sourcehelper branch
+86abb64 remains unreviewed/unused,113offline checks pass. No root process/PRwatch
+or native/guest/hostbus/provider/keyring actions. No task/criterion promotion.
