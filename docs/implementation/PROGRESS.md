@@ -407,3 +407,24 @@ custody control stays passing.12extractor/65full offline tests pass11.944s,
 syntax/2hashes/plan/whitespace pass. Entire helper still unintegrated/unused and
 requires independent review; no new PR or guest/build/native action. UI priority
 and full97-task/R1-03 objective remain unchanged.
+
+Fresh final PR87review c542a57a completed/read on exactaca7c0b: shortcuts/480px
+row/unclassifiedUnavailable resolved; token parity partly unresolved. P2 exact()
+compares comma-joined keys, accepting fontWeight{"medium,regular":500,"semibold":600}
+with required weights missing; Python rejects. Independent4289case sweep found
+fiveaffectedgroups.134/28/52/33unit/validator/type/lint/plan passed, all22PNGs
+inspected, no edits or acceptance promotion. Route the bounded exact-key fix and
+shared collision fixtures to original Opusmedium thread; APIs/canonical values
+stay frozen, renderer72448bb9 continues independent composition. PR87 watch active,
+currentACA planningCI41221811515 green but cannot merge until correction/recheck.
+
+Coordinator reserves a separate bounded F2-02 Local data UI lane for Opus5.5medium,
+branchcodex/f2-02-instrument-local-data. Own only data-settings renderer/CSS/local
+component tests and diagnostics product test/new instrument-local-data evidence.
+No main/preload/storage/credential/permission/contract changes. State API exposes
+appearance only; don't infer category readiness/backend status. Native action
+confirmations and category outcomes remain authoritative. Fixed window URL cannot
+gain hashes/query navigation because sender attestation is exact. Preserve current
+category action names/filter/close, no replay and confirmed effect semantics.
+This disjoint UI lane may develop against frozen corrected foundation APIs;
+integration waits for upstreamPR87. Renderer lane must not edit its reserved files.
