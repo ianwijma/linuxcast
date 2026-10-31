@@ -95,7 +95,31 @@ Eight component and four actual dark/light review/created captures have axe0.
 All741 historical PNGs match develop byte-for-byte after restoring test recaptures.
 New actual captures are `notes-markdown-import-application-{review,created}-{dark,light}.png`;
 component captures/report are under `packages/notes/evidence/markdown-import-*`.
-Final independent source/capture/evidence review and signed publication are pending.
+Independent review of signed source b3ea4d4 (GPT-6.1 SOL/high, isolated read-only
+checkout) inspected all12 captures and found no additional IPC/lifecycle/receipt/
+reentrancy/focus/schema or visual issues. Its291 focused checks passed, but it
+reported two P2 text regressions: escapes swallowed by bare-URL tokens, and terminal
+editor hard breaks changed into literal entities. The coordinator reproduced both
+with12 new semantic cases (11 initially failed), then fixed them using the public
+inline lexer for consumed escape pairs and terminal-LF serialization without a
+structural backslash. Escape pairs split across URL/text tokens are joined before
+lexing; escape nodes remain separate from entity-decoded text. Trailing hard breaks
+export as text LF because CommonMark has no terminal structural break representation.
+This preserves text/tasks, not the editor node's exact representation.
+
+Final review disposition: both bounded findings addressed and parent-validated;
+no claim of a second independent clean-source review. The actual production fixture
+now includes URL-adjacent literal punctuation and a trailing hard break, preserving
+all existing byte-identical second-export/source/owner/restart assertions. After
+these fixes:57 focused parser/export checks PASS0.562s;481mapped units PASS1.92s;
+36contracts PASS0.325s;258security PASS1.07s;88browser PASS42.7s;40integration
+PASS44.19s (actual import5.237s, retainedNotes29.034s, wholeTrash5.218s). Full pinned
+TypeScript and scoped lint pass. The first typecheck caught an optional helper type
+and an incorrect test generic; both corrected without weakening runtime admission.
+All741 historical captures restored byte-identical; four updated actual captures
+have axe0 and coordinator visual inspection, eight unchanged component captures
+retain the independent visual review. Signed publication/current-head CI/merge
+remain pending. These results supersede earlier final-run counts above.
 
 ## Partial acceptance and limitations
 

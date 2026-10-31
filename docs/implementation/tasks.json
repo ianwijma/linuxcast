@@ -7098,6 +7098,12 @@
               "outcome": "Partial: imported draft uses exact owner receipt/stable UUID, preserves outgoing saved/draft/flags, supports edit/Save/root navigation and persists through Quit/restart. Actual production import5.302s and retained Notes crash/recovery29.636s PASS. Full task/native/release acceptance pending.",
               "platform": "Pop!_OS22.04 amd64/Linux7.1.1; pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; owned private XvfbX11 and Chromium fixtures, native chooser choices instrumented. Not Debian/session/nativeAT acceptance.",
               "reference": "apps/desktop/evidence/notes-markdown-import-application.md; packages/notes/evidence/markdown-import-ui.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
+            },
+            {
+              "command": "Final mapped U1-01 unit/contracts/security/UI/integration;57 parser/export checks; independent b3ea4d4 review and coordinator regression disposition",
+              "outcome": "Partial: independent SOL6.1/high review found two P2 roundtrip bugs; both reproduced/fixed with12new cases,11initiallyred. URL-consumed/split escape pairs use maintained lexer; terminal hard breaks preserve LF text.481unit/36contract/258security/88browser/40integration PASS, actualimport5.237s includes both findings and unchanged byteidentical secondexport/exactowner/restart assertions.12publiccaptures axe0;741historicalPNG unchanged. No second independent clean review or full task/native/release acceptance claimed.",
+              "platform": "Pop!_OS22.04 amd64/Linux7.1.1; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; privateXvfbX11 and Chromium. Native chooser choices instrumented; not supported Debian/session/nativeAT acceptance.",
+              "reference": "apps/desktop/evidence/notes-markdown-import-application.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
             }
           ]
         },
@@ -7119,6 +7125,12 @@
               "outcome": "Partial: actual application export/import/re-export preserves Unicode, boundary LF, escaped HTML/link literals, checked/nested unchecked tasks and code; second export byte-identical and unsupported editor styling disclosed before Create. Strict notes.write JSON-envelope and combined escaping regressions pass. Broader Markdown/native chooser/task acceptance remains pending.",
               "platform": "Pop!_OS22.04 amd64/Linux7.1.1; pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; owned private XvfbX11 and Chromium fixtures, native chooser choices instrumented. Not Debian/session/nativeAT acceptance.",
               "reference": "apps/desktop/evidence/notes-markdown-import-application.md; packages/notes/evidence/markdown-import-ui.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
+            },
+            {
+              "command": "Final mapped U1-01 unit/contracts/security/UI/integration;57 parser/export checks; independent b3ea4d4 review and coordinator regression disposition",
+              "outcome": "Partial: independent SOL6.1/high review found two P2 roundtrip bugs; both reproduced/fixed with12new cases,11initiallyred. URL-consumed/split escape pairs use maintained lexer; terminal hard breaks preserve LF text.481unit/36contract/258security/88browser/40integration PASS, actualimport5.237s includes both findings and unchanged byteidentical secondexport/exactowner/restart assertions.12publiccaptures axe0;741historicalPNG unchanged. No second independent clean review or full task/native/release acceptance claimed.",
+              "platform": "Pop!_OS22.04 amd64/Linux7.1.1; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; privateXvfbX11 and Chromium. Native chooser choices instrumented; not supported Debian/session/nativeAT acceptance.",
+              "reference": "apps/desktop/evidence/notes-markdown-import-application.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
             }
           ]
         },
@@ -7194,6 +7206,12 @@
               "outcome": "Partial: all88 mapped browser cases PASS together43.1s, including8import cases covering readonly review, Cancel/Escape, once-only Create, pending/unknown/manual recovery/unavailable/200percent/focus. Eight component+fouractual dark/light captures axe0. Independent final review pending; nativeAT/highcontrast/session acceptance remains pending.",
               "platform": "Pop!_OS22.04 amd64/Linux7.1.1; pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; owned private XvfbX11 and Chromium fixtures, native chooser choices instrumented. Not Debian/session/nativeAT acceptance.",
               "reference": "apps/desktop/evidence/notes-markdown-import-application.md; packages/notes/evidence/markdown-import-ui.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
+            },
+            {
+              "command": "Final mapped U1-01 unit/contracts/security/UI/integration;57 parser/export checks; independent b3ea4d4 review and coordinator regression disposition",
+              "outcome": "Partial: independent SOL6.1/high review found two P2 roundtrip bugs; both reproduced/fixed with12new cases,11initiallyred. URL-consumed/split escape pairs use maintained lexer; terminal hard breaks preserve LF text.481unit/36contract/258security/88browser/40integration PASS, actualimport5.237s includes both findings and unchanged byteidentical secondexport/exactowner/restart assertions.12publiccaptures axe0;741historicalPNG unchanged. No second independent clean review or full task/native/release acceptance claimed.",
+              "platform": "Pop!_OS22.04 amd64/Linux7.1.1; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; privateXvfbX11 and Chromium. Native chooser choices instrumented; not supported Debian/session/nativeAT acceptance.",
+              "reference": "apps/desktop/evidence/notes-markdown-import-application.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
             }
           ]
         },
@@ -7269,6 +7287,12 @@
               "outcome": "Partial: selected source path never reaches renderer; closed bounded local parser, no resources/rendererHTTP(S), no sourcepath/content/UUID in command usage export, exact source/unrelated records preserved. Public synthetic fixtures/captures;258security and actual application privacy checks PASS. Remaining task/release privacy scope pending.",
               "platform": "Pop!_OS22.04 amd64/Linux7.1.1; pinned Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; owned private XvfbX11 and Chromium fixtures, native chooser choices instrumented. Not Debian/session/nativeAT acceptance.",
               "reference": "apps/desktop/evidence/notes-markdown-import-application.md; packages/notes/evidence/markdown-import-ui.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
+            },
+            {
+              "command": "Final mapped U1-01 unit/contracts/security/UI/integration;57 parser/export checks; independent b3ea4d4 review and coordinator regression disposition",
+              "outcome": "Partial: independent SOL6.1/high review found two P2 roundtrip bugs; both reproduced/fixed with12new cases,11initiallyred. URL-consumed/split escape pairs use maintained lexer; terminal hard breaks preserve LF text.481unit/36contract/258security/88browser/40integration PASS, actualimport5.237s includes both findings and unchanged byteidentical secondexport/exactowner/restart assertions.12publiccaptures axe0;741historicalPNG unchanged. No second independent clean review or full task/native/release acceptance claimed.",
+              "platform": "Pop!_OS22.04 amd64/Linux7.1.1; Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/Tiptap3.32.0; privateXvfbX11 and Chromium. Native chooser choices instrumented; not supported Debian/session/nativeAT acceptance.",
+              "reference": "apps/desktop/evidence/notes-markdown-import-application.md; PR77 https://github.com/ianwijma/linuxcast/pull/77"
             }
           ]
         }
@@ -7306,9 +7330,10 @@
         "Integrated reviewed/tested unfinished Empty Trash PR76 https://github.com/ianwijma/linuxcast/pull/76: exact signed head31ca944f9158fd4c44cb126a3d8db9a9573de20f locally cryptographically verified; normal expected-head merge09de566dc3773b058be7c43e517956bd08ef7fcb at29October2026 15:07:04UTC. Current-head planningCI40898183866 validatePASS15s; requested/submitted reviews/comments/threads[], developunprotected/rules[]; no bypass. Primarydevelop/origin cleanfastforwarded. All15UI/final13evidence hashes match independent reviews,729historicalPNG unchanged. Full U1-01/all97/R1-03 remain unfinished.",
         "Next bounded application increment selected after merged PR76: native selected local Markdown file -> bounded read/closed parser -> readonly title/body/tasks review -> no-effect Cancel or separate Create imported note through existing normal owner write -> edit/Save/export/search/restart. Existing Notes/Tiptap/storage/shared UI reused, no new dependencies/migrations/services. Coordinator codex/notes-markdown-import and existing GPT6.1SOL/high author codex/notes-markdown-import-ui base09de566. Full task/prerequisites/native chooser/session/AT/attachments/release acceptance remains pending; selection is not implementation evidence.",
         "31October2026 thread handoff: consolidated latest coordinator+author Markdown import changes on codex/notes-markdown-import/base09de566. Not merge-ready: parser optional undefined properties fail storage JSON request validation on actual Create; combined escaped literal HTML/link paragraph can retain trailing LF as literal &#10;. Component results do not close these actual failures. See docs/implementation/HANDOFF.md and handoff/markdown-import-source-manifest.json. All4U1criteria remain pending; no task completion claimed. No agent remains running; next thread fixes these bounded application issues, verifies/reviews and merges normally before more feature work.",
-        "31October2026 PR77 continuation closes both handoff application blockers with exact storage-envelope and combined entity/HTML/link/LF regressions, using public Tiptap APIs and unchanged strict storage/security contracts. Final mapped469unit/36contracts/258security/88browser/40integration PASS, actualimport5.302s/retainedNotes29.636s/wholeTrash5.353s; capture-only framing rerun4.98sPASS.12newpubliccaptures axe0,741historicalPNG unchanged. FullNodeTS/scopedlint/plan/diffPASS. Independent final source/capture/evidence review and signed publication/currentheadCI/reviews/normalmerge pending. All4U1criteria and complete local1.0 remain unfinished. See apps/desktop/evidence/notes-markdown-import-application.md."
+        "31October2026 PR77 continuation closes both handoff application blockers with exact storage-envelope and combined entity/HTML/link/LF regressions, using public Tiptap APIs and unchanged strict storage/security contracts. Final mapped469unit/36contracts/258security/88browser/40integration PASS, actualimport5.302s/retainedNotes29.636s/wholeTrash5.353s; capture-only framing rerun4.98sPASS.12newpubliccaptures axe0,741historicalPNG unchanged. FullNodeTS/scopedlint/plan/diffPASS. Independent final source/capture/evidence review and signed publication/currentheadCI/reviews/normalmerge pending. All4U1criteria and complete local1.0 remain unfinished. See apps/desktop/evidence/notes-markdown-import-application.md.",
+        "31October2026 completed independent review of signedb3ea4d4:291focusedchecksPASS,12newcaptures visuallyclean, no additional IPC/lifecycle/receipt/focus/schema objections, two P2 roundtrip changesrequested. Coordinator reproduced/fixed both (URLadjacentescapes and terminalhardbreaks),12newsemanticcases/11initialred;57focusedPASS. Finalmapped481unit1.92s/36contracts0.325s/258security1.07s/88browser42.7s/40integration44.19sPASS; actualimport5.237s strengthens fixture without weakening owner/source/byte-identicalreexport/restart/privacy assertions. Fourupdatedactualcaptures axe0/coordinatorinspected,8componentunchangedfromindependentreview,741historicalPNG unchanged; fullTS/scopedlint/plan/gate21/diffPASS. No second independent clean review claimed; no agents remain running. Final signed publication/currentheadCI/normalmergepending; all4U1criteria remainpending."
       ],
-      "owner": "coordinator; final Markdown import review and integration",
+      "owner": "coordinator; publish reviewed Markdown import corrections and integrate",
       "branch": "codex/notes-markdown-import",
       "limitations": [
         "Implementation in progress under user-authorized reviewed/tested unfinished application increments. F2-01 accepted; reviewed shared UI/primitives reused while broader D1-02/nativeAT acceptance remains unfinished. No prerequisite completion inferred.",

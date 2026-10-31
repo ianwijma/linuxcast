@@ -1,46 +1,44 @@
 # Coordinator checkpoint — 31 October 2026
 
-The complete agreed local1.0 objective remains unfinished. Finish PR77 before
-starting another feature. All subagents use GPT-6.1 SOL/high. Normal signed
-commit/push/PR/merge authorization persists; preserve the 1Password signing setup.
+The complete agreed local1.0 goal remains unfinished. Finish PR77 before starting
+another feature. All subagents GPT-6.1 SOL/high; normal signed publication/merge
+is authorized. Preserve the unchanged 1Password signing setup.
 
-Active: U1-01 bounded Markdown import on `codex/notes-markdown-import` in
-`.worktrees/linuxcast-notes-markdown-import`, base merged PR76/develop09de566.
-Draft PR: https://github.com/ianwijma/linuxcast/pull/77. The original author tree
-`.worktrees/linuxcast-notes-markdown-import-ui` remains a reference.
+Active U1-01: bounded selected-file Markdown review/import as a separate owner
+draft, branch `codex/notes-markdown-import`, existing worktree
+`.worktrees/linuxcast-notes-markdown-import`, base mergedPR76/develop09de566.
+PR77 https://github.com/ianwijma/linuxcast/pull/77. No new feature has started.
+All four U1 acceptance criteria stay pending; do not mark local1.0 complete.
 
-Both handoff blockers are fixed: permitted optional undefined node fields are
-removed after closed bounded validation and JSON-wire validation remains strict;
-lexer-split bare-URL/entity literal runs are rejoined before exactly-once text
-entity decoding through public Tiptap hooks. Literal entities/code and independent
-title/body limits remain covered. No storage guard, security boundary, dependency,
-manifest/lockfile or migration changed. All four U1 criteria remain pending.
+Both original handoff blockers were fixed on signed b3ea4d4. The isolated
+GPT-6.1 SOL/high independent source/capture/evidence review completed:291focused
+checks pass,12newcaptures visually clean, no additional boundary/lifecycle/receipt/
+focus/schema findings; two P2 semantic roundtrip bugs requested changes. The result
+was initially not collected and the old green PR watch was removed when the user
+asked about it. No independent review is still running.
 
-Final assembled mapped checks PASS:469unit/36contracts/258security/88browser/
-40integration. Actual sandboxed Electron import5.302s, retainedNotes29.636s,
-wholeTrash5.353s; new import covers review/Cancel/Create, exact text/tasks/second
-export, edit/Save, launcher keyboard navigation, Quit/restart and exact unrelated
-preservation. Eight component and four actual public captures have axe0; all741
-historical PNGs byte-identical to develop. Full pinned TypeScript/scoped lint pass.
-Detailed evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
-The earlier failed application and intermediate continuation attempts are retained
-in evidence; the historical HANDOFF.md does not describe current blockers.
+The coordinator reproduced and fixed both findings: URL-consumed escape pairs
+(including a pair split across URL/text tokens) now use the maintained public inline
+lexer, kept separate from entity-decoded text; terminal editor hard breaks export
+as text LF without a structural backslash marker.57focused parser/export checks
+pass, including12new cases (11red before fixes). Actual production fixture now
+includes URL-adjacent punctuation and a terminal hard break without weakening its
+byte-identical second export, exact owner/source preservation or restart assertions.
 
-Signed source head b3ea4d4ec590ccbf7dfb749110c55d364c0de1cd is pushed and its
-signature cryptographically verified against the configured public key. An isolated
-GPT-6.1 SOL/high read-only final source/capture/evidence review is running.
-The first pushed planning CI41182245139 failed two docs-only fixture checks because
-the new HANDOFF local report link reached outside the copied planning tree. The
-link now uses the immutable report URL; the same21gate tests pass locally, with no
-validator or application assertion changes. All20changedTS lint passes.
+Final mapped PASS:481unit1.92s/36contracts0.325s/258security1.07s/88browser42.7s/
+40integration44.19s; actualimport5.237s/retainedNotes29.034s/wholeTrash5.218s.
+Full pinned TypeScript/scoped lint pass. All741 historical PNGs unchanged; four
+updated actual dark/light captures axe0 and coordinator inspected, eight component
+captures unchanged from independent visual review. No second independent clean
+review is claimed; the two bounded findings are addressed with parent validation.
+Evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
 
-Next: finish independent review, inspect final-head CI/reviews/rules, ready PR77,
-then normal expected-head merge.
-After integration record its merge, refresh dependencies and select the next
-bounded application increment. No new feature has started.
+Planning CI41182395321 passed signed905a0a9. Its earlier fixture-link failure was
+fixed by using an immutable report URL, preserving validators/assertions. Publish
+the final reviewed-finding fixes, inspect new-head CI/reviews/rules, ready and merge
+normally with expected-head matching. Then record integration and select next work.
 
-Full Notes/attachments/remaining Markdown coverage, D1/native prerequisites,
-Debian13 GNOME/KDE Wayland/X11/nativeAT/highcontrast/performance/package/release
-acceptance remain required. Xvfb/Chromium and instrumented chooser choices are not
-supported-session/native chooser acceptance. Registry8done/20inprogress/69planned;
-acceptance56passed/325pending/8justifiedN/A. Do not mark the full objective complete.
+Full Notes/attachments/remainingMarkdown, D1/native prerequisites, Debian13 GNOME/
+KDE Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance remains
+required. Xvfb/Chromium and instrumented chooser choices are partial evidence only.
+Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A.

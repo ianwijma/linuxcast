@@ -1,4 +1,10 @@
 # Markdown import UI and parser — component history
+> Latest review disposition: independent review of b3ea4d4 found two further P2
+> roundtrip bugs (URL-adjacent escape pairs and terminal hard breaks). Both are
+> reproduced and fixed; final481unit/36contract/258security/88browser/40integration
+> pass, including the strengthened actual app fixture. Full disposition and honest
+> initial failures are in the current application evidence. All task gates remain.
+
 > Continuation update — 31 October 2026: both later application blockers are now
 > fixed. Final assembled checks pass:469 unit/36 contract/258 security/88 browser/
 > 40 integration, including actual sandboxed Electron import/create/re-export/Save/

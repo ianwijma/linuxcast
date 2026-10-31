@@ -1,7 +1,8 @@
 # Historical Linuxcast handoff — 31 October 2026
 
 > Continuation update: both application blockers below are fixed and the assembled
-> checks now pass (469 unit,36 contract,258 security,88 browser,40 integration).
+> checks now pass (481 unit,36 contract,258 security,88 browser,40 integration).
+> Two later independent-review roundtrip findings are also fixed and validated;
 > See [current application evidence](https://github.com/ianwijma/linuxcast/blob/b3ea4d4ec590ccbf7dfb749110c55d364c0de1cd/apps/desktop/evidence/notes-markdown-import-application.md)
 > and [PROGRESS.md](PROGRESS.md) for current publication/review state. The remainder
 > of this file preserves the original handoff and its historical failures.

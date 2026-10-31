@@ -4,6 +4,14 @@ import type {NoteContent,NoteNode} from '@linuxcast/contracts';
 import {exportNoteMarkdown,importNoteMarkdown,NOTE_MARKDOWN_MAX_BYTES,NOTE_MARKDOWN_NOTICE} from '../src/markdown.ts';
 const paragraph=(text:string):NoteNode=>({type:'paragraph',content:[{type:'text',text}]});
 const tasks=(node:NoteNode):boolean[]=>[...(node.type==='taskItem'?[node.attrs!.checked as boolean]:[]),...(node.content??[]).flatMap(tasks)];
+it.each(['https://example.org*bold*','https://example.org[brackets]','https://example.org`code`','https://example.org\\path\\','https://example.org\\*literal*','www.example.org*literal*','public@example.org*literal*'])('preserves escaped punctuation consumed by bare URLs: %j',text=>{
+ const note:NoteContent={title:'Public URL punctuation',document:{type:'doc',content:[paragraph(text)]}},before=structuredClone(note),exported=exportNoteMarkdown(note),result=importNoteMarkdown(exported);
+ expect(notePlainText(result.document)).toBe(text);expect(exportNoteMarkdown(result)).toBe(exported);expect(note).toEqual(before);
+});
+it.each<NoteNode[]>([[{type:'text',text:'End'},{type:'hardBreak'}],[{type:'hardBreak'}],[{type:'hardBreak'},{type:'hardBreak'}],[{type:'text',text:'https://example.org*literal*'},{type:'hardBreak'}],[{type:'text',text:'End\n'},{type:'hardBreak'},{type:'hardBreak'}]])('preserves trailing and break-only editor paragraphs: %j',(...content)=>{
+ const note:NoteContent={title:'Public trailing breaks',document:{type:'doc',content:[{type:'paragraph',content}]}},before=structuredClone(note),exported=exportNoteMarkdown(note),result=importNoteMarkdown(exported);
+ expect(notePlainText(result.document)).toBe(notePlainText(note.document));expect(notePlainText(importNoteMarkdown(exportNoteMarkdown(result)).document)).toBe(notePlainText(note.document));expect(note).toEqual(before);
+});
 it.each(['# Empty note','# Leaves\n\n---\n\nfirst\\\nsecond','# Tasks\n\n- [x] Done\n  - [ ] Pending','# Code\n\n```text\n&amp; &#10; <script>literal</script>\n```'])('produces a JSON-safe actual notes.write repository request for %j',source=>{
  const content=importNoteMarkdown(source),request={schemaVersion:1,requestId:'public-import-write',method:'notes.write',params:{id:'11111111-1111-4111-8111-111111111111',expectedRevision:0,action:'draft',content}};
  expect(parseRepositoryRequest(request,notesRepositoryContracts)).toEqual(request);

@@ -10,7 +10,9 @@ export const NOTE_MARKDOWN_MAX_BYTES=524288;
 export const NOTE_MARKDOWN_NOTICE='Linuxcast Markdown export: preserves note text and tasks. Editor fonts, colours, layout and undo history are not exported. Multiline inline code exports as plain text. Line endings normalize to LF. This file is unencrypted.';
 class NotesMarkdownManager extends MarkdownManager{
  override renderNodeToMarkdown(node:JSONContent,parent?:JSONContent,index=0,level=0,meta:Record<string,unknown>={}):string{
-  if(node.type==='hardBreak')return '\\\n';
+  // CommonMark cannot retain a structural break at a paragraph's end. Export
+  // that terminal LF as text, without the structural break's backslash marker.
+  if(node.type==='hardBreak')return parent?.content?.slice(index+1).every(child=>child.type==='hardBreak')?'&#10;':'\\\n';
   if(node.type==='codeBlock'){const text=(node.content??[]).map(child=>child.text??'').join('').replace(/\r\n?/gu,'\n'),fence='`'.repeat(Math.max(3,...Array.from(text.matchAll(/`+/gu),match=>match[0].length+1)));return fence+String(node.attrs?.language??'')+'\n'+text+'\n'+fence;}
   if(node.type==='paragraph'||node.type==='heading'){
    const prefix=node.type==='heading'?'#'.repeat(Number(node.attrs?.level??1))+' ':'';
@@ -26,13 +28,26 @@ class NotesMarkdownManager extends MarkdownManager{
 // an autolink and adjacent text (URL&#10 + ;). Rejoin only these literal runs
 // before the maintained text handlers decode entities once. Escapes/code stay
 // separate, and explicit links are still refused by the lexer admission check.
-function literalTextTokens(tokens:MarkdownToken[]):MarkdownToken[]{
- const result:MarkdownToken[]=[];
+function literalTextTokens(tokens:MarkdownToken[],tokenizeInline:(source:string)=>MarkdownToken[]):MarkdownToken[]{
+ const result:MarkdownToken[]=[];let text='',hasUrl=false;
+ const flush=()=>{
+  if(!text)return;
+  // GFM can also split an escape pair across URL/text tokens. Rejoin the run
+  // first, then let the maintained inline lexer recognize each escape pair.
+  // Escape tokens remain separate from text to prevent double entity decoding.
+  let start=0,cursor=0;
+  if(hasUrl)while((cursor=text.indexOf('\\',cursor))!==-1){
+   const pair=tokenizeInline(text.slice(cursor,cursor+2)),escape=pair.length===1&&pair[0]?.type==='escape'?pair[0]:undefined;
+   if(escape){if(cursor>start)result.push({type:'text',text:text.slice(start,cursor)});result.push(escape);cursor+=2;start=cursor;}else cursor++;
+  }
+  if(start<text.length)result.push({type:'text',text:text.slice(start)});
+  text='';hasUrl=false;
+ };
  for(const token of tokens){
-  if(token.type==='text'&&!token.tokens||token.type==='link'&&token.raw===token.text){const previous=result.at(-1);if(previous?.type==='text'&&!previous.tokens)previous.text=(previous.text??'')+(token.text??'');else result.push({type:'text',text:token.text??''});}
-  else result.push(token);
+  if(token.type==='text'&&!token.tokens||token.type==='link'&&token.raw===token.text){text+=token.text??'';hasUrl||=token.type==='link';}
+  else {flush();result.push(token);}
  }
- return result;
+ flush();return result;
 }
 const extensions=flattenExtensions([StarterKit.configure({heading:{levels:[1,2,3]},link:false,underline:false,trailingNode:false}),TaskList,TaskItem.configure({nested:true})]).map(extension=>extension.extend({
  // Already flattened: keep each node (including nested TaskItem), without
@@ -40,7 +55,8 @@ const extensions=flattenExtensions([StarterKit.configure({heading:{levels:[1,2,3
  addExtensions:()=>[],
  ...(getExtensionField(extension,'parseMarkdown')?{parseMarkdown(token,helpers){
   if(this.name==='text')return {type:'text',text:decodeHtmlEntities(token.text||'')};
-  return this.parent!(token,{...helpers,parseInline:tokens=>helpers.parseInline(literalTextTokens(tokens)),parseChildren:tokens=>helpers.parseChildren(literalTextTokens(tokens))});
+  const tokenizeInline=helpers.tokenizeInline;if(!tokenizeInline)throw new Error('Markdown inline tokenization is unavailable.');
+  return this.parent!(token,{...helpers,parseInline:tokens=>helpers.parseInline(literalTextTokens(tokens,tokenizeInline)),parseChildren:tokens=>helpers.parseChildren(literalTextTokens(tokens,tokenizeInline))});
  }}:{}),
 }));
 const manager=new NotesMarkdownManager({extensions,markedOptions:{gfm:true},indentation:{style:'space',size:2}});
