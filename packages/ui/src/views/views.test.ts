@@ -120,7 +120,8 @@ test('action panel: 280px, bottom filter, grouped destructive last, focus return
   expect(names.at(-1)).toContain('Remove from library'); expect(names.at(-1)).toContain('(destructive)');
   const destructive = panel.getByRole('button', { name: /^Remove from library.*\(destructive\)$/ });
   await expect(destructive).toHaveAttribute('data-variant', 'danger');
-  expect(await destructive.evaluate(row => row.closest('.lc-panel-group')!.querySelectorAll('.lc-panel-action').length)).toBe(1);
+  await expect(destructive).toHaveAttribute('data-group', 'destructive'); expect(await panel.locator('.lc-panel-action[data-group="destructive"]').count()).toBe(1);
+  expect(await destructive.evaluate(row => row.previousElementSibling?.getAttribute('data-group'))).toBe('destructive'); // own divider
   await expect(panel.getByRole('button', { name: /^Open details/ })).toHaveAttribute('data-current', 'true'); // primary stays the initial choice
   await page.keyboard.press('Control+k'); await expect(panel).toHaveCount(0); await expect(box).toBeFocused();
   // Pointer: the close control and an outside click both close without invoking.
@@ -381,4 +382,76 @@ test('extension search reveals the retained selection only after the host snapsh
   // A later ordinary extension snapshot keeps the user's scroll position.
   await scroller.evaluate(element => { element.scrollTop = 0; }); await box.fill('Public item 0'); await expect(page.getByRole('option')).toHaveCount(9); await box.fill('Public item'); await expect(page.getByRole('option')).toHaveCount(60);
   await expect.poll(() => page.locator('.lc-view:visible .lc-view-scroll').evaluate(element => element.scrollTop)).toBe(0);
+});
+
+for (const [width, name] of [[720, 'text-200-split-720'], [800, 'text-200-split-800']] as const) test(`${width}px at 200 percent root text stacks the split preview inside the container`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 }); await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await expect(page.getByRole('separator', { name: 'Resize list and preview' })).toBeVisible(); // normal text keeps the split
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  const layout = page.locator('.lc-collection-layout'); const preview = page.getByRole('complementary', { name: 'Selected item preview' });
+  await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+  const fit = await preview.evaluate(element => { const box = element.getBoundingClientRect(), scroller = element.closest('.lc-view-scroll')!, port = scroller.getBoundingClientRect(); return { left: box.left >= port.left - 1, right: box.right <= port.right + 1, overflow: scroller.scrollWidth <= scroller.clientWidth + 1, page: document.documentElement.scrollWidth <= innerWidth }; });
+  expect(fit).toEqual({ left: true, right: true, overflow: true, page: true });
+  await expect(layout).toHaveAttribute('data-stacked', 'true'); await expect(page.getByRole('separator', { name: 'Resize list and preview' })).toBeHidden();
+  await preview.getByRole('heading', { name: 'Launch brief' }).scrollIntoViewIfNeeded(); await expect(preview.getByRole('heading', { name: 'Launch brief' })).toBeInViewport();
+  await expect(page.getByRole('option')).toHaveCount(3); await expect(page.locator('output')).toHaveText('No action requested.');
+  await axe(page); await pageShot(page, name);
+  // Back at normal text the split returns with its default ratio.
+  await page.evaluate(() => { document.documentElement.style.fontSize = ''; }); await page.setViewportSize({ width: 1040, height: 1000 });
+  await expect(layout).not.toHaveAttribute('data-stacked', 'true'); await expect(page.getByRole('separator', { name: 'Resize list and preview' })).toHaveAttribute('aria-valuenow', '42');
+});
+
+const regroupHarness = (page: Page) => {
+  const box = query(page); const panel = page.getByRole('dialog', { name: 'Actions', exact: true }); const filter = page.getByRole('searchbox', { name: 'Find an action', exact: true });
+  const open = async (control: string) => { await page.getByRole('button', { name: control, exact: true }).click(); await expect(page.locator('.lc-view-footer .lc-footer-verb').first()).toHaveAccessibleName('Action one Enter'); await box.press('Control+k'); await expect(filter).toBeFocused(); };
+  return { box, panel, filter, open };
+};
+test('live regrouping keeps a focused destructive action when the group before it empties', async ({ page }) => {
+  const { box, panel, filter, open } = regroupHarness(page);
+  await open('Destructive regroup later'); await filter.press('Shift+Tab');
+  const danger = panel.getByRole('button', { name: /^Delete public item.*\(destructive\)$/ }); await expect(danger).toBeFocused();
+  await expect(panel.getByRole('button', { name: 'Extra action', exact: true })).toHaveCount(0);
+  await expect(danger).toBeFocused(); await expect(danger).toHaveAttribute('data-current', 'true'); await expect(page.locator('output')).toHaveText('No action requested.');
+  await page.keyboard.press('Escape'); await expect(box).toBeFocused(); await expect(page.locator('output')).toHaveText('No action requested.');
+});
+
+test('live regrouping keeps focus on a surviving action across group moves and falls back safely', async ({ page }) => {
+  const box = query(page); const panel = page.getByRole('dialog', { name: 'Actions', exact: true }); const filter = page.getByRole('searchbox', { name: 'Find an action', exact: true });
+  const open = async (control: string) => { await page.getByRole('button', { name: control, exact: true }).click(); await expect(page.locator('.lc-view-footer .lc-footer-verb').first()).toHaveAccessibleName('Action one Enter'); await box.press('Control+k'); await expect(filter).toBeFocused(); };
+  // Non-destructive "three" moves from the other group into the bound group when "two" is removed.
+  await open('Bound regroup later'); await filter.press('Shift+Tab'); await page.keyboard.press('Shift+Tab');
+  const three = panel.getByRole('button', { name: 'Action three', exact: true }); await expect(three).toBeFocused();
+  await expect(panel.getByRole('button', { name: 'Action two', exact: true })).toHaveCount(0);
+  await expect(three).toBeFocused(); await expect(three).toHaveAttribute('data-group', 'bound'); await expect(page.locator('output')).toHaveText('No action requested.');
+  await page.keyboard.press('Enter'); await expect(page.locator('output')).toHaveText('Requested three at revision 3 for guide.');
+  // Removing the focused action itself moves focus to the filter and invokes nothing.
+  await open('Bound regroup later'); for (let step = 0; step < 3; step++) await page.keyboard.press('Shift+Tab');
+  await expect(panel.getByRole('button', { name: 'Action two', exact: true })).toBeFocused();
+  await expect(panel.getByRole('button', { name: 'Action two', exact: true })).toHaveCount(0); await expect(filter).toBeFocused();
+  await expect(page.locator('output')).toHaveText('Requested three at revision 3 for guide.');
+  await page.keyboard.press('Escape');
+  // A focused filter is never disturbed by regrouping.
+  await open('Bound regroup later'); await filter.fill('action'); await expect(panel.getByRole('button', { name: 'Action two', exact: true })).toHaveCount(0);
+  await expect(filter).toBeFocused(); await expect(filter).toHaveValue('action'); await expect(page.locator('output')).toHaveText('Requested three at revision 3 for guide.');
+});
+
+test('list Left/Right move backward/forward; the query keeps native caret keys', async ({ page }) => {
+  const box = query(page); await box.press('ArrowDown'); await expect(page.getByRole('option', { name: /Weekly planning/ })).toHaveAttribute('aria-selected', 'true');
+  const list = page.getByRole('listbox', { name: 'Library', exact: true }); await list.focus();
+  await list.press('ArrowLeft'); await expect(page.getByRole('option', { name: /A calmer workspace/ })).toHaveAttribute('aria-selected', 'true');
+  await list.press('ArrowRight'); await expect(page.getByRole('option', { name: /Weekly planning/ })).toHaveAttribute('aria-selected', 'true');
+  await box.fill('ee'); await box.press('ArrowLeft'); await expect(page.getByRole('option', { name: /Weekly planning/ })).toHaveAttribute('aria-selected', 'true');
+  expect(await box.evaluate(input => (input as HTMLInputElement).selectionStart)).toBe(1); await expect(page.locator('output')).toHaveText('No action requested.');
+});
+
+test('grid handles exactly Ctrl+Home/Ctrl+End and leaves chords with extra modifiers unhandled', async ({ page }) => {
+  await page.getByRole('button', { name: 'Glyph grid', exact: true }).click(); const grid = page.getByRole('grid', { name: 'Public glyphs', exact: true }); await grid.focus();
+  await grid.press('Control+Home'); const first = page.getByRole('gridcell', { name: /Grinning face/ }); await expect(first).toHaveAttribute('aria-selected', 'true');
+  for (const extra of [{ altKey: true }, { shiftKey: true }, { metaKey: true }]) for (const key of ['End', 'Home']) {
+    const handled = await grid.evaluate((element, init) => !element.dispatchEvent(new KeyboardEvent('keydown', { ...init, ctrlKey: true, bubbles: true, cancelable: true })), { key, ...extra });
+    expect(handled).toBe(false); await expect(first).toHaveAttribute('aria-selected', 'true');
+  }
+  await grid.press('Control+Alt+End'); await expect(first).toHaveAttribute('aria-selected', 'true'); await expect(page.locator('output')).toHaveText('No action requested.');
+  await grid.press('Control+End'); await expect(page.getByRole('gridcell', { name: /Unavailable public glyph/ })).toHaveAttribute('aria-selected', 'true');
+  await grid.press('Control+Home'); await expect(first).toHaveAttribute('aria-selected', 'true');
 });
