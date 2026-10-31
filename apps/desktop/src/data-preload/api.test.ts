@@ -6,6 +6,8 @@ it('exposes only fixed data actions without any record, credential, path or disp
   expect(Object.keys(api).sort()).toEqual(['clearCategory','close','exportCategory','getState','onAppearance']);expect(Object.isFrozen(api)).toBe(true);
   await api.exportCategory('settings');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.export,{protocolVersion:1,category:'settings'});
   await api.clearCategory('file-index');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.clear,{protocolVersion:1,category:'file-index'});
+  await api.exportCategory('tool-diagnostics');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.export,{protocolVersion:1,category:'tool-diagnostics'});
+  await api.clearCategory('application-logs');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.clear,{protocolVersion:1,category:'application-logs'});
   await api.close();expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.close,{protocolVersion:1});
 });
 it('rejects malformed or content-bearing responses and suppresses transport exception content',async()=>{

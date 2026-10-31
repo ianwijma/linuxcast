@@ -36,7 +36,7 @@ clipboard/key content and credentials are rejected. Two independent categories
 are application-logs (14days/20MiB) and tool-diagnostics (30days/100MiB). Each has
 an additional10,000-record bound. Files/directories are private0600/0700; only
 service-owned fixed filenames are read/deleted, with no-follow and ownership/link
-checks. Writes and resets serialize; malformed records fail closed with an
+checks. Nonblocking reads reject FIFO/non-file entries without hanging. Writes and resets serialize; malformed records fail closed with an
 explicit category reset action. Clear of one category preserves the other and
 unrelated files. No crash dump or unattended upload is created.
 
@@ -65,7 +65,23 @@ child-owner tests verify category isolation, metadata exclusion, multi-transacti
 600-row index clear, late-generation rejection and preserved roots/source files.
 The producer stop fixture is a trusted job callback, not a native watcher test.
 
-Shared host UI integration and its keyboard, accessibility and affected-state
-evidence remain F2-02 acceptance requirements. Typed outcomes do not satisfy
+The production Local data window now exposes separate Application logs and Tool
+diagnostics export/reset controls using the existing named data preload and native
+save/confirmation owner. Main creates one ManagedDiagnostics lifecycle after the
+resident lock, honors XDG_STATE_HOME or the standard home fallback, pins a private
+state root and emits only a fixed main/started record at startup. A serialized minute timer enforces age retention during idle residency as well as
+on export/write. It stops scheduling and waits for maintenance and
+diagnostic operations to drain on Quit. No tool adapter is invented: a category
+with no emitted tool events exports an empty array. No renderer receives records,
+paths or a logging endpoint. Oversized diagnostic exports fail completely at the
+existing1MiB publisher bound; stored records remain intact. Explicit category reset
+recovers invalid owned records without touching the other category or user data.
+New events can appear after clearing, including the next application start.
+
+[Production flow and affected-state evidence](../../apps/desktop/evidence/diagnostics-application.md)
+cover actual private files, cancellation, selective reset, corruption recovery,
+restart, keyboard and200% focus-ring reachability. Native dialog responses are
+instrumented; supported Debian/native AT and credential setup UI remain pending.
+Full shared host UI keyboard/accessibility acceptance remains required. Typed outcomes do not satisfy
 F2-02-UI or transfer it to another task. Full Debian session/backend acceptance
 and final application integration remain distinct from these service checks.

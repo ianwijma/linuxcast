@@ -12,7 +12,7 @@ import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
 import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
-import { DataControls } from '@linuxcast/data-controls';
+import { DataControls,ManagedDiagnostics } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
 import { createPermissionSettings } from './permission-settings.ts';
 import { PermissionRegistry } from '../../../../packages/permissions/src/registry.ts';
@@ -164,6 +164,8 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   const currentNotes=notes;
   const controls=new DataControls(currentStorage.repository);
+  const stateHome=process.env.XDG_STATE_HOME;
+  const diagnostics=new ManagedDiagnostics(join(stateHome&&isAbsolute(stateHome)?stateHome:join(app.getPath('home'),'.local/state'),'linuxcast'));
   const fileService=createFileSearchService({
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
     controls,executable:join(__dirname,'platform'),
@@ -172,11 +174,13 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   const currentFiles=fileSearch;
   dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
     async exportCategory(category,signal){
+      if(category==='application-logs'||category==='tool-diagnostics')return diagnostics.export(category,signal);
       const result=await controls.export({category},{signal});
       if(result.outcome!=='exported')throw {reasonCode:result.reason};
       return {schemaVersion:1,format:result.format,encrypted:result.encrypted,data:result.data};
     },
     async clearCategory(category,signal){
+      if(category==='application-logs'||category==='tool-diagnostics')return diagnostics.clear(category,signal);
       try {
         const result=await controls.clear({category},{signal});
         if(result.outcome!=='completed')throw new Error('Local data action interrupted.');
@@ -188,7 +192,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   const currentSettings=dataSettings;
   // Index jobs and data operations must finish while their sole repository owner is still alive.
-  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop(),currentPermissions.stop()]);await permissionRegistry.close();await currentStorage.stop();},
-    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate(),currentPermissions.terminate()]);await currentStorage.terminate();await permissionRegistry.close();}};
+  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop(),currentPermissions.stop()]);await permissionRegistry.close();await diagnostics.close();await currentStorage.stop();},
+    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate(),currentPermissions.terminate()]);await diagnostics.close();await currentStorage.terminate();await permissionRegistry.close();}};
   return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow,currentNotes,currentPermissions];
 } });

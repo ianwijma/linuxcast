@@ -132,3 +132,17 @@ Publication update: normal signing recovered; coordinator committed final source
 and evidence as dd2a20f. No application/test/runner/dependency blob differs from
 independently reviewed c6b83bc5. Subsequent checkpoint changes are documentation.
 Native/session acceptance and the full task remain pending; this is draft work.
+
+
+## Integration with diagnostics, 1 November 2026
+
+Merged develop e568b4d (reviewed diagnostics PR82) into this branch. Shared main
+shutdown now retains both permission-registry and diagnostics cleanup before
+storage; termination preserves the prior permission shutdown ordering. Both F2
+and F3 integration mappings remain. Combined validation:75F3units/2contracts,
+72F3security/68F2security, fulltypecheck/lint/plan/whitespace pass. Actual private-
+Xvfb Electron permissions/workflow scenarios2/2 pass17.02s, then diagnostics1/1
+passes5.69s. These are production integration regressions, not supported-native
+acceptance. Nine incidental screenshot recaptures were restored to the existing
+reviewed pixels; no new visual/native claim. Current-head CI is required before
+merging this bounded increment. FullF3 AC02/UI/native and release gates stay open.

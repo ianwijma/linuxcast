@@ -1,4 +1,5 @@
 html, body, #root { margin: 0; min-inline-size: 0; }
+.data-settings .lc-focus { scroll-margin-block: var(--lc-space-8); }
 .data-settings { box-sizing: border-box; min-block-size: 100vh; padding: var(--lc-space-24); }
 .data-settings-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--lc-space-16); margin-block-end: var(--lc-space-24); }
 .data-settings h1 { margin: 0; font-size: var(--lc-text-workspace-title); }

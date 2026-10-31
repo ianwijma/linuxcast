@@ -360,6 +360,9 @@
     "F3-01": [
       "apps/desktop/tests/permissions.integration.test.ts",
       "apps/desktop/tests/workflow-run.integration.test.ts"
+    ],
+    "F2-02": [
+      "apps/desktop/tests/diagnostics.integration.test.ts"
     ]
   },
   "security": {
@@ -400,7 +403,9 @@
       "packages/secrets/tests/persistence.security.test.ts",
       "packages/data-controls/tests/controls.security.test.ts",
       "packages/data-controls/tests/controller.security.test.ts",
-      "packages/data-controls/tests/persistence.security.test.ts"
+      "packages/data-controls/tests/persistence.security.test.ts",
+      "packages/data-controls/tests/managed-diagnostics.security.test.ts",
+      "apps/desktop/src/main/data-settings.test.ts"
     ],
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",
