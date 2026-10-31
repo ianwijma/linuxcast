@@ -211,7 +211,7 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   // query) has focus: there they keep native editing behaviour. Footer hints follow that context.
   const [editing, setEditing] = useState(false);
   // One-shot: after a nonempty root query is cleared, reveal the preserved selection once the
-  // settled (non-loading) unfiltered results render. Ordinary revisions never scroll.
+  // settled (non-loading, current-query) unfiltered results render. Ordinary revisions never scroll.
   const reveal = useRef(false);
   const collection = view.kind === 'list' || view.kind === 'grid';
   const grid = view.kind === 'grid';
@@ -261,7 +261,11 @@ function ViewContent({ frame, session, host, active, canBack }: { frame: ViewFra
   useLayoutEffect(() => {
     if (!reveal.current || !active || !collection) return;
     if (frame.query !== '') { reveal.current = false; return; }
-    if (view.loading || !selected) return;
+    // Settled means the current unfiltered projection: host search filters locally at once, while
+    // extension search waits for the host's own snapshot echoing the cleared query (the stale
+    // filtered snapshot that is still on screen right after the edit must not consume the reveal).
+    const settled = (view.kind === 'list' || view.kind === 'grid') && (view.search.mode === 'host' || view.search.query === frame.query);
+    if (view.loading || !settled || !selected) return;
     reveal.current = false;
     const row = document.getElementById(itemId(selected)); const box = scroller.current;
     if (!row || !box || !box.contains(row)) return;

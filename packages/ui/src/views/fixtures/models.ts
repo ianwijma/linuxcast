@@ -37,3 +37,5 @@ export const note: ViewModel = { protocolVersion: 1, viewId: 'public-note', revi
 export const longList: ViewModel = { protocolVersion: 1, viewId: 'long-library', revision: 1, kind: 'list', title: 'Long library', search: { placeholder: 'Search long library…', query: '', mode: 'host' }, sections: [
   { id: 'all', title: 'All public items', items: Array.from({ length: 60 }, (_, index) => ({ id: `item-${index + 1}`, title: `Public item ${String(index + 1).padStart(2, '0')}`, subtitle: 'Synthetic row', icon: { kind: 'builtin' as const, name: 'file' }, actions: [open, copy] })) },
 ] };
+/** Extension-mode search: the fixture host filters asynchronously and echoes the query in its snapshot. */
+export const extensionList: ViewModel = { ...longList, viewId: 'extension-library', title: 'Extension library', search: { placeholder: 'Search extension library…', query: '', mode: 'extension' } };
