@@ -1,0 +1,43 @@
+{
+  "scope": "offline synthetic preparation only; no kernel namespace, guest, native, product or reader invocation",
+  "checkout": "/home/ian/.t3/worktrees/linuxcast/t3-a70523b6",
+  "branch": "codex/f1-02-namespace-wrapper",
+  "baseCommit": "beb0d716557c80c5c7e8d63a2527d6de61baa141",
+  "approvedProductCommit": "cd7bf0e5c086be7d2c1ee2b4e4ae7d895a67a688",
+  "approvedProductTree": "265bfc3b57a2cbd580456ce8004eb00c4cc6434d",
+  "python": "3.10.12",
+  "kernel": "7.1.1-76070101-generic",
+  "architecture": "x86_64",
+  "pathPrefix": "/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools",
+  "newWrapperTests": 42,
+  "existingPureProtocolParserStagingTests": 25,
+  "checks": [
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH PYTHONPATH=apps/desktop/tests/at python3 -B -m unittest test_lab_namespace test_controller_protocol test_orca_output test_product_staging -q",
+      "result": "67 pass, zero failures/errors/skips; synthetic adapters and private temporary files only"
+    },
+    {
+      "command": "python3 AST parsing of lab_namespace.py and test_lab_namespace.py",
+      "result": "2 parse; no bytecode or application execution"
+    },
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH python3 -B scripts/validate_plan.py",
+      "result": "pass: 279 sources, 57 features, 97 tasks, 126 Markdown files, 7 SVG assets; local integrity only"
+    },
+    {
+      "command": "git diff --cached --check",
+      "result": "checked before commit; must remain clean"
+    },
+    {
+      "command": "git diff cd7bf0e5c086be7d2c1ee2b4e4ae7d895a67a688 -- existing apps/desktop/tests/at files",
+      "result": "empty for existing files; no controller/protocol/staging/observer change"
+    }
+  ],
+  "nativeRuns": 0,
+  "namespaceActions": 0,
+  "guestActions": 0,
+  "signing": "UNSIGNED preparation commit: normal configured SSH signing via /opt/1Password/op-ssh-sign timed out after30s (exit124), producing no commit. Explicitly user-authorized per-command git -c commit.gpgsign=false fallback; no persistent signing configuration or signed release rule changes.",
+  "independentReview": "required; not performed by this implementation worker",
+  "outerLabOwner": "outstanding: reservation, baseline, shutdown/reap/release, SIGKILL and VM-loss recovery",
+  "acceptance": "F1-02-UI, D1 UI/native, full task and complete local 1.0 remain pending; accepted criterion evidence unchanged"
+}
