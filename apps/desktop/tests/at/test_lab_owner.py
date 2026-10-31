@@ -1057,6 +1057,45 @@ class ActualPython(unittest.TestCase):
         self.assertTrue(value['transportResultValid'])
         self.assertFalse(value['reservationClean'])
 
+    def test_fifo_permit_is_rejected_without_a_writer_or_retained_lock(self):
+        value = self.fixture('permit-fifo')
+        self.assertEqual(value, {'reason': 'custody', 'lockReacquired': True})
+
+    def test_fifo_source_is_rejected_before_reading(self):
+        value = self.fixture('source-fifo')
+        self.assertEqual(value['reason'], 'custody')
+
+    def test_preflight_has_a_deliverable_independent_deadline(self):
+        value = self.fixture('preflight-deadline')
+        self.assertEqual(value['reason'], 'deadline')
+        self.assertLess(value['elapsed'], .5)
+
+    def test_final_pidfd_close_failure_keeps_successful_dispatch_accounting(self):
+        value = self.fixture('guardian-final-close-success')
+        self.assertTrue(value['mayHaveStarted'])
+        self.assertTrue(value['mayHaveDispatched'])
+        self.assertTrue(value['transportResultValid'])
+        self.assertTrue(value['ownedChildrenAbsent'])
+        self.assertEqual(value['firstFailure'], 'cleanup')
+        self.assertEqual(value['cleanupFailure'], 'custody')
+        self.assertFalse(value['reservationClean'])
+
+    def test_final_pidfd_close_failure_keeps_the_original_transport_failure(self):
+        value = self.fixture('guardian-final-close-transport')
+        self.assertTrue(value['mayHaveStarted'])
+        self.assertTrue(value['mayHaveDispatched'])
+        self.assertTrue(value['transportResultValid'])
+        self.assertTrue(value['ownedChildrenAbsent'])
+        self.assertEqual(value['firstFailure'], 'transport')
+        self.assertEqual(value['cleanupFailure'], 'custody')
+        self.assertFalse(value['reservationClean'])
+
+    def test_expired_preflight_budget_cannot_be_reset_before_the_guardian(self):
+        with patch.object(owner.os, 'fork') as fork:
+            with self.assertRaisesRegex(owner.Rejected, 'deadline'):
+                owner.run_guarded(None, None, owner.Budget(.001))
+            fork.assert_not_called()
+
 
 class PythonLab(FakeLab):
     """Ordinary-Python-only lifetime fixture, never uses a native adapter."""
@@ -1085,6 +1124,9 @@ class PythonLab(FakeLab):
 
     def dispatch(self, budget):
         (self.lease.root / 'dispatched').write_text(str(os.getpid()))
+        if self.mode.startswith('guardian-final-close-'):
+            success = self.mode.endswith('success')
+            return (0 if success else 3), owner.encoded(wrapper(success))
         if self.mode == 'guardian-after-report':
             return 3, owner.encoded(wrapper(False))
         if self.mode == 'caller-hard':
@@ -1134,7 +1176,46 @@ def python_fixture(kind):
     with tempfile.TemporaryDirectory(prefix='outer-owner-python-') as directory:
         root = Path(directory)
         prepare(root)
-        if kind.startswith(('caller-', 'guardian-')) or kind == 'deadline':
+        if kind in ('permit-fifo', 'source-fifo', 'preflight-deadline'):
+            if kind == 'preflight-deadline':
+                start = time.monotonic()
+                with patch.object(owner, 'TOTAL_SECONDS', .03):
+                    try:
+                        with owner.operation_deadline():
+                            time.sleep(5)
+                    except owner.Rejected as error:
+                        value = {'reason': str(error), 'elapsed': time.monotonic() - start}
+                    else:
+                        raise RuntimeError('missing independent deadline')
+            else:
+                lease = owner.Reservation(root)
+                lease.acquire()
+                path = root / (owner.PERMIT if kind == 'permit-fifo' else 'synthetic-source')
+                if path.exists():
+                    path.unlink()
+                os.mkfifo(path, 0o400)
+                try:
+                    try:
+                        if kind == 'permit-fifo':
+                            lease.permit('1' * 64)
+                        else:
+                            owner.read_source(path, 100)
+                    except owner.Rejected as error:
+                        value = {'reason': str(error)}
+                    else:
+                        raise RuntimeError('nonregular source accepted')
+                finally:
+                    if not lease.close():
+                        raise RuntimeError('fixture descriptor cleanup')
+                if kind == 'permit-fifo':
+                    next_lease = owner.Reservation(root)
+                    try:
+                        next_lease.acquire()
+                        value['lockReacquired'] = True
+                    finally:
+                        if not next_lease.close():
+                            raise RuntimeError('fixture lock cleanup')
+        elif kind.startswith(('caller-', 'guardian-')) or kind == 'deadline':
             if kind.startswith('caller-') and kind != 'caller-hard':
                 caller = os.fork()
                 if caller == 0:
@@ -1169,7 +1250,21 @@ def python_fixture(kind):
                             actual_guardian(*args)
                             os._exit(3)
                         owner.guardian = bad_exit
-                    if kind == 'guardian-bookkeeping':
+                    if kind.startswith('guardian-final-close-'):
+                        actual_open, actual_close = os.pidfd_open, os.close
+                        retained = []
+                        def capture(pid):
+                            fd = actual_open(pid)
+                            retained.append(fd)
+                            return fd
+                        def fail_final(fd):
+                            actual_close(fd)
+                            if retained and fd == retained[0]:
+                                retained.clear()
+                                raise OSError('synthetic final pidfd close failure')
+                        with patch.object(owner.os, 'pidfd_open', capture), patch.object(owner.os, 'close', fail_final):
+                            value = owner.run_guarded(lease, lambda held, check: PythonLab(held, check, kind))
+                    elif kind == 'guardian-bookkeeping':
                         actual_open = os.pidfd_open
                         calls = 0
                         def fail_first(pid):
@@ -1374,7 +1469,7 @@ def supervise_fixture(kind):
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGALRM):
         signal.signal(sig, lambda *_: (_ for _ in ()).throw(FixtureExpired()))
     special = kind in ('guard-broken-return', 'guard-broken-hang', 'guard-bookkeeping')
-    seconds = .2 if kind == 'guard-broken-hang' else 7
+    seconds = .2 if kind == 'guard-broken-hang' else (.35 if kind in ('permit-fifo', 'source-fifo', 'preflight-deadline') else 7)
     code, timed_out = None, False
     with contextlib.ExitStack() as faults, tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
         if kind.startswith('guard-broken-'):

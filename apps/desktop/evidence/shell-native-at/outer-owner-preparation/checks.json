@@ -163,5 +163,24 @@
   "localNonOwnedBaseCases": 114,
   "parentReportedNonOwnedBaseCases": 120,
   "independentReview": "Parent reported initial independent review had not started when correction was assigned; no independent review result claimed.",
-  "completeGitConfigurationFingerprintAfterCurrentSigningAttempt": "3457aea9a73318dd85294df45c20e1e61cd22421af5d8efc870b89d879ee1992"
+  "completeGitConfigurationFingerprintAfterCurrentSigningAttempt": "3457aea9a73318dd85294df45c20e1e61cd22421af5d8efc870b89d879ee1992",
+  "coordinatorCorrections": {
+    "reviewedHead": "40adf937aeef8aaee7da0a5dc29e7d857c807dc1",
+    "base": "b3bea80bb7243d6801c3c44870b0c8cd1df3d013",
+    "initialReviews": {
+      "Standards1e654a49": "one P2: unbounded permit FIFO open",
+      "SecuritySpec80f02ab5": "two P2: same FIFO and final-close result loss"
+    },
+    "parentOwnedTests": 88,
+    "parentOfflineCases": 208,
+    "parentMappedSecurityChecks": 55,
+    "mappedWallSeconds": 17.76,
+    "pythonPayloadSeconds": 16.686,
+    "unchangedPythonDeadlineSeconds": 18,
+    "negativeControls": "four behavioral cases fail exact reviewed40adf937 and pass current source; independent fixture custody retained",
+    "secondIndependentCleanReviewClaimed": false,
+    "actualOwnerCli": false,
+    "actualDockerGuestNativeBuildActions": 0,
+    "acceptance": "pending"
+  }
 }

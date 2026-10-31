@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "kind": "offline-graceful-shutdown-and-independent-fixture-custody-not-permit",
   "files": {
-    "apps/desktop/tests/at/lab_owner.py": "281ba6cd758aef52be402226ddd99fcdd6afc057afd7d61d8b1c2bec4a7f88b7",
-    "apps/desktop/tests/at/test_lab_owner.py": "c679aa90002b36fac342aa022efcadf47d1253719a5070a899956096a50d801c",
-    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "90d834dd6e2da7cad32329057f6c44d1c7a7cbaf11b14c0133c712b5b96781d0",
-    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "0cc85e4b3079ecf75f71af0c6379cae62be82c1bdffbb5fae56e91b05be7fed9"
+    "apps/desktop/tests/at/lab_owner.py": "fbebe2fb0907e76a31a5507a0767c9cc9f4d31dc999054b8cc49957ac7429ed6",
+    "apps/desktop/tests/at/test_lab_owner.py": "4a0711cc7ceb8d830174ce6ed2e0e49c84774ab792c4879921f46670cfa46620",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "ef763f4d80ee726e68f942e70ec65b57a699dbe017bf1f5050aa9fe5c1009fcc",
+    "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "c806d26f1b78d3f9225d3795f8f14b531cfdfa185ca56afd04a352d38ce226a1"
   },
   "unchangedInputs": {
     "apps/desktop/tests/at/outer-owner-protocol.md": "b005609e94ea214509bbefbc86b31e44100514555a44d54abd29d69e699642aa",

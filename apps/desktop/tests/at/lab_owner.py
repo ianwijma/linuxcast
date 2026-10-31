@@ -164,7 +164,7 @@ class Reservation:
                 require(read_fd(self.markerfd, 4096) == self.marker_raw, 'custody')
 
     def permit(self, source_sha):
-        self.permitfd = os.open(PERMIT, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=self.rootfd)
+        self.permitfd = os.open(PERMIT, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=self.rootfd)
         regular(os.fstat(self.permitfd), self.uid, 0o400)
         self.permit_raw = read_fd(self.permitfd)
         pin = unique_json(self.permit_raw)
@@ -853,7 +853,7 @@ def lifetime_check(channel):
         raise Rejected('interrupted')
 
 
-def guardian(lease, lab_factory, channel):
+def guardian(lease, lab_factory, channel, deadline):
     """Fork target; reservation remains retained even after caller SIGKILL."""
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
         signal.signal(sig, lambda *_: (_ for _ in ()).throw(Rejected('interrupted')))
@@ -862,7 +862,7 @@ def guardian(lease, lab_factory, channel):
     # independent guardian MUST release that inherited signal mask; otherwise
     # SIGALRM and cancellation remain pending forever in a noncooperative job.
     signal.pthread_sigmask(signal.SIG_SETMASK, set())
-    signal.setitimer(signal.ITIMER_REAL, TOTAL_SECONDS - CLEAN_SECONDS)
+    signal.setitimer(signal.ITIMER_REAL, deadline.remaining() - CLEAN_SECONDS)
     subreaper()
     channel.settimeout(5)
     try:
@@ -880,8 +880,10 @@ def guardian(lease, lab_factory, channel):
         channel.close()
 
 
-def run_guarded(lease, lab_factory):
+def run_guarded(lease, lab_factory, deadline=None):
     """Dedicated caller only. Injection is a Python test seam, never a CLI flag."""
+    deadline = deadline or Budget(TOTAL_SECONDS)
+    require(deadline.remaining() > CLEAN_SECONDS, 'deadline')
     subreaper()
     require(not own_children())
     caller, child_channel = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
@@ -893,7 +895,7 @@ def run_guarded(lease, lab_factory):
             if pid == 0:
                 caller.close()
                 try:
-                    guardian(lease, lab_factory, child_channel)
+                    guardian(lease, lab_factory, child_channel, deadline)
                     os._exit(0)
                 except BaseException:
                     os._exit(3)
@@ -902,7 +904,6 @@ def run_guarded(lease, lab_factory):
             child_channel.close()
             caller.send(b'G')
         caller.setblocking(False)
-        deadline = Budget(TOTAL_SECONDS)
         with selectors.DefaultSelector() as selector:
             selector.register(caller, selectors.EVENT_READ)
             selector.register(pidfd, selectors.EVENT_READ)
@@ -931,7 +932,6 @@ def run_guarded(lease, lab_factory):
             time.sleep(.01)
         require(not own_children(), 'reap')
         lease.check()
-        return result
     except BaseException as error:
         if result is None:
             result = empty_result()
@@ -995,12 +995,40 @@ def run_guarded(lease, lab_factory):
             except BaseException as cleanup_error:
                 if result['cleanupFailure'] == 'none':
                     result['cleanupFailure'] = reason(cleanup_error, 'cleanup')
-        return validate_result(result)
     finally:
-        caller.close()
-        child_channel.close()
-        if pidfd is not None:
-            os.close(pidfd)
+        # Final descriptor errors must not throw past the known dispatch result
+        # and leave main publishing its initial false flags. Never retry a close:
+        # Linux may already have released the descriptor even when it reports an
+        # error. Preserve independently established child absence and first cause.
+        for close in (caller.close, child_channel.close, lambda: os.close(pidfd) if pidfd is not None else None):
+            try:
+                close()
+            except BaseException:
+                if result is None:
+                    result = empty_result()
+                    result.update(mayHaveStarted=True, mayHaveDispatched=True)
+                result.update(status='incomplete', reservationClean=False)
+                if result['cleanupFailure'] == 'none':
+                    result['cleanupFailure'] = 'custody'
+                if result['firstFailure'] == 'none':
+                    result['firstFailure'] = 'cleanup'
+    return validate_result(result)
+
+
+@contextlib.contextmanager
+def operation_deadline():
+    """Start the hard bound before source/permit preflight, without resetting it."""
+    deadline = Budget(TOTAL_SECONDS)
+    previous = signal.getsignal(signal.SIGALRM)
+    mask = signal.pthread_sigmask(signal.SIG_UNBLOCK, {signal.SIGALRM})
+    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(Rejected('deadline')))
+    signal.setitimer(signal.ITIMER_REAL, deadline.remaining())
+    try:
+        yield deadline
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous)
+        signal.pthread_sigmask(signal.SIG_SETMASK, mask)
 
 
 class ClosedParser(argparse.ArgumentParser):
@@ -1016,36 +1044,40 @@ def main(argv=None):
     lease = Reservation()
     result = empty_result()
     try:
-        require(sys.platform == 'linux' and hasattr(os, 'pidfd_open') and hasattr(os, 'fork'))
-        require(os.uname().machine == 'x86_64' and hasattr(signal, 'pidfd_send_signal'))
-        require(len(os.listdir('/proc/self/task')) == 1)
-        # No ambient Docker config, context, credentials, inherited FDs or bus.
-        require(not os.path.lexists(DOCKER[4]))
-        os.umask(0o077)
-        for fd in os.listdir('/proc/self/fd'):
-            if int(fd) > 2:
-                try:
-                    os.close(int(fd))
-                except OSError:
-                    pass  # the directory enumeration descriptor is already closed
-        os.environ.clear()
-        os.environ.update(ENV)
-        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
-            signal.signal(sig, lambda *_: (_ for _ in ()).throw(Rejected('interrupted')))
-        signal.pthread_sigmask(signal.SIG_SETMASK, set())
-        source = Path(__file__).resolve(strict=True)
-        source_sha = digest(read_source(source, 1024 * 1024))
-        inventory_raw = read_source(source.with_name('outer-owner-inventory.json'), MAX_BYTES)
-        require(digest(inventory_raw) == INVENTORY_SHA256, 'configuration')
-        inventory = unique_json(inventory_raw)
-        lease.acquire()
-        lease.permit(source_sha)
-        result = run_guarded(lease, lambda held, check: NativeLab(held, inventory, check))
+        with operation_deadline() as deadline:
+            require(sys.platform == 'linux' and hasattr(os, 'pidfd_open') and hasattr(os, 'fork'))
+            require(os.uname().machine == 'x86_64' and hasattr(signal, 'pidfd_send_signal'))
+            require(len(os.listdir('/proc/self/task')) == 1)
+            # No ambient Docker config, context, credentials, inherited FDs or bus.
+            require(not os.path.lexists(DOCKER[4]))
+            os.umask(0o077)
+            for fd in os.listdir('/proc/self/fd'):
+                if int(fd) > 2:
+                    try:
+                        os.close(int(fd))
+                    except OSError:
+                        pass  # the directory enumeration descriptor is already closed
+            os.environ.clear()
+            os.environ.update(ENV)
+            for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+                signal.signal(sig, lambda *_: (_ for _ in ()).throw(Rejected('interrupted')))
+            signal.pthread_sigmask(signal.SIG_SETMASK, set())
+            source = Path(__file__).resolve(strict=True)
+            source_sha = digest(read_source(source, 1024 * 1024))
+            inventory_raw = read_source(source.with_name('outer-owner-inventory.json'), MAX_BYTES)
+            require(digest(inventory_raw) == INVENTORY_SHA256, 'configuration')
+            inventory = unique_json(inventory_raw)
+            lease.acquire()
+            lease.permit(source_sha)
+            result = run_guarded(lease, lambda held, check: NativeLab(held, inventory, check), deadline)
     except BaseException as error:
-        result['firstFailure'] = reason(error)
+        if result['firstFailure'] == 'none':
+            result['firstFailure'] = reason(error)
     finally:
         if not lease.close():
-            result.update(status='incomplete', reservationClean=False, cleanupFailure='custody')
+            result.update(status='incomplete', reservationClean=False)
+            if result['cleanupFailure'] == 'none':
+                result['cleanupFailure'] = 'custody'
             if result['firstFailure'] == 'none':
                 result['firstFailure'] = 'cleanup'
     print(encoded(validate_result(result)).decode('ascii'))
@@ -1053,7 +1085,7 @@ def main(argv=None):
 
 
 def read_source(path, maximum):
-    fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW)
+    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_CLOEXEC | os.O_NOFOLLOW)
     try:
         info = os.fstat(fd)
         regular(info, os.getuid())

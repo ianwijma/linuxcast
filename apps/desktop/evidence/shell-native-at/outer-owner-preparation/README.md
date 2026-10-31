@@ -276,3 +276,34 @@ Applicable design references remain tokens, shell/navigation, states/motion,
 accessibility and review gate; no new screenshots or UI claim. F0-01 is accepted,
 but F1-02/native/UI/full task, four-session desktop matrix, physical input/audio,
 audible delivery, packaging and all97-task complete local1.0 gates stay pending.
+
+
+## Coordinator review corrections on integrated PR96 baseline
+
+Initial independent Standards1e654a49 and Security/Spec80f02ab5 reviewed exact
+40adf937 against approvedb3bea80. Both reproduced the blocking FIFO permit open;
+Security/Spec also reproduced a final pidfd-close error discarding dispatch flags
+and the earlier transport failure. Both independently ran202 offline cases
+(16.455s/16.227s); their clean-worktree/source/hash checks passed. These are initial
+reviews with findings, not clean final rechecks. No material Standards smell found.
+
+The coordinator opens permit and source descriptors with O_NONBLOCK, checks
+regular-file type before reading, and starts a deliverable hard operation timer
+before source/permit preflight. A shared monotonic budget is passed to the guardian
+instead of granting a fresh total after preflight. Existing cleanup limits stay.
+Final socket/pidfd-close errors now become custody cleanup failures while retaining
+known start/dispatch flags, transport-result validity, child absence and the first
+operation failure. Close is never retried because Linux may already have released
+the descriptor. Main also preserves an earlier first/cleanup failure.
+
+Six new checks cover permit FIFO/no writer/lock reacquisition, source FIFO,
+preflight timer delivery, spent preflight budget admission, and final pidfd-close
+failure after successful and failed synthetic dispatch. Four behavioral regressions
+fail exact40adf937 and pass corrected code. Ordinary Python fixtures retain the
+independent kernel supervisor and verified child absence; no real owner CLI,
+Docker/SSH, guest/build/native operation occurred. All88 owner tests pass4.480s;
+parent55mapped F1 security checks pass17.76s, including208 offline Python cases
+inside the unchanged18s subprocess limit (16.686s). AST, hashes, plan/whitespace
+are refreshed. Parent correction verification is not another independent review.
+Historical timeout absence, actual transport/account/poweroff/recovery/build and
+all native/UI/session/physical/release acceptance limitations remain unchanged.
