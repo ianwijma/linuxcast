@@ -30,7 +30,7 @@ it('manages actual private diagnostic categories through the production Local da
   const launch=async()=>{
     application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
     const app=application,page=await app.firstWindow();page.setDefaultTimeout(5000);await page.waitForURL('linuxcast-app://shell/index.html');
-    const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('Local data');
+    const query=page.getByRole('combobox',{name:'Search commands',exact:true});await query.fill('Local data');
     await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
     const next=app.waitForEvent('window');await query.press('Enter');const data=await next;data.setDefaultTimeout(5000);await data.waitForURL('linuxcast-app://shell/data-settings.html');
     await data.getByRole('button',{name:'Export application logs',exact:true}).waitFor();return {app,page,data};

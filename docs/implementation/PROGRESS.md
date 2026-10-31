@@ -517,3 +517,21 @@ unit failures, footer type absent (no wire field), rise-only panel motion versus
 canonical fade, editable textarea shortcut hints and query-clear selection scroll
 need bounded coordinator assessment. Parent LocalData branch remains the frozen
 review candidate; preserve separate UI increments and reserved test hunks.
+
+D1renderer eae6a6d integrated unchanged on separate
+codex/d1-02-instrument-renderer-integration at93ecda52, based on saved LocalData
+935b776 (LocalData source/review candidate remains unchanged on its own branch).
+Coordinator mechanically changes diagnostics query selector to combobox, preserving
+all LocalData focus/security assertions. Parent independently reproduces two L1unit
+failures from stale5609record boundary assumptions; search source/test/launcher
+contract are byte-identical to approved031f78e. Tests now pin current5614limit,
+accept that exact count and reject oneextra, with management target at final index.
+All323L1units pass. Combined actual private-Xvfb sandboxed Electron F1two22.80s
+andF2two14.30s pass (diagnostics7.68s/credential5.72s),19D1browser23.2s,28D1unit,
+32F1unit,55F1security/type/lint/plan pass.20incidentalPNGchanges restored and two
+untracked legacy data-settings recaptures removed. No supported native/AT proof.
+Original Opusmedium implementation follow-up requested truthful editable-context
+footer hints and query-clear selected-row visibility, plus narrowly ratified
+rise-only/full-opacity panel motion for AA. No invented footer type/newwirefield.
+LocalData Standards e6b7e5cb completed/read clean; Security/Spec8c81c029 returned
+clean, read final next and promptly publish focused LocalData PR/currentCI.
