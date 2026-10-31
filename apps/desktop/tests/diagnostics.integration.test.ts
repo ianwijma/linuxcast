@@ -39,43 +39,121 @@ it('manages actual private diagnostic categories through the production Local da
   expect(await data.evaluate(()=>({node:typeof(window as unknown as {process?:unknown}).process,require:typeof(window as unknown as {require?:unknown}).require,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()}))).toEqual({node:'undefined',require:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance','openCredentials']});
   const search=()=>data.getByRole('searchbox',{name:'Search data categories',exact:true});
   await expect.poll(()=>search().evaluate(element=>document.activeElement===element)).toBe(true);
-  const evidence=join(root,'apps/desktop/evidence');mkdirSync(evidence,{recursive:true});
+  // Instrument composition: category navigation, captured status band and hanging category regions.
+  const navigation=()=>data.getByRole('navigation',{name:'Data categories',exact:true});
+  const categories=()=>data.locator('.ld-category h2').allTextContents();
+  const navItems=()=>navigation().getByRole('button').allTextContents();
+  const outcome=()=>data.getByRole('status').evaluate(element=>({kind:element.querySelector('[data-kind]')?.getAttribute('data-kind')??null,title:element.querySelector('h2')?.textContent??null,text:element.textContent??''}));
+  const settled=()=>expect.poll(async()=>(await outcome()).kind).not.toBe('loading');
+  const pageUrl='linuxcast-app://shell/data-settings.html';
+  expect(await categories()).toEqual(['Credentials','Settings','Command usage','AI conversations','File index','Application logs','Tool diagnostics']);
+  expect(await navItems()).toEqual(await categories());
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Credentials');
+  const evidence=join(root,'apps/desktop/evidence/instrument-local-data');mkdirSync(evidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>data.locator('[data-lc-theme]').getAttribute('data-lc-theme')).toBe(theme);
     await data.evaluate(async()=>{await document.fonts.ready;});expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
-    await data.screenshot({path:join(evidence,`diagnostics-application-${theme}.png`),fullPage:true});
+    await data.screenshot({path:join(evidence,`local-data-${theme}.png`)});
   }
-  await search().fill('tool diagnostics');await expect.poll(()=>data.locator('section').count()).toBe(1);
+  // Sidebar activation scrolls/focuses local content only; main attests the exact fixed URL.
+  await navigation().getByRole('button',{name:'Application logs',exact:true}).click();
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Application logs');
+  await expect.poll(()=>data.getByRole('region',{name:'Application logs',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  expect(data.url()).toBe(pageUrl);
+  await navigation().getByRole('button',{name:'Application logs',exact:true}).focus();await data.keyboard.press('ArrowDown');
+  await expect.poll(()=>navigation().getByRole('button',{name:'Tool diagnostics',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  expect(await navigation().locator('[tabindex="0"]').count()).toBe(1);
+  await data.screenshot({path:join(evidence,'local-data-keyboard-navigation-light.png')});
+  expect(data.url()).toBe(pageUrl);
+  await search().fill('tool diagnostics');await expect.poll(categories).toEqual(['Tool diagnostics']);expect(await navItems()).toEqual(['Tool diagnostics']);
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/data-settings.html')!.webContents.setZoomFactor(2);});
-  await data.keyboard.press('Tab');await data.keyboard.press('Tab');
+  // Natural order: search -> current sidebar category (single roving stop) -> Export -> Clear.
+  await search().focus();await data.keyboard.press('Tab');
+  await expect.poll(()=>navigation().getByRole('button',{name:'Tool diagnostics',exact:true}).evaluate(element=>document.activeElement===element&&element.getAttribute('aria-current')==='true')).toBe(true);
+  await data.keyboard.press('Tab');
+  await expect.poll(()=>data.getByRole('button',{name:'Export tool diagnostics',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  await data.keyboard.press('Tab');
   const clear=()=>data.getByRole('button',{name:'Clear tool diagnostics',exact:true});
   await expect.poll(()=>clear().evaluate(element=>document.activeElement===element)).toBe(true);
   expect(await clear().evaluate(element=>{const rect=element.getBoundingClientRect();return rect.left>=4&&rect.right<=innerWidth-4&&rect.top>=4&&rect.bottom<=innerHeight-4;})).toBe(true);
   expect(await data.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
   const scaled=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/data-settings.html')!.capturePage()).toPNG().toString('base64'));
-  writeFileSync(join(evidence,'diagnostics-application-200-percent.png'),Buffer.from(scaled,'base64'));
+  writeFileSync(join(evidence,'local-data-200-percent-focus.png'),Buffer.from(scaled,'base64'));
+  await search().fill('');
+  for(const name of ['Close settings','Search data categories','Manage credentials','Export application logs','Clear tool diagnostics'])
+    expect(await data.getByLabel(name,{exact:true}).or(data.getByRole('button',{name,exact:true})).first().evaluate(element=>{element.scrollIntoView({block:'nearest'});const rect=element.getBoundingClientRect();return rect.width>0&&rect.left>=0&&rect.right<=innerWidth&&rect.height>0;}),name).toBe(true);
+  expect(await data.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  await search().fill('tool diagnostics');
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/data-settings.html')!.webContents.setZoomFactor(1);});
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});});
-  await clear().press('Enter');await expect.poll(()=>data.getByRole('status').textContent()).toBe('Action cancelled.');
+  await clear().press('Enter');await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title];}).toEqual(['interrupted','Action cancelled.']);
+  expect((await outcome()).text).toContain('Tool diagnostics: nothing was cleared.');
   expect(readFileSync(join(toolDirectory,toolName),'utf8')).toBe(originalTool);
   const exported=async(category:'application-logs'|'tool-diagnostics'|'command-usage',file:string)=>{
-    await search().fill('');await app.evaluate(({dialog},filePath)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:filePath});},file);
-    await data.getByRole('button',{name:`Export ${category==='application-logs'?'application logs':category==='tool-diagnostics'?'tool diagnostics':'command usage'}`,exact:true}).click();
-    await expect.poll(()=>existsSync(file)).toBe(true);await expect.poll(()=>data.getByRole('status').textContent()).toBe('Export saved.');return JSON.parse(readFileSync(file,'utf8'));
+    await search().fill('');await settled();await app.evaluate(({dialog},filePath)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:filePath});},file);
+    const title=category==='application-logs'?'Application logs':category==='tool-diagnostics'?'Tool diagnostics':'Command usage';
+    await data.getByRole('button',{name:`Export ${title.toLowerCase()}`,exact:true}).click();
+    await expect.poll(()=>existsSync(file)).toBe(true);
+    await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes(`${title}: written to the file you chose`)];}).toEqual(['success','Export saved.',true]);
+    return JSON.parse(readFileSync(file,'utf8'));
   };
   const logs=await exported('application-logs',join(temporary,'logs-before.json'));expect(logs.data.records).toContainEqual(expect.objectContaining({component:'main',event:'started'}));
   const tools=await exported('tool-diagnostics',join(temporary,'tools-before.json'));expect(tools.data.records).toEqual([JSON.parse(originalTool)]);
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
-  await data.getByRole('button',{name:'Clear application logs',exact:true}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
+  await data.getByRole('button',{name:'Clear application logs',exact:true}).click();await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes('Application logs: cleared.')];}).toEqual(['success','Data cleared.',true]);
+  await data.screenshot({path:join(evidence,'local-data-confirmed-light.png')});
   expect((await exported('application-logs',join(temporary,'logs-empty.json'))).data.records).toEqual([]);
   expect(readFileSync(join(toolDirectory,toolName),'utf8')).toBe(originalTool);
   writeFileSync(join(toolDirectory,toolName),JSON.stringify({private:'SYNTHETIC_PRIVATE_CANARY'}),{mode:0o600});
-  await data.getByRole('button',{name:'Export tool diagnostics',exact:true}).click();await expect.poll(()=>data.getByRole('status').textContent()).toContain('Diagnostics are unavailable.');
+  await settled();await data.getByRole('button',{name:'Export tool diagnostics',exact:true}).click();
+  await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes('Diagnostics are unavailable.')];}).toEqual(['error','Export tool diagnostics did not complete.',true]);
   expect(await data.locator('body').textContent()).not.toContain('SYNTHETIC_PRIVATE_CANARY');
   expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
-  await data.screenshot({path:join(evidence,'diagnostics-application-unavailable.png'),fullPage:true});
-  await data.getByRole('button',{name:'Clear tool diagnostics',exact:true}).click();await expect.poll(()=>data.getByRole('status').textContent()).toBe('Data cleared.');
+  await data.screenshot({path:join(evidence,'local-data-error-light.png')});
+  // Keyboard focus is never hidden under the sticky status band (wide layout): measured against the actual band.
+  const exposure=(selector:string)=>data.evaluate(value=>{
+    const target=document.querySelector(value)!,rect=target.getBoundingClientRect(),band=document.querySelector('.ld-status')!.getBoundingClientRect();
+    const inset=4,points=[[rect.left+inset,rect.top+inset],[rect.right-inset,rect.top+inset],[rect.left+rect.width/2,rect.top+rect.height/2],[rect.left+inset,rect.bottom-inset],[rect.right-inset,rect.bottom-inset]] as const;
+    const hits=points.map(([x,y])=>document.elementFromPoint(x,y));
+    return {focused:document.activeElement===target||document.activeElement?.getAttribute('aria-labelledby')===target.id,
+      covered:hits.some(hit=>Boolean(hit?.closest('.ld-status'))),visible:hits.every(hit=>Boolean(hit)&&target.contains(hit)),
+      inWindow:rect.top>=0&&rect.bottom<=innerHeight&&rect.left>=0&&rect.right<=innerWidth,bandHeight:Math.round(band.height)};
+  },selector);
+  const unobscured={focused:true,covered:false,visible:true,inWindow:true};
+  await navigation().getByRole('button',{name:'Settings',exact:true}).click();
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Settings');
+  expect(await outcome()).toMatchObject({kind:'error'});
+  expect(await exposure('#category-settings')).toMatchObject(unobscured);
+  await data.keyboard.press('Tab');
+  expect(await exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  expect(data.url()).toBe(pageUrl);
+  await data.screenshot({path:join(evidence,'local-data-status-focus-light.png')});
+  const errorBand=(await exposure('[aria-label="Export settings"]')).bandHeight;
+  // Busy band replaces the error band while focus stays on the invoking control.
+  await app.evaluate(({dialog})=>{dialog.showSaveDialog=()=>new Promise<Electron.SaveDialogReturnValue>(resolve=>{(globalThis as unknown as {releaseSave:(value:Electron.SaveDialogReturnValue)=>void}).releaseSave=resolve;});});
+  await data.keyboard.press('Enter');
+  await expect.poll(async()=>(await outcome()).title).toBe('Exporting settings…');
+  await expect.poll(async()=>(await exposure('[aria-label="Export settings"]')).bandHeight).not.toBe(errorBand);
+  expect(await exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  // The busy band grows when a narrower (still wide-layout) window rewraps it while focus stays in content.
+  const resize=(width:number,height:number)=>app.evaluate(({BrowserWindow},[w,h])=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/data-settings.html')!.setContentSize(w!,h!);},[width,height]);
+  const before=(await exposure('[aria-label="Export settings"]')).bandHeight;
+  await resize(640,720);
+  await expect.poll(async()=>(await exposure('[aria-label="Export settings"]')).bandHeight).toBeGreaterThan(before);
+  await expect.poll(()=>exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  expect(await outcome()).toMatchObject({kind:'loading',title:'Exporting settings…'});
+  await resize(1000,720);
+  await app.evaluate(()=>{(globalThis as unknown as {releaseSave:(value:{canceled:boolean;filePath:string})=>void}).releaseSave({canceled:true,filePath:''});});
+  await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title];}).toEqual(['interrupted','Action cancelled.']);
+  await expect.poll(()=>exposure('[aria-label="Export settings"]')).toMatchObject(unobscured);
+  // Restore the Tool diagnostics selection before the existing recovery assertions.
+  await navigation().getByRole('button',{name:'Tool diagnostics',exact:true}).click();
+  expect(await navigation().locator('[role="button"][aria-current="true"]').textContent()).toBe('Tool diagnostics');
+  expect(await exposure('#category-tool-diagnostics')).toMatchObject(unobscured);
+  // Recovery is the user's explicit, separately confirmed clear of only this category; nothing is replayed.
+  await data.getByRole('button',{name:'Clear tool diagnostics',exact:true}).click();await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes('Tool diagnostics: cleared.')];}).toEqual(['success','Data cleared.',true]);
+  await data.screenshot({path:join(evidence,'local-data-recovered-light.png')});
   expect((await exported('tool-diagnostics',join(temporary,'tools-reset.json'))).data.records).toEqual([]);
   expect((await exported('application-logs',join(temporary,'logs-preserved.json'))).data.records).toEqual([]);
   expect((await exported('command-usage',join(temporary,'usage-preserved.json'))).data.records).toContainEqual(expect.objectContaining({commandId:'linuxcast:open-local-data',useCount:1}));
@@ -84,9 +162,31 @@ it('manages actual private diagnostic categories through the production Local da
   await quit();({app,page,data}=await launch());
   expect((await exported('tool-diagnostics',join(temporary,'tools-restarted.json'))).data.records).toEqual([]);
   expect((await exported('application-logs',join(temporary,'logs-restarted.json'))).data.records).toHaveLength(1);
-  await search().fill('nothing public matches');await data.getByRole('heading',{name:'No matching categories',exact:true}).waitFor();
+  // A pending native save dialog keeps the captured action visible across filtering/navigation; cancelling is not success.
+  await settled();await app.evaluate(({dialog})=>{dialog.showSaveDialog=()=>new Promise<Electron.SaveDialogReturnValue>(resolve=>{(globalThis as unknown as {releaseSave:(value:Electron.SaveDialogReturnValue)=>void}).releaseSave=resolve;});});
+  await search().fill('');await data.getByRole('button',{name:'Export application logs',exact:true}).click();
+  await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title];}).toEqual(['loading','Exporting application logs…']);
+  await search().fill('file index');await navigation().getByRole('button',{name:'File index',exact:true}).click();
+  expect(await categories()).toEqual(['File index']);
+  expect(await outcome()).toMatchObject({kind:'loading',title:'Exporting application logs…'});
+  expect(await data.getByRole('button',{name:'Clear file index',exact:true}).getAttribute('aria-disabled')).toBe('true');
   expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
-  await data.screenshot({path:join(evidence,'diagnostics-application-filtered-empty.png'),fullPage:true});
+  await data.screenshot({path:join(evidence,'local-data-busy-captured-light.png')});
+  await app.evaluate(()=>{(globalThis as unknown as {releaseSave:(value:{canceled:boolean;filePath:string})=>void}).releaseSave({canceled:true,filePath:''});});
+  await expect.poll(async()=>{const value=await outcome();return [value.kind,value.title,value.text.includes('Application logs: nothing was exported.')];}).toEqual(['interrupted','Action cancelled.',true]);
+  await data.screenshot({path:join(evidence,'local-data-cancelled-light.png')});
+  expect(data.url()).toBe(pageUrl);
+  await search().fill('nothing public matches');await data.getByRole('heading',{name:'No matching categories',exact:true}).waitFor();
+  expect(await navItems()).toEqual([]);
+  expect((await new AxeBuilder({page:data}).setLegacyMode().analyze()).violations).toEqual([]);
+  await data.screenshot({path:join(evidence,'local-data-filtered-empty-light.png')});
+  // Forced colours and reduced motion on the actual window (Chromium emulation, not a native high-contrast session).
+  await search().fill('');await data.emulateMedia({forcedColors:'active',reducedMotion:'reduce'});
+  await expect.poll(()=>data.locator('[data-lc-motion]').getAttribute('data-lc-motion')).toBe('reduced');
+  await navigation().locator('[role="button"][aria-current="true"]').focus();
+  expect(await navigation().getByRole('button').first().evaluate(element=>getComputedStyle(element).transitionDuration)).toMatch(/^0s/);
+  await data.screenshot({path:join(evidence,'local-data-forced-colors-reduced-motion.png')});
+  await data.emulateMedia({forcedColors:'none',reducedMotion:'no-preference'});
   await data.keyboard.press('Escape').catch(error=>{if(!data.isClosed()||!(error instanceof Error)||!error.message.includes('Target page, context or browser has been closed'))throw error;});
   await expect.poll(()=>data.isClosed()).toBe(true);await quit();
 },180000);

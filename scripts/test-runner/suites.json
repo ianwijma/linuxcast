@@ -130,7 +130,8 @@
       "apps/desktop/src/features/launcher/tests/permission-catalogue.test.ts"
     ],
     "F2-02": [
-      "packages/secrets/src/ui/credentials.test.tsx"
+      "packages/secrets/src/ui/credentials.test.tsx",
+      "apps/desktop/src/renderer/data-settings/local-data.test.tsx"
     ]
   },
   "contracts": {

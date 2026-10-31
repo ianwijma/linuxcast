@@ -447,3 +447,85 @@ F2LocalDataOpusmediuma4c30760 against parent11cb8ed. Runtime settings confirmed
 claudeAgent/claude-opus-5-5/effortmedium for both. Root sourcehelperce13987 remains
 saved and unused/unintegrated; source-extractor reviews wait below UI priority.
 No guest/native/hostbus/keyring/provider/input actions or active root processes.
+
+PR87 MERGED31October17:21:13UTC at031f78ecc2376855000efd9e87e2e1d11a59f3ce,
+headc21d013634a429c9ddfdf2d7a867e95e3a8a860e. Fresh final b130ef1d independent
+Standards and Security/Spec PASS, no actionable findings; remaining exact-keyP2
+resolved. Independently152token/33Python/type/lint/plan/whitespace and5478synthetic
+cases across31objectpaths+125sharedcases agree TS/Python, negativeoldsource15false
+accepts confirmed, valid/reordered/boundary cases retained, malformed canonical
+fails before generation. PlanningCI41223479060 SUCCESS, no GHreviews/comments/
+requests or branchprotection/rulesets. User's tiny merge blurb sent immediately;
+PR87watch removed. Root fetched/fast-forwarded to approveddevelop031f78e and
+opened codex/d1-02-instrument-integration for next bounded UI integration.
+
+Opusmedium renderer72448bb9 and LocalDataa4c30760 notified upstream is integrated;
+may fetch/merge031f78e at clean checkpoints without unrelated reruns or sibling
+edits. Their branch/API/ownership constraints remain. No active PRwatch or root
+test process. Native/sourcehelper preparation remains deferred and unused.
+Additional private sourcehelperce13987 probes confirm symlink/outsidehardlink/
+cleanup-bound faults preserve sentinel/root/firstfailure and reportcleanupfalse;
+no repository change or guest/native action, not independent acceptance.
+Next integrate/review/test these existing UI increments, then credential/
+permission/file/notes/workflow surfaces, preserving all97tasks/full1.0 gates.
+
+LocalData Opusmediuma4c30760 completed/read: clean t3-8ebbb31c,
+codex/f2-02-instrument-local-data, unsignedacead29415fc669c5511d5b2a3551c154b022ba1
+(tree2fb22b13d8e42624eb88d602a382abc8277def67), including approveddevelop031f78e.
+18owned files add Instrument sidebar/status composition,15component tests and
+11actualcaptures. API/main/preload/backend unchanged, fixedURL/navigation intact.
+Parent created codex/f2-02-instrument-local-data-integration froma82b524 and merged
+authorunchanged as63790672. Coordinator maps new local-data.test.tsx toF2unit.
+Independent parent67F2unit/3contract/144security/type/lint pass. FouractualElectron
+flows pass F121.72s+F214.96s after mechanical old-status assertion integration:
+band exacttitle+semantic kind, all original file/category/privacy assertions kept.
+Original F1 wrapper-text assertion reproduced expected failure after new band.
+D1renderer72448bb9 notified reserved LocalData status hunks in shell test.
+
+Additional REAL private-Xvfb geometry probe after Errorband, selecting Settings,
+finds focusedheading118–142px behind stickyband56–196px; elementFromPoint confirms
+covered=true, focusedcategory-settings. New probe fails5.80s before recovery.
+This is a real visible-focus defect, not native/Orca evidence. Temporary probe
+removed and incidental historical/newrecaptures restored to frozenauthorblobs.
+Route focusedsticky/status navigation correction+permanent regression to original
+Opusmedium implementation before formal reviews/PR. UI source remains author-
+identical; parent changes only runner mapping/QA/checkpoint. Initialload/credential
+outcomes remain component-only, no supported desktop/AT acceptance. No PRwatch.
+
+LocalData focus follow-up623667e9 completed/read: Opus5.5medium unsignedff81b5d,
+treec70aca9, additive onacead29; 1Password failed within30s, authorized fallback,
+no config change. Root integrates unchanged at0f192394. Dynamic measured sticky
+band scroll padding keeps sidebar headings, Tab targets and retained focus clear
+through busy/error/cancel and width changes. Permanent actual diagnostics
+regression fails oldacead29 and passes fixed source (author7.29s). Parent reruns
+on integrated source:67F2unit,3contracts,144security,typecheck,lint,plan pass;
+four actual sandboxed Electron/private-Xvfb flows pass F122.61s andF214.77s,
+including diagnostics7.56s and credential6.32s. Existing file/category/privacy,
+no-replay, URL, native viewport and Quit checks retained. All25incidental PNG
+recaptures restored; new focused capture inspected. Initial independent Standards
+and Security/Spec review is next, then focused PR/CI/merge. No task/criterion
+promotion, native/Orca/keyring/provider acceptance unchanged. D1renderer72448bb9
+continues independently; no active PRwatch or root test process.
+
+Initial LocalData reviews now run against frozen d8e3133d8d4b64fc99dbccc34877f5e8e8698f8e:
+Standards e6b7e5cb-36fe-443a-a46f-b82604fd9f68 and Security/Spec
+8c81c029-6fec-405d-bc21-b166578b8a5f, fresh isolated GPT6.1SOL/high tasks.
+Completion wakes parent; do not poll. No LocalData PR yet. D1renderer72448bb9 has
+returned clean eae6a6d (unsigned authorized fallback) with browser/product evidence;
+read its completed final before integration. Reported two baseline search-limit
+unit failures, footer type absent (no wire field), rise-only panel motion versus
+canonical fade, editable textarea shortcut hints and query-clear selection scroll
+need bounded coordinator assessment. Parent LocalData branch remains the frozen
+review candidate; preserve separate UI increments and reserved test hunks.
+
+LocalData initial Standards e6b7e5cb and Security/Spec8c81c029 completed/read PASS,
+no actionable findings. Both independently67units/3contracts/type/lint/plan;
+Spec additionally6mockedmain/preload boundaries. All12screenshots inspected,
+source/diagnostics/evidence matchff81b5d, exactd8e3133/base031f78e clean unchanged.
+Parent144security/fourElectron results remain accurately reported rather than
+independently rerun by reviewers. Proceed focused LocalData PR/currentCI promptly;
+no native/UI/task acceptance promotion. Separate D1renderer integration is saved
+at2f19a597 (93ecda52 plus coordinatorQA). Original Opusmedium follow-up
+6fb9f0b9-3e85-4051-b63a-2c74bd4d095f runs for editable-context hint truthfulness,
+query-clear selected-row visibility and ratified full-opacity rise-only motion.
+No root test process, native action or PRwatch yet.

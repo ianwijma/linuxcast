@@ -1,13 +1,82 @@
+/* Local data window — selected Instrument settings composition (docs/design/DESIGN.md: Workspaces,
+   Settings and permissions, States and motion, Accessibility). Semantic tokens only. */
 html, body, #root { margin: 0; min-inline-size: 0; }
+.data-settings { min-block-size: 100vh; background: var(--lc-surface); }
+
+/* Wide layout: fixed workspace frame with independently scrolling sidebar and content regions. */
+.ld-shell { display: grid; grid-template-rows: auto minmax(0, 1fr); block-size: 100vh; min-inline-size: 0; }
+.ld-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--lc-space-8) var(--lc-space-12);
+  min-block-size: var(--lc-workspace-header-height); padding: var(--lc-space-8) var(--lc-space-16);
+  background: var(--lc-background); border-block-end: var(--lc-hairline) solid var(--lc-divider);
+  box-shadow: var(--lc-elevation-highlight);
+}
+.ld-header-title { margin: 0; font-size: var(--lc-text-emphasis); line-height: var(--lc-leading-emphasis); font-weight: var(--lc-weight-semibold); }
+.ld-close { margin-inline-start: auto; }
+.ld-body { display: grid; grid-template-columns: var(--lc-workspace-sidebar-width) minmax(0, 1fr); min-block-size: 0; }
+
+.ld-sidebar {
+  display: flex; flex-direction: column; gap: var(--lc-space-8); min-block-size: 0; overflow: auto;
+  padding: var(--lc-space-12); background: var(--lc-background); border-inline-end: var(--lc-hairline) solid var(--lc-divider);
+}
+.ld-sidebar .lc-group-caption { padding-inline-start: var(--lc-space-8); }
+.ld-nav-list { display: grid; gap: var(--lc-space-4); }
+.ld-nav-list .lc-row { cursor: default; }
+/* The shared Row text basis (12em) exceeds the 240px sidebar content box and would push titles under
+   their icon; sidebars keep hanging alignment by letting the title column take the remaining track. */
+.ld-nav-list .lc-row-text { flex-basis: 0; }
+.ld-nav-empty { margin: 0; padding-inline: var(--lc-space-8); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
+
+.ld-content { min-block-size: 0; overflow: auto; container-type: inline-size;
+  /* --ld-status-block-size is the measured sticky status band height (0 when it is not sticky). */
+  scroll-padding-block-start: calc(var(--ld-status-block-size, 0px) + var(--lc-space-8)); }
+.ld-page { box-sizing: border-box; max-inline-size: var(--lc-workspace-min-width); padding: var(--lc-space-24) var(--lc-space-32) var(--lc-space-32); display: grid; gap: var(--lc-space-16); align-content: start; }
+.ld-page h1 { margin: 0; font-size: var(--lc-text-workspace-title); line-height: var(--lc-leading-workspace-title); font-weight: var(--lc-weight-semibold); letter-spacing: var(--lc-tracking-workspace-title); }
+.ld-lede { margin: calc(var(--lc-space-8) * -1) 0 0; max-inline-size: var(--lc-prose-measure); }
+.ld-notice {
+  display: flex; gap: var(--lc-space-12); align-items: flex-start; padding: var(--lc-space-12) var(--lc-space-16);
+  border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-row); background: var(--lc-raised);
+}
+.ld-notice .lc-line-icon { margin-block-start: var(--lc-space-4); color: var(--lc-muted); }
+.ld-notice p { margin: 0; overflow-wrap: anywhere; }
+
+/* Status band stays above the categories while the content scrolls and names its captured action. */
+.ld-status { position: sticky; inset-block-start: 0; z-index: 1; background: var(--lc-surface); }
+.ld-status[data-active] { padding-block: var(--lc-space-4); }
+
+
+.ld-categories { display: grid; border-block-start: var(--lc-hairline) solid var(--lc-divider); }
+.ld-category {
+  display: grid; grid-template-columns: var(--lc-glyph-track) minmax(0, 1fr) auto; column-gap: var(--lc-space-8); row-gap: var(--lc-space-12);
+  align-items: start; padding: var(--lc-space-16) var(--lc-space-8); border-block-end: var(--lc-hairline) solid var(--lc-divider);
+  scroll-margin-block: var(--lc-space-8);
+}
+.ld-category.lc-focus:focus-visible { outline-offset: calc(var(--lc-focus-width) * -1); border-radius: var(--lc-radius-row); }
+.ld-category-glyph { display: inline-grid; place-items: center; min-block-size: var(--lc-leading-emphasis); }
+.ld-category-text { min-inline-size: 0; }
+.ld-category h2 { margin: 0 0 var(--lc-space-4); font-size: var(--lc-text-emphasis); line-height: var(--lc-leading-emphasis); font-weight: var(--lc-weight-semibold); }
+.ld-category p { margin: 0; overflow-wrap: anywhere; max-inline-size: var(--lc-prose-measure); }
+.ld-category-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--lc-space-8); }
 .data-settings .lc-focus { scroll-margin-block: var(--lc-space-8); }
-.data-settings { box-sizing: border-box; min-block-size: 100vh; padding: var(--lc-space-24); }
-.data-settings-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--lc-space-16); margin-block-end: var(--lc-space-24); }
-.data-settings h1 { margin: 0; font-size: var(--lc-text-workspace-title); }
-.data-settings-header p { margin-block-start: 0; }
-.data-settings-categories { display: grid; gap: var(--lc-space-12); margin-block-start: var(--lc-space-20); }
-.data-settings section { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--lc-space-16); padding: var(--lc-space-16); border: 1px solid var(--lc-border); border-radius: var(--lc-radius-row); background: var(--lc-surface); }
-.data-settings section > div:first-child { flex: 1; min-inline-size: min(100%, 240px); }
-.data-settings h2 { margin: 0 0 var(--lc-space-8); font-size: var(--lc-text-emphasis); }
-.data-settings section p { margin: 0; overflow-wrap: anywhere; }
-.data-settings-actions { display: flex; flex-wrap: wrap; gap: var(--lc-space-8); }
-.data-settings-status { min-block-size: var(--lc-space-24); margin-block: var(--lc-space-16) 0; }
+
+/* Content narrower than ~34rem: actions hang under the description on the title column. */
+@container (max-width: 34rem) {
+  .ld-page { padding: var(--lc-space-16); }
+  .ld-category { grid-template-columns: var(--lc-glyph-track) minmax(0, 1fr); }
+  .ld-category-actions { grid-column: 2; justify-content: flex-start; }
+}
+
+/* Narrow windows (--lc-narrow-breakpoint, 37.5rem; media queries cannot read custom properties):
+   one document scroll, sidebar reflows above the content, nothing is clipped at 200% text/zoom. */
+@media (max-width: 37.5rem) {
+  .ld-shell { display: block; block-size: auto; }
+  .ld-body { display: block; }
+  .ld-sidebar { overflow: visible; border-inline-end: 0; border-block-end: var(--lc-hairline) solid var(--lc-divider); }
+  .ld-content { overflow: visible; }
+  .ld-status { position: static; }
+}
+
+@media (forced-colors: active) {
+  .ld-header, .ld-sidebar, .ld-notice, .ld-categories, .ld-category { border-color: CanvasText; }
+  .ld-header { box-shadow: none; }
+}
