@@ -1,39 +1,36 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline cache routing review
+## Current coordinator state — offline cache correction publication
 
-Goal ACTIVE: all97/full local1.0 throughR1-03, registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. Approveddevelopbbbe813 is mergedPR95;
-PR93Notes/PR94workflows/allseven Instrument surfaces integrated, native/fulltask
-criteria remainpending. No openPR/watch. No actualnative product/Orca runs.
+Goal ACTIVE: full97/local1.0 throughR1-03; registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. Approveddevelopbbbe813/mergedPR95 includesall
+seven Instrument surfaces, Notes93/workflows94. No actualnative/Orca runs.
 
-Rootcodex/f1-02-offline-build-inputs fromapprovedbbbe813, source8bb3775: actual
-ordinaryPython negativecontrol proves originalprivatebuildHOME losesprepared
-Cargo/headercaches; fixedstager verifiesreadonlypublicinputmanifest, seeds only
-ownedprivateprofile, fixedofflineCargo/node-gyp paths, post-buildcacheimmutability.
-11stagingtests/119fullofflinePython(no skips)/55mappedsecurity13.18s/2AST/plan/
-whitespace/hash pass; originalsourcefails samefixture/currentpasses. No actual
-Node/Rust/Electronbuild, download, installer, guest/display/native operation.
-Initial independent Standards+SecuritySpec review next; no newpins/receipt schema
-or namespace gate changes. Oldcode/realguest build remains unaccepted.
+Rootcodex/f1-02-offline-build-inputs: initial Standards3c306e10 clear, Spec14cf1b4f
+twoP2s parent-verified resolved. Cacheinventory nowincludesreceipt-namedentries;
+file+symlinkregressions fail2312/passfixed. Correctedmutationfixturefailswithonly
+postcacheguarddisabled/passrestored. Final12staging/120offlinePython/55security
+14.11s/2AST/plan/hash/whitespace pass. No secondindependent finalcleanclaim.
+PublishfocusedPRnext/currentheadCI/reviews/normalmerge. No product/Node/Rustbuild,
+installer/guest/native invocation, no namespace/observer/controller/pin changes.
 
-Outerowner implementation task6ec25f18-7c53-4d3a-b850-e99d5fa822b9 assignedSOLhigh,
-separatepreparedcheckout fromfrozen7abb845 on saved
-codex/f1-02-lab-owner-preparation. Contract+inventory are only onthatbranch,
-excludedfromthis cache-reviewincrement. Await its completionwake; no actorpolls.
-Only newlab_owner.py/test_lab_owner.py/newouter-owner-preparation evidence owned;
-no Docker/SSH/guest/native execution authorized forworker. Parent owns integration.
+Publiccachecandidate outsideGit:420files/22861050bytes, manifestSHA
+ d733fe37559bac91c95c24ccea09b0993a25de604243e03e33063793f7e90db3.
+All152lockedcratearchives+selectedsparseindexrecordsmatchCargo.lock;125locally
+cachedElectron45headers haveunverifiedupstreamarchiveprovenance. HostCargo1.95
+metadata --offline --locked resolvesall152/fourworkspace fromnewprivateprofile;
+no compileroutput, lock/candidateunchanged/profile+rawmetadataremoved. No actual
+Debian compiler/ABI/build evidence. Exactv4freshstoppedfalse/PID0/exit0 before/
+aftercacheprep, no Dockerstart/exec/SSH/guest/native/bus/input/audio/provider.
 
-7abb845 also records fresh approvedPR95 archive:121180160bytes,
-SHA732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc,
-tree5a85d5251101716b338e820f23f78eef5e162dfb, all2789Gitblobs/modesverified;
-private0400snapshot/provenance andtemporaryextractionremoved. Signatureheader
-present butnotverified. Labexactv4 stoppedfalse/PID0/exit0 before/after.
-Currenthost Node126879696bytes/e32e2d16..cfafb andBun107308936bytes/10702245..ac235
-hashes rechecked, no runtimeexecuted/provisioned. ActualDebianbuild/receipt,
-reviewedouterownership, PID1metadata andnativecomboboxidentity remainmissing.
-No fallback or scope/acceptance reduction. Allphysical/performance/release gates
-remain mandatory. /homeabout2GiBfree; preserve activeauthor/root dependencies.
+Outerowner task6ec25f18 from7abb845 remains assigned/disjoint; awaitcompletionwake,
+no polls. Savedcodex/f1-02-lab-owner-preparation holdsparentcontract+inventory and
+sourcearchiveproof, excludedfromthiscacheincrement. CurrentBBBEarchive121180160B/
+SHA732f7bcc..436dc/tree5a85d525..62dfb/all2789blobs-modes verified;0400outsideGit,
+signatureheaderpresent/unverified. Oldguestwrapperstillrejectsnewsource. Actual
+Debianbuild/receipt, reviewedouterreservation/shutdown/recovery, PID1metadata and
+nativecomboboxidentity remain pending. No scope/acceptance/fallback changes.
+Allphysical/performance/release gates remain mandatory. No activePRwatch/process.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

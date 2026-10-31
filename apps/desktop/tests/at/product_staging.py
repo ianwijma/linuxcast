@@ -71,7 +71,7 @@ def _read_offline_inputs(staging, deadline):
                 or type(item["sha256"]) is not str or not re.fullmatch(r"[0-9a-f]{64}", item["sha256"])
                 or type(item["executable"]) is not bool):
             raise ControllerRejected("prerequisite")
-    entries = inventory(root, deadline)
+    entries = inventory(root, deadline, omit_receipt=False)
     files = {}
     total = 0
     for name, hashed in entries.items():
@@ -163,7 +163,7 @@ def digest(path, deadline=None):
     return hashed.hexdigest()
 
 
-def inventory(root, deadline=None):
+def inventory(root, deadline=None, *, omit_receipt=True):
     result = {}
     inode_counts = Counter()
     link_counts = {}
@@ -172,7 +172,7 @@ def inventory(root, deadline=None):
         if deadline:
             deadline.remaining()
         relative = str(path.relative_to(root))
-        if relative == "f102-build-receipt.json":
+        if omit_receipt and relative == "f102-build-receipt.json":
             continue
         if path.is_symlink():
             if not path.resolve().is_relative_to(root) or path.resolve() == receipt:
@@ -219,7 +219,7 @@ def prepare(staging, node, source_tree, archive_sha256):
     owner.env.update(PATH=str(Path(node).parent) + ":/usr/bin:/bin", CARGO_NET_OFFLINE="true")
     try:
         seed_build_home(owner, inputs, input_files, total)
-        if inventory(inputs, total) != input_inventory:
+        if inventory(inputs, total, omit_receipt=False) != input_inventory:
             raise ControllerRejected("prerequisite")
         for script in ("apps/desktop/setup-sqlite.ts", "apps/desktop/build.ts"):
             owner.run([str(node), script], Deadline(180, total), cwd=staging)

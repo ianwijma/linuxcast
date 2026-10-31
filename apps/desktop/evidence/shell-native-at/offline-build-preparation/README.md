@@ -84,3 +84,48 @@ Historical F1-02 AC01/AC02/privacy evidence and full97-task/local1.0 scope are
 unchanged. The separate current PR95 archive remains honestly historical relative
 to this new unreviewed preparer correction. No execution authority follows from
 these offline tests or this report.
+
+## Independent review and bounded corrections
+
+Initial Standards `3c306e10` of exact `2312fbd`/BASE `bbbe813` is clear:
+11staging/119offline Python cases, original-source routing negative control,
+AST/hashes/plan/whitespace independently pass. Initial Security/Spec `14cf1b4f`
+independently passed the same119 checks and found two P2s. Cache inventory reused
+the outer inventory's root receipt exclusion, so a newly added cache-local
+`f102-build-receipt.json` could be omitted. The mutation regression also created
+unrelated source directories, allowing an unrelated guard to make it pass.
+
+Cache inventories now explicitly include every entry; only the actual outer
+receipt inventory retains its old exclusion. Ordinary Python child regressions
+for a cache-local receipt-named file and symlink both fail exact `2312fbd` and
+pass the correction. The mutation fixture now precreates its source directories;
+disabling only post-build cache validation makes that test fail. Restoring the
+guard passes all12staging cases. Parent55mapped security checks pass14.11s,
+including all120offline Python tests without skips. Both AST parses, hashes,
+plan and whitespace pass. The two P2s are parent-verified resolved; no second
+independent final clean review is claimed. No real build/native invocation.
+
+## Public cache candidate inventory
+
+Separately, under the existing exclusive lab lock, the coordinator created an
+owned read-only public candidate outside Git:420payload files,22,861,050bytes,
+manifest SHA256 `d733fe37559bac91c95c24ccea09b0993a25de604243e03e33063793f7e90db3`.
+All152locked crate archives and their selected sparse-index records match the
+committed Cargo.lock checksums (lock SHA256
+`07693a75d13e9d180b86583aee18c5946fe9eedfc67eb74ba52fe1c8b8fe3031`).
+The125 locally cached Electron45header files include the required headers.
+Their upstream archive digest was **not independently verified**; that provenance
+remains a provisioning gate, not inferred from the folder label or local hash.
+
+The already pinned host Cargo1.95 resolved all152registry packages/four workspace
+members with `metadata --offline --locked` from an empty private profile seeded
+only with the selected public Cargo cache. No compiler output or target directory
+was produced; Cargo.lock and the read-only candidate remain unchanged, and the
+private profile/raw metadata were removed. Host Rust reports1.95.0/LLVM22.1.2;
+this is not Debian compiler/runtime inventory, compilation, or ABI evidence.
+
+The lab was freshly stopped/exited/PID0/exit0 before and after the cache snapshot.
+No guest/container-start/exec, dependency download, build, namespace, display,
+reader, input/audio, keyring or provider action occurred. The separate outer-owner
+implementation remains unreviewed and unused. Actual immutable Debian build and
+all previously listed native/full-task/release gates remain outstanding.

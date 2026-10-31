@@ -245,6 +245,9 @@ for name in ''' + repr(OUTPUTS) + ''':
     def test_build_cannot_mutate_offline_cache_inside_otherwise_mutable_dependencies(self):
         with tempfile.TemporaryDirectory() as temporary, tempfile.TemporaryDirectory() as profile:
             root = Path(temporary)
+            # These are source directories, not generated output. Keep them in
+            # the before snapshot so only the intended cache guard can reject.
+            (root / "apps/desktop").mkdir(parents=True)
             inputs = build_inputs(root)
             home = Path(profile) / "home"
             home.mkdir(mode=0o700)
@@ -269,6 +272,31 @@ for name in ''' + repr(OUTPUTS) + ''':
                 with self.assertRaises(ControllerRejected):
                     prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
             self.assertFalse((root / "f102-build-receipt.json").exists())
+
+    def test_build_cannot_hide_a_file_or_symlink_behind_the_outer_receipt_name(self):
+        for kind in ("file", "symlink"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                build_inputs(root)
+                script = '''import pathlib
+root=pathlib.Path.cwd();cache=root/''' + repr(BUILD_INPUTS) + '''
+cache.chmod(0o700);extra=cache/'f102-build-receipt.json'
+if not extra.exists():
+ if ''' + repr(kind) + '''=='file':extra.write_text('PUBLIC SYNTHETIC UNPINNED ADDITION');extra.chmod(0o400)
+ else:extra.symlink_to('.cargo/registry/public-fixture')
+cache.chmod(0o500)
+for name in ''' + repr(OUTPUTS) + ''':
+ p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'PUBLIC SYNTHETIC OUTPUT')
+'''
+                for name in ("apps/desktop/setup-sqlite.ts", "apps/desktop/build.ts"):
+                    path = root / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text(script)
+                with self.assertRaises(ControllerRejected):
+                    # Only the ordinary Python interpreter and fixture text run.
+                    prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
+                self.assertTrue((root / BUILD_INPUTS / "f102-build-receipt.json").exists())
+                self.assertFalse((root / "f102-build-receipt.json").exists())
 
     def test_short_cache_copy_writes_are_completed_but_zero_write_fails(self):
         import os
