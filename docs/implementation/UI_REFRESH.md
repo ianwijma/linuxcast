@@ -26,10 +26,10 @@ acceptance. The approved develop checkpoint is PR89 merge
 | Saved permissions (F3-01) | Merged in [PR90](https://github.com/ianwijma/linuxcast/pull/90), `f7ed86e` | Existing broker/controller/opaque snapshot authority is unchanged. Coordinator mapped the 8 new component cases: 83 units/2 contracts/72 security checks and two Electron flows (24.42s) pass. The 21 captures remain author-identical; both independent reviews passed without actionable findings. Native AC02/UI acceptance remains pending. |
 | Files, builtin details/forms/grid | Shared-frame adoption is included in the pending D1 increment | Downstream role/action/keyboard regressions support the shared change. Inspect any remaining feature-specific workspace composition after D1 merges; do not infer native acceptance or a complete feature from those fixtures. |
 | Notes (U1-01) | Merged [PR93](https://github.com/ianwijma/linuxcast/pull/93), `279a3a4` | 482 units/36 contracts/258 security/101 browser/40 integrations pass,28 captures. Slash-menu scaling correction parent-verified with four original-source failures; native/task gates remain pending. |
-| Workflows (W2-01/W2-03) | Opus source `0fa31fc` integrated and verified; ready for focused publication | Standards clear; sole Spec drag-frame P2 corrected and parent-verified with two original-source failures. Current48 browser cases,61 units,5 contracts,17 security and three actual app flows pass;39 captures. Native/task gates remain pending. |
+| Workflows (W2-01/W2-03) | Merged [PR94](https://github.com/ianwijma/linuxcast/pull/94), `96ac9fb` | Current48 browser cases,61 units,5 contracts,17 security and three actual Electron flows pass;39 captures unchanged. Sole held-drag P2 corrected and parent-verified against old source. Native/task gates remain pending. |
 
 Renderer, all three settings increments and Notes are merged. The workflow
-composition is verified for focused publication, using Opus 5.5 medium. Do not
+composition is also merged, using Opus 5.5 medium. Do not
 hold a reviewed UI increment for full native/task/release acceptance, and do not
 use its merge to promote those outstanding gates. The detailed registry remains
 authoritative for task and criterion verification.

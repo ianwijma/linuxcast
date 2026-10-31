@@ -1,11 +1,12 @@
 {
-  "kind": "instrument-dom-adapter-unexecuted-review-pending",
+  "kind": "instrument-dom-adapter-reviewed-offline-native-pending",
   "nativeRuns": 0,
   "files": {
     "apps/desktop/tests/at/product_driver.ts": "b81a4149c861d1961a0adca0a81ee1f336c81a8566cbaab67ac4d4346c18d083",
     "apps/desktop/tests/at/driver_guards.ts": "0819a50a0827dbb015f885b054a531b524b0fc31ca2b52968626614852a02dc6",
     "apps/desktop/tests/at/driver_guards.test.ts": "8f310cb1fc3ce77fd6b698d3e1028ed9629bb0fffd2769cf8a323d55d1e45a99"
   },
-  "approvedProductRevision": "8de8612aa92fbbc4aff5740c92f538dec8ce4589",
-  "approvedRendererCorrection": "a9090c119bb5b04ccc442105c2c8f42f47038988"
+  "approvedProductRevision": "96ac9fb1ae980129639f1cfef36662a2e80b9b6f",
+  "approvedRendererCorrection": "a9090c119bb5b04ccc442105c2c8f42f47038988",
+  "reviewedAdapterRevision": "9c77978832008513af76bf28a9aae4aafdc2d75d"
 }

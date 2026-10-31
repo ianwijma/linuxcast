@@ -56,3 +56,22 @@ the unchanged approved Instrument renderer and the reviewed nonexecuting source
 helper. All three adapter source/test hashes remain unchanged. This does not
 update the native observer roles, controller/Orca checkpoints or namespace
 approved-tree gate; actual native identity/build/containment proof remains pending.
+
+## Independent review and current integration
+
+Both initial independent axes are clear on exact `9c77978` against approved
+`8de8612`: Security/Spec `0098261d` independently passed37mapped units plus44
+synthetic boundary probes; Standards `073a5af7` independently reran37mapped
+units, full TypeScript, scoped lint, plan/whitespace and all three source hashes.
+No actionable findings. Frozen observer/parser/controller/namespace sources
+remain unchanged; neither reviewer ran the product driver or native controller.
+
+Coordinator reconciled the unchanged three adapter source/test files onto
+approved PR94 `96ac9fb`, preserving all merged Notes/workflow source and captures.
+Current37units2.28s,55mapped security checks13.18s (including the full114offline
+Python checks), full TypeScript, scoped lint, plan and whitespace pass. All three
+source hashes remain the reviewed values. The manifest identifies this offline
+review and product baseline, not a guest build receipt or execution permission.
+No native roles, source pins, wrapper authority or acceptance status changes.
+Actual native/Orca runs remain0; all previously listed native/build/ownership
+prerequisites remain outstanding.

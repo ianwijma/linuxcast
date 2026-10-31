@@ -1,23 +1,33 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — workflow verification after PR93
+## Current coordinator state — offline AT adapter publication after PR94
 
-Goal ACTIVE: full97/local1.0 throughR1-03, registry states unchanged.
-PR93 Notes merged279a3a41ccbd5290ac0517c01f29082781401f3b from901226b;
-CI41237501043 SUCCESS, GitHub reviews/requests/comments empty, normal exact-head
-merge. Tiny merge blurb sent immediately and watch removed. Notes sourcee5a5b8c
-and all28captures retained; all native/full-task gates remain pending.
+Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. All seven selected Instrument surfaces are
+integrated as bounded increments: foundationPR87, Localdata88, Credentials89,
+Permissions90, sharedrenderer91, Notes93 and workflows94. Native/full-task gates
+remain pending. Latestapproveddevelop96ac9fb is PR94 merge from91864e8;
+CI41237862351 SUCCESS, GitHubreviewrequests/reviews/comments empty, normalexact
+headmerge, immediate tinymergeblurb delivered. NotesPR93 merge279a3a4 from901226b,
+CI41237501043 SUCCESS, watchremoved. Allreviewedsource/28Notes+39workflowcaptures
+preserved. No active PRwatch/rootprocess.
 
-Root codex/w2-instrument-workflow-integration integrates original Opus0fa31fc
-on069669e and approvedPR93. Initial Standards7e116647 clear; Spec2ef28b07 sole
-held-drag/text-resize coordinate P2 corrected by locking the display and inverse
-frame for the entire gesture, including final release. Parent verification passes: both new cases fail original069669e and pass fixed;
-current24+24browser/61unit/5contract/17security/type/lint/plan, three actual
-Electron flows(6.140s/5.245s/8.93s) pass. Publishing focused workflow PR next;
-no second independent final clean review claimed. Parent test-only v7 fixture
-fix60667ab retained, no production storage/controller/engine/shared changes.
-AT adapter9c77978 separatebranch Spec0098261d clear; initial Standards pending.
-Actual native/Orca runs0; no guest/namespace/hostbus/keyring/provider actions.
+Rootcodex/f1-02-instrument-at-integration reconciles9c77978 ontoapprovedPR94
+at84f11aa. Bothinitialreviews clear: Spec0098261d37mapped+44synthetic,
+Standards073a5af737mapped/fulltype/scopedlint/plan/3hashes. Both completed/read,
+noactivechild. Parentcurrent37units2.28s/55security13.18s(all114offlinePython)/
+fulltype/scopedlint/plan pass. Adapterthreefiles matchreviewed9c byte-for-byte;
+no nativeobserver/controller/parser/namespace/pinchanges. PublishingfocusedPRnext.
+
+Actualnativeproduct/Orca runs0. Fresh currentapprovedarchive/immutableDebianbuild/
+receipt, nativeENTRYvsCOMBO_BOXidentity, PID1metadatafeasibility, reviewedouter
+reservation/shutdown/recovery and actualcontainment/AT remain pending. Read-only
+hostDockerinventory freshlyconfirmed v4 exactID674cd884..5098/imagea1805464..c4d10
+exitedfalse/PID0/exit0, nonprivileged/read-onlyroot/capdropALL/no-new-privileges,
+onlyprivate-labRWbind/nohostports. No start/exec/SSH/guest/native/bus/input/audio.
+Next implement bounded outerowner and provision only reviewed current sources,
+without loosening historical gates. Fullnative/physical/performance/release scope
+remains mandatory; no overallcompletionclaim.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
