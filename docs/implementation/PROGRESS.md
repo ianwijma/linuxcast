@@ -529,3 +529,29 @@ at2f19a597 (93ecda52 plus coordinatorQA). Original Opusmedium follow-up
 6fb9f0b9-3e85-4051-b63a-2c74bd4d095f runs for editable-context hint truthfulness,
 query-clear selected-row visibility and ratified full-opacity rise-only motion.
 No root test process, native action or PRwatch yet.
+
+PR88 merged e2b3a5a8470a1ccd5a3e52de65f837c0febc5726 at31October18:00:09UTC,
+exact5e46071/currentCI41227182012SUCCESS, no GHreviews/comments/requests/rulesets
+or branchprotection. Tiny merge blurb sent immediately; watchremoved. D1renderer
+integration saved separately at13375e8, including approvedPR88 and coordinatorQA;
+active Opusmedium6fb9f0b9 addresses editable hints/query-clear scroll/live-panel
+growth. Do not poll. Separate native sourcehelper0aa7e3f (16source/69offline,
+four old-source negative controls) and DOMadapter5eca891 (37F1unit, realRow fixture,
+combobox/control guards, no newnative roles/pins/approvedtree) remain unintegrated,
+unused, unreviewed saved branches. No guest/native/input/hostbus/keyring actions.
+
+Credential Instrument Opusmedium3237f2ec completed/read: clean t3-63694be4,
+codex/f2-02-instrument-credentials, unsigned2ea07e8fcc4ffa2450f6d63d64923942a194d774
+treeba5a0c164d15b937374cde22fa620e66f7cbf4d0 on approvedPR88. Two commits,15owned
+files: secrets/UI presentation/CSS/70tests and dedicated product test/9newcaptures.
+1Password timed out30s; authorized per-command unsigned, no config change.
+Root integrates author unchanged asffc53f24b0758412918d5d9fd86aed917bb18a22
+on codex/f2-02-instrument-credentials-integration directly from approvede2b3a5a,
+without unreviewedD1source. No contract/backend/mapping change. Parent85F2unit/
+3contract/144security/type/lint pass; actual sandboxed private-Xvfb F2two16.21s
+(diagnostics7.63s/credential7.66s),9newcaptures. Four incidentalLocalDataPNGs
+restored. Initial two-axis independent review next. Stored-local success band
+whilelocked is explicitly distinct from session usability; review truthful
+outcome classifications against unchanged main semantics, not UI fixtures alone.
+AC01/UI/native observer/keyring/provider/Debianfour-session/Orca remain pending;
+AC02/privacy historical status unchanged. No PR/watch/rootprocess currently.
