@@ -885,3 +885,21 @@ product/native actions permitted. No final clean review claimed yet. Sourcehelpe
 04657eb9 remains active from approved63c9581 in codex/u1-01-instrument-notes; no
 completion inferred. Next: complete bounded final D1 review, publish focused PR,
 current CI/review inspection and prompt merge; continue existing Notes/workflow UI.
+
+Workflow existing-UI refresh8e4a9591-2d36-406f-bcd2-63b5a4eb823c is now active in
+ClaudeOpus5.5medium, isolated codex/w2-instrument-workflow from59549f0. Owned
+canvas/debugger presentation/tests/newcaptures only, no controllers/main/contracts/
+engine/graph/journal changes. Preserve actual no-drag editing, exact draft/saved
+CAS, nativeclose/Quit, explicit saved-run approval/cancellation/recovery/no-replay.
+Notes04657eb9 and finalD1review3fe2a5e4 remain active; do not poll. Threechildren
+plus root fill four slots. No root process beyond current scoped regressionchecks.
+
+Final D1 review3fe2a5e4 completed/read PASS bothaxes on184d4d74; allfourP2s closed,
+14ownedsourcepaths authora909 byte-identical. Independently28D1/10glyphunits,
+30Chromium/sixcontrolledprobes/sixoldsource-negativecontrols/type/scopedlint/plan/
+whitespace pass; all8changed/newcaptures directlyinspected,33component20product.
+59549f0 permissions-test synchronization inspected separately, no productchanges.
+Parent current323L1unit/55F1security/177L1security pass1.32s/13.16s/1.59s. Six
+actualElectron flows F125.76s/F322.54s/F214.88s pass; previous firstF3race remains
+honestly disclosed. Focused D1publication/currentCI/merge next. Notes04657eb9 and
+workflow8e4a9591 remainactive Opusmedium; finalreview terminal, no new delegation.
