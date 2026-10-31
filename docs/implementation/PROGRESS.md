@@ -1,37 +1,48 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — outer owner corrections ready for publication
+## Current coordinator state — inventory-only ownership preparation
 
-Goal ACTIVE, all97/local1.0 throughR1-03; no status/criterion promotion. Approved
-b3bea80/PR96, seven Instrument surfaces retained. No real native/guest/build runs.
-Both initial owner reviews on40adf937 completed/read: Standards1e654a49 soleP2
-FIFO preflight; Security/Spec80f02ab5 same plus final-close dispatch/first-failure
-loss. Parent fixes both directly: nonblocking source/permit opens, preflight hard
-alarm/shared budget, final descriptor errors retain known result/first cause.
-88owner tests4.480s; four actual behavioral cases fail old40adf937/passcurrent.
-55mapped security17.76s includes208Python/payload16.686s under unchanged18s bound.
-AST/hash/plan/whitespace pass, no second independent clean-review claim. Publish
-focused owner PR/currentCI/review inspection/normal merge next. Actual permit,
-transport, graceful/forced shutdown/recovery and native proof remain outstanding;
-historical two-timeout fixture absence remains honestly unverified.
+Full97/local1.0 Goal ACTIVE; no task/acceptance promotion. PR97 merged at
+b23a3cc650f98238c1190b6136889c5117266694 fromfe78d059, PlanningCI41245660272 SUCCESS,
+no requested/submittedreviews/comments, normalexpectedheadmerge, tinyblurb sent,
+watch removed. Base outer owner88tests/208offline/55mappedsecurity pass; actual
+transport/shutdown/recovery/native/build remains unproved. Historical two early
+probe timeouts still lack verified absence, never retroactively claimed clean.
 
-Independent AI author ef66ad7c continues GPT6.1SOL/high from8b0b88e; no polling.
-Coordinator configuration work saved clean on codex/a1-01-global-configuration,
-95d9f185: atomic SQLite profile/model/CAS record with dedicated contracts/client,
-no migration/new writer/renderer/export access.15contracts/10privateSQLite/7client
-and43existing storage regressions/type/scopedlint/plan pass. No integration/review
-or production credential snapshot wiring claimed. A1staysplanned. Parent sent
-material note about existing private session-only references and use/fresh seam;
-worker must propose exact captured-credential glue without importing parent work.
+Root codex/f1-02-inventory-owner-preparation from approvedPR97 freezes
+apps/desktop/tests/at/inventory-owner-protocol.md. A separate inventory-only
+permit/closed SSH job reuses the reviewed outer owner without fake native receipt.
+Read-only guest facts plus one bounded no-new-privileges dedicated-UID namespace
+metadata child, fixed poweroff/verified shutdown; no install/build/native action.
+Implementation and independent review required before invocation. Historical
+UID1000/Debian13.7/prior shutdown facts are leads only; current account/transport
+must be reconciled without private user-data/key reads or account guessing.
+All existing native admission/source/receipt/wrapper/PID1 checks stay intact.
 
-Host public build inputs are pinned outsideGit: BBBE source/archive,152locked
-Cargo crates and124upstream-verifiedElectron headers; five Rust1.95 archives
-127772720B with official manifest checksums and263-member nonexecuting layout
-inventory. No extraction/install/compiler/guest execution.13GiBfree, no further
-cleanup. Separate reviewed build-provisioning ownership remains necessary: native
-owner requires an actual receipt, never a placeholder. Old wrapper tree, PID1
-metadata, native combo identity, four desktop sessions/AT/physical/performance/
-release and all remaining tasks remain pending.
+A1 configuration is saved unchanged atc78228e43607f0c85b3da8329c1e84bae14e06e0 on
+codex/a1-01-configuration-integration, baseb23a3cc. Initial independent Standards
+0d0375fd and Security/Specab97a261 completed/read clear:15contracts/10SQLite/7client
+plus type/scopedlint/plan independently pass; Spec adds14 controlled probes.
+Authorized public Node SQLite addon reuse/hash/distinctinode provenance is stated,
+not Debian/Electron proof.43older regressionchecks inherited. Keep preparation
+unpublished/unmerged until A1's accepted F2-02/F3-01 dependency gate is satisfied.
+
+Backend author ef66ad7c completed/read clean0252f471d4bffbb4bda50116ec6838d43e689cee,
+treed5d8278063ade67259301928cfa145949bd5ee4b, worktreet3-9dbd8c05/branch
+codex/a1-01-openrouter-broker from8b0b88e:14owned additions only,132synthetictests/
+fulltype/scopedlint/plan/whitespace pass. Mapped contracts command unavailable in
+its frozenbase, exit3 honestly reported. Unsigned after bounded signing timeout,
+no config change. Parent has not integrated/reviewed source yet. Atomicconfig,
+private session-only captured-reference/eligibility lease, authenticated authority/
+content/tool ports, persistence/main utility/routing/mapping remain coordinator
+work. SharedSecretStore admission lacks caller cancellation; dispatch stops but
+cleanup waits for actual admission retirement. No real provider/keyring/desktop
+proof; all four A1criteria remain pending and integration prerequisites intact.
+
+Public source/header/Cargo/Rust candidates stay read-only outsideGit; no guest,
+compiler, downloaded toolchain extraction/installation or native execution. Root
+has no active test process or PRwatch. Inventory implementation assignment next;
+no other delegates active after three known-completed finals were fully read.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
