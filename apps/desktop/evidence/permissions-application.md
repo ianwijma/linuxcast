@@ -127,3 +127,8 @@ Final independent source review is clean on the frozen tree above; PR checks/rev
 and native AT evidence remain outstanding. Global reusable consent surfaces and
 non-workflow effect integrations are not completed by this window. F3-01 AC02/UI
 stay pending, and the full local 1.0 goal remains active.
+
+Publication update: normal signing recovered; coordinator committed final source
+and evidence as dd2a20f. No application/test/runner/dependency blob differs from
+independently reviewed c6b83bc5. Subsequent checkpoint changes are documentation.
+Native/session acceptance and the full task remain pending; this is draft work.

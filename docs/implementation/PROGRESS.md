@@ -92,3 +92,15 @@ real-file regressions;5finalscreenshots inspected. Followups parent-validated,
 no second final cleanreview claim. F2 body ready at /tmp/linuxcast-f2-diagnostics-pr.md.
 Signing unlock request remains pending; no more retry until response/statechange.
 Current fullgoal remainsactive with native and credential UI work outstanding.
+
+Signing recovered after the native session worker's normal signed d89d05e. A
+normal coordinator retry succeeded: F3 final source/evidence committed dd2a20f.
+Application/test/package/runner blobs exactly match independently reviewed frozen
+c6b83bc5; later differences are documentation only. No signing configuration changed.
+Publishing focused draft next, AC02/UI/native/task completion still pending. Native
+AT reviews foundP1cleanup/Enter/external-path andP2build-source/receipt issues;
+coordinator fixes and regressions in parent F1 worktree pass55security (46Python
+checks inside wrapper),23unit/typecheck/lint/plan. Independent recheck remains.
+Credential observer signed d89d05e returned in t3-3dc194dc, new12ownedfiles,
+6pure/35privatebus/nonrootpeer rejection checks reported. Not integrated/reviewed;
+production Nodeclient/SecretStore/UI wiring stillmissing. Fullgoal remains active.
