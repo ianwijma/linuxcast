@@ -5,7 +5,7 @@ import { Plugin } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import { Button } from '@linuxcast/ui';
+import { Button, Keycap } from '@linuxcast/ui';
 import { NOTE_TEXT_MAX_BYTES, noteDocumentSchema } from '@linuxcast/contracts';
 import type { NoteDocument } from '@linuxcast/contracts';
 import type { Editor } from '@tiptap/core';
@@ -52,12 +52,12 @@ export function RichNoteEditor({document,disabled=false,label='Note body',idPref
  const filtered=slash?commands.filter(command=>command.label.toLowerCase().includes(slash.query)):[];
  return <div className="notes-rich">
   <div role="toolbar" aria-label={idPrefix==='notes'?'Note formatting':`${label} formatting`} className="notes-toolbar">
-   {(['bold','italic','strike','code'] as const).map(mark=><Button key={mark} disabled={!editor||disabled} aria-pressed={editor?.isActive(mark)??false} onClick={()=>editor?.chain().focus().toggleMark(mark).run()}>{mark==='strike'?'Strikethrough':mark[0]!.toUpperCase()+mark.slice(1)}</Button>)}
-   <label className="notes-block-label">Block <select aria-label={idPrefix==='notes'?'Block style':`${label} block style`} disabled={disabled} value="" onChange={event=>{const command=commands.find(item=>item.label===event.target.value);if(editor&&command){editor.commands.focus();command.run(editor);}}}><option value="">Choose block</option>{commands.map(item=><option key={item.label}>{item.label}</option>)}</select></label>
-   <Button disabled={disabled||!editor?.can().undo()} onClick={()=>editor?.chain().focus().undo().run()}>Undo</Button><Button disabled={disabled||!editor?.can().redo()} onClick={()=>editor?.chain().focus().redo().run()}>Redo</Button>
+   {(['bold','italic','strike','code'] as const).map(mark=><Button key={mark} variant="ghost" className="notes-tool" disabled={!editor||disabled} aria-pressed={editor?.isActive(mark)??false} onClick={()=>editor?.chain().focus().toggleMark(mark).run()}>{mark==='strike'?'Strikethrough':mark[0]!.toUpperCase()+mark.slice(1)}</Button>)}
+   <span className="notes-tool-divider" aria-hidden="true"/><label className="notes-block-label">Block <select className="lc-focus" aria-label={idPrefix==='notes'?'Block style':`${label} block style`} disabled={disabled} value="" onChange={event=>{const command=commands.find(item=>item.label===event.target.value);if(editor&&command){editor.commands.focus();command.run(editor);}}}><option value="">Choose block</option>{commands.map(item=><option key={item.label}>{item.label}</option>)}</select></label><span className="notes-tool-divider" aria-hidden="true"/>
+   <Button variant="ghost" className="notes-tool" disabled={disabled||!editor?.can().undo()} onClick={()=>editor?.chain().focus().undo().run()}>Undo</Button><Button variant="ghost" className="notes-tool" disabled={disabled||!editor?.can().redo()} onClick={()=>editor?.chain().focus().redo().run()}>Redo</Button>
   </div>
-  <p id={`${idPrefix}-rich-guidance`} className="lc-muted">{idPrefix==='notes'?'Type / for blocks and tasks. Paste and drop plain text only; attachments and links are unavailable. Maximum 64 KiB of text.':previewKind==='import'?'Read-only Markdown import preview. Rich text and task states are shown without editing.':'Read-only saved revision. Rich text and task states are shown without editing.'}</p>
-  {!disabled&&slash&&<div id={`${idPrefix}-slash-menu`} role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`${idPrefix}-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div>}
+  <p id={`${idPrefix}-rich-guidance`} className="lc-muted notes-guidance">{idPrefix==='notes'?'Type / for blocks and tasks. Paste and drop plain text only; attachments and links are unavailable. Maximum 64 KiB of text.':previewKind==='import'?'Read-only Markdown import preview. Rich text and task states are shown without editing.':'Read-only saved revision. Rich text and task states are shown without editing.'}</p>
+  {!disabled&&slash&&<div className="notes-slash-popover"><p className="notes-slash-caption" aria-hidden="true">Insert block</p><div id={`${idPrefix}-slash-menu`} role="listbox" aria-label="Insert block" className="notes-slash">{filtered.length?filtered.map((command,index)=><button type="button" role="option" id={`${idPrefix}-slash-${index}`} aria-selected={slash.index===index} key={command.label} onMouseDown={event=>event.preventDefault()} onClick={()=>choose(command)}>{command.label}</button>):<p>No matching blocks. Press Escape to keep typing.</p>}</div><p className="notes-slash-hint"><Keycap>Up</Keycap><Keycap>Down</Keycap> move <Keycap>Enter</Keycap> insert <Keycap>Escape</Keycap> close</p></div>}
   <EditorContent editor={editor}/>
  </div>;
 }
