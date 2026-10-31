@@ -32,24 +32,44 @@ user intent; the UI never displays operation success based on that return.
   supplied cancellation callback. Query, selection, scroll and form drafts remain
   while a parent view is hidden. Removed components clear their local drafts and
   abort their picker/credential work. `session.close()` removes all views; call it when disposing the owning command session.
-- Lists use grouped semantic listboxes and stable IDs. Host search filters title,
+- Collection queries are `combobox` fields (`aria-expanded`, `aria-controls`,
+  `aria-activedescendant`, native caret keys). Lists use grouped semantic listboxes of
+  Instrument `Row` options and stable IDs; glyphs resolve through a closed host map from
+  validated builtin icon names to the eight tile categories (unknown names fall back to
+  `system`), validated emoji text or packaged images. Titles, subtitles and disabled
+  reasons stay in the accessible name and tooltip. Host search filters title,
   subtitle and keywords; extension search emits query changes without local
   filtering. A query revision increments for each accepted change. New results do
   not replace a surviving selection or primary action. Removal selects the first
   available item; disabled items remain readable with their reason.
-- Grids use the same selection model with spatial arrow navigation, density,
-  captions and stable failed-image cells. Optional item previews share a keyboard
-  adjustable divider and become vertically stacked on narrow layouts.
+- Grids use `grid`/`rowgroup`/`row`/`gridcell`; rows follow the measured rendered
+  columns, Left/Right move one cell, Up/Down keep the column, Home/End stay in the row
+  and Ctrl+Home/End reach the first/last cell; the query's Up/Down move by row. Cells keep
+  a stable footprint when an image fails; the selected cell has a short bottom rail.
+  Compact grids show glyphs only (names stay accessible and appear in the footer).
+  Optional item previews use a focusable `separator` (42% list, 30–60%, 2% arrows,
+  Home/End, pointer drag) and stack vertically below 600 px; PDF previews show an
+  unavailable band without erasing the list.
 - Detail renders CommonMark, metadata and host-resolved attachments. Text supports
   readonly and local editable drafts. Image views use host-resolved images. PDF
   previews explicitly report unavailable until a sandboxed document viewer is
   integrated; available declared document actions remain usable.
-- `Ctrl+K` opens the searchable action dialog, arrows select an action, Enter
-  dispatches it, Tab traverses native controls, and Escape closes it and restores
-  focus. Outside editable controls declared shortcuts are supported. Enter uses
-  the selected primary action; Ctrl+Enter selects the supplied secondary action.
-  Escape otherwise pops the view (last pop closes the session view). The broker
-  owns actual launcher dismissal. Dirty forms/text request explicit discard.
+- `Ctrl+K` opens the 280 px action dialog (“Actions”) anchored above the footer: a
+  header with the selected title and a Close control, native buttons with line icons
+  and keycaps grouped by divider (bound primary/secondary, others, destructive last
+  with an accessible “(destructive)” suffix), and the “Find an action” filter at the
+  bottom. Arrows move, Enter dispatches the highlighted action, Escape or Ctrl+K close
+  and focus returns. The list scrolls so header and filter stay reachable in compact
+  windows and at 200% zoom. Grouping is visual only: the initial highlight is the
+  current primary and dispatch re-reads the latest view/revision/selection.
+- The footer status line shows the selected item's small glyph and title, the bound
+  primary (Enter) and secondary (Ctrl+Enter) verbs only when supplied, and Actions
+  (Ctrl+K). No type label is inferred (the ViewModel has no type field).
+- Root Escape closes the action panel, then clears a nonempty query, then pops the
+  root (the broker owns actual dismissal). Nested Escape closes the panel, then pops
+  with the parent's query/selection/focus. Dirty forms/text request explicit discard
+  first. Loading shows a header hairline plus a polite status; a list without rows
+  shows a Loading plate; host status messages render as tinted bands that keep rows.
 - Forms cover text, secret, number, date, boolean, enum, file, directory and
   application fields. Persistent labels, descriptions and inline errors remain
   accessible; required/range/type/UTF-8/aggregate-size validation happens before
@@ -131,3 +151,16 @@ D1-01's actual native accessibility/UI acceptance remains pending, so D1-02 is n
 marked complete. Actual Electron screen-reader/text-scaling/high-contrast/reduced-
 motion checks and host adapters remain integration work. No VM, host display,
 physical input, privileged service or real filesystem operation was exercised.
+
+## Instrument adoption (1 November 2026)
+
+Selected Opus Instrument presentation (DESIGN.md: Shell and navigation; Results and
+actions; List, grid, detail and form; States and motion; Accessibility) on the merged
+D1-01 primitives. `views.test.ts` now covers 19 Chromium cases including the combobox/
+listbox relationship, root/nested Escape order, footer verbs, action-panel geometry and
+destructive grouping, stale-snapshot dispatch, grid rows/columns/Home/End, separator
+keys/pointer, truthful state bands, 480 px at 200% text, forced colours and reduced
+motion. Captures are in `evidence/instrument/` (see its README); earlier files in
+`evidence/` remain historical. Browser fixtures are not Electron or native AT evidence.
+The action panel uses the 4 px rise without an opacity fade so text never drops below
+AA contrast while the panel is already interactive.
