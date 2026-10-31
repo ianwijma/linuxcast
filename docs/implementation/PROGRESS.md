@@ -646,3 +646,12 @@ branch. The D1 integration/adoption ledger is saved at7f4b1f8, separate from thi
 F3 candidate. No sourcehelper/AT-adapter additions included. Sourcehelper branch
 86abb64 remains unreviewed/unused,113offline checks pass. No root process/PRwatch
 or native/guest/hostbus/provider/keyring actions. No task/criterion promotion.
+
+Initial F3 reviews now run on frozen fad2135448e5e6c69cfaeeec943e8fdd9786685f,
+base63c9581: Standards52c6c909-bb9b-4dc1-97cc-6e86ff79474e and Security/Spec
+6bbb20cf-2041-4abb-abba-6bf8f913290e, fresh isolated GPT6.1SOL/high. Both briefs
+cover task/contracts/security/design, exact29file scope,21captures, parent83unit/
+2contract/72security/current2Electron24.42s evidence and inherited-versus-rerun
+limits. No native actions, publication or delegation. Completion wakes parent;
+don't poll. D1 original Opusmedium9c84499d remains active on its four review P2s.
+Root has no test process or PR watch; preserve separate focused UI branches.
