@@ -3,13 +3,38 @@
 The user selected Opus **Instrument** for all seven surfaces in merged PR84 and
 now prioritizes updating existing UI. This supersedes the earlier hybrid idea.
 Every UI design/implementation/update assignment uses **Claude Opus 5.5, medium**
-(`claudeAgent`, `claude-opus-5-5`, `effort: medium`). The general Goal model rule
-continues for non-UI work. Full agreed local1.0 scope is preserved.
+(`claudeAgent`, `claude-opus-5-5`, `effort: medium`). Non-UI subagents use
+GPT-6.1 SOL with high reasoning. Full agreed local1.0 scope is preserved.
 
 The selected proposal at `docs/design/proposals/raycast-refresh/opus/` is the
 adoption source. The coordinator migrates canonical DESIGN.md/tokens together,
 reviews shared interfaces and integrations, and records actual evidence. Proposed
 screenshots and old appearance checks do not establish implemented adoption.
+
+## Current adoption checkpoints
+
+These are bounded implementation checkpoints, not completed task or native UI
+acceptance. The approved develop checkpoint is PR89 merge
+`63c958115d3efec4505efad12f3898aa0003bb93`.
+
+| Surface | Implementation state | Evidence and remaining work |
+| --- | --- | --- |
+| Shared tokens and primitives (D1-01) | Merged in [PR87](https://github.com/ianwijma/linuxcast/pull/87), `031f78e` | Instrument tokens, controls, rows, tiles and state plates; validator parity and malformed-key regressions passed independent review. Product adoption and native/AT acceptance remain separate gates. |
+| Local data (F2-02) | Merged in [PR88](https://github.com/ianwijma/linuxcast/pull/88), `e2b3a5a` | Sidebar, captured-action bands and measured sticky-band focus clearance; 12 affected-state product captures. Both independent reviews passed. Native dialogs are instrumented and supported desktop/Orca proof remains pending. |
+| Credentials (F2-02) | Merged in [PR89](https://github.com/ianwijma/linuxcast/pull/89), `63c9581` | Explicit storage radios, qualified local status and truthful cancellation; 9 captures, 86 unit/3 contract/145 security checks and two Electron flows. Initial reviews' cancellation finding was corrected and coordinator-verified. Native observer/keyring/provider and supported session/AT proof remain pending. |
+| Shared renderer and launcher (D1-02/F1-02/L1-01) | Source `5197d94` integrated on `codex/d1-02-instrument-renderer-integration`; initial reviews require four corrections | Existing 24 renderer browser cases, 28 D1 units, 323 L1 units and four combined Electron flows pass. Review added reproductions for 200% split overflow, regrouped-action focus loss, list Left routing and modified grid jumps. Original Opus author is fixing those before publication; native acceptance remains pending. |
+| Saved permissions (F3-01) | Opus source `e1db203` integrated on `codex/f3-01-instrument-permissions-integration`; independent reviews running | Existing broker/controller/opaque snapshot authority is unchanged. Coordinator mapped the 8 new component cases: 83 units/2 contracts/72 security checks and two Electron flows (24.42s) pass. The 21 captures remain author-identical; current independent reviews gate publication. |
+| Files, builtin details/forms/grid | Shared-frame adoption is included in the pending D1 increment | Downstream role/action/keyboard regressions support the shared change. Inspect any remaining feature-specific workspace composition after D1 merges; do not infer native acceptance or a complete feature from those fixtures. |
+| Notes and workflows | Existing compositions still await their bounded Instrument updates | Preserve draft/import/export/recovery, non-drag workflow access, approvals, cancellation and unknown-outcome behavior. These are the next composition assignments after the current UI lanes. |
+
+The immediate merge target is the reviewed renderer increment once actionable
+findings are resolved. Saved permissions continues on disjoint paths. Do not
+hold a reviewed UI increment for full native/task/release acceptance, and do not
+use its merge to promote those outstanding gates. The detailed registry remains
+authoritative for task and criterion verification.
+
+The evidence below the priority table records the original pre-adoption audit;
+its baseline implementation descriptions and timings are historical.
 
 | Priority | Existing tasks and surfaces | Bounded result |
 | --- | --- | --- |
@@ -61,8 +86,8 @@ is no glyph-category property. Any added wire field must be proposed to the
 coordinator and validated, never smuggled as CSS/SVG/style. The next Opus lane
 chooses presentation using the accepted shared primitives and frozen contracts.
 
-The selected proposal differs from the current implementation in more than
-colour: current action filtering is above its list, grid uses listbox/option
+The selected proposal differed from the audited baseline in more than
+colour: its action filtering was above its list, grid used listbox/option
 semantics, and detail resizing uses a range input. Instrument specifies the
 bottom filter, grid/gridcell semantics and a focusable separator. These require
 intentional keyboard/ARIA regression updates, not a blanket screenshot refresh.
@@ -83,8 +108,8 @@ Relevant existing mappings in scripts/test-runner/suites.json:
 
 Coordinator executed D1-02's existing session/form/loading unit baseline before
 renderer adoption:27/27pass on pinned Node24.22.1/Bun1.4.4 atb9fefd2. This is behavior preparation, not Instrument visual or native
-acceptance. The current Opus D1-01 lane remains the only UI implementation writer;
-renderer implementation waits for its shared API/token freeze.
+acceptance. At that checkpoint the Opus D1-01 lane was the only UI implementation
+writer, and renderer implementation waited for its shared API/token freeze.
 
 The unchanged renderer browser baseline also passes: `bun run test:ui -- D1-02`,
 11/11 tests in10.9s at290d7f0, Node24.22.1/Bun1.4.4/Playwright1.64.1. It covers

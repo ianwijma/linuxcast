@@ -655,3 +655,15 @@ cover task/contracts/security/design, exact29file scope,21captures, parent83unit
 limits. No native actions, publication or delegation. Completion wakes parent;
 don't poll. D1 original Opusmedium9c84499d remains active on its four review P2s.
 Root has no test process or PR watch; preserve separate focused UI branches.
+
+Current F3 registry branch now points to the actual Instrument integration lane;
+its parent83unit/2contract/72security/twoElectron24.42s evidence is recorded as
+review-pending, without promoting any criterion. UI_REFRESH carries the current
+merged PR87/88/89, D1 four pending P2s and F3 review state. All97task statuses and
+acceptance records verified unchanged. Standards52c6c909 completed/read clean,
+no actionable findings; independently83units/2contracts/type/lint/plan and21PNGs,
+exactfad2135/base63c9581 clean unchanged. Retained neutral receipt and StrictMode
+caveats verified baseline with non-StrictMode production entry. Security/Spec
+6bbb20cf still pending; don't poll. Concrete PR body is prepared privately at
+/tmp/linuxcast-instrument-permissions-pr.md with that pending state explicit;
+do not publish until its final review result is incorporated. No PR open/watch.
