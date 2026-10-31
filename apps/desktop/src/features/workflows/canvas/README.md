@@ -176,6 +176,17 @@ visible sized card/label boxes inside the canvas do not intersect, and stored st
 (`apps/desktop/evidence/instrument-workflows/workflow-editor-application-light-zoom-200.png`, captured
 with `webContents.capturePage()` because Playwright element capture ignores Electron zoom).
 
+Gesture frame: React Flow computes every event of a pointer drag, including the final release, from
+drag-start display coordinates. The canvas therefore freezes the projection factor for the duration of a
+gesture (`onNodeDragStart`/`onSelectionDragStart`, or the first `dragging` change) for both display and
+inverse, and releases it right after the final `dragging: false` change (which also covers xyflow's abort
+path). A text-size change during a held drag no longer rescales the stored point on release; the new
+frame applies once the gesture ends. No compensating writes, controller, persistence or autosave
+changes. Two Chromium cases fail on 069669e and pass here: resize while held then release without motion
+keeps the exact settled stored point, write count, viewport, nodes/edges and a stored-frame Undo; and the
+controls (100% drag, resize with further motion stored in the gesture frame, 200% keyboard move = 5/f
+with exact Undo). `test:ui -- W2-01` 24 passed.
+
 Remaining limitations and shared requests (coordinator-owned):
 
 1. Shared `Row`: `.lc-row-text` `flex: 1 1 12em` overflows a 240 px sidebar at normal text. Request a

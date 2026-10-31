@@ -146,3 +146,61 @@ test('text resizing never writes or changes stored layout, viewport, undo or the
   const settled = await writes(page); await page.evaluate(() => { document.documentElement.style.fontSize = ''; }); await page.waitForTimeout(700);
   expect(await writes(page)).toBe(settled); expect((await storedGraph(page)).positions).toEqual(before.positions);
 });
+
+// One coordinate frame per pointer gesture: a text-size change while a drag is held must not rescale its release.
+const projection = async (page: Page) => Number(await page.locator('.wf-canvas').getAttribute('data-projection'));
+const viewportZoom = (page: Page) => page.locator('.react-flow__viewport').evaluate(element => new DOMMatrixReadOnly(getComputedStyle(element).transform).a);
+async function centre(page: Page, id: string) { const box = (await page.locator(`.react-flow__node[data-id="${id}"]`).boundingBox())!; return { x: box.x + box.width / 2, y: box.y + box.height / 2 }; }
+/** Card top-left relative to the React Flow pane: survives page reflow and card-size changes. */
+async function paneOrigin(page: Page, id: string) { return page.evaluate(nodeId => { const pane = document.querySelector('.react-flow')!.getBoundingClientRect(), node = document.querySelector(`.react-flow__node[data-id="${nodeId}"]`)!.getBoundingClientRect(); return { x: node.left - pane.left, y: node.top - pane.top }; }, id); }
+async function resizeRootText(page: Page, value: string, minimumCardWidth: number) {
+  await page.evaluate(size => { document.documentElement.style.fontSize = size; }, value);
+  await expect.poll(() => page.locator('.wf-canvas-probe [data-probe="card"]').evaluate(element => (element as HTMLElement).offsetWidth)).toBeGreaterThanOrEqual(minimumCardWidth);
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+test('text resize during a held pointer drag keeps the exact settled stored point, writes, undo and graph on release', async ({ page }) => {
+  await ready(page); await buildChain(page); await page.waitForTimeout(700);
+  const initial = await storedGraph(page), start = await centre(page, 'node-2');
+  await page.mouse.move(start.x, start.y); await page.mouse.down(); await page.mouse.move(start.x + 20, start.y + 10, { steps: 4 }); await page.mouse.move(start.x + 40, start.y + 20, { steps: 4 });
+  await page.waitForTimeout(700); // the held drag settles through ordinary autosave
+  const settled = await storedGraph(page), count = await writes(page);
+  expect(settled.positions['node-2']).not.toEqual(initial.positions['node-2']);
+  await resizeRootText(page, '200%', 400);
+  await page.mouse.up(); await page.waitForTimeout(700);
+  const released = await storedGraph(page);
+  expect(released.positions).toEqual(settled.positions); expect(await writes(page)).toBe(count);
+  expect(released.nodes).toEqual(initial.nodes); expect(released.edges).toEqual(initial.edges); expect(released.viewport).toEqual(initial.viewport);
+  await expect.poll(() => projection(page)).toBeGreaterThan(2); // the new frame applies only after release
+  await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click(); await page.waitForTimeout(700);
+  const undone = (await storedGraph(page)).positions['node-2']!; // one drag step back, still in the stored frame
+  expect(undone.x).toBeGreaterThanOrEqual(initial.positions['node-2']!.x - 0.001); expect(undone.x).toBeLessThan(settled.positions['node-2']!.x);
+  expect(undone.y).toBeGreaterThanOrEqual(initial.positions['node-2']!.y - 0.001); expect(undone.y).toBeLessThanOrEqual(settled.positions['node-2']!.y);
+});
+test('controls: 100% drag, resize with further pointer motion, and keyboard move use the gesture frame; Undo restores exactly', async ({ page }) => {
+  await ready(page); await buildChain(page); await page.waitForTimeout(700);
+  const initial = await storedGraph(page), f100 = await projection(page), zoom = await viewportZoom(page);
+  // Ordinary 100% drag stores screen delta / zoom / f.
+  let from = await centre(page, 'node-1'); await page.mouse.move(from.x, from.y); await page.mouse.down(); await page.mouse.move(from.x + 50, from.y + 25, { steps: 8 }); await page.mouse.up(); await page.waitForTimeout(700);
+  const to = await centre(page, 'node-1'); let stored = await storedGraph(page);
+  expect(to.x - from.x).toBeGreaterThan(30);
+  expect(stored.positions['node-1']!.x - initial.positions['node-1']!.x).toBeCloseTo((to.x - from.x) / zoom / f100, 1); expect(stored.positions['node-1']!.y - initial.positions['node-1']!.y).toBeCloseTo((to.y - from.y) / zoom / f100, 1);
+  // Resize while held, then keep moving: the whole gesture stays in its start frame.
+  const before3 = stored.positions['node-3']!, start3 = await paneOrigin(page, 'node-3'); from = await centre(page, 'node-3');
+  await page.mouse.move(from.x, from.y); await page.mouse.down(); await page.mouse.move(from.x + 40, from.y + 20, { steps: 6 });
+  await resizeRootText(page, '200%', 400);
+  await page.mouse.move(from.x + 70, from.y + 35, { steps: 6 }); const drawn = await paneOrigin(page, 'node-3'); // still drawn in the gesture frame
+  await page.mouse.up(); await page.waitForTimeout(700);
+  stored = await storedGraph(page);
+  expect(stored.positions['node-3']!.x - before3.x).toBeCloseTo((drawn.x - start3.x) / zoom / f100, 1); expect(stored.positions['node-3']!.y - before3.y).toBeCloseTo((drawn.y - start3.y) / zoom / f100, 1);
+  expect(stored.positions['node-3']!.x).toBeGreaterThan(before3.x);
+  expect(stored.nodes).toEqual(initial.nodes); expect(stored.edges).toEqual(initial.edges);
+  // Keyboard move at 200% stores the display step divided by the current frame; Undo restores exactly.
+  const f200 = await projection(page); expect(f200).toBeGreaterThan(2);
+  const second = page.locator('.react-flow__node[data-id="node-2"]'); await second.focus(); await page.keyboard.press('Enter'); await expect(second).toHaveAttribute('aria-pressed', 'true');
+  const beforeKey = (await storedGraph(page)).positions; await page.keyboard.press('ArrowRight'); await page.waitForTimeout(700);
+  const keyed = (await storedGraph(page)).positions;
+  expect(keyed['node-2']!.x - beforeKey['node-2']!.x).toBeCloseTo(5 / f200, 6); expect(keyed['node-2']!.y).toBe(beforeKey['node-2']!.y);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click(); await page.waitForTimeout(700);
+  expect((await storedGraph(page)).positions).toEqual(beforeKey);
+});

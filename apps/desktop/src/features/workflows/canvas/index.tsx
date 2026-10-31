@@ -105,7 +105,13 @@ export function WorkflowEditor({ api, runApi,launchIntent }: { api: WorkflowEdit
   const titleOf = (type: string) => EDITOR_NODE_TYPES.find(item => item.type === type);
   const outputsOf = (node: WorkflowDefinition['nodes'][number]) => { try { return [...(EDITOR_NODE_REGISTRY.get(node.type)?.outputPorts(node.config) ?? [])]; } catch { return [] as string[]; /* Invalid drafts remain editable. */ } };
   const kindOf = (node: WorkflowDefinition['nodes'][number] | undefined, port: string) => { if (!node) return 'unknown'; try { return EDITOR_NODE_REGISTRY.get(node.type)?.outputKinds(node.config).get(port) ?? 'unknown'; } catch { return 'unknown'; } };
-  const [probe, setProbe] = useState<HTMLDivElement | null>(null), factor = useMeasuredProjection(probe);
+  const [probe, setProbe] = useState<HTMLDivElement | null>(null), measuredFactor = useMeasuredProjection(probe);
+  /* One coordinate frame per pointer gesture: React Flow computes every drag event (including the final
+     release) from drag-start display coordinates, so a text-size change mid-gesture must not change the
+     frame used to display or invert that gesture. The ref is the synchronous inverse; state re-renders. */
+  const gestureFrame = useRef<number | null>(null), [frozenFactor, setFrozenFactor] = useState<number | null>(null);
+  const factor = frozenFactor ?? measuredFactor;
+  const beginGesture = () => { if (gestureFrame.current === null) { gestureFrame.current = factor; setFrozenFactor(factor); } };
   const nodes: CanvasNode[] = (draft?.nodes ?? []).map(node => {
     const entry = titleOf(node.type), registration = EDITOR_NODE_REGISTRY.get(node.type), tile = nodeTile(node.type), outputs = outputsOf(node);
     const label = node.label || entry?.title || 'Unknown node', category = entry?.category ?? 'Unavailable', summary = configSummary(node);
@@ -157,7 +163,9 @@ export function WorkflowEditor({ api, runApi,launchIntent }: { api: WorkflowEdit
             <div className="wf-canvas-toolbar"><h2 className="wf-panel-title">Canvas</h2><span className="wf-count">{draft.nodes.length} nodes · {draft.edges.length} connections</span><p className="wf-caption">Positions and zoom are layout only. Use the structured controls below without dragging.</p></div>
             <div className="wf-canvas" data-projection={factor}><div className="wf-canvas-probe" ref={setProbe} aria-hidden="true"><span data-probe="card" /><span data-probe="slot" className="wf-edge-label-slot"><span className="wf-edge-label">{probeKind}</span></span></div>{draft.nodes.length ? <ReactFlow<CanvasNode, CanvasEdge> nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} minZoom={0.25} maxZoom={2} viewport={viewport} onViewportChange={setViewport} deleteKeyCode={null} nodesDraggable={!locked} nodesConnectable={!locked} elementsSelectable={!locked}
               onNodesChange={changes => { const updated = applyNodeChanges(changes, nodes); const dimensions = changes.filter(change => change.type === 'dimensions'); if (dimensions.length) setMeasurements(previous => ({ ...previous, ...Object.fromEntries(updated.filter(node => node.measured?.width && node.measured.height).map(node => [node.id, { width: node.measured!.width!, height: node.measured!.height! }])) }));
-                for (const change of changes) { if (change.type === 'select' && change.selected) controller.select(change.id); if (change.type === 'position' && change.position) controller.positions({ [change.id]: toStored(change.position, factor) }); } }}
+                for (const change of changes) { if (change.type === 'select' && change.selected) controller.select(change.id); if (change.type === 'position' && change.position) { if (change.dragging === true) beginGesture(); controller.positions({ [change.id]: toStored(change.position, gestureFrame.current ?? factor) }); } }
+                if (gestureFrame.current !== null && changes.some(change => change.type === 'position' && change.dragging === false)) { gestureFrame.current = null; setFrozenFactor(null); } }}
+              onNodeDragStart={beginGesture} onSelectionDragStart={beginGesture}
               onNodeClick={(_, node) => controller.select(node.id)} onConnect={connection => { if (connection.sourceHandle && connection.targetHandle === 'in') controller.connect(connection.source, connection.sourceHandle, connection.target); }}
               onMoveEnd={(event, viewport) => { if (event) controller.viewport(viewport); }} proOptions={{ hideAttribution: false }}>{/* 16-unit canvasDot grid in flow coordinates (token canvasDotSpacing). */}<Background variant={BackgroundVariant.Dots} gap={16} size={1} color="var(--lc-canvas-dot)" /><Controls showInteractive={false} /></ReactFlow>
               : <EmptyState title="Start with a Keyword" description="Add a Keyword from the palette, then Transform text and Copy text. Every step is also reachable from the structured controls below." />}</div>
