@@ -1,3 +1,4 @@
+import {NOTES_IMPORT_CHANNEL,noteImportReplySchema} from '../../../../packages/contracts/src/notes-import.ts';
 import {NOTES_LAUNCHER_CHANNELS,notesOpenAttemptSchema} from '../../../../packages/contracts/src/notes-launcher.ts';
 import * as z from 'zod';
 import {NOTES_EXPORT_CHANNEL,noteExportSelectionSchema,noteExportReplySchema} from '../../../../packages/contracts/src/notes-export.ts';
@@ -13,6 +14,7 @@ export function createNotesApi(transport:Pick<ShellTransport,'invoke'|'on'|'remo
  };
  let quickListener=false,latestQuickAttempt=0,openListener=false,latestOpenAttempt=0;
  return Object.freeze<NotesApi>({
+  async chooseMarkdownImport(){try{const reply=noteImportReplySchema.safeParse(await transport.invoke(NOTES_IMPORT_CHANNEL,{protocolVersion:1}));return reply.success?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
   async trashSnapshot(){try{const reply=notesTrashSnapshotReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.trashSnapshot,{protocolVersion:1}));return reply.success?reply.data:failed('unavailable');}catch{return failed('unavailable');}},
   async emptyTrash(input){const request=notesEmptyTrashSchema.safeParse(input);if(!request.success)return failed('invalid-request');try{const reply=notesEmptyTrashReplySchema.safeParse(await transport.invoke(NOTES_CHANNELS.emptyTrash,{protocolVersion:1,input:request.data}));return reply.success&&(!reply.data.ok||reply.data.value.deletedCount===request.data.expectedCount&&reply.data.value.fingerprint===request.data.expectedFingerprint)?reply.data:failed('unknown-outcome');}catch{return failed('unknown-outcome');}},
   onOpenNoteRequested(listener){

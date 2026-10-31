@@ -1,0 +1,79 @@
+{
+  "base": "09de566dc3773b058be7c43e517956bd08ef7fcb",
+  "status": "unfinished; known application failures; not merge-ready",
+  "authorWorktree": "/home/ian/Projects/ianwijma/linuxcast/.worktrees/linuxcast-notes-markdown-import-ui",
+  "files": {
+    "packages/notes/src/controller.ts": {
+      "authorSha256": "0389b14ca69a43a5195987333fcb5c5b80e29b6c55ff5d88b7883bba2a579123",
+      "assembledSha256": "0389b14ca69a43a5195987333fcb5c5b80e29b6c55ff5d88b7883bba2a579123"
+    },
+    "packages/notes/src/index.tsx": {
+      "authorSha256": "c3f3e8c86f43dbfa8cad517f4aac76d8acd16e03009f5a64389d15ea4789e95a",
+      "assembledSha256": "c3f3e8c86f43dbfa8cad517f4aac76d8acd16e03009f5a64389d15ea4789e95a"
+    },
+    "packages/notes/src/editor.tsx": {
+      "authorSha256": "b61dd56c4bb422f37b758510d6c5c52c9c164fe82529abc2de9c78d4b528634c",
+      "assembledSha256": "b61dd56c4bb422f37b758510d6c5c52c9c164fe82529abc2de9c78d4b528634c"
+    },
+    "packages/notes/src/markdown.ts": {
+      "authorSha256": "5b8e21fa1bc131972453cd6e51958c6cfcd82eba36f8674c9678bf451775100e",
+      "assembledSha256": "5b8e21fa1bc131972453cd6e51958c6cfcd82eba36f8674c9678bf451775100e"
+    },
+    "packages/notes/tests/import-controller.test.ts": {
+      "authorSha256": "32f64e34e35892b23430e8df32cd69f79145b7cd2ac6f30b71054b873c0b7dcd",
+      "assembledSha256": "32f64e34e35892b23430e8df32cd69f79145b7cd2ac6f30b71054b873c0b7dcd"
+    },
+    "packages/notes/tests/import-markdown.test.ts": {
+      "authorSha256": "68554be0971e45669cb5989472164b6efed7868b117bac3024a232840a390551",
+      "assembledSha256": "68554be0971e45669cb5989472164b6efed7868b117bac3024a232840a390551"
+    },
+    "packages/notes/tests/import.ui.test.ts": {
+      "authorSha256": "9502607fb79c4eddfd616b79a464d394f3e8ac1673ed44384224f45b90a6e6a0",
+      "assembledSha256": "9502607fb79c4eddfd616b79a464d394f3e8ac1673ed44384224f45b90a6e6a0"
+    },
+    "packages/notes/fixtures/import.html": {
+      "authorSha256": "817f194f08624be387b4cb52e2526e216435945ee707ed853de6bb7bcc5bf9f9",
+      "assembledSha256": "817f194f08624be387b4cb52e2526e216435945ee707ed853de6bb7bcc5bf9f9"
+    },
+    "packages/notes/fixtures/import.tsx": {
+      "authorSha256": "a8722405cbcd7cff3a1aacac44e4dbf566bcb162cac177a61cf36bacb69c522b",
+      "assembledSha256": "a8722405cbcd7cff3a1aacac44e4dbf566bcb162cac177a61cf36bacb69c522b"
+    },
+    "packages/notes/evidence/markdown-import-ui.md": {
+      "authorSha256": "4f9ad033c4f9c562dabba9fe05b3c9f91a32cca9b01b97b87ac2d4de3f9d0936",
+      "assembledSha256": "462ae544ddb7bf514bb8d0b96ad500c9b0e80010564dfcdb9105add8f38753b2"
+    },
+    "packages/notes/evidence/markdown-import-200-percent-light.png": {
+      "authorSha256": "6cc060cec37e95837eaba5cea290961b70c04536fe85a517900241bbdc99152a",
+      "assembledSha256": "6cc060cec37e95837eaba5cea290961b70c04536fe85a517900241bbdc99152a"
+    },
+    "packages/notes/evidence/markdown-import-created-dark.png": {
+      "authorSha256": "c834172728566ca2402cb2447b8790681ec422c069ee8b7a9b3b6979e78c98d4",
+      "assembledSha256": "c834172728566ca2402cb2447b8790681ec422c069ee8b7a9b3b6979e78c98d4"
+    },
+    "packages/notes/evidence/markdown-import-created-light.png": {
+      "authorSha256": "b13ac3804df012cd87c5bc5d46e52995e728f36ac8242b3c8b1697019652d8aa",
+      "assembledSha256": "b13ac3804df012cd87c5bc5d46e52995e728f36ac8242b3c8b1697019652d8aa"
+    },
+    "packages/notes/evidence/markdown-import-pending-dark.png": {
+      "authorSha256": "d3adbd7ed41abacae8d091f11ac6309053647e05b0b9962508a6e1614e39ee7c",
+      "assembledSha256": "d3adbd7ed41abacae8d091f11ac6309053647e05b0b9962508a6e1614e39ee7c"
+    },
+    "packages/notes/evidence/markdown-import-review-dark.png": {
+      "authorSha256": "1aaa2ea603eb1978818f369b790c3406479a2f8467fed41a8d9f2760fc2c7bce",
+      "assembledSha256": "1aaa2ea603eb1978818f369b790c3406479a2f8467fed41a8d9f2760fc2c7bce"
+    },
+    "packages/notes/evidence/markdown-import-review-light.png": {
+      "authorSha256": "80c57705b083272b73e1fcf2883880b808afdc93ea6de724a519ff7c62d4feab",
+      "assembledSha256": "80c57705b083272b73e1fcf2883880b808afdc93ea6de724a519ff7c62d4feab"
+    },
+    "packages/notes/evidence/markdown-import-unavailable-light.png": {
+      "authorSha256": "30618afc7ed398ae99b4c9cb1ab602ff59a74f8711a38da5e353f2993db8dfa3",
+      "assembledSha256": "30618afc7ed398ae99b4c9cb1ab602ff59a74f8711a38da5e353f2993db8dfa3"
+    },
+    "packages/notes/evidence/markdown-import-unknown-light.png": {
+      "authorSha256": "bfa645cc651a7159bfb9650479cc47a2ca0357e38f2d0ee256b5c38e19118a42",
+      "assembledSha256": "bfa645cc651a7159bfb9650479cc47a2ca0357e38f2d0ee256b5c38e19118a42"
+    }
+  }
+}

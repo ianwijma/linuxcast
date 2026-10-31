@@ -96,7 +96,9 @@
       "apps/desktop/src/features/launcher/tests/notes-routing.test.ts",
       "packages/notes/tests/launcher-open.test.ts",
       "packages/notes/tests/delete-controller.test.ts",
-      "packages/notes/tests/empty-trash-controller.test.ts"
+      "packages/notes/tests/empty-trash-controller.test.ts",
+      "packages/notes/tests/import-controller.test.ts",
+      "packages/notes/tests/import-markdown.test.ts"
     ],
     "L2-06": [
       "packages/builtins/emoji/tests/search.test.ts",
@@ -190,7 +192,8 @@
       "packages/contracts/tests/notes.contract.test.ts",
       "packages/contracts/tests/notes-export.contract.test.ts",
       "packages/contracts/tests/notes-launcher.contract.test.ts",
-      "packages/contracts/tests/notes-empty-trash.contract.test.ts"
+      "packages/contracts/tests/notes-empty-trash.contract.test.ts",
+      "packages/contracts/tests/notes-import.contract.test.ts"
     ],
     "L2-06": [
       "packages/contracts/tests/emoji.contract.test.ts",
@@ -245,7 +248,8 @@
       "apps/desktop/src/features/launcher/tests/notes-search.ui.test.ts",
       "packages/notes/tests/launcher-open.ui.test.ts",
       "packages/notes/tests/delete.ui.test.ts",
-      "packages/notes/tests/empty-trash.ui.test.ts"
+      "packages/notes/tests/empty-trash.ui.test.ts",
+      "packages/notes/tests/import.ui.test.ts"
     ],
     "L2-06": [
       "packages/builtins/emoji/tests/emoji.ui.test.ts",
@@ -327,7 +331,8 @@
       "apps/desktop/tests/notes.integration.test.ts",
       "packages/storage/tests/notes-root-search.integration.test.ts",
       "packages/storage/tests/notes-empty-trash.integration.test.ts",
-      "apps/desktop/tests/notes-empty-trash.integration.test.ts"
+      "apps/desktop/tests/notes-empty-trash.integration.test.ts",
+      "apps/desktop/tests/notes-markdown-import.integration.test.ts"
     ],
     "L2-06": [
       "apps/desktop/tests/emoji.integration.test.ts",
@@ -439,7 +444,9 @@
       "apps/desktop/src/main/notes-launcher-ipc.test.ts",
       "apps/desktop/src/main/notes-open-ipc.test.ts",
       "apps/desktop/src/preload/notes.test.ts",
-      "apps/desktop/src/main/notes-empty-trash-ipc.test.ts"
+      "apps/desktop/src/main/notes-empty-trash-ipc.test.ts",
+      "apps/desktop/src/main/notes-import-ipc.test.ts",
+      "apps/desktop/src/main/notes-import-file.test.ts"
     ],
     "L2-06": [
       "apps/desktop/src/main/emoji-ipc.test.ts",

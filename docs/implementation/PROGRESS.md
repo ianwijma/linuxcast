@@ -1,98 +1,39 @@
-# Coordinator checkpoint — 30 October 2026
+# Coordinator checkpoint — 31 October 2026
 
-Full complete local1.0/all97/R1-03/release Goal active/unfinished. User wants small
-reviewed/tested unfinished application increments merged promptly; preserve scope,
-security and explicit remaining desktop/release acceptance. All agents GPT6.1SOL/high.
+The user requested wrapping this thread so the complete local 1.0 goal can continue
+in another thread. No agents or application test processes remain running. No new
+feature is queued. The objective is unfinished; do not mark it complete.
 
-## Integrated baseline
+Read [HANDOFF.md](HANDOFF.md) for the exact continuation instructions, validation
+history, remaining fixes, worktrees and persistent user decisions. All subagents
+must use GPT-6.1 SOL/high. Preserve full scope/security and merge smaller reviewed,
+tested application increments promptly.
 
-PR75 https://github.com/ianwijma/linuxcast/pull/75 normally merged
-29October14:32:10UTC, mergea8ad162cc1d37b2bfd3ccaf05b1cdbd7d66d8e7a; exact
-reviewed signedheadbd8d36a8a656730fe403067a952cb38aefc20888 locally cryptoverified
-withconfiguredpublickey. Unchanged1Password signerworked. Currenthead planningCI
-40892341111 validatePASS14s; requested/submittedreviews/comments/threads[],
-developunprotected/rules[], no bypass. AttachedPR; primarydevelop/originclean
-fastforwarded a8ad162. Pinned frozeninstall repairedstaleprimaryworkspacelinks;
-productionbuild69rendererassetsPASS/no lockchange. PriorPR74spelling/73emoji/
-71definitions/72keywords/Notesapplication increments allintegrated, notblockedon
-old signingprompts. Old worktrees/frozenpatches retained.
+Primary develop is clean at09de566dc3773b058be7c43e517956bd08ef7fcb. PR75 captured-clock
+Quicklinks and PR76 confirmed whole-Trash deletion are merged. The last signature
+verified normally with the unchanged 1Password configuration; old unlock prompts
+are resolved. PR76 evidence is in apps/desktop/evidence/notes-empty-trash-application.md.
 
-PR75 date/time/timezone Quicklinks: actualrootname/tag/Arrow/Enter, Reviewcaptures
-onepublicvalue/exactURL, separateOpenexistingnativeGIOsamevalueacrossmidnight.
-503unit/19contracts/57security/63UI/50integration+100overlapstoragePASS;
-14newcapturesreviewed/715historicalexact. apps/desktop/evidence/quicklink-clock-
-application.md recordslimits. FullL2-05/prerequisites/nativeAT/release pending.
-Registry/newgeneratedL2-05cardnowrecordPR75merge incurrentnextbranch.
+Current unfinished work is consolidated in `.worktrees/linuxcast-notes-markdown-import`,
+branch `codex/notes-markdown-import`. The separate author tree
+`.worktrees/linuxcast-notes-markdown-import-ui` is retained. Source manifest:
+`handoff/markdown-import-source-manifest.json`. Old agent IDs and `/tmp` artifacts
+are not required or assumed available. The draft PR is a handoff snapshot, not a
+merge-ready application increment.
 
-## Current application increment — U1-01 Empty Trash, ready signed PR
+U1-01 import merge blockers: (1) strip permitted optional undefined fields from
+parser output and validate the actual storage JSON envelope without weakening it;
+(2) preserve a trailing LF after combined escaped HTML/link literals without global
+double decoding or changing code text. Actual Create currently fails storage request
+validation; full production roundtrip has not passed. Latest author controller
+0389b14c preserves the selected-open publication fence, and parser5b8e21fa preserves
+independent title/body limits. Keep these fixes. The author report's earlier component
+passes are explicitly superseded for the failing application cases.
 
-Coordinator .worktrees/linuxcast-notes-empty-trash, codex/notes-empty-trash,
-basea8ad162. Fulltask/data/security/builtins/testing-release/DESIGN/tokens read.
-F2-01accepted; D1/sharedNotes reusedunderuserapprovedunfinishedsequencing.
-Showtrashednotes→EmptyTrashread ALLcount independentsearch/pin/archive/pagination→
-defaultKeep/Escape(no effect)→separateEmptyTrashpermanently atomically deletes
-exactunchangedset+savedrevisions; preserveactive/archivedNONtrashedsources.
-Zero is honestno-op. No Undo/backuperasure/secure-erasureclaim or scopeshrink.
-
-Freeze packages/notes/EMPTY-TRASH-INCREMENT.md. Parent strictoptionaltrashSnapshot/
-emptyTrash APIs, existingstorage/main/preload/client/wiring;2namedchannels, no new
-migration/table/dependency/provider/framework. SoleownerstreamsdomainSHA256 ordered
-UUID/revision/count; immediate transaction recomputesCASset, deletestrashedonly,
-existingFKcascade/exactaffectedcount. Publicbasisnotpermissiontoken. Actualbatch/
-globalunknown fence mutations/Close/export/Quick/selected-open; onlynewstablewhole
-snapshotafteractualsettlement canreconcile. Get/listcannotclear, neverreplay.
-
-UI author manifest_notes_delete_sol, .worktrees/linuxcast-notes-empty-trash-ui,
-codex/notes-empty-trash-ui, finished15ownedfiles(no commit):controller/index,
-2fixtures/2tests/report/8newPNG. Patch /tmp/linuxcast-notes-empty-trash-ui.patch
-SHAb0d444977e3e76c92aec357fc9cecaeaf41b6679353d51b305e0e129583fd7b6;
-manifest sameprefix. Exactcopied/reconciledcontroller9815bb/index26a2f5b9;
-independent notes_merge_record_review_sol finalUI15 source/captures clean.
-Authorhonestlyrecordsinitialstatuslocatorfailure/split7cases and focused3focus
-checks; finalparentALL80mappedbrowsercases pass, including all8new inonecleanrun.
-Existing individualdelete/editor/Save/history/Quick/Close/export retained.
-
-## Final checks and reviews
-
-417unit10files2.29s/34contracts4files334ms/245security10files1.22s/
-80UI5files51.4s/39integration5files42.02s PASS. Integration=2actualsandboxed
-Electron(oldfullNotes30.904s/newEmptyTrash6.068s),37owner/client checks.
-Owner105Trash confirmsbeyond100page/allflagscope/CASaddremove/samecountrevision/
-rollbacktrigger/cascade/reopen/forgedreceipt. Actualall3Trashvs1filtered/pinned,
-defaultKeep/Escape+Keepnoeffect, exactactive saved/draft+archivepreserved,
-applicationNew/Save/Trash+Emptyclearsselection, meaningfulEmpty/Newfocus,zero/
-Quit/restart/reopenedowner/aggregateprivacy/0observedrendererHTTP(S). Earlier
-actual11.09s beforefocusfinding and6.37s finalfocusrun alsoPASS; finalmapped
-6.068s is definitive. Actualtestbb6c647a strengthenedfocusassertions.
-
-Independentboundary notes_delete_boundary_sol closedP2: narrowisEmptyingTrash
-actualbatch/globalunknown inQuick/selected-open mainentry/sendguard; ordinary
-pendingSave flag/behaviorunchanged. UIreview closedP2: removedconfirmationhad
-leftbodyfocuswithheldIPC/activeeditor; scopedsettledfocusnowwaitsenabledEmpty/
-Reload, onlybody/null/disconnected, preservesdeliberatefocus andexistingNewfocus.
-Reactchecklist applied: existinglazycontroller/subscriptioncleanup/event-only
-invocation/sharedprimitives/ref-focus, no dependency/server/cache architecture.
-
-FullpinnedNodeTypeScript/scopedallchangedlint/render/plan/status/diffPASS.
-App report apps/desktop/evidence/notes-empty-trash-application.md finalcounts;
-registryaddsaccuratepartialAC01/UI/PRIVACYevidence; AC02Markdown gainsnone.
-All4U1criteriaremainpending, totalsunchanged. EightnewUI PNGs restoredexactauthor
-reviewfreeze afterrequiredUIrerun; all729historical PNGs byteidentical after
-92UI+40actualrecaptures restored. Baseline /tmp/linuxcast-notes-empty-trash-
-historical-png.json. Fouractualfinaldark/lightconfirm/resultcaptures need final
-hash refresh/review afterlastrequiredsuite; finalappreport/metadatareview next.
-Reviewrecords /tmp/linuxcast-notes-empty-trash-independent-{boundary,actual}-review.json.
-
-## Immediate next
-
-Finalindependentreviewcurrent4actualcaptures/assertions/appreport/metadata, verify
-frozenbytes/historicalbaseline, stage/signedcommit/cryptoverify/push/focusedPR+
-attach. InspectcurrentheadCI/requestedreviews/comments/rules, normalexpectedhead
-mergepromptly. No more tests unlessnewchanges/failures justify. No stagedchange/
-commit/PRyet; no useraction/signingblocker. Recordmerge+selectnextboundedappflow
-withouttask-choicequestions; preferMarkdownimport/roundtripactualNotesinputnext.
-Fullattachments/Markdownimport/roundtrip/prerequisite/Debian13GNOME/KDEWayland/
-X11/nativeAT/highcontrast/performance/package/release gates remainpending.
-HostPop!_OS22.04amd64/Linux7.1.1/Node24.22.1/Bun1.4.4/Electron45/SQLite3.53.4/
-privateXvfbX11 is notsupporteddesktopmatrixacceptance. Totals8done/20inprogress/
-69planned;56passed/325pending/8notapplicable. FullGoal/R1-03notcomplete.
+Next thread: fix those two issues, run final assembled checks and independent review,
+then sign/publish/inspect CI and required reviews/merge normally. Maintain exact
+acceptance limitations and record the integrated increment before choosing more work.
+Fresh consolidated handoff checks:463unit/36contracts/258security/TypeScript/plan PASS;
+application and final mapped browser/integration acceptance still pending.
+All4U1criteria remain pending. Full97/R1-03/native/session/AT/performance/package/release
+requirements remain. Totals8done/20inprogress/69planned;56passed/325pending/8N/A.

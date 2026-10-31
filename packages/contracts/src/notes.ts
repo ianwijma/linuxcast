@@ -1,3 +1,4 @@
+import type {NoteImportReply} from './notes-import.ts';
 import * as z from 'zod';
 import type {NotesLauncherSelection} from './notes-launcher.ts';
 import type {NoteExportSelection,NoteExportReply} from './notes-export.ts';
@@ -132,6 +133,7 @@ export const notesCloseAttemptSchema=notesRequestSchema.extend({attemptId:z.numb
 export const notesCloseFinishedSchema=notesCloseAttemptSchema.extend({allowClose:z.boolean()});
 export const notesQuickNoteFinishedSchema=notesCloseAttemptSchema.extend({created:z.boolean()});
 export interface NotesApi{
+ chooseMarkdownImport?():Promise<NoteImportReply>;
  trashSnapshot?():Promise<NotesTrashSnapshotReply>;
  emptyTrash?(input:NotesEmptyTrash):Promise<NotesEmptyTrashReply>;
  deletePermanently?(input:NoteDelete):Promise<NotesDeleteReply>;
