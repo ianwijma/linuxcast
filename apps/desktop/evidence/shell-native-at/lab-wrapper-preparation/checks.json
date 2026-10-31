@@ -12,7 +12,20 @@
   "newWrapperTests": 44,
   "existingPureProtocolParserStagingTests": 25,
   "completeOfflineAtTests": 97,
+  "mappedF1SecurityTests": 55,
   "checks": [
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH bun install --frozen-lockfile --backend=copyfile",
+      "result": "pass on Bun1.4.4; initially absent Vitest dependencies installed without manifest/lock changes"
+    },
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH bun run test:security -- F1-02",
+      "result": "55 mapped checks pass in14.39s, including full97-test offline Python discovery; no skips"
+    },
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH bun run typecheck; bun run lint",
+      "result": "both pass; no source/index/manifest/lock changes"
+    },
     {
       "command": "PYTHONPATH=apps/desktop/tests/at python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py' -q",
       "result": "97 pass in12.102s, zero failures/errors/skips. Existing private ordinary-Python controller stand-ins only; no product, display, reader, namespace or guest execution."

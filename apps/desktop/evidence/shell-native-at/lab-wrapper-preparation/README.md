@@ -249,6 +249,10 @@ keeps an unrecorded child unresolved past the bound and requires preservation.
 The complete offline AT discovery suite also passes97tests in12.102s without
 skips. Its existing controller fixtures use ordinary private Python stand-ins;
 they execute no product, display, reader or namespace operations.
+After a pinned frozen dependency install with the copyfile backend, all55mapped
+F1-02 security checks pass14.39s, including the full97-test Python discovery;
+no-write TypeScript and ESLint also pass. The existing discovery guard already
+includes every test_*.py in the AT directory, so no runner mapping edit is needed.
 Final independent recheck of this correction remains required before invocation.
 Native, namespace and guest runs remain zero; outer ownership and UI/source
 refresh prerequisites remain unchanged. These corrections are coordinator-authored
