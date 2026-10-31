@@ -1,33 +1,29 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline AT adapter publication after PR94
+## Current coordinator state — source frozen; outer owner preparation
 
-Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. All seven selected Instrument surfaces are
-integrated as bounded increments: foundationPR87, Localdata88, Credentials89,
-Permissions90, sharedrenderer91, Notes93 and workflows94. Native/full-task gates
-remain pending. Latestapproveddevelop96ac9fb is PR94 merge from91864e8;
-CI41237862351 SUCCESS, GitHubreviewrequests/reviews/comments empty, normalexact
-headmerge, immediate tinymergeblurb delivered. NotesPR93 merge279a3a4 from901226b,
-CI41237501043 SUCCESS, watchremoved. Allreviewedsource/28Notes+39workflowcaptures
-preserved. No active PRwatch/rootprocess.
+Goal ACTIVE: full97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. Latestapproveddevelopbbbe813 is PR95 merge
+fromaf1de99; CI41238278929 SUCCESS, reviews/requests/comments empty, normal exact
+headmerge, tinyblurb delivered/watchremoved. PR93Notes279a3a4/PR94workflows96ac9fb
+and allseven Instrument surfaces retained; no full/native acceptance promotion.
 
-Rootcodex/f1-02-instrument-at-integration reconciles9c77978 ontoapprovedPR94
-at84f11aa. Bothinitialreviews clear: Spec0098261d37mapped+44synthetic,
-Standards073a5af737mapped/fulltype/scopedlint/plan/3hashes. Both completed/read,
-noactivechild. Parentcurrent37units2.28s/55security13.18s(all114offlinePython)/
-fulltype/scopedlint/plan pass. Adapterthreefiles matchreviewed9c byte-for-byte;
-no nativeobserver/controller/parser/namespace/pinchanges. PublishingfocusedPRnext.
+Rootcodex/f1-02-lab-owner-preparation fromapprovedbbbe813. Freshhost-only current
+archive121180160bytes SHA732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc,
+tree5a85d5251101716b338e820f23f78eef5e162dfb, all2789Gitblobs/executableflags/private
+modes independently verified afterreviewedextractor, tempremoved. Archive+private
+provenance0400 outsideGit; sourceSignatureHeaderPresent=true butsignatureVerified
+false, no release-signing claim. Existinglablock held throughout; fresh exactv4
+stoppedfalse/PID0/exit0 before/after, no guest/start/exec/build/install/native.
 
-Actualnativeproduct/Orca runs0. Fresh currentapprovedarchive/immutableDebianbuild/
-receipt, nativeENTRYvsCOMBO_BOXidentity, PID1metadatafeasibility, reviewedouter
-reservation/shutdown/recovery and actualcontainment/AT remain pending. Read-only
-hostDockerinventory freshlyconfirmed v4 exactID674cd884..5098/imagea1805464..c4d10
-exitedfalse/PID0/exit0, nonprivileged/read-onlyroot/capdropALL/no-new-privileges,
-onlyprivate-labRWbind/nohostports. No start/exec/SSH/guest/native/bus/input/audio.
-Next implement bounded outerowner and provision only reviewed current sources,
-without loosening historical gates. Fullnative/physical/performance/release scope
-remains mandatory; no overallcompletionclaim.
+Parentauthored outer-owner-protocol.md and exactread-onlyDockerconfiguration
+inventory; source not yet implemented/reviewed/invoked. Next delegatebounded
+nonUI owner implementationSOLhigh onisolatedownedfiles whileparentprepares
+remaining prerequisites. Currentguestwrapper source gate intentionallyrejectsnew
+source; PID1metadata/nativecomboboxidentity and actualDebianbuild/receipt remain
+unresolved. No fallback, widenedauthority or nativeinput/audio action permitted.
+Actualnativeproduct/Orca runs0, allfull97/native/physical/performance/release gates
+remain pending. No activePRwatch or rootprocess; no childcurrentlyactive.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
