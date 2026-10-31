@@ -211,6 +211,9 @@
     ],
     "F3-01": [
       "packages/permissions/tests/permission-settings.contract.test.ts"
+    ],
+    "F2-02": [
+      "packages/platform-contracts/tests/credential-settings.contract.test.ts"
     ]
   },
   "ui": {

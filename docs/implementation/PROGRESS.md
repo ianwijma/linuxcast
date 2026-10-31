@@ -65,3 +65,29 @@ All screenshots unchanged. Core production files byte-match reviewed/fixed06373b
 only shared runner source hash changes from the map union. No production session/
 credential UI enabled. Next publish and integrate this bounded component promptly,
 then wire its main lifecycle and actual setup/status flow in the next increment.
+
+
+PR83 MERGED atcd7bf0e5c086be7d2c1ee2b4e4ae7d895a67a688,31Oct13:35:15UTC;
+currenthead6e5fd77 CI41206158857 passed with no requestedreviews/comments. The
+session/store/native component is integrated;100F2security/55F1/72F3/38Rust and
+actual production smoke5.99s pass. No task or native acceptance promoted.
+User requests a super-small blurb immediately after every merge: state what changed
+in1–2sentences (and material limit if needed); keep prompt bounded integrations.
+
+Next worktree /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage switched
+tocodex/f2-02-credential-runtime atapprovedcd7bf0e. New CredentialRuntime owns
+stable store/session access across generation replacement, suspend/resume/storage
+loss, coalesced owned shutdown independent of pending initialization.9new runtime
+and6storage-readiness tests pass;115mapped F2security/type/lint and existing actual
+product smoke6.16s pass. This runtime is not wired to main/UI yet; new source awaits
+review as part of the complete next flow. Main storage adds private boolean
+onReadiness notification only, not renderer IPC.
+
+Parent coordinator now freezes the narrow first-party credential-settings contract
+on codex/f2-02-credential-contract for a disjoint UI assignment. Fixed OpenRouter
+key target; no global route/model selection or provider traffic. New DTO,3contract
+checks/type/lint and React/UI workspace-only manifest/lock additions; no new third-
+party version. UI export target is intentionally prepared for child implementation,
+not claimed implemented. packages/secrets/CREDENTIAL-SETTINGS-CONTRACT.md records
+security/UX boundaries. Coordinator retains main/preload/build/IPC/preferences/
+runtime/status ownership. UI child may add only packages/secrets/src/ui files.
