@@ -722,6 +722,20 @@ in Opus5.5medium from approvedPR88. No root process or PR watch remains active.
 Saved sourcehelper0aa7e3f and DOMadapter5eca891 remain unintegrated/unreviewed/
 unused. No native/lab/keyring/provider/host-input actions or acceptance promotion.
 
+Source-helper reconciliation checkpoint: saved branch
+codex/f1-02-native-build-staging now includes approved PR89 develop63c9581.
+Merge442a5fd retained the current authoritative registry; regenerated cards and
+resolved historical PROGRESS conflicts without changing acceptance. Final saved
+HEAD86abb64b912c6a5a2e1b49397160b5e64cfac215,
+tree828a9577859a5e38895efcd003b1ef0ffb88ce84, clean. Its diff against develop is
+exactly four helper/evidence files, no registry/application changes. Source/test
+hashes remain those of0aa7e3f. Combined existing wrapper/controller/observer plus
+helper suite passes113 offline tests in12.079s, no skips; AST/hash/plan/whitespace
+checks pass. No build, dependencies, guest, namespaces or native actions. This
+helper is still unreviewed, unintegrated and unused; independent two-axis review
+waits below UI priority. Root returned to D1 integration29e65c2. Both D1 reviews
+and F3 Opusmedium remain active without polling; no root process or PR watch.
+
 Both credential initial reviews completed/read: Standards eebf4024 and
 Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
 wording P2; no other actionable findings/smells. Both85units/3contracts/type/lint/
