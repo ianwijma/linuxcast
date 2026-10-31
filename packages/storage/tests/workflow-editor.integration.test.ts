@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import Database from 'better-sqlite3';
 import { StorageOwner } from '../src/owner.ts';
 import { foundationMigrations } from '../src/migrations.ts';
+import { STORAGE_SCHEMA_VERSION } from '../src/schema-version.ts';
 import { createStorageClient } from '../src/client.ts';
 import { createWorkflowDraft } from '../../workflows/src/registry.ts';
 import type { StorageMethod,StorageMethods } from '../src/repositories.ts';
@@ -34,10 +35,15 @@ it('preserves invalid drafts but refuses to replace a valid saved graph and roll
 });
 it('upgrades a real version7 database with a consistent recovery snapshot and preserves source definitions',async()=>{
   const migrations=await foundationMigrations(),{owner,dir}=await open(undefined,migrations.slice(0,7));
-  const link=request(owner,'quicklinks.save',{expectedRevision:0,name:'Public retained link',url:'https://example.invalid/retained'});await owner.confirmSuccessfulLaunch();await owner.close();
-  const next=(await open(dir)).owner;expect(next.version).toBe(9);expect(request(next,'quicklinks.get',{id:link.id,revision:1})).toEqual(link);expect(request(next,'workflows.editor.get',{})).toBeNull();
+  await owner.confirmSuccessfulLaunch();await owner.close();
+  // Seed the actual legacy schema, rather than asking today's repository to
+  // write columns that did not exist in version7. The owner is closed first.
+  const link={id:randomUUID(),revision:1,name:'Public retained link',url:'https://example.invalid/retained',createdAt:'2026-10-26T00:00:00.000Z',updatedAt:'2026-10-26T00:00:00.000Z'};
+  const legacy=new Database(join(dir,'linuxcast.db'),{fileMustExist:true});
+  try{expect(legacy.pragma('user_version',{simple:true})).toBe(7);legacy.prepare('INSERT INTO quicklinks(id,revision,name,name_key,url,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(link.id,link.revision,link.name,'public retained link',link.url,link.createdAt,link.updatedAt);}finally{legacy.close();}
+  const next=(await open(dir)).owner;expect(next.version).toBe(STORAGE_SCHEMA_VERSION);expect(request(next,'quicklinks.get',{id:link.id,revision:1})).toEqual(link);expect(request(next,'workflows.editor.get',{})).toBeNull();
   const backups=join(dir,'backups'),journals=await Promise.all((await readdir(backups)).filter(name=>name.endsWith('.json')).map(async name=>JSON.parse(await readFile(join(backups,name),'utf8')) as {id:string;fromVersion:number;toVersion:number;state:string}));
-  const journal=journals.find(item=>item.fromVersion===7&&item.toVersion===9)!;expect(journal.state).toBe('awaiting-confirmation');
+  const journal=journals.find(item=>item.fromVersion===7&&item.toVersion===STORAGE_SCHEMA_VERSION)!;expect(journal.state).toBe('awaiting-confirmation');
   const snapshot=new Database(join(backups,`${journal.id}.db`),{readonly:true});try{expect(snapshot.pragma('user_version',{simple:true})).toBe(7);expect(snapshot.prepare("SELECT name FROM sqlite_master WHERE name='workflow_editor'").get()).toBeUndefined();expect(snapshot.prepare('SELECT name FROM quicklinks WHERE id=?').get(link.id)).toEqual({name:'Public retained link'});}finally{snapshot.close();}
 });
 it.each(['revision','draft','saved'])('rejects a mismatched %s write acknowledgement without replay',async field=>{
