@@ -117,7 +117,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // clipping its separate Close button inside the popup's scrollport.
   const menuGeometry=await page.getByRole('dialog',{name:'Actions',exact:true}).evaluate(element=>({scroll:element.scrollHeight,client:element.clientHeight,height:element.getBoundingClientRect().height,viewport:window.innerHeight,list:element.querySelector('.lc-action-list')?.getBoundingClientRect().height,field:element.querySelector('.lc-field')?.getBoundingClientRect().height,close:element.querySelector('button:last-child')?.getBoundingClientRect().height}));
   expect(menuGeometry.scroll,JSON.stringify(menuGeometry)).toBeLessThanOrEqual(menuGeometry.client);
-  const actionEvidence=join(root,'apps/desktop/evidence');mkdirSync(actionEvidence,{recursive:true});
+  const actionEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(actionEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
     await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
@@ -139,7 +139,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await page.getByRole('button',{name:'Open URL',exact:true}).click();
   await expect.poll(()=>urlField.getAttribute('aria-invalid')).toBe('true');expect(existsSync(urlMarker)).toBe(false);
   await urlField.fill(publicUrl);
-  const urlEvidence=join(root,'apps/desktop/evidence');mkdirSync(urlEvidence,{recursive:true});
+  const urlEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(urlEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
     await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
@@ -192,7 +192,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await expect.poll(()=>page.getByText('This alias is already used by another command. Choose another alias.').isVisible()).toBe(true);
   expect(await aliasField.inputValue()).toBe('quit');
   await aliasField.fill('public-hide');
-  const aliasEvidence=join(root,'apps/desktop/evidence');mkdirSync(aliasEvidence,{recursive:true});
+  const aliasEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(aliasEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
     await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
@@ -226,7 +226,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
       setTimeout(() => resolve(false), 1000);
     });
   })).toBe(true);
-  const evidence = join(root, 'apps/desktop/evidence'); mkdirSync(evidence, { recursive: true });
+  const evidence = join(root, 'apps/desktop/evidence/instrument-renderer'); mkdirSync(evidence, { recursive: true });
   for (const theme of ['dark', 'light'] as const) {
     await app.evaluate(({ nativeTheme }, value) => { nativeTheme.themeSource = value; }, theme);
     await expect.poll(() => page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
