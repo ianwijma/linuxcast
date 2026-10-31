@@ -572,6 +572,40 @@ requests stay coordinator-owned. No push/PR/status promotion. Task completion
 wakes parent; do not poll. D1follow-up6fb9f0b9 remains independently active.
 Root current clean integration branch4ce6b5e; no active root process/PRwatch.
 
+Current coordinator checkpoint: credential UI source remains on separate
+codex/f2-02-instrument-credentials-integration, published PR89
+https://github.com/ianwijma/linuxcast/pull/89, head6b421d5097068c5b230ae04724c551441ae12899,
+basee2b3a5a. Original Opusmedium0633abb fixes only initial reviews' cancelled
+no-changeP2, integratedf2f4b2a; parent production boundary regression plus original
+real controller/presentation probe pass with storednone and neutralcancelledtitle.
+86units/3contracts/145security/type/lint, actualF2two16.60s (7.51/8.16),9captures
+pass/inspected; parent sequences testdeferred reply/event to removeact warnings,
+86rerun clean. No additional independent final re-review claimed for smallcopyfix.
+PR89 currentCI41229616116 inprogress, mergeable, notdraft, no GHreviews/comments/
+requests, rulesetsempty/developunprotected. Linked immediately. Watch next and
+merge promptly once exactheadCI passes; tinymergeblurb required. Do not push
+unrelated D1 commits to this focused PR. F2registry records PR88 merge accurately,
+all97statuses/acceptance records unchanged, current F2branch pointscredentiallane.
+
+Current root branch D1integration2e45107 before this docs checkpoint, authorcf12
+UI unchanged. New production extensionqueryclear assertion fails2.62s (selected
+Publiccatalogue119/queryfocus/activedescendant preserved, scrollTop0/rowbottom
+outsideviewport); prior23browser/4Electron passed beforethisaddedcase. Active
+original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 fixes settled
+extension projection only, no controller/main/contracts. No D1initialreview yet.
+Saved sourcehelper0aa7e3f and DOMadapter5eca891 remain unused/unreviewed/separate;
+no guest/native/device actions. Sourcehelper69offline andDOMadapter37F1unit pass.
+
+Next existingUI lane ffa91bc1-da5d-4825-a0d4-071b4493b7a9 active, confirmed
+claudeAgent/claude-opus-5-5/effortmedium, isolated from approvede2b3a5a; requested
+codex/f3-01-instrument-permissions. Own permissionUIindex/CSS/newUItests (NOT
+controller), permissionproducttest andNEWinstrument-permissions evidence only.
+Preserve opaque snapshot selection/whole-recordcompare-delete/quarantine/cancel/
+no-replay/fullsourceversionDOM+tooltips+review/Keepfocus/Refreshinitialloadingfocus.
+No new approval/capability claims, contracts/backend/native work or statuspromotion;
+parent owns newrunner mapping and D1combobox testintegration. No hostbus/keyring/
+provider/desktop/input/lab action. Completion wakes parent; don'tpoll eitherUIlane.
+
 Parent D1boundary probe on unchanged eae UI (current7ae6357) finds real live-panel
 growth defect: at800x600, open1action panel x447.5/y26.5/w280/h122; a real
 ViewSession revision2 snapshot growing to24actions leavesy26.5 withheight584,
