@@ -31,6 +31,7 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   definition.nodes=EDITOR_NODE_TYPES.map((type,index)=>({id:`node-${index}`,type:type.type,typeVersion:1,config:structuredClone(type.config)}));
   definition.edges=[{id:'edge-1',from:{nodeId:'node-0',port:'out'},to:{nodeId:'node-1',port:'in'},order:0},{id:'edge-2',from:{nodeId:'node-1',port:'out'},to:{nodeId:'node-2',port:'in'},order:0}];
   const unrelated={schemaVersion:1,id:randomUUID(),principal:{kind:'builtin',id:'public.saved-source'},declarationHash:'a'.repeat(64),permissionId:'files.read',scope:{kind:'resource',resourceId:'public-selected-resource'},decision:'deny',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-01-01T00:00:00.000Z'};
+  const long={...unrelated,id:randomUUID(),principal:{kind:'extension',id:`public.long-source.${'synthetic-segment-'.repeat(8)}end`,version:`1.0.0-${'public.build.'.repeat(6)}final`,integrity:'c'.repeat(64)},declarationHash:'c'.repeat(64),permissionId:'files.write',scope:{kind:'resource',resourceId:`public-long-resource.${'segment-'.repeat(20)}final`},decision:'allow'};
   const savedWorkflow=owner.request({schemaVersion:1,requestId:randomUUID(),method:'workflows.editor.write',params:{expectedRevision:0,draft:definition,action:'save'}}).result as WorkflowEditorRecord;
   owner.request({schemaVersion:1,requestId:randomUUID(),method:'permissions.put',params:{record:unrelated}});
   await owner.confirmSuccessfulLaunch();await owner.close();
@@ -73,13 +74,22 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   await review().click();await expect.poll(()=>permissions.getByRole('button',{name:'Keep decision',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
   await permissions.keyboard.press('Escape');await expect.poll(()=>review().evaluate(element=>document.activeElement===element)).toBe(true);
   expect(await permissions.locator('.permission-row').count()).toBe(2);
-  const evidence=join(root,'apps/desktop/evidence');mkdirSync(evidence,{recursive:true});
+  // Instrument refresh captures; historical permissions-application-* evidence stays unchanged.
+  const evidence=join(root,'apps/desktop/evidence/instrument-permissions');mkdirSync(evidence,{recursive:true});
+  const shot=async(name:string)=>{await permissions.evaluate(async()=>{await document.fonts.ready;});expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);await permissions.screenshot({path:join(evidence,name),fullPage:true});};
+  const themed=async(name:string)=>{
+    for(const theme of ['dark','light'] as const){
+      await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
+      await expect.poll(()=>permissions.locator('[data-lc-theme]').getAttribute('data-lc-theme')).toBe(theme);
+      await shot(`${name}-${theme}.png`);
+    }
+  };
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
     await expect.poll(()=>permissions.locator('[data-lc-theme]').getAttribute('data-lc-theme')).toBe(theme);
     await permissions.evaluate(async()=>{await document.fonts.ready;});
     expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-    await permissions.screenshot({path:join(evidence,`permissions-application-${theme}.png`),fullPage:true});
+    await permissions.screenshot({path:join(evidence,`list-${theme}.png`),fullPage:true});
   }
   const captureNative=async(name:string)=>{
     const image=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/permission-settings.html')!.capturePage()).toPNG().toString('base64'));
@@ -96,22 +106,24 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   await expect.poll(()=>scaledControl.evaluate(element=>document.activeElement===element)).toBe(true);
   expect(await scaledControl.evaluate(element=>{const rect=element.getBoundingClientRect();return rect.top>=0&&rect.bottom<=innerHeight&&rect.left>=0&&rect.right<=innerWidth;})).toBe(true);
   expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await captureNative('permissions-application-200-percent-light.png');
+  await captureNative('list-200-percent-keyboard-focus-light.png');
   await permissions.emulateMedia({forcedColors:'active',reducedMotion:'reduce'});
   expect(await permissions.evaluate(()=>matchMedia('(forced-colors: active)').matches&&matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
   expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await captureNative('permissions-application-forced-colors.png');
+  await captureNative('list-200-percent-forced-colors-reduced-motion.png');
   await permissions.emulateMedia({forcedColors:'none',reducedMotion:'no-preference'});
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/permission-settings.html')!.webContents.setZoomFactor(1);});
   await review().click();
-  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await permissions.screenshot({path:join(evidence,'permissions-application-confirm-light.png'),fullPage:true});
+  await expect.poll(()=>permissions.getByRole('button',{name:'Keep decision',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  expect(await permissions.getByRole('region',{name:'Complete saved decision',exact:true}).textContent()).toContain('Public permission workflow');
+  await themed('review-allow');
   await permissions.getByRole('button',{name:'Remove decision',exact:true}).click();
   await expect.poll(()=>permissions.getByRole('status').textContent()).toContain('Saved decision removed.');
   await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(1);
   await expect.poll(()=>refresh().evaluate(element=>document.activeElement===element)).toBe(true);
-  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await permissions.screenshot({path:join(evidence,'permissions-application-removed-light.png'),fullPage:true});
+  // The receipt is the controller's fixed neutral copy, never a success plate or capability claim.
+  expect(await permissions.locator('.lc-plate[data-kind="success"]').count()).toBe(0);
+  await themed('removed');
   expect(await app.evaluate(({clipboard})=>clipboard.readText())).toBe('Public permission result');
   await app.evaluate(({clipboard})=>{clipboard.writeText('Public after-removal sentinel');});
   await start('Public request after removal');
@@ -129,10 +141,12 @@ it('reviews actual persisted permissions, confirms removal without replay and re
     expect((preserved.request({schemaVersion:1,requestId:randomUUID(),method:'permissions.inventory',params:{limit:50}}).result as {records:unknown[]}).records).toEqual([unrelated]);
     // Seed an obsolete declaration choice for the same immutable source,
     // analogous to an earlier host declaration set. It cannot approve this run.
+    // Synthetic public long-text seed for overflow review: unbroken source and version labels and a long declared scope.
+    preserved.request({schemaVersion:1,requestId:randomUUID(),method:'permissions.put',params:{record:long}});
     preserved.request({schemaVersion:1,requestId:randomUUID(),method:'permissions.put',params:{record:{...unrelated,id:randomUUID(),principal:{kind:'workflow',id:definition.id,version:definition.version,integrity:createHash('sha256').update(stableWorkflowJson(savedWorkflow.saved!)).digest('hex')},declarationHash:'b'.repeat(64),permissionId:'clipboard.write',scope:{kind:'global'},decision:'allow'}}});
   }finally{await preserved.close();}
   ({app,page}=await launch());permissions=await open('Saved permissions','linuxcast-app://shell/permission-settings.html');
-  await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(2);
+  await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(3);
   const unrelatedRow=permissions.locator('.permission-row').filter({hasText:'public.saved-source'});
   expect(await unrelatedRow.textContent()).toContain('Remembered: deny');
   editor=await open('Workflow draft','linuxcast-app://shell/workflow-editor.html');await editor.getByRole('button',{name:'Run saved workflow',exact:true}).click();
@@ -142,25 +156,46 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   await expect.poll(async()=>(await run(editor))?.state).toBe('cancelled');
   expect(await app.evaluate(({clipboard})=>clipboard.readText())).toBe('Public pending-revocation sentinel');
   await expect.poll(()=>app.evaluate(({app})=>app.getAppMetrics().filter(metric=>metric.name==='Linuxcast workflow').length)).toBe(0);
-  await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(1);
+  await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(2);
   await permissions.getByRole('button',{name:'Review removal: public.saved-source · Read selected files',exact:true}).click();
   await permissions.getByText('Removing a denial permits a new request. It does not approve or rerun anything.',{exact:true}).waitFor();
+  await themed('review-deny');
+  await permissions.getByRole('button',{name:'Remove decision',exact:true}).click();
+  await expect.poll(()=>permissions.locator('.permission-row').count()).toBe(1);
+  // Long source/version/scope: complete text stays in the accessible name, the tooltip and the review region.
+  const longReview=permissions.getByRole('button',{name:`Review removal: ${long.principal.id} · Write selected files`,exact:true});
+  expect(await permissions.locator('.permission-row').getByTitle(long.principal.version,{exact:true}).textContent()).toBe(long.principal.version);
+  await themed('long-source-list');
+  await longReview.click();
+  const details=permissions.getByRole('region',{name:'Complete saved decision',exact:true});
+  for(const text of [long.principal.id,long.principal.version,'Selected resource: '+long.scope.resourceId])expect(await details.textContent()).toContain(text);
+  await themed('long-source-review');
+  const permissionWindow=async(zoom:number)=>app.evaluate(({BrowserWindow},value)=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/permission-settings.html')!.webContents.setZoomFactor(value);},zoom);
+  await permissionWindow(2);await expect.poll(()=>permissions.evaluate(()=>devicePixelRatio)).toBe(2);
+  await expect.poll(()=>permissions.getByRole('button',{name:'Keep decision',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  await permissions.keyboard.press('Shift+Tab');
+  await expect.poll(()=>details.evaluate(element=>document.activeElement===element)).toBe(true);
+  expect(await permissions.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  expect(await details.evaluate(element=>{const rect=element.getBoundingClientRect();return rect.top>=0&&rect.top<innerHeight&&rect.left>=0&&rect.right<=innerWidth+1;})).toBe(true);
+  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
+  await captureNative('long-source-review-200-percent-keyboard-focus-light.png');
+  await permissionWindow(1);
+  await permissions.keyboard.press('Escape');await expect.poll(()=>longReview.evaluate(element=>document.activeElement===element)).toBe(true);
+  await longReview.click();
   await permissions.getByRole('button',{name:'Remove decision',exact:true}).click();
   await permissions.getByRole('heading',{name:'No saved decisions on this page',exact:true}).waitFor();
-  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await permissions.screenshot({path:join(evidence,'permissions-application-empty-light.png'),fullPage:true});
+  await themed('empty');
   // This is an actual kill of only this fixture's owned storage child.
   await app.evaluate(({app})=>{const child=app.getAppMetrics().find(metric=>metric.name==='Linuxcast storage');if(!child)throw new Error('Missing owned storage child.');process.kill(child.pid,'SIGKILL');});
   await refresh().click();await permissions.getByRole('heading',{name:'Review current permissions',exact:true}).waitFor();
   await permissions.getByText('Saved permissions are unavailable. Refresh after local data opens, or quit and reopen Linuxcast to reconnect.',{exact:true}).waitFor();
-  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await permissions.screenshot({path:join(evidence,'permissions-application-unavailable-light.png'),fullPage:true});
+  await themed('unavailable');
   // Pending read is a labelled renderer-state fixture, not a storage recovery.
   await app.evaluate(({ipcMain})=>{ipcMain.removeHandler('permission-settings:list');ipcMain.handle('permission-settings:list',()=>new Promise(()=>{}));});
   await permissions.reload();await permissions.getByText('Reading saved permissions…',{exact:true}).waitFor();
   await expect.poll(()=>refresh().evaluate(element=>document.activeElement===element)).toBe(true);
-  expect((await new AxeBuilder({page:permissions}).setLegacyMode().analyze()).violations).toEqual([]);
-  await permissions.screenshot({path:join(evidence,'permissions-application-loading-light.png'),fullPage:true});
+  await themed('loading-fixture');
+  await expect.poll(()=>refresh().evaluate(element=>document.activeElement===element)).toBe(true);
   await quit();
   const final=await StorageOwner.open({dataDirectory:directory,applicationBuild:'public-permission-result'});
   try{
