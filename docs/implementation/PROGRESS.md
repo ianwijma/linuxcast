@@ -564,3 +564,19 @@ validation distinction,9captures and main-authoritative notice semantics. No
 native actions/delegation/publication; completion wakes parent, do not poll.
 Root current credentials integration excludes saved D1/AT/sourcehelper branches;
 keep focused PR independent from still-running D1Opusmedium follow-up6fb9f0b9.
+
+Parent verifies a new credential notice P2 on unchanged2ea07e8 UI: the universal
+cancelled title "Nothing was changed" is false for a real main outcome. Private
+fixture uses production CredentialRuntime/SettingsService with synthetic secure
+storage/session, saves persistent key, enables clear-on-lock, then replaces with
+session-only and emitslocked after real old persistent reference deletion. Main
+returnscancelled, finalstorednone/remainingpersistentrecords0; outcomeNotice still
+saysNothingwaschanged. Tight regression title!=Nothingwaschanged fails21ms.
+No backend change needed: use neutral cancelled wording/current-status review,
+preserve interrupted kind and no replay. Original Opusmedium UI author must
+correct source/test/product assertion/affected capture before publication, after
+review slots return (do not exceed root+D1+two reviews). Both initial reviews
+continue on frozen944c1f7 without polling. Private probe copied to
+/tmp/linuxcast-credential-outcome-probe-gta2dzkm
+and removed from repo; no source/evidence/index changed by probe, no native/keyring/
+provider/hostbus action. No PR yet; full task/UI/native acceptance unchanged.
