@@ -555,3 +555,12 @@ whilelocked is explicitly distinct from session usability; review truthful
 outcome classifications against unchanged main semantics, not UI fixtures alone.
 AC01/UI/native observer/keyring/provider/Debianfour-session/Orca remain pending;
 AC02/privacy historical status unchanged. No PR/watch/rootprocess currently.
+
+Credential initial reviews now active against exact944c1f7eb54ab43a54719a097dc8fdf5bdf23ef0,
+basee2b3a5a: Standards eebf4024-bfd9-471a-8aed-fcab2a98ff9b and Security/Spec
+de842f32-f124-415e-9bdc-6847a7cd01dd, fresh isolated GPT6.1SOL/high. Both briefs
+include full task/contracts/design/security, source-only scope, independent
+validation distinction,9captures and main-authoritative notice semantics. No
+native actions/delegation/publication; completion wakes parent, do not poll.
+Root current credentials integration excludes saved D1/AT/sourcehelper branches;
+keep focused PR independent from still-running D1Opusmedium follow-up6fb9f0b9.
