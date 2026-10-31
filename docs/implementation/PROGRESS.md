@@ -447,3 +447,24 @@ F2LocalDataOpusmediuma4c30760 against parent11cb8ed. Runtime settings confirmed
 claudeAgent/claude-opus-5-5/effortmedium for both. Root sourcehelperce13987 remains
 saved and unused/unintegrated; source-extractor reviews wait below UI priority.
 No guest/native/hostbus/keyring/provider/input actions or active root processes.
+
+PR87 MERGED31October17:21:13UTC at031f78ecc2376855000efd9e87e2e1d11a59f3ce,
+headc21d013634a429c9ddfdf2d7a867e95e3a8a860e. Fresh final b130ef1d independent
+Standards and Security/Spec PASS, no actionable findings; remaining exact-keyP2
+resolved. Independently152token/33Python/type/lint/plan/whitespace and5478synthetic
+cases across31objectpaths+125sharedcases agree TS/Python, negativeoldsource15false
+accepts confirmed, valid/reordered/boundary cases retained, malformed canonical
+fails before generation. PlanningCI41223479060 SUCCESS, no GHreviews/comments/
+requests or branchprotection/rulesets. User's tiny merge blurb sent immediately;
+PR87watch removed. Root fetched/fast-forwarded to approveddevelop031f78e and
+opened codex/d1-02-instrument-integration for next bounded UI integration.
+
+Opusmedium renderer72448bb9 and LocalDataa4c30760 notified upstream is integrated;
+may fetch/merge031f78e at clean checkpoints without unrelated reruns or sibling
+edits. Their branch/API/ownership constraints remain. No active PRwatch or root
+test process. Native/sourcehelper preparation remains deferred and unused.
+Additional private sourcehelperce13987 probes confirm symlink/outsidehardlink/
+cleanup-bound faults preserve sentinel/root/firstfailure and reportcleanupfalse;
+no repository change or guest/native action, not independent acceptance.
+Next integrate/review/test these existing UI increments, then credential/
+permission/file/notes/workflow surfaces, preserving all97tasks/full1.0 gates.
