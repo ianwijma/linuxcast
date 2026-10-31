@@ -45,7 +45,7 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   };
   let {app,page}=await launch();
   const open=async(title:string,url:string)=>{
-    const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill(title);
+    const query=page.getByRole('combobox',{name:'Search commands',exact:true});await query.fill(title);
     await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain(title);
     const opened=app.waitForEvent('window');await query.press('Enter');const workspace=await opened;workspace.setDefaultTimeout(5000);await workspace.waitForURL(url);return workspace;
   };
@@ -187,8 +187,12 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   await themed('empty');
   // This is an actual kill of only this fixture's owned storage child.
   await app.evaluate(({app})=>{const child=app.getAppMetrics().find(metric=>metric.name==='Linuxcast storage');if(!child)throw new Error('Missing owned storage child.');process.kill(child.pid,'SIGKILL');});
+  // SIGKILL delivery precedes main's exit/readiness notification. Observe the
+  // existing read-only boundary before asking the controller to render it.
+  const unavailable='Saved permissions are unavailable. Refresh after local data opens, or quit and reopen Linuxcast to reconnect.';
+  await expect.poll(()=>permissions.evaluate(async()=>{const reply=await(window as unknown as {linuxcastPermissions:PermissionSettingsApi}).linuxcastPermissions.getState({});return reply.ok?'ready':reply.error.message;})).toBe(unavailable);
   await refresh().click();await permissions.getByRole('heading',{name:'Review current permissions',exact:true}).waitFor();
-  await permissions.getByText('Saved permissions are unavailable. Refresh after local data opens, or quit and reopen Linuxcast to reconnect.',{exact:true}).waitFor();
+  await permissions.getByText(unavailable,{exact:true}).waitFor();
   await themed('unavailable');
   // Pending read is a labelled renderer-state fixture, not a storage recovery.
   await app.evaluate(({ipcMain})=>{ipcMain.removeHandler('permission-settings:list');ipcMain.handle('permission-settings:list',()=>new Promise(()=>{}));});

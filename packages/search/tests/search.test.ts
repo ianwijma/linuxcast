@@ -51,8 +51,9 @@ it('L1-02 valid HTTP queries match only an already registered Open URL command w
   for(const query of ['example.org','file:///tmp/public','javascript:alert(1)','https://user@example.org/','https://example.org/white space'])expect(rankCommands([url],query,now)).toEqual([]);
   expect(rankCommands([], 'https://example.org/',now)).toEqual([]);expect(url).toEqual(before);
 });
-it('L1-02 admits thirteen builtins plus4096application,1000workflow and500saved Quicklink identities and rejects5610records',()=>{
-  const commands=Array.from({length:5609},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
+it('L1-02 admits the current5614-command registry ceiling and rejects one extra record',()=>{
+  expect(MAX_COMMANDS).toBe(5614);
+  const commands=Array.from({length:MAX_COMMANDS},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));expect(rankCommands(commands,'',now)).toHaveLength(20);expect(()=>rankCommands([...commands,make('fixture:extra','Extra')],'',now)).toThrow('limit');
 });
 
 
@@ -95,9 +96,10 @@ describe('L1-01 hidden root commands and local management projection',()=>{
     expect(rankManagedCommands(rows,'no matches',rows[149]!.id)).toEqual([]);
     expect(rankManagedCommands(rows,'')).toEqual(rows.slice(0,100));
   });
-  it('uses the existing 5609-registry and 512-query limits for management and rejects duplicate IDs',()=>{
-    const rows=Array.from({length:5609},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));rows[4102]!.title='Later hidden target';rows[4102]!.hidden=true;
-    expect(rankManagedCommands(rows,'Later hidden target')).toEqual([rows[4102]]);
+  it('uses the current5614-registry and 512-query limits for management and rejects duplicate IDs',()=>{
+    expect(MAX_COMMANDS).toBe(5614);
+    const rows=Array.from({length:MAX_COMMANDS},(_,i)=>make(`fixture:${i}`,`Fixture ${i}`));rows[MAX_COMMANDS-1]!.title='Later hidden target';rows[MAX_COMMANDS-1]!.hidden=true;
+    expect(rankManagedCommands(rows,'Later hidden target')).toEqual([rows[MAX_COMMANDS-1]]);
     expect(()=>rankManagedCommands([...rows,make('fixture:extra','Extra')],'')).toThrow('limit');
     expect(()=>rankManagedCommands([],'x'.repeat(513))).toThrow('limit');expect(()=>rankManagedCommands([rows[0]!,rows[0]!],'')).toThrow('Duplicate');
   });

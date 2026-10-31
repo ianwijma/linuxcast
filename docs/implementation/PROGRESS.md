@@ -518,6 +518,24 @@ canonical fade, editable textarea shortcut hints and query-clear selection scrol
 need bounded coordinator assessment. Parent LocalData branch remains the frozen
 review candidate; preserve separate UI increments and reserved test hunks.
 
+D1renderer eae6a6d integrated unchanged on separate
+codex/d1-02-instrument-renderer-integration at93ecda52, based on saved LocalData
+935b776 (LocalData source/review candidate remains unchanged on its own branch).
+Coordinator mechanically changes diagnostics query selector to combobox, preserving
+all LocalData focus/security assertions. Parent independently reproduces two L1unit
+failures from stale5609record boundary assumptions; search source/test/launcher
+contract are byte-identical to approved031f78e. Tests now pin current5614limit,
+accept that exact count and reject oneextra, with management target at final index.
+All323L1units pass. Combined actual private-Xvfb sandboxed Electron F1two22.80s
+andF2two14.30s pass (diagnostics7.68s/credential5.72s),19D1browser23.2s,28D1unit,
+32F1unit,55F1security/type/lint/plan pass.20incidentalPNGchanges restored and two
+untracked legacy data-settings recaptures removed. No supported native/AT proof.
+Original Opusmedium implementation follow-up requested truthful editable-context
+footer hints and query-clear selected-row visibility, plus narrowly ratified
+rise-only/full-opacity panel motion for AA. No invented footer type/newwirefield.
+LocalData Standards e6b7e5cb completed/read clean; Security/Spec8c81c029 returned
+clean, read final next and promptly publish focused LocalData PR/currentCI.
+
 LocalData initial Standards e6b7e5cb and Security/Spec8c81c029 completed/read PASS,
 no actionable findings. Both independently67units/3contracts/type/lint/plan;
 Spec additionally6mockedmain/preload boundaries. All12screenshots inspected,
@@ -529,6 +547,99 @@ at2f19a597 (93ecda52 plus coordinatorQA). Original Opusmedium follow-up
 6fb9f0b9-3e85-4051-b63a-2c74bd4d095f runs for editable-context hint truthfulness,
 query-clear selected-row visibility and ratified full-opacity rise-only motion.
 No root test process, native action or PRwatch yet.
+
+PR88 MERGED31October18:00:09UTC at e2b3a5a8470a1ccd5a3e52de65f837c0febc5726,
+head5e46071fc7908dbb5b58378bbc8da87f7eac5a5c, current PlanningCI41227182012
+SUCCESS; exacthead mergeable/clean, no GHreviews/comments/requests, rulesets empty
+and develop unprotected. Both independent reviews clean as above, metadata-only
+diff afterd8e3133. Tiny merge blurb sent immediately; PR88watch removed. Root
+fast-forwarded LocalData branch to merged develop, then merged approveddevelop
+into saved D1renderer integration; only PROGRESS conflict, both histories retained.
+F2task/criterion statuses unchanged. Opusmedium D1follow-up6fb9f0b9 remains active;
+do not poll it. Next existing workspace: bounded credential presentation refresh
+using frozen shared primitives; preserve credential contract/lifecycle/security.
+
+Next UI task3237f2ec-7b4a-4b8d-8082-8e2661f63250 is active, runtime confirmed
+claudeAgent/claude-opus-5-5/effortmedium. Isolated from approved PR88develop e2b3a5a,
+requested branch codex/f2-02-instrument-credentials; own secrets/src/ui/**,
+credentials.integration.test.ts and NEW instrument-credentials evidence only.
+Preserve consumed-once masked input, main-owned revision/confirmations, explicit
+storage choices, session eligibility, no-replay/status truthfulness and exactURL.
+No main/preload/contracts/backend/native changes; private sandboxed synthetic
+credential harness only. Existing52UI security assertions retained, no captures
+while a key is entered, no hostbus/keyring/provider/native operations. Shared
+requests stay coordinator-owned. No push/PR/status promotion. Task completion
+wakes parent; do not poll. D1follow-up6fb9f0b9 remains independently active.
+Root current clean integration branch4ce6b5e; no active root process/PRwatch.
+
+Current coordinator checkpoint: credential UI source remains on separate
+codex/f2-02-instrument-credentials-integration, published PR89
+https://github.com/ianwijma/linuxcast/pull/89, head6b421d5097068c5b230ae04724c551441ae12899,
+basee2b3a5a. Original Opusmedium0633abb fixes only initial reviews' cancelled
+no-changeP2, integratedf2f4b2a; parent production boundary regression plus original
+real controller/presentation probe pass with storednone and neutralcancelledtitle.
+86units/3contracts/145security/type/lint, actualF2two16.60s (7.51/8.16),9captures
+pass/inspected; parent sequences testdeferred reply/event to removeact warnings,
+86rerun clean. No additional independent final re-review claimed for smallcopyfix.
+PR89 currentCI41229616116 inprogress, mergeable, notdraft, no GHreviews/comments/
+requests, rulesetsempty/developunprotected. Linked immediately. Watch next and
+merge promptly once exactheadCI passes; tinymergeblurb required. Do not push
+unrelated D1 commits to this focused PR. F2registry records PR88 merge accurately,
+all97statuses/acceptance records unchanged, current F2branch pointscredentiallane.
+
+Current root branch D1integration2e45107 before this docs checkpoint, authorcf12
+UI unchanged. New production extensionqueryclear assertion fails2.62s (selected
+Publiccatalogue119/queryfocus/activedescendant preserved, scrollTop0/rowbottom
+outsideviewport); prior23browser/4Electron passed beforethisaddedcase. Active
+original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 fixes settled
+extension projection only, no controller/main/contracts. No D1initialreview yet.
+Saved sourcehelper0aa7e3f and DOMadapter5eca891 remain unused/unreviewed/separate;
+no guest/native/device actions. Sourcehelper69offline andDOMadapter37F1unit pass.
+
+Next existingUI lane ffa91bc1-da5d-4825-a0d4-071b4493b7a9 active, confirmed
+claudeAgent/claude-opus-5-5/effortmedium, isolated from approvede2b3a5a; requested
+codex/f3-01-instrument-permissions. Own permissionUIindex/CSS/newUItests (NOT
+controller), permissionproducttest andNEWinstrument-permissions evidence only.
+Preserve opaque snapshot selection/whole-recordcompare-delete/quarantine/cancel/
+no-replay/fullsourceversionDOM+tooltips+review/Keepfocus/Refreshinitialloadingfocus.
+No new approval/capability claims, contracts/backend/native work or statuspromotion;
+parent owns newrunner mapping and D1combobox testintegration. No hostbus/keyring/
+provider/desktop/input/lab action. Completion wakes parent; don'tpoll eitherUIlane.
+
+Parent D1boundary probe on unchanged eae UI (current7ae6357) finds real live-panel
+growth defect: at800x600, open1action panel x447.5/y26.5/w280/h122; a real
+ViewSession revision2 snapshot growing to24actions leavesy26.5 withheight584,
+bottom610.5 and filterbottom609.5, beyondviewport600. Chromium assertion fails.
+Private synthetic test-only fixture/probe copied to
+/tmp/linuxcast-d1-panel-probe-bl9oahin then all3temporary repo files removed.
+No product source/capture/native/effect action changed. Material reproduction
+steered to already-running Opusmedium6fb9f0b9 for content/geometry reanchoring and
+permanent regression, preserving focus/selection/revision guards. AT README now
+distinguishes historical observer-only notes from existing offline controller/
+parser/wrapper and explicitly gates stale Instrument query/title selectors,
+native roles/source pins/approved authority/fresh receipt before any future run.
+No preparation compatibility/native acceptance claim; main README historical
+staleness reported by observer author was already corrected, no duplicate edit.
+
+Independent root work while both OpusUI lanes run: saved/unintegrated sourcehelper
+ce13987 success-path mutation now reproduced concretely. Replacing stage during
+first successful write returnedextracted and redirected later files. Parent or
+nested-directory replacement also returnedextracted. Four new regressions
+(three custody swaps plus implicit-directory entry budget) fail exactce13987.
+Corrected helper retains root and descriptor-relative directory/file creation,
+records directory identities and rechecks parent/root/known-directory bindings
+before publication/cleanup; unknown custody preserves replacements and reports
+cleanupfalse. Entry budget includes implicit parents before writing. An injected
+childfstat fault rejects/cleans with zero descriptor leaks.16source and full69
+offlinePython tests pass11.971s, two AST/hash checks, plan/whitespace pass.
+Saved unsigned0aa7e3fbe3d75e173e4da3dbecb8734eaa864c49,
+treed545587fbf2ca14c79ae949b63e2749c1ed814b5 on
+codex/f1-02-native-build-staging, clean. Per-command authorized fallback for
+continuing1Password failures, no configuration changes. Four lane-owned files
+only; no sourcehelper push/PR/integration/use, dependencies/build/guest/ns/native
+action. Entire helper still requires independent two-axis review before use.
+Root returned to D1renderer integration; UIpriority remains unchanged, both
+Opusmedium lanes active without polling, no root process/PRwatch.
 
 PR88 merged e2b3a5a8470a1ccd5a3e52de65f837c0febc5726 at31October18:00:09UTC,
 exact5e46071/currentCI41227182012SUCCESS, no GHreviews/comments/requests/rulesets
@@ -580,6 +691,75 @@ continue on frozen944c1f7 without polling. Private probe copied to
 /tmp/linuxcast-credential-outcome-probe-gta2dzkm
 and removed from repo; no source/evidence/index changed by probe, no native/keyring/
 provider/hostbus action. No PR yet; full task/UI/native acceptance unchanged.
+
+PR89 merged on 31 October at 18:31:10 UTC into develop63c958115d3efec4505efad12f3898aa0003bb93,
+from exact6b421d5097068c5b230ae04724c551441ae12899 after current Planning CI
+41229616116 passed. No GitHub reviews, comments or requests; mergeable/clean,
+no rulesets/develop protection at inspection. Initial two independent reviews'
+sole cancellation-wording P2 was corrected by Opus and verified by parent as
+documented above; no invented final independent re-review. Tiny merge blurb sent
+immediately and PR89 watch removed. Root merged approved develop into D1 branch
+at8fc6cdd; only PROGRESS conflicted, both histories preserved. Credentials test
+combobox selector and neutral cancellation assertions merged together correctly.
+
+D1 extension-query correction returned clean5197d94c0e43ed7be6d9b3d0e4904a46ff6406a7,
+tree4b35848801d4e1363580d3d20ade1d6940604740, unsigned authorized fallback after
+1Password error/no config change. Opus adds query-echo settlement check before
+one-shot reveal; unchanged controller/session/contracts. Browser delayed-host
+regression and the parent's real Electron assertion failcf12 and passfixed.
+Root integrates author unchanged at1e4682b2e0a69fd90dfa4a12c1c3db95130f3c09.
+Current parent validation:24 D1 browser cases28.7s,28 D1units,323 L1units,
+typecheck/lint; four actual sandboxed private-Xvfb Electron flows F122.17s and
+F214.83s, including the previously failing selection-clear case, all pass.
+Incidental screenshots restored and transient legacy data-settings captures
+removed; application source remains byte-identical to author5197d94.
+
+Fresh initial D1 reviews are active against frozen1e4682b/base63c9581:
+Standards865866cd-5732-4587-bf36-007d05fcda64 and Security/Spec
+b7c9ef93-4e6d-44ac-b774-686b96cab3cf, isolated GPT6.1SOL/high. No D1 PR yet.
+Completion wakes parent; don't poll. F3 Instrument UIffa91bc1 continues separately
+in Opus5.5medium from approvedPR88. No root process or PR watch remains active.
+Saved sourcehelper0aa7e3f and DOMadapter5eca891 remain unintegrated/unreviewed/
+unused. No native/lab/keyring/provider/host-input actions or acceptance promotion.
+
+Source-helper reconciliation checkpoint: saved branch
+codex/f1-02-native-build-staging now includes approved PR89 develop63c9581.
+Merge442a5fd retained the current authoritative registry; regenerated cards and
+resolved historical PROGRESS conflicts without changing acceptance. Final saved
+HEAD86abb64b912c6a5a2e1b49397160b5e64cfac215,
+tree828a9577859a5e38895efcd003b1ef0ffb88ce84, clean. Its diff against develop is
+exactly four helper/evidence files, no registry/application changes. Source/test
+hashes remain those of0aa7e3f. Combined existing wrapper/controller/observer plus
+helper suite passes113 offline tests in12.079s, no skips; AST/hash/plan/whitespace
+checks pass. No build, dependencies, guest, namespaces or native actions. This
+helper is still unreviewed, unintegrated and unused; independent two-axis review
+waits below UI priority. Root returned to D1 integration29e65c2. Both D1 reviews
+and F3 Opusmedium remain active without polling; no root process or PR watch.
+
+D1 initial reviews completed and read. Standards865866cd reports two P2s and
+Security/Specb7c9ef93 reports four, representing four distinct regressions: scaled
+split minimum widths overflow at200% text; surviving action focus is lost when
+groups empty or membership changes; list Left incorrectly advances; Ctrl+Alt/
+Super grid jumps are consumed despite exact Ctrl-only binding. Both inspected
+all51 captures, found no effect/security assertion weakening; no new executable
+content or Form-secret defect. Parent/author existing suites remain reported
+passes, not proof against these new reproductions. Original Opus5.5medium
+follow-up9c84499d-ab07-48f8-ad69-dc746e8fa12a now fixes exactly those four cases
+with negative controls, preserves earlier fixes and all frozen interfaces. No
+D1 PR yet, no acceptance promotion. Reviews remain tied to1e4682b/base63c9581.
+
+F3 Instrument laneffa91bc1 completed/read, clean t3-721f2a64, requested branch
+codex/f3-01-instrument-permissions, author e1db203 on b455f80/basee2b3a5a,
+tree09bd24d. Changes only UIindex/CSS/newpresentation/new8componenttests,
+permission product test and21newcaptures. Controller/broker/contracts unchanged;
+neutral receipts, full source/version/scope DOM/review, review focus and native
+fixed URL preserved. Author75units/2contracts/72security+8newunits/type/lint/plan
+and2private-Xvfb Electron checks pass. Parent must map new component test and
+integrate against current approved develop, then independently check/review.
+Existing non-StrictMode production entry retained; baseline StrictMode controller
+disposal limitation is disclosed, no new production-mode acceptance inferred.
+UI_REFRESH now distinguishes merged PR87/88/89, D1 findings, returned F3 work
+and remaining notes/workflow composition. All97 statuses/acceptance preserved.
 
 Both credential initial reviews completed/read: Standards eebf4024 and
 Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
@@ -678,3 +858,48 @@ updated with final results, UIadoption/registry reflect reviewed preparation and
 all acceptance remains unchanged. Publish focused F3 PR now, check currentCI and
 merge promptly; exclude D1/sourcehelper/ATadapter code. D1Opusmedium9c84499d
 continues four scoped P2 corrections. No active root process or PRwatch.
+
+
+PR90 MERGED atf7ed86e92d9fb111de9f001dec074a561b24e26b from9d744d2; Planning
+CI41231641269 SUCCESS, both independent reviews clean, no requested/submitted
+GitHub reviews/comments. Immediate tiny merge blurb sent; no PRwatch was started.
+Approved F3 source merged into D1 branch43dfb0d; only adoption-ledger conflict
+resolved with current PR90/active Notes state. Task/criteria unchanged.
+
+Opusmedium D1 correction9c84499d completed/read cleana9090c119bb5b04ccc442105c2c8f42f47038988,
+tree848bf90657823f255fec324d4e887381a90782cf, unsigned authorized fallback after
+normal30s signer failure/no config change. Integrated184d4d74; only14owned views
+paths changed: actual-container/text-scaled split stacking, stable flat action-ID
+rows/focus, backward Left, exactCtrlHomeEnd. Six new regressions fail5197/passfix.
+Parent28D1units/30browser40.2s/fulltype/lint/plan and2F1Electron25.76s pass.
+After PR90 integration, F3two22.54s and F2two14.88s pass. Initial F3 run raced
+Refresh against SIGKILL exit notification and failed its precise message check;
+unchanged isolated rerun passed15.27s. Test now observes existing read-only API
+unavailability before Refresh; product source/claims unchanged. All incidental
+PNGs restored and two known transient legacy Localdata captures removed.
+
+Fresh bounded final recheck3fe2a5e4-3087-4f33-97ed-7de62b91dc36 runs independently
+on184d4d74/base1e4682b, both Standards and Security/Spec axes; no source edits or
+product/native actions permitted. No final clean review claimed yet. Sourcehelper
+86abb64/ATadapter5eca891 remain unreviewed/unused and excluded. Notes Opusmedium
+04657eb9 remains active from approved63c9581 in codex/u1-01-instrument-notes; no
+completion inferred. Next: complete bounded final D1 review, publish focused PR,
+current CI/review inspection and prompt merge; continue existing Notes/workflow UI.
+
+Workflow existing-UI refresh8e4a9591-2d36-406f-bcd2-63b5a4eb823c is now active in
+ClaudeOpus5.5medium, isolated codex/w2-instrument-workflow from59549f0. Owned
+canvas/debugger presentation/tests/newcaptures only, no controllers/main/contracts/
+engine/graph/journal changes. Preserve actual no-drag editing, exact draft/saved
+CAS, nativeclose/Quit, explicit saved-run approval/cancellation/recovery/no-replay.
+Notes04657eb9 and finalD1review3fe2a5e4 remain active; do not poll. Threechildren
+plus root fill four slots. No root process beyond current scoped regressionchecks.
+
+Final D1 review3fe2a5e4 completed/read PASS bothaxes on184d4d74; allfourP2s closed,
+14ownedsourcepaths authora909 byte-identical. Independently28D1/10glyphunits,
+30Chromium/sixcontrolledprobes/sixoldsource-negativecontrols/type/scopedlint/plan/
+whitespace pass; all8changed/newcaptures directlyinspected,33component20product.
+59549f0 permissions-test synchronization inspected separately, no productchanges.
+Parent current323L1unit/55F1security/177L1security pass1.32s/13.16s/1.59s. Six
+actualElectron flows F125.76s/F322.54s/F214.88s pass; previous firstF3race remains
+honestly disclosed. Focused D1publication/currentCI/merge next. Notes04657eb9 and
+workflow8e4a9591 remainactive Opusmedium; finalreview terminal, no new delegation.

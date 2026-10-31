@@ -65,9 +65,30 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
   const app = application, page = await app.firstWindow();
   page.setDefaultTimeout(5000);
   await page.waitForURL('linuxcast-app://shell/index.html');
-  const query = page.getByRole('searchbox', { name: 'Search commands', exact: true });
+  const query = page.getByRole('combobox', { name: 'Search commands', exact: true });
   await expect.poll(() => query.evaluate(element => element === document.activeElement)).toBe(true);
   await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
+  // Extension-mode production search: clearing a narrow query retains and reveals
+  // its selected application after the unfiltered controller projection arrives.
+  await query.fill('Public catalogue 119');
+  await expect.poll(() => page.getByRole('option').count()).toBe(1);
+  const retained = page.getByRole('option', { name: 'Public catalogue 119 Installed application', exact: true });
+  await expect.poll(() => retained.getAttribute('aria-selected')).toBe('true');
+  await query.press('Escape');
+  await expect.poll(() => query.inputValue()).toBe('');
+  await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
+  await expect.poll(() => retained.evaluate(element => {
+    const row = element.getBoundingClientRect(), body = element.closest('.lc-view-scroll')!.getBoundingClientRect();
+    const scroller = element.closest<HTMLElement>('.lc-view-scroll')!;
+    const input = document.querySelector<HTMLInputElement>('[data-view-query]')!;
+    return { selected: element.getAttribute('aria-selected') === 'true', focused: document.activeElement === input,
+      active: input.getAttribute('aria-activedescendant') === element.id, scrolled: scroller.scrollTop > 0,
+      topVisible: row.top >= body.top, bottomVisible: row.bottom <= body.bottom + 1 };
+  })).toEqual({ selected: true, focused: true, active: true, scrolled: true, topVisible: true, bottomVisible: true });
+  // Reset through ordinary keys before the existing catalogue/alias/viewport flow.
+  await query.press('Tab');
+  await page.getByRole('listbox', { name: 'Search commands', exact: true }).press('Home');
+  await page.keyboard.press('Shift+Tab');
   await query.fill('hide');
   await expect.poll(() => page.getByRole('option').count()).toBe(1);
   await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.getSize()[1]!)).toBeLessThan(560);
@@ -115,7 +136,33 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
   await expect.poll(() => page.getByRole('button', { name: 'Cancel', exact: true }).evaluate(element => element === document.activeElement)).toBe(true);
   await page.keyboard.press('Enter');
   await expect.poll(() => query.evaluate(element => element === document.activeElement)).toBe(true);
-  const evidence = join(root, 'apps/desktop/evidence');
+  // Instrument semantics (D1-02): the root query is a combobox controlling the grouped listbox
+  // through a valid active descendant; the footer shows only bound verbs.
+  expect(await query.getAttribute('aria-controls')).toBe(await results.getAttribute('id'));
+  expect(await query.getAttribute('aria-expanded')).toBe('true');
+  const activeId = await query.getAttribute('aria-activedescendant');
+  expect(activeId).toBeTruthy();
+  expect(await page.locator(`[id="${activeId}"]`).getAttribute('aria-selected')).toBe('true');
+  expect(await page.locator(`[id="${activeId}"]`).getAttribute('role')).toBe('option');
+  const footer = page.locator('.lc-view:not([hidden]) .lc-view-footer');
+  await expect.poll(() => footer.getByRole('button', { name: 'Actions Ctrl+K', exact: true }).getAttribute('aria-haspopup')).toBe('dialog');
+  await expect.poll(() => footer.getByRole('button', { name: /Enter$/ }).first().isVisible()).toBe(true);
+  // Root Escape clears a nonempty query before it could dismiss; nothing is invoked.
+  await query.fill('public catalogue 1');
+  await page.keyboard.press('Escape');
+  await expect.poll(() => query.inputValue()).toBe('');
+  expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
+  await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
+  const panelFits = () => page.evaluate(() => {
+    const dialog = document.querySelector<HTMLDialogElement>('dialog.lc-action-panel[open]')!;
+    const box = dialog.getBoundingClientRect(), filter = dialog.querySelector('.lc-panel-filter')!.getBoundingClientRect();
+    const controls = Array.from(dialog.querySelectorAll<HTMLElement>('button, input'));
+    return { inside: box.top >= 0 && box.left >= 0 && box.bottom <= innerHeight + 1 && box.right <= innerWidth + 1,
+      filterVisible: filter.top >= box.top - 1 && filter.bottom <= box.bottom + 1,
+      reachable: controls.every(control => { control.scrollIntoView({ block: 'nearest' }); const rect = control.getBoundingClientRect(); return rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1; }) };
+  });
+  const evidence = join(root, 'apps/desktop/evidence/instrument-renderer');
+  mkdirSync(evidence, { recursive: true });
   const capture = async (name: string) => {
     const sizes = await page.evaluate(async () => {
       const observed: string[] = [];
@@ -138,6 +185,20 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
     await expect.poll(() => fitsWindow(page)).toEqual({ footerVisible: true, bodyVisible: true, noHorizontalOverflow: true, noDocumentScroll: true });
     expect((await new AxeBuilder({ page }).setLegacyMode().analyze()).violations).toEqual([]);
     await capture(`shell-zoom-200-${theme}.png`);
+    // Action panel at 200% zoom in the default 720×560 window and in a compact 600×400 window.
+    await query.press('Control+k');
+    await expect.poll(() => find.evaluate(element => element === document.activeElement)).toBe(true);
+    await page.evaluate(() => Promise.all(document.querySelector('dialog.lc-action-panel')!.getAnimations().map(animation => animation.finished)));
+    await expect.poll(panelFits).toEqual({ inside: true, filterVisible: true, reachable: true });
+    expect((await new AxeBuilder({ page }).setLegacyMode().analyze()).violations).toEqual([]);
+    await capture(`shell-zoom-200-actions-${theme}.png`);
+    await app.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.setSize(600, 400); });
+    await expect.poll(panelFits).toEqual({ inside: true, filterVisible: true, reachable: true });
+    if (theme === 'dark') await capture('shell-zoom-200-actions-compact-dark.png');
+    await page.keyboard.press('Control+k');
+    await expect.poll(() => query.evaluate(element => element === document.activeElement)).toBe(true);
+    await app.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.setSize(720, 560); });
+    await expect.poll(() => fitsWindow(page)).toEqual({ footerVisible: true, bodyVisible: true, noHorizontalOverflow: true, noDocumentScroll: true });
   }
   await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
   expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches && matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
