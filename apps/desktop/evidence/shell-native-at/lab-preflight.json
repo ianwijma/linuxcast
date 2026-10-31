@@ -1,0 +1,57 @@
+{
+  "kind": "read-only-infrastructure-check",
+  "observedUtc": "2026-10-31T10:10:25Z",
+  "hostTargetSupported": false,
+  "hostPackages": {
+    "orca": "42.0-1ubuntu2",
+    "at-spi2-core": "2.44.0-3",
+    "python3-pyatspi": "2.38.2-1",
+    "xvfb": "2:21.1.4-2ubuntu1.7~22.04.16"
+  },
+  "lab": {
+    "container": "linuxcast-native-lab-v4",
+    "observedState": {
+      "running": false,
+      "status": "exited",
+      "exitCode": 0
+    },
+    "historicalGuestShutdownPerformed": true,
+    "historicalStoppedUtc": "2026-10-24T10:44:42.94744667Z",
+    "historicalReadiness": {
+      "debianVersion": "13.7",
+      "kernel": "6.12.113+deb13-cloud-amd64",
+      "packages": {
+        "orca": "48.1-1+deb13u2",
+        "at-spi2-core": "2.56.2-1+deb13u2",
+        "python3-gi": "3.50.0-4+b1",
+        "python3-pyatspi": "2.46.1-1",
+        "python3-dbus": "1.4.0-1",
+        "speech-dispatcher": "0.12.0-5",
+        "speech-dispatcher-audio-plugins": "0.12.0-5",
+        "dbus-x11": "1.16.2-2",
+        "xvfb": "2:21.1.16-1.3+deb13u4",
+        "xauth": "1:1.1.2-1.1",
+        "xdotool": "1:3.20160805.1-5.1"
+      },
+      "runtimes": {
+        "node": {
+          "sha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+          "version": "v24.22.1"
+        },
+        "bun": {
+          "sha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+          "version": "1.4.4"
+        }
+      }
+    },
+    "historicalMetadataSha256": {
+      "readiness.json": "91d68771eedaf8abce6f5d67379947bc892017821052006bebf06af879498885",
+      "reconstruction.json": "77a940b8e192211f6ae0f4fd11d583bbc0a5f26a9df707cf1178f81e36af8fbb"
+    }
+  },
+  "blocker": "No active reserved Debian 13/Orca 48 product AT session; product controller, fresh-output parser and publication integration remain preparation work.",
+  "sshAttempted": false,
+  "credentialsRead": false,
+  "labMutated": false,
+  "nativeRuns": 0
+}

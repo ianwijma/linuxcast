@@ -1,0 +1,11 @@
+{
+  "kind": "coordinator-preparation-only-not-native-execution",
+  "files": {
+    "apps/desktop/tests/at/test_observations.py": "463dbcc8a5b4b0c1f8c588a89f5a9686681993fadac91123715a876b99965572",
+    "apps/desktop/tests/at/native_at.py": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b",
+    "apps/desktop/tests/at/observations.py": "70ae79e556c233699cb890192a88c5f9e0d46a71ab77644f2a7a305bc478b55b",
+    "apps/desktop/tests/at/README.md": "a5e2f8b212b004ce4260f0527916b3a2dded37ae77cd2c9470267e34990daefd",
+    "apps/desktop/tests/at-preparation.security.test.ts": "0474b4febfe19c3f80d035cc6d82a098fd19039f9c48bc893b714c31daf8fcc3",
+    "scripts/test-runner/suites.json": "58c9045724be83658e4f20ee74a517b56b065e6600cae63968a1d197f1f05d87"
+  }
+}

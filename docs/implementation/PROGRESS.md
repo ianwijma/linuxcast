@@ -60,3 +60,29 @@ pass. Restored9incidental PNG recaptures to reviewed images. Only production mer
 resolution combines already reviewed shutdown owners; no new operation/privilege.
 Next: normally signed mergecommit, push/link, inspect current CI/reviews, merge
 when green. User requests prompt bounded integration; task/native gates unchanged.
+
+
+PR81 MERGED atf4f5409c102ce1afa8c03c87dad411dfbc7dd76f,31Oct13:14:08UTC.
+Current signed a1ffb88 CI41204589655 passed; no requestedreviews/comments. Its
+combined checks above pass. PR82 andPR81 are integrated; task acceptance unchanged.
+
+PR80 now updating todevelopf4f5409. Production source merged automatically;
+coordinator resolves registry/evidence/checkpoint conflicts preserving all three
+increments and all56passed/325pending/8N/A criteria. v2 independent review of
+41c3260 completed/read with no Standards or Security/Spec blocker;32unit/55security
+including53Python plus30extra pure boundaries/type/lint/plan/19hashes/signature
+pass independently. Need current combined F1/F2/F3 tests and actualElectron flows,
+then signed update/push/link/currentCI and merge. No additional feature work before
+closing this last ready PR. Actual product/Orca native runs remain0; all supported
+native/fulltask/release gates remain mandatory and explicitly pending.
+
+
+PR80 combined validation PASS after developf4f5409 integration:32F1unit,55F1/
+68F2/72F3security (53Python no skips), fulltype/lint/frozeninstall/plan/whitespace,
+19unchanged native preparation source hashes. Five actual private-Xvfb Electron
+scenarios pass (F1two18.11s,F2one5.75s,F3two17.90s). Corrected legacy expected
+command count to frozen built-in IDs plus1fixture after Saved permissions addition;
+exact preload/security assertions unchanged. New affected-state zoom dark/light
+captures inspected in apps/desktop/evidence/pr80-integration/;19incidental historical
+recaptures restored. Next: signed mergecommit/push/link/currentCI/merge, retaining
+all unfinished task/native/release gates and source/evidence provenance.
