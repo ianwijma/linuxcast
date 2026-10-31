@@ -1,40 +1,22 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — workflow candidate
+## Current coordinator state — workflow verification after PR93
 
-Goal ACTIVE: all97/full local1.0 throughR1-03. Registry8done/20inprogress/69planned;
-56passed/325pending/8N/A unchanged. PR91renderer432fa6a andPR92sourcehelper8de8612
-merged, no openPRwatch. No native/lab/namespace/hostbus/provider/keyring actions.
+Goal ACTIVE: full97/local1.0 throughR1-03, registry states unchanged.
+PR93 Notes merged279a3a41ccbd5290ac0517c01f29082781401f3b from901226b;
+CI41237501043 SUCCESS, GitHub reviews/requests/comments empty, normal exact-head
+merge. Tiny merge blurb sent immediately and watch removed. Notes sourcee5a5b8c
+and all28captures retained; all native/full-task gates remain pending.
 
-Rootcodex/w2-instrument-workflow-integration source7816d71, approved8de8612 +
-Opus069669e (initial8e3d) + parentfixture60667ab(cherryf94df0d). Source/evidence
-allauthor-identical, no controller/engine/graph/storageproduction/shared changes.
-Current24+37units/5contracts/15+2security/fulltype/lint/plan pass;22browser30.2s
-and24browser17.9s; W2-01integration8/6.99s(editor5.639s),launcher1/5.15s(4.699s),
-extraactualrun1/8.35s(7.56s). Allthree sandboxprivateXvfb/publicfixtureflows pass.
-39newcaptures(14canvas18debugger7product)unchanged,6incidentalPNGsrestored.
-Initial Standards7e116647-5d50-4f88-826b-ad16afc0b8c4 and SecuritySpec2ef28b07-
-9421-4a5b-88f2-e66221a4b648 ACTIVE freshSOLhigh on7816d71/base8de8612; no polls.
-Fullcardfitnotclaimed: nativezoom test checksnodeintersection/nonoverlap, long
-chainsremainpannable/Fitview. Left/rightportsretainhorizontalstoredmodel; no
-verticaldefaultlayouthelper or persistedcoordinate transposition introduced.
+Root codex/w2-instrument-workflow-integration integrates original Opus0fa31fc
+on069669e and approvedPR93. Initial Standards7e116647 clear; Spec2ef28b07 sole
+held-drag/text-resize coordinate P2 corrected by locking the display and inverse
+frame for the entire gesture, including final release. Parent verification next;
+no second independent final clean review claimed. Parent test-only v7 fixture
+fix60667ab retained, no production storage/controller/engine/shared changes.
+AT adapter9c77978 separatebranch Spec0098261d clear; initial Standards pending.
+Actual native/Orca runs0; no guest/namespace/hostbus/keyring/provider actions.
 
-Notes rootcheckpoint7b1cd6d codex/u1-01-instrument-notes-integration excludes
-workflowunreviewedsource. Opusoriginalauthor23cbeeb5-8b0b-4153-895f-a0af1f03cab8
-ACTIVE forsoleStandardsP2 slashpopover150%visibility; initialSpecfa38clear.
-Parent482/36/258/97/40/type/lint/plan allpass beforethatnewcase; no NotesPR yet.
-
-ATadapter9c77978 separatecodex/f1-02-instrument-at-integration initialSpec0098261d
-completed/read clear:37units+44syntheticprobes/type/lint/plan/hashes, no driver/
-nativeexecution. InitialStandards remains pending. Freshsource/archive/build,
-nativeidentity/pins,PID1metadataaccess andouterowner remain required.
-Current3childslots=NotesOpusfix+twoWorkflowreviews; no rootprocess/PRwatch.
-
-/home2.4GiBfree afterdeletingonlyderivednode_modulesfrom6completedreviewclones;
-sources/index/HEAD verifiedunchanged andactiveauthor/rootdepspreserved. Keep
-future frozeninstallsbounded; no broadfilesystem cleanup.
-
-## Earlier checkpoints
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
 native desktop/AT, performance, packaging and publication gates remain required.
@@ -1036,9 +1018,3 @@ exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
 23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
 occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
 recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
-
-Workflow069669e completed/read clean, integrated7816d71 with parentfixture60667ab.
-Two measuredprojection-regressionsfail8e3d andpassfixed; invariantcaseoldfails
-becausefixturegetterabsent, notindependentnegativeproof. Currentparentallchecks
-abovepass and39PNGs preserved. New58pathsfrozen forinitial2axisreviews, no
-Notes/ATunreviewedsource mixed. No newactor or task/criteria promotion.
