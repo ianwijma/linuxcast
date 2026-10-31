@@ -586,3 +586,23 @@ parser/wrapper and explicitly gates stale Instrument query/title selectors,
 native roles/source pins/approved authority/fresh receipt before any future run.
 No preparation compatibility/native acceptance claim; main README historical
 staleness reported by observer author was already corrected, no duplicate edit.
+
+Independent root work while both OpusUI lanes run: saved/unintegrated sourcehelper
+ce13987 success-path mutation now reproduced concretely. Replacing stage during
+first successful write returnedextracted and redirected later files. Parent or
+nested-directory replacement also returnedextracted. Four new regressions
+(three custody swaps plus implicit-directory entry budget) fail exactce13987.
+Corrected helper retains root and descriptor-relative directory/file creation,
+records directory identities and rechecks parent/root/known-directory bindings
+before publication/cleanup; unknown custody preserves replacements and reports
+cleanupfalse. Entry budget includes implicit parents before writing. An injected
+childfstat fault rejects/cleans with zero descriptor leaks.16source and full69
+offlinePython tests pass11.971s, two AST/hash checks, plan/whitespace pass.
+Saved unsigned0aa7e3fbe3d75e173e4da3dbecb8734eaa864c49,
+treed545587fbf2ca14c79ae949b63e2749c1ed814b5 on
+codex/f1-02-native-build-staging, clean. Per-command authorized fallback for
+continuing1Password failures, no configuration changes. Four lane-owned files
+only; no sourcehelper push/PR/integration/use, dependencies/build/guest/ns/native
+action. Entire helper still requires independent two-axis review before use.
+Root returned to D1renderer integration; UIpriority remains unchanged, both
+Opusmedium lanes active without polling, no root process/PRwatch.
