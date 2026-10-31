@@ -385,7 +385,11 @@
       "packages/secrets/tests/persistence.security.test.ts",
       "packages/data-controls/tests/controls.security.test.ts",
       "packages/data-controls/tests/controller.security.test.ts",
-      "packages/data-controls/tests/persistence.security.test.ts"
+      "packages/data-controls/tests/persistence.security.test.ts",
+      "packages/secrets/tests/session.security.test.ts",
+      "packages/secrets/tests/session-stream.security.test.ts",
+      "packages/secrets/tests/session-client.security.test.ts",
+      "packages/secrets/tests/session-store.security.test.ts"
     ],
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",

@@ -1,3 +1,4 @@
+import { syntheticSession } from './session-fixture.ts';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mkdtemp, rm, readdir, readFile, writeFile, chmod, symlink, link } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -26,7 +27,7 @@ function references() {
 }
 async function setup(api=fakeSafeStorage(),refs=references().refs) {
   const directory=await mkdtemp(join(tmpdir(),'linuxcast-secret-fixture-'));directories.push(directory);
-  const store=await SecretStore.open({dataDirectory:directory,safeStorage:api,references:refs});stores.push(store);return {store,directory,api,refs};
+  const store=await SecretStore.open({session:syntheticSession().access,dataDirectory:directory,safeStorage:api,references:refs});stores.push(store);return {store,directory,api,refs};
 }
 async function stored(store:SecretStore,secret=generated(),mode:'persistent'|'session-only'='persistent'):Promise<SecretReference> {const result=await store.store(owner,secret,mode);expect(result.outcome).toBe('stored');if(result.outcome!=='stored')throw new Error();return result.reference;}
 
@@ -48,7 +49,7 @@ describe('F2-02 secret boundary',()=>{
     const metadata=references();const f=await setup(fakeSafeStorage(),metadata.refs);const secret=generated();const reference=await stored(f.store,secret);
     expect(Object.keys(reference).sort()).toEqual(['id','mode']);const file=await readFile(join(f.directory,'secrets',`${reference.id}.blob`));expect(file.toString('utf8')).not.toContain(secret);
     expect(JSON.stringify([...metadata.records.values()])).not.toContain(secret);let observed=false;expect(await f.store.use(reference,owner,async value=>{observed=value===secret;})).toEqual({outcome:'used'});expect(observed).toBe(true);
-    await f.store.close();const reopened=await SecretStore.open({dataDirectory:f.directory,safeStorage:f.api,references:metadata.refs});stores.push(reopened);expect(await reopened.use(reference,owner,async value=>{expect(value===secret).toBe(true);})).toEqual({outcome:'used'});
+    await f.store.close();const reopened=await SecretStore.open({session:syntheticSession().access,dataDirectory:f.directory,safeStorage:f.api,references:metadata.refs});stores.push(reopened);expect(await reopened.use(reference,owner,async value=>{expect(value===secret).toBe(true);})).toEqual({outcome:'used'});
   });
   it('binds ciphertext to its exact reference and owner instead of trusting the filename alone',async()=>{
     const f=await setup();const first=await stored(f.store);const secondResult=await f.store.store({...owner,ownerId:'second-provider'},generated(),'persistent');if(secondResult.outcome!=='stored')throw new Error();
