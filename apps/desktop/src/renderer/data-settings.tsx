@@ -9,6 +9,8 @@ const categories:[string,string,string,DataSettingsExportCategory|null,DataSetti
   ['command-usage','Command usage','Clear usage counts and last-used times. Your pins and aliases stay.','command-usage','command-usage'],
   ['ai-conversations','AI conversations','Export conversations as unencrypted JSON, or delete conversations and their message revisions.','ai-conversations','ai-conversations'],
   ['file-index','File index','Clear indexed metadata. Selected folders and original files stay.',null,'file-index'],
+  ['application-logs','Application logs','Export or reset local event metadata. No content bodies or credentials. Kept for 14 days, up to 20 MiB. New events may appear after clearing.','application-logs','application-logs'],
+  ['tool-diagnostics','Tool diagnostics','Export or reset local tool event metadata. No tool arguments, results or credentials. Kept for 30 days, up to 100 MiB. Each category is managed separately.','tool-diagnostics','tool-diagnostics'],
 ];
 function DataSettings(){
   const api=(window as unknown as {linuxcastData?:DataSettingsApi}).linuxcastData;
