@@ -21,6 +21,7 @@ Selected proposal: `docs/design/proposals/raycast-refresh/opus/` (Workspace fram
 | `local-data-cancelled-light.png` | Save dialog cancelled → Cancelled plate (“Application logs: nothing was exported.”), not success |
 | `local-data-confirmed-light.png` | Confirmed native clear → Done plate only after the backend `cleared` reply |
 | `local-data-error-light.png` | Malformed synthetic diagnostics → fixed main reply in an Error band with `code: internal`; canary text never rendered; axe 0 |
+| `local-data-status-focus-light.png` | Error band stuck at the top of the scrolled content; sidebar Settings activation lands the focused category below the measured band, then Tab focuses Export settings fully visible (no status hit). The same run checks busy replacement, the busy band growing in a 640px window, and cancel, with focus staying unobscured |
 | `local-data-recovered-light.png` | User-initiated, separately confirmed clear of only Tool diagnostics → Done; nothing replayed |
 | `local-data-filtered-empty-light.png` | No matches: sidebar count 0 and filtered-empty plate; previous outcome band still visible; axe 0 |
 | `local-data-forced-colors-reduced-motion.png` | Chromium `forcedColors: active` + `reducedMotion: reduce` emulation on the real window (system-colour borders, Highlight rail/outline, transitions 0s) |

@@ -27,7 +27,9 @@ html, body, #root { margin: 0; min-inline-size: 0; }
 .ld-nav-list .lc-row-text { flex-basis: 0; }
 .ld-nav-empty { margin: 0; padding-inline: var(--lc-space-8); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
 
-.ld-content { min-block-size: 0; overflow: auto; container-type: inline-size; }
+.ld-content { min-block-size: 0; overflow: auto; container-type: inline-size;
+  /* --ld-status-block-size is the measured sticky status band height (0 when it is not sticky). */
+  scroll-padding-block-start: calc(var(--ld-status-block-size, 0px) + var(--lc-space-8)); }
 .ld-page { box-sizing: border-box; max-inline-size: var(--lc-workspace-min-width); padding: var(--lc-space-24) var(--lc-space-32) var(--lc-space-32); display: grid; gap: var(--lc-space-16); align-content: start; }
 .ld-page h1 { margin: 0; font-size: var(--lc-text-workspace-title); line-height: var(--lc-leading-workspace-title); font-weight: var(--lc-weight-semibold); letter-spacing: var(--lc-tracking-workspace-title); }
 .ld-lede { margin: calc(var(--lc-space-8) * -1) 0 0; max-inline-size: var(--lc-prose-measure); }
