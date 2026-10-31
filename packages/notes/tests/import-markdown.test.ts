@@ -1,9 +1,18 @@
 import {expect,it} from 'vitest';
-import {notePlainText} from '@linuxcast/contracts';
+import {notePlainText,notesRepositoryContracts,parseRepositoryRequest} from '@linuxcast/contracts';
 import type {NoteContent,NoteNode} from '@linuxcast/contracts';
 import {exportNoteMarkdown,importNoteMarkdown,NOTE_MARKDOWN_MAX_BYTES,NOTE_MARKDOWN_NOTICE} from '../src/markdown.ts';
 const paragraph=(text:string):NoteNode=>({type:'paragraph',content:[{type:'text',text}]});
 const tasks=(node:NoteNode):boolean[]=>[...(node.type==='taskItem'?[node.attrs!.checked as boolean]:[]),...(node.content??[]).flatMap(tasks)];
+it.each(['# Empty note','# Leaves\n\n---\n\nfirst\\\nsecond','# Tasks\n\n- [x] Done\n  - [ ] Pending','# Code\n\n```text\n&amp; &#10; <script>literal</script>\n```'])('produces a JSON-safe actual notes.write repository request for %j',source=>{
+ const content=importNoteMarkdown(source),request={schemaVersion:1,requestId:'public-import-write',method:'notes.write',params:{id:'11111111-1111-4111-8111-111111111111',expectedRevision:0,action:'draft',content}};
+ expect(parseRepositoryRequest(request,notesRepositoryContracts)).toEqual(request);
+ expect(JSON.parse(JSON.stringify(request))).toEqual(request);
+});
+it.each(['\nPublic Unicode 雪 🐧 and literal <script>inert</script> [link](https://example.org)\n','\nLiteral &amp; &lt; &#10; &#38;#10; [link](https://example.org)\n'])('preserves combined escaped literals and boundary LF exactly once: %j',text=>{
+ const note:NoteContent={title:'Public combined escaping',document:{type:'doc',content:[paragraph(text),{type:'codeBlock',content:[{type:'text',text:'&amp; &lt; &#10; &#38;#10;'}]}]}};
+ const before=structuredClone(note),result=importNoteMarkdown(exportNoteMarkdown(note));expect(notePlainText(result.document)).toBe(notePlainText(note.document));expect(note).toEqual(before);
+});
 it('imports actual exported Unicode/text/tasks/lists/quotes/code without source mutation',()=>{
  const nested:NoteNode={type:'taskList',content:[{type:'taskItem',attrs:{checked:false},content:[paragraph('Nested pending')]}]};
  const note:NoteContent={title:'Public café 日本語 🪶 #',document:{type:'doc',content:[

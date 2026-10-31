@@ -1,4 +1,11 @@
-# Markdown import UI and parser — unfinished handoff
+# Markdown import UI and parser — component history
+> Continuation update — 31 October 2026: both later application blockers are now
+> fixed. Final assembled checks pass:469 unit/36 contract/258 security/88 browser/
+> 40 integration, including actual sandboxed Electron import/create/re-export/Save/
+> launcher/restart. See `apps/desktop/evidence/notes-markdown-import-application.md`
+> for current evidence and remaining acceptance limits. The warning and author
+> results below are preserved as validation history, not current failure claims.
+
 > Handoff update — 31 October 2026: the report below preserves the author’s earlier
 > component results. Subsequent coordinator application checks found two unresolved
 > issues: parser output can contain optional `undefined` properties rejected by the

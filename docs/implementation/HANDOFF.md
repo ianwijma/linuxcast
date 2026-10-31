@@ -1,4 +1,10 @@
-# Linuxcast handoff — 31 October 2026
+# Historical Linuxcast handoff — 31 October 2026
+
+> Continuation update: both application blockers below are fixed and the assembled
+> checks now pass (469 unit,36 contract,258 security,88 browser,40 integration).
+> See [current application evidence](../../apps/desktop/evidence/notes-markdown-import-application.md)
+> and [PROGRESS.md](PROGRESS.md) for current publication/review state. The remainder
+> of this file preserves the original handoff and its historical failures.
 
 Resume the complete agreed local 1.0 objective, covering all 97 tasks through
 R1-03 and every release gate. This handoff is unfinished work, not a release or

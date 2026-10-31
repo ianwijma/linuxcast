@@ -1,10 +1,11 @@
 import {MarkdownManager} from '@tiptap/markdown';
-import type {JSONContent} from '@tiptap/core';
+import type {JSONContent,MarkdownToken} from '@tiptap/core';
+import {decodeHtmlEntities,flattenExtensions,getExtensionField} from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import {emptyNoteDocument,noteContentSchema,noteDocumentSchema,notePlainText} from '@linuxcast/contracts';
-import type {NoteContent} from '@linuxcast/contracts';
+import {emptyNoteDocument,repositoryRequestSchema,noteContentSchema,noteDocumentSchema,notePlainText} from '@linuxcast/contracts';
+import type {NoteContent,NoteNode} from '@linuxcast/contracts';
 export const NOTE_MARKDOWN_MAX_BYTES=524288;
 export const NOTE_MARKDOWN_NOTICE='Linuxcast Markdown export: preserves note text and tasks. Editor fonts, colours, layout and undo history are not exported. Multiline inline code exports as plain text. Line endings normalize to LF. This file is unencrypted.';
 class NotesMarkdownManager extends MarkdownManager{
@@ -21,7 +22,36 @@ class NotesMarkdownManager extends MarkdownManager{
   return super.renderNodeToMarkdown(node,parent,index,level,meta);
  }
 }
-const manager=new NotesMarkdownManager({extensions:[StarterKit.configure({heading:{levels:[1,2,3]},link:false,underline:false,trailingNode:false}),TaskList,TaskItem.configure({nested:true})],markedOptions:{gfm:true},indentation:{style:'space',size:2}});
+// Bare URLs are literal Notes text. The GFM lexer can split an entity between
+// an autolink and adjacent text (URL&#10 + ;). Rejoin only these literal runs
+// before the maintained text handlers decode entities once. Escapes/code stay
+// separate, and explicit links are still refused by the lexer admission check.
+function literalTextTokens(tokens:MarkdownToken[]):MarkdownToken[]{
+ const result:MarkdownToken[]=[];
+ for(const token of tokens){
+  if(token.type==='text'&&!token.tokens||token.type==='link'&&token.raw===token.text){const previous=result.at(-1);if(previous?.type==='text'&&!previous.tokens)previous.text=(previous.text??'')+(token.text??'');else result.push({type:'text',text:token.text??''});}
+  else result.push(token);
+ }
+ return result;
+}
+const extensions=flattenExtensions([StarterKit.configure({heading:{levels:[1,2,3]},link:false,underline:false,trailingNode:false}),TaskList,TaskItem.configure({nested:true})]).map(extension=>extension.extend({
+ // Already flattened: keep each node (including nested TaskItem), without
+ // registering the original children ahead of these extended handlers again.
+ addExtensions:()=>[],
+ ...(getExtensionField(extension,'parseMarkdown')?{parseMarkdown(token,helpers){
+  if(this.name==='text')return {type:'text',text:decodeHtmlEntities(token.text||'')};
+  return this.parent!(token,{...helpers,parseInline:tokens=>helpers.parseInline(literalTextTokens(tokens)),parseChildren:tokens=>helpers.parseChildren(literalTextTokens(tokens))});
+ }}:{}),
+}));
+const manager=new NotesMarkdownManager({extensions,markedOptions:{gfm:true},indentation:{style:'space',size:2}});
+/** Only after closed, bounded schema validation: Tiptap helpers retain optional
+ * undefined fields that are not JSON values. Never normalize arbitrary input. */
+function wireNode(node:NoteNode):NoteNode{
+ const copy={...node};for(const field of ['attrs','text','marks','content'] as const)if(copy[field]===undefined)delete copy[field];
+ if(copy.content)copy.content=copy.content.map(wireNode);
+ if(copy.type==='orderedList'&&copy.attrs&&copy.attrs.type===undefined){copy.attrs={...copy.attrs};delete copy.attrs.type;}
+ return copy;
+}
 /** Main-owned bounded serialization only; no imported HTML, URL loading or editor.
  * The official serializer uses the same closed extensions as the Notes editor. */
 export function exportNoteMarkdown(value:NoteContent):string{
@@ -52,6 +82,7 @@ export function importNoteMarkdown(text:string):NoteContent{
   }
   const document=manager.parse(source);let title='Imported note';const titleIndex=document.content?.findIndex(node=>node.type==='heading'&&node.attrs?.level===1)??-1;if(titleIndex>=0){const titleDocument=noteDocumentSchema.safeParse({type:'doc',content:[document.content![titleIndex]!]});if(!titleDocument.success)throw new Error(unsupported);title=notePlainText(titleDocument.data);document.content=document.content!.filter((_,index)=>index!==titleIndex);}
   if(!document.content?.length)document.content=emptyNoteDocument().content;
-  const parsed=noteContentSchema.safeParse({title,document});if(!parsed.success)throw new Error(unsupported);return parsed.data;
+  const parsed=noteContentSchema.safeParse({title,document});if(!parsed.success)throw new Error(unsupported);
+  const content=noteContentSchema.parse({title:parsed.data.title,document:{type:'doc',content:parsed.data.document.content.map(wireNode)}});repositoryRequestSchema.shape.params.parse(content);return content;
  }catch{throw new Error(unsupported);}
 }

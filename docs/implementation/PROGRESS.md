@@ -1,41 +1,38 @@
 # Coordinator checkpoint — 31 October 2026
 
-The user requested wrapping this thread so the complete local 1.0 goal can continue
-in another thread. No agents or application test processes remain running. No new
-feature is queued. The objective is unfinished; do not mark it complete.
+The complete agreed local1.0 objective remains unfinished. Finish PR77 before
+starting another feature. All subagents use GPT-6.1 SOL/high. Normal signed
+commit/push/PR/merge authorization persists; preserve the 1Password signing setup.
 
-Read [HANDOFF.md](HANDOFF.md) for the exact continuation instructions, validation
-history, remaining fixes, worktrees and persistent user decisions. All subagents
-must use GPT-6.1 SOL/high. Preserve full scope/security and merge smaller reviewed,
-tested application increments promptly.
+Active: U1-01 bounded Markdown import on `codex/notes-markdown-import` in
+`.worktrees/linuxcast-notes-markdown-import`, base merged PR76/develop09de566.
+Draft PR: https://github.com/ianwijma/linuxcast/pull/77. The original author tree
+`.worktrees/linuxcast-notes-markdown-import-ui` remains a reference.
 
-Primary develop is clean at09de566dc3773b058be7c43e517956bd08ef7fcb. PR75 captured-clock
-Quicklinks and PR76 confirmed whole-Trash deletion are merged. The last signature
-verified normally with the unchanged 1Password configuration; old unlock prompts
-are resolved. PR76 evidence is in apps/desktop/evidence/notes-empty-trash-application.md.
+Both handoff blockers are fixed: permitted optional undefined node fields are
+removed after closed bounded validation and JSON-wire validation remains strict;
+lexer-split bare-URL/entity literal runs are rejoined before exactly-once text
+entity decoding through public Tiptap hooks. Literal entities/code and independent
+title/body limits remain covered. No storage guard, security boundary, dependency,
+manifest/lockfile or migration changed. All four U1 criteria remain pending.
 
-Current unfinished work is consolidated in `.worktrees/linuxcast-notes-markdown-import`,
-branch `codex/notes-markdown-import`. The separate author tree
-`.worktrees/linuxcast-notes-markdown-import-ui` is retained. Source manifest:
-`handoff/markdown-import-source-manifest.json`. Old agent IDs and `/tmp` artifacts
-are not required or assumed available. The draft PR is a handoff snapshot, not a
-merge-ready application increment. Draft PR77:
-https://github.com/ianwijma/linuxcast/pull/77. Signed source snapshot41824ea9b5fd422e3ea3654b91a83e1762e73b88
-is pushed; its planningCI41181103805 passed. The PR remains draft/unmerged.
+Final assembled mapped checks PASS:469unit/36contracts/258security/88browser/
+40integration. Actual sandboxed Electron import5.302s, retainedNotes29.636s,
+wholeTrash5.353s; new import covers review/Cancel/Create, exact text/tasks/second
+export, edit/Save, launcher keyboard navigation, Quit/restart and exact unrelated
+preservation. Eight component and four actual public captures have axe0; all741
+historical PNGs byte-identical to develop. Full pinned TypeScript/scoped lint pass.
+Detailed evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
+The earlier failed application and intermediate continuation attempts are retained
+in evidence; the historical HANDOFF.md does not describe current blockers.
 
-U1-01 import merge blockers: (1) strip permitted optional undefined fields from
-parser output and validate the actual storage JSON envelope without weakening it;
-(2) preserve a trailing LF after combined escaped HTML/link literals without global
-double decoding or changing code text. Actual Create currently fails storage request
-validation; full production roundtrip has not passed. Latest author controller
-0389b14c preserves the selected-open publication fence, and parser5b8e21fa preserves
-independent title/body limits. Keep these fixes. The author report's earlier component
-passes are explicitly superseded for the failing application cases.
+Next: independent final source/capture/evidence review, signed commit/push, ready
+PR77, inspect current-head CI/reviews/rules, then normal expected-head merge.
+After integration record its merge, refresh dependencies and select the next
+bounded application increment. No new feature has started.
 
-Next thread: fix those two issues, run final assembled checks and independent review,
-then sign/publish/inspect CI and required reviews/merge normally. Maintain exact
-acceptance limitations and record the integrated increment before choosing more work.
-Fresh consolidated handoff checks:463unit/36contracts/258security/TypeScript/plan PASS;
-application and final mapped browser/integration acceptance still pending.
-All4U1criteria remain pending. Full97/R1-03/native/session/AT/performance/package/release
-requirements remain. Totals8done/20inprogress/69planned;56passed/325pending/8N/A.
+Full Notes/attachments/remaining Markdown coverage, D1/native prerequisites,
+Debian13 GNOME/KDE Wayland/X11/nativeAT/highcontrast/performance/package/release
+acceptance remain required. Xvfb/Chromium and instrumented chooser choices are not
+supported-session/native chooser acceptance. Registry8done/20inprogress/69planned;
+acceptance56passed/325pending/8justifiedN/A. Do not mark the full objective complete.
