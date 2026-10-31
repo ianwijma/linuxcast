@@ -46,18 +46,22 @@ retain the merged combobox role. The two old-base search-limit unit failures
 are resolved by PR91's existing test-only5614-command boundary correction;
 no Notes controller or search behavior changes were needed.
 
-Current coordinator checks pass:482 units,36 contracts,258 security,97 browser
-cases in two batches (70/51.2s and27/18.6s),40 integrations47.75s, fulltype/lint/
-plan/whitespace. Actual sandboxed private-Xvfb Notes31.262s, EmptyTrash5.558s
-and MarkdownImport5.555s retain original owner/restart/crash/receipt/no-replay/
-privacy assertions. All166 incidental tracked screenshot recaptures were restored.
-All25 new component/product captures remain author-identical; the coordinator
-directly inspected actual dark/light saved and native200% focused captures.
+Current corrected coordinator checks pass:482 units,36 contracts,258 security,
+101 browser cases (74/53.8s and27/18.2s),40 integrations46.54s, full typecheck,
+lint, plan and whitespace. Actual sandboxed private-Xvfb Notes30.564s,
+EmptyTrash5.557s and MarkdownImport5.512s retain original owner/restart/crash/
+receipt/no-replay/privacy assertions. All28 new captures (15 component,13 product)
+remain author-identical; incidental historical and Instrument recaptures restored.
 
 Initial independent Security/Spec review `fa38a7fc` of frozen `ec55310` is
-clear:301 focused units,14 synthetic Chromium boundary probes, all25 captures
-and semantic/product-assertion comparisons independently pass. Standards review
-`00e3b125` found one P2: at150% root text the new unbounded slash menu puts
-the selected option outside the editor clipping region. The original Opus author
-is correcting that boundary with targeted regressions. No clean final Standards
-conclusion, publication or additional acceptance is inferred.
+clear:301 focused units,14 synthetic Chromium boundary probes, all25 original
+captures and semantic/product assertions pass. Standards `00e3b125` found one P2
+slash-menu visibility regression. Original Opus5.5medium author corrected it in
+`e5a5b8c`, integrated `041f723`: bounded caret anchoring intersects the viewport
+and every clipping/scrolling ancestor, with active-option scrolling confined to
+the menu. Parent independently ran all four new100/150/200/narrow cases separately
+against original `e896a13` (four fail), restored fixed source (four pass), and
+inspected all three new captures. The actual Electron flow also checks the open
+menu across zoom1→2→1. Editor focus/caret/scroll and input guards remain intact.
+The initial P2 is parent-verified resolved; no second independent final clean
+review or native/full-task acceptance is claimed.

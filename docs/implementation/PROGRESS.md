@@ -1,45 +1,30 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — after PR92
+## Current coordinator state — Notes publication
 
-Goal ACTIVE: all97 tasks/full local1.0 throughR1-03; no native/physical/release
-acceptance waived. Registry8done/20inprogress/69planned;56passed/325pending/8N/A.
-PR91 renderer merged432fa6a; PR92 sourcehelper merged8de8612 (CI41234204280
-SUCCESS, head92e56c0, reviews[], normal exactheadmerge31Oct19:27:11UTC). Tiny
-mergeblurbs sent immediately. No openPRwatch/rootprocess; no lab/native runs.
+Goal ACTIVE: all97 tasks/full local1.0 throughR1-03; registry8done/20inprogress/
+69planned and56passed/325pending/8N/A unchanged. Approved develop8de8612(PR92).
+Root codex/u1-01-instrument-notes-integration integrates original Opus e5a5b8c
+at041f723. Initial Specfa38a7fc clear; Standards00e3b125 sole slash-menu P2
+parent-verified resolved: each100/150/200/narrow test fails on original e896a13,
+all four pass fixed source. Current482unit/36contract/258security/101browser/
+40integration46.54s/type/lint/plan pass. Actual Notes30.564s/Trash5.557s/import
+5.512s;28newauthor-identical captures, incidental recaptures restored. Publishing
+focused Notes PR next, then current-head CI/reviews/normal exact-head merge.
+No second independent final review or native/full-task acceptance claimed.
 
-Root branch codex/u1-01-instrument-notes-integration, sourceec55310 (Opus
-e896a13 unchanged on approved8de8612). Current482units/36contracts/258security/
-97browser70+27/40integration47.75s/type/full-lint/plan pass; actualNotes31.262s,
-Trash5.558s/import5.555s. PR91 fixes both oldbase search-limit assertions and
-mechanicalcombobox selectors;166incidentalPNGs restored,25newauthorcaptures
-unchanged, actualdark/light/native200focus inspected. SecuritySpecfa38a7fc completed/read clear on exactec55310/base8de8612,
-independently301units/14Chromiumprobes/all25PNGs/semantic-productassertions.
-Standards00e3b125 completed/read with oneP2 slashpopovervisibility at150%text.
-Original NotesOpusmedium followup23cbeeb5-8b0b-4153-895f-a0af1f03cab8 ACTIVE
-onexacte896a13; boundmenuactualclipping/scrollactiveselection, keepeditorcaret/
-IME/readonlyguards. No controller/API/shared changes, no secondreviewrequested.
-No NotesPR yet; sourcefrozenec untilauthorcorrectionarrives.
+Workflow initial Standards7e116647 clear; Spec2ef28b07 sole P2 held-drag resize
+coordinate corruption. Original Opus fix0fa31fcb on069669e is completed; read
+terminal report and integrate into saved codex/w2-instrument-workflow-integration
+(e7d54fb). Includes parent test-only legacy v7 migration fixture fixf94df0d.
+Verify focused old-source negative controls/current regressions and publish next.
+No current workflow PR, no source/controller/owner change authorized by this fix.
 
-Original workflow Opusmedium author8e4a9591 finished8e3d1116, cleanownedlane
-t3-93b7f756/codex/w2-instrument-workflow. Followup7b821f60-5231-49e4-a1c9-
-ca111012637d ACTIVE sameOpusmedium: fix200%canvas overlap and restoretypededge
-labels with inertUIgeometry mapping, no controller/engine/owner edits without
-concreteAPIapproval. Parentreproduced7-case storage migration suite1failure at
-oldfixture calling currentquicklinks.save on schema7; allrelevant production
-files byte-identical to approvedparent. Separate test-only fixf94df0df63330979fce8607b13be77dd07fe85bf is saved on
-codex/w2-01-migration-fixture fromapproved8de8612: seedrealv7columns after
-closingsoleowner, migrate toactualSTORAGE_SCHEMA_VERSION18, preserveoriginal
-source/backup asserts. All7cases pass710ms vsoriginal1failed6passed685ms;
-scopedlint/whitespace pass, no productionchanges. Carry into workflow later,
-don't mix it intoNotes. Reactchecklist exactpath supplied.
-
-Saved ATadaptera9bbb33 nowreconciled ontoapprovedPR92 as9c77978 on separate
-codex/f1-02-instrument-at-integration; initialSecuritySpec0098261d active with
-onefree slot whilebothUIauthorscorrectfindings. No actor polling. Sourcehelper accepted inPR92; small
-SpecP2 corrected and Standardsindependentlyconfirmednegativecontrol, no second
-cleanSpecclaim. Legacyarchive/build/procPID1/outerowner/nativeidentity/AT gates
-remain open. No arbitrary namespaceprivilege/witness or gate change.
+AT adapter9c77978 saved on codex/f1-02-instrument-at-integration: initial Spec
+0098261d clear(37mapped+44synthetic/type/lint/plan/hashes), initial Standards
+still required. No driver/native execution; actual native/Orca runs0. Fresh
+approved source/archive/build/pins, native query identity, PID1 feasibility and
+outer ownership remain pending; lab stopped, no native gate changes.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
