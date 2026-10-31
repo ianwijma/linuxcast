@@ -1,15 +1,15 @@
 import { useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore } from 'react';
-import { Button,EmptyState,ErrorState,LoadingState,ThemeProvider } from '@linuxcast/ui';
-import type { PermissionSettingsApi,PermissionSettingsRow } from '../../../platform-contracts/src/permission-settings.ts';
+import { Button,EmptyState,GlyphTile,LineIcon,LoadingState,StatePlate,ThemeProvider } from '@linuxcast/ui';
+import type { PermissionSettingsApi } from '../../../platform-contracts/src/permission-settings.ts';
 import { PermissionScreenController } from './controller.ts';
+import { decisionText,operations,removalConsequence,reviewName,sourceKinds,sourceTiles,versionText } from './presentation.ts';
 import './permissions.css';
-const operations:Record<PermissionSettingsRow['permissionId'],string>={
-  'files.read':'Read selected files','files.write':'Write selected files','network.fetch':'Contact an allowed website','network.local':'Contact a local network service',
-  'clipboard.read':'Read the current clipboard','clipboard.history':'Read selected clipboard history','clipboard.write':'Replace the clipboard','input.paste':'Paste into an application',
-  'input.shortcut':'Send a shortcut to an application','applications.launch':'Open an application or selected file','windows.control':'Control a selected window','ai.generate':'Use the configured AI provider',
-  'notifications.show':'Show notifications','background.run':'Run in the background','scripts.execute':'Run a sandboxed script',
-};
-const sourceKinds={builtin:'Linuxcast',workflow:'Workflow',extension:'Extension'} as const;
+
+/**
+ * Existing Saved permissions window in the selected Instrument settings composition (docs/design/DESIGN.md
+ * "Settings and permissions", "List, grid, detail and form", "States and motion", "Accessibility").
+ * Presentation only: the controller and main own snapshots, opaque selections, compare-delete and outcomes.
+ */
 export function SavedPermissions({api}:{api:PermissionSettingsApi}) {
   const [controller]=useState(()=>new PermissionScreenController(api));
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot,controller.getSnapshot);
@@ -23,34 +23,75 @@ export function SavedPermissions({api}:{api:PermissionSettingsApi}) {
   useEffect(()=>{if(review&&!selected){restore.current=refresh.current;setReview(null);}},[review,selected]);
   useLayoutEffect(()=>{if(!review&&!busy&&restore.current){const target=restore.current.isConnected?restore.current:refresh.current;restore.current=null;target?.focus();}},[review,busy]);
   const closeReview=()=>{restore.current=opener.current?.isConnected?opener.current:refresh.current;setReview(null);};
-  return <ThemeProvider appearance={state.appearance??'system'}>
-    <main className="permission-screen" onKeyDown={event=>{
+  const records=state.snapshot?.records??[];
+  return <ThemeProvider appearance={state.appearance??'system'} className="permission-window">
+    <div className="permission-shell" onKeyDown={event=>{
       if(event.key==='Escape'&&!event.nativeEvent.isComposing&&!event.altKey&&!event.ctrlKey&&!event.metaKey){
         event.preventDefault();if(state.removing)return;if(review)closeReview();else void api.close();
       }
     }}>
-      <header className="permission-heading"><div><h1>Saved permissions</h1><p>Review remembered allow and deny choices. Each choice applies to its saved source version and declared scope.</p></div>
-        <div className="permission-actions"><Button ref={refresh} busy={state.loading} disabled={state.removing} onClick={()=>{setReview(null);void controller.refresh();}}>Refresh</Button><Button disabled={state.removing} onClick={()=>{void api.close();}}>Close</Button></div>
+      <header className="permission-header">
+        <GlyphTile category="system" icon="gear"/>
+        <p className="permission-header-title">Linuxcast settings</p>
+        <div className="permission-header-actions">
+          <Button ref={refresh} busy={state.loading} disabled={state.removing} onClick={()=>{setReview(null);void controller.refresh();}}>Refresh</Button>
+          <Button variant="ghost" shortcut={['Escape']} disabled={state.removing} onClick={()=>{void api.close();}}>Close</Button>
+        </div>
       </header>
-      <p className="lc-muted">These are saved decisions, not proof that a desktop capability is currently available. Every operation checks its current permissions and backend.</p>
-      {state.message&&<p role="status" className="permission-message">{state.message}</p>}
-      {state.error&&<ErrorState title="Review current permissions" description={state.error} announce/>}
-      {state.loading&&<LoadingState label="Reading saved permissions…"/>}
-      {!state.loading&&!state.error&&state.snapshot?.records.length===0&&<EmptyState title="No saved decisions on this page" description="Allow once is never saved. A source asks again when it needs access without a remembered choice."/>}
-      {selected&&<section className="permission-review" aria-label="Remove saved decision" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();event.preventDefault();if(!state.removing)closeReview();}}}>
-        <h2>Remove this saved {selected.decision==='allow'?'allow':'deny'} choice?</h2>
-        <p className="permission-review-source" role="region" tabIndex={0} aria-label="Complete requesting source" dir="auto"><strong>{selected.sourceLabel}</strong>{selected.version?' · version '+selected.version:''}</p><p>{operations[selected.permissionId]}</p><p>{selected.scopeLabel}</p>
-        <p>{selected.decision==='deny'?'Removing a denial permits a new request. It does not approve or rerun anything.':'Future operations will need a new approval. Pending requests for this source will be cancelled; an action already sent cannot be undone.'}</p>
-        <div className="permission-actions"><Button ref={keep} disabled={state.removing} onClick={closeReview}>Keep decision</Button><Button variant="danger" busy={state.removing} disabled={state.loading||state.unconfirmed} onClick={()=>{restore.current=refresh.current;void controller.revoke(selected.selectionId).then(()=>{setReview(null);});}}>Remove decision</Button></div>
-      </section>}
-      <ul className="permission-list" aria-label="Saved permission decisions">
-        {state.snapshot?.records.map(row=><li key={row.selectionId} className="permission-row">
-          <div><p className="permission-source"><strong dir="auto" title={row.sourceLabel}>{row.sourceLabel}</strong><span className="lc-muted" title={row.version??undefined}>{sourceKinds[row.sourceKind]}{row.version?' · version '+row.version:''}</span></p>
-            <h2>{operations[row.permissionId]}</h2><p dir="auto">{row.scopeLabel}</p><p className="lc-muted">{row.decision==='allow'?'Remembered: allow':'Remembered: deny'} · Updated <time dateTime={row.updatedAt}>{new Date(row.updatedAt).toLocaleString()}</time></p></div>
-          <Button disabled={busy||state.unconfirmed||!!review} aria-label={'Review removal: '+row.sourceLabel+' · '+operations[row.permissionId]} onClick={event=>{opener.current=event.currentTarget;setReview(row.selectionId);}}>Review removal</Button>
-        </li>)}
-      </ul>
-      <footer className="permission-actions"><Button disabled={busy||state.page===0} onClick={()=>{setReview(null);void controller.previous();}}>Previous page</Button><span>Page {state.page+1}</span><Button disabled={busy||state.unconfirmed||!state.snapshot?.nextCursor} onClick={()=>{setReview(null);void controller.next();}}>Next page</Button></footer>
-    </main>
+      <main className="permission-content">
+        <div className="permission-page">
+          <h1>Saved permissions</h1>
+          <p className="permission-lede lc-muted">Review remembered allow and deny choices. Each choice applies to its saved source version and declared scope.</p>
+          <aside className="permission-notice" aria-label="About saved decisions">
+            <LineIcon name="info"/>
+            <p>These are saved decisions, not proof that a desktop capability is currently available. Every operation checks its current permissions and backend.</p>
+          </aside>
+          {state.message&&<p role="status" className="permission-message"><LineIcon name="info"/><span>{state.message}</span></p>}
+          {state.error&&<StatePlate kind="unavailable" layout="band" title="Review current permissions" description={state.error} announce/>}
+          {state.loading&&<LoadingState label="Reading saved permissions…"/>}
+          {!state.loading&&!state.error&&state.snapshot?.records.length===0&&<EmptyState title="No saved decisions on this page" description="Allow once is never saved. A source asks again when it needs access without a remembered choice."/>}
+          {selected&&<section className="permission-review" aria-labelledby="permission-review-title" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();event.preventDefault();if(!state.removing)closeReview();}}}>
+            <div className="permission-review-heading">
+              <p className="permission-eyebrow">Review removal</p>
+              <h2 id="permission-review-title">Remove this saved {selected.decision==='allow'?'allow':'deny'} choice?</h2>
+            </div>
+            <div className="permission-review-details lc-focus" role="region" tabIndex={0} aria-label="Complete saved decision">
+              <dl className="permission-facts">
+                <div><dt>Requesting source</dt><dd dir="auto"><strong>{selected.sourceLabel}</strong> <span className="lc-muted">· {sourceKinds[selected.sourceKind]}</span></dd></div>
+                <div><dt>Version</dt><dd dir="auto">{versionText(selected)}</dd></div>
+                <div><dt>Operation</dt><dd>{operations[selected.permissionId]} <code className="permission-id">{selected.permissionId}</code></dd></div>
+                <div><dt>Declared scope</dt><dd dir="auto">{selected.scopeLabel}</dd></div>
+                <div><dt>Current decision</dt><dd><Decision decision={selected.decision} text={decisionText(selected)}/></dd></div>
+              </dl>
+            </div>
+            <p className="permission-consequence">{removalConsequence(selected)}</p>
+            <div className="permission-review-actions"><Button ref={keep} disabled={state.removing} onClick={closeReview}>Keep decision</Button><Button variant="danger" busy={state.removing} disabled={state.loading||state.unconfirmed} onClick={()=>{restore.current=refresh.current;void controller.revoke(selected.selectionId).then(()=>{setReview(null);});}}>Remove decision</Button></div>
+          </section>}
+          {records.length>0&&<ul className="permission-list" aria-label="Saved permission decisions">
+            {records.map(row=><li key={row.selectionId} className="permission-row" aria-current={row.selectionId===review?'true':undefined}>
+              <span className="permission-row-glyph"><GlyphTile category={sourceTiles[row.sourceKind]}/></span>
+              <div className="permission-row-text">
+                <div className="permission-row-title"><h2>{operations[row.permissionId]}</h2><Decision decision={row.decision} text={decisionText(row)}/></div>
+                <dl className="permission-facts">
+                  <div><dt>Source</dt><dd><span className="permission-clamp" dir="auto" title={row.sourceLabel}>{row.sourceLabel}</span> <span className="permission-source-kind lc-muted">{sourceKinds[row.sourceKind]}</span></dd></div>
+                  <div><dt>Version</dt><dd><span className="permission-clamp" dir="auto" title={versionText(row)}>{versionText(row)}</span></dd></div>
+                  <div><dt>Scope</dt><dd><span className="permission-clamp" data-lines="3" dir="auto" title={row.scopeLabel}>{row.scopeLabel}</span></dd></div>
+                  <div><dt>Updated</dt><dd><time dateTime={row.updatedAt}>{new Date(row.updatedAt).toLocaleString()}</time></dd></div>
+                </dl>
+              </div>
+              <div className="permission-row-actions">
+                <Button disabled={busy||state.unconfirmed||!!review} aria-label={reviewName(row)} title={reviewName(row)} onClick={event=>{opener.current=event.currentTarget;setReview(row.selectionId);}}>Review removal</Button>
+              </div>
+            </li>)}
+          </ul>}
+          <nav className="permission-pages" aria-label="Saved decision pages"><Button disabled={busy||state.page===0} onClick={()=>{setReview(null);void controller.previous();}}>Previous page</Button><span>Page {state.page+1}</span><Button disabled={busy||state.unconfirmed||!state.snapshot?.nextCursor} onClick={()=>{setReview(null);void controller.next();}}>Next page</Button></nav>
+        </div>
+      </main>
+    </div>
   </ThemeProvider>;
+}
+
+/** Remembered classification: the word is the signal, the glyph shape repeats it, colour stays neutral. */
+function Decision({decision,text}:{decision:'allow'|'deny';text:string}) {
+  return <span className="permission-decision" data-decision={decision}><LineIcon name={decision==='allow'?'check':'stateDenied'}/><span>{text}</span></span>;
 }
