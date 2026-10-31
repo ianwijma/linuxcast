@@ -1,44 +1,62 @@
 # Coordinator checkpoint — 31 October 2026
 
-The complete agreed local1.0 goal remains unfinished. Finish PR77 before starting
-another feature. All subagents GPT-6.1 SOL/high; normal signed publication/merge
-is authorized. Preserve the unchanged 1Password signing setup.
+The complete local 1.0 objective in `GOAL.md` remains active and unfinished.
+All subagents used in this continuation are GPT-6.1 SOL/high. Preserve the
+unchanged 1Password SSH signing setup; normal signed commits succeeded.
 
-Active U1-01: bounded selected-file Markdown review/import as a separate owner
-draft, branch `codex/notes-markdown-import`, existing worktree
-`.worktrees/linuxcast-notes-markdown-import`, base mergedPR76/develop09de566.
-PR77 https://github.com/ianwijma/linuxcast/pull/77. No new feature has started.
-All four U1 acceptance criteria stay pending; do not mark local1.0 complete.
+## Reconciled integration
 
-Both original handoff blockers were fixed on signed b3ea4d4. The isolated
-GPT-6.1 SOL/high independent source/capture/evidence review completed:291focused
-checks pass,12newcaptures visually clean, no additional boundary/lifecycle/receipt/
-focus/schema findings; two P2 semantic roundtrip bugs requested changes. The result
-was initially not collected and the old green PR watch was removed when the user
-asked about it. No independent review is still running.
+Fetched `origin/develop` at `e265dc6`. PR77 is already merged: head
+`210592089cb99875cb2ec033e95b0c099842910d`, merge
+`ed58cf50c71b429c27980b80654daf518fa04260`, 31 October 08:51:02 UTC.
+Its final planning CI41186206515 passed. No open PRs existed at initialization.
+The previous instruction to finish PR77 was stale. Registry now records its
+integration; every U1-01 criterion remains pending.
 
-The coordinator reproduced and fixed both findings: URL-consumed escape pairs
-(including a pair split across URL/text tokens) now use the maintained public inline
-lexer, kept separate from entity-decoded text; terminal editor hard breaks export
-as text LF without a structural backslash marker.57focused parser/export checks
-pass, including12new cases (11red before fixes). Actual production fixture now
-includes URL-adjacent punctuation and a terminal hard break without weakening its
-byte-identical second export, exact owner/source preservation or restart assertions.
+Criterion tracking prerequisite already exists and its 21 Python regressions
+pass. Registry retains stable IDs, explicit evidence/status, conditional N/A,
+shared criteria and rejection of unsupported done claims. No replacement needed.
 
-Final mapped PASS:481unit1.92s/36contracts0.325s/258security1.07s/88browser42.7s/
-40integration44.19s; actualimport5.237s/retainedNotes29.034s/wholeTrash5.218s.
-Full pinned TypeScript/scoped lint pass. All741 historical PNGs unchanged; four
-updated actual dark/light captures axe0 and coordinator inspected, eight component
-captures unchanged from independent visual review. No second independent clean
-review is claimed; the two bounded findings are addressed with parent validation.
-Evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
+## Active F1-02
 
-Planning CI41182395321 passed signed905a0a9. Its earlier fixture-link failure was
-fixed by using an immutable report URL, preserving validators/assertions. Publish
-the final reviewed-finding fixes, inspect new-head CI/reviews/rules, ready and merge
-normally with expected-head matching. Then record integration and select next work.
+Worktree `/home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd`, branch
+`codex/f1-02-shell-accessibility`, based on `e265dc6`; initial signed source
+`566a9b3` with subsequent coordinator fixes. PR publication follows this checkpoint.
 
-Full Notes/attachments/remainingMarkdown, D1/native prerequisites, Debian13 GNOME/
-KDE Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance remains
-required. Xvfb/Chromium and instrumented chooser choices are partial evidence only.
-Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A.
+Implemented and reproduced actual 200% zoom footer clipping; corrected CSS/native
+units, viewport/body layout, intrinsic grow-after-shrink reporting and duplicate
+resizes. Stronger tests then exposed/corrected long-title footer wrapping,
+fallback heading semantics and startup-error focus. Legacy scenario expectations
+now match fourteen current commands and the exact existing named preload API.
+No new API/schema/dependency/migration/permission or physical input authority.
+
+Final mapped checks: 15 units, 54 security, both production integration scenarios
+PASS (18.79 s total; legacy11.068 s/new6.533 s), full pinned typecheck/lint PASS.
+Seven native captures cover dark/light launcher/loading/error plus emulated
+forced-colors/reduced-motion; axe0, viewport stability, body/last-result reachability,
+form keyboard and actual secondary reopen checked. Historical capture files
+restored unchanged after legacy recapture. Initial independent Standards and Spec
+reviews of566a9b3 found no blockers; requested extra coverage and ensuing bounded
+fixes are coordinator-validated, not a second independent clean review claim.
+Evidence: `apps/desktop/evidence/shell-zoom-accessibility.md`.
+
+F1-02-UI remains pending. Private Pop!_OS/Xvfb Electron and injected pending/error
+replies/media emulation do not establish Debian GNOME/KDE Wayland/X11, Orca,
+actual OS preference or backend failure/recovery acceptance. Do not merge or mark
+the task complete merely because these checks or planning CI pass.
+
+## Next actions and remaining gates
+
+Publish the focused F1-02 continuation with its evidence; inspect current-head
+CI/reviews/rules. Complete final independent follow-up review and supported native
+accessibility acceptance before claiming this task done. Continue dependency-ready
+foundation work while desktop evidence is outstanding: F3-01 host permission
+approval/management/remediation is explicitly unimplemented; its dependencies
+F0-01/F2-01 are accepted. Read its card and complete broker/storage contracts
+before implementing. Keep coordinator ownership of shared wiring and registry.
+
+F1-01 and F0-01 are accepted; S0-01 and S0-03 retain their native/physical gates.
+No privileged service was enabled. All product families, native sessions/AT,
+security/recovery, performance, packaging and R1-01/R1-02/R1-03 release artifacts
+remain required. Registry: 8 done/20 in progress/69 planned; 56 passed criteria,
+325 pending and 8 justified N/A. Planning validation and status refresh pass.

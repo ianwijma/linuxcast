@@ -35,7 +35,7 @@ function Shell() {
     if (!api || !content.current) return;
     return observeShellSize(content.current, height => { void api.reportContentHeight(height); });
   }, [api]);
-  useEffect(() => { if (state?.visible && error) hide.current?.focus(); }, [state?.visible, error]);
+  useEffect(() => { if (state?.visible !== false && error) hide.current?.focus(); }, [state?.visible, error]);
   const command = async (kind: 'hide' | 'quit') => {
     if (!api || busy) return;
     setBusy(true);
@@ -49,6 +49,7 @@ function Shell() {
         event.preventDefault(); void command('hide');
       }
     }}>
+      {(!state || error || !api) && <h1 className="lc-view-announcement">Linuxcast</h1>}
       <div className={state && api && !error ? "shell-launcher" : "shell-content"}>
         {error ? <ErrorState title="Linuxcast could not connect" description="Quit and reopen Linuxcast to try again." announce />
           : !state ? <LoadingState label="Opening Linuxcast…" />

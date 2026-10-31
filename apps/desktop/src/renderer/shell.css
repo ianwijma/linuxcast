@@ -11,5 +11,6 @@ html, body, #root { margin: 0; min-inline-size: 0; }
 .shell-launcher, .shell-launcher > div, .shell-launcher .lc-view-shell { display: flex; flex-direction: column; min-block-size: 0; }
 .shell-launcher .lc-view { min-block-size: 0; max-block-size: var(--lc-launcher-max-height); }
 .shell-launcher .lc-view-header { flex-shrink: 0; }
+.shell-launcher .lc-footer-context { flex: 1; min-inline-size: 0; }
 .shell-launcher .lc-view-shell { border: 0; border-radius: 0; }
 .shell-launcher > p { flex-shrink: 0; margin-block: var(--lc-space-8); padding-inline: var(--lc-space-16); }
