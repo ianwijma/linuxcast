@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-10-31T15:04:46.176Z",
+  "browserVersion": "156.0.8078.4",
+  "nodeVersion": "v26.11.1",
+  "results": [
+    {
+      "candidate": "sol",
+      "desktopViewThemeStateCombinations": 98,
+      "narrowViewsWithoutPageOverflow": 7,
+      "runtimeErrors": 0,
+      "externalRequests": 0,
+      "keyboard": "Ctrl+K action-filter focus, Escape then Shift+Tab",
+      "forcedColorsReducedMotion": "render smoke check only",
+      "baselineTokens": "unchanged; base text, muted, focus and accent-text contrast pass",
+      "proposedThemeRoles": 0,
+      "launcherGeometry": {
+        "width": 720,
+        "height": 454
+      },
+      "screenshotCount": 24
+    },
+    {
+      "candidate": "opus",
+      "desktopViewThemeStateCombinations": 98,
+      "narrowViewsWithoutPageOverflow": 7,
+      "runtimeErrors": 0,
+      "externalRequests": 0,
+      "keyboard": "Ctrl+K action-filter focus, Escape then Shift+Tab",
+      "forcedColorsReducedMotion": "render smoke check only",
+      "baselineTokens": "unchanged; base text, muted, focus and accent-text contrast pass",
+      "proposedThemeRoles": 13,
+      "launcherGeometry": {
+        "width": 720,
+        "height": 538
+      },
+      "screenshotCount": 24
+    }
+  ],
+  "comparison": "28 images load; all 7 surfaces × 2 themes at 728px and 390px; selection summary updates; no script errors",
+  "limits": "Chromium documentation artifacts only. No Electron, native desktop, screen-reader, backend or product acceptance claim."
+}
