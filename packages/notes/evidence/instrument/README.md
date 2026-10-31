@@ -31,3 +31,24 @@ adopted.
 | `dark-narrow.png` | same | 560 px viewport at 100%: stacked, library capped at 16rem and scrollable |
 | `light-forced-colors-reduced-motion.png` | Instrument forced colours … | Emulated forced colours and reduced motion: selected-row outline, system-colour boundaries, no transitions |
 | `light-import-preview.png` | `import.ui.test.ts` Instrument import preview … | Read-only import review; `Escape` keycap only on Cancel import; disabled formatting tools; axe 0 |
+
+## Slash menu reachability (standards finding on e896a13)
+
+On e896a13 the slash menu was an in-flow block above the editor. With the caret at the bottom of a note at
+150% root text (1120×850) the active option was above the editor's clipping region; 200% and narrow windows
+failed the same way. Filtering the menu at 100% also reset the editor scroller to 0. The menu is now a
+caret-anchored layer. Its block size is bounded by the intersection of every actual clipping ancestor and the
+viewport, it opens on the side with more room, and it is clamped into that region when the caret is outside
+it. It scrolls internally and keeps the active option visible on open, on every Up/Down and on each filter
+change, by moving only its own `scrollTop`. Focus, caret, IME, held-key, plain-text and read-only guards are
+unchanged.
+
+Regressions (`notes.ui.test.ts`, slash menu …) require the active option inside its clipping region (which
+includes the menu scroller), the whole menu inside its ancestors' region, and a hit test at the option centre.
+They cover 100%, 150% and 200% through Up/Down and filtering (the editor scroll position must not change), and
+a 560 px window at the bottom of a long note. All four fail with the e896a13 source and pass with the fix.
+
+| Capture | State |
+|---|---|
+| `dark-slash-150-percent-bottom.png` | 150% root text, caret at the bottom, filtered `/li`: menu below the caret inside the editor region, active Bullet list visible |
+| `light-slash-narrow-bottom.png` | 560 px window, bottom of a long note, after Down to Divider: active option scrolled into view in the bounded menu |
