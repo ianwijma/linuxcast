@@ -16,6 +16,7 @@ export function createDataSettingsApi(transport: Pick<ShellTransport,'invoke'|'o
       let active=true;const receive=(_event:unknown,value:unknown)=>{const parsed=dataSettingsAppearanceSchema.safeParse(value);if(active&&parsed.success)listener(parsed.data);};
       transport.on(DATA_SETTINGS_APPEARANCE_CHANNEL,receive);return()=>{active=false;transport.removeListener(DATA_SETTINGS_APPEARANCE_CHANNEL,receive);};
     },
+    openCredentials:()=>action(DATA_SETTINGS_CHANNELS.credentials,{protocolVersion:1}),
     close:()=>action(DATA_SETTINGS_CHANNELS.close,{protocolVersion:1}),
   });
 }

@@ -128,6 +128,9 @@
       "packages/permissions/tests/screen-controller.test.ts",
       "apps/desktop/src/main/launcher-ipc.test.ts",
       "apps/desktop/src/features/launcher/tests/permission-catalogue.test.ts"
+    ],
+    "F2-02": [
+      "packages/secrets/src/ui/credentials.test.tsx"
     ]
   },
   "contracts": {
@@ -211,6 +214,9 @@
     ],
     "F3-01": [
       "packages/permissions/tests/permission-settings.contract.test.ts"
+    ],
+    "F2-02": [
+      "packages/platform-contracts/tests/credential-settings.contract.test.ts"
     ]
   },
   "ui": {
@@ -364,7 +370,8 @@
       "apps/desktop/tests/workflow-run.integration.test.ts"
     ],
     "F2-02": [
-      "apps/desktop/tests/diagnostics.integration.test.ts"
+      "apps/desktop/tests/diagnostics.integration.test.ts",
+      "apps/desktop/tests/credentials.integration.test.ts"
     ]
   },
   "security": {
@@ -412,7 +419,13 @@
       "packages/secrets/tests/session.security.test.ts",
       "packages/secrets/tests/session-stream.security.test.ts",
       "packages/secrets/tests/session-client.security.test.ts",
-      "packages/secrets/tests/session-store.security.test.ts"
+      "packages/secrets/tests/session-store.security.test.ts",
+      "packages/secrets/tests/runtime.security.test.ts",
+      "apps/desktop/src/services/storage.test.ts",
+      "packages/secrets/tests/settings.security.test.ts",
+      "apps/desktop/src/credential-preload/api.test.ts",
+      "apps/desktop/src/main/credential-settings.test.ts",
+      "packages/storage/tests/credential-preferences.integration.test.ts"
     ],
     "L1-01": [
       "apps/desktop/src/main/launcher-ipc.test.ts",

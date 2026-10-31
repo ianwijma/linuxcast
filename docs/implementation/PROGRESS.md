@@ -65,3 +65,98 @@ All screenshots unchanged. Core production files byte-match reviewed/fixed06373b
 only shared runner source hash changes from the map union. No production session/
 credential UI enabled. Next publish and integrate this bounded component promptly,
 then wire its main lifecycle and actual setup/status flow in the next increment.
+
+
+PR83 MERGED atcd7bf0e5c086be7d2c1ee2b4e4ae7d895a67a688,31Oct13:35:15UTC;
+currenthead6e5fd77 CI41206158857 passed with no requestedreviews/comments. The
+session/store/native component is integrated;100F2security/55F1/72F3/38Rust and
+actual production smoke5.99s pass. No task or native acceptance promoted.
+User requests a super-small blurb immediately after every merge: state what changed
+in1–2sentences (and material limit if needed); keep prompt bounded integrations.
+
+Next worktree /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage switched
+tocodex/f2-02-credential-runtime atapprovedcd7bf0e. New CredentialRuntime owns
+stable store/session access across generation replacement, suspend/resume/storage
+loss, coalesced owned shutdown independent of pending initialization.9new runtime
+and6storage-readiness tests pass;115mapped F2security/type/lint and existing actual
+product smoke6.16s pass. This runtime is not wired to main/UI yet; new source awaits
+review as part of the complete next flow. Main storage adds private boolean
+onReadiness notification only, not renderer IPC.
+
+Parent coordinator now freezes the narrow first-party credential-settings contract
+on codex/f2-02-credential-contract for a disjoint UI assignment. Fixed OpenRouter
+key target; no global route/model selection or provider traffic. New DTO,3contract
+checks/type/lint and React/UI workspace-only manifest/lock additions; no new third-
+party version. UI export target is intentionally prepared for child implementation,
+not claimed implemented. packages/secrets/CREDENTIAL-SETTINGS-CONTRACT.md records
+security/UX boundaries. Coordinator retains main/preload/build/IPC/preferences/
+runtime/status ownership. UI child may add only packages/secrets/src/ui files.
+
+
+User authorization update1November2026: if configured1Password signing causes
+problems, use unsigned implementation commits and record that status; preserve
+Git signing configuration and separate signed-release requirements. This explicit
+user instruction supersedes earlier no-unsigned implementation fallback notes.
+UI-only F2-02 assignment1dd9be48 is running from frozen6838888; coordinator owns
+main/settings/runtime/storage integration in codex/f2-02-credential-runtime.
+
+
+Current credential continuation1November2026: UI child finished signed3b2feac
+(treeb181519) in /home/ian/.t3/worktrees/linuxcast/t3-15eb8101, branch
+codex/f2-02-credential-settings-ui; only three new UI files. Read final report;
+52synthetic UI tests pass. Integrated source with cherry-pick --no-commit into
+F2runtime checkout; parent code also uncommitted while completing validation.
+New actual settings window/preload/Localdata link, main fixed-target service,
+strict opaque preferenceCAS (no migration), export exclusion, confirmed mutation/
+unknown review, session-only clearpolicy and provider lease seam. Runtime lazy on
+initialresume/storageunready; suspend/storage loss immediately denies, stop starts
+model/runtime drain independently before sole storage owner closes.
+139mappedsecurity/52UIunit/3contract/type/lint/frozeninstall passed; actual mapped
+Electron diagnostics5.31s +credentials4.87s passed with synthetic observer and
+denied-keyring fixture, five credential captures plus new Localdata theme copies.
+Actual private-Xvfb product code executes but no actual native observer, systembus,
+keyring/provider/desktop acceptance. Expanded removal/Escape regression rerun in
+progress. Original diagnostic PNGs restored; new affected captures in dedicated
+credential-settings directory. Need final checks/evidence/commit, independent
+Standards+Security/Spec reviews, focused PR and prompt integration. No open PR,
+no active delegates/watches. User permits unsigned implementation fallback on
+1Password failure; never mutate signing config; signed releases still required.
+
+
+Credential final local validation:139F2security/52UIunit/3contracts,55F1security/
+72F3security, fulltype/lint/frozeninstall/plan/whitespace pass. Combined actual
+Electron integration union F1-02/F2-02/F3-01:6/6pass48.69s. Finalcredential
+rerun after explicit invoking-window focus restoration:1/1pass5.60s.
+Seven new captures visually inspected (empty dark/light, saved, locked, native
+200%focusedviewport, Localdata dark/light);20historical incidentalPNGs restored.
+Source/hash receipt covers41current changed code/test/build/lockfiles. Runtime
+review still required. No unsupported native/keyring/provider/task acceptance.
+Fetcheddevelop remainscd7bf0e; no openPR. Next commit this focused increment,
+carry it into rootcoordinator for two independent fresh axis reviews, then publish
+and integrate promptly after findings/currentCI/GitHub reviews are handled.
+
+Credential application source checkpoint0541bef is now committed with the normal
+configured SSH signer; signature verified against configured public key without
+changing configuration. Working source is frozen for independent review against
+approveddevelopcd7bf0e. All listed local checks and41source pins pass; actual
+helper/keyring/provider/desktop/AT/full-task acceptance remain pending. No push or
+PR yet. Coordinator will synchronize this checkpoint to its own root checkout
+and request two fresh independent axis reviews before publication/integration.
+
+
+Reviews of frozen1e769ed completed/read: Standards9b1c0590 found P2 denied-
+session policy weakening; Specabdb932d found P1 stale read disabling clearpolicy
+and P2 saved after lock erased memory. Parent fixes now pass144F2security, final
+type/lint and mapped Electron2/2 (credential5.25s, diagnostics5.65s).5new
+regressions include exact single-FIFO paged interleaving;3finding tests fail on
+reviewed source and pass fixed source. Snapshot revision/generation fences and
+coalesced bounded metadata refresh prevent stale application/publication. Policy
+checks admission and eligibility epoch across IO, keeps stronger floor, restores
+stronger preference once by exactCAS after acknowledged weakening races denial;
+unknown restoration stays review-required. Save checks post-IO reference/lease.
+Native F1 prerequisite audit this turn only: controller preflight requires own
+network namespace distinct from guestPID1 plus matching sysfs/loopback; labv4
+fresh inspect still false/PID0/exit0. No lab resume, native process, new checkout
+or wrapper execution. Source preparation still pending; resume after F2merge.
+Need commit fixes, publish focused draft to startCI, then one fresh independent
+bounded concurrency recheck before merging. No active delegates or watches yet.

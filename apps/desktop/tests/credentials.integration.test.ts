@@ -1,0 +1,64 @@
+import {afterEach,expect,it} from 'vitest';
+import {_electron as electron} from '@playwright/test';
+import type {ElectronApplication} from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import {execFileSync} from 'node:child_process';
+import {createRequire} from 'node:module';
+import {existsSync,mkdtempSync,mkdirSync,readFileSync,readdirSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import type {CredentialSettingsApi} from '../../../packages/platform-contracts/src/credential-settings.ts';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../../..'),executable=createRequire(import.meta.url)('electron') as string;
+let application:ElectronApplication|undefined,temporary='';
+afterEach(async()=>{if(application)await application.close().catch(()=>{application?.process().kill('SIGKILL');});application=undefined;if(temporary)rmSync(temporary,{recursive:true,force:true});});
+it('runs the production credential window/store with an explicitly synthetic session observer and denied-keyring fixture',async()=>{
+  if(!process.env.DISPLAY||process.env.LINUXCAST_PRIVATE_DISPLAY!=='1')throw new Error('Requires owned private Xvfb; no supported native-session acceptance.');
+  execFileSync(process.execPath,['apps/desktop/build.ts'],{cwd:root,timeout:120000,stdio:'pipe'});
+  temporary=mkdtempSync(join(tmpdir(),'linuxcast-credentials-product-'));
+  for(const name of ['home','profile','state','config','cache','data','runtime','system'])mkdirSync(join(temporary,name),{mode:0o700});
+  const control=join(temporary,'observer-state'),marker=join(temporary,'observer-pids'),helper=join(temporary,'synthetic-observer.py');writeFileSync(control,'unlocked',{mode:0o600});
+  // Ordinary Python emits only the frozen protocol. It never opens a desktop bus,
+  // input, keyring, audio or provider. This is not a native observer execution.
+  writeFileSync(helper,`import sys,json,select\nfrom pathlib import Path\nsequence=0\nwhile True:\n ready,_,_=select.select([sys.stdin],[],[],0.2)\n if ready and not sys.stdin.buffer.read(1): break\n state=Path(${JSON.stringify(control)}).read_text()\n if state=='silent': continue\n sequence+=1\n print(json.dumps({'schemaVersion':1,'sequence':sequence,'state':'observed','active':state!='inactive','lockedHint':state=='locked','localGraphical':True,'ownerMatches':True}),flush=True)\n`,{mode:0o600});
+  const wrapper=join(temporary,'entry.cjs');
+  writeFileSync(wrapper,`const {app,safeStorage}=require('electron'),cp=require('node:child_process'),fs=require('node:fs');process.argv=process.argv.filter(value=>value!=='--inspect=0'&&value!=='--remote-debugging-port=0');app.setPath('userData',${JSON.stringify(join(temporary,'profile'))});app.setPath('sessionData',${JSON.stringify(join(temporary,'profile'))});safeStorage.getSelectedStorageBackend=()=> 'basic_text';safeStorage.isEncryptionAvailable=()=>false;safeStorage.encryptString=()=>{throw new Error('Unexpected test encryption');};safeStorage.decryptString=()=>{throw new Error('Unexpected test decryption');};const original=cp.spawn;cp.spawn=function(command,args,options){if(command===${JSON.stringify(join(root,'apps/desktop/dist/platform'))}&&Array.isArray(args)&&args.length===1&&args[0]==='credential-session'){const child=original('/usr/bin/python3',[${JSON.stringify(helper)}],options);fs.appendFileSync(${JSON.stringify(marker)},String(child.pid)+String.fromCharCode(10),{mode:0o600});return child;}return original(command,args,options);};require(${JSON.stringify(join(root,'apps/desktop/dist/main.cjs'))});`,{mode:0o600});
+  const env:Record<string,string>={HOME:join(temporary,'home'),XDG_STATE_HOME:join(temporary,'state'),XDG_CONFIG_HOME:join(temporary,'config'),XDG_CACHE_HOME:join(temporary,'cache'),XDG_DATA_HOME:join(temporary,'data'),XDG_RUNTIME_DIR:join(temporary,'runtime'),XDG_SESSION_TYPE:'x11',XDG_DATA_DIRS:join(temporary,'system'),XDG_CONFIG_DIRS:join(temporary,'config'),DBUS_SESSION_BUS_ADDRESS:'unix:path=/nonexistent-linuxcast-credential-test-bus'};
+  for(const name of ['DISPLAY','XAUTHORITY','PATH','LANG'])if(process.env[name])env[name]=process.env[name]!;
+  application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
+  const app=application,page=await app.firstWindow();page.setDefaultTimeout(6000);await page.waitForURL('linuxcast-app://shell/index.html');
+  // Lazy startup proves unrelated launcher/data use does not query a session bus.
+  expect(existsSync(marker)).toBe(false);const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('Local data');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
+  const dataEvent=app.waitForEvent('window');await query.press('Enter');const data=await dataEvent;await data.waitForURL('linuxcast-app://shell/data-settings.html');await data.getByRole('button',{name:'Manage credentials',exact:true}).waitFor();expect(existsSync(marker)).toBe(false);
+  const credentialEvent=app.waitForEvent('window');await data.getByRole('button',{name:'Manage credentials',exact:true}).click();const credentials=await credentialEvent;credentials.setDefaultTimeout(6000);await credentials.waitForURL('linuxcast-app://shell/credential-settings.html');
+  const state=()=>credentials.evaluate(async()=>{const reply=await(window as unknown as {linuxcastCredentials:CredentialSettingsApi}).linuxcastCredentials.getState();if(!reply.ok)throw new Error('Metadata unavailable.');return reply.value;});
+  await expect.poll(async()=>(await state()).session).toBe('observed-unlocked');await expect.poll(()=>credentials.getByText('Persistent storage refused:',{exact:false}).isVisible()).toBe(true);
+  expect(await credentials.evaluate(()=>({node:typeof(window as unknown as {process?:unknown}).process,require:typeof(window as unknown as {require?:unknown}).require,methods:Object.keys((window as unknown as {linuxcastCredentials:CredentialSettingsApi}).linuxcastCredentials).sort()}))).toEqual({node:'undefined',require:'undefined',methods:['close','getState','onChanged','recheck','removeKey','saveKey','setPolicy']});
+  const evidence=join(root,'apps/desktop/evidence/credential-settings');mkdirSync(evidence,{recursive:true});
+  const capture=async(name:string)=>{await credentials.evaluate(async()=>{await document.fonts.ready;});expect((await new AxeBuilder({page:credentials}).setLegacyMode().analyze()).violations).toEqual([]);await credentials.screenshot({path:join(evidence,name+'.png'),fullPage:true});};
+  for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},theme)=>{nativeTheme.themeSource=theme;},theme);await expect.poll(()=>credentials.locator('[data-lc-theme]').getAttribute('data-lc-theme')).toBe(theme);await capture('empty-'+theme);}
+  const input=credentials.getByLabel('New API key',{exact:true}),mode=credentials.getByLabel('Keep this key',{exact:true});expect(await input.getAttribute('type')).toBe('password');expect(await mode.inputValue()).toBe('');expect(await mode.locator('option[value="persistent"]').isDisabled()).toBe(true);
+  await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});});await input.fill('SYNTHETIC_CANCELLED_ENTRY');await mode.selectOption('session-only');await credentials.getByRole('button',{name:'Save key',exact:true}).click();await expect.poll(()=>input.inputValue()).toBe('');await expect.poll(async()=>(await state()).busy).toBe(false);expect((await state()).stored).toBe('none');
+  await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});await input.fill('SYNTHETIC_MEMORY_ONLY_KEY');await credentials.getByRole('button',{name:'Save key',exact:true}).click();await expect.poll(async()=>(await state()).stored).toBe('session-only');await expect.poll(async()=>(await state()).busy).toBe(false);await capture('saved-session-light');
+  expect(await credentials.locator('body').textContent()).not.toContain('SYNTHETIC_MEMORY_ONLY_KEY');const secretDirectory=join(temporary,'data/linuxcast/secrets');expect(readdirSync(secretDirectory)).toEqual([]);
+  await input.fill('SYNTHETIC_UNSUBMITTED_ENTRY');writeFileSync(control,'locked');await expect.poll(async()=>(await state()).session).toBe('locked');await expect.poll(()=>input.inputValue()).toBe('');expect((await state()).stored).toBe('session-only');expect((await state()).sessionOnlyAvailable).toBe(false);await capture('locked-light');
+  writeFileSync(control,'unlocked');await expect.poll(async()=>(await state()).session).toBe('observed-unlocked');const policy=credentials.getByRole('checkbox',{name:'Clear session-only keys on lock or session loss'});await policy.click();await expect.poll(async()=>(await state()).clearSessionOnLock).toBe(true);await expect.poll(async()=>(await state()).busy).toBe(false);
+  writeFileSync(control,'inactive');await expect.poll(async()=>(await state()).session).toBe('inactive');expect((await state()).stored).toBe('none');writeFileSync(control,'unlocked');await expect.poll(async()=>(await state()).session).toBe('observed-unlocked');
+  const firstPids=readFileSync(marker,'utf8').trim().split('\n').map(Number);await credentials.getByRole('button',{name:'Recheck status',exact:true}).click();await expect.poll(()=>readFileSync(marker,'utf8').trim().split('\n').length).toBe(2);await expect.poll(async()=>(await state()).session).toBe('observed-unlocked');for(const pid of firstPids)expect(()=>process.kill(pid,0)).toThrow();
+  await expect.poll(async()=>(await state()).busy).toBe(false);
+  await input.fill('SYNTHETIC_REMOVABLE_ENTRY');await credentials.getByRole('button',{name:'Save key',exact:true}).click();await expect.poll(async()=>(await state()).stored).toBe('session-only');await expect.poll(async()=>(await state()).busy).toBe(false);
+  const remove=credentials.getByRole('button',{name:'Remove key…',exact:true});await expect.poll(()=>remove.isEnabled()).toBe(true);await remove.press('Enter');await expect.poll(async()=>(await state()).stored).toBe('none');await expect.poll(async()=>(await state()).busy).toBe(false);
+  await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/credential-settings.html')!.webContents.setZoomFactor(2);});
+  await input.focus();expect(await credentials.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  expect(await input.evaluate(element=>{const rect=element.getBoundingClientRect();return rect.left>=4&&rect.right<=innerWidth-4&&rect.top>=4&&rect.bottom<=innerHeight-4;})).toBe(true);
+  expect((await new AxeBuilder({page:credentials}).setLegacyMode().analyze()).violations).toEqual([]);
+  // Playwright fullPage clips Electron zoom output. Capture the actual native
+  // viewport with the focused control visible; no full-document claim.
+  const scaled=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/credential-settings.html')!.capturePage()).toPNG().toString('base64'));
+  writeFileSync(join(evidence,'scaled-light.png'),Buffer.from(scaled,'base64'));
+  await credentials.keyboard.press('Escape').catch(error=>{if(!credentials.isClosed())throw error;});await expect.poll(()=>credentials.isClosed()).toBe(true);await expect.poll(()=>data.getByRole('button',{name:'Manage credentials',exact:true}).evaluate(element=>document.activeElement===element)).toBe(true);
+  const reopenedEvent=app.waitForEvent('window');await data.getByRole('button',{name:'Manage credentials',exact:true}).click();const reopened=await reopenedEvent;await reopened.waitForURL('linuxcast-app://shell/credential-settings.html');await reopened.getByText('No key saved',{exact:true}).waitFor();expect(readFileSync(marker,'utf8').trim().split('\n')).toHaveLength(2);
+  const processHandle=app.process();await page.evaluate(async()=>{await(window as unknown as {linuxcast:{quit():Promise<unknown>}}).linuxcast.quit();});if(processHandle.exitCode===null)await new Promise(resolve=>processHandle.once('exit',resolve));expect(processHandle.exitCode).toBe(0);application=undefined;
+  for(const pid of readFileSync(marker,'utf8').trim().split('\n').map(Number))expect(()=>process.kill(pid,0)).toThrow();
+  for(const name of readdirSync(join(temporary,'data/linuxcast')).filter(name=>name.startsWith('linuxcast.db'))){const content=readFileSync(join(temporary,'data/linuxcast',name)).toString('utf8');for(const canary of ['SYNTHETIC_MEMORY_ONLY_KEY','SYNTHETIC_CANCELLED_ENTRY','SYNTHETIC_UNSUBMITTED_ENTRY','SYNTHETIC_REMOVABLE_ENTRY'])expect(content).not.toContain(canary);}
+},120000);

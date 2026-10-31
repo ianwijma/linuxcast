@@ -34,8 +34,8 @@ function DataSettings(){
     <p className="lc-muted">Exports are unencrypted JSON. Choose a new filename; existing files are kept. Deletion is local and does not securely erase disk contents. Existing backups may retain earlier data.</p>
     {failed?<ErrorState title="Local data controls are unavailable" description="Close and reopen settings, or try again." action={<Button onClick={()=>{void load();}}>Try again</Button>} />
       :!ready?<LoadingState label="Opening data controls…" />
-      :visible.length===0?<EmptyState title="No matching categories" description="Try another category name." />
-      :<div className="data-settings-categories">{visible.map(([id,title,description,exportCategory,clearCategory])=><section key={id} aria-labelledby={`category-${id}`}>
+      :visible.length===0&&!(!query.trim()||'credentials openrouter key storage'.includes(query.toLocaleLowerCase().trim()))?<EmptyState title="No matching categories" description="Try another category name." />
+      :<div className="data-settings-categories">{(!query.trim()||'credentials openrouter key storage'.includes(query.toLocaleLowerCase().trim()))&&<section aria-labelledby="credential-category"><div><h2 id="credential-category">Credentials</h2><p className="lc-muted">Manage the OpenRouter key, storage mode and session-only clearing. Provider and model selection are separate.</p></div><Button disabled={busy} onClick={()=>{void api?.openCredentials().then(reply=>{if(active.current&&!reply.ok)setMessage('Credential settings could not be opened.');});}}>Manage credentials</Button></section>}{visible.map(([id,title,description,exportCategory,clearCategory])=><section key={id} aria-labelledby={`category-${id}`}>
         <div><h2 id={`category-${id}`}>{title}</h2><p className="lc-muted">{description}</p></div>
         <div className="data-settings-actions">
           {exportCategory&&<Button busy={busy} disabled={!ready} aria-label={`Export ${title.toLowerCase()}`} onClick={()=>{void run('export',exportCategory);}}>Export</Button>}

@@ -13,12 +13,15 @@ import { createApplications } from '@linuxcast/applications';
 import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
 import { DataControls,ManagedDiagnostics } from '@linuxcast/data-controls';
+import {CredentialRuntime,createSecretReferences} from '../../../../packages/secrets/src/index.ts';
+import {createCredentialSettings} from './credential-settings.ts';
+import {CREDENTIAL_PREFERENCE_ID} from '../../../../packages/platform-contracts/src/credential-preferences.ts';
 import { createDataSettings } from './data-settings.ts';
 import { createPermissionSettings } from './permission-settings.ts';
 import { PermissionRegistry } from '../../../../packages/permissions/src/registry.ts';
 import { createHash } from 'node:crypto';
 import { stableWorkflowJson } from '../../../../packages/storage/src/workflow-editor-json.ts';
-import { app,clipboard,dialog,BrowserWindow } from 'electron';
+import { app,clipboard,dialog,BrowserWindow,safeStorage } from 'electron';
 import { createClipboardWriter } from './clipboard-write.ts';
 import { isAbsolute, join } from 'node:path';
 import { startResidentShell } from './shell.ts';
@@ -131,6 +134,13 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   applications=createApplications({helperPath:join(__dirname,'platform')});
   const currentStorage = startStorage(__dirname, directory, app.getVersion());
   storage = currentStorage;
+  const references=createSecretReferences(currentStorage.repository);
+  const credentialRuntime=new CredentialRuntime({helperPath:join(__dirname,'platform'),dataDirectory:directory,safeStorage,references,isStorageReady:currentStorage.isReady});
+  const removeReadiness=currentStorage.onReadiness(()=>credentialRuntime.notifyStorageState());
+  const credentials=createCredentialSettings({resourcesDirectory:__dirname,runtime:credentialRuntime,references,removeReadiness,restoreFocus:()=>dataSettings?.focusExisting(),
+    preferences:{async read(){const row=await currentStorage.repository.request('settings.get',{id:CREDENTIAL_PREFERENCE_ID});if(row&&typeof row.value!=='string')throw new Error('Credential preference unavailable.');return row?{revision:row.revision,value:row.value as string}:null;},
+      async write(expectedRevision,value){const row=await currentStorage.repository.request('settings.set',{id:CREDENTIAL_PREFERENCE_ID,expectedRevision,value});if(typeof row.value!=='string')throw new Error('Credential preference unconfirmed.');return {revision:row.revision,value:row.value};}},
+  });
   const permissionRegistry=new PermissionRegistry(currentStorage.repository);
   permissionSettings=createPermissionSettings({resourcesDirectory:__dirname,registry:permissionRegistry,isReady:currentStorage.isReady,
     async workflowName(principal){
@@ -172,7 +182,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   fileSearch=createFileSearchWorkspace({resourcesDirectory:__dirname,service:fileService,isReady:currentStorage.isReady,copyPath:copyText,copyText,previewText:async input=>{if(!applications)throw new Error('Preview unavailable.');return applications.previewText(input);}});
   const currentFiles=fileSearch;
-  dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
+  dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,openCredentials:()=>credentials.open(),
     async exportCategory(category,signal){
       if(category==='application-logs'||category==='tool-diagnostics')return diagnostics.export(category,signal);
       const result=await controls.export({category},{signal});
@@ -192,7 +202,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   const currentSettings=dataSettings;
   // Index jobs and data operations must finish while their sole repository owner is still alive.
-  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop(),currentPermissions.stop()]);await permissionRegistry.close();await diagnostics.close();await currentStorage.stop();},
-    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate(),currentPermissions.terminate()]);await diagnostics.close();await currentStorage.terminate();await permissionRegistry.close();}};
+  const orderedStorage={async stop(){await Promise.all([credentials.stop(),currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop(),currentPermissions.stop()]);await permissionRegistry.close();await diagnostics.close();await currentStorage.stop();},
+    async terminate(){await Promise.all([credentials.terminate(),currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate(),currentPermissions.terminate()]);await diagnostics.close();await currentStorage.terminate();await permissionRegistry.close();}};
   return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow,currentNotes,currentPermissions];
 } });

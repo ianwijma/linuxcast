@@ -273,7 +273,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   })).toMatchObject({alias:'public-data',useCount:1});
   expect(await data.evaluate(()=>({require:typeof (window as unknown as {require?:unknown}).require,process:typeof (window as unknown as {process?:unknown}).process,
     shell:typeof (window as unknown as {linuxcast?:unknown}).linuxcast,methods:Object.keys((window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData).sort()})))
-    .toEqual({require:'undefined',process:'undefined',shell:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance']});
+    .toEqual({require:'undefined',process:'undefined',shell:'undefined',methods:['clearCategory','close','exportCategory','getState','onAppearance','openCredentials']});
   expect(await data.evaluate(()=>(window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData.clearCategory('permissions' as never))).toMatchObject({ok:false,error:{code:'invalid-request'}});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);

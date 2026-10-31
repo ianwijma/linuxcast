@@ -6,3 +6,9 @@ export type { SecretRepositoryClient } from './references.ts';
 
 export { SecretSessionClient } from './session-client.ts';
 export type { SecretSessionAccess,SecretSessionState } from './session.ts';
+
+export { CredentialRuntime } from './runtime.ts';
+export type { CredentialRuntimeOptions,OwnedSecretSession,SessionRestart } from './runtime.ts';
+
+export { CredentialSettingsService } from './settings.ts';
+export type { CredentialPreferences } from './settings.ts';

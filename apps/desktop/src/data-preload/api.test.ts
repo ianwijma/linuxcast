@@ -3,7 +3,7 @@ import { DATA_SETTINGS_CHANNELS } from '@linuxcast/contracts';
 import { createDataSettingsApi } from './api.ts';
 it('exposes only fixed data actions without any record, credential, path or dispatcher method',async()=>{
   const invoke=vi.fn(async()=>({ok:true,value:{outcome:'cancelled'}})),api=createDataSettingsApi({invoke,on:vi.fn(),removeListener:vi.fn()});
-  expect(Object.keys(api).sort()).toEqual(['clearCategory','close','exportCategory','getState','onAppearance']);expect(Object.isFrozen(api)).toBe(true);
+  expect(Object.keys(api).sort()).toEqual(['clearCategory','close','exportCategory','getState','onAppearance','openCredentials']);expect(Object.isFrozen(api)).toBe(true);
   await api.exportCategory('settings');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.export,{protocolVersion:1,category:'settings'});
   await api.clearCategory('file-index');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.clear,{protocolVersion:1,category:'file-index'});
   await api.exportCategory('tool-diagnostics');expect(invoke).toHaveBeenLastCalledWith(DATA_SETTINGS_CHANNELS.export,{protocolVersion:1,category:'tool-diagnostics'});
