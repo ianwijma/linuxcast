@@ -21,14 +21,14 @@ private `xvfb-run -a -s "-nolisten tcp …"` X11 display, `LINUXCAST_PRIVATE_DIS
 test. Source: parent 59549f0 plus this branch's owned presentation changes. axe (legacy mode) passes on each
 captured state. This is not GNOME/KDE, Wayland, native X11 session or assistive-technology acceptance.
 
-## Coordinator integration on approved PR92
+## Coordinator integration on approved PR93
 
-Opus `069669e` (initial `8e3d111`) is integrated unchanged at `7816d71` on
-`8de8612`. Current coordinator checks pass:24/37 units,5 contracts,15/2 security,
-22/24 Chromium cases (30.2s/17.9s), full typecheck/lint/plan/whitespace.
-W2-01 integration passes8 checks in6.99s (editor5.639s); the launcher flow passes
-in5.15s (actual4.699s), and the explicit run/approval flow passes in8.35s
-(actual7.56s). All6 incidental screenshot recaptures were restored.
+Opus `0fa31fc` (initial `8e3d111`, geometry `069669e`) is integrated with
+approved PR93 `279a3a4`. Final coordinator checks pass:24/37 units,5 contracts,
+15/2 security,24/24 Chromium cases (42.8s/20.1s), full typecheck/lint/plan/whitespace.
+W2-01 integration passes8 checks in7.75s (editor6.140s); launcher passes1/5.72s
+(actual5.245s), and explicit run/approval passes1/9.95s (actual8.93s). Incidental
+tracked screenshot recaptures are restored; all39 new captures match the author.
 
 The parent-owned version7 migration fixture now seeds legacy columns directly
 after closing the sole owner, then upgrades through the actual current18 schema.
@@ -46,5 +46,16 @@ ports retain the existing horizontal stored layout and typed compatibility.
 
 All39 new public captures (14 canvas,18 run-panel,7 product) remain author-identical.
 The coordinator directly inspected editor/native-zoom and200% component captures.
-Initial independent Standards/Security-Spec reviews are active on frozen
-`7816d71`; no clean review, publication or further native/task acceptance is inferred.
+Initial Standards `7e116647` of frozen `7816d71` is clear:24/37 units,5 contracts,
+17 security checks,6 selected Chromium cases, additional synthetic resize/move/
+reconnect probes, type/lint/plan and all39 captures inspected. Security/Spec
+`2ef28b07` independently passed46 Chromium cases and other mapped checks, but
+found one P2: root text resize while holding a drag caused release coordinates
+from the old display frame to be divided by the new factor.
+
+Original Opus5.5medium author fixed this in `0fa31fc`: display and inverse share
+one locked factor for the complete drag, including final release/abort position
+changes. Parent independently ran each new held-release and further-motion case
+on `069669e` (both fail), restored exact corrected source (both pass), then ran
+the full corrected matrix above. The initial P2 is parent-verified resolved;
+no second independent final clean Spec review or native/task acceptance is claimed.

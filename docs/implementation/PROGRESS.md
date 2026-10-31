@@ -11,7 +11,9 @@ and all28captures retained; all native/full-task gates remain pending.
 Root codex/w2-instrument-workflow-integration integrates original Opus0fa31fc
 on069669e and approvedPR93. Initial Standards7e116647 clear; Spec2ef28b07 sole
 held-drag/text-resize coordinate P2 corrected by locking the display and inverse
-frame for the entire gesture, including final release. Parent verification next;
+frame for the entire gesture, including final release. Parent verification passes: both new cases fail original069669e and pass fixed;
+current24+24browser/61unit/5contract/17security/type/lint/plan, three actual
+Electron flows(6.140s/5.245s/8.93s) pass. Publishing focused workflow PR next;
 no second independent final clean review claimed. Parent test-only v7 fixture
 fix60667ab retained, no production storage/controller/engine/shared changes.
 AT adapter9c77978 separatebranch Spec0098261d clear; initial Standards pending.
