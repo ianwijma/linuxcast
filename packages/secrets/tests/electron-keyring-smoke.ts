@@ -1,3 +1,4 @@
+import { syntheticSession } from './session-fixture.ts';
 /** Actual Electron main/keyring smoke, bundled by run-keyring-smoke.ts. No
  * credential values or errors are emitted; reference persistence is tested
  * separately against the real storage owner. */
@@ -17,11 +18,11 @@ void (async()=>{try {
   process.stdout.write('{"phase":"electron-ready"}\n');
   const records=new Map<string,SecretReferenceRecord>();
   const references:SecretReferences={get:async id=>records.get(id)??null,put:async record=>{records.set(record.id,record);return record;},delete:async id=>records.delete(id),list:async()=>({records:[...records.values()],nextCursor:null})};
-  store=await SecretStore.open({dataDirectory:directory,safeStorage,references});
+  store=await SecretStore.open({session:syntheticSession().access,dataDirectory:directory,safeStorage,references});
   const status=store.recheckKeyring();process.stdout.write(JSON.stringify({phase:'keyring-probe',state:status.state,...(status.state==='available'?{backend:status.backend}:{reason:status.reason})})+'\n');if(status.state!=='available')throw new Error();
   const generated=randomBytes(32).toString('hex');const owner={ownerKind:'provider' as const,ownerId:'disposable-smoke'};
   const result=await store.store(owner,generated,'persistent');if(result.outcome!=='stored')throw new Error();
-  await store.close();store=await SecretStore.open({dataDirectory:directory,safeStorage,references});
+  await store.close();store=await SecretStore.open({session:syntheticSession().access,dataDirectory:directory,safeStorage,references});
   let roundtrip=false;const used=await store.use(result.reference,owner,async value=>{roundtrip=value===generated;});
   const deleted=await store.delete(result.reference,owner);await store.close();
   const clean=(await readdir(join(directory,'secrets'))).length===0 && records.size===0;

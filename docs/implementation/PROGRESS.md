@@ -1,88 +1,67 @@
 # Coordinator checkpoint — 1 November 2026
 
-The complete local1.0 goal remains active:97tasks through R1-03 and every native,
-physical recovery, accessibility, performance and package/release gate remain.
-Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A.
-User prioritizes prompt PR integration. Reviewed bounded increments integrate on
-their own checks/reviews/CI; full task/release criteria remain explicitly pending.
-Do not hold a complete increment for unrelated future work or mark a task done.
+Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
+native desktop/AT, performance, packaging and publication gates remain required.
+Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.
+User requests prompt PR integration: close reviewed bounded increments on their
+own passing checks/reviews/CI, while retaining full task/release criteria. Do not
+hold reviewed increments for unrelated future feature work. No scope reduction.
 
-PR82 diagnostics https://github.com/ianwijma/linuxcast/pull/82 MERGED todevelop
-ate568b4d61b88cdb48bd5a5626bb18ba1284edb4e,31Oct13:09:35UTC. Head e31b3e5 had
-68security/actualElectron5.93s/5captures/type/lint/plan/21Python, independent review
-with small findings fixed/validated, CI41198787692 passed and no requested reviews
-or outstanding comments/rulesets. No F2 criterion promoted. Native dialogs were
-instrumented; supported native/credential/UI/release acceptance remains open.
+All three PRs now MERGED into develop; GitHub open PR list verified empty:
+- PR82 https://github.com/ianwijma/linuxcast/pull/82 diagnostics, mergee568b4d61b88cdb48bd5a5626bb18ba1284edb4e. Signedheade31b3e5, CI41198787692 passed, no requestedreviews/comments. Initial independent Standards clean, Spec idle-retention fix and FIFO safety coordinator-validated.68security/actualElectron5.93s/5captures/type/lint/plan/21Python.
+- PR81 https://github.com/ianwijma/linuxcast/pull/81 Saved permissions, mergef4f5409c102ce1afa8c03c87dad411dfbc7dd76f. Signedheada1ffb88 integrates diagnostics while preserving both cleanup owners. Final core reviewc6b83bc5 clean.75unit/2contract/72F3security/68F2security/type/lint/plan plus3actualElectron scenarios17.02s+5.69s pass; CI41204589655 passed, no requestedreviews/comments. Historical captures preserved.
+- PR80 https://github.com/ianwijma/linuxcast/pull/80 shellzoom/native preparation, merge1b3efe1b5878057ee035914bff8e02e7c98a900b. Signedheadb17139d integrates both PRs.32F1unit/55F1security (53Python no skips)/68F2security/72F3security/type/lint/frozeninstall/plan/19hashes and5actualElectron scenarios18.11s+5.75s+17.90s pass. CI41205145467 passed, no requestedreviews/comments. Independent v2review41c3260 clean (plus30extra pure probes). New inspected dark/light integration captures separate from19restored incidental historical recaptures. Legacy command count now frozenbuiltins+1fixture, exact security assertions unchanged.
 
-PR81 Saved permissions https://github.com/ianwijma/linuxcast/pull/81 is next.
-Worktree /home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui,
-codex/f3-01-permissions-ui. Signedhead79f056a; finalsource matches independent
-c6b83bc5 review with no blocker.75unit/2contract/72security/2actualElectron17.51s/
-9captures and CI41198685600 previously pass. Merging newdevelop diagnostics now;
-resolve shared main shutdown by retaining permission registry and diagnostics
-cleanup before storage stop, plus both integration test mappings. Revalidate
-combined UI/lifecycle and source before pushing, then merge on current CI.
-FullF3 AC02/UI/native and generic host consent/remediation remain pending.
+Current approved develop baseline1b3efe1 includes all three increments. Source
+integration is not task acceptance: F1UI, F2AC01/UI and F3AC02/UI stay pending;
+full native/generic consent/provider/release work remains. No product/Orca native
+runs:0, completion/delivery/audible false. Labv4 lastverified stoppedfalse/PID0/exit0.
+Next F1 native actions: immutableDebian source/build receipt, reviewed namespace
+and outer shutdown wrapper, actual native attempts; stronger alternate/final119
+observer IDs and15-stepv2 protocol already reviewed. No physicalinput authority.
 
-PR80 shell zoom/native preparation https://github.com/ianwijma/linuxcast/pull/80,
-parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
-codex/f1-02-shell-accessibility, signed41c3260. v2 independent Standards and Spec
-review completed/read clean within bounded scope.32unit/55security including53
-Python without skips/type/lint/plan/19hashes/signature and30extra pure boundaries
-independently pass. CI41203762504 passes. Update on develop after PR81 and integrate
-reviewed sizing/preparation increment once its own integration checks pass.
-No product/Orca native execution:0. Native IDs and15-step schema are preparation,
-not actual evidence; freshimmutableDebianbuild/receipt, reviewednamespace/outer
-shutdown, supporteddesktop/AT and fulltask/release gates remain mandatory. Earlier
-2actual private-Xvfb flows17.76s cover unchanged product behavior, not v2 execution.
+Next active implementation F2-02 credential setup/status and runtime:
+/home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
+codex/f2-02-credential-storage, signed06373ba afterf18efab (not pushed/noPR).
+Nativeobserverd89d05e unchanged, productionreview clean; P3parent-death fixture
+strengthened6pure/35privatebus/nonrootpeer. Coordinator boundedstream/client and
+mandatorySecretStore session admission/abort/clear/drain implemented. Standards
+clean; Spec2P2 fixed: checkfresh afterblobIO/beforedecrypt, returncurrentdeniedstatus
+on operation failures.90security/type/lint/plan/hash pass; smallfixes parent-
+validated, no second clean finalSpec claim. Runtime startup/retry/suspend/ordered
+shutdown, actual provider predispatch and credentialsetup/status UI remain missing.
+Before new edits, update that branch from this approved integration checkpoint,
+resolve shared wiring without losing mergeddiagnostics/permissions, then complete
+one bounded credential flow and integrate promptly on its own gates.
 
-F2 credential /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
-codex/f2-02-credential-storage: signed06373ba afterf18efab. Native d89d05e unchanged,
-review no production defect; P3 parent-death fixture strengthened. Coordinator
-stream/client/mandatorystore session gating, cancellation/clear and drain implemented;
-87security/38Rust/6pure/35privatebus/nonrootpeer checked initially. Standards clean;
-Spec2P2 corrected at06373ba: fresh check after blobIO/beforedecrypt, denial status
-on all failures.90security/type/lint/plan/hash pass; smallfixes parent-validated,
-no additional clean finalSpec claim. Runtime startup/retry/suspend/ordered shutdown,
-actual provider predispatch and credentialsetup/status UI remain next after merging
-these PRs. Do not expand another branch while ready increments await integration.
-
-Debian v4 lab lastverified stoppedfalse/PID0/exit0; no hostbus/desktop/input operation.
-Optional input service remains disabled/stopped. No real credentials/provider calls.
-Normal1Password signing recovered and user confirmed fixed; preserve configuration,
-no unsignedfallback. Tools PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH
-(Node24.22.1/Bun1.4.4/Rust1.95). No active delegate now; do not poll completed work.
+Parent worktree /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd now retains this local
+coordinator checkpoint atop approveddevelop; carry it into the next feature PR,
+no separate documentation PR needed. Other diagnostics/permissions worktrees remain
+available for evidence, with approved branches; no source revert or branch cleanup.
+Normal1Password signing works and user confirmedfixed; preserveconfiguration,
+no unsignedfallback. All new agents GPT6.1SOL/high. No active delegates/watches.
+Tools PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH
+(Node24.22.1/Bun1.4.4/Rust1.95). Optional inputservice disabled/stopped; no host
+bus/desktop/input action or real credential/provider call was performed.
 
 
-PR81 develop-update validation completed:75unit/2contract/72F3security/68F2security,
-fulltype/lint/plan/whitespace and3actualElectron scenarios (F3two17.02s;F2one5.69s)
-pass. Restored9incidental PNG recaptures to reviewed images. Only production merge
-resolution combines already reviewed shutdown owners; no new operation/privilege.
-Next: normally signed mergecommit, push/link, inspect current CI/reviews, merge
-when green. User requests prompt bounded integration; task/native gates unchanged.
+Active F2 component updated from local coordinator d595aed (approveddevelop1b3efe1).
+All source merged automatically; conflict resolution is only registry/checkpoint/
+runner union. Current bounded increment includes reviewed d89d05e native observer,
+f18efab coordinator framing/client/store/CLI and small reviewed-finding fixes06373ba.
+Preserve merged diagnostics/permissions/shell maps and all task criteria. Next:
+validate100mapped F2security plus native/build/link checks and unaffected F1/F3
+regressions, publish a focused component PR, inspect current checks/reviews and
+merge promptly. This has no renderer UI/new IPC/production credential flow yet;
+its concrete library and fixed native mode are prerequisites for that next flow.
+Full scope remains; do not call unsupported native desktop/session proof passed.
 
 
-PR81 MERGED atf4f5409c102ce1afa8c03c87dad411dfbc7dd76f,31Oct13:14:08UTC.
-Current signed a1ffb88 CI41204589655 passed; no requestedreviews/comments. Its
-combined checks above pass. PR82 andPR81 are integrated; task acceptance unchanged.
-
-PR80 now updating todevelopf4f5409. Production source merged automatically;
-coordinator resolves registry/evidence/checkpoint conflicts preserving all three
-increments and all56passed/325pending/8N/A criteria. v2 independent review of
-41c3260 completed/read with no Standards or Security/Spec blocker;32unit/55security
-including53Python plus30extra pure boundaries/type/lint/plan/19hashes/signature
-pass independently. Need current combined F1/F2/F3 tests and actualElectron flows,
-then signed update/push/link/currentCI and merge. No additional feature work before
-closing this last ready PR. Actual product/Orca native runs remain0; all supported
-native/fulltask/release gates remain mandatory and explicitly pending.
-
-
-PR80 combined validation PASS after developf4f5409 integration:32F1unit,55F1/
-68F2/72F3security (53Python no skips), fulltype/lint/frozeninstall/plan/whitespace,
-19unchanged native preparation source hashes. Five actual private-Xvfb Electron
-scenarios pass (F1two18.11s,F2one5.75s,F3two17.90s). Corrected legacy expected
-command count to frozen built-in IDs plus1fixture after Saved permissions addition;
-exact preload/security assertions unchanged. New affected-state zoom dark/light
-captures inspected in apps/desktop/evidence/pr80-integration/;19incidental historical
-recaptures restored. Next: signed mergecommit/push/link/currentCI/merge, retaining
-all unfinished task/native/release gates and source/evidence provenance.
+F2 updated component validation completed:100F2security/55F1security (53Python)/
+72F3security/38Rust, offlineClippy/format/fulltype/lint/frozeninstall/plan/20hashes
+pass. First Electron smoke build lacked the worktree's SQLite addon and stopped
+before launch; standard pinned rebuild fixed the environment, rerun1/1 passes5.99s.
+All screenshots unchanged. Core production files byte-match reviewed/fixed06373ba;
+only shared runner source hash changes from the map union. No production session/
+credential UI enabled. Next publish and integrate this bounded component promptly,
+then wire its main lifecycle and actual setup/status flow in the next increment.

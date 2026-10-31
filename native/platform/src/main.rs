@@ -14,6 +14,15 @@ fn main() {
         }
         return;
     }
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    if arguments == ["credential-session"] {
+        let code = if linuxcast_platform::credential_session::run_stdio().is_ok() {
+            0
+        } else {
+            1
+        };
+        std::process::exit(code);
+    }
     if arguments != ["index"] {
         eprintln!("PLATFORM_INVALID_OPERATION");
         std::process::exit(2);

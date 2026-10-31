@@ -1,3 +1,4 @@
+import { syntheticSession } from './session-fixture.ts';
 import { afterEach,describe,expect,it } from 'vitest';
 import { mkdtemp,readdir,readFile,rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -17,7 +18,7 @@ function fixtureCrypto(backend='gnome_libsecret'):ElectronSafeStorage {
     decryptString:value=>{const decipher=createDecipheriv('aes-256-gcm',key,value.subarray(3,15));decipher.setAuthTag(value.subarray(-16));return Buffer.concat([decipher.update(value.subarray(15,-16)),decipher.final()]).toString('utf8');}};
 }
 const identity={ownerKind:'provider' as const,ownerId:'synthetic-provider'};
-async function secrets(f:Awaited<ReturnType<typeof owner>>,safeStorage:ElectronSafeStorage){const store=await SecretStore.open({dataDirectory:f.directory,safeStorage,references:createSecretReferences(f.client)});stores.push(store);return store;}
+async function secrets(f:Awaited<ReturnType<typeof owner>>,safeStorage:ElectronSafeStorage){const store=await SecretStore.open({session:syntheticSession().access,dataDirectory:f.directory,safeStorage,references:createSecretReferences(f.client)});stores.push(store);return store;}
 describe('F2-02 actual owner secret metadata lifecycle (test cipher)',()=>{
   it('reopens the child owner and decrypts using metadata-only references, then permanently removes both on deletion',async()=>{
     const api=fixtureCrypto(),first=await owner(),store=await secrets(first,api),secret=`synthetic-${randomBytes(24).toString('hex')}`;

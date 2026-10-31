@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { ElectronSafeStorage, SecureBackend, SecretStatus } from './types.ts';
 const secure = new Set(['gnome_libsecret','kwallet','kwallet5','kwallet6']);
 export function unavailable(reason:Extract<SecretStatus,{state:'unavailable'}>['reason']):Extract<SecretStatus,{state:'unavailable'}> {
-  return {state:'unavailable',reason,sessionOnlyAvailable:reason!=='locked',remediationAction:reason==='locked'?'unlock-keyring':reason==='storage-failed'?'retry-storage':reason==='not-found'?'enter-credential-again':'configure-keyring'};
+  return {state:'unavailable',reason,sessionOnlyAvailable:reason!=='locked'&&reason!=='session-unavailable',remediationAction:reason==='session-unavailable'?'retry-session':reason==='locked'?'unlock-keyring':reason==='storage-failed'?'retry-storage':reason==='not-found'?'enter-credential-again':'configure-keyring'};
 }
 /** Pinned Electron45 synchronous Linux API: its selected backend attests the
  * same OSCrypt implementation used by encrypt/decrypt. The independent async

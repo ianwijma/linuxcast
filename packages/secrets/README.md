@@ -1,7 +1,8 @@
 # Main-owned secret storage — F2-02
 
 `SecretStore` is a main-only service. Main supplies the actual Electron safeStorage
-object and the single F2 storage owner's `secretRefs.*` repository adapter.
+object, the single F2 storage owner's `secretRefs.*` repository adapter and a
+trusted fresh `SecretSessionAccess`. There is no default eligible-session bypass.
 Consumers receive an opaque UUID and persistence mode. There is no plaintext
 get/decrypt IPC endpoint; an authorized trusted main adapter receives the value
 only inside `use(reference, owner, callback)`. Callback results are discarded.
@@ -52,8 +53,22 @@ no per-credential keyring deletion API: its shared app encryption key must not b
 deleted while other credentials rely on it. Deletion is logical cleanup, not
 forensic erasure, and cannot undo an already sent external request.
 
-`setLocked` receives trusted session events; safeStorage does not expose a
-separate keyring-lock state query. Failed availability/use returns an actionable
+`SecretSessionClient` owns the fixed packaged helper's `credential-session`
+mode. Its bounded NDJSON stream requires fresh eligible observations, denies
+lock/inactivity and quarantines malformed, lost or delayed generations. Every
+SecretStore admission and trusted consumer callback rechecks freshness; pending
+IO also rechecks immediately before decrypting. Session denials synchronously
+abort consumers and optional clear-on-lock removes session buffers. A manual
+`setLocked(false)` cannot override denied observation. The owner must invalidate
+on suspend/resume, wait for exact helper closure and create a fresh generation
+for recovery. See [session contract](SESSION-CONTRACT.md) and
+[component evidence](evidence/session-integration/README.md).
+
+The actual Electron startup/retry/suspend/ordered lifecycle and credential setup/
+status UI are still separate unfinished integration. Trusted provider adapters
+must check their current lease immediately before actual dispatch; receiving a
+secret inside a callback is not inference authorization. safeStorage does not
+expose a separate keyring-lock state query. Failed availability/use returns an actionable
 state without guessing that a particular backend error means the user locked it.
 No host session, keyring or desktop setting is changed by tests.
 
