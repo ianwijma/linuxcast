@@ -571,3 +571,18 @@ while a key is entered, no hostbus/keyring/provider/native operations. Shared
 requests stay coordinator-owned. No push/PR/status promotion. Task completion
 wakes parent; do not poll. D1follow-up6fb9f0b9 remains independently active.
 Root current clean integration branch4ce6b5e; no active root process/PRwatch.
+
+Parent D1boundary probe on unchanged eae UI (current7ae6357) finds real live-panel
+growth defect: at800x600, open1action panel x447.5/y26.5/w280/h122; a real
+ViewSession revision2 snapshot growing to24actions leavesy26.5 withheight584,
+bottom610.5 and filterbottom609.5, beyondviewport600. Chromium assertion fails.
+Private synthetic test-only fixture/probe copied to
+/tmp/linuxcast-d1-panel-probe-bl9oahin then all3temporary repo files removed.
+No product source/capture/native/effect action changed. Material reproduction
+steered to already-running Opusmedium6fb9f0b9 for content/geometry reanchoring and
+permanent regression, preserving focus/selection/revision guards. AT README now
+distinguishes historical observer-only notes from existing offline controller/
+parser/wrapper and explicitly gates stale Instrument query/title selectors,
+native roles/source pins/approved authority/fresh receipt before any future run.
+No preparation compatibility/native acceptance claim; main README historical
+staleness reported by observer author was already corrected, no duplicate edit.

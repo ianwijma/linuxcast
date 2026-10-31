@@ -1,10 +1,31 @@
 # F1-02 product native AT preparation
 
-This directory prepares the **production** launcher native observation leg. It
-does not contain an end-to-end session controller or a successful native run.
-The 31 October checkpoint in
+This directory contains offline preparation for the **production** launcher's
+native observation leg: the observer, session controller, fresh Orca parser,
+immutable build validation and guest namespace wrapper. It contains no successful
+native product run. The authoritative controller sequence and remaining execution
+prerequisites are in [controller-protocol.md](controller-protocol.md); wrapper
+preparation is recorded in
+[lab-wrapper-preparation](../../evidence/shell-native-at/lab-wrapper-preparation/README.md).
+The original observer-only 31 October checkpoint in
 [the evidence directory](../../evidence/shell-native-at/README.md) records the
-stopped Debian lab and the unexecuted presentation/recovery gates.
+stopped Debian lab and the unexecuted presentation/recovery gates at that time.
+The observer contribution and protocol below are historical preparation context,
+not a claim that the later controller/parser files are absent.
+
+## Instrument integration gate
+
+The Instrument renderer changes the root query from `searchbox` to `combobox`
+and result title markup from `.lc-result-copy` to `.lc-row-title`. The current
+`product_driver.ts` query selectors and `driver_guards.ts` final-row selectors
+still target the earlier renderer. They must be adapted and reviewed, together
+with native role/name assumptions and source pins, before any native attempt
+using the Instrument product. Passing offline guards against the earlier fixture
+does not establish compatibility. Do not relax native freshness, ownership,
+exact action/selection, first-failure or cleanup requirements to accommodate it.
+The namespace wrapper's approved product authority and a fresh immutable source
+archive/build receipt must also match the reviewed Instrument revision. No native
+execution or acceptance is established by the renderer's Chromium/Xvfb evidence.
 
 Run the offline checks from the repository root:
 
@@ -149,8 +170,10 @@ The coordinator resumed/reserved the existing lab on31October, verified fresh
 Debian13.7/Orca48.1, clean owned baseline and all13reviewed Orca source hashes,
 then shut it down cleanly. See
 [preflight evidence](../../evidence/shell-native-at/lab-resume-preflight/README.md).
-No product/native run occurred. The earlier access blocker is resolved; product
-controller/parser/publication wiring remains outstanding.
+No product/native run occurred. The earlier access blocker was resolved at that
+checkpoint; the controller/parser/publication preparation was added subsequently.
+Actual product execution and the current Instrument integration gate above remain
+outstanding.
 
 
 ## Coordinator version2 alternate/final preparation
