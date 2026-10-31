@@ -16,7 +16,8 @@
     ],
     "F1-02": [
       "apps/desktop/src/main/lifecycle.test.ts",
-      "apps/desktop/src/main/shell.test.ts"
+      "apps/desktop/src/main/shell.test.ts",
+      "apps/desktop/tests/at/driver_guards.test.ts"
     ],
     "D1-02": [
       "packages/ui/src/views/session.test.ts",
@@ -369,7 +370,8 @@
       "apps/desktop/src/main/assets.test.ts",
       "apps/desktop/src/main/security.test.ts",
       "apps/desktop/src/main/ipc.test.ts",
-      "apps/desktop/src/preload/api.test.ts"
+      "apps/desktop/src/preload/api.test.ts",
+      "apps/desktop/tests/at-preparation.security.test.ts"
     ],
     "F3-01": [
       "packages/storage/tests/permissions.integration.test.ts",

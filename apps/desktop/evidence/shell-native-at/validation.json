@@ -1,0 +1,62 @@
+{
+  "checkedUtc": "2026-10-31T10:12:14.057147+00:00",
+  "reviewedSourceCommit": "757ce20c650c0f4df6d847f10212c6edeaa016ab",
+  "platform": {
+    "distro": "Pop!_OS 22.04",
+    "architecture": "x86_64",
+    "kernel": "7.1.1-76070101-generic",
+    "node": "24.22.1",
+    "bun": "1.4.4"
+  },
+  "commands": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0,
+      "packagesInstalled": 805
+    },
+    {
+      "command": "node scripts/test-runner/run.ts unit F1-02",
+      "exitCode": 0,
+      "passed": 15
+    },
+    {
+      "command": "node scripts/test-runner/run.ts security F1-02",
+      "exitCode": 0,
+      "passed": 54
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py' -v",
+      "exitCode": 0,
+      "passed": 14,
+      "scope": "offline synthetic objects and owned temporary Unix sockets"
+    },
+    {
+      "command": "bun run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "bun run lint",
+      "exitCode": 0
+    },
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "nativeRuns": 0,
+  "productionIntegrationRerun": false,
+  "nativeProductOutcome": "unavailable-before-execution",
+  "F1-02-UI": "pending",
+  "cleanup": {
+    "offlineChildrenExited": true,
+    "offlineTemporaryResourcesRemoved": true,
+    "nativeProcessesStarted": false,
+    "labStartedOrResumed": false,
+    "historicalArtifactsChanged": false,
+    "signingConfigurationChanged": false
+  }
+}

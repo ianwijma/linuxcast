@@ -1,71 +1,58 @@
-# Coordinator checkpoint — 31 October 2026
+# Coordinator checkpoint —31October2026
 
-The complete local 1.0 objective in `GOAL.md` remains active and unfinished.
-All subagents used in this continuation are GPT-6.1 SOL/high. Preserve the
-unchanged 1Password SSH signing setup; normal signed commits succeeded.
+Full local1.0 GOAL remains active,97tasks/R1-03 unfinished. Registry8done,
+20inprogress/69planned;56passed/325pending/8justifiedN/A. No acceptance narrowed.
+All agents GPT6.1SOL/high. Normal1Password signing recovered; configured signer
+unchanged, SSH signatures verified against configured publickey via temporary
+allowedSigners. No unsignedcommit fallback. Prior failure notes are historical.
 
-## Reconciled integration
+F1-02 current parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
+codex/f1-02-shell-accessibility, draftPR80 https://github.com/ianwijma/linuxcast/pull/80.
+Signedhead757ce20 + staged coordinator observer/controller/preflight and critical
+review fixes. Initial nativecontroller stagedtree1f5fce5 in t3-1c57ce87 preserved
+unchanged. Standardsreview foundP1discoveryfailure skipsknownchildkill/P2unsupported
+signedtestprep requirement. Specreview foundP1unsafeEnter andexternalpathreplacement,
+P2buildsourceadditions andreceiptaliases. Root fixes: kill retainedPopen/pidfds before
+falliblediscovery, keep unverifiedprivate roots, exact alias DOM+nativeguards, bind
+Xlock/socket inode/type/UID/PID/SO_PEERCRED, bidirectional file/dir inventory and
+receiptalias rejection+independentdigestpin.23unit/55security (47Python inwrapper),
+fulltype/lint/plan pass. ActualElectron integration2/2 passes17.76s (newguard6.181/legacy10.433);
+guard excludes canonical aria-hidden decorative icon, exactlabel retained. Six
+historical PNG recaptures restored unchanged. No native AT evidence inferred.
+Next: freeze/normalcommit/push PR80 updates, linkimmediately, independent final
+security recheck before nativeattempt. No native product/Orca run:0. Stoppedlab
+freshDebian13.7/Orca48.1/13sourcehash baseline verified, shutdownexit0/PID0.
+Testprep may use reviewed frozen-tree/archive with honest unsignedstatus; release
+signing unchanged. Missingalternate/finalrow IDs, freshguestbuild, reviewednamespace
+wrapper and outerfinally remain. Evidence controller-preparation/README.md.
 
-Fetched `origin/develop` at `e265dc6`. PR77 is already merged: head
-`210592089cb99875cb2ec033e95b0c099842910d`, merge
-`ed58cf50c71b429c27980b80654daf518fa04260`, 31 October 08:51:02 UTC.
-Its final planning CI41186206515 passed. No open PRs existed at initialization.
-The previous instruction to finish PR77 was stale. Registry now records its
-integration; every U1-01 criterion remains pending.
+F3-01 /home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui,
+codex/f3-01-permissions-ui, published draftPR81 https://github.com/ianwijma/linuxcast/pull/81,
+verifiedsignedhead79f056a658ae3d75b2a48c1f913bcaf1ed178be0. Source exactly matches
+independent finalc6b83bc5 review, no blocker.75unit/2contract/72security/2actualElectron
+integration/9captures pass. Current-head planningCI41198685600 passed; reviewrequests,
+submissions/comments empty; rulesets[]. Notmerged: AC02/UI/native acceptance pending.
 
-Criterion tracking prerequisite already exists and its 21 Python regressions
-pass. Registry retains stable IDs, explicit evidence/status, conditional N/A,
-shared criteria and rejection of unsupported done claims. No replacement needed.
+F2 diagnostics /home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls,
+codex/f2-02-diagnostic-controls, draftPR82 https://github.com/ianwijma/linuxcast/pull/82,
+verifiedsignedheade31b3e5c35785b707a88c2d390232f2ba748ef00.68security/actualElectron
+1flow5.93s/5captures/type/lint/plan/21Python pass. InitialStandards clean, SpecP2idle
+retention fixed andFIFOguard parent-validated, no secondcleanfinalreviewclaim.
+PlanningCI41198787692 passed, no requested/submitted reviews/comments. Notmerged;
+credential/native/task acceptance pending. No channel/dependency/migration added.
 
-## Active F1-02
+Credential/session /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
+codex/f2-02-credential-storage, stagedpolicytree6ed5dc0.4syntheticgate/62mappedsecurity/
+type/lint/plan pass; no productionroute/UI enabled. Read-only nativeobserver returned
+signedd89d05eea1937616a6f3fa72b0079266a61fe1cd, treeeea838c78a4878cfb0c4ddf84d12d363bfd277db,
+in /home/ian/.t3/worktrees/linuxcast/t3-3dc194dc, codex/f2-02-session-observer, clean.
+12newownedfiles,6pure/35privatebus/nonrootpeer rejection reported, no hostbus/device/
+desktop action. Read evidence/nativeREADME for glue; not yet integrated/reviewed.
+Nodeclient/admission/predispatch/abortstale/lock/loss andcredentialsetup/status remain
+coordinator work. The AT P1 fixes tookpriority before Nodeclient implementation.
 
-Worktree `/home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd`, branch
-`codex/f1-02-shell-accessibility`, based on `e265dc6`; initial signed source
-`566a9b3` with signed coordinator follow-ups `abe53ee`. Draft PR80:
-https://github.com/ianwijma/linuxcast/pull/80. No merge or task completion is claimed.
-
-Implemented and reproduced actual 200% zoom footer clipping; corrected CSS/native
-units, viewport/body layout, intrinsic grow-after-shrink reporting and duplicate
-resizes. Stronger tests then exposed/corrected long-title footer wrapping,
-fallback heading semantics and startup-error focus. Legacy scenario expectations
-now match fourteen current commands and the exact existing named preload API.
-No new API/schema/dependency/migration/permission or physical input authority.
-
-Final mapped checks: 15 units, 54 security, both production integration scenarios
-PASS (18.79 s total; legacy11.068 s/new6.533 s), full pinned typecheck/lint PASS.
-Seven native captures cover dark/light launcher/loading/error plus emulated
-forced-colors/reduced-motion; axe0, viewport stability, body/last-result reachability,
-form keyboard and actual secondary reopen checked. Historical capture files
-restored unchanged after legacy recapture. Initial independent Standards and Spec
-reviews of566a9b3 found no blockers; requested extra coverage and ensuing bounded
-fixes are coordinator-validated, not a second independent clean review claim.
-Evidence: `apps/desktop/evidence/shell-zoom-accessibility.md`.
-
-F1-02-UI remains pending. Private Pop!_OS/Xvfb Electron and injected pending/error
-replies/media emulation do not establish Debian GNOME/KDE Wayland/X11, Orca,
-actual OS preference or backend failure/recovery acceptance. Do not merge or mark
-the task complete merely because these checks or planning CI pass.
-
-## Next actions and remaining gates
-
-PR80 planning CI41190850786 passed on signed checkpoint a72d08c; requested and
-submitted GitHub reviews/comments are empty, develop unprotected and rulesets empty.
-Required native acceptance remains outstanding. The next bounded F1-02 continuation
-uses a runtime-prepared isolated child checkout (GPT-6.1 SOL/high) to audit the
-final source and prepare/attempt product Electron native AT evidence using existing
-Debian lab infrastructure. Child owns only new apps/desktop/tests/at/ and
-apps/desktop/evidence/shell-native-at/ files, not shared wiring or registry. Its
-runtime task/link and resulting path/branch must be reconciled on completion.
-No child execution or acceptance result is claimed by this pre-dispatch checkpoint.
-Complete final follow-up review and supported native accessibility acceptance
-before claiming this task done. Continue dependency-ready
-foundation work while desktop evidence is outstanding: F3-01 host permission
-approval/management/remediation is explicitly unimplemented; its dependencies
-F0-01/F2-01 are accepted. Read its card and complete broker/storage contracts
-before implementing. Keep coordinator ownership of shared wiring and registry.
-
-F1-01 and F0-01 are accepted; S0-01 and S0-03 retain their native/physical gates.
-No privileged service was enabled. All product families, native sessions/AT,
-security/recovery, performance, packaging and R1-01/R1-02/R1-03 release artifacts
-remain required. Registry: 8 done/20 in progress/69 planned; 56 passed criteria,
-325 pending and 8 justified N/A. Planning validation and status refresh pass.
+Do not poll live background delegates; all three most recent workers/reviews now
+completed and read. Next finalATrecheck must be a NEWdelegate_task, no reviewthread
+send. Keep bodies/docs precise, draftCIgreen is not mergeacceptance. Full native
+GNOME/KDE Wayland/X11/AT, physical recovery, allfeaturefamilies, performance,
+packages/artifacts/publication remain mandatory. No privilegedservice enabled.

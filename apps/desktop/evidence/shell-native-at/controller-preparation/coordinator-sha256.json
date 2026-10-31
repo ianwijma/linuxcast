@@ -1,0 +1,26 @@
+{
+  "kind": "coordinator-reviewed-finding-fixes-unexecuted-native-preparation",
+  "reviewedInputTree": "1f5fce5dbd1f1d4aca288a2eab5cda8712ccfe0d",
+  "nativeRuns": 0,
+  "files": {
+    "apps/desktop/tests/at/controller_protocol.py": "277bad8e63727f7e3817ed3e5be833d254a882a2059c4b858993eac4bccb7b1d",
+    "apps/desktop/tests/at/native_at.py": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b",
+    "apps/desktop/tests/at/observations.py": "70ae79e556c233699cb890192a88c5f9e0d46a71ab77644f2a7a305bc478b55b",
+    "apps/desktop/tests/at/orca_output.py": "9b3d30cc0ee4e305b287f91968a9f85d09448cd2d08643db2461e5850bf86664",
+    "apps/desktop/tests/at/private_discovery.py": "40cacc7d964158d0fdae8c42c4509f096fc62025fb2ae1241ae95d1d4f12e2ae",
+    "apps/desktop/tests/at/product_controller.py": "3ba8220649ebc307f6699e5af79c82d73f075d843b520f18137f4036645b2e3d",
+    "apps/desktop/tests/at/product_staging.py": "8925a252c6e26edbeb809b3241c3be310ef5ebd98224d6bb794ca70be11ebc67",
+    "apps/desktop/tests/at/session_owner.py": "cac46decf734117884f662c5f40fa1de363db96899c9b1e778c996b57e5dbbaf",
+    "apps/desktop/tests/at/test_controller_failures.py": "313f28c6e56291ad348a49d40fbded1829b680aacd3d3dfdaba90957924d3a16",
+    "apps/desktop/tests/at/test_controller_protocol.py": "77b08d87783eaab95704dd5f5cede00a439afbf91cc1c99b1aaf36e676e41bca",
+    "apps/desktop/tests/at/test_observations.py": "463dbcc8a5b4b0c1f8c588a89f5a9686681993fadac91123715a876b99965572",
+    "apps/desktop/tests/at/test_orca_output.py": "cd3bd63e11e621a42cfc6ac35e3a634644e49f0ef4197fd2f061715697e443ce",
+    "apps/desktop/tests/at/test_product_staging.py": "0dc5118b54200aa87809c05da48f0dd2be4fa7bab6e0f483f0d8691b826767d1",
+    "apps/desktop/tests/at/test_session_owner.py": "3d4caaee1eb239e1cb4dca1f904a73fc376686d24b10899e557c2869b6f5feb3",
+    "apps/desktop/tests/at/driver_guards.test.ts": "262e2f32049b0e1f3bfb7f35ca71ec5b50d0bfaf3da47301799d7003e334616b",
+    "apps/desktop/tests/at/driver_guards.ts": "6d73b12023794071112b983208731069f492f6f350a22e885e57777aab4b43ae",
+    "apps/desktop/tests/at/product_driver.ts": "b33ab1d8c2a437b3cce0546697e6a87f33cafcffa3f23160cafcead971cfa7e4",
+    "apps/desktop/tests/at-preparation.security.test.ts": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c",
+    "apps/desktop/tests/shell-accessibility.integration.test.ts": "23e4755f3a9c33fa5121c989e1d2521701ec5d0faaef804480a5fe49f0a2ea5f"
+  }
+}

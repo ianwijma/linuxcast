@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { enterAliasForm } from './at/driver_guards.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const executable = createRequire(import.meta.url)('electron') as string;
@@ -104,7 +105,7 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
   const find = page.getByRole('searchbox', { name: 'Find an action', exact: true });
   await expect.poll(() => find.evaluate(element => element === document.activeElement)).toBe(true);
   await find.fill('Edit search alias');
-  await find.press('Enter');
+  await enterAliasForm(page);
   const alias = page.getByRole('textbox', { name: 'Search alias', exact: true });
   await expect.poll(() => alias.evaluate(element => element === document.activeElement)).toBe(true);
   await expect.poll(() => fitsWindow(page)).toEqual({ footerVisible: true, bodyVisible: true, noHorizontalOverflow: true, noDocumentScroll: true });
