@@ -28,7 +28,7 @@ it('runs the production credential window/store with an explicitly synthetic ses
   application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
   const app=application,page=await app.firstWindow();page.setDefaultTimeout(6000);await page.waitForURL('linuxcast-app://shell/index.html');
   // Lazy startup proves unrelated launcher/data use does not query a session bus.
-  expect(existsSync(marker)).toBe(false);const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('Local data');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
+  expect(existsSync(marker)).toBe(false);const query=page.getByRole('combobox',{name:'Search commands',exact:true});await query.fill('Local data');await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain('Local data');
   const dataEvent=app.waitForEvent('window');await query.press('Enter');const data=await dataEvent;await data.waitForURL('linuxcast-app://shell/data-settings.html');await data.getByRole('button',{name:'Manage credentials',exact:true}).waitFor();expect(existsSync(marker)).toBe(false);
   const credentialEvent=app.waitForEvent('window');await data.getByRole('button',{name:'Manage credentials',exact:true}).click();const credentials=await credentialEvent;credentials.setDefaultTimeout(6000);await credentials.waitForURL('linuxcast-app://shell/credential-settings.html');
   const state=()=>credentials.evaluate(async()=>{const reply=await(window as unknown as {linuxcastCredentials:CredentialSettingsApi}).linuxcastCredentials.getState();if(!reply.ok)throw new Error('Metadata unavailable.');return reply.value;});

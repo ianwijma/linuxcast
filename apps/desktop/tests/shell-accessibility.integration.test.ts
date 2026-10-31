@@ -65,7 +65,7 @@ require(${JSON.stringify(join(root, 'apps/desktop/dist/main.cjs'))});
   const app = application, page = await app.firstWindow();
   page.setDefaultTimeout(5000);
   await page.waitForURL('linuxcast-app://shell/index.html');
-  const query = page.getByRole('searchbox', { name: 'Search commands', exact: true });
+  const query = page.getByRole('combobox', { name: 'Search commands', exact: true });
   await expect.poll(() => query.evaluate(element => element === document.activeElement)).toBe(true);
   await expect.poll(() => page.getByRole('option').count()).toBeGreaterThan(25);
   await query.fill('hide');

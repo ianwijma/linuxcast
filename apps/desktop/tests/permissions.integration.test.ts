@@ -44,7 +44,7 @@ it('reviews actual persisted permissions, confirms removal without replay and re
   };
   let {app,page}=await launch();
   const open=async(title:string,url:string)=>{
-    const query=page.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill(title);
+    const query=page.getByRole('combobox',{name:'Search commands',exact:true});await query.fill(title);
     await expect.poll(()=>page.getByRole('option',{selected:true}).textContent()).toContain(title);
     const opened=app.waitForEvent('window');await query.press('Enter');const workspace=await opened;workspace.setDefaultTimeout(5000);await workspace.waitForURL(url);return workspace;
   };

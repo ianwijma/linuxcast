@@ -92,7 +92,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     chromiumSandbox: true, env, timeout: 20000 });
   const app = application, page = await app.firstWindow();
   await page.waitForURL(appUrl);
-  const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
+  const query=page.getByRole('combobox',{name:'Search commands',exact:true});
   await query.waitFor({timeout:5000});
   await expect.poll(()=>page.getByRole('option').count()).toBe(LAUNCHER_BUILTIN_COMMAND_IDS.length+1);
   await expect.poll(()=>query.evaluate(element=>element===document.activeElement)).toBe(true);
@@ -244,7 +244,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   const applicationMetadata=await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):undefined;});
   expect(applicationMetadata?.usage).toMatchObject({pinned:true,alias:'public-application',useCount:2});
   await action(page,'Hide command');await expect.poll(()=>page.getByRole('option').count()).toBe(0);
-  await action(page,'Manage commands');const managed=page.getByRole('searchbox',{name:'Manage commands',exact:true});await managed.fill('public-application');
+  await action(page,'Manage commands');const managed=page.getByRole('combobox',{name:'Manage commands',exact:true});await managed.fill('public-application');
   await expect.poll(()=>page.getByRole('option').count()).toBe(1);await expect.poll(()=>page.getByRole('option').textContent()).toContain('Hidden');
   expect(await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications')?.usage:null;})).toEqual(applicationMetadata?.usage);
   for(const theme of ['dark','light'] as const){
@@ -393,7 +393,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // Relaunch the same real private profile: pins must be durable, not renderer state.
   application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
   const restarted=application,reopened=await restarted.firstWindow();await reopened.waitForURL(appUrl);
-  const reopenedQuery=reopened.getByRole('searchbox',{name:'Search commands',exact:true});
+  const reopenedQuery=reopened.getByRole('combobox',{name:'Search commands',exact:true});
   await reopenedQuery.waitFor();
   await expect.poll(()=>reopened.getByRole('option').first().textContent()).toContain('Hide Linuxcast');
   const savedUsage=await reopened.evaluate(async()=>{
@@ -404,7 +404,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // Restart proves the root exclusion is durable. Show via the same management
   // List, then execute the real registered GIO application again.
   await reopenedQuery.fill('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(0);
-  await action(reopened,'Manage commands');const reopenedManaged=reopened.getByRole('searchbox',{name:'Manage commands',exact:true});await reopenedManaged.fill('public-application');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Hidden');
+  await action(reopened,'Manage commands');const reopenedManaged=reopened.getByRole('combobox',{name:'Manage commands',exact:true});await reopenedManaged.fill('public-application');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Hidden');
   await action(reopened,'Show command');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Shown');
   await reopened.keyboard.press('Escape');await reopenedQuery.waitFor();expect(await reopenedQuery.inputValue()).toBe('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(1);
   expect(await reopened.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):null;})).toMatchObject({hidden:false,usage:{pinned:true,alias:'public-application',useCount:0,lastUsedAt:null}});
