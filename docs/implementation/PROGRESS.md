@@ -1,33 +1,39 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — offline AT adapter publication after PR94
+## Current coordinator state — offline cache routing review
 
-Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. All seven selected Instrument surfaces are
-integrated as bounded increments: foundationPR87, Localdata88, Credentials89,
-Permissions90, sharedrenderer91, Notes93 and workflows94. Native/full-task gates
-remain pending. Latestapproveddevelop96ac9fb is PR94 merge from91864e8;
-CI41237862351 SUCCESS, GitHubreviewrequests/reviews/comments empty, normalexact
-headmerge, immediate tinymergeblurb delivered. NotesPR93 merge279a3a4 from901226b,
-CI41237501043 SUCCESS, watchremoved. Allreviewedsource/28Notes+39workflowcaptures
-preserved. No active PRwatch/rootprocess.
+Goal ACTIVE: all97/full local1.0 throughR1-03, registry8done/20inprogress/69planned,
+56passed/325pending/8N/A unchanged. Approveddevelopbbbe813 is mergedPR95;
+PR93Notes/PR94workflows/allseven Instrument surfaces integrated, native/fulltask
+criteria remainpending. No openPR/watch. No actualnative product/Orca runs.
 
-Rootcodex/f1-02-instrument-at-integration reconciles9c77978 ontoapprovedPR94
-at84f11aa. Bothinitialreviews clear: Spec0098261d37mapped+44synthetic,
-Standards073a5af737mapped/fulltype/scopedlint/plan/3hashes. Both completed/read,
-noactivechild. Parentcurrent37units2.28s/55security13.18s(all114offlinePython)/
-fulltype/scopedlint/plan pass. Adapterthreefiles matchreviewed9c byte-for-byte;
-no nativeobserver/controller/parser/namespace/pinchanges. PublishingfocusedPRnext.
+Rootcodex/f1-02-offline-build-inputs fromapprovedbbbe813, source8bb3775: actual
+ordinaryPython negativecontrol proves originalprivatebuildHOME losesprepared
+Cargo/headercaches; fixedstager verifiesreadonlypublicinputmanifest, seeds only
+ownedprivateprofile, fixedofflineCargo/node-gyp paths, post-buildcacheimmutability.
+11stagingtests/119fullofflinePython(no skips)/55mappedsecurity13.18s/2AST/plan/
+whitespace/hash pass; originalsourcefails samefixture/currentpasses. No actual
+Node/Rust/Electronbuild, download, installer, guest/display/native operation.
+Initial independent Standards+SecuritySpec review next; no newpins/receipt schema
+or namespace gate changes. Oldcode/realguest build remains unaccepted.
 
-Actualnativeproduct/Orca runs0. Fresh currentapprovedarchive/immutableDebianbuild/
-receipt, nativeENTRYvsCOMBO_BOXidentity, PID1metadatafeasibility, reviewedouter
-reservation/shutdown/recovery and actualcontainment/AT remain pending. Read-only
-hostDockerinventory freshlyconfirmed v4 exactID674cd884..5098/imagea1805464..c4d10
-exitedfalse/PID0/exit0, nonprivileged/read-onlyroot/capdropALL/no-new-privileges,
-onlyprivate-labRWbind/nohostports. No start/exec/SSH/guest/native/bus/input/audio.
-Next implement bounded outerowner and provision only reviewed current sources,
-without loosening historical gates. Fullnative/physical/performance/release scope
-remains mandatory; no overallcompletionclaim.
+Outerowner implementation task6ec25f18-7c53-4d3a-b850-e99d5fa822b9 assignedSOLhigh,
+separatepreparedcheckout fromfrozen7abb845 on saved
+codex/f1-02-lab-owner-preparation. Contract+inventory are only onthatbranch,
+excludedfromthis cache-reviewincrement. Await its completionwake; no actorpolls.
+Only newlab_owner.py/test_lab_owner.py/newouter-owner-preparation evidence owned;
+no Docker/SSH/guest/native execution authorized forworker. Parent owns integration.
+
+7abb845 also records fresh approvedPR95 archive:121180160bytes,
+SHA732f7bcc1aced64225ce13f4ee2ebaf848e623a5d3a3b631f1236d574a8436dc,
+tree5a85d5251101716b338e820f23f78eef5e162dfb, all2789Gitblobs/modesverified;
+private0400snapshot/provenance andtemporaryextractionremoved. Signatureheader
+present butnotverified. Labexactv4 stoppedfalse/PID0/exit0 before/after.
+Currenthost Node126879696bytes/e32e2d16..cfafb andBun107308936bytes/10702245..ac235
+hashes rechecked, no runtimeexecuted/provisioned. ActualDebianbuild/receipt,
+reviewedouterownership, PID1metadata andnativecomboboxidentity remainmissing.
+No fallback or scope/acceptance reduction. Allphysical/performance/release gates
+remain mandatory. /homeabout2GiBfree; preserve activeauthor/root dependencies.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
