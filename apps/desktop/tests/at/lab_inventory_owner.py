@@ -90,7 +90,11 @@ def package_versions(raw):
         if package in versions:
             need(package not in seen)
             seen.add(package)
-            if fields.get('Status') == 'install ok installed':
+            state = fields.get('Status', '').split()
+            need(len(state) == 3 and state[0] in ('unknown', 'install', 'hold', 'deinstall', 'purge')
+                 and state[1] in ('ok', 'reinstreq') and state[2] in ('not-installed', 'config-files',
+                 'half-installed', 'unpacked', 'half-configured', 'triggers-awaited', 'triggers-pending', 'installed'))
+            if state[2] == 'installed':
                 version = fields.get('Version', '')
                 need(re.fullmatch(r'[0-9][A-Za-z0-9.+:~\-]{0,95}', version))
                 versions[package] = version
@@ -103,6 +107,7 @@ def os_facts():
             key, value = line.split('=', 1)
             need(key not in fields)
             fields[key] = value.strip('"')
+    need(re.fullmatch(r'[a-z0-9][a-z0-9._-]{0,31}', fields.get('ID', '')))
     need(re.fullmatch(r'[0-9]{1,3}(\.[0-9]{1,3}){0,2}', fields.get('VERSION_ID', '')))
     return {'status': 'known', 'id': 'debian' if fields.get('ID') == 'debian' else 'other',
             'version': fields['VERSION_ID'],
@@ -144,6 +149,7 @@ def process_counts():
             counts['uid20000'] += int(any(int(v) == 20000 for v in uids))
             counts['graphicalCandidates'] += int(fields['Name'] in graphical)
             counts['testCandidates'] += int(fields['Name'] in tests)
+    need(counts['total'] > 0)
     return counts
 
 def ns_fact(kind):
@@ -618,6 +624,7 @@ def _validate_inventory(raw, code):
     owner.require(all(type(processes[k]) is int and 0 <= processes[k] <= 8192
                       if processes['status'] == 'known' else processes[k] is None for k in counts), 'protocol')
     if processes['status'] == 'known':
+        owner.require(processes['total'] > 0, 'protocol')
         owner.require(all(processes[k] <= processes['total'] for k in counts[1:]), 'protocol')
     probe = facts['namespaceProbe']
     exact(probe, ('status', 'firstFailure', 'cleanup', 'net', 'pid'))

@@ -417,6 +417,24 @@ class GuestFacts(unittest.TestCase):
             with self.subTest(size=len(raw)), self.assertRaises(PROBE['Fault']):
                 parse(raw)
 
+    def test_incomplete_package_or_os_identity_metadata_is_unknown_not_absence(self):
+        for status in ('', 'private', 'install ok mystery'):
+            with self.assertRaises(PROBE['Fault']):
+                PROBE['package_versions']('Package: python3\n' + ('Status: ' + status + '\n' if status else ''))
+        held = PROBE['package_versions']('Package: python3\nStatus: hold ok installed\nVersion: 3.13.5\n')
+        self.assertEqual(held['python3'], '3.13.5')
+        with patch.dict(PROBE, text=lambda *_: 'VERSION_ID="13.7"\n'), self.assertRaises(PROBE['Fault']):
+            PROBE['os_facts']()
+
+    def test_empty_proc_directory_does_not_claim_zero_processes(self):
+        entries = contextlib.nullcontext(iter(()))
+        with patch.dict(PROBE, os=SimpleNamespace(scandir=lambda _: entries)), self.assertRaises(PROBE['Fault']):
+            PROBE['process_counts']()
+        value = reply()
+        value['facts']['processes']['total'] = 0
+        with self.assertRaises(owner.Rejected):
+            inventory.validate_inventory(owner.encoded(value), 0)
+
     def test_package_read_failure_is_unknown_not_missing_packages(self):
         value, touched = self.collect(fail='packages')
         self.assertEqual(value['firstFailure'], 'packages')

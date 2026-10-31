@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "scope": "inventory-owner-offline-preparation-not-permit",
+  "files": {
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
+    "apps/desktop/tests/at/lab_inventory_owner.py": "56c12732cd10a521b77867fb17a64ae2fecf818e9adeac1e5730f0be1648e822",
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": "4c1e2afc7159f17074874f5bf43384e4cccca06ec61d1facc855e5a64ef1a0ea",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "08056d5806d4937895010a7445db3148931f4998f542da5e01b73604c8b73fac",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/checks.json": "795b227c7b0f024223ee9c2a43f8d2e21fef733f5ec6f7ca5a8f8f2e85939125"
+  },
+  "embeddedGuestSource": {
+    "sha256": "7b2259dfd0aef5a21bf73d104a83c5d6f130d28728c165936117c23f2dcb281f",
+    "bytes": 18728
+  },
+  "unchangedInputs": {
+    "AGENTS.md": "178cc4ac29d12d854e6960f3bfcf0925882c6dda86cbeb3440c669d7bed25ee8",
+    "docs/PLAN.md": "4b8e437d470074a3ca11b57cd0bb01c7e745d250b3812a4a7b3b255f0bd74181",
+    "docs/implementation/tasks/F1-02.md": "3afac176c48d385a51e839edb3c89d3b64344ce650338530f90d4fc90009353f",
+    "docs/implementation/tasks.json": "b65df0de59e4898bf4664a81e43cd6284006fe8e24be1592643e67129adc7b8a",
+    "docs/architecture/security.md": "1ae6030431544477f0bdd63b4ec4550df7a48bde3617196b98f85db9dbf6578b",
+    "docs/architecture/overview.md": "4e1eac6f454b651e3444261bbf4759f2cc8846c3f2353b5a9c2a0d6ca4ccdc25",
+    "docs/architecture/stack.md": "f90483bc25c76fb745861efa7b6a7063abcf27dab4e6acbfeb7931a7ca2dfbc3",
+    "docs/architecture/linux-integration.md": "80c230c719f05c52d7136e57b4cc750b47c164c94616c903fc390b588725882a",
+    "docs/implementation/testing-release.md": "75207dcb25d1584a320711be25d613e05dcd8ce53fa4a7f70dcfd1847abe22fb",
+    "apps/desktop/tests/at/inventory-owner-protocol.md": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f",
+    "apps/desktop/tests/at/outer-owner-protocol.md": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at/controller-protocol.md": "676cf91a4f63cf9152eb9c42b8201c165948bf61bf2c5788f4b6eeeb189c0dad",
+    "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410",
+    "apps/desktop/tests/at/product_controller.py": "c089c03e1e44e3bdca8b1db56c61050daeabae18b9513d1fa79118f3599a7fa8"
+  }
+}
