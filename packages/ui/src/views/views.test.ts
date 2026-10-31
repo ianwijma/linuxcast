@@ -283,3 +283,85 @@ test('composing Enter repeats retain native IME behavior while ordinary repeats 
   expect(await box.evaluate(element=>element.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',repeat:true,bubbles:true,cancelable:true})))).toBe(false);
   await expect(box).toBeVisible();await expect(page.locator('output')).toHaveText('No action requested.');
 });
+
+test('editable text footer advertises Enter/Ctrl+Enter only in contexts where those chords are bound', async ({ page }) => {
+  await page.getByRole('button', { name: 'Text', exact: true }).click();
+  const text = page.getByRole('textbox', { name: 'Public note', exact: true }); const footer = page.locator('.lc-view-footer');
+  await expect(text).toBeFocused();
+  // In the textarea Enter/Ctrl+Enter are native editing keys: no chord hint, no action.
+  await expect(footer.getByRole('button', { name: 'Save note', exact: true })).toBeVisible();
+  await expect(footer.getByRole('button', { name: 'Copy reference', exact: true })).toBeVisible();
+  await expect(footer.getByRole('img', { name: 'Enter', exact: true })).toHaveCount(0); await expect(footer.getByRole('img', { name: 'Ctrl+Enter', exact: true })).toHaveCount(0);
+  await expect(footer.getByRole('button', { name: 'Actions Ctrl+K', exact: true })).toBeVisible();
+  await text.press('End'); await text.press('Enter'); await page.keyboard.type('second public line'); await text.press('Control+Enter');
+  await expect(text).toHaveValue('First public line\nsecond public line'); await expect(page.locator('output')).toHaveText('No action requested.');
+  await page.setViewportSize({ width: 560, height: 1100 });
+  expect(await footer.getByRole('button', { name: 'Save note', exact: true }).locator('.lc-footer-label').evaluate(label => getComputedStyle(label).clipPath)).toBe('none'); // label stays visible without a keycap
+  await shot(page, 'dark-text-editing-footer');
+  await page.setViewportSize({ width: 1040, height: 1100 });
+  // Leaving the editor for the view surface restores the genuine chords, which then work.
+  await page.getByRole('heading', { name: 'Public note', exact: true }).click(); await expect(text).not.toBeFocused();
+  await expect(footer.getByRole('button', { name: 'Save note Enter', exact: true })).toBeVisible();
+  await expect(footer.getByRole('button', { name: 'Copy reference Ctrl+Enter', exact: true })).toBeVisible();
+  await shot(page, 'dark-text-view-footer');
+  await page.keyboard.press('Control+Enter'); await expect(page.locator('output')).toHaveText('Requested copy at revision 1.');
+  await page.keyboard.press('Enter'); await expect(page.locator('output')).toHaveText('Requested save-text at revision 1 with 1 fields.');
+  await text.focus(); await expect(footer.getByRole('img', { name: 'Enter', exact: true })).toHaveCount(0);
+});
+
+test('non-editable detail keeps genuine Enter hints and actions', async ({ page }) => {
+  await page.getByRole('button', { name: 'Detail', exact: true }).click();
+  const article = page.locator('article.lc-detail'); await expect(article).toBeFocused();
+  await expect(page.locator('.lc-view-footer').getByRole('button', { name: 'Copy reference Enter', exact: true })).toBeVisible();
+  await article.press('Enter'); await expect(page.locator('output')).toHaveText('Requested copy at revision 1.');
+});
+
+test('clearing the root query reveals the preserved selection once, without focus, invocation or later forced scrolling', async ({ page }) => {
+  await page.getByRole('button', { name: 'Long list', exact: true }).click();
+  const box = query(page, 'Long library'); const scroller = page.locator('.lc-view:visible .lc-view-scroll');
+  const visible = (name: string) => page.getByRole('option', { name: new RegExp(name) }).evaluate(row => { const a = row.getBoundingClientRect(), b = row.closest('.lc-view-scroll')!.getBoundingClientRect(); return a.top >= b.top - 1 && a.bottom <= b.bottom + 1; });
+  await box.fill('Public item 50'); await expect(page.getByRole('option')).toHaveCount(1);
+  await box.press('Escape'); await expect(box).toHaveValue(''); await expect(box).toBeFocused(); await expect(page.getByRole('option')).toHaveCount(60);
+  await expect(page.getByRole('option', { name: /Public item 50/ })).toHaveAttribute('aria-selected', 'true');
+  expect(await scroller.evaluate(element => element.scrollTop)).toBeGreaterThan(0); expect(await visible('Public item 50')).toBe(true);
+  await expect(page.locator('output')).toHaveText('No action requested.');
+  // A later ordinary snapshot neither re-scrolls nor changes the stable selection.
+  await scroller.evaluate(element => { element.scrollTop = 0; });
+  await page.getByRole('button', { name: 'Async update', exact: true }).click(); await expect(page.getByRole('option', { name: /New arrival/ })).toBeAttached();
+  expect(await scroller.evaluate(element => element.scrollTop)).toBe(0);
+  await expect(page.getByRole('option', { name: /Public item 50/ })).toHaveAttribute('aria-selected', 'true'); await expect(page.locator('.lc-footer-title')).toHaveText('Public item 50');
+  // Clearing by editing the field reveals too; nested history and the query are untouched by the reveal.
+  await box.fill('Public item 45'); await box.fill(''); expect(await visible('Public item 45')).toBe(true); await expect(box).toBeFocused();
+  await box.press('Enter'); await expect(page.getByRole('heading', { name: 'A calmer workspace', exact: true })).toBeVisible(); await page.keyboard.press('Escape');
+  await expect(box).toHaveValue(''); await expect(page.getByRole('option', { name: /Public item 45/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('output')).toHaveText('Requested open at revision 2 for item-45.');
+});
+
+test('a live snapshot growing or shrinking actions re-anchors the open panel inside the shell and viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 800, height: 600 }); await page.getByRole('button', { name: 'List', exact: true }).click();
+  const box = query(page); const panel = page.getByRole('dialog', { name: 'Actions', exact: true }); const filter = page.getByRole('searchbox', { name: 'Find an action', exact: true });
+  const geometry = () => panel.evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.finished));
+    const rect = element.getBoundingClientRect(), footer = element.closest('.lc-view')!.querySelector('.lc-view-footer')!.getBoundingClientRect();
+    const header = element.querySelector('.lc-panel-header')!.getBoundingClientRect(), filterBox = element.querySelector('.lc-panel-filter')!.getBoundingClientRect(), list = element.querySelector('.lc-action-list')!;
+    return { top: rect.top, shellTop: element.closest('.lc-view-shell')!.getBoundingClientRect().top, bottom: rect.bottom, footerTop: footer.top, viewport: innerHeight, headerTop: header.top, filterBottom: filterBox.bottom, scrollable: list.scrollHeight > list.clientHeight, rows: element.querySelectorAll('.lc-panel-action').length };
+  });
+  // Grow: panel opened with few actions, then revision 2 supplies 24 while the filter keeps focus.
+  await page.getByRole('button', { name: 'Grow actions later', exact: true }).click(); await box.press('Control+k'); await expect(filter).toBeFocused();
+  const before = await geometry(); expect(before.rows).toBeLessThan(6);
+  await expect(panel.locator('.lc-panel-action')).toHaveCount(25);
+  const grown = await geometry();
+  expect(grown.top).toBeGreaterThanOrEqual(0); expect(grown.top).toBeGreaterThanOrEqual(grown.shellTop); expect(grown.bottom).toBeLessThanOrEqual(grown.viewport); expect(grown.bottom).toBeLessThanOrEqual(grown.footerTop);
+  expect(grown.headerTop).toBeGreaterThanOrEqual(grown.top); expect(grown.filterBottom).toBeLessThanOrEqual(grown.bottom + 1); expect(grown.scrollable).toBe(true);
+  await expect(filter).toBeFocused(); await expect(filter).toHaveValue('');
+  await panel.getByRole('button', { name: 'Public action 24', exact: true }).scrollIntoViewIfNeeded(); await expect(panel.getByRole('button', { name: 'Public action 24', exact: true })).toBeInViewport();
+  await shot(page, 'dark-action-panel-grown');
+  await filter.press('ArrowDown'); await filter.press('Enter'); await expect(page.locator('output')).toHaveText('Requested public-action-02 at revision 2 for guide.');
+  // Shrink: open with 24, then revision 4 reduces to one; the panel drops back onto its footer anchor.
+  await page.getByRole('button', { name: 'Grow actions later', exact: true }).click(); await expect(page.locator('.lc-view-footer .lc-footer-verb').first()).toHaveAccessibleName('Public action 01 Enter');
+  await page.getByRole('button', { name: 'Shrink actions later', exact: true }).click(); await box.press('Control+k'); await expect(panel.locator('.lc-panel-action')).toHaveCount(25);
+  await expect(panel.locator('.lc-panel-action')).toHaveCount(2);
+  const shrunk = await geometry();
+  expect(shrunk.bottom).toBeLessThanOrEqual(shrunk.footerTop); expect(shrunk.footerTop - shrunk.bottom).toBeLessThan(16); expect(shrunk.top).toBeGreaterThan(grown.top + 100);
+  await expect(filter).toBeFocused(); await filter.press('Enter'); await expect(page.locator('output')).toHaveText('Requested public-action-01 at revision 4 for guide.');
+});

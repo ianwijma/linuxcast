@@ -33,3 +33,7 @@ export const glyphGrid: ViewModel = { protocolVersion: 1, viewId: 'public-glyphs
   { id: 'faces', title: 'Smileys', items: glyphs.slice(0, 8).map(glyphItem) },
   { id: 'nature', title: 'Animals and nature', items: [...glyphs.slice(8).map(glyphItem), { id: 'unavailable', title: 'Unavailable public glyph', icon: { kind: 'glyph' as const, value: '🦄' }, disabledReason: 'Not available in this public fixture.' }] },
 ] };
+export const note: ViewModel = { protocolVersion: 1, viewId: 'public-note', revision: 1, kind: 'text', title: 'Public note', text: 'First public line', editable: true, submitActionId: 'save-text', actions: [{ id: 'save-text', title: 'Save note', kind: 'invoke', effect: 'write' }, copy] };
+export const longList: ViewModel = { protocolVersion: 1, viewId: 'long-library', revision: 1, kind: 'list', title: 'Long library', search: { placeholder: 'Search long library…', query: '', mode: 'host' }, sections: [
+  { id: 'all', title: 'All public items', items: Array.from({ length: 60 }, (_, index) => ({ id: `item-${index + 1}`, title: `Public item ${String(index + 1).padStart(2, '0')}`, subtitle: 'Synthetic row', icon: { kind: 'builtin' as const, name: 'file' }, actions: [open, copy] })) },
+] };

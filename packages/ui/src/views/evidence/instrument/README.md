@@ -12,6 +12,8 @@ assistive-technology acceptance. Earlier captures in `../` are historical.
 | `{dark,light}-split.png`, `dark-split-pdf-band.png`, `dark-split-narrow.png` | List/detail separator at 42%, PDF unavailable band beside rows, stacked below 600 px |
 | `{dark,light}-glyph-grid.png` | Compact emoji grid, grouped rows, bottom selection rail, footer context |
 | `{dark,light}-action-panel.png`, `dark-actions-filtered.png` | 280 px panel, bottom filter, destructive-last group |
+| `dark-action-panel-grown.png` | Panel re-anchored inside the shell after a live revision grows the actions to 25 (800×600 viewport) |
+| `dark-text-editing-footer.png`, `dark-text-view-footer.png` | Editable text: no Enter/Ctrl+Enter keycaps while the textarea has focus (560 px, labels stay visible); keycaps return on the view surface |
 | `dark-loading.png`, `dark-refreshing.png`, `dark-empty.png`, `dark-error.png`, `dark-permission.png` | Loading plate/hairline, refresh keeping rows, empty plate, error and caller-copy warning bands |
 | `dark-form-validation.png`, `dark-discard-draft.png` | Inline validation and discard confirmation |
 | `text-200-actions.png`, `text-200-480-actions.png` | 200% text at 720 px and 480 px with every panel control reachable |
