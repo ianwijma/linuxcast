@@ -34,7 +34,7 @@ it('opens the real workflow editor, saves a keyboard-built graph and recovers dr
   await editor.getByRole('button',{name:'Save workflow',exact:true}).click();await expect.poll(async()=>(await loaded(editor))?.saved?.edges.length).toBe(2);
   expect((await loaded(editor))?.saved).toMatchObject({name:'Public text workflow',permissions:[{id:'clipboard.write',reason:expect.any(String)}]});
   const run=editor.getByRole('button',{name:/^Run/});expect(await run.isDisabled()).toBe(false);
-  const evidence=join(root,'apps/desktop/evidence');mkdirSync(evidence,{recursive:true});
+  const evidence=join(root,'apps/desktop/evidence/instrument-workflows');mkdirSync(evidence,{recursive:true});
   for(const theme of ['dark','light'] as const){await app.evaluate(({nativeTheme},theme)=>{nativeTheme.themeSource=theme;},theme);await expect.poll(()=>editor.locator('[data-lc-theme]').first().getAttribute('data-lc-theme')).toBe(theme);await editor.screenshot({path:join(evidence,`workflow-editor-application-${theme}-saved.png`)});expect((await new AxeBuilder({page:editor}).setLegacyMode().analyze()).violations).toEqual([]);}
   // Native window-close must flush an edit made before its500ms autosave timer.
   await editor.getByRole('textbox',{name:'Workflow name',exact:true}).fill('Public recovered draft');const closed=editor.waitForEvent('close');await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL()==='linuxcast-app://shell/workflow-editor.html')!.close();});await closed;

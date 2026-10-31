@@ -99,3 +99,57 @@ is unavailable; Copy inspector explains the separate approval step. The optional
 component fixture without a run API continues to show explicit unavailable state.
 See ../debugger/README.md and desktop/evidence/workflow-run-application.md for
 actual worker/clipboard evidence and unfinished full-scope acceptance.
+
+## Instrument presentation refresh (existing UI, no new features)
+
+The existing workspace now uses the selected Instrument composition (DESIGN.md: Workflows, Shell and
+navigation, Results and actions, Controls/keycaps/line icons, List/grid/detail/form, States and motion,
+Accessibility) with shared `Button`, `TextField`, `GlyphTile`, `LineIcon`, `GroupCaption`, `StatePlate`
+and state primitives; `editor.css` uses semantic tokens only. Controller, registry, graph, storage,
+run and permission semantics are unchanged.
+
+- **Header**: workflow tile, `Workflow editor` title, bounded workflow name and the existing quiet save
+  status. Keycaps appear only where the editor actually binds them: Save `Ctrl` `S`, Close `Escape`
+  (Run, Revert, Reload, Undo and Redo carry none). Header is in normal flow, never sticky.
+- **Palette (240)**: flush captions with live counts per category; rows with a closed-vocabulary tile
+  (Keyword `command`, Transform `system`, Copy `clipboard`), name, description and `+` verb. Name stays
+  "Add …" for assistive technology. Empty categories show the dotted (not-yet-available) or filtered
+  shape with the existing copy. A scoped grid replaces the shared Row here so a 240 px sidebar never
+  overflows (the shared Row's `12em` text basis does; see shared requests).
+- **Canvas**: controlled React Flow 12.12 on `canvas` with a 16-unit `canvasDot` grid in flow
+  coordinates; 208 px `raised` node cards (tile, uppercase category, title, one configuration line,
+  typed port line). Nodes are `role="button"` with `aria-pressed` and are named from their visible text;
+  the selected node uses `selection` plus the rail. Edges use `controlBorder`. Positions/viewport remain
+  presentation only. With no nodes the canvas shows an empty plate.
+- **Structured path** stays directly under the canvas: numbered node rows (tile, `label · id`, category,
+  "in … from … · out … to …", `aria-pressed`, rail) and the unchanged connection chooser/edge list.
+- **Inspector (300)**: tile + name, ID/Type/Input/Output/Declared effects facts ("clipboard.write ·
+  declaration only, not a grant"), then the unchanged configuration controls and Delete node last.
+- **Notices** keep their single `alert` region each. Fixed controller copy is classified only by exact
+  string: Save/Revert receipts (after exact CAS) are a neutral notice, never a success plate; validator
+  rejections are error bands; write/load/close uncertainty is the unclassified unavailable band.
+- **Layout**: panels share hairline separators and wrap (rather than overflow) for narrow windows and
+  200% text; forced colors map selection to `Highlight` outline/rail and the pane to `Canvas`.
+
+Verification (Linux amd64, Node 24.22.1, Bun 1.4.4, Chromium via Playwright; pinned tools PATH):
+`bun run test:ui -- W2-01` 19 passed (13 existing unchanged plus 6 new: node keyboard selection
+persistence and visible-text names, bound-only shortcuts and Ctrl+S receipt classification, 240 px palette
+/inspector geometry at 1440/1000@200%/600, dark/light forced colors + reduced motion, 200% focused row).
+`test:unit -- W2-01` 24, `test:contracts -- W2-01` 5, `test:security -- W2-01` 15 passed. Actual Electron
+`apps/desktop/tests/workflow-editor.integration.test.ts` passed on owned private Xvfb (captures in
+`apps/desktop/evidence/instrument-workflows/`). Captures: `evidence/instrument/README.md`.
+
+Limitations and shared requests (coordinator-owned):
+
+1. Stored node spacing (`controller.add`: x step 240 flow units) ignores text scaling, while card width
+   follows rem tokens, so cards overlap on the canvas at 200% text. Request: derive placement from measured
+   card size or provide a non-overlapping layout helper. Ports stay left/right (not the design's
+   top/bottom) because that controller layout is horizontal.
+2. Shared `Row`: `.lc-row-text` `flex: 1 1 12em` overflows a 240 px sidebar at normal text. Request a
+   sidebar/compact Row variant in D1-01; this lane uses a scoped palette grid meanwhile.
+3. Typed edge labels and an invalid-edge rendering are omitted: the 32-unit gap between stored positions
+   leaves no room, and the validator rejects invalid edges before they exist.
+4. New cases live in the already-mapped `tests/editor.ui.test.ts`; no runner mapping change needed.
+5. `packages/storage/tests/workflow-editor.integration.test.ts` (mapped integration W2-01) fails one
+   version-7 migration case on the unchanged parent base (`StorageError invalid-request`); it imports no
+   UI and is outside this lane.
