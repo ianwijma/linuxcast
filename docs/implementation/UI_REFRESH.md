@@ -94,3 +94,13 @@ Markdown/model denial, states,200% text, forced colours, reduced motion and IME
 repeat guards. Incidental screenshot recaptures were restored to their exact Git
 blobs; no historical evidence was replaced. This establishes the existing browser
 behavior only, not Instrument appearance, native Electron or supported-session AT.
+
+A separate geometry probe of the unchanged synthetic fixture (Chromium156.0.8078.4,
+720×1200 viewport,100%/200% root text) confirms that existing list rows grow from
+43.8–59.4px to85.6–148.0px and grid cells also grow, with no measured vertical
+title/caption clipping. A long list title ellipsizes horizontally at200%; its
+complete accessible label remains the existing contract. The fixture's outer
+promotional header can push the shell/footer below the viewport, so its document
+overflow assertion does not prove native window/footer visibility. Preserve
+intrinsic row growth and add explicit implemented row-content/footer bounds in
+the migration checks, using the actual product harness for window geometry.
