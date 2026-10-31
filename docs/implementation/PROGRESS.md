@@ -314,3 +314,12 @@ new mocked regressions first fail on original9f6f053 and pass after correction;
 complete offline AT suite97tests passes12.102s without skips, plus69focused tests,
 AST/plan/whitespace/hash checks. No product/reader/namespace/guest execution.
 Fresh final independent recheck is next; UIac8ad89b remains primary and unpolled.
+
+Wrapper validation checkpoint now10ccf270057913686c642894445f2c0cf2fa4549
+(documentation-only after source50dd813), clean isolated author branch. Frozen
+copyfile dependency install resolves absent Vitest without lock/source changes;
+55mapped F1security passes14.39s including97Python, typecheck/lint pass. Existing
+offline discovery already maps all test_*.py, so no shared runner edit is needed.
+Published/linked draft PR86 https://github.com/ianwijma/linuxcast/pull/86 from this
+exact unsignedhead while CI and a fresh final correction recheck are pending.
+No native invocation or acceptance promotion; InstrumentUI remains primary.
