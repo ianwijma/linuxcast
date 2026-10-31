@@ -93,7 +93,7 @@ describe('F2-02 secret boundary',()=>{
   });
   it('waits for pending write cleanup before closing its pinned directory',async()=>{
     const metadata=references();let release!:(record:SecretReferenceRecord)=>void;let record!:SecretReferenceRecord;metadata.refs.put=value=>{record=value;return new Promise(resolve=>{release=resolve;});};const f=await setup(fakeSafeStorage(),metadata.refs);
-    const pending=f.store.store(owner,generated(),'persistent');while(!release)await new Promise(resolve=>setImmediate(resolve));const closing=f.store.close();release(record);expect(await pending).toMatchObject({outcome:'unavailable',status:{reason:'cancelled'}});await closing;expect(await readdir(join(f.directory,'secrets'))).toEqual([]);
+    const pending=f.store.store(owner,generated(),'persistent');while(!release)await new Promise(resolve=>setImmediate(resolve));const closing=f.store.close();release(record);expect(await pending).toMatchObject({outcome:'unavailable',status:{reason:'unavailable',sessionOnlyAvailable:false}});await closing;expect(await readdir(join(f.directory,'secrets'))).toEqual([]);
   });
   it('reconciles only owned orphan/staging names after complete metadata validation',async()=>{
     const metadata=references();const f=await setup(fakeSafeStorage(),metadata.refs);const reference=await stored(f.store);const folder=join(f.directory,'secrets');

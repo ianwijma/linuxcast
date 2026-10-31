@@ -81,3 +81,24 @@ main service startup/retry/ordered shutdown, native suspend/resume, real keyring
 provider flows, Debian13 GNOME48/Plasma6.3 Wayland/X11, packaging and release gates
 remain mandatory. Async LockedHint/IPC are not atomic physical lock proof or input
 authority. No task completion or full local1.0 completion is claimed.
+
+
+## Independent reviews and small coordinator fixes
+
+Independent Standards review of signedf18efab found no actionable finding.
+Security/Spec independently passed87mapped/38Rust/6pure/35privatebus/nonrootpeer,
+fulltype/lint/Clippy/format/plan/hash/signature checks, and identified twoP2s:
+lock during blob IO still decrypted once before the callback guard; cancellation
+could offer session-only entry while current session status denied it. Neither
+finding exposed the credential to a consumer, but both violated the preparation
+boundary. Coordinator fixes recheck session freshness/abort/deletion immediately
+after blob closure and before decrypting, within ciphertext zero-fill finally.
+All operation failure results now prefer current blocked session status to a
+generic error, including persistent-write cancellation. Three denial-state blob
+IO injections assert zero decrypt calls, no consumer, zeroed ciphertext and no
+session-only offer. Persistent-write cases cover locked/inactive/unavailable;
+older tests now expect the current denied status.90mappedsecurity checks pass.
+These small fixes are coordinator-validated; no new independent final clean
+Security/Spec review is claimed. Production lifecycle/UI/provider/native gates
+listed above remain pending. Current sources.json supersedes its prior current
+hashes; reviewed commit f18efab preserves the reviewed source provenance.

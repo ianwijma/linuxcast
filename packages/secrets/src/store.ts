@@ -69,6 +69,11 @@ export class SecretStore {
     if(this.#sessionDenied)return unavailable('session-unavailable');
     return undefined;
   }
+  #failure(reason:Extract<SecretStatus,{state:'unavailable'}>['reason']):Extract<SecretStatus,{state:'unavailable'}> {
+    // Every operation result reflects current session denial, including errors
+    // that settle after IO; an old generic status cannot offer session entry.
+    return this.#blocked()??unavailable(reason);
+  }
   static async open(options:{dataDirectory:string;safeStorage:ElectronSafeStorage;references:SecretReferences;session:SecretSessionAccess;clearSessionOnLock?:boolean}):Promise<SecretStore> {
     if(!options.session||typeof options.session.state!=='function'||typeof options.session.subscribe!=='function')throw new Error('Session observation unavailable.');
     if(!isAbsolute(options.dataDirectory))throw new Error('Invalid private data directory.');
@@ -118,17 +123,17 @@ export class SecretStore {
     void operation.then(()=>{this.#writes.delete(operation);},()=>{this.#writes.delete(operation);});return operation;
   }
   async #store(owner:SecretOwner,value:string,persistence:'persistent'|'session-only'):Promise<StoreResult> {
-    if(!validOwner(owner) || typeof value!=='string' || !value || Buffer.byteLength(value)>64*1024 || Buffer.from(value,'utf8').toString('utf8')!==value || !['persistent','session-only'].includes(persistence))return {outcome:'unavailable',status:unavailable('invalid-request')};
+    if(!validOwner(owner) || typeof value!=='string' || !value || Buffer.byteLength(value)>64*1024 || Buffer.from(value,'utf8').toString('utf8')!==value || !['persistent','session-only'].includes(persistence))return {outcome:'unavailable',status:this.#failure('invalid-request')};
     const blocked=this.#blocked();if(blocked)return {outcome:'unavailable',status:blocked};
     const id=randomUUID();const epoch=this.#epoch;
     if(persistence==='session-only') {
-      if(this.#session.size>=256 || this.#sessionBytes+Buffer.byteLength(value)>1024*1024)return {outcome:'unavailable',status:unavailable('storage-failed')};
+      if(this.#session.size>=256 || this.#sessionBytes+Buffer.byteLength(value)>1024*1024)return {outcome:'unavailable',status:this.#failure('storage-failed')};
       const bytes=Buffer.from(value);this.#session.set(id,{owner:{...owner},value:bytes});this.#sessionBytes+=bytes.length;
       return {outcome:'stored',reference:{id,mode:'session-only'}};
     }
-    const status=this.status();if(this.#reconciling)return {outcome:'unavailable',status:unavailable('storage-failed')};if(status.state!=='available')return {outcome:'unavailable',status};
+    const status=this.status();if(this.#reconciling)return {outcome:'unavailable',status:this.#failure('storage-failed')};if(status.state!=='available')return {outcome:'unavailable',status};
     let ciphertext:Buffer;
-    try {ciphertext=this.#adapter.encrypt(JSON.stringify({schemaVersion:1,referenceId:id,...owner,valueBase64:Buffer.from(value,'utf8').toString('base64')}));}catch{return {outcome:'unavailable',status:unavailable('encryption-failed')};}
+    try {ciphertext=this.#adapter.encrypt(JSON.stringify({schemaVersion:1,referenceId:id,...owner,valueBase64:Buffer.from(value,'utf8').toString('base64')}));}catch{return {outcome:'unavailable',status:this.#failure('encryption-failed')};}
     const filename=this.#path(id);const staging=`${filename}.${randomUUID()}.tmp`;
     let published=false;
     try {
@@ -147,7 +152,7 @@ export class SecretStore {
       if(published)await unlink(filename).catch(()=>{});
       await unlink(staging).catch(()=>{});
       await this.#references.delete(id).catch(()=>{});
-      return {outcome:'unavailable',status:unavailable(this.#fresh(epoch)?'storage-failed':'cancelled')};
+      return {outcome:'unavailable',status:this.#failure(this.#fresh(epoch)?'storage-failed':'cancelled')};
     } finally {ciphertext.fill(0);}
   }
   use(reference:SecretReference,owner:SecretOwner,consumer:(secret:string,signal:AbortSignal)=>Promise<void>):Promise<UseResult> {
@@ -155,22 +160,22 @@ export class SecretStore {
     void operation.then(()=>{this.#uses.delete(operation);},()=>{this.#uses.delete(operation);});return operation;
   }
   async #use(reference:SecretReference,owner:SecretOwner,consumer:(secret:string,signal:AbortSignal)=>Promise<void>):Promise<UseResult> {
-    if(!uuid.test(reference.id) || !validOwner(owner) || !['session-only','secure-persistent'].includes(reference.mode))return {outcome:'unavailable',status:unavailable('invalid-request')};
+    if(!uuid.test(reference.id) || !validOwner(owner) || !['session-only','secure-persistent'].includes(reference.mode))return {outcome:'unavailable',status:this.#failure('invalid-request')};
     const blocked=this.#blocked();if(blocked)return {outcome:'unavailable',status:blocked};
-    if(this.#busy.has(reference.id))return {outcome:'unavailable',status:unavailable('unavailable')};
+    if(this.#busy.has(reference.id))return {outcome:'unavailable',status:this.#failure('unavailable')};
     reference={...reference};owner={...owner};
-    if([...this.#leases.values()].reduce((sum,leases)=>sum+leases.size,0)>=128)return {outcome:'unavailable',status:unavailable('unavailable')};
+    if([...this.#leases.values()].reduce((sum,leases)=>sum+leases.size,0)>=128)return {outcome:'unavailable',status:this.#failure('unavailable')};
     const epoch=this.#epoch;const controller=new AbortController();const leases=this.#leases.get(reference.id)??new Set();leases.add(controller);this.#leases.set(reference.id,leases);
     try {
       let value:string;
       if(reference.mode==='session-only') {
-        const session=this.#session.get(reference.id);if(!session || !sameOwner(session.owner,owner))return {outcome:'unavailable',status:unavailable('not-found')};
+        const session=this.#session.get(reference.id);if(!session || !sameOwner(session.owner,owner))return {outcome:'unavailable',status:this.#failure('not-found')};
         value=session.value.toString('utf8');
       } else {
         const status=this.status();if(status.state!=='available')return {outcome:'unavailable',status};
         const record=await this.#references.get(reference.id);
-        if(!record || !validRecord(record,reference.id,owner))return {outcome:'unavailable',status:unavailable('not-found')};
-        if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:unavailable('cancelled')};
+        if(!record || !validRecord(record,reference.id,owner))return {outcome:'unavailable',status:this.#failure('not-found')};
+        if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:this.#failure('cancelled')};
         const file=await open(this.#path(reference.id),constants.O_RDONLY|constants.O_NOFOLLOW);
         let ciphertext:Buffer;
         try {
@@ -178,6 +183,7 @@ export class SecretStore {
           ciphertext=await file.readFile();
         }finally{await file.close();}
         try {
+          if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:this.#failure('cancelled')};
           const envelope=encryptedEnvelopeSchema.parse(JSON.parse(this.#adapter.decrypt(ciphertext)));
           if(envelope.referenceId!==reference.id || !sameOwner(envelope,owner))throw new Error();
           const decoded=Buffer.from(envelope.valueBase64,'base64');
@@ -185,10 +191,10 @@ export class SecretStore {
           finally {decoded.fill(0);}
         }finally{ciphertext.fill(0);}
       }
-      if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:unavailable('cancelled')};
+      if(!this.#fresh(epoch) || controller.signal.aborted || this.#busy.has(reference.id))return {outcome:'unavailable',status:this.#failure('cancelled')};
       await consumer(value,controller.signal);
-      return this.#fresh(epoch) && !controller.signal.aborted?{outcome:'used'}:{outcome:'unavailable',status:unavailable('cancelled')};
-    } catch {return {outcome:'unavailable',status:unavailable('unavailable')};}
+      return this.#fresh(epoch) && !controller.signal.aborted?{outcome:'used'}:{outcome:'unavailable',status:this.#failure('cancelled')};
+    } catch {return {outcome:'unavailable',status:this.#failure('unavailable')};}
     finally {leases.delete(controller);if(!leases.size)this.#leases.delete(reference.id);}
   }
   delete(reference:SecretReference,owner:SecretOwner):Promise<DeleteResult> {
@@ -196,22 +202,22 @@ export class SecretStore {
     void operation.then(()=>{this.#deletions.delete(operation);},()=>{this.#deletions.delete(operation);});return operation;
   }
   async #delete(reference:SecretReference,owner:SecretOwner):Promise<DeleteResult> {
-    if(this.#closed || !uuid.test(reference.id) || !validOwner(owner) || this.#busy.has(reference.id))return {outcome:'unavailable',status:unavailable('invalid-request')};
+    if(this.#closed || !uuid.test(reference.id) || !validOwner(owner) || this.#busy.has(reference.id))return {outcome:'unavailable',status:this.#failure('invalid-request')};
     reference={...reference};owner={...owner};
     this.#busy.add(reference.id);
     try {
       const session=this.#session.get(reference.id);
       if(reference.mode==='session-only') {
-        if(!session || !sameOwner(session.owner,owner))return {outcome:'unavailable',status:unavailable('not-found')};
+        if(!session || !sameOwner(session.owner,owner))return {outcome:'unavailable',status:this.#failure('not-found')};
         for(const lease of this.#leases.get(reference.id)??[])lease.abort();
         this.#sessionBytes-=session.value.length;session.value.fill(0);this.#session.delete(reference.id);return {outcome:'deleted'};
       }
-      if(reference.mode!=='secure-persistent')return {outcome:'unavailable',status:unavailable('invalid-request')};
-      const record=await this.#references.get(reference.id);if(!record || !validRecord(record,reference.id,owner))return {outcome:'unavailable',status:unavailable('not-found')};
+      if(reference.mode!=='secure-persistent')return {outcome:'unavailable',status:this.#failure('invalid-request')};
+      const record=await this.#references.get(reference.id);if(!record || !validRecord(record,reference.id,owner))return {outcome:'unavailable',status:this.#failure('not-found')};
       for(const lease of this.#leases.get(reference.id)??[])lease.abort();
       await unlink(this.#path(reference.id)).catch((error:unknown)=>{if(!(error && typeof error==='object' && 'code' in error && error.code==='ENOENT'))throw new Error();});
       await this.#directory.sync();await this.#references.delete(reference.id);return {outcome:'deleted'};
-    } catch {return {outcome:'unavailable',status:unavailable('storage-failed')};}
+    } catch {return {outcome:'unavailable',status:this.#failure('storage-failed')};}
     finally {this.#busy.delete(reference.id);}
   }
   setLocked(locked:boolean,options:{clearSession?:boolean}={}):void {

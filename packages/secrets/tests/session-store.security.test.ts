@@ -1,5 +1,6 @@
 import { afterEach,expect,it,vi } from 'vitest';
-import { mkdtemp,rm,readdir } from 'node:fs/promises';
+import { mkdtemp,rm,readdir,open } from 'node:fs/promises';
+import type { FileHandle } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomBytes,createCipheriv,createDecipheriv } from 'node:crypto';
@@ -60,7 +61,7 @@ it('fresh-checks immediately before consumer dispatch even without a state notif
   const access:SecretSessionAccess={state:()=>stream.state(),subscribe:listener=>{listener(stream.state());return ()=>{};}};
   const f=await fixture({access,set:()=>{},listeners:new Set()}),ref=await reference(f,'persistent'),decrypt=f.api.decryptString;
   f.api.decryptString=value=>{const text=decrypt(value);time+=2500;return text;};const consumer=vi.fn(async()=>{});
-  expect(await f.store.use(ref,owner,consumer)).toMatchObject({outcome:'unavailable',status:{reason:'cancelled'}});expect(consumer).not.toHaveBeenCalled();
+  expect(await f.store.use(ref,owner,consumer)).toMatchObject({outcome:'unavailable',status:{reason:'session-unavailable',sessionOnlyAvailable:false}});expect(consumer).not.toHaveBeenCalled();
   expect(f.store.status()).toMatchObject({state:'unavailable',reason:'session-unavailable',sessionOnlyAvailable:false,remediationAction:'retry-session'});
 });
 it('rejects a failed subscription despite an eligible read, and unsubscribes on close',async()=>{
@@ -68,11 +69,11 @@ it('rejects a failed subscription despite an eligible read, and unsubscribes on 
   const f=await fixture(session);expect(await f.store.store(owner,'synthetic-test-credential','session-only')).toMatchObject({outcome:'unavailable',status:{reason:'session-unavailable'}});
   const healthy=await fixture();expect(healthy.session.listeners.size).toBe(1);await healthy.store.close();expect(healthy.session.listeners.size).toBe(0);expect(healthy.store.status()).toMatchObject({state:'unavailable',sessionOnlyAvailable:false});
 });
-it('cancels and removes a persistent write whose metadata settles after session loss',async()=>{
+it.each(['locked','inactive','unavailable'] as const)('cancels and removes a persistent write whose metadata settles after %s',async state=>{
   const f=await fixture();let release!:(record:SecretReferenceRecord)=>void,record:SecretReferenceRecord|undefined;
   f.refs.put=value=>{record=value;f.records.set(value.id,value);return new Promise(resolve=>{release=resolve;});};
   const pending=f.store.store(owner,'synthetic-test-credential','persistent');while(!release)await new Promise(resolve=>setImmediate(resolve));
-  f.session.set('unavailable');release(record!);expect(await pending).toMatchObject({outcome:'unavailable',status:{reason:'cancelled'}});
+  f.session.set(state);release(record!);expect(await pending).toMatchObject({outcome:'unavailable',status:{reason:state==='locked'?'locked':'session-unavailable',sessionOnlyAvailable:false}});
   expect(f.records.size).toBe(0);expect(await readdir(join(f.root,'secrets'))).toEqual([]);
 });
 
@@ -95,4 +96,21 @@ it('coalesces a close reentered synchronously by a consumer abort callback',asyn
   });
   while(!entered)await new Promise(resolve=>setImmediate(resolve));
   const closing=f.store.close();expect(nested).toBe(closing);await closing;expect(await pending).toMatchObject({outcome:'unavailable'});
+});
+
+it('denial during blob IO prevents decrypt and consumer dispatch, clears ciphertext and returns current denied status',async()=>{
+  for(const state of ['locked','inactive','unavailable'] as const){
+    const f=await fixture(),ref=await reference(f,'persistent');
+    const probe=await open(join(f.root,'prototype-probe'),'w',0o600),prototype=Object.getPrototypeOf(probe) as FileHandle;await probe.close();
+    const original=prototype.readFile;let ciphertext:Buffer|undefined;
+    const read=vi.spyOn(prototype,'readFile').mockImplementation(async function(this:FileHandle,...args:Parameters<FileHandle['readFile']>){
+      const value=await original.apply(this,args);if(Buffer.isBuffer(value)){ciphertext=value;f.session.set(state);}return value;
+    });
+    const consumer=vi.fn(async()=>{});vi.mocked(f.api.decryptString).mockClear();
+    try {
+      expect(await f.store.use(ref,owner,consumer)).toMatchObject({outcome:'unavailable',status:{reason:state==='locked'?'locked':'session-unavailable',sessionOnlyAvailable:false}});
+      expect(f.api.decryptString).not.toHaveBeenCalled();expect(consumer).not.toHaveBeenCalled();
+      expect(ciphertext?.length).toBeGreaterThan(0);expect(ciphertext?.every(byte=>byte===0)).toBe(true);
+    }finally{read.mockRestore();}
+  }
 });

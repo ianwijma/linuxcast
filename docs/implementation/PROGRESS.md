@@ -106,3 +106,16 @@ native alternate/final-row observer coverage, immutable guestbuild and reviewed
 namespace/outershutdown, then actual supported native attempts. PR80 remains draft;
 F3PR81/F2diagnosticsPR82 remain unchanged drafts, no merge/acceptance promotion.
 Full97tasks/R1-03 local1.0 scope and all physical/native/release gates remain.
+
+
+F2 coordinator checkpoint signedf18efab, signature/hash/source verified; independent
+Standards review clean, Security/Spec2P2 found: decrypt after lock duringblobIO and
+cancelled status offering session-only whiledenied. Both fixed directly, with
+90mappedsecurity passing: fresh/abort/deletion guard before decrypt within cipher
+cleanup finally; operation errors prefer current denied status. Regression injects
+locked/inactive/unavailable after actual private blob read, proves zero decrypt/
+consumer and cleared cipher; persistent-write statuses covered. No final clean
+Spec recheck inferred. Runtime startup/retry/suspend/ordered service shutdown,
+actual provider predispatch and credentialsetup/status UI remain next. F1 parent
+now prepares v2 exactalternate/final119 identities and End checkpoint independently;
+no native lab/display/reader execution. All acceptance/full1.0 scope unchanged.
