@@ -8,7 +8,7 @@ import { DATA_SETTINGS_URL } from './assets.ts';
 import { restrictContents, securePreferences } from './security.ts';
 import { saveDataExport } from './data-export.ts';
 import type { ResidentService } from './lifecycle.ts';
-const labels={settings:'Settings','command-usage':'Command usage','ai-conversations':'AI conversations','file-index':'File index'} as const;
+const labels={settings:'Settings','command-usage':'Command usage','ai-conversations':'AI conversations','file-index':'File index','application-logs':'Application logs','tool-diagnostics':'Tool diagnostics'} as const;
 export interface DataSettingsOptions {
   resourcesDirectory:string;
   exportCategory(category:DataSettingsExportCategory,signal:AbortSignal):Promise<unknown>;
@@ -44,13 +44,14 @@ export function createDataSettings(options:DataSettingsOptions):ResidentService&
           await saveDataExport(choice.filePath,value,signal);return {ok:true,value:{outcome:'saved'}};
         }
         const category=dataSettingsClearSchema.parse(payload).category;
-        const detail=category==='command-usage'?'Usage counts and last-used times will be removed. Pins and aliases stay.':category==='file-index'?'Indexed metadata will be removed. Selected folders and original files stay.':'Conversations and their message revisions will be deleted. Other categories stay.';
+        const detail=category==='command-usage'?'Usage counts and last-used times will be removed. Pins and aliases stay.':category==='file-index'?'Indexed metadata will be removed. Selected folders and original files stay.':category==='application-logs'?'Only application log metadata will be removed. Tool diagnostics and other data stay. New events may appear after clearing.':category==='tool-diagnostics'?'Only tool diagnostic metadata will be removed. Application logs and other data stay. New events may appear after clearing.':'Conversations and their message revisions will be deleted. Other categories stay.';
         const choice=await dialog.showMessageBox(owner,{type:'warning',title:`Clear ${labels[category].toLowerCase()}?`,message:`Clear ${labels[category].toLowerCase()}?`,
           detail:`${detail} Existing backups may still contain earlier data. This does not securely erase disk contents.`,buttons:['Cancel','Clear data'],defaultId:0,cancelId:0,noLink:true});
         if(choice.response!==1||!alive(owner))return cancelled();
         await options.clearCategory(category,signal);return {ok:true,value:{outcome:'cleared'}};
       }catch(error){
         if(error&&typeof error==='object'&&'reasonCode'in error&&error.reasonCode==='export-too-large')return failed('This category is too large for a single export.');
+        if(error&&typeof error==='object'&&'reasonCode'in error&&error.reasonCode==='diagnostics-unavailable')return failed('Diagnostics are unavailable. Clear only this diagnostic category to reset unreadable records, or quit and reopen Linuxcast after checking local storage.');
         return failed('The data action could not be completed. Check the category before trying again.');
       }
     };

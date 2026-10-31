@@ -12,8 +12,12 @@ import { createWorkflowEditorWorkspace } from './workflow-editor.ts';
 import { createApplications } from '@linuxcast/applications';
 import { createFileSearchService } from '@linuxcast/file-search/service';
 import { createFileSearchWorkspace } from './file-search.ts';
-import { DataControls } from '@linuxcast/data-controls';
+import { DataControls,ManagedDiagnostics } from '@linuxcast/data-controls';
 import { createDataSettings } from './data-settings.ts';
+import { createPermissionSettings } from './permission-settings.ts';
+import { PermissionRegistry } from '../../../../packages/permissions/src/registry.ts';
+import { createHash } from 'node:crypto';
+import { stableWorkflowJson } from '../../../../packages/storage/src/workflow-editor-json.ts';
 import { app,clipboard,dialog,BrowserWindow } from 'electron';
 import { createClipboardWriter } from './clipboard-write.ts';
 import { isAbsolute, join } from 'node:path';
@@ -25,6 +29,7 @@ let notes:ReturnType<typeof createNotesWorkspace>|undefined;
 let workflowEditor:ReturnType<typeof createWorkflowEditorWorkspace>|undefined;
 let fileSearch:ReturnType<typeof createFileSearchWorkspace>|undefined;
 let dataSettings:ReturnType<typeof createDataSettings>|undefined;
+let permissionSettings:ReturnType<typeof createPermissionSettings>|undefined;
 let storage:ReturnType<typeof startStorage>|undefined;
 let applications:ReturnType<typeof createApplications>|undefined;
 const copyText=createClipboardWriter(clipboard,()=>process.env.XDG_SESSION_TYPE==='x11'&&!!process.env.DISPLAY || process.env.XDG_SESSION_TYPE==='wayland'&&!!process.env.WAYLAND_DISPLAY);
@@ -119,16 +124,26 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   openNotes:async()=>{if(!notes)throw new Error('Notes unavailable.');await notes.open();},
   openQuickNote:async()=>{if(!notes)throw new Error('Notes unavailable.');await notes.quickNote();},
   openFileSearch:async()=>{if(!fileSearch)throw new Error('File search unavailable.');await fileSearch.open();},
-  openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();}, createServices: () => {
+  openDataSettings:async()=>{if(!dataSettings)throw new Error('Local data workspace unavailable.');await dataSettings.open();},
+  openPermissionSettings:async()=>{if(!permissionSettings)throw new Error('Saved permissions unavailable.');await permissionSettings.open();}, createServices: () => {
   const dataHome = process.env.XDG_DATA_HOME;
   const directory = join(dataHome && isAbsolute(dataHome) ? dataHome : join(app.getPath('home'), '.local/share'), 'linuxcast');
   applications=createApplications({helperPath:join(__dirname,'platform')});
   const currentStorage = startStorage(__dirname, directory, app.getVersion());
   storage = currentStorage;
+  const permissionRegistry=new PermissionRegistry(currentStorage.repository);
+  permissionSettings=createPermissionSettings({resourcesDirectory:__dirname,registry:permissionRegistry,isReady:currentStorage.isReady,
+    async workflowName(principal){
+      const record=await currentStorage.repository.request('workflows.editor.get',{}),definition=record?.saved;
+      return principal.kind==='workflow'&&definition&&definition.id===principal.id&&definition.version===principal.version&&
+        createHash('sha256').update(stableWorkflowJson(definition)).digest('hex')===principal.integrity ? definition.name : undefined;
+    },
+  });
+  const currentPermissions=permissionSettings;
   app.once('browser-window-created', (_event, window) => {
     window.webContents.once('did-finish-load', () => currentStorage.confirmLaunch());
   });
-  workflowEditor=createWorkflowEditorWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,repository:currentStorage.repository,copyText,
+  workflowEditor=createWorkflowEditorWorkspace({resourcesDirectory:__dirname,isReady:currentStorage.isReady,repository:currentStorage.repository,permissions:permissionRegistry,copyText,
     load:()=>currentStorage.repository.request('workflows.editor.get',{}),
     write:input=>currentStorage.repository.request('workflows.editor.write',input),
   });
@@ -149,6 +164,8 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   const currentNotes=notes;
   const controls=new DataControls(currentStorage.repository);
+  const stateHome=process.env.XDG_STATE_HOME;
+  const diagnostics=new ManagedDiagnostics(join(stateHome&&isAbsolute(stateHome)?stateHome:join(app.getPath('home'),'.local/state'),'linuxcast'));
   const fileService=createFileSearchService({
     repository:{async request(method,params){if(!currentStorage.isReady())throw new Error('File search storage unavailable.');return currentStorage.repository.request(method,params,{timeoutMs:1000});}},
     controls,executable:join(__dirname,'platform'),
@@ -157,11 +174,13 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   const currentFiles=fileSearch;
   dataSettings=createDataSettings({resourcesDirectory:__dirname,isReady:currentStorage.isReady,
     async exportCategory(category,signal){
+      if(category==='application-logs'||category==='tool-diagnostics')return diagnostics.export(category,signal);
       const result=await controls.export({category},{signal});
       if(result.outcome!=='exported')throw {reasonCode:result.reason};
       return {schemaVersion:1,format:result.format,encrypted:result.encrypted,data:result.data};
     },
     async clearCategory(category,signal){
+      if(category==='application-logs'||category==='tool-diagnostics')return diagnostics.clear(category,signal);
       try {
         const result=await controls.clear({category},{signal});
         if(result.outcome!=='completed')throw new Error('Local data action interrupted.');
@@ -173,7 +192,7 @@ startResidentShell({ resourcesDirectory: __dirname,rates,dictionary:createInstal
   });
   const currentSettings=dataSettings;
   // Index jobs and data operations must finish while their sole repository owner is still alive.
-  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop()]);await currentStorage.stop();},
-    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate()]);await currentStorage.terminate();}};
-  return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow,currentNotes];
+  const orderedStorage={async stop(){await Promise.all([currentFiles.stop(),currentSettings.stop(),currentWorkflow.stop(),currentNotes.stop(),currentPermissions.stop()]);await permissionRegistry.close();await diagnostics.close();await currentStorage.stop();},
+    async terminate(){await Promise.all([currentFiles.terminate(),currentSettings.terminate(),currentWorkflow.terminate(),currentNotes.terminate(),currentPermissions.terminate()]);await diagnostics.close();await currentStorage.terminate();await permissionRegistry.close();}};
+  return [orderedStorage,currentFiles,dataSettings,applications,currentWorkflow,currentNotes,currentPermissions];
 } });

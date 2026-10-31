@@ -16,7 +16,8 @@
     ],
     "F1-02": [
       "apps/desktop/src/main/lifecycle.test.ts",
-      "apps/desktop/src/main/shell.test.ts"
+      "apps/desktop/src/main/shell.test.ts",
+      "apps/desktop/tests/at/driver_guards.test.ts"
     ],
     "D1-02": [
       "packages/ui/src/views/session.test.ts",
@@ -122,6 +123,11 @@
       "packages/builtins/dictionary/tests/spelling-source.test.ts",
       "packages/builtins/dictionary/tests/native-spelling.test.ts",
       "packages/builtins/dictionary/tests/spelling-wrapper.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/screen-controller.test.ts",
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/features/launcher/tests/permission-catalogue.test.ts"
     ]
   },
   "contracts": {
@@ -202,6 +208,9 @@
       "packages/contracts/tests/emoji-keywords.contract.test.ts",
       "packages/contracts/tests/emoji-frecency.contract.test.ts",
       "packages/contracts/tests/dictionary-spelling.contract.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/permission-settings.contract.test.ts"
     ]
   },
   "ui": {
@@ -278,7 +287,8 @@
       "packages/storage/tests/rate-cache.integration.test.ts"
     ],
     "F1-02": [
-      "apps/desktop/tests/shell.integration.test.ts"
+      "apps/desktop/tests/shell.integration.test.ts",
+      "apps/desktop/tests/shell-accessibility.integration.test.ts"
     ],
     "L2-01": [
       "packages/file-index/tests/index.integration.test.ts",
@@ -348,6 +358,13 @@
       "apps/desktop/tests/emoji-frecency.integration.test.ts",
       "apps/desktop/tests/dictionary-spelling.integration.test.ts",
       "packages/builtins/dictionary/tests/spelling-native.integration.test.ts"
+    ],
+    "F3-01": [
+      "apps/desktop/tests/permissions.integration.test.ts",
+      "apps/desktop/tests/workflow-run.integration.test.ts"
+    ],
+    "F2-02": [
+      "apps/desktop/tests/diagnostics.integration.test.ts"
     ]
   },
   "security": {
@@ -368,13 +385,17 @@
       "apps/desktop/src/main/assets.test.ts",
       "apps/desktop/src/main/security.test.ts",
       "apps/desktop/src/main/ipc.test.ts",
-      "apps/desktop/src/preload/api.test.ts"
+      "apps/desktop/src/preload/api.test.ts",
+      "apps/desktop/tests/at-preparation.security.test.ts"
     ],
     "F3-01": [
       "packages/storage/tests/permissions.integration.test.ts",
       "packages/permissions/tests/broker.security.test.ts",
       "packages/permissions/tests/pagination.security.test.ts",
-      "packages/permissions/tests/persistence.security.test.ts"
+      "packages/permissions/tests/persistence.security.test.ts",
+      "packages/permissions/tests/registry.security.test.ts",
+      "apps/desktop/src/permission-preload/api.test.ts",
+      "apps/desktop/src/main/permission-settings.test.ts"
     ],
     "F2-02": [
       "packages/storage/tests/secrets.integration.test.ts",
@@ -386,6 +407,8 @@
       "packages/data-controls/tests/controls.security.test.ts",
       "packages/data-controls/tests/controller.security.test.ts",
       "packages/data-controls/tests/persistence.security.test.ts",
+      "packages/data-controls/tests/managed-diagnostics.security.test.ts",
+      "apps/desktop/src/main/data-settings.test.ts",
       "packages/secrets/tests/session.security.test.ts",
       "packages/secrets/tests/session-stream.security.test.ts",
       "packages/secrets/tests/session-client.security.test.ts",

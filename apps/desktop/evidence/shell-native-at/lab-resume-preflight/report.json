@@ -1,0 +1,69 @@
+{
+  "scope": "Fresh guest preflight only; no display, reader or product test started",
+  "startedAtUtc": "2026-10-31T11:05:36.249396+00:00",
+  "container": "linuxcast-native-lab-v4",
+  "nativeRuns": 0,
+  "guest": {
+    "observedAtUtc": "2026-10-31T11:06:10.725043+00:00",
+    "uid": 1000,
+    "debianVersion": "13.7",
+    "kernel": "6.12.113+deb13-cloud-amd64",
+    "packages": {
+      "orca": "48.1-1+deb13u2",
+      "at-spi2-core": "2.56.2-1+deb13u2",
+      "python3-gi": "3.50.0-4+b1",
+      "python3-pyatspi": "2.46.1-1",
+      "python3-dbus": "1.4.0-1",
+      "speech-dispatcher": "0.12.0-5",
+      "xvfb": "2:21.1.16-1.3+deb13u4",
+      "xauth": "1:1.1.2-1.1",
+      "xdotool": "1:3.20160805.1-5.1"
+    },
+    "orcaSourceHashes": {
+      "scripts/default.py": "a00ffb60f6bea89094bb4f493bc17096254f2a7a3546241f10958db27efb5eb3",
+      "scripts/web/script.py": "ac044208aeeb138cb4a8ddf46e8aecd98edde3ef59e0f2135a64e859cb07aee5",
+      "settings.py": "48dc0833fae4e5c908496ecd92a406c8a0bae399e233f4623c3c4797c7f239ce",
+      "settings_manager.py": "c2a7534b6881cc920959e1fa151c7c38d3b5b7c3533b10378f2f5d5358e35a85",
+      "backends/json_backend.py": "ec485b5da86a9af816a51515da5b90c09edc00850ff58622bf8b4fb6fd021042",
+      "speech.py": "88ef3fb73c8984968c71460af8410344384e4f73ea4cf022e9015589ed38c5a4",
+      "speechserver.py": "bc966bdff543dd5877c0961c091446e3f25e6d31fe49dd5e23c30049a2e2f33a",
+      "speechdispatcherfactory.py": "47f584dfeb47a0988a7bd34586d29f7c45bbd2ffaba3dfa9ea9798d82622d7e6",
+      "ssml.py": "0bb7896a48b4ce4cad8e73b52c263efa856105bb2d802dd2f181d6bffe4f293f",
+      "input_event.py": "953665d9129070a901cccc73ab6f16365ebadf4cce517dd0112bc7ae85575185",
+      "speech_and_verbosity_manager.py": "7194efaffd8a75c5955a64f7936050661fc7c052fd13634bbe4b96f673cbc290",
+      "debug.py": "ca2159aba7c42282b65235e493c67f092b893fc0b7e9b00c602a4705c995ffd8",
+      "ax_utilities_debugging.py": "c21b12c5e7ff1fa5120f9073f3b2a9478826623fed581279c2e77b267a3c6482"
+    },
+    "ownedProcessCounts": {
+      "gnome-shell": 0,
+      "kwin_wayland": 0,
+      "kwin_x11": 0,
+      "Xvfb": 0,
+      "electron": 0,
+      "orca": 0,
+      "node": 0,
+      "dbus-daemon": 0,
+      "dbus-broker": 0,
+      "at-spi2-registr": 0,
+      "speech-dispatch": 0
+    },
+    "privateTestRootsPresent": {
+      "linuxcast-s001-at-bus-": false,
+      "linuxcast-launcher-at-": false,
+      "linuxcast-f102-at-": false,
+      "xvfb-run.": false
+    },
+    "inputLabMarkerPresent": false,
+    "optionalInputService": {
+      "enabledState": "not-found",
+      "activeState": "inactive"
+    },
+    "productTestStarted": false
+  },
+  "orcaSourceMatchesHistoricalBaseline": true,
+  "cleanBaseline": true,
+  "shutdownRequestAccepted": true,
+  "containerExit": "0",
+  "finalContainerState": "exited 0 0",
+  "finishedAtUtc": "2026-10-31T11:06:13.696757+00:00"
+}

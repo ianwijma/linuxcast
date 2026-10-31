@@ -25,7 +25,7 @@ import { dispatchQuicklinks,QuicklinkRepositoryError } from '@linuxcast/quicklin
 import { QUICKLINK_STORAGE_METHODS } from '../../contracts/src/quicklinks.ts';
 import type { QuicklinkStorageMethod,QuicklinkStorageMethods } from '../../contracts/src/quicklinks.ts';
 import type { DecisionRecord } from '@linuxcast/platform-contracts/permissions';
-import { listPermissionDecisions, putPermissionDecision, revokePermissionDecision } from './permissions.ts';
+import { listPermissionDecisions, putPermissionDecision, revokePermissionDecision, inventoryPermissionDecisions, revokeSelectedPermission } from './permissions.ts';
 import { conversationRecordSchema, messageRevisionRecordSchema, parseContract, parseRepositoryRequest,
   MAX_ENVELOPE_BYTES, uiTextSchema } from '../../contracts/src/index.ts';
 import type { MessageRevisionRecord } from '../../contracts/src/index.ts';
@@ -47,6 +47,8 @@ export interface StorageMethods extends NotesRootStorageMethods,FileIndexMethods
   'secretRefs.delete': {params: {id: string}; result: boolean};
   'secretRefs.list': {params: {afterId?: string; limit: number}; result: {records: SecretReferenceRecord[]; nextCursor: string | null}};
   'permissions.list': { params: {principalKey: string; afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string | null} };
+  'permissions.inventory': {params: {afterId?: string; limit: number}; result: {records: DecisionRecord[]; nextCursor: string|null}};
+  'permissions.revokeSelected': {params: {record: DecisionRecord}; result: 'removed'|'changed'|'missing'};
   'permissions.put': { params: {record: DecisionRecord}; result: DecisionRecord };
   'permissions.revoke': { params: {id: string}; result: boolean };
   'rates.cache.get': {params:{base:string;quote:string};result:RateSnapshot|null};
@@ -66,7 +68,7 @@ export interface StorageMethods extends NotesRootStorageMethods,FileIndexMethods
   'ai.messages.list': { params: {conversationId: string; afterId?: string; limit: number}; result: MessageRevisionRecord[] };
 }
 export type StorageMethod = keyof StorageMethods;
-export const STORAGE_METHODS: readonly StorageMethod[] = [...NOTES_STORAGE_METHODS,'notes.searchRoot',...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'rates.cache.get','rates.cache.put','rates.cache.clear', 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
+export const STORAGE_METHODS: readonly StorageMethod[] = [...NOTES_STORAGE_METHODS,'notes.searchRoot',...JOURNAL_METHODS,...FILE_INDEX_METHODS,...QUICKLINK_STORAGE_METHODS, 'rates.cache.get','rates.cache.put','rates.cache.clear', 'workflows.editor.get', 'workflows.editor.write', 'dataControls.clear', 'dataControls.export', 'secretRefs.get', 'secretRefs.put', 'secretRefs.delete', 'secretRefs.list', 'permissions.list', 'permissions.inventory', 'permissions.revokeSelected', 'permissions.put', 'permissions.revoke', 'settings.get', 'settings.set', 'commands.recordUse', 'commands.getUsage', 'commands.setPinned', 'commands.setAlias', 'commands.listHidden', 'commands.setHidden',
   'ai.conversations.get', 'ai.conversations.put', 'ai.messages.appendRevision', 'ai.messages.list'];
 function object(value: unknown, required: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new StorageError('invalid-request');
@@ -142,6 +144,8 @@ export class Repositories {
       case 'secretRefs.delete': return db.prepare('DELETE FROM secret_references WHERE id=?').run((input as StorageMethods['secretRefs.delete']['params']).id).changes !== 0;
       case 'secretRefs.list': return listSecretReferences(db, input as StorageMethods['secretRefs.list']['params']);
       case 'permissions.list': return listPermissionDecisions(db, input as StorageMethods['permissions.list']['params']);
+      case 'permissions.inventory': return inventoryPermissionDecisions(db, input as StorageMethods['permissions.inventory']['params']);
+      case 'permissions.revokeSelected': return revokeSelectedPermission(db, (input as StorageMethods['permissions.revokeSelected']['params']).record);
       case 'permissions.put': return putPermissionDecision(db, (input as StorageMethods['permissions.put']['params']).record);
       case 'permissions.revoke': return revokePermissionDecision(db, (input as StorageMethods['permissions.revoke']['params']).id);
       case 'rates.cache.get': return getCachedRate(db,input as StorageMethods['rates.cache.get']['params']);

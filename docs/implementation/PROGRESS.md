@@ -1,121 +1,67 @@
-# Coordinator checkpoint —31October2026
+# Coordinator checkpoint — 1 November 2026
 
-Complete local1.0 goal active and unfinished. New coordinator bounded F2-02
-credential/session integration in isolated /home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
-codex/f2-02-credential-storage, freshbase developf461a87. F2-01 prerequisite accepted.
-InstalledElectron45 types mark lock/unlock events darwin/win32 only. Do not pretend
-Linux credentials pause through those events. Frozen packages/secrets/SESSION-CONTRACT.md
-and src/session.ts define read-only GIO/logind helper frames and fail-closed main
-freshness gate;4synthetic tests and final mapped62security/typecheck/lint/plan pass, including
-clock-exception handling. No production integration, credential setup/status UI or
-actual session/keyring acceptance yet. No host desktop/input/device/bus accessed.
-Next: implement native observer in isolated child with new-file ownership, then
-coordinator client/lifecycle and actual secure/session-only credential/status flows;
-independently review before production use, verify supported sessions separately.
-Full task/native/provider scope remains mandatory, not replaced by the policy tests.
+Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
+native desktop/AT, performance, packaging and publication gates remain required.
+Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.
+User requests prompt PR integration: close reviewed bounded increments on their
+own passing checks/reviews/CI, while retaining full task/release criteria. Do not
+hold reviewed increments for unrelated future feature work. No scope reduction.
 
-F2 diagnostics separate isolated /home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls,
-codex/f2-02-diagnostic-controls, final staged d4458886ee5bb0675a1063984a272a24256e8e7b.
-68security/1actual Electron5.93s/typecheck/lint/21Python/plan pass;5captures axe0.
-Initial independent Standards clean; Spec idle-retentionP2 fixed with serialized
-minute cleanup/drain/fake-clock regression; FIFO guard actual test passes. Small
-followups coordinator validated, not independently re-reviewed. No signedcommit/PR.
-Body /tmp/linuxcast-f2-diagnostics-pr.md ready. Credential/fullnative gates pending.
+All three PRs now MERGED into develop; GitHub open PR list verified empty:
+- PR82 https://github.com/ianwijma/linuxcast/pull/82 diagnostics, mergee568b4d61b88cdb48bd5a5626bb18ba1284edb4e. Signedheade31b3e5, CI41198787692 passed, no requestedreviews/comments. Initial independent Standards clean, Spec idle-retention fix and FIFO safety coordinator-validated.68security/actualElectron5.93s/5captures/type/lint/plan/21Python.
+- PR81 https://github.com/ianwijma/linuxcast/pull/81 Saved permissions, mergef4f5409c102ce1afa8c03c87dad411dfbc7dd76f. Signedheada1ffb88 integrates diagnostics while preserving both cleanup owners. Final core reviewc6b83bc5 clean.75unit/2contract/72F3security/68F2security/type/lint/plan plus3actualElectron scenarios17.02s+5.69s pass; CI41204589655 passed, no requestedreviews/comments. Historical captures preserved.
+- PR80 https://github.com/ianwijma/linuxcast/pull/80 shellzoom/native preparation, merge1b3efe1b5878057ee035914bff8e02e7c98a900b. Signedheadb17139d integrates both PRs.32F1unit/55F1security (53Python no skips)/68F2security/72F3security/type/lint/frozeninstall/plan/19hashes and5actualElectron scenarios18.11s+5.75s+17.90s pass. CI41205145467 passed, no requestedreviews/comments. Independent v2review41c3260 clean (plus30extra pure probes). New inspected dark/light integration captures separate from19restored incidental historical recaptures. Legacy command count now frozenbuiltins+1fixture, exact security assertions unchanged.
 
-F3 Saved permissions: /home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui,
-codex/f3-01-permissions-ui, signedinitial3d127ea plus staged finalsource/evidence.
-Independent final frozen c6b83bc5 review clean;75unit/2contract/72security/2actual
-Electron integrations/9captures pass. AC02/UI pending supported native/publication.
-Body /tmp/linuxcast-f3-permissions-pr.md ready. No incomplete-head publication.
+Current approved develop baseline1b3efe1 includes all three increments. Source
+integration is not task acceptance: F1UI, F2AC01/UI and F3AC02/UI stay pending;
+full native/generic consent/provider/release work remains. No product/Orca native
+runs:0, completion/delivery/audible false. Labv4 lastverified stoppedfalse/PID0/exit0.
+Next F1 native actions: immutableDebian source/build receipt, reviewed namespace
+and outer shutdown wrapper, actual native attempts; stronger alternate/final119
+observer IDs and15-stepv2 protocol already reviewed. No physicalinput authority.
 
-F1 parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
-codex/f1-02-shell-accessibility, draftPR80 https://github.com/ianwijma/linuxcast/pull/80,
-signedhead757ce20 plus staged observer/preflight/mapping.55security includes14offline
-Python tests; typecheck/lint/plan pass. Actual product native runs0. Fresh reserved
-Debian13.7/Orca48.1 preflight confirmed clean baseline/13sourcehashes; shutdown0/PID0.
-AT-controller/parser background worker in /home/ian/.t3/worktrees/linuxcast/t3-1c57ce87,
-codex/f1-02-native-at-controller; do not poll, completion wakes parent. No actual AT
-run until reviewed immutable controller/build/provenance/cleanup are ready.
+Next active implementation F2-02 credential setup/status and runtime:
+/home/ian/.t3/worktrees/linuxcast/f2-02-credential-storage,
+codex/f2-02-credential-storage, signed06373ba afterf18efab (not pushed/noPR).
+Nativeobserverd89d05e unchanged, productionreview clean; P3parent-death fixture
+strengthened6pure/35privatebus/nonrootpeer. Coordinator boundedstream/client and
+mandatorySecretStore session admission/abort/clear/drain implemented. Standards
+clean; Spec2P2 fixed: checkfresh afterblobIO/beforedecrypt, returncurrentdeniedstatus
+on operation failures.90security/type/lint/plan/hash pass; smallfixes parent-
+validated, no second clean finalSpec claim. Runtime startup/retry/suspend/ordered
+shutdown, actual provider predispatch and credentialsetup/status UI remain missing.
+Before new edits, update that branch from this approved integration checkpoint,
+resolve shared wiring without losing mergeddiagnostics/permissions, then complete
+one bounded credential flow and integrate promptly on its own gates.
 
-Normal1Password signing failed repeatedly; async user unlock/approve request is
-pending. Preserve signing config and staged work; no unsignedfallback, no further
-retries until response/statechange. Publication blocked; useful implementation
-continues, so fullgoal not blocked. Registry8done/20inprogress/69planned,
-56passed/325pending/8justifiedN/A. All97tasks/R1-03/fullplatform/security/physical/
-performance/package/publication scope remain required. All agents GPT6.1SOL/high.
-
-AT-controller delegation completed: /home/ian/.t3/worktrees/linuxcast/t3-1c57ce87,
-codex/f1-02-native-at-controller, stagedtree1f5fce5dbd1f1d4aca288a2eab5cda8712ccfe0d,
-14newfiles,26new+14frozenobserver tests/scopedTS/lint/plan pass. Signing timedout,
-no commit. Native runs0, labstoppedfalse/0/0. Read its controller-protocol.md and
-controller-preparation/README.md: missing fresh guestbuild/namespacewrapper,
-alternate/finalrow observerIDs, outer finally cleanup; independentreview required
-before actual attempt. Next dispatch independent Standards/Spec reviewers read-only
-on that frozen tree and observerfc0; implementationworker independently builds
-credential-session native module under packages/secrets/native only. Coordinator
-retains all CLI/lib/IPC/contracts/manifests/wiring/status. Do not poll background
-work; completion wakes parent. Fullgoal, F2/F1 acceptance unchanged.
-
-Signing recovered normally: signedF3 source dd2a20f/doc79f056a published draftPR81
-https://github.com/ianwijma/linuxcast/pull/81, PlanningCI41198685600 pass; signedF2
- diagnostics e31b3e5 published draftPR82 https://github.com/ianwijma/linuxcast/pull/82,
-PlanningCI41198787692 pass. No requested/submitted reviews/comments at inspection;
-notmerged due remaining acceptance. Prior unlock/failure notes are historical.
-Native observer d89d05eea1937616a6f3fa72b0079266a61fe1cd copied exactly into this
-worktree (12ownedfiles) alongsidefrozenpolicy6ed5dc0. No CLI/lib/productionwiring
-changes yet; needs independent review. Main Nodeclient was deferred to fix AT
-review3P1/2P2 inparentF1; current signedATsource292767a plusdescriptorfollowup,
-23unit/55security with48Python/2actualElectron17.76s/type/lint/plan pass. Native
-actualruns0. Next: independentfinalAT/security review plus nativecredentialreview,
-then Node boundedframing, freshadmission/predispatch checks, abort-onlock/stale/
-loss/suspend and verifiedshutdown before missingcredentialstatus/setupUI.
-Security design note: receipt-age alone must not accept buffered old unlocked
-frames after an event-loop/suspend gap. Check monotonic plus wall gap before
-consuming a batch, quarantine delayed/reordered/malformed streams, validate an
-entire received batch before notifying, and require a new trusted generation
-on transportfailure. No actual suspend or desktop lock proof exists yet.
+Parent worktree /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd now retains this local
+coordinator checkpoint atop approveddevelop; carry it into the next feature PR,
+no separate documentation PR needed. Other diagnostics/permissions worktrees remain
+available for evidence, with approved branches; no source revert or branch cleanup.
+Normal1Password signing works and user confirmedfixed; preserveconfiguration,
+no unsignedfallback. All new agents GPT6.1SOL/high. No active delegates/watches.
+Tools PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH
+(Node24.22.1/Bun1.4.4/Rust1.95). Optional inputservice disabled/stopped; no host
+bus/desktop/input action or real credential/provider call was performed.
 
 
-31October native observer review completed: no production defect in signed d89d05e.
-P3 parent-death fixture EOF/partial-validator gap fixed in coordinator copy only;
-separate writer stays open through original parent death, eligible observation
-precedes exit, exact helper reaped and shared strict validators applied.6pure/
-35privatebus/nonrootpeer plus offlineClippy/warnings/format pass. Historical child
-sources.sha256 unchanged; coordinator-review.json records the corrected fixture.
-No production CLI/lib/client/UI wiring yet; F2 acceptance unchanged.
+Active F2 component updated from local coordinator d595aed (approveddevelop1b3efe1).
+All source merged automatically; conflict resolution is only registry/checkpoint/
+runner union. Current bounded increment includes reviewed d89d05e native observer,
+f18efab coordinator framing/client/store/CLI and small reviewed-finding fixes06373ba.
+Preserve merged diagnostics/permissions/shell maps and all task criteria. Next:
+validate100mapped F2security plus native/build/link checks and unaffected F1/F3
+regressions, publish a focused component PR, inspect current checks/reviews and
+merge promptly. This has no renderer UI/new IPC/production credential flow yet;
+its concrete library and fixed native mode are prerequisites for that next flow.
+Full scope remains; do not call unsupported native desktop/session proof passed.
 
 
-31October coordinator credential continuation supersedes earlier no-client/glue
-statements. Fixed credential-session native CLI/library compiles; new bounded
-session-stream/client, mandatory SecretStore session admission/fresh callback
-checks, synchronous consumer abort, optional clear-on-denial, and coalesced
-reads/deletes/reconcile/writes drain before pinned-directory close implemented.
-87mappedsecurity/38platformRust tests, offlineClippy/type/lint/plan pass; native
-observer6pure/35privatebus/nonrootpeer checks remain synthetic. Current source
-pins/report: packages/secrets/evidence/session-integration/. Independent two-axis
-review of this new coordinator source is next. Main Electron startup/retry/
-suspend/ordered service lifecycle, actual provider predispatch, credentialsetup/
-status UI and supported native matrix remain missing. No production UI/route
-silently enabled, no actual credential/provider/host session operation performed.
-
-F1 final recheck of signed7310cee completed/read: Standards no actionable finding;
-Security/Spec both partial-scan P1 and post-launch undercount P2 resolved, no new
-blocking defect in bounded scope.55mappedsecurity/50Python/19hashes/observerpins/
-plan/whitespace/signature independently pass. Native runs0. Next F1 work remains
-native alternate/final-row observer coverage, immutable guestbuild and reviewed
-namespace/outershutdown, then actual supported native attempts. PR80 remains draft;
-F3PR81/F2diagnosticsPR82 remain unchanged drafts, no merge/acceptance promotion.
-Full97tasks/R1-03 local1.0 scope and all physical/native/release gates remain.
-
-
-F2 coordinator checkpoint signedf18efab, signature/hash/source verified; independent
-Standards review clean, Security/Spec2P2 found: decrypt after lock duringblobIO and
-cancelled status offering session-only whiledenied. Both fixed directly, with
-90mappedsecurity passing: fresh/abort/deletion guard before decrypt within cipher
-cleanup finally; operation errors prefer current denied status. Regression injects
-locked/inactive/unavailable after actual private blob read, proves zero decrypt/
-consumer and cleared cipher; persistent-write statuses covered. No final clean
-Spec recheck inferred. Runtime startup/retry/suspend/ordered service shutdown,
-actual provider predispatch and credentialsetup/status UI remain next. F1 parent
-now prepares v2 exactalternate/final119 identities and End checkpoint independently;
-no native lab/display/reader execution. All acceptance/full1.0 scope unchanged.
+F2 updated component validation completed:100F2security/55F1security (53Python)/
+72F3security/38Rust, offlineClippy/format/fulltype/lint/frozeninstall/plan/20hashes
+pass. First Electron smoke build lacked the worktree's SQLite addon and stopped
+before launch; standard pinned rebuild fixed the environment, rerun1/1 passes5.99s.
+All screenshots unchanged. Core production files byte-match reviewed/fixed06373ba;
+only shared runner source hash changes from the map union. No production session/
+credential UI enabled. Next publish and integrate this bounded component promptly,
+then wire its main lifecycle and actual setup/status flow in the next increment.

@@ -15,12 +15,12 @@ const electron = vi.hoisted(() => {
       clear: () => listeners.clear(),
     };
   }
-  const contents = { ...events(), setWindowOpenHandler: vi.fn(), getURL: () => 'linuxcast-app://shell/index.html',
-    isDestroyed: () => false, send: vi.fn() };
+  const contents = { ...events(), setWindowOpenHandler: vi.fn(), mainFrame: { url: 'linuxcast-app://shell/index.html' }, getURL: () => 'linuxcast-app://shell/index.html',
+    isDestroyed: () => false, send: vi.fn(), getZoomFactor: vi.fn(() => 1) };
   let visible = false, destroyed = false;
   const window = { ...events(), webContents: contents, setMenu: vi.fn(), loadURL: vi.fn(async () => {}),
     isDestroyed: () => destroyed, isVisible: () => visible, isFocused: () => false, isMinimized: () => false,
-    getBounds: () => ({ x: 0, y: 0, width: 720, height: 560 }), getSize: () => [720, 560],
+    getBounds: () => ({ x: 0, y: 0, width: 720, height: 560 }), getSize: vi.fn(() => [720, 560]),
     setMinimumSize: vi.fn(), setSize: vi.fn(), setBackgroundColor: vi.fn(), restore: vi.fn(), focus: vi.fn(),
     show: vi.fn(() => { visible = true; }), hide: vi.fn(() => { visible = false; }),
     destroy: vi.fn(() => { destroyed = true; visible = false; }),
@@ -34,7 +34,7 @@ const electron = vi.hoisted(() => {
       requestSingleInstanceLock: vi.fn(() => true), exit: vi.fn(), whenReady: vi.fn(async () => {}),
       commandLine: { appendSwitch: vi.fn() } },
     BrowserWindow: vi.fn(function (_options: unknown) { void _options; return window; }), window,
-    ipcMain: { handle: vi.fn(), removeHandler: vi.fn() },
+    ipcMain: { handle: vi.fn<(channel: string, handler: (event: unknown, payload: unknown) => unknown) => void>(), removeHandler: vi.fn() },
     nativeTheme: { ...events(), shouldUseDarkColors: true },
     protocol: { registerSchemesAsPrivileged: vi.fn() },
     session: { fromPartition: vi.fn(() => session) },
@@ -50,6 +50,7 @@ let argv: string[];
 beforeEach(async () => {
   vi.clearAllMocks(); electron.app.clear(); electron.window.clear(); electron.window.webContents.clear();
   electron.window.reset(); electron.app.requestSingleInstanceLock.mockReturnValue(true);
+  electron.window.webContents.getZoomFactor.mockReturnValue(1); electron.window.getSize.mockReturnValue([720, 560]);
   argv = process.argv; process.argv = ['/packaged/linuxcast', '--show'];
   vi.stubEnv('XDG_SESSION_TYPE', 'wayland'); vi.stubEnv('WAYLAND_DISPLAY', 'synthetic');
   resources = await mkdtemp(join(tmpdir(), 'linuxcast-shell-'));
@@ -63,6 +64,23 @@ afterEach(async () => {
 });
 
 describe('Electron main integration with deterministic Electron boundaries', () => {
+  it('scales content height by the native zoom, bounds it and suppresses redundant resizes', async () => {
+    startResidentShell({ resourcesDirectory: resources });
+    await vi.waitFor(() => expect(electron.window.show).toHaveBeenCalled());
+    const handler = electron.ipcMain.handle.mock.calls.find(([channel]) => channel === 'shell:content-height')?.[1];
+    expect(handler).toBeDefined();
+    const event = { sender: electron.window.webContents, senderFrame: electron.window.webContents.mainFrame };
+    electron.window.webContents.getZoomFactor.mockReturnValue(2);
+    expect(handler!(event, { protocolVersion: 1, height: 220 })).toMatchObject({ ok: true });
+    expect(electron.window.setSize).toHaveBeenLastCalledWith(720, 440);
+    electron.window.getSize.mockReturnValue([720, 440]);
+    handler!(event, { protocolVersion: 1, height: 220 });
+    expect(electron.window.setSize).toHaveBeenCalledTimes(1);
+    handler!(event, { protocolVersion: 1, height: 4096 });
+    expect(electron.window.setSize).toHaveBeenLastCalledWith(720, 560);
+    electron.app.emit('before-quit', { preventDefault: vi.fn() });
+    await vi.waitFor(() => expect(electron.app.exit).toHaveBeenCalledWith(0));
+  });
   it('creates a secure resident window and routes the second instance to it', async () => {
     startResidentShell({ resourcesDirectory: resources });
     await vi.waitFor(() => expect(electron.window.show).toHaveBeenCalled());

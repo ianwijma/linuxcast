@@ -1,0 +1,9 @@
+{
+  "kind": "unexecuted-native-preparation",
+  "files": {
+    "apps/desktop/tests/at/README.md": "d06302642b5b1db402e225e287354902da582850d71af3b579c5d88422935e59",
+    "apps/desktop/tests/at/native_at.py": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b",
+    "apps/desktop/tests/at/observations.py": "70ae79e556c233699cb890192a88c5f9e0d46a71ab77644f2a7a305bc478b55b",
+    "apps/desktop/tests/at/test_observations.py": "463dbcc8a5b4b0c1f8c588a89f5a9686681993fadac91123715a876b99965572"
+  }
+}

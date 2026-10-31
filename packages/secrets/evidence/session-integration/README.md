@@ -102,3 +102,25 @@ These small fixes are coordinator-validated; no new independent final clean
 Security/Spec review is claimed. Production lifecycle/UI/provider/native gates
 listed above remain pending. Current sources.json supersedes its prior current
 hashes; reviewed commit f18efab preserves the reviewed source provenance.
+
+
+## Integrated foundation baseline, 1 November 2026
+
+Updated to approved develop1b3efe1 (merged diagnostics, Saved permissions and
+shellzoom/native preparation), carrying coordinator checkpointd595aed. All product
+source merged automatically. Registry/checkpoint/test-map conflicts preserve every
+merged increment and every pending criterion. Current100F2security/55F1security/
+72F3security,38platformRust, offlineClippy/format, fulltypecheck/lint/frozeninstall/
+plan/whitespace pass. Native observer and all coordinator production implementation
+files are unchanged from reviewed/fixedf18efab/06373ba; only runner source pin changes
+for the union. The focused component PR need not wait for its future runtime/UI
+consumer to integrate. Full task, credential flow, supported desktop and release
+acceptance remain pending. An initial smoke build stopped before product launch
+because this worktree lacked its Electron SQLite addon; standard pinned setup-
+sqlite rebuilt it without source/config changes before the rerun.
+
+Actual production diagnostics smoke on this integrated tree passes1/1 in5.99s,
+including build/link of the helper with its new fixed mode. Existing diagnostics
+captures remain byte-identical. No credential mode was enabled in the Electron
+flow: its native success/denial/unsupported/termination evidence remains the
+explicit private-bus component suite, not actual desktop/session acceptance.

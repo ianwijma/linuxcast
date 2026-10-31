@@ -9,6 +9,7 @@ import { workflowFork } from '../services/workflow-worker.ts';
 import { WORKFLOW_RUN_UPDATED } from '../../../../packages/contracts/src/workflow-run.ts';
 import type { createStorageClient } from '@linuxcast/storage';
 import type { ClipboardWriteOutcome } from './clipboard-write.ts';
+import type { PermissionRegistry } from '../../../../packages/permissions/src/registry.ts';
 import { BrowserWindow, ipcMain, nativeTheme, screen, session } from 'electron';
 import { join } from 'node:path';
 import { WORKFLOW_EDITOR_CLOSE_REQUESTED, WORKFLOW_EDITOR_APPEARANCE, WORKFLOW_EDITOR_CLOSE_FINISHED, workflowEditorCloseFinishedSchema,
@@ -22,7 +23,7 @@ import type { ResidentService } from './lifecycle.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
 export interface WorkflowEditorOptions {
   resourcesDirectory:string; isReady():boolean;
-  repository:ReturnType<typeof createStorageClient>;copyText(text:string):Promise<ClipboardWriteOutcome>;
+  repository:ReturnType<typeof createStorageClient>;permissions?:PermissionRegistry;copyText(text:string):Promise<ClipboardWriteOutcome>;
   load():Promise<WorkflowEditorRecord|null>;
   write(input:WorkflowEditorWrite):Promise<WorkflowEditorRecord>;
 }
@@ -36,7 +37,7 @@ export function createWorkflowEditorWorkspace(options:WorkflowEditorOptions):Res
   const finishAttempt=(value:boolean)=>{const pending=attempt;attempt=undefined;pending?.resolve(value);};
   const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
   const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
-  const runs=createWorkflowRuns({repository:options.repository,fork:workflowFork(options.resourcesDirectory),copyText:options.copyText,ready:options.isReady,publish(state){if(window&&!window.isDestroyed()&&window.webContents.getURL()===WORKFLOW_EDITOR_URL)window.webContents.send(WORKFLOW_RUN_UPDATED,state);}});
+  const runs=createWorkflowRuns({repository:options.repository,...(options.permissions?{permissions:options.permissions}:{}),fork:workflowFork(options.resourcesDirectory),copyText:options.copyText,ready:options.isReady,publish(state){if(window&&!window.isDestroyed()&&window.webContents.getURL()===WORKFLOW_EDITOR_URL)window.webContents.send(WORKFLOW_RUN_UPDATED,state);}});
   const removeRunIpc=registerWorkflowRunIpc(ipcMain,runs,()=>window?.webContents);
   const ipc=registerWorkflowEditorIpc(ipcMain,{
     contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,
