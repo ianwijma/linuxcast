@@ -1,5 +1,41 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Current coordinator state — workflow candidate
+
+Goal ACTIVE: all97/full local1.0 throughR1-03. Registry8done/20inprogress/69planned;
+56passed/325pending/8N/A unchanged. PR91renderer432fa6a andPR92sourcehelper8de8612
+merged, no openPRwatch. No native/lab/namespace/hostbus/provider/keyring actions.
+
+Rootcodex/w2-instrument-workflow-integration source7816d71, approved8de8612 +
+Opus069669e (initial8e3d) + parentfixture60667ab(cherryf94df0d). Source/evidence
+allauthor-identical, no controller/engine/graph/storageproduction/shared changes.
+Current24+37units/5contracts/15+2security/fulltype/lint/plan pass;22browser30.2s
+and24browser17.9s; W2-01integration8/6.99s(editor5.639s),launcher1/5.15s(4.699s),
+extraactualrun1/8.35s(7.56s). Allthree sandboxprivateXvfb/publicfixtureflows pass.
+39newcaptures(14canvas18debugger7product)unchanged,6incidentalPNGsrestored.
+Initial Standards7e116647-5d50-4f88-826b-ad16afc0b8c4 and SecuritySpec2ef28b07-
+9421-4a5b-88f2-e66221a4b648 ACTIVE freshSOLhigh on7816d71/base8de8612; no polls.
+Fullcardfitnotclaimed: nativezoom test checksnodeintersection/nonoverlap, long
+chainsremainpannable/Fitview. Left/rightportsretainhorizontalstoredmodel; no
+verticaldefaultlayouthelper or persistedcoordinate transposition introduced.
+
+Notes rootcheckpoint7b1cd6d codex/u1-01-instrument-notes-integration excludes
+workflowunreviewedsource. Opusoriginalauthor23cbeeb5-8b0b-4153-895f-a0af1f03cab8
+ACTIVE forsoleStandardsP2 slashpopover150%visibility; initialSpecfa38clear.
+Parent482/36/258/97/40/type/lint/plan allpass beforethatnewcase; no NotesPR yet.
+
+ATadapter9c77978 separatecodex/f1-02-instrument-at-integration initialSpec0098261d
+completed/read clear:37units+44syntheticprobes/type/lint/plan/hashes, no driver/
+nativeexecution. InitialStandards remains pending. Freshsource/archive/build,
+nativeidentity/pins,PID1metadataaccess andouterowner remain required.
+Current3childslots=NotesOpusfix+twoWorkflowreviews; no rootprocess/PRwatch.
+
+/home2.4GiBfree afterdeletingonlyderivednode_modulesfrom6completedreviewclones;
+sources/index/HEAD verifiedunchanged andactiveauthor/rootdepspreserved. Keep
+future frozeninstallsbounded; no broadfilesystem cleanup.
+
+## Earlier checkpoints
+
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
 native desktop/AT, performance, packaging and publication gates remain required.
 Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.
@@ -964,3 +1000,45 @@ parentfixedandStandardsindependentlyverified original-red/currentgreen; no new
 cleanSpecclaim. Sourcehelper codefrozen443c9ca, publication/currentCI thenprompt
 integration next, no native/guest/product/sourcearchive/build. Allfull97criteria
 unchanged. Notes/workflows continueOpusmedium; no polls/watches or rootprocess.
+
+Notes Spec fa38a7fc completed/read clear atfrozenec55310:301focusedunits,14
+synthetic Chromiumprobes,25newcaptures+selecteddesigninspected,semanticattrs/
+alloldproductexpectassertions preserved,36ownedpaths exactcleanbeforeafter.
+Some initialprivateprobe assumptions corrected beforefinal14pass, inherited
+parentfulllocalresults distinguished. Standards00e3b125 stillpending; no polls.
+Notes PR body prepared /tmp/linuxcast-instrument-notes-pr.md withthatpending
+review explicit; no NotesPR published yet. RootNotesbranch excludes savedtest
+fixf94df0d and unreviewedATadapter. Workflow originalOpusfollowup7b821f60
+active on200%canvas andedge-label fixes, no schema/engine/controllerauthority
+changes approved. No activePRwatch/rootprocess, allnative/full97 gates remain.
+
+Notes Standards00e3b125 completed/read: oneP2 unboundedverticalslashpopover
+selectsParagraphoutsideeditorclip at150%; correctBASEcomparison,200%BASEalso
+failsnotclassifiednew. All25newPNGs/36paths/346historicalunchanged/ASThandlers/
+gates/refs/plan/whitespacechecked, no materialsmeIls. OptionalfreshinstallENOSPC
+failedthenremoved; privateChromiumprobes completedafterharnessalias corrections.
+Original Opus authorfollowup23cbeeb5 active, samee896branch; Specclear, no final
+Standardsclaimed. ParentprovidedexactReactchecklistpath; modelunchanged.
+
+/homeonly363MiBfree/inodeshealthy causedreviewinstallfailure. ParentremovedONLY
+node_modulesfromknownTERMINALreviewcheckouts e2b591df,da57380a,d8e3a584,172df7b6,
+0148f524,a3b2eb22. Eachcanonicalownerchecked, no trackednode_modules, cleanbefore/
+afterandidenticalgitindexlisting/HEAD, nosources/evidenceoractiveUI/rootdeps
+removed. Free/home2.7GiBafter. RootNotescheckoutclean, no processes/PRwatches.
+Notes23cbeeb5+workflow7b821f60 Opusmedium fixesactive; no polling. Savedtestfix
+f94df0d remains separateforworkflow, ATadaptera9bbb33 remains unreviewedunused.
+
+Offline ATadapter currentreconciliation9c77978832008513af76bf28a9aae4aafdc2d75d,
+base8de8612, exactly5ownedpaths/3unchangedsource-testhashesfrom5eca/a9. Current
+37unit2.33s/fulltype/scopedlint/plan/whitespacepass, no driver/nativeexecution.
+FreshinitialSpec0098261d-87c7-4f13-ae18-6130be5e429c runsSOLhigh isolated from
+exact9c, readonly/purefixturesonly; initialStandardswillfollowcapacity. Notes
+23cbeeb5 andworkflow7b821f60 remainOpusmedium corrections; all3childslots now
+occupied, nopoll. RootreturnedNotesintegration39de5f0 (adapternotincluded) and
+recordsmetadataonly; no newNotesPR/nativegateproof or sourcepinchange.
+
+Workflow069669e completed/read clean, integrated7816d71 with parentfixture60667ab.
+Two measuredprojection-regressionsfail8e3d andpassfixed; invariantcaseoldfails
+becausefixturegetterabsent, notindependentnegativeproof. Currentparentallchecks
+abovepass and39PNGs preserved. New58pathsfrozen forinitial2axisreviews, no
+Notes/ATunreviewedsource mixed. No newactor or task/criteria promotion.

@@ -20,3 +20,31 @@ private `xvfb-run -a -s "-nolisten tcp …"` X11 display, `LINUXCAST_PRIVATE_DIS
 `DBUS_SESSION_BUS_ADDRESS`/`WAYLAND_DISPLAY`, Chromium sandbox on, private HOME/XDG/profile created by each
 test. Source: parent 59549f0 plus this branch's owned presentation changes. axe (legacy mode) passes on each
 captured state. This is not GNOME/KDE, Wayland, native X11 session or assistive-technology acceptance.
+
+## Coordinator integration on approved PR92
+
+Opus `069669e` (initial `8e3d111`) is integrated unchanged at `7816d71` on
+`8de8612`. Current coordinator checks pass:24/37 units,5 contracts,15/2 security,
+22/24 Chromium cases (30.2s/17.9s), full typecheck/lint/plan/whitespace.
+W2-01 integration passes8 checks in6.99s (editor5.639s); the launcher flow passes
+in5.15s (actual4.699s), and the explicit run/approval flow passes in8.35s
+(actual7.56s). All6 incidental screenshot recaptures were restored.
+
+The parent-owned version7 migration fixture now seeds legacy columns directly
+after closing the sole owner, then upgrades through the actual current18 schema.
+The original fixture failed before reaching its migration assertions because it
+called today's repository against old columns and expected schema9. All7 fixture
+cases pass after the test-only repair; source preservation and recovery-snapshot
+assertions remain. Production storage/migrations are unchanged.
+
+Measured UI projection prevents default-card/typed-label overlap at100/200% text
+and maps real pointer/keyboard moves back to stored units. Resizing alone writes
+nothing. The native zoom test checks every node intersects the canvas and labels
+do not overlap; long chains can extend beyond the canvas and remain pannable or
+reachable with Fit view. It does not assert whole-card containment. Left/right
+ports retain the existing horizontal stored layout and typed compatibility.
+
+All39 new public captures (14 canvas,18 run-panel,7 product) remain author-identical.
+The coordinator directly inspected editor/native-zoom and200% component captures.
+Initial independent Standards/Security-Spec reviews are active on frozen
+`7816d71`; no clean review, publication or further native/task acceptance is inferred.
