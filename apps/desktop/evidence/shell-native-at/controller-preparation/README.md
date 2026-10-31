@@ -114,7 +114,7 @@ UID to the retained X-server PID and SO_PEERCRED; compare both sides of the buil
 inventory including directories; reject receipt symlink/hardlink aliases and pin
 its digest independently across execution. Eight JS guard tests, actual ordinary
 Unix socket/Python lifecycle tests and synthetic staging regressions cover these
-boundaries. Final mapped23unit/55security (47Python checks inside wrapper), full
+boundaries. Final mapped23unit/55security (48Python checks inside wrapper), full
 repository typecheck/lint and plan pass. Actual product/Orca native runs remain0.
 Final independent security recheck is required; no clean final review is inferred.
 
@@ -126,5 +126,10 @@ contains the icon and8guard checks pass. Final mapped integration2/2 passes17.76
 (newguard6.181s/legacy10.433s). Six historical PNG recaptures restored unchanged;
 no new native screenshot or presentation evidence. Additional hardlink inventory
 regression rejects external-cache aliases before chmod, while permitting fully
-inventoried internal build hardlinks. Final Python suite47checks; mappedsecurity
+inventoried internal build hardlinks. Final Python suite48checks; mappedsecurity
 55/55 andunit23/23, fulltypecheck/lint pass. Final independent recheck pending.
+
+Final lifecycle hardening also releases a newly acquired pidfd if the subsequent
+identity read fails before ownership registration. A dedicated subprocess fault
+checks the live descriptor count, retained-child termination and clean teardown.
+All48offlinePython cases pass through the mapped wrapper; no native run occurred.

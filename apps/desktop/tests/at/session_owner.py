@@ -146,6 +146,7 @@ class SessionOwner:
                 current = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
                 if current != starts[pid]:
                     os.close(fd)
+                    fd = None
                     continue
                 if pid in self.handles:
                     os.close(self.handles[pid])
@@ -154,9 +155,12 @@ class SessionOwner:
                 if len(self.handles) > 512:
                     raise ControllerRejected("child")
             except (ProcessLookupError, FileNotFoundError):
-                if fd is not None:
-                    os.close(fd)
                 pass
+            finally:
+                # A failed identity read after pidfd_open must not leak an
+                # acquired descriptor which was never installed in ownership.
+                if fd is not None and self.handles.get(pid) != fd:
+                    os.close(fd)
 
     def alive(self):
         self.refresh()

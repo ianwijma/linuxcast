@@ -8,18 +8,18 @@ allowedSigners. No unsignedcommit fallback. Prior failure notes are historical.
 
 F1-02 current parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd,
 codex/f1-02-shell-accessibility, draftPR80 https://github.com/ianwijma/linuxcast/pull/80.
-Signedhead757ce20 + staged coordinator observer/controller/preflight and critical
-review fixes. Initial nativecontroller stagedtree1f5fce5 in t3-1c57ce87 preserved
+Published signed source292767a + the current lifecycle descriptor/docs follow-up.
+Both normal Git signing and configured public-key verification now work. Initial nativecontroller stagedtree1f5fce5 in t3-1c57ce87 preserved
 unchanged. Standardsreview foundP1discoveryfailure skipsknownchildkill/P2unsupported
 signedtestprep requirement. Specreview foundP1unsafeEnter andexternalpathreplacement,
 P2buildsourceadditions andreceiptaliases. Root fixes: kill retainedPopen/pidfds before
 falliblediscovery, keep unverifiedprivate roots, exact alias DOM+nativeguards, bind
 Xlock/socket inode/type/UID/PID/SO_PEERCRED, bidirectional file/dir inventory and
-receiptalias rejection+independentdigestpin.23unit/55security (47Python inwrapper),
+receiptalias rejection+independentdigestpin.23unit/55security (48Python inwrapper),
 fulltype/lint/plan pass. ActualElectron integration2/2 passes17.76s (newguard6.181/legacy10.433);
 guard excludes canonical aria-hidden decorative icon, exactlabel retained. Six
 historical PNG recaptures restored unchanged. No native AT evidence inferred.
-Next: freeze/normalcommit/push PR80 updates, linkimmediately, independent final
+Next: publish the final small follow-up/linkimmediately, independent final
 security recheck before nativeattempt. No native product/Orca run:0. Stoppedlab
 freshDebian13.7/Orca48.1/13sourcehash baseline verified, shutdownexit0/PID0.
 Testprep may use reviewed frozen-tree/archive with honest unsignedstatus; release
@@ -56,3 +56,14 @@ completed and read. Next finalATrecheck must be a NEWdelegate_task, no reviewthr
 send. Keep bodies/docs precise, draftCIgreen is not mergeacceptance. Full native
 GNOME/KDE Wayland/X11/AT, physical recovery, allfeaturefamilies, performance,
 packages/artifacts/publication remain mandatory. No privilegedservice enabled.
+
+Current publication: signed source292767a pushed to PR80 and linked immediately;
+PR81/82 published+linked, PlanningCI41198685600/41198787692 pass respectively,
+no requested/submitted reviews/comments/rulesets at inspection. No merges because
+native/task acceptance remains pending. Final AT recheck must cover current
+P1/P2 fixes and descriptor follow-up. Separate d89d05e credential observer source
+copied exactly into credential worktree as staged additions; no CLI/lib or runtime
+wire enabled, no independent review yet. Next two read-only review delegates cover
+AT final safety and the native credential observer while coordinator resumes the
+Nodeclient/freshness/lifecycle and missingcredentialUI work. All previous delegates
+completed/read; no active one is being polled or replaced.

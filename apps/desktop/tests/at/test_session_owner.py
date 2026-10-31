@@ -185,6 +185,34 @@ with tempfile.TemporaryDirectory() as temporary:
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         self.assertTrue(all(json.loads(result.stdout).values()))
 
+    def test_failed_identity_verification_closes_unregistered_pidfd(self):
+        program = r'''
+import json,os,sys
+from pathlib import Path
+from unittest import mock
+from session_owner import SessionOwner
+owner=SessionOwner();child=owner.spawn([sys.executable,'-c','import time;time.sleep(30)'])
+os.close(owner.handles.pop(child.pid));owner.identities.pop(child.pid)
+before=len(os.listdir('/proc/self/fd'));read=Path.read_text;count=0
+def identity(path,*args,**kwargs):
+ global count
+ if path==Path(f'/proc/{child.pid}/stat'):
+  count+=1
+  if count==2: raise OSError('SYNTHETIC_IDENTITY_READ_FAILURE')
+ return read(path,*args,**kwargs)
+try:
+ with mock.patch.object(Path,'read_text',identity):
+  try:owner.refresh()
+  except OSError:pass
+ noLeak=len(os.listdir('/proc/self/fd'))==before
+finally:clean=owner.cleanup()
+print(json.dumps({'noUnregisteredLeak':noLeak,'clean':clean,'directReaped':child.returncode is not None}))
+'''
+        result = subprocess.run([sys.executable, "-B", "-c", program], cwd=HERE,
+                                env={"PATH": "/usr/bin:/bin"}, capture_output=True, timeout=9)
+        self.assertEqual(result.returncode, 0, result.stderr.decode())
+        self.assertTrue(all(json.loads(result.stdout).values()))
+
 
 if __name__ == "__main__":
     unittest.main()
