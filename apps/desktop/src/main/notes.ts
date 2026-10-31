@@ -1,3 +1,6 @@
+import {registerNotesImportIpc} from './notes-import-ipc.ts';
+import {readNoteMarkdownFile} from './notes-import-file.ts';
+import {importNoteMarkdown} from '../../../../packages/notes/src/markdown.ts';
 import {registerNotesOpenIpc} from './notes-open-ipc.ts';
 import type {NotesLauncherSelection} from '../../../../packages/contracts/src/notes-launcher.ts';
 import {registerQuickNoteIpc} from './notes-quick-note-ipc.ts';
@@ -19,17 +22,20 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  const finish=(value:boolean)=>{const pending=attempt;attempt=undefined;if(pending){clearTimeout(pending.timer);pending.resolve(value);}};
  const appearance=()=>nativeTheme.shouldUseDarkColors?'dark' as const:'light' as const;
  const alive=(owner:BrowserWindow)=>!stopped&&window===owner&&!owner.isDestroyed();
- const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy(),closeBusy:()=>quick.busy()||opener.busy(),observedRead:record=>opener.read(record),committed:(input,record)=>quick.committed(input,record),appearance,...(options.trashSnapshot?{trashSnapshot:options.trashSnapshot}:{}),...(options.emptyTrash?{emptyTrash:options.emptyTrash}:{}),list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,deletePermanently:options.deletePermanently,history:options.history,getRevision:options.getRevision,restoreRevision:options.restoreRevision,
-  close(){if(window&&alive(window)&&!exporter.busy()&&!api.isWriting()&&!quick.busy()&&!opener.busy()){approvedClose=true;window.close();}},
+ const api=registerNotesIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,exportBusy:()=>exporter.busy()||importer.busy(),closeBusy:()=>quick.busy()||opener.busy(),observedRead:record=>opener.read(record),committed:(input,record)=>quick.committed(input,record),appearance,...(options.trashSnapshot?{trashSnapshot:options.trashSnapshot}:{}),...(options.emptyTrash?{emptyTrash:options.emptyTrash}:{}),list:options.list,get:options.get,write:options.write,setPinned:options.setPinned,setArchived:options.setArchived,setTrashed:options.setTrashed,deletePermanently:options.deletePermanently,history:options.history,getRevision:options.getRevision,restoreRevision:options.restoreRevision,
+  close(){if(window&&alive(window)&&!exporter.busy()&&!importer.busy()&&!api.isWriting()&&!quick.busy()&&!opener.busy()){approvedClose=true;window.close();}},
  });
- const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:()=>api.isWriting()||quick.busy()||opener.busy(),get:options.get,publish:saveNoteMarkdown,
+ const exporter=registerNotesExportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:()=>api.isWriting()||quick.busy()||opener.busy()||importer.busy(),get:options.get,publish:saveNoteMarkdown,
   async choose(record){const owner=window;if(!owner||!alive(owner))return null;const choice=await dialog.showSaveDialog(owner,{title:'Export note — unencrypted Markdown',defaultPath:`linuxcast-note-${record.id}.md`,buttonLabel:'Save unencrypted Markdown',filters:[{name:'Markdown',extensions:['md']}],properties:['createDirectory']});if(!alive(owner)||owner.webContents.getURL()!==NOTES_URL)throw new Error('Notes export owner changed.');return choice.canceled||!choice.filePath?null:choice.filePath;},
+ });
+ const importer=registerNotesImportIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!!window&&!window.isDestroyed(),ready:options.isReady,writeBusy:()=>api.isWriting()||exporter.busy()||quick.busy()||opener.busy()||!!attempt,read:readNoteMarkdownFile,parse:importNoteMarkdown,
+  async choose(){const owner=window;if(!owner||!alive(owner))return null;const choice=await dialog.showOpenDialog(owner,{title:'Import Markdown — review before creating a note',buttonLabel:'Review Markdown',filters:[{name:'Markdown',extensions:['md','markdown']}],properties:['openFile']});if(!alive(owner)||owner.webContents.getURL()!==NOTES_URL)throw new Error('Notes import owner changed.');return choice.canceled||choice.filePaths.length!==1?null:choice.filePaths[0]!;},
  });
  const updated=()=>{if(window&&alive(window)){window.setBackgroundColor(tokens.themes[appearance()].background);if(window.webContents.getURL()===NOTES_URL)window.webContents.send(NOTES_APPEARANCE,appearance());}};
  nativeTheme.on('updated',updated);
  const requestClose=():Promise<boolean>=>{
   if(quick.busy()||opener.busy())return Promise.resolve(false);
-  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(exporter.busy()||api.isWriting()||quick.busy()||opener.busy())return Promise.resolve(false);if(attempt?.owner===owner)return attempt.promise;
+  const owner=window;if(!owner||owner.isDestroyed())return Promise.resolve(true);if(exporter.busy()||importer.busy()||api.isWriting()||quick.busy()||opener.busy())return Promise.resolve(false);if(attempt?.owner===owner)return attempt.promise;
   if(owner.webContents.getURL()!==NOTES_URL)return Promise.resolve(false);
   let resolve!:(value:boolean)=>void;const promise=new Promise<boolean>(done=>{resolve=done;});
   attempt={id:++sequence,owner,promise,resolve,timer:setTimeout(()=>finish(false),15000)};
@@ -38,13 +44,13 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  ipcMain.handle(NOTES_CLOSE_FINISHED,(event,payload)=>{
   const parsed=notesCloseFinishedSchema.safeParse(payload),pending=attempt;
   if(!pending||!parsed.success||parsed.data.attemptId!==pending.id||pending.owner!==window||!trustedAppSender(event,pending.owner.webContents,NOTES_URL))return {ok:false};
-  if(exporter.busy()||api.isWriting()||quick.busy()||opener.busy()){finish(false);return {ok:false};}
+  if(exporter.busy()||importer.busy()||api.isWriting()||quick.busy()||opener.busy()){finish(false);return {ok:false};}
   if(!parsed.data.allowClose)finish(false);
   return {ok:true};
  });
- const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);api.remove();quick.remove();opener.remove();exporter?.remove();ipcMain.removeHandler(NOTES_CLOSE_FINISHED);finish(false);};
- const quick=registerQuickNoteIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||opener.busy()||api.isEmptyingTrash(),exportBusy:()=>exporter.busy(),open:openWorkspace});
- const opener=registerNotesOpenIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||api.isEmptyingTrash(),exportBusy:()=>exporter.busy(),quickBusy:()=>quick.busy(),open:openWorkspace});
+ const dispose=()=>{stopped=true;nativeTheme.off('updated',updated);api.remove();quick.remove();opener.remove();exporter?.remove();importer?.remove();ipcMain.removeHandler(NOTES_CLOSE_FINISHED);finish(false);};
+ const quick=registerQuickNoteIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||opener.busy()||api.isEmptyingTrash(),exportBusy:()=>exporter.busy()||importer.busy(),open:openWorkspace});
+ const opener=registerNotesOpenIpc(ipcMain,{contents:()=>window?.webContents,active:()=>!stopped&&!stopping,ready:options.isReady,closeBusy:()=>!!attempt||api.isEmptyingTrash(),exportBusy:()=>exporter.busy()||importer.busy(),quickBusy:()=>quick.busy(),open:openWorkspace});
  async function openWorkspace(){
    if(stopped||stopping)throw new Error('Notes are unavailable.');if(creating)await creating;
    if(stopped||stopping||attempt)throw new Error('Notes are closing.');
@@ -60,7 +66,7 @@ export function createNotesWorkspace(options:{resourcesDirectory:string;isReady(
  return {
   open:openWorkspace,quickNote:quick.request,openNote:opener.request,
   prepareClose:requestClose,
-  stop(){return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Notes close preflight is incomplete.');await Promise.all([api.drain(),exporter?.drain()]);dispose();})();},
-  async terminate(){dispose();if(window&&!window.isDestroyed())window.destroy();await creating?.catch(()=>{});await Promise.all([api.drain(),exporter?.drain()]);},
+  stop(){return stopPromise??=(async()=>{stopping=true;await creating?.catch(()=>{});if(window&&!window.isDestroyed())throw new Error('Notes close preflight is incomplete.');await Promise.all([api.drain(),exporter?.drain(),importer?.drain()]);dispose();})();},
+  async terminate(){dispose();if(window&&!window.isDestroyed())window.destroy();await creating?.catch(()=>{});await Promise.all([api.drain(),exporter?.drain(),importer?.drain()]);},
  };
 }

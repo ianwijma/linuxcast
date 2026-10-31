@@ -1,0 +1,43 @@
+import {expect,it} from 'vitest';
+import {notePlainText,notesRepositoryContracts,parseRepositoryRequest} from '@linuxcast/contracts';
+import type {NoteContent,NoteNode} from '@linuxcast/contracts';
+import {exportNoteMarkdown,importNoteMarkdown,NOTE_MARKDOWN_MAX_BYTES,NOTE_MARKDOWN_NOTICE} from '../src/markdown.ts';
+const paragraph=(text:string):NoteNode=>({type:'paragraph',content:[{type:'text',text}]});
+const tasks=(node:NoteNode):boolean[]=>[...(node.type==='taskItem'?[node.attrs!.checked as boolean]:[]),...(node.content??[]).flatMap(tasks)];
+it.each(['https://example.org*bold*','https://example.org[brackets]','https://example.org`code`','https://example.org\\path\\','https://example.org\\*literal*','www.example.org*literal*','public@example.org*literal*'])('preserves escaped punctuation consumed by bare URLs: %j',text=>{
+ const note:NoteContent={title:'Public URL punctuation',document:{type:'doc',content:[paragraph(text)]}},before=structuredClone(note),exported=exportNoteMarkdown(note),result=importNoteMarkdown(exported);
+ expect(notePlainText(result.document)).toBe(text);expect(exportNoteMarkdown(result)).toBe(exported);expect(note).toEqual(before);
+});
+it.each<NoteNode[]>([[{type:'text',text:'End'},{type:'hardBreak'}],[{type:'hardBreak'}],[{type:'hardBreak'},{type:'hardBreak'}],[{type:'text',text:'https://example.org*literal*'},{type:'hardBreak'}],[{type:'text',text:'End\n'},{type:'hardBreak'},{type:'hardBreak'}]])('preserves trailing and break-only editor paragraphs: %j',(...content)=>{
+ const note:NoteContent={title:'Public trailing breaks',document:{type:'doc',content:[{type:'paragraph',content}]}},before=structuredClone(note),exported=exportNoteMarkdown(note),result=importNoteMarkdown(exported);
+ expect(notePlainText(result.document)).toBe(notePlainText(note.document));expect(notePlainText(importNoteMarkdown(exportNoteMarkdown(result)).document)).toBe(notePlainText(note.document));expect(note).toEqual(before);
+});
+it.each(['# Empty note','# Leaves\n\n---\n\nfirst\\\nsecond','# Tasks\n\n- [x] Done\n  - [ ] Pending','# Code\n\n```text\n&amp; &#10; <script>literal</script>\n```'])('produces a JSON-safe actual notes.write repository request for %j',source=>{
+ const content=importNoteMarkdown(source),request={schemaVersion:1,requestId:'public-import-write',method:'notes.write',params:{id:'11111111-1111-4111-8111-111111111111',expectedRevision:0,action:'draft',content}};
+ expect(parseRepositoryRequest(request,notesRepositoryContracts)).toEqual(request);
+ expect(JSON.parse(JSON.stringify(request))).toEqual(request);
+});
+it.each(['\nPublic Unicode 雪 🐧 and literal <script>inert</script> [link](https://example.org)\n','\nLiteral &amp; &lt; &#10; &#38;#10; [link](https://example.org)\n'])('preserves combined escaped literals and boundary LF exactly once: %j',text=>{
+ const note:NoteContent={title:'Public combined escaping',document:{type:'doc',content:[paragraph(text),{type:'codeBlock',content:[{type:'text',text:'&amp; &lt; &#10; &#38;#10;'}]}]}};
+ const before=structuredClone(note),result=importNoteMarkdown(exportNoteMarkdown(note));expect(notePlainText(result.document)).toBe(notePlainText(note.document));expect(note).toEqual(before);
+});
+it('imports actual exported Unicode/text/tasks/lists/quotes/code without source mutation',()=>{
+ const nested:NoteNode={type:'taskList',content:[{type:'taskItem',attrs:{checked:false},content:[paragraph('Nested pending')]}]};
+ const note:NoteContent={title:'Public café 日本語 🪶 #',document:{type:'doc',content:[
+  {type:'heading',attrs:{level:2},content:[{type:'text',text:'Public body heading'}]},
+  paragraph('Plain <script>text</script> &amp; [link](https://example.org) ![image](https://example.org/a)'),
+  {type:'taskList',content:[{type:'taskItem',attrs:{checked:true},content:[paragraph('Checked'),nested]}]},
+  {type:'orderedList',attrs:{start:3},content:[{type:'listItem',content:[paragraph('Third'),paragraph('Extra paragraph')]}]},
+  {type:'blockquote',content:[paragraph('Public quote')]},{type:'horizontalRule'},
+  {type:'codeBlock',attrs:{language:'text'},content:[{type:'text',text:'```\n<script>literal</script>\n````'}]},
+ ]}};
+ const before=structuredClone(note),text=exportNoteMarkdown(note),result=importNoteMarkdown(text);expect(result.title).toBe(note.title);expect(notePlainText(result.document)).toBe(notePlainText(note.document));expect(tasks(result.document)).toEqual([true,false]);expect(result.document.content.at(-1)?.content?.[0]?.text).toBe('```\n<script>literal</script>\n````');expect(note).toEqual(before);
+});
+it.each(['# literal *bold* _underscore_ ~~strike~~ [link](https://example.org) <script>public</script> &amp; ![image](https://example.org/a)','a`b``c```d',' leading and trailing ','first\nsecond','first\r\nsecond','one\ttwo','\nPublic','Public\n','\n\nPublic\n\n','Public https://example.org and user@example.org','\n# heading\n- list\n1. item\n---'])('preserves actual escaped export literal %j',text=>{const note={title:'Public * literal #',document:{type:'doc' as const,content:[paragraph(text)]}};const result=importNoteMarkdown(exportNoteMarkdown(note));expect(result.title).toBe(note.title);expect(notePlainText(result.document)).toBe(text.replace(/\r\n?/gu,'\n'));});
+it('preserves supported marks and disclosed multiline inline-code plain text',()=>{const document={type:'doc' as const,content:[{type:'paragraph',content:[{type:'text',text:'Bold',marks:[{type:'bold'}]},{type:'hardBreak'},{type:'text',text:'Italic',marks:[{type:'italic'}]},{type:'text',text:'Strike',marks:[{type:'strike'}]},{type:'text',text:'a`b',marks:[{type:'code'}]},{type:'text',text:'Multi\n# literal',marks:[{type:'code'}]}]}]};const result=importNoteMarkdown(exportNoteMarkdown({title:'Formatting',document}));expect(notePlainText(result.document)).toBe(notePlainText(document));expect(JSON.stringify(result.document)).toContain('"type":"bold"');expect(JSON.stringify(result.document)).toContain('"type":"strike"');});
+it('uses first top-level H1 as title, retains other H1/body and handles title-only/untitled documents',()=>{expect(importNoteMarkdown('# Public title').document).toEqual({type:'doc',content:[{type:'paragraph'}]});const without=importNoteMarkdown('Public body\r\n\r\n# Later heading');expect(without.title).toBe('Later heading');expect(notePlainText(without.document)).toBe('Public body');expect(importNoteMarkdown('Public body only').title).toBe('Imported note');expect(importNoteMarkdown('# First\n\n# Body heading').title).toBe('First');});
+it('removes only exact starting Linuxcast notice; other HTML comments/locations refused',()=>{expect(importNoteMarkdown('<!-- '+NOTE_MARKDOWN_NOTICE+' -->\n\n# Public').title).toBe('Public');for(const text of ['<!-- other comment -->\n# Public','# Public\n\n<!-- '+NOTE_MARKDOWN_NOTICE+' -->',' <!-- '+NOTE_MARKDOWN_NOTICE+' -->\n\n# Public'])expect(()=>importNoteMarkdown(text)).toThrow('unsupported');});
+it.each(['<script>public</script>','<div>public</div>','<img src="https://example.org">','[public](https://example.org)','![public](https://example.org/a)','<https://example.org>','[public][ref]\n\n[ref]: https://example.org','| a | b |\n| - | - |\n| x | y |','#### Unsupported heading','```bad language\npublic\n```'])('refuses unsupported content without silent stripping or resource effects: %j',text=>{expect(()=>importNoteMarkdown(text)).toThrow('unsupported');});
+it('bounds invalid text, output bytes, title, nodes and nesting with content-free errors',()=>{for(const text of ['', ' \n\t','\0Public','\ud800','x'.repeat(NOTE_MARKDOWN_MAX_BYTES+1),'雪'.repeat(180000),'# '+ 'x'.repeat(257),'x'.repeat(65537),Array.from({length:2050},()=>'- public').join('\n'),'> '.repeat(40)+'Public']){try{importNoteMarkdown(text);throw new Error('accepted');}catch(error){expect((error as Error).message).not.toBe('accepted');expect((error as Error).message.length).toBeLessThan(220);expect((error as Error).message).not.toContain('雪');}}});
+
+it('applies the64KiB body limit independently from the256byte title during actual export/import',()=>{const note={title:'t'.repeat(256),document:{type:'doc' as const,content:[paragraph('x'.repeat(65536))]}};expect(importNoteMarkdown(exportNoteMarkdown(note))).toEqual(note);});
