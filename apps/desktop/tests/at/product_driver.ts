@@ -89,7 +89,7 @@ async function command(id: string) {
     page = await app.firstWindow({ timeout: 8000 });
     page.setDefaultTimeout(1500);
     await page.waitForURL('linuxcast-app://shell/index.html');
-    await page.getByRole('searchbox', { name: 'Search commands', exact: true }).waitFor();
+    await page.getByRole('combobox', { name: 'Search commands', exact: true }).waitFor();
     const runtime = await app.evaluate(({ app, BrowserWindow }) => {
       app.setAccessibilitySupportEnabled(true);
       const windows = BrowserWindow.getAllWindows();
@@ -131,7 +131,7 @@ async function command(id: string) {
     if (await page.getByRole('option', { name, exact: true }).getAttribute('aria-selected') !== 'true') throw new Error('Selection');
   } else if (id === 'final-query') {
     await page.keyboard.press('Shift+Tab');
-    const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
+    const query=page.getByRole('combobox',{name:'Search commands',exact:true});
     if(!await query.evaluate(element=>element===document.activeElement))throw new Error('Final query focus');
     await page.keyboard.press('Control+a');
     await page.keyboard.press('Backspace');
@@ -164,7 +164,7 @@ async function command(id: string) {
     const same = await app!.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows().length === 1 && BrowserWindow.getAllWindows()[0]!.isVisible());
     if (!same || app!.process().pid !== mainPid) throw new Error('Singleton');
-    await page.getByRole('searchbox', { name: 'Search commands', exact: true }).waitFor();
+    await page.getByRole('combobox', { name: 'Search commands', exact: true }).waitFor();
   } else if (id === 'loading') {
     await app!.evaluate(({ ipcMain }) => {
       ipcMain.removeHandler('shell:get-state');
@@ -186,7 +186,7 @@ async function command(id: string) {
     await page.reload();
     const state = await page.evaluate(() => (window as unknown as { linuxcast: DesktopShellApi }).linuxcast.getState());
     if (!state.ok) throw new Error('Recovery');
-    await page.getByRole('searchbox', { name: 'Search commands', exact: true }).waitFor();
+    await page.getByRole('combobox', { name: 'Search commands', exact: true }).waitFor();
   }
   return { status: 'ok', operation: true, geometry: await geometry(id === 'loading' || id === 'error', ['result', 'away', 'back', 'final'].includes(id), id === 'final') };
 }

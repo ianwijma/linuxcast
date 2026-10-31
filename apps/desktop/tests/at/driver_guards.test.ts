@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach,expect,it,vi } from 'vitest';
 import type { Page } from '@playwright/test';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { Row } from '@linuxcast/ui';
 import { rankCommands } from '../../../../packages/search/src/index.ts';
 import { enterAliasForm, endAtFinalResult } from './driver_guards.ts';
 afterEach(()=>{document.body.replaceChildren();});
@@ -27,11 +30,10 @@ it.each(['dropped-text','wrong-action','multiple','disabled','not-current','no-f
 });
 
 function finalFixture(){
-  document.body.innerHTML='<div class="lc-view"><input type="search" data-view-query="true" value="Public AT filler 1"><div role="listbox" aria-label="Search commands" tabindex="0" aria-activedescendant="row-0"></div></div>';
+  document.body.innerHTML='<div class="lc-view"><input type="search" role="combobox" data-view-query="true" aria-controls="public-results" value="Public AT filler 1"><div id="public-results" role="listbox" aria-label="Search commands" tabindex="0" aria-activedescendant="row-0"></div></div>';
   const list=document.querySelector<HTMLElement>('[role="listbox"]')!;
   for(let index=0;index<20;index++){
-    const row=document.createElement('div');row.id=`row-${index}`;row.setAttribute('role','option');row.setAttribute('aria-selected',String(index===0));
-    row.innerHTML=`<span class="lc-result-copy"><span>Public AT filler ${String(100+index).padStart(3,'0')}</span><small>Installed application</small></span>`;list.append(row);
+    list.insertAdjacentHTML('beforeend',renderToStaticMarkup(createElement(Row,{id:`row-${index}`,role:'option','aria-selected':index===0,title:`Public AT filler ${String(100+index).padStart(3,'0')}`,subtitle:'Installed application'})));
   }
   list.focus(); // Synthetic fixture only; production adapter uses native keys.
   const rows=[...list.querySelectorAll<HTMLElement>('[role="option"]')];
@@ -42,11 +44,13 @@ function finalFixture(){
 it('presses End from the exact final-page projection anchor and verifies its sole final selection',async()=>{
   const f=finalFixture();await endAtFinalResult(f.page);expect(f.press).toHaveBeenCalledExactlyOnceWith('End');expect(f.waitFor).toHaveBeenCalledExactlyOnceWith({timeout:1500});
 });
-it.each(['wrong-query','short-list','wrong-last','no-focus','multiple','wrong-anchor'])('does not dispatch End with %s',async failure=>{
+it.each(['wrong-query','wrong-query-role','wrong-query-controls','short-list','wrong-last','no-focus','multiple','wrong-anchor'])('does not dispatch End with %s',async failure=>{
   const f=finalFixture();
   if(failure==='wrong-query')document.querySelector('input')!.value='Public AT result';
+  if(failure==='wrong-query-role')document.querySelector('input')!.setAttribute('role','searchbox');
+  if(failure==='wrong-query-controls')document.querySelector('input')!.setAttribute('aria-controls','foreign-results');
   if(failure==='short-list')f.rows[19]!.remove();
-  if(failure==='wrong-last')f.rows[19]!.querySelector('span > span')!.textContent='Private canary';
+  if(failure==='wrong-last')f.rows[19]!.querySelector('.lc-row-title')!.textContent='Private canary';
   if(failure==='no-focus')f.list.blur();
   if(failure==='multiple')f.rows[1]!.setAttribute('aria-selected','true');
   if(failure==='wrong-anchor')f.list.setAttribute('aria-activedescendant','row-1');
@@ -55,6 +59,17 @@ it.each(['wrong-query','short-list','wrong-last','no-focus','multiple','wrong-an
 it('refuses to report a final selection if End did not move selection',async()=>{
   const f=finalFixture();f.press.mockImplementation(async()=>{});
   await expect(endAtFinalResult(f.page)).rejects.toThrow('Final result selection unavailable.');
+});
+it.each(['role','controls','query'])('refuses to report final selection if the query %s changes after End',async failure=>{
+  const f=finalFixture(),move=f.press.getMockImplementation()!;
+  f.press.mockImplementation(async()=>{
+    await move();const query=document.querySelector('input')!;
+    if(failure==='role')query.setAttribute('role','searchbox');
+    if(failure==='controls')query.setAttribute('aria-controls','foreign-results');
+    if(failure==='query')query.value='Public AT result';
+  });
+  await expect(endAtFinalResult(f.page)).rejects.toThrow('Final result selection unavailable.');
+  expect(f.press).toHaveBeenCalledExactlyOnceWith('End');
 });
 
 it('derives the final twenty-row projection from actual production ranking without changing its cap',()=>{
