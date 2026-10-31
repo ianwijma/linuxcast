@@ -624,3 +624,57 @@ andbottomVisiblefalse. Rootmechanical test is committed in2e45107; applicationUI
 source remainsauthorcf12.24incidentalPNGs+twolegacyuntrackedcaptures restored.
 Original Opusmedium follow-up6ce33667-2239-4b61-8bdc-632dd0928443 now addresses this
 single real extension-mode settled-projection gap. No D1PR/review yet; don'tpoll.
+
+Saved permissions Instrument source e1db20359b2c056ede1350bc5cbb7c3e4f3acd1b
+(tree09bd24d, clean author t3-721f2a64) is integrated unchanged as1c15dfb0 on
+codex/f3-01-instrument-permissions-integration from approved develop63c9581/PR89.
+Parent maps new saved-permissions.test.tsx under unit.F3-01. Current integrated
+checks pass:83 units,2 contracts,72 security,typecheck,whole-repo lint,plan and
+whitespace; actual sandboxed private-Xvfb F3two24.42s (permissions15.30s and
+workflow7.59s), preserving real revocation/stale/cancel/quarantine/clipboard
+sentinel/noNode/narrowAPI/Quit assertions.21new author captures remain intact;
+13incidental new/historical recaptures restored. Parent inspected long-source
+review200% keyboard capture. Source remains author-identical, controller/broker/
+contracts untouched. Initial two-axis independent review next; native/session/UI
+and full-task acceptance remain pending. Existing StrictMode limitation disclosed
+by author is unchanged from baseline production (non-StrictMode entry).
+
+D1 initial reviews completed/read at1e4682b/base63c9581: four distinct P2s across
+two axes (split200%overflow, live regrouping focus, listLeft, extra grid modifiers).
+Original Opusmedium9c84499d-ab07-48f8-ad69-dc746e8fa12a is fixing them in its own
+branch. The D1 integration/adoption ledger is saved at7f4b1f8, separate from this
+F3 candidate. No sourcehelper/AT-adapter additions included. Sourcehelper branch
+86abb64 remains unreviewed/unused,113offline checks pass. No root process/PRwatch
+or native/guest/hostbus/provider/keyring actions. No task/criterion promotion.
+
+Initial F3 reviews now run on frozen fad2135448e5e6c69cfaeeec943e8fdd9786685f,
+base63c9581: Standards52c6c909-bb9b-4dc1-97cc-6e86ff79474e and Security/Spec
+6bbb20cf-2041-4abb-abba-6bf8f913290e, fresh isolated GPT6.1SOL/high. Both briefs
+cover task/contracts/security/design, exact29file scope,21captures, parent83unit/
+2contract/72security/current2Electron24.42s evidence and inherited-versus-rerun
+limits. No native actions, publication or delegation. Completion wakes parent;
+don't poll. D1 original Opusmedium9c84499d remains active on its four review P2s.
+Root has no test process or PR watch; preserve separate focused UI branches.
+
+Current F3 registry branch now points to the actual Instrument integration lane;
+its parent83unit/2contract/72security/twoElectron24.42s evidence is recorded as
+review-pending, without promoting any criterion. UI_REFRESH carries the current
+merged PR87/88/89, D1 four pending P2s and F3 review state. All97task statuses and
+acceptance records verified unchanged. Standards52c6c909 completed/read clean,
+no actionable findings; independently83units/2contracts/type/lint/plan and21PNGs,
+exactfad2135/base63c9581 clean unchanged. Retained neutral receipt and StrictMode
+caveats verified baseline with non-StrictMode production entry. Security/Spec
+6bbb20cf still pending; don't poll. Concrete PR body is prepared privately at
+/tmp/linuxcast-instrument-permissions-pr.md with that pending state explicit;
+do not publish until its final review result is incorporated. No PR open/watch.
+
+F3 Security/Spec6bbb20cf completed/read PASS, no actionable findings. Independently
+83mappedunits/2contracts/63syntheticsecurity and12component probes (4additional
+missing/unavailable/thrown/malformed removal cases), type/lint/plan/whitespace;
+all21captures inspected and27author blobs match e1db203. Exactfad2135/base63c9581
+clean before/after. Both axes now clean; baseline caveats confirmed unchanged.
+Parent actual72security/2Electron24.42s evidence distinguished accurately. PRbody
+updated with final results, UIadoption/registry reflect reviewed preparation and
+all acceptance remains unchanged. Publish focused F3 PR now, check currentCI and
+merge promptly; exclude D1/sourcehelper/ATadapter code. D1Opusmedium9c84499d
+continues four scoped P2 corrections. No active root process or PRwatch.
