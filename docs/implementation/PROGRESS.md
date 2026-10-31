@@ -1,44 +1,61 @@
-# Coordinator checkpoint — 31 October 2026
+# Coordinator checkpoint —31October2026
 
-The complete agreed local1.0 goal remains unfinished. Finish PR77 before starting
-another feature. All subagents GPT-6.1 SOL/high; normal signed publication/merge
-is authorized. Preserve the unchanged 1Password signing setup.
+Full local1.0 goal active, unfinished. Coordinator active bounded task F2-02:
+/home/ian/.t3/worktrees/linuxcast/f2-02-diagnostic-controls, codex/f2-02-diagnostic-controls,
+base developf461a87. F2-01 prerequisite accepted. Implements production diagnostics
+export/reset using existing Local data window/named IPC/private metadata service;
+no new dependency, channel or migration.68security/1actual Electron private-Xvfb
+flow pass;5screenshots inspected/axe0. Actual200percent focus-ring clipping
+reproduced and fixed with canonical-token scroll margin. Typecheck/lint pass after
+test mock typing fix; final full typecheck/lint/security/integration/plan pass. Initial Standards review
+clean; Spec review P2 idle retention fixed with serialized minute cleanup, no
+overlap, shutdown drain and actual-file fake-clock15/31day regression. Source-found
+FIFO hazard guarded by nonblocking read, actual FIFO reset/close regression passes.
+These small follow-ups parent-validated, not independently re-reviewed.
+AC01/UI remain pending, full F2/credential/provider/native matrix not complete.
+Evidence apps/desktop/evidence/diagnostics-application.md. No PR/commit yet.
 
-Active U1-01: bounded selected-file Markdown review/import as a separate owner
-draft, branch `codex/notes-markdown-import`, existing worktree
-`.worktrees/linuxcast-notes-markdown-import`, base mergedPR76/develop09de566.
-PR77 https://github.com/ianwijma/linuxcast/pull/77. No new feature has started.
-All four U1 acceptance criteria stay pending; do not mark local1.0 complete.
+Other useful existing work: F3-01 Saved permissions isolated worktree
+/home/ian/.t3/worktrees/linuxcast/f3-01-permissions-ui, signed initial3d127ea plus
+final staged code/evidence. Independent final frozen-treec6b83bc5 review clean,
+75unit/2contract/72security/2actual Electron integration and9captures pass. AC02/UI
+remain pending supported Debian/native AT and publication. Normal1Password signer
+failed multiple times; configured signing preserved. Async request to user to
+unlock/approve signing is pending. Do not disable signing or publish incompletehead.
 
-Both original handoff blockers were fixed on signed b3ea4d4. The isolated
-GPT-6.1 SOL/high independent source/capture/evidence review completed:291focused
-checks pass,12newcaptures visually clean, no additional boundary/lifecycle/receipt/
-focus/schema findings; two P2 semantic roundtrip bugs requested changes. The result
-was initially not collected and the old green PR watch was removed when the user
-asked about it. No independent review is still running.
+F1-02 parent /home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd, codex/f1-02-shell-accessibility,
+draftPR80 https://github.com/ianwijma/linuxcast/pull/80, signedhead757ce20 +staged
+native observer integration/preflight/mapping.55security includes14offlinePython
+checks; typecheck/lint/plan pass. Existing15unit/2actual Electron integrations/7captures
+remain separate. Native product runs0. Fresh reserved Debian13.7/Orca48.1 lab
+preflight confirmed13sourcehashes/cleanbaseline; shutdown exit0/PID0. Stopped guest
+access blocker resolved. Actual desktop/AT/release acceptance is not inferred.
 
-The coordinator reproduced and fixed both findings: URL-consumed escape pairs
-(including a pair split across URL/text tokens) now use the maintained public inline
-lexer, kept separate from entity-decoded text; terminal editor hard breaks export
-as text LF without a structural backslash marker.57focused parser/export checks
-pass, including12new cases (11red before fixes). Actual production fixture now
-includes URL-adjacent punctuation and a terminal hard break without weakening its
-byte-identical second export, exact owner/source preservation or restart assertions.
+Background product AT controller/parser implementation is running in runtime
+prepared /home/ian/.t3/worktrees/linuxcast/t3-1c57ce87, codex/f1-02-native-at-controller.
+Do not poll it; completion wakes parent. New controller files only, no native test
+until independent review; coordinator integrates shared dependencies/wiring/status.
+Exact task metadata is in parent orchestration. All agents GPT6.1SOL/high.
 
-Final mapped PASS:481unit1.92s/36contracts0.325s/258security1.07s/88browser42.7s/
-40integration44.19s; actualimport5.237s/retainedNotes29.034s/wholeTrash5.218s.
-Full pinned TypeScript/scoped lint pass. All741 historical PNGs unchanged; four
-updated actual dark/light captures axe0 and coordinator inspected, eight component
-captures unchanged from independent visual review. No second independent clean
-review is claimed; the two bounded findings are addressed with parent validation.
-Evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
+Registry8done/20inprogress/69planned,56passed/325pending/8justifiedN/A. No privileged
+service or user content/clipboard touched. Native GNOME/KDE Wayland/X11/AT,
+physical recovery, allfeaturefamilies, performance/package/R1 release gates remain.
 
-Planning CI41182395321 passed signed905a0a9. Its earlier fixture-link failure was
-fixed by using an immutable report URL, preserving validators/assertions. Publish
-the final reviewed-finding fixes, inspect new-head CI/reviews/rules, ready and merge
-normally with expected-head matching. Then record integration and select next work.
+Final actual integration5.93s (scenario5.473s),68security, full typecheck/lint and
+21Python planning tests pass; final5captures visually inspected, axe0. No historical
+captures changed. Frozen initial reviewtreea6b4feba source findings addressed,
+final stage includes timer/FIFO follow-up. No final signed commit/publication yet;
+1Password unlock request pending, no more retries until response/state changes.
+PR body ready at /tmp/linuxcast-f2-diagnostics-pr.md. Next: publish signed reviewed
+bounded work when signer recovers; preserve pending supported-native and missing
+credential UI acceptance, then continue ready implementation. Do not poll live
+background AT-controller delegate; completion wakes parent.
 
-Full Notes/attachments/remainingMarkdown, D1/native prerequisites, Debian13 GNOME/
-KDE Wayland/X11/nativeAT/highcontrast/performance/package/release acceptance remains
-required. Xvfb/Chromium and instrumented chooser choices are partial evidence only.
-Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A.
+Signing recovery: native credential worker normally signed d89d05e, then coordinator
+normally signed F3 dd2a20f/79f056a and published draftPR81
+https://github.com/ianwijma/linuxcast/pull/81. Source exactly matches finalindependent
+c6b83bc5 review; task/native acceptance pending. Normal signing config unchanged.
+Publishing this F2 diagnostics increment as draft next; all finalchecks remain
+as recorded above and no native/credential completion inferred. AT source reviews
+found3P1/2P2 plus unsupported signed-prep precondition; coordinator fixes/8guardunit/
+46Python regressions pass in parentF1; final independent recheck before any run.
