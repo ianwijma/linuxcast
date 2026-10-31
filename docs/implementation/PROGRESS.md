@@ -19,7 +19,9 @@ branch `codex/notes-markdown-import`. The separate author tree
 `.worktrees/linuxcast-notes-markdown-import-ui` is retained. Source manifest:
 `handoff/markdown-import-source-manifest.json`. Old agent IDs and `/tmp` artifacts
 are not required or assumed available. The draft PR is a handoff snapshot, not a
-merge-ready application increment.
+merge-ready application increment. Draft PR77:
+https://github.com/ianwijma/linuxcast/pull/77. Signed source snapshot41824ea9b5fd422e3ea3654b91a83e1762e73b88
+is pushed; its planningCI41181103805 passed. The PR remains draft/unmerged.
 
 U1-01 import merge blockers: (1) strip permitted optional undefined fields from
 parser output and validate the actual storage JSON envelope without weakening it;

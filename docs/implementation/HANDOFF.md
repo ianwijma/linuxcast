@@ -5,6 +5,11 @@ R1-03 and every release gate. This handoff is unfinished work, not a release or
 feature-completion claim. The user requested wrapping this thread so work can
 continue in another thread. No further feature has been started.
 
+Draft handoff PR: https://github.com/ianwijma/linuxcast/pull/77.
+The signed source snapshot is `41824ea9b5fd422e3ea3654b91a83e1762e73b88`;
+its planning CI41181103805 passed. The draft remains unmerged because of the two
+application blockers below.
+
 ## Start here
 
 Use `/home/ian/Projects/ianwijma/linuxcast/.worktrees/linuxcast-notes-markdown-import`
