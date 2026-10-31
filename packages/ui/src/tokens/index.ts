@@ -61,8 +61,9 @@ export function validateTokens(candidate: Json): string[] {
   const fail = (message: string) => { errors.push(message); };
   const exact = (path: string, value: Json, keys: readonly string[]): value is Record<string, Json> => {
     if (!isRecord(value)) { fail(`${path}: expected object`); return false; }
-    const actual = Object.keys(value).sort().join(','), expected = [...keys].sort().join(',');
-    if (actual !== expected) { fail(`${path}: keys differ (expected ${expected})`); return false; }
+    // Compare counts and individual keys; a delimiter serialisation would let "a,b" impersonate a and b.
+    const actual = Object.keys(value).sort(), expected = [...keys].sort();
+    if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) { fail(`${path}: keys differ (expected ${expected.join(', ')})`); return false; }
     return true;
   };
   const int = (path: string, value: Json, min: number, max: number) => {
