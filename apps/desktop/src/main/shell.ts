@@ -189,9 +189,11 @@ export function startResidentShell(options: ResidentShellOptions): void {
       resize: height => {
         if (!window || window.isDestroyed()) return;
         const area = screen.getDisplayMatching(window.getBounds()).workArea;
+        const heightInDesktopPixels = Math.ceil(height * window.webContents.getZoomFactor());
         window.setMinimumSize(Math.min(360, area.width), Math.min(200, area.height));
-        window.setSize(Math.max(1, Math.min(window.getSize()[0]!, area.width - 32)),
-          Math.max(1, Math.min(height, tokens.layout.launcherMaxHeight, area.height - 32)));
+        const width = Math.max(1, Math.min(window.getSize()[0]!, area.width - 32));
+        const boundedHeight = Math.max(1, Math.min(heightInDesktopPixels, tokens.layout.launcherMaxHeight, area.height - 32));
+        if (window.getSize()[0] !== width || window.getSize()[1] !== boundedHeight) window.setSize(width, boundedHeight);
       },
       quit: () => requestQuit(), quitting: () => lifecycle.quitting,
     });

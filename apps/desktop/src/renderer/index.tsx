@@ -5,6 +5,7 @@ import type { DesktopShellApi, DesktopShellState } from '@linuxcast/contracts';
 import '@linuxcast/ui/styles.css';
 import './shell.css';
 import { Launcher } from '../features/launcher/index.tsx';
+import { observeShellSize } from './shell-sizing.ts';
 
 
 
@@ -32,12 +33,7 @@ function Shell() {
   }, [api]);
   useEffect(() => {
     if (!api || !content.current) return;
-    const observer = new ResizeObserver(entries => {
-      const height = Math.ceil(entries[0]?.borderBoxSize[0]?.blockSize ?? 0);
-      if (height >= 32 && height <= 4096) void api.reportContentHeight(height);
-    });
-    observer.observe(content.current);
-    return () => observer.disconnect();
+    return observeShellSize(content.current, height => { void api.reportContentHeight(height); });
   }, [api]);
   useEffect(() => { if (state?.visible && error) hide.current?.focus(); }, [state?.visible, error]);
   const command = async (kind: 'hide' | 'quit') => {

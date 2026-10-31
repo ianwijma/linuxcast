@@ -278,7 +278,8 @@
       "packages/storage/tests/rate-cache.integration.test.ts"
     ],
     "F1-02": [
-      "apps/desktop/tests/shell.integration.test.ts"
+      "apps/desktop/tests/shell.integration.test.ts",
+      "apps/desktop/tests/shell-accessibility.integration.test.ts"
     ],
     "L2-01": [
       "packages/file-index/tests/index.integration.test.ts",
