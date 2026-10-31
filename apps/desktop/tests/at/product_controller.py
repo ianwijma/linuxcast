@@ -90,6 +90,13 @@ def catalogue(owner):
                     f"[Desktop Entry]\nType=Application\nName={title}\nExec=/usr/bin/false\n")
 
 
+def launch_reader(owner, arguments, report):
+    def started(_child):
+        # Popen succeeded even if later identity registration fails.
+        report.native_runs = 1
+    return owner.spawn(arguments, on_started=started)
+
+
 def infrastructure(owner, total, display, report):
     ready = Deadline(10, total)
     runtime = owner.root / "runtime"
@@ -147,9 +154,8 @@ def infrastructure(owner, total, display, report):
         "enableEchoBySentence": False, "startingProfile": ["Default", "default"]},
         "profiles": {"default": {"profile": ["Default", "default"]}}, "keybindings": {}, "pronunciations": {}}))
     log = owner.write("orca.log", "")
-    reader = owner.spawn(["/usr/bin/orca", "--user-prefs", str(owner.root / "orca"), "--enable", "speech",
-                          "--disable", "braille", "--debug-file", str(log)])
-    report.native_runs = 1
+    reader = launch_reader(owner, ["/usr/bin/orca", "--user-prefs", str(owner.root / "orca"), "--enable", "speech",
+                                   "--disable", "braille", "--debug-file", str(log)], report)
     def startup():
         if log.stat().st_size > 8 * 1024 * 1024:
             raise ControllerRejected("orca")

@@ -2,6 +2,8 @@
 import json
 from pathlib import Path
 import signal
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -68,6 +70,40 @@ class FailureTests(unittest.TestCase):
             owner.assert_not_called()
             value = json.loads((Path(temporary) / "new/report.json").read_text())
             self.assertEqual((code, value["nativeRuns"], value["firstFailure"]), (3, 0, "prerequisite"))
+
+    def test_post_spawn_identity_failure_records_launch_before_report_publication(self):
+        # An ordinary Python stand-in, never a real reader/display invocation.
+        program = r'''
+import json,sys,tempfile
+from pathlib import Path
+from unittest import mock
+from session_owner import SessionOwner
+from product_controller import launch_reader
+from controller_protocol import Report,publish
+owner=SessionOwner();report=Report();refresh=owner.refresh;calls=0
+def fail_after_launch():
+ global calls
+ calls+=1
+ if calls>1:raise PermissionError('synthetic post-launch identity failure')
+ refresh()
+try:
+ with mock.patch.object(owner,'refresh',side_effect=fail_after_launch):
+  try:launch_reader(owner,[sys.executable,'-c','import time;time.sleep(30)'],report)
+  except PermissionError:report.fail('prerequisite','setup')
+ report.cleaned=owner.cleanup()
+ with tempfile.TemporaryDirectory() as temporary:
+  target=Path(temporary)/'synthetic-report';publish(target,report.public())
+  value=json.loads((target/'report.json').read_text())
+ print(json.dumps({'oneActualStandInLaunch':len(owner.children)==1,'countPreserved':value['nativeRuns']==1,'failurePreserved':value['firstFailure']=='prerequisite','clean':value['cleanup']}))
+finally:
+ for child in owner.children:
+  if child.poll() is None:child.kill()
+  child.wait(timeout=2)
+'''
+        result = subprocess.run([sys.executable, "-B", "-c", program], cwd=Path(__file__).resolve().parent,
+                                env={"PATH": "/usr/bin:/bin"}, capture_output=True, timeout=9)
+        self.assertEqual(result.returncode, 0, result.stderr.decode())
+        self.assertTrue(all(json.loads(result.stdout).values()))
 
 
 if __name__ == "__main__":

@@ -133,3 +133,29 @@ Final lifecycle hardening also releases a newly acquired pidfd if the subsequent
 identity read fails before ownership registration. A dedicated subprocess fault
 checks the live descriptor count, retained-child termination and clean teardown.
 All48offlinePython cases pass through the mapped wrapper; no native run occurred.
+
+## Final recheck findings and coordinator correction
+
+The independent security recheck of signed67ecd632 confirmed the initial Enter,
+external-path, build-inventory, receipt and retained-child fixes, but found two
+remaining defects. A partially unreadable live `/proc` entry could be omitted
+and falsely verify cleanup; reader launch accounting could remain zero when a
+post-Popen identity refresh failed. No native attempt was made.
+
+The coordinator now ignores only confirmed vanished process entries, propagates
+unreadable/malformed live identities into cleanup failure, and requires kernel
+ECHILD after exact retained-child termination/reaping before verifying absence.
+Transient scan faults are retried within the existing bound and remain a reported
+cleanup failure; unverified absence preserves the private root. Dedicated adopted
+child regressions cover persistent/transient read denial and malformed live stat.
+Reader accounting now runs immediately after successful Popen retention, before
+fallible refresh. A real ordinary Python stand-in exercises this failure through
+report publication and verifies nativeRuns1; it is explicitly not a native reader.
+
+Final offline validation:50Python tests pass without skips; mapped55security
+checks pass, including that complete Python suite. The earlier23unit and2actual
+Electron integration results cover unchanged TypeScript/product sources. No new
+native actualrun, screenshot, delivery, completion or acceptance claim is made.
+These material corrections require an independent final recheck before execution.
+The coordinator hash manifest records the current files; original child manifests
+and reviewed input trees remain historical provenance.

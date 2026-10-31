@@ -213,6 +213,51 @@ print(json.dumps({'noUnregisteredLeak':noLeak,'clean':clean,'directReaped':child
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         self.assertTrue(all(json.loads(result.stdout).values()))
 
+    def test_unreadable_or_malformed_live_adopted_entry_never_verifies_absence(self):
+        for mode in ("persistent-permission", "transient-permission", "malformed-live"):
+            with self.subTest(mode=mode):
+                program = r'''
+import contextlib,json,os,shutil,sys,time
+from pathlib import Path
+from unittest import mock
+from session_owner import SessionOwner
+owner=SessionOwner();root=owner.root;marker=root/'adopted.pid'
+source="import os,sys,time;from pathlib import Path;p=os.fork();os._exit(0) if p else None;os.setsid();Path(sys.argv[1]).write_text(str(os.getpid()));time.sleep(30)"
+child=owner.spawn([sys.executable,'-c',source,str(marker)],required=False)
+deadline=time.monotonic()+2
+while not marker.exists():
+ if time.monotonic()>deadline:raise RuntimeError('fixture startup')
+ time.sleep(.01)
+child.wait(timeout=2);adopted=int(marker.read_text())
+if adopted in owner.handles:os.close(owner.handles.pop(adopted))
+owner.identities.pop(adopted,None)
+read=Path.read_text;calls=0;mode=sys.argv[1]
+def fault(path,*args,**kwargs):
+ global calls
+ if path==Path(f'/proc/{adopted}/stat'):
+  calls+=1
+  if mode=='malformed-live':return 'malformed synthetic stat'
+  if mode=='persistent-permission' or calls==1:raise PermissionError('synthetic unreadable live entry')
+ return read(path,*args,**kwargs)
+clock=contextlib.nullcontext() if mode=='transient-permission' else mock.patch('session_owner.time.monotonic',side_effect=[100,106])
+try:
+ with mock.patch.object(Path,'read_text',fault),clock:clean=owner.cleanup()
+ alive=Path(f'/proc/{adopted}').exists()
+ valid=(not clean and (root.exists() if alive else not root.exists()) and calls>0)
+finally:
+ try:os.kill(adopted,9)
+ except ProcessLookupError:pass
+ while True:
+  try:os.waitpid(-1,0)
+  except ChildProcessError:break
+ shutil.rmtree(root,ignore_errors=True)
+print(json.dumps({'noFalseClean':valid,'transientReaped':mode!='transient-permission' or not alive}))
+'''
+                result = subprocess.run([sys.executable, "-B", "-c", program, mode], cwd=HERE,
+                                        env={"PATH": "/usr/bin:/bin"}, capture_output=True, timeout=9)
+                self.assertEqual(result.returncode, 0, result.stderr.decode())
+                self.assertTrue(all(json.loads(result.stdout).values()))
+
 
 if __name__ == "__main__":
     unittest.main()

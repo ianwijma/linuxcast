@@ -105,7 +105,7 @@ class SessionOwner:
             stream.write(text)
         return path
 
-    def spawn(self, arguments, cwd=None, protocol=False, required=True):
+    def spawn(self, arguments, cwd=None, protocol=False, required=True, on_started=None):
         self.refresh()
         child = subprocess.Popen(arguments, cwd=cwd or self.root, env=self.env, start_new_session=True,
                                  stdin=subprocess.PIPE if protocol else subprocess.DEVNULL,
@@ -114,6 +114,8 @@ class SessionOwner:
         self.children.append(child)  # Retain even on later setup failure.
         if required:
             self.required.append(child)
+        if on_started is not None:
+            on_started(child)
         self.refresh()
         return child
 
@@ -128,7 +130,13 @@ class SessionOwner:
                     parents[int(entry.name)] = int(data[1])
                     starts[int(entry.name)] = data[19]
                 except (OSError, ValueError, IndexError):
-                    continue
+                    # Only a confirmed disappearance can be omitted. Skipping
+                    # an unreadable live process could hide an adopted child.
+                    try:
+                        entry.stat()
+                    except (FileNotFoundError, ProcessLookupError):
+                        continue
+                    raise ControllerRejected("child") from None
         owned = {os.getpid()}
         while True:
             more = {pid for pid, parent in parents.items() if parent in owned}
@@ -241,12 +249,14 @@ class SessionOwner:
                 # Popen owns its direct children; then reap adopted descendants.
                 for child in self.children:
                     child.poll()
+                no_remaining_children = False
                 while True:
                     try:
                         pid, _ = os.waitpid(-1, os.WNOHANG)
                         if pid == 0:
                             break
                     except ChildProcessError:
+                        no_remaining_children = True
                         break
                 try:
                     # Retry discovery after reaping, which can also release scarce
@@ -256,7 +266,7 @@ class SessionOwner:
                         for fd in self.handles.values():
                             selector.register(fd, selectors.EVENT_READ)
                         dead_count = len(selector.select(0))
-                    verified = (not live and dead_count == len(self.handles)
+                    verified = (no_remaining_children and not live and dead_count == len(self.handles)
                                 and all(child.poll() is not None for child in self.children))
                     if verified:
                         break

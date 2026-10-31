@@ -79,3 +79,26 @@ PR81/82 remain drafts with accepted local checks and current-head planningCI as
 recorded; no requested/submitted reviews/comments or develop protection/rulesets.
 No merge before outstanding native/task acceptance. Published progress is a
 checkpoint, not completion of any unfinished task or the full local1.0 goal.
+
+
+31October final review correction checkpoint (supersedes pending-review statements
+above): final AT recheck of67ecd632 is complete/read. Initial findings resolved,
+but P1 partial unreadable live process scan could falsely verify cleanup and P2
+post-launch refresh failure could undercount reader runs. Coordinator corrections
+now require confirmed disappearance, kernel ECHILD plus no retained live children,
+bounded discovery retry/root preservation, and launch accounting immediately after
+Popen retention.50offlinePython/55mappedsecurity pass, no skips. No TypeScript or
+production UI changed; prior23unit/2actualElectron evidence remains scoped to its
+unchanged sources. Native runs0, lab not resumed. New independent final safety
+recheck remains required; no clean review or acceptance is inferred.
+
+Native credential observer independent security/spec review ofd89d05e is complete:
+no production defect found; P3 parent-death fixture also allowed EOF and bypassed
+full output validation. Coordinator copy in f2-02-credential-storage now retains a
+separate stdin writer across parent death, requires an eligible first observation,
+reaps the exact helper and uses shared strict frame/terminal validation.6pure,
+35privatebus andnonrootpeer checks, offlineClippy/warnings/format pass after this
+small fixture correction. No native desktop/keyring/provider acceptance. Original
+worker commit/manifests remain historical. Missing Nodeclient, native CLI/library
+glue, admission/predispatch/abort/clearing, credentialsetup/status and Debianmatrix
+remain useful next work. No active delegate is being polled.
