@@ -35,7 +35,9 @@ export function outcomeNotice(reply: CredentialSettingsActionReply, operation: O
     case 'saved': return { kind: 'success', title: 'Local save confirmed', text: 'The local key save was confirmed. Provider authentication has not been checked.' };
     case 'removed': return { kind: 'success', title: 'Removal confirmed', text: 'Key removal was confirmed.' };
     case 'policy-updated': return { kind: 'success', title: 'Policy update confirmed', text: 'The session policy update was confirmed.' };
-    case 'cancelled': return { kind: 'interrupted', eyebrow: 'Cancelled', title: 'Nothing was changed', text: 'The operation was cancelled. Editable input was cleared.' };
+    // Neutral: main does not guarantee rollback (a cancel can follow partial work), so never claim
+    // the prior state survived. The refreshed confirmed snapshot below is the only status source.
+    case 'cancelled': return { kind: 'interrupted', eyebrow: 'Cancelled', title: 'Operation cancelled', text: 'The operation was cancelled. Editable input was cleared. Review the current status below before acting again; nothing is replayed.' };
     case 'stale': return { kind: 'interrupted', eyebrow: 'Not applied', title: 'Settings changed', text: STALE_TEXT };
     case 'unknown': return unknownNotice;
     case 'unavailable': return { kind: 'unavailable', title: 'Operation unavailable', text: UNAVAILABLE_TEXT };
