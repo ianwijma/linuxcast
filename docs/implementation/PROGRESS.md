@@ -580,3 +580,23 @@ continue on frozen944c1f7 without polling. Private probe copied to
 /tmp/linuxcast-credential-outcome-probe-gta2dzkm
 and removed from repo; no source/evidence/index changed by probe, no native/keyring/
 provider/hostbus action. No PR yet; full task/UI/native acceptance unchanged.
+
+Both credential initial reviews completed/read: Standards eebf4024 and
+Security/Specde842f32 independently reproduce ONLY the same cancelled rollback-
+wording P2; no other actionable findings/smells. Both85units/3contracts/type/lint/
+plan, Standards27settings/runtime andSpec34selectedsecurity plus own faultprobes,
+all9PNGs inspected; parent144security/Electron inherited honestly. Saved-local
+band whilelocked explicitly qualified, no finding. Original Opusmedium author
+follow-up6f81af85-d902-46d0-a12b-3cf92a126a45 now corrects neutral cancellation
+copy/UI regression/product assertion/one affected capture; no backend changes.
+Parent adds production settings boundary regression documenting that cancelled
+replacement can leave storednone after oldpersistent deletion/newmemory clearing.
+No another broad review requested for the small copy correction; parent will
+verify exact current changes and rerun the real failing probe before publication.
+D1Opusmedium6fb9f0b9 completed/read clean cf12fe365bf3d2b0fbd2ff7c3289113b150eb8b8,
+treead3ba1c50db71ac67ce7e5d68924411a5b5670ec, two unsigned additive commits fromeae:
+truthful editable-context hints, one-shot query-clear selection reveal, live-panel
+resize/reanchor and ratified narrow full-opacity rise exception. Each new browser
+regression fails eae/passesfixed; author23browser/350downstream/28D1/32F1/10glyph/
+2Electron/type/lint/plan pass. Native/AT pending; parent integrate/check then fresh
+two-axis review next, while credential small correction runs independently.
