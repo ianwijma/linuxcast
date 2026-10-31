@@ -142,3 +142,39 @@ executed or installed. The original cache/provenance remain unchanged; a separat
 private0400supplement records the new verification. This closes the bounded
 upstream-header-content gap noted at initial snapshot time, not signed-release,
 actual Debian compiler/ABI/build or native acceptance.
+
+
+## Pinned Rust distribution inputs, download and data inventory only
+
+The coordinator downloaded five x86_64-unknown-linux-gnu Rust1.95 components
+from the official dated distribution URLs. The 848,342-byte
+[channel manifest](https://static.rust-lang.org/dist/channel-rust-1.95.0.toml)
+matches its published SHA256,
+`821ff14e4c4a1cbe1e8915f35aff0a3fbbdf8d293ad48ab8f31e3b0440c581f9`.
+All component archive digests match that manifest; release signatures were not
+verified. The read-only private candidate totals127,772,720 compressed bytes.
+
+| Component | Compressed bytes | SHA256 |
+| --- | ---: | --- |
+| rustc | 80,351,960 | `8426a3d170a5879f5682f5fbdd024a1779b3951e7baba685af2d6dc32a6dfc15` |
+| cargo | 10,984,780 | `e74edd2cf7d0f1f1383b4f00eb90c843750bc489e2ccf7214e6476678a907425` |
+| rust-std | 29,573,972 | `047ea7098803d3500fa1072e9cee5392697e21525559e4458128a2bf874aa382` |
+| clippy-preview | 4,697,128 | `ac779bc9839dd47180806b133e4e2563c4a34716284cd5b8fede8ef289f452ca` |
+| rustfmt-preview | 2,164,880 | `f1b2a7301513ffdd95ebf22ebbdd932e4d17fc806f748d93924740d0297b1396` |
+
+A later data-only inventory, under the retained existing exclusive lab lock,
+rehashed all five archives and checked all263 members against a canonical
+component prefix, duplicate/path/type/sparse/link and bounded expansion checks.
+There are215 regular files, no links, and642,478,515 expanded regular-file bytes.
+The14 inspected ELF headers in bin paths identify x86-64 and the interpreter
+`/lib64/ld-linux-x86-64.so.2`. No file was extracted, no downloaded program was
+executed, and no installer, compiler, guest or native action occurred. Private
+0400 provenance and layout reports retain these exact facts outside Git.
+The first inventory attempt stopped before publication because Python3.10 lacks
+hashlib.file_digest; the corrected streaming SHA256 pass completed.
+
+This proves bounded archive/content inventory only. Actual Debian library/ABI,
+installation, compiler identity, dependency installation and complete build/receipt
+still require the reviewed guest preparation owner. The native-only outer owner
+requires an existing actual receipt and must not accept a placeholder to permit
+provisioning. No source, wrapper, permit or native acceptance gate is weakened.

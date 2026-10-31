@@ -1,38 +1,38 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — outer owner initial review preparation
+## Current coordinator state — outer owner initial review
 
-Goal ACTIVE: complete97/local1.0 throughR1-03, registry8done/20inprogress/69planned,
-56passed/325pending/8N/A unchanged. Approveddevelopb3bea80 is mergedPR96 fromdf840d4;
-CI41241160063 SUCCESS, GitHubreviews/requests/comments empty, normalexactheadmerge,
-immediate tinymergeblurb. Allseven Instrument surfaces retained, no full/native
-acceptance. No openPR/watch or rootprocess.
+Goal ACTIVE: all97 tasks/full local1.0 throughR1-03. Approved develop b3bea80
+(PR96) retains the seven Instrument UI refreshes. Registry8done/20inprogress/
+69planned and56passed/325pending/8N/A remain unchanged. No native/Orca runs.
 
-Rootcodex/f1-02-outer-owner-integration integrates frozenworker43a811e from7abb845
-ontoPR96, resolvingonlycoordinatormetadata. Newowner1002lines/tests1034lines and
-3evidencefiles, parentfrozenouter-owner-protocol/inventory. Worker59owned/173base
-Python/no skips/AST/hashes/planpass; inheritedcontextnotcurrentparentruntimeproof.
-ActualownerCLI/Docker/SSH/guest/native neverinvoked. Initialindependentreviewsnext.
-Twoearlydeadlinefixturesfromworker lacksretainedhistoricaldescendantabsence;
-readonlyexactinvocationcheck0readablematches/3unreadablecandidates/no signals,
-sohistoricalreapingremainsunverified. Do not claimretroactivecleanup orsignal
-unattributedprocesses. Review/hardenindependentfixturecustody beforenewfaultprobes.
-Currentbase's120Python plus59owned means179discoveredcases; combinedexecution
-notyetclaimed. Existing18s mappedPythonbudget requiresactualmeasurement,noauto
-widening/skips. Native/build/transport/permit/outerrecoveryremainunaccepted.
+Root codex/f1-02-outer-owner-integration now integrates author2be0016 unchanged
+as722f92b on revised parent contract745bf7f. Five owned files add fixed graceful
+poweroff before forced fallback and an independent fixture kernel custody guard.
+Author82owned/196offline Python pass; parent current55mapped F1 security passes
+18.29s, with combined Python payload17.027s inside unchanged18s bound. Parent
+2ASTs/four owned hashes/two unchanged pins/revised contract/plan/whitespace pass.
+Initial independent two-axis review is next. No actual owner CLI, Docker/SSH,
+guest, build or native action; historical early timeout absence remains unverified.
 
-Currentpubliccache420files/22861050B manifestd733fe37..0db3: all152lockedcrate
-archives+selectedsparseindexmetadata verified, hostCargo1.95 offline metadata
-resolves152/fourworkspace withoutcompileroutput; privateprofile/rawmetadataremoved.
-NewupstreamElectron45headers download350098B SHA bf3ec8ef..ae4f6 verifiedagainst
-officialHTTPS SHASUMS256; all124upstreamfilesmatchcandidate, solelocalinstallVersion
-matchespinnednode-gyp. Supplemental0400provenanceoutsideGit, originalunverified-
-atcreationrecord preserved. Not signedreleaseverification, DebianABI orbuildproof.
-FrozenBBBEproductsource/tree5a85d525/archive732f7bcc..436dc remainsapprovedbaseline;
-oldguestwrapperrejectsnewtree, actualDebianbuild/receipt, PID1metadata andnative
-comboboxidentity unresolved. No native/Orca runs; physical/performance/release
-scope remains required. /homeabout2GiBfree; cleanup onlyderivedconfirmedterminal
-worktrees ifneeded, preserve all sources/evidence/disks/keys/archives.
+A1-01 backend work runs independently from coordinator bootstrap8b0b88e on
+codex/a1-01-broker-preparation: new workspace/lock/contract only, frozen install,
+typecheck/plan/whitespace pass. Unsigned fallback after current 1Password failure,
+configuration unchanged. GPT6.1SOL/high child ef66ad7c owns only broker/OpenRouter
+source directories; synthetic transports, scoped SecretStore and one global route.
+No UI, provider requests, shared-schema or accepted prerequisite/task claims.
+A1 remains planned pending implementation evidence and integration readiness.
+
+Public inputs outside Git: approved BBBE source tree5a85d525/archive732f7bcc,
+420-file Cargo/header cache with152locked crates and verified124upstream Electron
+headers. Rust1.95's five archives127772720B match the official manifest; subsequent
+nonexecuting263-member/215-file inventory checks paths/types/ELF headers. No
+extraction/install/compiler invocation. Full hashes and limitations are in the
+offline-build-preparation report; private provenance retained read-only.
+/home has13GiB free, no additional cleanup. Native-only owner needs an actual
+receipt; separately reviewed build provisioning is required, never a placeholder.
+Old wrapper tree rejection, PID1 metadata, actual native query identity, guest
+transport/recovery and supported desktop/AT/physical/performance/release remain.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
