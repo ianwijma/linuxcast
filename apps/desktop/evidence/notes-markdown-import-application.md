@@ -70,8 +70,13 @@ the retained `linuxcast-emoji-ui` worktree. Production sandbox settings unchange
 - `BUN_TMPDIR=/tmp LINUXCAST_PRIVATE_DISPLAY=1 xvfb-run -a node scripts/test-runner/run.ts integration U1-01`:
   all 40 PASS, 6 files, 45.21s. Actual import 5.302s, retained Notes 29.636s,
   whole-Trash 5.353s, plus 37 real owner checks.
-- Full pinned TypeScript and scoped lint PASS; documentation rendering, plan/status
-  validation and whitespace checks run before publication.
+- Full pinned TypeScript and lint over all20 changed TypeScript files PASS.
+  Documentation rendering/plan/status/whitespace checks and all21 documentation
+  gate tests PASS. The first pushed CI failed two gate fixture tests because the
+  HANDOFF local report link reached outside the docs-only copied fixture; changing
+  that link to the immutable GitHub report URL fixed the same reproduced failures.
+  No validator, fixture or application assertion was weakened.
+- Capture framing-only actual import rerun:1 PASS,4.98s (5.77s overall).
 
 The actual production test exports a draft with boundary LF, escaped HTML/link
 text, Unicode, checked/nested unchecked tasks and literal code. It verifies chooser

@@ -26,8 +26,16 @@ Detailed evidence: `apps/desktop/evidence/notes-markdown-import-application.md`.
 The earlier failed application and intermediate continuation attempts are retained
 in evidence; the historical HANDOFF.md does not describe current blockers.
 
-Next: independent final source/capture/evidence review, signed commit/push, ready
-PR77, inspect current-head CI/reviews/rules, then normal expected-head merge.
+Signed source head b3ea4d4ec590ccbf7dfb749110c55d364c0de1cd is pushed and its
+signature cryptographically verified against the configured public key. An isolated
+GPT-6.1 SOL/high read-only final source/capture/evidence review is running.
+The first pushed planning CI41182245139 failed two docs-only fixture checks because
+the new HANDOFF local report link reached outside the copied planning tree. The
+link now uses the immutable report URL; the same21gate tests pass locally, with no
+validator or application assertion changes. All20changedTS lint passes.
+
+Next: finish independent review, inspect final-head CI/reviews/rules, ready PR77,
+then normal expected-head merge.
 After integration record its merge, refresh dependencies and select the next
 bounded application increment. No new feature has started.
 
