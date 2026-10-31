@@ -567,6 +567,46 @@ class FaultBoundaries(unittest.TestCase):
                 g.start()
         self.assertEqual((g.pid, g.gate, g.pidfd), (1234, 42, None))
 
+    def test_interrupted_fork_requires_echild_before_removing_owned_paths(self):
+        # Simulate a signal after fork created the gated child but before Python
+        # could retain its PID. No real fork/process or kernel setup is executed.
+        g = lab.Guest()
+        g.cgfd = 44
+        events = []
+        def wait(*args):
+            events.append('wait')
+            if events.count('wait') == 1:
+                return (0, 0)  # gate EOF has not yet caused the child's exit
+            if events.count('wait') == 2:
+                return (1234, 0)
+            raise ChildProcessError
+        with patch('os.pipe2', return_value=(41, 42)), \
+             patch('os.fork', side_effect=KeyboardInterrupt), patch('os.close') as close:
+            with self.assertRaises(KeyboardInterrupt):
+                g.start()
+            self.assertIsNone(g.pid)
+            with patch.object(g, 'write_cgroup'), patch.object(g, 'cgroup_empty', return_value=True), \
+                 patch.object(g, 'remove_owned', side_effect=lambda: events.append('remove')), \
+                 patch('os.waitpid', side_effect=wait), patch('time.sleep'), \
+                 patch('signal.signal'), patch('signal.setitimer'):
+                self.assertTrue(g.cleanup())
+        self.assertEqual(events, ['wait', 'wait', 'wait', 'remove'])
+        self.assertEqual([call.args[0] for call in close.call_args_list], [41, 42])
+
+    def test_interrupted_fork_preserves_resources_when_child_absence_is_unknown(self):
+        g = lab.Guest()
+        g.cgfd = 44
+        with patch('os.pipe2', return_value=(41, 42)), \
+             patch('os.fork', side_effect=KeyboardInterrupt), patch('os.close'):
+            with self.assertRaises(KeyboardInterrupt):
+                g.start()
+            with patch.object(g, 'write_cgroup'), patch.object(g, 'cgroup_empty', return_value=True), \
+                 patch.object(g, 'remove_owned') as remove, patch('os.waitpid', return_value=(0, 0)), \
+                 patch('time.monotonic', side_effect=[0, 9]), \
+                 patch('signal.signal'), patch('signal.setitimer'):
+                self.assertFalse(g.cleanup())
+        remove.assert_not_called()
+
     def test_cgroup_admission_must_confirm_exact_child_before_release(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

@@ -9,12 +9,17 @@
   "kernel": "7.1.1-76070101-generic",
   "architecture": "x86_64",
   "pathPrefix": "/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools",
-  "newWrapperTests": 42,
+  "newWrapperTests": 44,
   "existingPureProtocolParserStagingTests": 25,
+  "completeOfflineAtTests": 97,
   "checks": [
     {
+      "command": "PYTHONPATH=apps/desktop/tests/at python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py' -q",
+      "result": "97 pass in12.102s, zero failures/errors/skips. Existing private ordinary-Python controller stand-ins only; no product, display, reader, namespace or guest execution."
+    },
+    {
       "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH PYTHONPATH=apps/desktop/tests/at python3 -B -m unittest test_lab_namespace test_controller_protocol test_orca_output test_product_staging -q",
-      "result": "67 pass, zero failures/errors/skips; synthetic adapters and private temporary files only"
+      "result": "69 pass, zero failures/errors/skips; synthetic adapters and private temporary files only. Two new interrupted-fork regressions failed on original9f6f053 before correction."
     },
     {
       "command": "python3 AST parsing of lab_namespace.py and test_lab_namespace.py",
@@ -37,7 +42,7 @@
   "namespaceActions": 0,
   "guestActions": 0,
   "signing": "UNSIGNED preparation commit: normal configured SSH signing via /opt/1Password/op-ssh-sign timed out after30s (exit124), producing no commit. Explicitly user-authorized per-command git -c commit.gpgsign=false fallback; no persistent signing configuration or signed release rule changes.",
-  "independentReview": "required; not performed by this implementation worker",
+  "independentReview": "Original9f6f053: Standards P2 interrupted-fork child-absence verification; Security/Spec no actionable findings. Both independently67offline tests passed. Coordinator correction69offline tests passes; fresh final independent recheck remains required.",
   "outerLabOwner": "outstanding: reservation, baseline, shutdown/reap/release, SIGKILL and VM-loss recovery",
   "acceptance": "F1-02-UI, D1 UI/native, full task and complete local 1.0 remain pending; accepted criterion evidence unchanged"
 }

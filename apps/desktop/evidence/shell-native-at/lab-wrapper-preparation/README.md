@@ -193,7 +193,7 @@ cleanup; a future coordinator must retain only the reviewed fixed projection.
 ## Offline evidence and acceptance limits
 
 See [checks.json](checks.json) and [sha256.json](sha256.json) for this increment's
-recorded commands and source hashes. New42unittest cases use only pure validators,
+recorded commands and source hashes. New44unittest cases use only pure validators,
 fixed plans, mocked kernel/process/privilege operations and private temporary
 files. They cover each parent/setup step, each read-only bind operation, invalid
 host/root/UID/identity/Node/staging/receipt/path, no-PID namespace planning, argv/
@@ -225,6 +225,34 @@ semantics in [cgroup v2](https://docs.kernel.org/admin-guide/cgroup-v2.html),
 and mounting sysfs in [sysfs](https://docs.kernel.org/filesystems/sysfs.html).
 Kernel/user-namespace and ptrace behavior still require actual guest verification;
 source/manual reading is not runtime proof.
+
+## Independent review and coordinator correction
+
+The frozen unsigned9f6f053 increment received separate independent Standards and
+Security/Spec reviews. Both independently passed67offline tests and preserved
+the exact clean source/index. Security/Spec reported no actionable findings and
+passed five additional synthetic boundary probes. Standards found one P2: a signal
+after kernel fork but before Python retained its PID could let cleanup skip
+ECHILD verification while the gated child had not yet exited.
+
+The coordinator now records the possibility of a child before invoking fork.
+After closing the gate, any attempted fork requires bounded reaping through
+ECHILD and an empty owned cgroup before resource removal. An unknown child PID
+does not authorize a PID-name sweep or removal of unverified resources. A failure
+before any fork retains the existing no-unowned-child-reaping behavior.
+
+Two mocked regressions demonstrate the original defect: both fail against
+9f6f053 (early removal/no waits and false cleanup success). The corrected source
+passes44wrapper tests plus25existing pure protocol/parser/staging tests,69total,
+without skips. They create no processes or namespaces. The second regression
+keeps an unrecorded child unresolved past the bound and requires preservation.
+The complete offline AT discovery suite also passes97tests in12.102s without
+skips. Its existing controller fixtures use ordinary private Python stand-ins;
+they execute no product, display, reader or namespace operations.
+Final independent recheck of this correction remains required before invocation.
+Native, namespace and guest runs remain zero; outer ownership and UI/source
+refresh prerequisites remain unchanged. These corrections are coordinator-authored
+nonUI work; the active Instrument UI lane uses Opus5.5medium separately.
 
 ## Commit signing record
 

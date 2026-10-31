@@ -355,6 +355,7 @@ class Guest:
         self.root_name = self.cg_name = None
         self.root_identity = self.cg_identity = None
         self.pid = self.pidfd = self.gate = None
+        self.fork_attempted = False
         self.parent_pid = os.getpid()
         self.reaped = False
         self.code = None
@@ -454,6 +455,9 @@ class Guest:
         read, write = os.pipe2(os.O_CLOEXEC)
         self.gate = write
         try:
+            # A signal can interrupt Python after the kernel creates a child but
+            # before its return value is retained. Cleanup must still prove ECHILD.
+            self.fork_attempted = True
             pid = os.fork()
         except BaseException:
             os.close(read)
@@ -554,7 +558,7 @@ class Guest:
         verified = False
         while True:
             try:
-                if self.pid is None:
+                if not self.fork_attempted and self.pid is None:
                     verified = self.cgfd is None or self.cgroup_empty()
                     break
                 # Reap direct and adopted children in this dedicated wrapper only.
