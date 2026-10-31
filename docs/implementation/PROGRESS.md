@@ -858,3 +858,30 @@ updated with final results, UIadoption/registry reflect reviewed preparation and
 all acceptance remains unchanged. Publish focused F3 PR now, check currentCI and
 merge promptly; exclude D1/sourcehelper/ATadapter code. D1Opusmedium9c84499d
 continues four scoped P2 corrections. No active root process or PRwatch.
+
+
+PR90 MERGED atf7ed86e92d9fb111de9f001dec074a561b24e26b from9d744d2; Planning
+CI41231641269 SUCCESS, both independent reviews clean, no requested/submitted
+GitHub reviews/comments. Immediate tiny merge blurb sent; no PRwatch was started.
+Approved F3 source merged into D1 branch43dfb0d; only adoption-ledger conflict
+resolved with current PR90/active Notes state. Task/criteria unchanged.
+
+Opusmedium D1 correction9c84499d completed/read cleana9090c119bb5b04ccc442105c2c8f42f47038988,
+tree848bf90657823f255fec324d4e887381a90782cf, unsigned authorized fallback after
+normal30s signer failure/no config change. Integrated184d4d74; only14owned views
+paths changed: actual-container/text-scaled split stacking, stable flat action-ID
+rows/focus, backward Left, exactCtrlHomeEnd. Six new regressions fail5197/passfix.
+Parent28D1units/30browser40.2s/fulltype/lint/plan and2F1Electron25.76s pass.
+After PR90 integration, F3two22.54s and F2two14.88s pass. Initial F3 run raced
+Refresh against SIGKILL exit notification and failed its precise message check;
+unchanged isolated rerun passed15.27s. Test now observes existing read-only API
+unavailability before Refresh; product source/claims unchanged. All incidental
+PNGs restored and two known transient legacy Localdata captures removed.
+
+Fresh bounded final recheck3fe2a5e4-3087-4f33-97ed-7de62b91dc36 runs independently
+on184d4d74/base1e4682b, both Standards and Security/Spec axes; no source edits or
+product/native actions permitted. No final clean review claimed yet. Sourcehelper
+86abb64/ATadapter5eca891 remain unreviewed/unused and excluded. Notes Opusmedium
+04657eb9 remains active from approved63c9581 in codex/u1-01-instrument-notes; no
+completion inferred. Next: complete bounded final D1 review, publish focused PR,
+current CI/review inspection and prompt merge; continue existing Notes/workflow UI.
