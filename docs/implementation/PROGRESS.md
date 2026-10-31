@@ -931,3 +931,12 @@ change or actual execution. Needs its own independent review beforeuse. Root
 returned to this approved-source coordinator continuation (no adapter additions).
 Notes04657eb9 and workflow8e4a9591 still follow asynccompletion callbacks; don't
 poll. No running rootprocess/PRwatch. Full97task/native/physical/release goalactive.
+
+Current source-helper reconciliation on codex/f1-02-source-build-reconcile from
+approvedPR91 plus coordinator22ab1c9: copies only4ownedfiles from saved86abb64,
+2executable/testhashes unchanged. Complete113offlinePythonchecks/no skips,2AST/
+hashes/plan/whitespace pass. No sourcearchive/build/guest/namespace/native actions;
+legacy PR85archive is historical and cannot serve Instrumentbuild. Initial
+independent review of full extraction/custody/cleanup remains required beforeuse.
+Separate ATadaptera9bbb33 excluded. Notes/workflow lanes remain disjoint and
+async, no statuspoll. All full97task/native/physical/release gates remain active.
