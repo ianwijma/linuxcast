@@ -506,3 +506,14 @@ recaptures restored; new focused capture inspected. Initial independent Standard
 and Security/Spec review is next, then focused PR/CI/merge. No task/criterion
 promotion, native/Orca/keyring/provider acceptance unchanged. D1renderer72448bb9
 continues independently; no active PRwatch or root test process.
+
+Initial LocalData reviews now run against frozen d8e3133d8d4b64fc99dbccc34877f5e8e8698f8e:
+Standards e6b7e5cb-36fe-443a-a46f-b82604fd9f68 and Security/Spec
+8c81c029-6fec-405d-bc21-b166578b8a5f, fresh isolated GPT6.1SOL/high tasks.
+Completion wakes parent; do not poll. No LocalData PR yet. D1renderer72448bb9 has
+returned clean eae6a6d (unsigned authorized fallback) with browser/product evidence;
+read its completed final before integration. Reported two baseline search-limit
+unit failures, footer type absent (no wire field), rise-only panel motion versus
+canonical fade, editable textarea shortcut hints and query-clear selection scroll
+need bounded coordinator assessment. Parent LocalData branch remains the frozen
+review candidate; preserve separate UI increments and reserved test hunks.
