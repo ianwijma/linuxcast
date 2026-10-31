@@ -921,3 +921,13 @@ sourcehelper86abb64 and ATadapter5eca891 remain unreviewed/unused; no native
 product/Orca runs, labguest/namespace actions or hostbus/keyring/provider traffic.
 Next integrate/review existing Notes/workflows on their actual completion; use
 spare coordinator time for bounded nonUI native preparation without starting lab.
+
+Offline adapter reconciliation is saved separately at
+a9bbb33b5db19b2c9f8b3c21cb6e29ebba171741, codex/f1-02-instrument-at-reconcile,
+clean. It carries approvedPR91 and saved adapter5eca891 with unchanged3source
+hashes,37currentF1units2.48s/fulltype/scopedlint/plan/hash pass. Native observer's
+ENTRY-versus-COMBO_BOX identity remains explicitly unresolved; no role/pin/parser
+change or actual execution. Needs its own independent review beforeuse. Root
+returned to this approved-source coordinator continuation (no adapter additions).
+Notes04657eb9 and workflow8e4a9591 still follow asynccompletion callbacks; don't
+poll. No running rootprocess/PRwatch. Full97task/native/physical/release goalactive.
