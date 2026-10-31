@@ -32,14 +32,14 @@ it('opens selected-folder search through the real launcher and preserves native 
   for(const key of ['DISPLAY','XAUTHORITY','PATH','LANG'])if(process.env[key])env[key]=process.env[key]!;
   const launch=async()=>{
     application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
-    const launcher=await application.firstWindow();await launcher.waitForURL('linuxcast-app://shell/index.html');await launcher.getByRole('searchbox',{name:'Search commands',exact:true}).waitFor();return {app:application,launcher};
+    const launcher=await application.firstWindow();await launcher.waitForURL('linuxcast-app://shell/index.html');await launcher.getByRole('combobox',{name:'Search commands',exact:true}).waitFor();return {app:application,launcher};
   };
   let {app,launcher}=await launch();
   const clipboardText=()=>execFileSync('xclip',['-selection','clipboard','-out'],{env,encoding:'utf8',timeout:3000});
   await app.evaluate(async({clipboard})=>{await clipboard.writeText('PUBLIC_PATH_CLIPBOARD_SENTINEL');});expect(clipboardText()).toBe('PUBLIC_PATH_CLIPBOARD_SENTINEL');
   const openFiles=async()=>{
-    const query=launcher.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('file search');await expect.poll(()=>launcher.getByRole('option',{selected:true}).textContent()).toContain('File search');
-    const opened=app.waitForEvent('window');await query.press('Enter');const page=await opened;await page.waitForURL('linuxcast-app://shell/file-search.html');await page.getByRole('searchbox',{name:'Folders',exact:true}).waitFor();return page;
+    const query=launcher.getByRole('combobox',{name:'Search commands',exact:true});await query.fill('file search');await expect.poll(()=>launcher.getByRole('option',{selected:true}).textContent()).toContain('File search');
+    const opened=app.waitForEvent('window');await query.press('Enter');const page=await opened;await page.waitForURL('linuxcast-app://shell/file-search.html');await page.getByRole('combobox',{name:'Folders',exact:true}).waitFor();return page;
   };
   let files=await openFiles();
   const state=()=>files.evaluate(async()=>{const reply=await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.getState();return reply.ok?reply.value:null;});
@@ -47,9 +47,9 @@ it('opens selected-folder search through the real launcher and preserves native 
   expect(await files.evaluate(()=>({node:typeof process,require:typeof (window as unknown as {require?:unknown}).require,keys:Object.keys((window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles).sort()}))).toEqual({node:'undefined',require:'undefined',keys:['chooseFolder','close','copyPath','copyPreviewText','getState','onState','pauseIndex','previewText','removeFolder','search','startIndex']});
   // Native dialogs alone are instrumented; renderer, IPC, native index, storage and lifecycle are production.
   await app.evaluate(({dialog})=>{dialog.showOpenDialog=async()=>({canceled:true,filePaths:[]});});
-  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');expect((await state())?.roots).toEqual([]);
+  await files.getByRole('combobox',{name:'Folders',exact:true}).press('Enter');expect((await state())?.roots).toEqual([]);
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},selected);
-  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');const search=files.getByRole('searchbox',{name:'Search files',exact:true});await search.waitFor();
+  await files.getByRole('combobox',{name:'Folders',exact:true}).press('Enter');const search=files.getByRole('combobox',{name:'Search files',exact:true});await search.waitFor();
   await expect.poll(state).toMatchObject({roots:[{activity:'paused',state:'idle',generation:null}]});
   await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching',state:'ready',generation:expect.any(String)}]});
   await search.fill('public');await expect.poll(()=>files.getByRole('option').count()).toBe(2);await search.press('ArrowDown');await search.press('Enter');
@@ -125,9 +125,9 @@ it('opens selected-folder search through the real launcher and preserves native 
   writeFileSync(join(selected,'public-summary.txt'),publicText);utimesSync(join(selected,'public-summary.txt'),new Date('2024-01-03T12:00:00Z'),new Date('2024-01-03T12:00:00Z'));
   // Closing this workspace preserves the resident owner. Reopening reuses saved metadata.
   await files.close();files=await openFiles();await expect.poll(state).toMatchObject({roots:[{activity:'paused',state:'ready'}]});
-  const quit=async()=>{const exited=new Promise<number|null>(resolve=>app.process().once('exit',resolve));const query=launcher.getByRole('searchbox',{name:'Search commands',exact:true});await query.fill('quit');await query.press('Enter',{noWaitAfter:true});expect(await exited).toBe(0);application=undefined;};
+  const quit=async()=>{const exited=new Promise<number|null>(resolve=>app.process().once('exit',resolve));const query=launcher.getByRole('combobox',{name:'Search commands',exact:true});await query.fill('quit');await query.press('Enter',{noWaitAfter:true});expect(await exited).toBe(0);application=undefined;};
   await quit();({app,launcher}=await launch());files=await openFiles();await expect.poll(state).toMatchObject({roots:[{activity:'paused',state:'ready'}]});
-  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('searchbox',{name:'Search files',exact:true}).fill('public renamed');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
+  await files.getByRole('combobox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('combobox',{name:'Search files',exact:true}).fill('public renamed');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
   // Reopened queries establish fresh main-owned selections. Old metadata never opens a source.
   const admitted=await files.evaluate(async()=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.search({query:'public renamed'}));
   if(!admitted.ok||admitted.value.results.length!==1)throw new Error('Synthetic indexed selection missing.');
@@ -141,7 +141,7 @@ it('opens selected-folder search through the real launcher and preserves native 
   const savedPreviewCopy={...savedSelection,previewId:issuedPreview.value.previewId};
 
   // This root remains paused: clear must publish invalidation without any live job callback.
-  const local=launcher.getByRole('searchbox',{name:'Search commands',exact:true});await local.fill('local data');const opened=app.waitForEvent('window');await local.press('Enter');const data=await opened;await data.waitForURL('linuxcast-app://shell/data-settings.html');
+  const local=launcher.getByRole('combobox',{name:'Search commands',exact:true});await local.fill('local data');const opened=app.waitForEvent('window');await local.press('Enter');const data=await opened;await data.waitForURL('linuxcast-app://shell/data-settings.html');
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});
   expect(await data.evaluate(async()=>await (window as unknown as {linuxcastData:DataSettingsApi}).linuxcastData.clearCategory('file-index'))).toMatchObject({ok:true});
   await expect.poll(()=>files.getByRole('option').count()).toBe(0);await expect.poll(state).toMatchObject({roots:[{activity:'paused',generation:null}]});
@@ -150,10 +150,10 @@ it('opens selected-folder search through the real launcher and preserves native 
   expect(await files.evaluate(async selection=>await (window as unknown as {linuxcastFiles:FileSearchApi}).linuxcastFiles.copyPreviewText!(selection),savedPreviewCopy)).toMatchObject({ok:false});expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));
   expect(readFileSync(join(selected,'public-renamed.txt'),'utf8')).toBe('SYNTHETIC_CONTENT_SENTINEL');expect(readFileSync(join(selected,'public-summary.txt'),'utf8')).toBe(publicText);
   // Original sources survive index clearing and both removal outcomes.
-  expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);await data.close();await files.getByRole('searchbox',{name:'Search files',exact:true}).press('Escape');
+  expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);await data.close();await files.getByRole('combobox',{name:'Search files',exact:true}).press('Escape');
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:0,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(()=>files.getByRole('option').count()).toBe(1);
   await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1,checkboxChecked:false});});await action(files,'Remove folder');await expect.poll(state).toMatchObject({roots:[]});expect(existsSync(join(selected,'public-renamed.txt'))).toBe(true);
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},selected);
-  await files.getByRole('searchbox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('searchbox',{name:'Search files',exact:true}).waitFor();await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching'}]});
-  const empty=join(selected,'public-empty.txt');writeFileSync(empty,'');const finalSearch=files.getByRole('searchbox',{name:'Search files',exact:true});await finalSearch.fill('public-empty');const emptyRow=files.getByRole('option',{name:/^public-empty[.]txt /});await emptyRow.waitFor();await emptyRow.click();await action(files,'Preview text');await expect.poll(()=>files.getByRole('status').textContent()).toContain('This text file is empty.');expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');expect(await app.evaluate(async({clipboard})=>(await clipboard.read()).flatMap(item=>item.types))).toEqual([]);expect(await app.evaluate(async({clipboard})=>await clipboard.readText())).toBe('');const targets=spawnSync('xclip',['-selection','clipboard','-target','TARGETS','-out'],{env,encoding:'utf8',timeout:3000});if(targets.status===0)expect(targets.stdout.trim().split(/\s+/u).filter(target=>target&&!['TIMESTAMP','TARGETS','SAVE_TARGETS','MULTIPLE'].includes(target))).toEqual([]);else{expect(targets.status).toBe(1);expect(targets.stdout).toBe('');expect(targets.stderr.trim()).toBe('Error: target TARGETS not available');}await files.screenshot({path:join(evidence,'application-empty-preview-copy.png')});expect(readFileSync(empty,'utf8')).toBe('');await quit();
+  await files.getByRole('combobox',{name:'Folders',exact:true}).press('Enter');await files.getByRole('combobox',{name:'Search files',exact:true}).waitFor();await action(files,'Index folder');await expect.poll(state).toMatchObject({roots:[{activity:'watching'}]});
+  const empty=join(selected,'public-empty.txt');writeFileSync(empty,'');const finalSearch=files.getByRole('combobox',{name:'Search files',exact:true});await finalSearch.fill('public-empty');const emptyRow=files.getByRole('option',{name:/^public-empty[.]txt /});await emptyRow.waitFor();await emptyRow.click();await action(files,'Preview text');await expect.poll(()=>files.getByRole('status').textContent()).toContain('This text file is empty.');expect(clipboardText()).toBe(join(selected,'public-renamed.txt'));await action(files,'Copy text');await expect.poll(()=>files.getByRole('status').textContent()).toBe('Text copied.');expect(await app.evaluate(async({clipboard})=>(await clipboard.read()).flatMap(item=>item.types))).toEqual([]);expect(await app.evaluate(async({clipboard})=>await clipboard.readText())).toBe('');const targets=spawnSync('xclip',['-selection','clipboard','-target','TARGETS','-out'],{env,encoding:'utf8',timeout:3000});if(targets.status===0)expect(targets.stdout.trim().split(/\s+/u).filter(target=>target&&!['TIMESTAMP','TARGETS','SAVE_TARGETS','MULTIPLE'].includes(target))).toEqual([]);else{expect(targets.status).toBe(1);expect(targets.stdout).toBe('');expect(targets.stderr.trim()).toBe('Error: target TARGETS not available');}await files.screenshot({path:join(evidence,'application-empty-preview-copy.png')});expect(readFileSync(empty,'utf8')).toBe('');await quit();
 },60000);

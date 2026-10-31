@@ -1,9 +1,10 @@
 import type { ViewModel, ActionModel } from '@linuxcast/contracts';
 export const open: ActionModel = { id: 'open', title: 'Open details', kind: 'navigate', effect: 'read' };
 export const copy: ActionModel = { id: 'copy', title: 'Copy reference', kind: 'copy', effect: 'write', shortcut: { key: 'c', modifiers: ['Ctrl', 'Shift'] } };
+export const remove: ActionModel = { id: 'remove', title: 'Remove from library', kind: 'invoke', effect: 'destructive', shortcut: { key: 'Delete', modifiers: ['Ctrl'] } };
 export const list: ViewModel = { protocolVersion: 1, viewId: 'library', revision: 1, kind: 'list', title: 'Library', search: { placeholder: 'Search local examples…', query: '', mode: 'host' }, sections: [
   { id: 'recent', title: 'Recent', items: [
-    { id: 'guide', title: 'A calmer workspace', subtitle: 'Design notes · Updated today', icon: { kind: 'builtin', name: 'file' }, actions: [open, copy], accessories: [{ text: 'Markdown' }] },
+    { id: 'guide', title: 'A calmer workspace', subtitle: 'Design notes · Updated today', icon: { kind: 'builtin', name: 'file' }, actions: [open, copy, remove], accessories: [{ text: 'Markdown' }] },
     { id: 'work', title: 'Weekly planning', subtitle: 'Personal collection', icon: { kind: 'builtin', name: 'folder' }, actions: [open, copy], tags: [{ text: 'Local', tone: 'neutral' }] },
     { id: 'archive', title: 'Shared archive', subtitle: 'A selected directory', icon: { kind: 'builtin', name: 'folder' }, disabledReason: 'Permission required. Choose this directory to grant access.' },
   ] }, { id: 'examples', title: 'Examples', items: [{ id: 'international', title: '仕事のメモ · ملاحظات · Long names remain readable with a complete accessible label', subtitle: 'Public multilingual fixture', actions: [open] }] },
@@ -19,3 +20,16 @@ export const form: ViewModel = { protocolVersion: 1, viewId: 'collection-form', 
   { id: 'folder', kind: 'directory', title: 'Folder', required: false, value: null, description: 'Only a directory you choose can be attached.' },
   { id: 'credential', kind: 'secret', title: 'Optional credential', required: false, description: 'Kept in memory until the host stores a credential handle.' },
 ], submitActionId: 'save', cancelActionId: 'cancel', actions: [{ id: 'save', title: 'Create collection', kind: 'invoke', effect: 'write' }, { id: 'cancel', title: 'Cancel', kind: 'navigate', effect: 'read' }] };
+export const split: ViewModel = { protocolVersion: 1, viewId: 'notes-split', revision: 1, kind: 'list', title: 'Reading list', search: { placeholder: 'Search reading list…', query: '', mode: 'host' }, sections: [
+  { id: 'docs', title: 'Documents', items: [
+    { id: 'brief', title: 'Launch brief', subtitle: '~/Documents/Public/brief.md', icon: { kind: 'builtin', name: 'file' }, actions: [open, copy, remove], preview: { kind: 'text', text: '# Launch brief\n\nA **public** synthetic preview.\n\n- Keep the list readable.\n- Keep the preview beside it.\n\n[Public guide](https://example.org/guide)' } },
+    { id: 'handbook', title: 'Public handbook.pdf', subtitle: '~/Documents/Public/handbook.pdf', icon: { kind: 'builtin', name: 'file' }, actions: [open, copy], preview: { kind: 'pdf', source: { kind: 'asset', assetId: 'public-handbook' } } },
+    { id: 'cover', title: 'Cover image', subtitle: 'Packaged image preview', icon: { kind: 'builtin', name: 'folder' }, actions: [open], preview: { kind: 'image', source: { kind: 'asset', assetId: 'public-cover' } } },
+  ] },
+] };
+const glyphs = [['grinning', '😀', 'Grinning face'], ['smile', '😊', 'Smiling face with smiling eyes'], ['wink', '😉', 'Winking face'], ['think', '🤔', 'Thinking face'], ['cool', '😎', 'Smiling face with sunglasses'], ['party', '🥳', 'Partying face'], ['sleep', '😴', 'Sleeping face'], ['nerd', '🤓', 'Nerd face'], ['penguin', '🐧', 'Penguin'], ['fox', '🦊', 'Fox'], ['turtle', '🐢', 'Turtle'], ['owl', '🦉', 'Owl'], ['seedling', '🌱', 'Seedling']] as const;
+const glyphItem = ([id, value, title]: readonly [string, string, string]) => ({ id, title, icon: { kind: 'glyph' as const, value }, actions: [{ id: 'copy-glyph', title: 'Copy emoji', kind: 'copy' as const, effect: 'write' as const }] });
+export const glyphGrid: ViewModel = { protocolVersion: 1, viewId: 'public-glyphs', revision: 1, kind: 'grid', title: 'Public glyphs', density: 'compact', images: [], search: { placeholder: 'Search public glyphs…', query: '', mode: 'host' }, sections: [
+  { id: 'faces', title: 'Smileys', items: glyphs.slice(0, 8).map(glyphItem) },
+  { id: 'nature', title: 'Animals and nature', items: [...glyphs.slice(8).map(glyphItem), { id: 'unavailable', title: 'Unavailable public glyph', icon: { kind: 'glyph' as const, value: '🦄' }, disabledReason: 'Not available in this public fixture.' }] },
+] };

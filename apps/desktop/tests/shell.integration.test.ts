@@ -92,7 +92,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
     chromiumSandbox: true, env, timeout: 20000 });
   const app = application, page = await app.firstWindow();
   await page.waitForURL(appUrl);
-  const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
+  const query=page.getByRole('combobox',{name:'Search commands',exact:true});
   await query.waitFor({timeout:5000});
   await expect.poll(()=>page.getByRole('option').count()).toBe(LAUNCHER_BUILTIN_COMMAND_IDS.length+1);
   await expect.poll(()=>query.evaluate(element=>element===document.activeElement)).toBe(true);
@@ -117,7 +117,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // clipping its separate Close button inside the popup's scrollport.
   const menuGeometry=await page.getByRole('dialog',{name:'Actions',exact:true}).evaluate(element=>({scroll:element.scrollHeight,client:element.clientHeight,height:element.getBoundingClientRect().height,viewport:window.innerHeight,list:element.querySelector('.lc-action-list')?.getBoundingClientRect().height,field:element.querySelector('.lc-field')?.getBoundingClientRect().height,close:element.querySelector('button:last-child')?.getBoundingClientRect().height}));
   expect(menuGeometry.scroll,JSON.stringify(menuGeometry)).toBeLessThanOrEqual(menuGeometry.client);
-  const actionEvidence=join(root,'apps/desktop/evidence');mkdirSync(actionEvidence,{recursive:true});
+  const actionEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(actionEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
     await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().map(animation=>animation.finished.catch(()=>{})));});
@@ -139,7 +139,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await page.getByRole('button',{name:'Open URL',exact:true}).click();
   await expect.poll(()=>urlField.getAttribute('aria-invalid')).toBe('true');expect(existsSync(urlMarker)).toBe(false);
   await urlField.fill(publicUrl);
-  const urlEvidence=join(root,'apps/desktop/evidence');mkdirSync(urlEvidence,{recursive:true});
+  const urlEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(urlEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
     await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
@@ -192,7 +192,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   await expect.poll(()=>page.getByText('This alias is already used by another command. Choose another alias.').isVisible()).toBe(true);
   expect(await aliasField.inputValue()).toBe('quit');
   await aliasField.fill('public-hide');
-  const aliasEvidence=join(root,'apps/desktop/evidence');mkdirSync(aliasEvidence,{recursive:true});
+  const aliasEvidence=join(root,'apps/desktop/evidence/instrument-renderer');mkdirSync(aliasEvidence,{recursive:true});
   for(const theme of ['dark','light'] as const){
     await app.evaluate(({nativeTheme},value)=>{nativeTheme.themeSource=value;},theme);
     await expect.poll(()=>page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
@@ -226,7 +226,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
       setTimeout(() => resolve(false), 1000);
     });
   })).toBe(true);
-  const evidence = join(root, 'apps/desktop/evidence'); mkdirSync(evidence, { recursive: true });
+  const evidence = join(root, 'apps/desktop/evidence/instrument-renderer'); mkdirSync(evidence, { recursive: true });
   for (const theme of ['dark', 'light'] as const) {
     await app.evaluate(({ nativeTheme }, value) => { nativeTheme.themeSource = value; }, theme);
     await expect.poll(() => page.locator('.lc-theme').getAttribute('data-lc-theme')).toBe(theme);
@@ -244,7 +244,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   const applicationMetadata=await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):undefined;});
   expect(applicationMetadata?.usage).toMatchObject({pinned:true,alias:'public-application',useCount:2});
   await action(page,'Hide command');await expect.poll(()=>page.getByRole('option').count()).toBe(0);
-  await action(page,'Manage commands');const managed=page.getByRole('searchbox',{name:'Manage commands',exact:true});await managed.fill('public-application');
+  await action(page,'Manage commands');const managed=page.getByRole('combobox',{name:'Manage commands',exact:true});await managed.fill('public-application');
   await expect.poll(()=>page.getByRole('option').count()).toBe(1);await expect.poll(()=>page.getByRole('option').textContent()).toContain('Hidden');
   expect(await page.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications')?.usage:null;})).toEqual(applicationMetadata?.usage);
   for(const theme of ['dark','light'] as const){
@@ -401,7 +401,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // Relaunch the same real private profile: pins must be durable, not renderer state.
   application=await electron.launch({executablePath:executable,args:[wrapper,'--show'],chromiumSandbox:true,env,timeout:20000});
   const restarted=application,reopened=await restarted.firstWindow();await reopened.waitForURL(appUrl);
-  const reopenedQuery=reopened.getByRole('searchbox',{name:'Search commands',exact:true});
+  const reopenedQuery=reopened.getByRole('combobox',{name:'Search commands',exact:true});
   await reopenedQuery.waitFor();
   await expect.poll(()=>reopened.getByRole('option').first().textContent()).toContain('Hide Linuxcast');
   const savedUsage=await reopened.evaluate(async()=>{
@@ -412,7 +412,7 @@ MimeType=x-scheme-handler/http;x-scheme-handler/https;
   // Restart proves the root exclusion is durable. Show via the same management
   // List, then execute the real registered GIO application again.
   await reopenedQuery.fill('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(0);
-  await action(reopened,'Manage commands');const reopenedManaged=reopened.getByRole('searchbox',{name:'Manage commands',exact:true});await reopenedManaged.fill('public-application');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Hidden');
+  await action(reopened,'Manage commands');const reopenedManaged=reopened.getByRole('combobox',{name:'Manage commands',exact:true});await reopenedManaged.fill('public-application');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Hidden');
   await action(reopened,'Show command');await expect.poll(()=>reopened.getByRole('option').textContent()).toContain('Shown');
   await reopened.keyboard.press('Escape');await reopenedQuery.waitFor();expect(await reopenedQuery.inputValue()).toBe('public-application');await expect.poll(()=>reopened.getByRole('option').count()).toBe(1);
   expect(await reopened.evaluate(async()=>{const reply=await (window as unknown as {linuxcast:DesktopShellApi}).linuxcast.getLauncherCommands();return reply.ok?reply.value.commands.find(row=>row.provider==='applications'):null;})).toMatchObject({hidden:false,usage:{pinned:true,alias:'public-application',useCount:0,lastUsedAt:null}});
