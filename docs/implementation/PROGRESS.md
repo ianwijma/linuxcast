@@ -48,9 +48,17 @@ the task complete merely because these checks or planning CI pass.
 
 ## Next actions and remaining gates
 
-PR80 is published with its evidence. Inspect current-head CI/reviews/rules after
-this checkpoint push; required native acceptance remains outstanding. Complete final independent follow-up review and supported native
-accessibility acceptance before claiming this task done. Continue dependency-ready
+PR80 planning CI41190850786 passed on signed checkpoint a72d08c; requested and
+submitted GitHub reviews/comments are empty, develop unprotected and rulesets empty.
+Required native acceptance remains outstanding. The next bounded F1-02 continuation
+uses a runtime-prepared isolated child checkout (GPT-6.1 SOL/high) to audit the
+final source and prepare/attempt product Electron native AT evidence using existing
+Debian lab infrastructure. Child owns only new apps/desktop/tests/at/ and
+apps/desktop/evidence/shell-native-at/ files, not shared wiring or registry. Its
+runtime task/link and resulting path/branch must be reconciled on completion.
+No child execution or acceptance result is claimed by this pre-dispatch checkpoint.
+Complete final follow-up review and supported native accessibility acceptance
+before claiming this task done. Continue dependency-ready
 foundation work while desktop evidence is outstanding: F3-01 host permission
 approval/management/remediation is explicitly unimplemented; its dependencies
 F0-01/F2-01 are accepted. Read its card and complete broker/storage contracts
