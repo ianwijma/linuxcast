@@ -21,7 +21,8 @@ shared criteria and rejection of unsupported done claims. No replacement needed.
 
 Worktree `/home/ian/.t3/worktrees/linuxcast/t3-d1b99cbd`, branch
 `codex/f1-02-shell-accessibility`, based on `e265dc6`; initial signed source
-`566a9b3` with subsequent coordinator fixes. PR publication follows this checkpoint.
+`566a9b3` with signed coordinator follow-ups `abe53ee`. Draft PR80:
+https://github.com/ianwijma/linuxcast/pull/80. No merge or task completion is claimed.
 
 Implemented and reproduced actual 200% zoom footer clipping; corrected CSS/native
 units, viewport/body layout, intrinsic grow-after-shrink reporting and duplicate
@@ -47,8 +48,8 @@ the task complete merely because these checks or planning CI pass.
 
 ## Next actions and remaining gates
 
-Publish the focused F1-02 continuation with its evidence; inspect current-head
-CI/reviews/rules. Complete final independent follow-up review and supported native
+PR80 is published with its evidence. Inspect current-head CI/reviews/rules after
+this checkpoint push; required native acceptance remains outstanding. Complete final independent follow-up review and supported native
 accessibility acceptance before claiming this task done. Continue dependency-ready
 foundation work while desktop evidence is outstanding: F3-01 host permission
 approval/management/remediation is explicitly unimplemented; its dependencies
