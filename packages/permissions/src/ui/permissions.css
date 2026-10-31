@@ -1,0 +1,15 @@
+.permission-screen { max-inline-size: calc(var(--lc-space-32) * 36); margin-inline: auto; padding: var(--lc-space-24); display: grid; gap: var(--lc-space-16); }
+.permission-screen p, .permission-screen h1, .permission-screen h2 { margin: 0; overflow-wrap: anywhere; }
+.permission-screen h1 { font-size: var(--lc-text-workspace-title); }
+.permission-screen h2 { font-size: var(--lc-text-emphasis); }
+.permission-heading { display: flex; flex-wrap: wrap; align-items: start; gap: var(--lc-space-16); }
+.permission-heading > div:first-child { flex: 1; min-inline-size: 0; display: grid; gap: var(--lc-space-8); }
+.permission-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--lc-space-8); }
+.permission-list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--lc-space-12); }
+.permission-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--lc-space-16); padding: var(--lc-space-16); border: 1px solid var(--lc-border); border-radius: var(--lc-radius-row); background: var(--lc-surface); }
+.permission-row > div { flex: 1; min-inline-size: min(100%, calc(var(--lc-space-32) * 8)); display: grid; gap: var(--lc-space-8); }
+.permission-source { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-8); }
+.permission-source span { font-size: var(--lc-text-caption); }
+.permission-review { padding: var(--lc-space-16); display: grid; gap: var(--lc-space-12); background: var(--lc-raised); border: 1px solid var(--lc-border); border-radius: var(--lc-radius-popover); }
+.permission-message { color: var(--lc-text); border-inline-start: 2px solid var(--lc-focus); padding-inline-start: var(--lc-space-12); }
+@media (forced-colors: active) { .permission-row, .permission-review { border-color: CanvasText; } }

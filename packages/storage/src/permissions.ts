@@ -48,3 +48,30 @@ export function putPermissionDecision(db: Database.Database, input: DecisionReco
 export function revokePermissionDecision(db: Database.Database, id: string): boolean {
   return db.transaction(() => db.prepare('DELETE FROM permission_decisions WHERE id=?').run(id).changes !== 0).immediate();
 }
+
+/** Trusted settings inventory only; never exposed to an extension connection. */
+export function inventoryPermissionDecisions(db: Database.Database, params: {afterId?: string; limit: number}) {
+  const rows = db.prepare('SELECT record FROM permission_decisions WHERE id>? ORDER BY id LIMIT ?')
+    .all(params.afterId ?? '', params.limit + 1) as {record: string}[];
+  const records: DecisionRecord[] = [];
+  let bytes = 0;
+  for (const row of rows.slice(0, params.limit)) {
+    const record = parse(row), size = Buffer.byteLength(JSON.stringify(record)) + 1;
+    if (bytes + size > MAX_ENVELOPE_BYTES - 8192) break;
+    records.push(record); bytes += size;
+  }
+  if (rows.length && !records.length) throw new StorageError('invalid-request');
+  return {records, nextCursor: rows.length > records.length ? records.at(-1)!.id : null};
+}
+
+/** Compare the whole validated selection inside the writer transaction. A newer
+ * allow/deny choice with the same row ID must not be deleted by a stale screen. */
+export function revokeSelectedPermission(db: Database.Database, selected: DecisionRecord): 'removed'|'changed'|'missing' {
+  return db.transaction(() => {
+    const row = db.prepare('SELECT record FROM permission_decisions WHERE id=?').get(selected.id) as {record: string}|undefined;
+    if (!row) return 'missing';
+    if (JSON.stringify(parse(row)) !== JSON.stringify(permissionDecisionRecordSchema.parse(selected))) return 'changed';
+    db.prepare('DELETE FROM permission_decisions WHERE id=?').run(selected.id);
+    return 'removed';
+  }).immediate();
+}

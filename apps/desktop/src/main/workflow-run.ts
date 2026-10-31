@@ -1,7 +1,8 @@
 import { createHash,randomUUID } from 'node:crypto';
 import * as z from 'zod';
 import type { createStorageClient } from '@linuxcast/storage';
-import { PermissionBroker,createDecisionStore } from '../../../../packages/permissions/src/index.ts';
+import { PermissionRegistry,createDecisionStore } from '../../../../packages/permissions/src/index.ts';
+import type { PermissionBroker } from '../../../../packages/permissions/src/index.ts';
 import { CapabilityBroker } from '../../../../packages/platform-contracts/src/capabilities.ts';
 import { principalKeyMaterial } from '../../../../packages/platform-contracts/src/permissions.ts';
 import type { Principal,Requirement } from '../../../../packages/platform-contracts/src/permissions.ts';
@@ -24,8 +25,9 @@ interface Run {
   broker:PermissionBroker;identity:object;child?:WorkflowChild;chain:Promise<void>;journal:Promise<void>;lastRequest:number;finished:boolean;finishing:boolean;settled:Promise<void>;resolveSettled():void;
   prompt?:{id:string;resolve():void;reject():void}|undefined;cancelInvocation?:(()=>void)|undefined;timer?:ReturnType<typeof setTimeout>;killTimer?:ReturnType<typeof setTimeout>;dispatched:boolean;completed:boolean;denied:boolean;
 }
-export function createWorkflowRuns(options:{repository:ReturnType<typeof createStorageClient>;fork:WorkflowFork;copyText(text:string):Promise<ClipboardWriteOutcome>;ready():boolean;publish(state:WorkflowRunState):void}){
+export function createWorkflowRuns(options:{repository:ReturnType<typeof createStorageClient>;permissions?:PermissionRegistry;fork:WorkflowFork;copyText(text:string):Promise<ClipboardWriteOutcome>;ready():boolean;publish(state:WorkflowRunState):void}){
   const repository=options.repository,store=createDecisionStore(repository);
+  const permissions=options.permissions??new PermissionRegistry(repository);
   const capabilities=new CapabilityBroker(['workflowClipboardAdapter']);
   // This reports the registered host adapter, not a native/session capability.
   // Its actual backend support and exact write/read receipt are checked per call.
@@ -56,7 +58,7 @@ export function createWorkflowRuns(options:{repository:ReturnType<typeof createS
     if(!editor?.saved||editor.revision!==run.state.editorRevision||hash(editor.saved)!==run.record.definitionHash||!run.trusted()||run.controller.signal.aborted||signal.aborted)throw new Error('Saved workflow changed.');
   }
   async function finish(run:Run,result:z.infer<typeof textRunResultSchema>){
-    if(run.finished||run.finishing)return;run.finishing=true;clearTimeout(run.timer);clearTimeout(run.killTimer);run.prompt?.reject();run.prompt=undefined;run.cancelInvocation?.();run.broker.disconnect(run.identity);run.broker.close();
+    if(run.finished||run.finishing)return;run.finishing=true;clearTimeout(run.timer);clearTimeout(run.killTimer);run.prompt?.reject();run.prompt=undefined;run.cancelInvocation?.();run.broker.disconnect(run.identity);await permissions.release(run.broker);
     const cancelled=run.controller.signal.aborted;
     let unknown=result.effectOutcome==='unknown'||run.dispatched&&!run.completed||[...run.steps.values()].some(step=>step.state==='dispatched'||step.state==='unknown');
     run.state={...run.state,state:cancelled?'cancelled':result.state,prompt:undefined,effectOutcome:unknown?'unknown':run.completed?'completed':result.effectOutcome,requiresReview:unknown||result.requiresReview,...(!cancelled&&result.output!==undefined?{output:result.output}:{}),errorCode:unknown?'unknown-outcome':cancelled?'cancelled':result.errorCode};
@@ -130,7 +132,7 @@ export function createWorkflowRuns(options:{repository:ReturnType<typeof createS
         run={state:{runId,sequence:1,editorRevision:editor.revision,workflowName:workflowDisplayName(definition.name),triggerNodeId:parsed.data.triggerNodeId,state:'queued',steps:[],effectOutcome:'not-dispatched',requiresReview:false},record:{runId,workflowId:definition.id,workflowVersion:definition.version,definitionHash:integrity,editorRevision:editor.revision,triggerNodeId:parsed.data.triggerNodeId,state:'queued',effectOutcome:'not-dispatched',requiresReview:false,revision:1,createdAt:now,updatedAt:now},steps:new Map(),definition,reachable:new Set([parsed.data.triggerNodeId]),receipts:new Set(),trusted,controller:new AbortController(),identity,broker:undefined!,chain:Promise.resolve(),journal:Promise.resolve(),lastRequest:0,finished:false,finishing:false,settled,resolveSettled,dispatched:false,completed:false,denied:false};
         for(const id of run.reachable){for(const edge of definition.edges)if(edge.from.nodeId===id&&!definition.nodes.find(node=>node.id===edge.to.nodeId)?.disabled)run.reachable.add(edge.to.nodeId);}
         const active=run;
-        run.broker=new PermissionBroker({store,capabilities,operations:[{
+        run.broker=permissions.createBroker({capabilities,onRevoked:cancelCurrent,operations:[{
           contract:{id:'workflow.copy-text',effect:'write',externallyCommunicating:true,queryAllowed:false,retrySafe:false,permissionIds:['clipboard.write']},arguments:copyArgs,capabilities:['workflowClipboardAdapter'],requirements:()=>[requirement],
           async validate(request,signal){if(request.context.runId!==active.state.runId)throw new Error('Wrong run.');const args=copyArgs.parse(request.arguments),step=active.steps.get(args.activationId);if(!step||step.nodeId!==args.nodeId||step.nodeType!=='output.clipboard'||!['pending','prepared','dispatched'].includes(step.state))throw new Error('Wrong activation.');await fresh(active,signal);},
           async prepare(request,signal){await fresh(active,signal);await writeStep(active,copyArgs.parse(request.arguments).activationId,'prepared');},
@@ -153,7 +155,7 @@ export function createWorkflowRuns(options:{repository:ReturnType<typeof createS
         const freshReset=async()=>{if(stopped||!trusted())return false;const latest=await repository.request('workflows.editor.get',{});return !stopped&&trusted()&&!!latest?.saved&&latest.revision===parsed.data.editorRevision&&hash(latest.saved)===principal.integrity;};
         if(!await freshReset())return failure('conflict');
         let revoked=false;
-        for(const record of records)if(record.permissionId==='clipboard.write'&&record.scope.kind==='global'){if(!await freshReset())return failure(revoked?'unknown-outcome':'conflict');await store.revoke(record.id);revoked=true;}
+        for(const record of records)if(record.permissionId==='clipboard.write'&&record.scope.kind==='global'){if(!await freshReset())return failure(revoked?'unknown-outcome':'conflict');const outcome=await permissions.revoke(record);if(outcome!=='removed'&&outcome!=='missing')return failure(revoked?'unknown-outcome':'conflict');revoked=true;}
         return ok();}catch{return failure('unknown-outcome');}finally{busy=false;}},
     cancelCurrent,
     async stop(){stopped=true;cancelCurrent();const run=current;if(run?.child){await run.child.exited;await run.settled;}},

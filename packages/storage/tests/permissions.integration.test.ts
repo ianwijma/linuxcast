@@ -34,6 +34,25 @@ function list(owner: StorageOwner, principalKey: string, limit = 200, afterId?: 
   return request(owner, 'permissions.list', {principalKey, limit, ...(afterId ? {afterId} : {})}) as {records: DecisionRecord[]; nextCursor: string | null};
 }
 
+it('inventories multiple principals and compare-deletes only the exact selected durable decision', async () => {
+  const owner=await open();
+  const first=decision(), second=decision({principal:{kind:'workflow',id:randomUUID(),version:'1.0.0',integrity:'b'.repeat(64)}});
+  for(const record of [first,second])request(owner,'permissions.put',{record});
+  const page=request(owner,'permissions.inventory',{limit:1}) as {records:DecisionRecord[];nextCursor:string};
+  const next=request(owner,'permissions.inventory',{limit:1,afterId:page.nextCursor}) as {records:DecisionRecord[];nextCursor:null};
+  expect([...page.records,...next.records].map(row=>row.id)).toEqual([first.id,second.id].sort());
+  expect(next.nextCursor).toBeNull();
+  const newer={...first,decision:'allow' as const,updatedAt:'2026-01-02T00:00:00.000Z'};
+  request(owner,'permissions.put',{record:newer});
+  expect(request(owner,'permissions.revokeSelected',{record:first})).toBe('changed');
+  expect(list(owner,permissionPrincipalKey(first)).records).toEqual([newer]);
+  expect(request(owner,'permissions.revokeSelected',{record:newer})).toBe('removed');
+  expect(request(owner,'permissions.revokeSelected',{record:newer})).toBe('missing');
+  expect(list(owner,permissionPrincipalKey(second)).records).toEqual([second]);
+  for(const params of [{limit:101},{limit:0},{limit:1,principalKey:permissionPrincipalKey(first)},{limit:1,afterId:'private-not-a-cursor'}])
+    expect(()=>request(owner,'permissions.inventory',params)).toThrow('invalid-request');
+});
+
 it('upgrades the retained schema1 database without losing user settings and persists scoped decisions across reopen', async () => {
   const initial = await open(undefined, true);
   request(initial, 'settings.set', {id: 'ui.theme', value: 'dark', expectedRevision: 0});

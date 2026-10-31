@@ -27,6 +27,8 @@ export const permissionDecisionRecordSchema = z.strictObject({
   ...requirementShape,decision:z.enum(['allow','deny']),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime(),
 }).refine(compatible).refine(value=>Date.parse(value.updatedAt)>=Date.parse(value.createdAt));
 export const permissionRepositoryContracts = new Map<string,{params:z.ZodType;result:z.ZodType}>([
+  ['permissions.inventory',{params:z.strictObject({afterId:z.uuid().optional(),limit:z.number().int().min(1).max(100)}),result:z.strictObject({records:z.array(permissionDecisionRecordSchema).max(100),nextCursor:z.uuid().nullable()})}],
+  ['permissions.revokeSelected',{params:z.strictObject({record:permissionDecisionRecordSchema}),result:z.enum(['removed','changed','missing'])}],
   ['permissions.list',{params:z.strictObject({principalKey:z.string().regex(/^[a-f0-9]{64}$/u),afterId:z.uuid().optional(),limit:z.number().int().min(1).max(200)}),result:z.strictObject({records:z.array(permissionDecisionRecordSchema).max(200),nextCursor:z.uuid().nullable()})}],
   ['permissions.put',{params:z.strictObject({record:permissionDecisionRecordSchema}),result:permissionDecisionRecordSchema}],
   ['permissions.revoke',{params:z.strictObject({id:z.uuid()}),result:z.boolean()}],

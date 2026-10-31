@@ -122,6 +122,9 @@
       "packages/builtins/dictionary/tests/spelling-source.test.ts",
       "packages/builtins/dictionary/tests/native-spelling.test.ts",
       "packages/builtins/dictionary/tests/spelling-wrapper.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/screen-controller.test.ts"
     ]
   },
   "contracts": {
@@ -202,6 +205,9 @@
       "packages/contracts/tests/emoji-keywords.contract.test.ts",
       "packages/contracts/tests/emoji-frecency.contract.test.ts",
       "packages/contracts/tests/dictionary-spelling.contract.test.ts"
+    ],
+    "F3-01": [
+      "packages/permissions/tests/permission-settings.contract.test.ts"
     ]
   },
   "ui": {
@@ -374,7 +380,10 @@
       "packages/storage/tests/permissions.integration.test.ts",
       "packages/permissions/tests/broker.security.test.ts",
       "packages/permissions/tests/pagination.security.test.ts",
-      "packages/permissions/tests/persistence.security.test.ts"
+      "packages/permissions/tests/persistence.security.test.ts",
+      "packages/permissions/tests/registry.security.test.ts",
+      "apps/desktop/src/permission-preload/api.test.ts",
+      "apps/desktop/src/main/permission-settings.test.ts"
     ],
     "F2-02": [
       "packages/storage/tests/secrets.integration.test.ts",
