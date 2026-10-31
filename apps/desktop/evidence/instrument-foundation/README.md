@@ -3,6 +3,10 @@
 The shared D1-01 foundation was authored by Claude Opus5.5 at medium effort:
 signed sourceb40bce040762c9d4d94433db02a84705736fb8c8 plus signed correction
 ecfd891d234e667d4cffd692caede7191e0f59c4, integrated unchanged as6868fae.
+The final token-gate correction is Opus-authored b965cf8ed96e615dc02f345a1ec08d98b7048fef,
+integrated unchanged as eeca81a. It is honestly unsigned after1Password timed out,
+using the user's per-command fallback. Canonical values and all visual behavior
+are unchanged by that gate-only correction.
 All assigned Opus source/artifacts and authorized consumer tests remain
 byte-identical. These captures exercise the existing
 production shell with the changed controls, keycaps and state primitives.
@@ -51,9 +55,9 @@ provider or input operations are involved.
 Twenty-nine incidental historical PNG recaptures were restored to their exact Git
 blobs; these thirteen files preserve current evidence separately.
 
-Coordinator independently passes134D1-01 token units,28D1-02 behavior units,
-52F2-02 UI units and33planning-validator tests. This includes107shared token
-schema fixtures (20valid,87invalid). Opus reports12D1-01 browser checks,11D1-02 browser
+Coordinator independently passes152D1-01 token units,28D1-02 behavior units,
+52F2-02 UI units and33planning-validator tests. This includes125shared token
+schema fixtures (20valid,105invalid). Opus reports12D1-01 browser checks,11D1-02 browser
 checks and the listed downstream component suites in its separate
 [component evidence](../../../../packages/ui/src/primitives/evidence/instrument/README.md).
 The reported L1-01 pending-fallback fixture failure also occurs twice on baseline
@@ -78,3 +82,12 @@ ratifies the additive unclassified `unavailable` StatePlate kind and its canonic
 table entry; unsupported/denied classification now requires an explicit reason.
 This adds no serialized capability state or effect authority. Fresh final
 independent recheck of the correction remains required.
+
+That recheck resolved the shortcut/row/legacy-state findings and exposed one
+remaining exact-key parity gap: comma-joined key names could mask missing keys.
+The final correction compares key counts and individual sorted keys. Eighteen
+shared collision fixtures cover the exact groups;15were falsely accepted by the
+previous TS code and3already failed value checks. The coordinator independently
+confirms the reported fontWeight collision is rejected and canonical tokens still
+pass. Final narrow independent gate recheck remains before merge; earlier product
+captures remain current because only this validator and test data changed.
