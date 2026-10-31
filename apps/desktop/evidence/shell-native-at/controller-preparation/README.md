@@ -173,3 +173,28 @@ controller safety findings: native alternate/final-row IDs, fresh immutable gues
 build/receipt, reviewed namespace/outer shutdown, actual containment/native runs
 and supported desktop/UI/full1.0 acceptance remain outstanding. Actual product/
 Orca native runs0; completion/delivery false; existing AC01/AC02/privacy unchanged.
+
+
+## Version2 alternate/final native coverage preparation
+
+After the clean7310cee safety recheck, coordinator extends the exact observer
+allowlist with public-alternate and public-final119 identities, and version2
+requires fresh native/Orca evidence for away and a new final checkpoint. Existing
+v1 reports remain historical and are rejected by the v2 validator. The final
+query uses the production20-row cap unchanged: `Public AT filler 1` gives rows100–119,
+first100 anchor then one End to119. DOM guards verify count/title/sole selection/
+active descendant and focus; final geometry requires actual overflow and positive
+scrollTop plus whole-row/footer/native pixel bounds. A unit using actual production
+ranking verifies the projection. Native states/events remain mandatory, never
+inferred from those DOM checks. Private catalogue/Exec/Enter restrictions are
+unchanged. Three new Python tests cover exact names/freshness/privacy, target-
+specific Orca markers and v2 public requirements; nine new JS guards cover End
+preconditions/no-movement and ranking.53offlinePython and32unit checks pass.
+Version2 source hashes are in the coordinator manifest, original worker manifests
+remain historical. These additions require independent review and actual native
+execution; no native runs or acceptance are added. Guest build/receipt and
+reviewed namespace/outer shutdown are still prerequisites.
+
+Final version2 checks also pass55mappedsecurity (all53Python without skips),
+32unit, fulltypecheck/lint, plan/whitespace and19current source hashes. The existing
+Debian lab remains stoppedfalse/PID0/exit0. No version2 driver/native run occurred.

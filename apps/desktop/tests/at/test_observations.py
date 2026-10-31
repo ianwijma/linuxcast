@@ -82,6 +82,26 @@ class ObservationTests(unittest.TestCase):
         node.states["selected"] = False
         self.assertFalse(checkpoint(self.snapshot(node, self.control(kind="listbox")), "public-result", "option", 0, "active-descendant"))
 
+    def test_alternate_and_final_require_exact_name_fresh_event_and_current_selection(self):
+        for label, identifier in (("Public AT result alternate Installed application", "public-alternate"),
+                                  ("Public AT filler 119 Installed application", "public-final")):
+            with self.subTest(identifier=identifier):
+                observer = Observer(101, 102, 103)
+                row = Node(label, "option", selected=True, visible=True, showing=True)
+                listing = self.control(kind="listbox")
+                observer.event(row, "active-descendant")
+                value = observer.snapshot([Node(children=[row, listing])])
+                self.assertTrue(checkpoint(value, identifier, "option", 0, "active-descendant"))
+                self.assertFalse(checkpoint(value, identifier, "option", value["sequence"], "active-descendant"))
+                for state in ("selected", "visible", "showing"):
+                    row.states[state] = False
+                    self.assertFalse(checkpoint(observer.snapshot([Node(children=[row, listing])]), identifier, "option", 0, "active-descendant"))
+                    row.states[state] = True
+                self.assertFalse(checkpoint(value, identifier, "button", 0, "active-descendant"))
+                suffix = Node(label + " private canary", "option", selected=True, visible=True, showing=True)
+                observer.event(suffix, "active-descendant")
+                self.assertNotIn("canary", json.dumps(observer.snapshot([Node(children=[suffix, listing])])) )
+
     def test_foreign_application_is_rejected_before_any_content_read(self):
         target, foreign = Node(children=[self.control()]), Node(pid=999)
         with self.assertRaisesRegex(Rejected, "foreign-application"):

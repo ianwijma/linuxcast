@@ -19,6 +19,8 @@ NAMES = {
     "Linuxcast could not connect": "error-heading",
     "Opening Linuxcast…": "loading",
     "Public AT result Installed application": "public-result",
+    "Public AT result alternate Installed application": "public-alternate",
+    "Public AT filler 119 Installed application": "public-final",
 }
 KINDS = {"entry", "listbox", "option", "button", "heading", "dialog", "status"}
 STATES = ("focused", "selected", "showing", "visible")

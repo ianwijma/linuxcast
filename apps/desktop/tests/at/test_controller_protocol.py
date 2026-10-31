@@ -95,6 +95,20 @@ class ProtocolTests(unittest.TestCase):
         report.native_runs = 1
         self.assertEqual(report.public()["status"], "observed-private-sequence")
 
+    def test_v2_requires_fresh_alternate_and_final_and_rejects_legacy_schema(self):
+        for target in ("away", "final"):
+            report = Report()
+            for step in STEPS:
+                if step == target:
+                    with self.assertRaises(ControllerRejected):
+                        report.add(step, {**flags(step), "freshEvent": False})
+                    break
+                report.add(step, flags(step))
+        value = Report().public()
+        value["schema"] = "f102-native-controller-v1"
+        with self.assertRaises(ControllerRejected):
+            validate_public(value)
+
     def test_publication_refuses_unknown_fields_text_counts_and_overwrite(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary) / "new"

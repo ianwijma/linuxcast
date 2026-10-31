@@ -7,7 +7,7 @@ import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { createInterface } from 'node:readline';
-import { enterAliasForm } from './driver_guards.ts';
+import { enterAliasForm, endAtFinalResult } from './driver_guards.ts';
 
 const staging = resolve(process.argv[2]!);
 const root = process.env.LINUXCAST_F102_AT_ROOT;
@@ -31,11 +31,11 @@ let app: ElectronApplication | undefined;
 let page: Page;
 let mainPid = 0;
 let expected = 0;
-const commands = ['attest', 'anchor', 'search', 'query', 'result', 'away', 'back', 'actions', 'filter-action', 'form',
+const commands = ['attest', 'anchor', 'search', 'query', 'result', 'away', 'back', 'final-query', 'final', 'actions', 'filter-action', 'form',
   'save', 'cancel', 'restore', 'hide', 'reopen', 'loading', 'error', 'recovery'];
 const output = (value: unknown) => process.stdout.write(`${JSON.stringify(value)}\n`);
 
-async function geometry(fallback = false, result = false) {
+async function geometry(fallback = false, result = false, final = false) {
   const stable = await page.evaluate(async () => {
     const frames: string[] = [];
     for (let frame = 0; frame < 12; frame++) {
@@ -44,7 +44,7 @@ async function geometry(fallback = false, result = false) {
     }
     return new Set(frames.slice(-6)).size === 1;
   });
-  const viewport = await page.evaluate(({ fallback, result }) => {
+  const viewport = await page.evaluate(({ fallback, result, final }) => {
     const footer = document.querySelector(fallback ? '.shell-footer' : '.lc-view:not([hidden]) .lc-view-footer');
     if (!footer) return false;
     const f = footer.getBoundingClientRect();
@@ -54,13 +54,13 @@ async function geometry(fallback = false, result = false) {
       const row = document.querySelector('[role="option"][aria-selected="true"]');
       if (!body || !row) return false;
       const r = row.getBoundingClientRect(), b = body.getBoundingClientRect();
-      rowFits = r.top >= b.top && r.bottom <= b.bottom + 1 && r.left >= 0 && r.right <= innerWidth + 1;
+      rowFits = (!final || body.scrollTop > 0 && body.scrollHeight > body.clientHeight) && r.top >= b.top && r.bottom <= b.bottom + 1 && r.left >= 0 && r.right <= innerWidth + 1;
     }
     return devicePixelRatio === 2 && innerWidth > 0 && innerHeight > 0 && f.top >= 0 &&
       f.bottom <= innerHeight + 1 && f.right <= innerWidth + 1 && f.left >= 0 && rowFits &&
       document.documentElement.scrollWidth <= innerWidth + 1 &&
       document.documentElement.scrollHeight <= innerHeight + 1 && (fallback || !!body && body.clientHeight > 0);
-  }, { fallback, result });
+  }, { fallback, result, final });
   const pixels = await app!.evaluate(async ({ BrowserWindow }) => {
     const windows = BrowserWindow.getAllWindows();
     if (windows.length !== 1) return false;
@@ -129,6 +129,17 @@ async function command(id: string) {
     await page.keyboard.press(id === 'away' ? 'ArrowDown' : 'ArrowUp');
     const name = id === 'away' ? 'Public AT result alternate Installed application' : 'Public AT result Installed application';
     if (await page.getByRole('option', { name, exact: true }).getAttribute('aria-selected') !== 'true') throw new Error('Selection');
+  } else if (id === 'final-query') {
+    await page.keyboard.press('Shift+Tab');
+    const query=page.getByRole('searchbox',{name:'Search commands',exact:true});
+    if(!await query.evaluate(element=>element===document.activeElement))throw new Error('Final query focus');
+    await page.keyboard.press('Control+a');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.type('Public AT filler 1');
+    await page.getByRole('option',{name:'Public AT filler 119 Installed application',exact:true}).waitFor();
+    await page.keyboard.press('Tab');
+  } else if (id === 'final') {
+    await endAtFinalResult(page);
   } else if (id === 'actions') {
     await page.keyboard.press('Shift+Tab');
     await page.keyboard.press('Control+k');
@@ -177,7 +188,7 @@ async function command(id: string) {
     if (!state.ok) throw new Error('Recovery');
     await page.getByRole('searchbox', { name: 'Search commands', exact: true }).waitFor();
   }
-  return { status: 'ok', operation: true, geometry: await geometry(id === 'loading' || id === 'error', ['result', 'away', 'back'].includes(id)) };
+  return { status: 'ok', operation: true, geometry: await geometry(id === 'loading' || id === 'error', ['result', 'away', 'back', 'final'].includes(id), id === 'final') };
 }
 
 // Serialized bounded command processing. Parent owns the overall 10s deadline;

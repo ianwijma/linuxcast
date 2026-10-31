@@ -1,18 +1,19 @@
-# F1-02 production controller review protocol, version 1
+# F1-02 production controller review protocol, version 2
 
 This is implementation and offline preparation for **one future** product AT
 attempt. Actual native runs in this assignment: **0**. No display, reader,
 product executable, desktop entry or native input test was started. The complete
 local 1.0 scope and every outstanding desktop/release gate remain unchanged.
 
-Authority: product `757ce20c650c0f4df6d847f10212c6edeaa016ab`, observer preparation
-`fc0fdb2e544c8b7b4aab08611cf1de9dabd416b0`, and coordinator frozen tree
-`0dcf462fb338c031effcf35081351444e1338440`. Read the coordinator-owned
-observer protocol at `apps/desktop/tests/at/README.md` in the frozen tree before reviewing this separate adaptation. The
-observer is absent in this branch; this document does not authorize copying or
-editing its files. The controller pins its two executable observer-source hashes.
-Integration must supply those exact reviewed files or explicitly review a new
-interface and update the pins.
+Authority: product `757ce20c650c0f4df6d847f10212c6edeaa016ab` and inherited
+observer preparation `fc0fdb2e544c8b7b4aab08611cf1de9dabd416b0`. The integrated
+version1 safety fixes were independently reviewed at signed7310cee. Version2
+adds only exact public alternate/final identities and stronger checkpoints;
+independent review of those additions is required before execution. Current
+observer code is integrated here and its two executable hashes are pinned in
+product_controller.py. Original worker manifests/trees remain historical; the
+coordinator manifest records the current sources. Read the current observer
+protocol at `apps/desktop/tests/at/README.md`; never loosen identities during a run.
 
 ## Components and execution boundary
 
@@ -135,8 +136,9 @@ presentation offset, excluding typed-key echoes. It cannot count as a checkpoint
 | --- | --- | --- |
 | search | Shift+Tab from the explicit anchor | fresh search entry focus and Search commands generation/attempt |
 | result | type the exact query, then Tab | focused search listbox, selected canonical option and fresh selection/active-descendant event, generation/attempt |
-| away | ArrowDown | exact alternate selection in DOM; current canonical option deselected and native listbox focused |
+| away | ArrowDown | exact alternate DOM selection, focused native listbox, fresh selected public-alternate native event and generation/attempt |
 | back | ArrowUp | canonical option selected plus fresh native event and generation/attempt |
+| final | prepare query Public AT filler 1, Tab to row100; then End after fresh offset | exact20-row production projection, selected final row119, fresh public-final native event and generation/attempt, overflow/scrollTop and row/footer/pixel bounds |
 | actions | Shift+Tab, Ctrl+K | native Actions dialog and fresh Find an action entry focus/generation/attempt |
 | form | type Edit search alias, Enter | fresh Search alias entry focus/generation/attempt |
 | save | Tab | fresh Save alias button focus/generation/attempt; do not activate |
@@ -148,15 +150,20 @@ presentation offset, excluding typed-key echoes. It cannot count as a checkpoint
 | error | fixed failed reply, reload | native error heading and fresh Hide button focus/generation/attempt, separate bounds |
 | recovery | restore captured real handler, reload | real successful state response and fresh native Search focus/generation/attempt |
 
-Away has **no claimed fresh alternate event**: the frozen observer excludes that
-name. Its current deselection and DOM selection checks are explicitly weaker than
-the back checkpoint. The public `freshEvent` flag remains false for away, loading
-and hide; `native` there means only the documented current-state check. If review
-requires native alternate-event evidence, the coordinator must add an exact fixed
-alternate ID to the observer, its negative tests, protocol and source pins before
-execution; do not silently widen the observer or mark that stronger path complete.
-End/final-row native identity/scroll coverage likewise needs an independently
-reviewed observer ID and extra checkpoint; filler count alone proves none of it.
+Version2 requires fresh native alternate selection for away as well as back.
+Before final, fixed query `Public AT filler 1` projects entries100–119 through the
+unchanged production20-result provider cap. A guard requires that complete20-row
+DOM projection, the focused native/DOM listbox, row100 as sole current selection
+and correct active descendant. The fresh final transition issues End exactly
+once, requires row119 as the sole last selection/current descendant, plus a
+matching fresh selected/active-descendant native event and exact Orca generation/
+pre-send attempt. Geometry additionally requires real body overflow, positive
+scrollTop, the entire selected row inside the body, visible footer and matching
+native capture/content dimensions. All geometry is supplemental; DOM never
+substitutes for native evidence. A production-ranking unit fixture pins this
+projection assumption. The catalogue contains120 fillers but that count alone
+proves neither a native event nor scrolling. Only hide/loading retain false
+freshEvent/generated/attempt flags. Actual version2 execution remains unproved.
 
 Loading/error are **injected renderer-state** observations. Recovery restores the
 real validating handler, rather than cached synthetic success, and proves only
@@ -206,7 +213,7 @@ never substitutes for it.
 
 ## Publication and acceptance mapping
 
-`f102-native-controller-v1` permits only fixed IDs, booleans, enumerated failure/
+`f102-native-controller-v2` permits only fixed IDs, booleans, enumerated failure/
 status values and native-run count0/1. It records every finished step and the
 fixed-flag partial failed step. `firstFailure` is immutable even after cleanup
 failure. Arbitrary fields are rejected **before** creating a directory. Publication
@@ -215,14 +222,13 @@ prior failures. Public output contains no logs, names, values, screenshots,
 PIDs, paths, exception strings or source/build receipts. All raw runtime data is
 discarded with the private session tree. Only a complete ordered local protocol
 with verified cleanup can say `observed-private-sequence`; this is never task or
-release acceptance, and its explicitly limited away checkpoint is not promoted
-to fresh alternate evidence.
+release acceptance, and no unexecuted alternate/final checkpoint is promoted to acceptance.
 
 | Criterion | What this increment provides | Remaining acceptance |
 | --- | --- | --- |
 | F1-02-AC01 | Actual-product URL/security/noNode attestation code; source/build integrity checks | No new runtime execution; existing AC01 evidence is unchanged; navigation denials remain in existing security/integration suite |
 | F1-02-AC02 | Same-profile secondary --show, retained primary PID, hide/reopen checks | No new singleton/native result; malformed CLI/deep-link/explicit Quit coverage remains existing suite responsibility |
-| F1-02-UI | Canonical focus/selection/form order, zoom2 geometry, loading/error/recovery controller and fresh parser | Independent review, fresh guest build and actual run; stronger alternate/final-row native IDs; dark/light captures, audible/tactile, GNOME48/Plasma6.3 Wayland/X11 and D1-01/02 remain pending |
+| F1-02-UI | Canonical focus/selection/form order, zoom2 geometry, loading/error/recovery controller and fresh parser | Review of version2 IDs/checkpoints, fresh guest build and actual native execution; dark/light captures, audible/tactile, GNOME48/Plasma6.3 Wayland/X11 and D1-01/02 remain pending |
 | F1-02-PRIVACY | Minimal environment, private profiles/buses/display, bounded protocol, strict publisher and negative privacy fixtures | Actual descendant/socket/root cleanup and private-session containment must still be verified in the future lab attempt; outer lab wrapper review remains mandatory |
 
 Applicable design sections: tokens, shell/navigation, results/actions,
@@ -255,5 +261,5 @@ SO_PEERCRED and exact device/inode/type/UID; replacement paths are preserved and
 cleanup reports incomplete. Build comparison includes added/deleted files and
 directories outside explicit rebuild/output locations. Receipt aliases are refused,
 its regular private single-link bytes are bounded/no-follow read, and a separately
-retained digest is required for validation before/after execution. These revisions
-are coordinator-validated and await final independent recheck before any native run.
+retained digest is required for validation before/after execution. These version1 corrections passed independent final recheck at7310cee.
+Version2 alternate/final additions require separate review before native execution.

@@ -120,6 +120,19 @@ class FreshOrcaTests(unittest.TestCase):
         self.append(GENERATED.replace(b"Search commands", b"Cancel"))
         self.assertFalse(self.parser.observe()["generated"])
 
+    def test_alternate_and_final_require_their_own_exact_fresh_generation_and_attempt(self):
+        for identifier, label in (("public-alternate", "Public AT result alternate Installed application"),
+                                  ("public-final", "Public AT filler 119 Installed application")):
+            with self.subTest(identifier=identifier):
+                self.path.write_bytes(b"")
+                parser = FreshOutput(self.path)
+                parser.arm(identifier)
+                self.append(GENERATED + ATTEMPT)
+                self.assertFalse(parser.observe()["generated"])
+                self.append(f"SPEECH OUTPUT: '{label}' {VOICE}\n".encode())
+                self.append(f"SPEECH DISPATCHER: Speaking '<speak>{label}</speak>' \n".encode())
+                self.assertEqual(parser.observe(), {"generated": True, "attempt": True, "completion": False, "completeLines": True})
+
     def test_rewrite_of_already_observed_step_and_incremental_size_fail(self):
         self.parser.arm("search")
         self.append(GENERATED)

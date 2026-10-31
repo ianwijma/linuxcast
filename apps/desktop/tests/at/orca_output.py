@@ -18,6 +18,8 @@ class OutputRejected(Exception):
 
 LABELS = {
     "search": "Search commands", "public-result": "Public AT result Installed application",
+    "public-alternate": "Public AT result alternate Installed application",
+    "public-final": "Public AT filler 119 Installed application",
     "action-search": "Find an action", "alias-field": "Search alias",
     "save-alias": "Save alias", "cancel": "Cancel", "fallback-hide": "Hide",
     "application-heading": "Linuxcast", "loading": "Opening Linuxcast…",
@@ -26,7 +28,7 @@ LABELS = {
 # Exact complete alternatives, never suffix/substring matching. Unsupported
 # native pronunciation is an unmet prerequisite, not automatically learned.
 UTTERANCES = {identifier: {label} for identifier, label in LABELS.items()}
-NEUTRAL = {"text", "entry", "button", "search text", "list", "selected", "1 of 2", "2 of 2"}
+NEUTRAL = {"text", "entry", "button", "search text", "list", "selected", "1 of 2", "2 of 2", "1 of 20", "20 of 20"}
 STAMP = r"(?:[0-2][0-9]:[0-5][0-9]:[0-5][0-9]\.\d{6} - )?"
 GENERATED = re.compile(STAMP + r"SPEECH OUTPUT: '([^'\r\n]*)' (\{[^\r\n]*\})")
 ATTEMPT = re.compile(STAMP + r"SPEECH DISPATCHER: Speaking '<speak>([^'\r\n]*)</speak>' *")

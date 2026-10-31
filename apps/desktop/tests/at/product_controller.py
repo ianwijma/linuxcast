@@ -37,6 +37,7 @@ ORCA_HASHES = {
 }
 TARGETS = {
     "search": ("search", "entry"), "result": ("public-result", "option"),
+    "away": ("public-alternate", "option"), "final": ("public-final", "option"),
     "back": ("public-result", "option"), "actions": ("action-search", "entry"),
     "form": ("alias-field", "entry"), "save": ("save-alias", "button"),
     "cancel": ("cancel", "button"), "restore": ("search", "entry"),
@@ -57,7 +58,7 @@ def preflight(staging, node, total):
     if HERE != staging / "apps/desktop/tests/at":
         raise ControllerRejected("prerequisite")
     expected = {"native_at.py": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b",
-                "observations.py": "70ae79e556c233699cb890192a88c5f9e0d46a71ab77644f2a7a305bc478b55b"}
+                "observations.py": "93e618b4cd2d9a0405c75f7b9ab4779707a6eb1194a5889978b32694dcdc29c6"}
     if any(hashlib.sha256((HERE / name).read_bytes()).hexdigest() != digest for name, digest in expected.items()):
         raise ControllerRejected("prerequisite")
     base = Path("/usr/lib/python3/dist-packages/orca")
@@ -222,9 +223,13 @@ def sequence(owner, total, staging, node, reader, log, report):
         # before the single transition under test, excluding typed-key echoes.
         if step == "result":
             drive("query", deadline)
+        if step == "final":
+            drive("final-query", deadline)
         if step == "form":
             drive("filter-action", deadline)
         before_native = inspect(deadline)
+        if step == "final" and not visible(before_native, "search", "listbox", focused=True):
+            raise ControllerRejected("native")
         if step == "form" and not (visible(before_native, "action-search", "entry", focused=True)
                                     and visible(before_native, "actions-dialog", "dialog")
                                     and visible(before_native, "edit-alias", "button")):
@@ -259,11 +264,6 @@ def sequence(owner, total, staging, node, reader, log, report):
                 return native_ok and parsed["generated"] and parsed["attempt"] and parsed["completeLines"]
             if step == "loading":
                 flags["native"] = visible(native, "application-heading", "heading") and visible(native, "loading", "status")
-            elif step == "away":
-                # Frozen observer deliberately excludes alternate name. Require
-                # current target deselection and collection focus; no invented
-                # option focus/fresh alternate event is claimed.
-                flags["native"] = visible(native, "public-result", "option", selected=False) and visible(native, "search", "listbox", focused=True)
             else:  # Hide: absence of every showing control, main still owned.
                 flags["native"] = not any(c["showing"] for c in native["controls"])
             pending.update(flags)

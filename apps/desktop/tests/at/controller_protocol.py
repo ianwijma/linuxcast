@@ -3,14 +3,14 @@ import json
 import os
 from pathlib import Path
 
-STEPS = ("search", "result", "away", "back", "actions", "form", "save", "cancel",
+STEPS = ("search", "result", "away", "back", "final", "actions", "form", "save", "cancel",
          "restore", "hide", "reopen", "loading", "error", "recovery")
 IDS = {"search", "action-search", "actions-dialog", "edit-alias", "alias-field", "save-alias",
-       "cancel", "fallback-hide", "quit", "application-heading", "error-heading", "loading", "public-result"}
+       "cancel", "fallback-hide", "quit", "application-heading", "error-heading", "loading", "public-result", "public-alternate", "public-final"}
 KINDS = {"entry", "listbox", "option", "button", "heading", "dialog", "status"}
 EVENTS = {"focus", "selection", "active-descendant"}
 FLAGS = {"native", "freshEvent", "generated", "attempt", "completion", "geometry", "operation"}
-SPEECH_STEPS = set(STEPS) - {"away", "hide", "loading"}
+SPEECH_STEPS = set(STEPS) - {"hide", "loading"}
 FAILURES = {"none", "prerequisite", "deadline", "child", "protocol", "native", "orca", "product", "cleanup"}
 
 
@@ -95,7 +95,7 @@ class Report:
         self.pending = None
 
     def public(self):
-        value = {"schema": "f102-native-controller-v1", "status": "incomplete",
+        value = {"schema": "f102-native-controller-v2", "status": "incomplete",
                  "firstFailure": self.failure, "failedStep": self.failed_step,
                  "steps": self.steps, "pending": self.pending, "cleanup": self.cleaned,
                  "injectedStates": True, "mediaEmulated": False, "audible": False,
@@ -110,7 +110,7 @@ class Report:
 def validate_public(value):
     keys = {"schema", "status", "firstFailure", "failedStep", "steps", "pending", "cleanup", "injectedStates",
             "mediaEmulated", "audible", "completionValidated", "nativeRuns"}
-    if (type(value) is not dict or set(value) != keys or value["schema"] != "f102-native-controller-v1"
+    if (type(value) is not dict or set(value) != keys or value["schema"] != "f102-native-controller-v2"
             or not enum(value["status"], {"incomplete", "observed-private-sequence"})
             or not enum(value["firstFailure"], FAILURES) or not enum(value["failedStep"], (*STEPS, "setup", "none"))
             or type(value["steps"]) is not list or len(value["steps"]) > len(STEPS)

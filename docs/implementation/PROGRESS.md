@@ -120,3 +120,29 @@ native observer production source unchanged, corrected parent-death fixture6pure
 is next before runtime startup/retry/suspend/ordered shutdown/provider dispatch
 and missingcredentialsetup/status UI. Source/evidence stays in that isolated F2
 worktree; no renderer/native session/provider acceptance claimed. Fullgoal active.
+
+
+1November2026 checkpoint: F1 version2 native observer/controller additions prepared
+in parent. Exact public-alternate/public-final119 IDs, fresh away and final native/
+Orca events required; fixed query Public AT filler1 projects rows100–119 using the
+unchanged20-result productioncap. End guarded by exact count/title/sole selection/
+active descendant/listfocus; final geometry additionally requires overflow and
+scrollTop plus complete row/footer/native pixel bounds. v2 schema rejects legacy
+v1 reports; historical manifests preserved.32unit/55security (53Python no skips),
+fulltype/lint/plan/whitespace/19hashes pass. No productUI changed, no new captures.
+Lab authoritative statefalse/PID0/exit0. Independent review of newIDs/checkpoints,
+immutableguestbuild/receipt, reviewednamespace/outershutdown then actual native
+execution remain next F1 actions. Full native/task acceptance stays pending.
+
+F2 both independent f18efab reviews completed/read: Standards clean; Spec2P2s fixed
+in signed06373ba6ae4e30f886aef4c43b8153ca6792e0be. After private blobIO, recheck
+fresh/abort/deletion before decrypt and clearcipher even on denial; failure results
+prefer current denied status, never offer session-only whileineligible.90mapped
+security/type/lint/plan/hash pass; directfault tests prove no decrypt/consumer,
+cipherzeroing, and write status forlocked/inactive/unavailable. Smallfixes parent-
+validated, no new clean independent finalSpec claim. Worktree clean. Next useful
+F2work: main service startup/retry/suspend/ordered shutdown and actual credential
+setup/status UI and provider predispatch contract, while newF1review runs. F2
+native session/provider/keyring/DesktopUI and full97tasks/R1-03 remain outstanding.
+Normal1Password signing recovered and user confirmed fixed; no configchange or
+unsignedfallback. PR80/81/82 remain drafts, nothingmerged or acceptancepromoted.

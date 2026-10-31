@@ -71,8 +71,9 @@ duplicate/absent target or a 120-second deadline ends it incompletely. Reports
 contain only fixed IDs, role categories, four state booleans and bounded event
 sequence records. They omit text/value/description reads, IDs/PIDs, object paths,
 exceptions, raw events and logs. Unknown names and suffix matches are excluded.
-The fixed public result name is `Public AT result Installed application`; any
-different native name/role is an unmet checkpoint, not a reason to loosen the
+The exact result names are `Public AT result Installed application`,
+`Public AT result alternate Installed application` and
+`Public AT filler 119 Installed application`; any different native name/role is an unmet checkpoint, not a reason to loosen the
 match during the run. Native role mappings themselves remain runtime-unverified.
 
 `observations.checkpoint` requires a unique, showing, visible native control,
@@ -150,3 +151,20 @@ then shut it down cleanly. See
 [preflight evidence](../../evidence/shell-native-at/lab-resume-preflight/README.md).
 No product/native run occurred. The earlier access blocker is resolved; product
 controller/parser/publication wiring remains outstanding.
+
+
+## Coordinator version2 alternate/final preparation
+
+The original fc0fdb2 manifest and14-test record are historical provenance. Current
+coordinator code adds only exact public-alternate/public-final IDs for the fixed
+names above; PID-before-content, fixed role/state/event rules and all privacy
+bounds remain. The strict controller protocol is now version2 and rejects v1
+reports. Away requires its own fresh native selection and Orca generation/
+pre-send attempt. Final filters entries100–119 through the unchanged20-row
+provider projection, establishes a native/DOM collection anchor, then uses End
+once to reach row119. Native current selection/fresh event and independent DOM
+scroll/footer/row/pixel bounds are required. No input launch occurs; alias and
+Cancel Enter guards remain. Current pins are in controller-preparation's
+coordinator-sha256.json. These new IDs/checkpoints are offline preparation and
+require independent review, fresh guest build and actual native execution; no
+native acceptance, completion, delivery or audible result is claimed.
