@@ -182,7 +182,12 @@ describe('credential settings synthetic metadata and privacy', () => {
 
   it('blocks replacement for needs-review and offers main-owned removal/recheck', async () => {
     const f = fixture({ stored: 'needs-review' }); render(<CredentialSettings api={f.api} />);
-    await screen.findByRole('heading', { name: 'Saved credential needs review' });
+    const review = await screen.findByRole('heading', { name: 'Saved credential needs review' });
+    // Review uncertainty is not an unsupported session capability, a denial or an approval request.
+    const plate = review.closest('section')!;
+    expect(plate.getAttribute('data-kind')).toBe('unavailable');
+    expect(plate.textContent).toContain('Unavailable');
+    expect(plate.textContent).not.toMatch(/Unsupported in this session|Permission denied|Approval needed/);
     expect(input().readOnly).toBe(true);
     enter(); submit(); expect(f.api.saveKey).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Remove key…' }));

@@ -132,9 +132,12 @@ Non-default states use one **state plate**. Kinds and their shape, eyebrow word 
 | error | triangle with a bar | Error | danger |
 | permission denied | circle with a diagonal slash | Permission denied | warning |
 | unsupported | dashed square | Unsupported in this session | muted |
+| unavailable (unclassified) | circle with an i | Unavailable | warning |
 | interrupted | pause bars in a circle | Interrupted | warning |
 | approval needed | shield with a mark | Approval needed | focus |
 | success | check in a circle | Done | success |
+
+Use `unsupported` only for a probed missing backend or session capability and `denied` only for a recorded permission refusal. When a caller cannot classify why something is unusable (for example review uncertainty or missing data), it uses the unclassified `unavailable` plate and states the cause in its own copy; no plate implies a cause it was not given.
 
 A **block** plate centres in an empty region (520 px measure). A **band** fills the width of a list or document on the matching tint and never replaces results that still work. Content is eyebrow, title, muted body, an optional monospace detail naming the backend or error code (never secrets or user content), and at most one primary and one secondary action plus an optional ghost. Plates present caller-owned copy and actions only: they never retry, grant, cancel or claim an effect. Success appears only after the backend confirms a real result. Colour is never the only signal.
 

@@ -32,18 +32,23 @@ message without announcing every keystroke. Native editable caret behavior is
 preserved. `Keycap` and `ShortcutHint` only display keys; each key of a chord is
 its own cap and labels are normalised to Linux names (`linuxKeyLabel`: ⌘/Cmd/Meta
 → Super, ⌥/Option → Alt, Return → Enter, Esc → Escape, single letters upper-case).
-`ariaKeyShortcuts` builds the matching ARIA value.
+`ariaKeyShortcuts` builds the matching ARIA value. Key names may come from contract-validated
+extension data, so both name maps use own-property lookups only: names such as
+`__proto__`, `constructor` or `toString` render as ordinary bounded key text.
 
 `StatePlate` is the shared state surface: `kind` is `loading`, `empty`, `filtered`,
-`error`, `denied`, `unsupported`, `interrupted`, `pending` or `success`; each has a
+`error`, `denied`, `unsupported`, `unavailable` (unclassified), `interrupted`, `pending` or `success`; each has a
 fixed glyph shape, eyebrow word and tone so colour is never the only signal.
 `layout="block"` centres in an empty region; `layout="band"` is a tinted inline
 strip that must not replace working results. Optional `detail` is a monospace
 backend/error-code line and must never contain secrets or user content. The
 existing `LoadingState`, `EmptyState` (`filtered` for filtered-empty),
-`ErrorState` and `UnavailableState` (`reason: 'unsupported' | 'denied'`) remain
+`ErrorState` and `UnavailableState` remain
 exported and render through `StatePlate`; `LoadingState` stays a compact inline
-row with the `.lc-loading` hook. Every state accepts explicit public copy and
+row with the `.lc-loading` hook. `UnavailableState` without `reason` keeps the legacy
+unclassified meaning (`data-kind="unavailable"`, eyebrow “Unavailable”); pass
+`reason: 'unsupported'` only for a probed missing capability and `'denied'` only
+for a recorded refusal. Every state accepts explicit public copy and
 caller-owned actions and performs no retry, cancellation, permission or backend
 operation itself. Loading announces politely by default; error announcements are
 opt-in via `announce`. Never render `success` for a simulated or unconfirmed
@@ -55,7 +60,8 @@ keys`): callers own its role (`option`, link, button…), ARIA state, handlers a
 shortcut binding. Its rail/selection fill follow `aria-selected`/`aria-current`,
 or an explicit `current` for multi-select lists where `aria-selected` reports the
 checkbox choice. Rows have minimum (not fixed) heights; under narrow widths or
-200% text the trailing accessory/keys wrap below the title. Truncated text keeps
+200% text the trailing group wraps below the title, and its accessory words and
+individual keycaps wrap within the row; nothing is clipped or hidden. Truncated text keeps
 its full value in the tooltip and accessible name. `GroupCaption` starts on the
 title column (or `flush`) with an optional tabular count; it is presentational,
 so the group element carries the accessible name. `GlyphTile` accepts one of the

@@ -14,17 +14,22 @@ const LINUX_KEY_NAMES: Readonly<Record<string, string>> = {
   arrowup: 'Up', arrowdown: 'Down', arrowleft: 'Left', arrowright: 'Right',
   home: 'Home', end: 'End', pageup: 'PageUp', pagedown: 'PageDown',
 };
+/**
+ * Own-property lookup only. Key names come from untrusted, contract-validated extension data, so
+ * inherited names such as `__proto__`, `constructor` or `toString` must stay ordinary text.
+ */
+const lookup = (names: Readonly<Record<string, string>>, key: string): string | undefined => Object.hasOwn(names, key) ? names[key] : undefined;
 /** Linux keycap label for one key. macOS glyphs/names map to Ctrl/Alt/Shift/Super; single letters upper-case. */
 export function linuxKeyLabel(key: string): string {
-  const trimmed = key.trim();
-  const named = LINUX_KEY_NAMES[trimmed.toLowerCase()];
+  const trimmed = String(key).trim();
+  const named = lookup(LINUX_KEY_NAMES, trimmed.toLowerCase());
   if (named) return named;
   return trimmed.length === 1 ? trimmed.toUpperCase() : trimmed;
 }
 const ARIA_KEY_NAMES: Readonly<Record<string, string>> = { Ctrl: 'Control', Super: 'Meta', Up: 'ArrowUp', Down: 'ArrowDown', Left: 'ArrowLeft', Right: 'ArrowRight' };
 /** `aria-keyshortcuts` value for a chord (e.g. ['Ctrl','K'] → "Control+K"). */
 export function ariaKeyShortcuts(keys: readonly string[]): string {
-  return keys.map(linuxKeyLabel).map(key => ARIA_KEY_NAMES[key] ?? key).join('+');
+  return keys.map(linuxKeyLabel).map(key => lookup(ARIA_KEY_NAMES, key) ?? key).join('+');
 }
 
 /* ------------------------------------------------------------------ buttons */

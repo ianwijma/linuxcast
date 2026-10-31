@@ -13,7 +13,10 @@ Schema version 2 (selected Instrument direction) has exact key sets per group;
 strings, alpha on opaque roles, unsafe font text, off-scale spacing, out-of-range
 ratios and generated custom-property collisions. Importing the module throws if
 the canonical file is invalid, so neither generation nor the renderer can run on
-an invalid contract. `scripts/validate_plan.py` mirrors the schema for docs CI.
+an invalid contract. `scripts/validate_plan.py` (`token_errors`) mirrors every key,
+bound and integer/finite rule for docs CI. Both validators run the shared cases
+in `schema-cases.json` (valid boundaries and malformed variants, with explicit
+`{"$nonfinite": "NaN"}` markers decoded as data) and must agree on each.
 
 Units are deliberate. Type, line heights, spacing, radii and layout dimensions
 use rem relative to the user's root text size (canonical px ÷ 16). `ratio.*` is

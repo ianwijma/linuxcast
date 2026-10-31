@@ -104,11 +104,15 @@ function Preview() {
         {loading ? <LoadingState label="Loading example commands…" action={<Button variant="quiet" onClick={() => setLoading(false)}>Cancel loading</Button>} /> : <p role="status">Loading cancelled.</p>}
       </section>
       <ResultList />
+      <section className="preview-section preview-wide" aria-labelledby="narrow-title"><h2 id="narrow-title">Narrow row</h2>
+        <div className="preview-narrow"><Row current leading={<GlyphTile category="system" />} title="Switch windows" subtitle="Window management (synthetic)" accessory="Temporarily unavailable" shortcut={['Alt', 'Shift', 'F']} /></div>
+      </section>
       <MultiSelect />
       <EmptyState filtered title="No matching commands" description="Try another search or clear the filter to see your commands." action={<Button onClick={() => setMessage('Example filter cleared.')}>Clear filter</Button>} />
       <ErrorState title="Changes could not be saved" description="Your edits are still here. Try saving again." detail="example-store · write failed" action={<Button onClick={() => setMessage('Example retry requested.')}>Try again</Button>} />
       <UnavailableState reason="denied" title="Permission required" description="Enable this integration in Settings before using its commands." action={<Button onClick={() => setMessage('Example settings opened.')}>Open settings</Button>} />
-      <UnavailableState title="Window switching isn’t available here" description="This session does not expose the capability. Nothing was run." detail="example-backend · unsupported" />
+      <UnavailableState reason="unsupported" title="Window switching isn’t available here" description="This session does not expose the capability. Nothing was run." detail="example-backend · unsupported" />
+      <UnavailableState title="Example source needs review" description="Unclassified: the caller explains why; no session or permission cause is implied." />
       <EmptyState title="No commands yet" description="Add your first command when you are ready. Your existing settings are unchanged." />
       <section className="preview-section preview-wide" aria-labelledby="bands-title"><h2 id="bands-title">Inline state bands</h2>
         <div className="preview-bands">

@@ -21,6 +21,7 @@ provider, desktop window or external page is involved.
 | [rows-dark.png](rows-dark.png) | Hanging rows: selection fill + 2 px rail, keycaps per chord, mono path subtitle |
 | [states-dark.png](states-dark.png), [states-light.png](states-light.png) | Error, denied, interrupted, pending, unsupported and success bands |
 | [light-reduced-motion.png](light-reduced-motion.png) | OS reduced motion: no transitions, static loading arc |
+| [narrow-row-200-percent.png](narrow-row-200-percent.png) | 480 px row at 200% text: trailing accessory words and individual keycaps wrap inside the row (review fix) |
 | [text-200-percent.png](text-200-percent.png) | 200% root text at 720 CSS px: rows/captions grow, trailing keys wrap under the title, no horizontal overflow |
 | [forced-colors.png](forced-colors.png) | Forced colours: Highlight outline + rail on the selected row, system borders on tiles, fields, buttons, keycaps and bands |
 
@@ -53,3 +54,18 @@ Incidental downstream screenshot recaptures were restored; only this directory h
 - Not run: actual Electron/private-Xvfb product regression for this increment. Product surfaces have not yet adopted Row/GroupCaption/GlyphTile/StatePlate bands (D1-02), so captures would mostly show restyled controls.
 - Not evidence of: Debian 13 GNOME/KDE on Wayland/X11, Orca or other native assistive technology, or the full desktop matrix. Headless Chromium is renderer evidence only.
 - Fontsource Inter's `cv11`/`ss01` features are requested through the token; if a bundled subset lacks them, Inter's defaults render.
+
+## Review corrections (four P2 findings)
+
+1. Shortcut key names from contract-validated extension data use own-property lookups in both
+   name maps, so `__proto__`, `constructor`, `toString`, `hasOwnProperty` and `valueOf` render as plain
+   keycaps with truthful labels (regression in `packages/ui/src/views/loading.test.tsx` through
+   `viewModelSchema` and the real renderer action panel).
+2. The row trailing group, accessory words and individual keycaps wrap within the row; the 480 px /
+   200% case passes with `scrollWidth <= clientWidth` and every child inside the row (b40: 508 px).
+3. `scripts/validate_plan.py` `token_errors` mirrors `validateTokens` exactly; both run the shared
+   cases in `packages/ui/src/tokens/schema-cases.json` (20 valid, 87 invalid). b40 Python disagreed on
+   24 cases; b40 TypeScript accepted a string spacing scale.
+4. `UnavailableState` without `reason` is the unclassified `unavailable` plate (“Unavailable”), not
+   “Unsupported in this session”; the credential needs-review regression is in
+   `packages/secrets/src/ui/credentials.test.tsx`.

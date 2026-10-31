@@ -1,0 +1,1689 @@
+{
+ "description": "Shared token-schema cases. Both packages/ui/src/tokens/tokens.test.ts (validateTokens) and scripts/test_validate_plan.py (validate_plan.token_errors) apply each case to the canonical tokens.json and must agree on validity. Values of the form {\"$nonfinite\": \"NaN\"|\"Infinity\"|\"-Infinity\"} are decoded by each harness into the corresponding non-finite number; nothing is evaluated.",
+ "cases": [
+  {
+   "name": "canonical contract unchanged",
+   "valid": true,
+   "mutations": []
+  },
+  {
+   "name": "integral float layout dimension",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": 40.0
+    }
+   ]
+  },
+  {
+   "name": "layout lower bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "hairline"
+     ],
+     "value": 1
+    }
+   ]
+  },
+  {
+   "name": "layout upper bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "workspaceMinWidth"
+     ],
+     "value": 4096
+    }
+   ]
+  },
+  {
+   "name": "font size lower bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "caption"
+     ],
+     "value": 8
+    }
+   ]
+  },
+  {
+   "name": "line height equal to its size",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "lineHeight",
+      "body"
+     ],
+     "value": 14
+    }
+   ]
+  },
+  {
+   "name": "font weight upper bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontWeight",
+      "semibold"
+     ],
+     "value": 900
+    }
+   ]
+  },
+  {
+   "name": "letter spacing lower bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "letterSpacingEm",
+      "workspaceTitle"
+     ],
+     "value": -0.1
+    }
+   ]
+  },
+  {
+   "name": "letter spacing upper bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "letterSpacingEm",
+      "groupCaption"
+     ],
+     "value": 0.2
+    }
+   ]
+  },
+  {
+   "name": "radius zero",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "radius",
+      "keycap"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "ratio at its minimum",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetail"
+     ],
+     "value": 0.3
+    }
+   ]
+  },
+  {
+   "name": "ratio step upper bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailStep"
+     ],
+     "value": 0.1
+    }
+   ]
+  },
+  {
+   "name": "stroke upper bound",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "strokePx",
+      "edge"
+     ],
+     "value": 4
+    }
+   ]
+  },
+  {
+   "name": "motion upper bounds",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "stateMs"
+     ],
+     "value": 400
+    },
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelMs"
+     ],
+     "value": 400
+    },
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelOffset"
+     ],
+     "value": 8
+    }
+   ]
+  },
+  {
+   "name": "motion offset zero",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelOffset"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "easing with overshoot on y",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      0,
+      -0.5,
+      1,
+      1.5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "shadow bounds",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "popover",
+      0
+     ],
+     "value": {
+      "y": -8,
+      "blur": 96,
+      "spread": 8,
+      "color": "#00000080"
+     }
+    }
+   ]
+  },
+  {
+   "name": "shadow upper y",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "popover",
+      1,
+      "y"
+     ],
+     "value": 64
+    }
+   ]
+  },
+  {
+   "name": "four shadow layers",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "popover"
+     ],
+     "value": [
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lower-case hex",
+   "valid": true,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark",
+      "divider"
+     ],
+     "value": "#2c2e35"
+    }
+   ]
+  },
+  {
+   "name": "unsupported version",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "version"
+     ],
+     "value": 1
+    }
+   ]
+  },
+  {
+   "name": "string version",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "version"
+     ],
+     "value": "2"
+    }
+   ]
+  },
+  {
+   "name": "unknown top-level group",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "gradients"
+     ],
+     "value": {}
+    }
+   ]
+  },
+  {
+   "name": "missing top-level group",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "ratio"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "unsafe font stack",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "font",
+      "ui"
+     ],
+     "value": "Inter; } body { display: none"
+    }
+   ]
+  },
+  {
+   "name": "empty font stack",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "font",
+      "mono"
+     ],
+     "value": ""
+    }
+   ]
+  },
+  {
+   "name": "unsafe font feature",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontFeature",
+      "ui"
+     ],
+     "value": "\"cv11\" 1; color: red"
+    }
+   ]
+  },
+  {
+   "name": "non-string font feature",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontFeature",
+      "numeric"
+     ],
+     "value": 1
+    }
+   ]
+  },
+  {
+   "name": "font weight not a hundred",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontWeight",
+      "medium"
+     ],
+     "value": 450
+    }
+   ]
+  },
+  {
+   "name": "font weight too heavy",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontWeight",
+      "semibold"
+     ],
+     "value": 1000
+    }
+   ]
+  },
+  {
+   "name": "font weight too light",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontWeight",
+      "regular"
+     ],
+     "value": 50
+    }
+   ]
+  },
+  {
+   "name": "zero font size",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "body"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "font size below bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "caption"
+     ],
+     "value": 7
+    }
+   ]
+  },
+  {
+   "name": "font size above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "workspaceTitle"
+     ],
+     "value": 65
+    }
+   ]
+  },
+  {
+   "name": "string font size",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "fontSize",
+      "body"
+     ],
+     "value": "14"
+    }
+   ]
+  },
+  {
+   "name": "line height below its size",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "lineHeight",
+      "body"
+     ],
+     "value": 13
+    }
+   ]
+  },
+  {
+   "name": "prose line height below body",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "lineHeight",
+      "prose"
+     ],
+     "value": 12
+    }
+   ]
+  },
+  {
+   "name": "line height above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "lineHeight",
+      "workspaceTitle"
+     ],
+     "value": 97
+    }
+   ]
+  },
+  {
+   "name": "letter spacing above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "letterSpacingEm",
+      "caption"
+     ],
+     "value": 0.3
+    }
+   ]
+  },
+  {
+   "name": "non-finite letter spacing",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "letterSpacingEm",
+      "caption"
+     ],
+     "value": {
+      "$nonfinite": "NaN"
+     }
+    }
+   ]
+  },
+  {
+   "name": "string spacing scale",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "spacing"
+     ],
+     "value": [
+      "4",
+      "8",
+      "12",
+      "16",
+      "20",
+      "24",
+      "32"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "off-scale spacing",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "spacing"
+     ],
+     "value": [
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      32.5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "extra spacing step",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "spacing"
+     ],
+     "value": [
+      4,
+      6,
+      8,
+      12,
+      16,
+      20,
+      24,
+      32
+     ]
+    }
+   ]
+  },
+  {
+   "name": "radius above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "radius",
+      "shell"
+     ],
+     "value": 33
+    }
+   ]
+  },
+  {
+   "name": "negative radius",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "radius",
+      "row"
+     ],
+     "value": -1
+    }
+   ]
+  },
+  {
+   "name": "zero layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "negative layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": -1
+    }
+   ]
+  },
+  {
+   "name": "layout above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "launcherWidth"
+     ],
+     "value": 4097
+    }
+   ]
+  },
+  {
+   "name": "fractional layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": 40.5
+    }
+   ]
+  },
+  {
+   "name": "string layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": "40"
+    }
+   ]
+  },
+  {
+   "name": "boolean layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": true
+    }
+   ]
+  },
+  {
+   "name": "null layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": null
+    }
+   ]
+  },
+  {
+   "name": "NaN layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": {
+      "$nonfinite": "NaN"
+     }
+    }
+   ]
+  },
+  {
+   "name": "infinite layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "rowHeight"
+     ],
+     "value": {
+      "$nonfinite": "Infinity"
+     }
+    }
+   ]
+  },
+  {
+   "name": "unknown layout dimension",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "promoBanner"
+     ],
+     "value": 300
+    }
+   ]
+  },
+  {
+   "name": "layout shadows colour role",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "layout",
+      "selectionRail"
+     ],
+     "value": 2
+    },
+    {
+     "op": "delete",
+     "path": [
+      "layout",
+      "selectionRailWidth"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ratio step half",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailStep"
+     ],
+     "value": 0.5
+    }
+   ]
+  },
+  {
+   "name": "ratio step large",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailStep"
+     ],
+     "value": 0.9
+    }
+   ]
+  },
+  {
+   "name": "ratio step just above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailStep"
+     ],
+     "value": 0.11
+    }
+   ]
+  },
+  {
+   "name": "ratio above max",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetail"
+     ],
+     "value": 0.9
+    }
+   ]
+  },
+  {
+   "name": "ratio below min",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetail"
+     ],
+     "value": 0.2
+    }
+   ]
+  },
+  {
+   "name": "ratio min zero",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailMin"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "ratio NaN",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetailMax"
+     ],
+     "value": {
+      "$nonfinite": "NaN"
+     }
+    }
+   ]
+  },
+  {
+   "name": "string ratio",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "ratio",
+      "listDetail"
+     ],
+     "value": "0.42"
+    }
+   ]
+  },
+  {
+   "name": "stroke below bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "strokePx",
+      "glyph"
+     ],
+     "value": 0.4
+    }
+   ]
+  },
+  {
+   "name": "stroke above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "strokePx",
+      "glyph"
+     ],
+     "value": 4.5
+    }
+   ]
+  },
+  {
+   "name": "string motion",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "stateMs"
+     ],
+     "value": "bogus"
+    }
+   ]
+  },
+  {
+   "name": "negative motion",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "stateMs"
+     ],
+     "value": -100
+    }
+   ]
+  },
+  {
+   "name": "zero motion",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "stateMs"
+     ],
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "motion above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelMs"
+     ],
+     "value": 401
+    }
+   ]
+  },
+  {
+   "name": "fractional motion",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "stateMs"
+     ],
+     "value": 100.5
+    }
+   ]
+  },
+  {
+   "name": "NaN motion",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelMs"
+     ],
+     "value": {
+      "$nonfinite": "NaN"
+     }
+    }
+   ]
+  },
+  {
+   "name": "panel offset above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelOffset"
+     ],
+     "value": 9
+    }
+   ]
+  },
+  {
+   "name": "negative panel offset",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "panelOffset"
+     ],
+     "value": -1
+    }
+   ]
+  },
+  {
+   "name": "changed reduced-motion policy",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "reducedMotion"
+     ],
+     "value": "full"
+    }
+   ]
+  },
+  {
+   "name": "short easing",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      0.2,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "easing x1 above one",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      1.2,
+      0,
+      0,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "easing x2 negative",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      0.2,
+      0,
+      -0.1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "string easing point",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      0.2,
+      "0",
+      0,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "infinite easing point",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": [
+      0.2,
+      0,
+      0,
+      {
+       "$nonfinite": "Infinity"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "easing as string",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "easing"
+     ],
+     "value": "cubic-bezier(0.2, 0, 0, 1)"
+    }
+   ]
+  },
+  {
+   "name": "unknown motion key",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "motion",
+      "bounce"
+     ],
+     "value": 1
+    }
+   ]
+  },
+  {
+   "name": "unknown glyph category",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "glyphTiles",
+      "custom"
+     ],
+     "value": "#123456"
+    }
+   ]
+  },
+  {
+   "name": "translucent glyph tile",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "glyphTiles",
+      "ai"
+     ],
+     "value": "#B83E6680"
+    }
+   ]
+  },
+  {
+   "name": "missing glyph category",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "glyphTiles",
+      "system"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "extra theme",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "sepia"
+     ],
+     "value": {}
+    }
+   ]
+  },
+  {
+   "name": "extra theme role",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark",
+      "brandGlow"
+     ],
+     "value": "#FF00FF"
+    }
+   ]
+  },
+  {
+   "name": "missing theme role",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "themes",
+      "light",
+      "controlBorder"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "alpha on opaque role",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark",
+      "surface"
+     ],
+     "value": "#1C1D2280"
+    }
+   ]
+  },
+  {
+   "name": "opaque scrim",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "dark",
+      "scrim"
+     ],
+     "value": "#0A0B0E"
+    }
+   ]
+  },
+  {
+   "name": "raw CSS colour",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "light",
+      "divider"
+     ],
+     "value": "rgb(0 0 0 / 10%)"
+    }
+   ]
+  },
+  {
+   "name": "short hex",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "themes",
+      "light",
+      "text"
+     ],
+     "value": "#FFF"
+    }
+   ]
+  },
+  {
+   "name": "raw shadow string",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "shell"
+     ],
+     "value": "0 0 4px red"
+    }
+   ]
+  },
+  {
+   "name": "empty shadow",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "shell"
+     ],
+     "value": []
+    }
+   ]
+  },
+  {
+   "name": "five shadow layers",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "popover"
+     ],
+     "value": [
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      },
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "huge shadow blur",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "shell",
+      1,
+      "blur"
+     ],
+     "value": 999
+    }
+   ]
+  },
+  {
+   "name": "negative shadow blur",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "shell",
+      1,
+      "blur"
+     ],
+     "value": -1
+    }
+   ]
+  },
+  {
+   "name": "fractional shadow blur",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "shell",
+      1,
+      "blur"
+     ],
+     "value": 1.5
+    }
+   ]
+  },
+  {
+   "name": "shadow y above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "popover",
+      0,
+      "y"
+     ],
+     "value": 65
+    }
+   ]
+  },
+  {
+   "name": "shadow y below bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "popover",
+      0,
+      "y"
+     ],
+     "value": -9
+    }
+   ]
+  },
+  {
+   "name": "shadow spread above bound",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "shell",
+      0,
+      "spread"
+     ],
+     "value": 9
+    }
+   ]
+  },
+  {
+   "name": "NaN shadow offset",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "shell",
+      0,
+      "y"
+     ],
+     "value": {
+      "$nonfinite": "NaN"
+     }
+    }
+   ]
+  },
+  {
+   "name": "opaque shadow colour",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "light",
+      "popover",
+      0,
+      "color"
+     ],
+     "value": "#1C1D24"
+    }
+   ]
+  },
+  {
+   "name": "false inset",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "highlight",
+      0,
+      "inset"
+     ],
+     "value": false
+    }
+   ]
+  },
+  {
+   "name": "extra shadow layer key",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "popover",
+      0,
+      "x"
+     ],
+     "value": 2
+    }
+   ]
+  },
+  {
+   "name": "unknown elevation level",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "set",
+     "path": [
+      "elevation",
+      "dark",
+      "modal"
+     ],
+     "value": [
+      {
+       "y": 1,
+       "blur": 2,
+       "spread": 0,
+       "color": "#00000080"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "missing elevation theme",
+   "valid": false,
+   "mutations": [
+    {
+     "op": "delete",
+     "path": [
+      "elevation",
+      "light"
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -8,7 +8,7 @@ import type { LineIconName } from './icons.tsx';
  * semantic tone, so colour is never the only signal. Plates present caller-owned
  * copy and actions only: they never retry, grant, cancel or claim a system effect.
  */
-export type StatePlateKind = 'loading' | 'empty' | 'filtered' | 'error' | 'denied' | 'unsupported' | 'interrupted' | 'pending' | 'success';
+export type StatePlateKind = 'loading' | 'empty' | 'filtered' | 'error' | 'denied' | 'unsupported' | 'unavailable' | 'interrupted' | 'pending' | 'success';
 export type StatePlateLayout = 'block' | 'band';
 const KINDS: Readonly<Record<StatePlateKind, { glyph: LineIconName; tone: 'muted' | 'danger' | 'warning' | 'focus' | 'success'; eyebrow: string }>> = {
   loading: { glyph: 'stateLoading', tone: 'muted', eyebrow: 'Loading' },
@@ -17,6 +17,8 @@ const KINDS: Readonly<Record<StatePlateKind, { glyph: LineIconName; tone: 'muted
   error: { glyph: 'stateError', tone: 'danger', eyebrow: 'Error' },
   denied: { glyph: 'stateDenied', tone: 'warning', eyebrow: 'Permission denied' },
   unsupported: { glyph: 'stateUnsupported', tone: 'muted', eyebrow: 'Unsupported in this session' },
+  // Unclassified: something cannot be used right now, with no claim about why (session capability, permission, review…).
+  unavailable: { glyph: 'info', tone: 'warning', eyebrow: 'Unavailable' },
   interrupted: { glyph: 'stateInterrupted', tone: 'warning', eyebrow: 'Interrupted' },
   pending: { glyph: 'statePending', tone: 'focus', eyebrow: 'Approval needed' },
   success: { glyph: 'stateSuccess', tone: 'success', eyebrow: 'Done' },
@@ -61,11 +63,12 @@ export function EmptyState({ filtered = false, ...props }: StateProps & { filter
 }
 export function ErrorState(props: StateProps & { announce?: boolean }) { return <StatePlate {...props} kind="error" />; }
 /**
- * A capability that cannot run: `unsupported` (default) for a missing backend/session capability,
- * `denied` for a recorded permission refusal. Callers must describe the real reason and remediation.
+ * Something cannot be used right now. Without `reason` it stays unclassified ("Unavailable") and the
+ * caller's copy carries the cause, matching the legacy contract. Pass `unsupported` only for a probed
+ * missing backend/session capability and `denied` only for a recorded permission refusal.
  */
-export function UnavailableState({ reason = 'unsupported', ...props }: StateProps & { reason?: 'unsupported' | 'denied' }) {
-  return <StatePlate {...props} kind={reason} />;
+export function UnavailableState({ reason, ...props }: StateProps & { reason?: 'unsupported' | 'denied' | undefined }) {
+  return <StatePlate {...props} kind={reason ?? 'unavailable'} />;
 }
 /** Compact inline progress row (open-ring glyph, static under reduced motion). Announces politely by default. */
 export function LoadingState({ label = 'Loading…', action, announce = true }: { label?: string; action?: ReactNode; announce?: boolean }) {

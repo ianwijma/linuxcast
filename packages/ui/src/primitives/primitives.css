@@ -155,14 +155,16 @@
 .lc-row-leading { display: inline-grid; place-items: center; flex: none; inline-size: var(--lc-glyph-track); }
 .lc-row-leading input[type='checkbox'] { accent-color: var(--lc-accent); margin: 0; }
 .lc-row-text { display: flex; flex: 1 1 12em; align-items: baseline; gap: var(--lc-space-8); min-inline-size: 0; }
-.lc-row-trailing { display: inline-flex; flex: none; align-items: center; gap: var(--lc-space-8); margin-inline-start: auto; max-inline-size: 100%; }
+/* Trailing group keeps its natural width when it fits; otherwise it wraps onto its own line(s) and its
+   accessory words and individual keycaps wrap within the row. Nothing is clipped, hidden or shrunk. */
+.lc-row-trailing { display: inline-flex; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--lc-space-4) var(--lc-space-8); margin-inline-start: auto; min-inline-size: 0; max-inline-size: 100%; }
 .lc-row-title { flex: 0 1 auto; max-inline-size: 70%; font-weight: var(--lc-weight-medium); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lc-row-title[data-solo] { max-inline-size: 100%; }
 .lc-row-subtitle { flex: 1 1 0; min-inline-size: 0; color: var(--lc-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lc-row-subtitle[data-mono] { font-family: var(--lc-font-mono); font-size: var(--lc-text-caption); }
-.lc-row-accessory { display: inline-flex; align-items: center; gap: var(--lc-space-4); color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); white-space: nowrap; }
-.lc-row-keys { display: inline-flex; }
-.lc-row-keys .lc-shortcut { flex-wrap: nowrap; }
+.lc-row-accessory { display: inline-flex; align-items: center; gap: var(--lc-space-4); color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); min-inline-size: 0; overflow-wrap: anywhere; }
+.lc-row-keys { display: inline-flex; min-inline-size: 0; max-inline-size: 100%; }
+.lc-row-keys .lc-shortcut { justify-content: flex-end; }
 .lc-group-caption {
   display: flex;
   align-items: flex-end;

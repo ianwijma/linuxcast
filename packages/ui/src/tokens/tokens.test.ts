@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import sharedCases from './schema-cases.json' with { type: 'json' };
 import { describe, expect, test } from 'vitest';
 import { glyphCategories, tailwindCss, tokenCss, tokens, validateTokens } from './index.ts';
 
@@ -107,5 +108,43 @@ describe('schema rejects malformed variants', () => {
     const errors = validateTokens(candidate);
     expect(errors.length).toBeGreaterThan(0);
     expect(errors.join('\n')).toMatch(expected);
+  });
+});
+
+/* Shared with scripts/test_validate_plan.py: both validators must agree on every case. */
+type Mutation = { op: 'set' | 'delete'; path: (string | number)[]; value?: unknown };
+const NONFINITE: Readonly<Record<string, number>> = { NaN: Number.NaN, Infinity: Number.POSITIVE_INFINITY, '-Infinity': Number.NEGATIVE_INFINITY };
+/** Explicit data decoding only: `{"$nonfinite": "NaN"}` becomes NaN. Nothing is evaluated. */
+function decode(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(decode);
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value);
+    if (entries.length === 1 && entries[0]![0] === '$nonfinite') {
+      const marker = entries[0]![1];
+      if (typeof marker !== 'string' || !Object.hasOwn(NONFINITE, marker)) throw new Error(`Unknown non-finite marker ${String(marker)}`);
+      return NONFINITE[marker];
+    }
+    return Object.fromEntries(entries.map(([key, inner]) => [key, decode(inner)]));
+  }
+  return value;
+}
+function applyCase(mutations: readonly Mutation[]): unknown {
+  const candidate = JSON.parse(JSON.stringify(tokens)) as Record<string, unknown>;
+  for (const { op, path, value } of mutations) {
+    const parent = path.slice(0, -1).reduce<unknown>((node, key) => (node as Record<string | number, unknown>)[key], candidate) as Record<string | number, unknown>;
+    const last = path[path.length - 1]!;
+    if (op === 'delete') delete parent[last]; else parent[last] = decode(value);
+  }
+  return candidate;
+}
+describe('shared schema cases (parity with the Python planning gate)', () => {
+  const { cases } = sharedCases as { cases: { name: string; valid: boolean; mutations: Mutation[] }[] };
+  test('cover both outcomes', () => {
+    expect(cases.filter(item => item.valid).length).toBeGreaterThanOrEqual(10);
+    expect(cases.filter(item => !item.valid).length).toBeGreaterThanOrEqual(50);
+  });
+  for (const item of cases) test(`${item.valid ? 'accepts' : 'rejects'} ${item.name}`, () => {
+    const errors = validateTokens(applyCase(item.mutations));
+    if (item.valid) expect(errors).toEqual([]); else expect(errors.length).toBeGreaterThan(0);
   });
 });

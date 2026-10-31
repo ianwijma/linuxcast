@@ -104,13 +104,17 @@ test('multi-selection checkboxes stay distinct from the cursor rail', async ({ p
 });
 
 test('state plates: shape, eyebrow word and tone for every kind; caller-owned actions only', async ({ page }) => {
-  const expected: Record<string, string> = { filtered: 'No matches', error: 'Error', denied: 'Permission denied', unsupported: 'Unsupported in this session', interrupted: 'Interrupted', pending: 'Approval needed', success: 'Done', empty: 'Empty' };
+  const expected: Record<string, string> = { filtered: 'No matches', error: 'Error', denied: 'Permission denied', unsupported: 'Unsupported in this session', unavailable: 'Unavailable', interrupted: 'Interrupted', pending: 'Approval needed', success: 'Done', empty: 'Empty' };
   for (const [kind, word] of Object.entries(expected)) {
     const plate = page.locator(`.lc-plate[data-kind="${kind}"]`).first();
     await expect(plate.locator('.lc-plate-eyebrow')).toHaveText(word);
     await expect(plate.locator('.lc-plate-glyph svg')).toHaveAttribute('aria-hidden', 'true');
   }
   await expect(page.locator('.lc-plate[data-layout="band"][data-kind="error"]')).toHaveCSS('background-color', /rgb/);
+  // Legacy UnavailableState without an explicit classification asserts no cause.
+  const unclassified = page.locator('.lc-plate', { has: page.getByRole('heading', { name: 'Example source needs review' }) });
+  await expect(unclassified).toHaveAttribute('data-kind', 'unavailable');
+  await expect(unclassified).not.toContainText(/Unsupported|Permission denied|Approval needed|Done/);
   // Errors are not live-announced unless the caller opts in.
   await expect(page.locator('.lc-plate[data-kind="error"] [role="status"]')).toHaveCount(0);
   await expect(page.getByText('Loading example commands…')).toHaveAttribute('role', 'status');
@@ -202,6 +206,35 @@ test('200 percent text scaling and narrow viewport preserve labels, wrapping and
   }
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: `${evidence}/text-200-percent.png`, fullPage: true });
+});
+
+test('480 px row at 200 percent text wraps the trailing accessory and keycaps inside the row', async ({ page }) => {
+  await page.setViewportSize({ width: 720, height: 1100 });
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  expect(await page.evaluate(() => document.fonts.check('28px Inter') && document.fonts.check('24px "JetBrains Mono"'))).toBe(true);
+  const narrow = page.locator('.preview-narrow');
+  await narrow.evaluate(element => { element.style.inlineSize = '480px'; });
+  const row = narrow.locator('.lc-row');
+  await row.scrollIntoViewIfNeeded();
+  const layout = await row.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    const children = Array.from(element.querySelectorAll<HTMLElement>('*')).map(child => ({ name: `${child.tagName}.${child.className}`, rect: child.getBoundingClientRect() }));
+    return {
+      width: box.width, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth,
+      outside: children.filter(child => child.rect.left < box.left - 0.5 || child.rect.right > box.right + 0.5).map(child => child.name),
+      caps: Array.from(element.querySelectorAll('kbd'), cap => ({ text: cap.textContent, fits: cap.scrollWidth <= cap.clientWidth })),
+      accessorySize: getComputedStyle(element.querySelector('.lc-row-accessory')!).fontSize,
+      rail: getComputedStyle(element, '::before').height,
+    };
+  });
+  expect(layout.width).toBe(480);
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth);
+  expect(layout.outside).toEqual([]);
+  expect(layout.caps).toEqual([{ text: 'Alt', fits: true }, { text: 'Shift', fits: true }, { text: 'F', fits: true }]);
+  expect(layout.accessorySize).toBe('24px');
+  expect(parseFloat(layout.rail)).toBeGreaterThan(0);
+  await expect(row).toContainText('Temporarily unavailable');
+  await page.screenshot({ path: `${evidence}/narrow-row-200-percent.png`, clip: (await narrow.boundingBox())! });
 });
 
 test('forced colors retain native control boundaries and visible keyboard focus', async ({ page }) => {

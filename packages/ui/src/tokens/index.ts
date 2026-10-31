@@ -90,7 +90,7 @@ export function validateTokens(candidate: Json): string[] {
     if (typeof value === 'number' && typeof size === 'number' && value < size) fail(`lineHeight.${key}: smaller than its font size`);
   }
   if (exact('letterSpacingEm', t.letterSpacingEm, tokenSchema.letterSpacingEm)) for (const [key, value] of Object.entries(t.letterSpacingEm)) num(`letterSpacingEm.${key}`, value, -0.1, 0.2);
-  if (!Array.isArray(t.spacing) || t.spacing.join(',') !== tokenSchema.spacing.join(',')) fail('spacing: the 4 px scale is fixed');
+  if (!Array.isArray(t.spacing) || t.spacing.length !== tokenSchema.spacing.length || t.spacing.some((value: Json, index) => typeof value !== 'number' || value !== tokenSchema.spacing[index])) fail('spacing: the 4 px scale is fixed');
   if (exact('radius', t.radius, tokenSchema.radius)) for (const [key, value] of Object.entries(t.radius)) int(`radius.${key}`, value, 0, 32);
   if (exact('layout', t.layout, tokenSchema.layout)) for (const [key, value] of Object.entries(t.layout)) int(`layout.${key}`, value, 1, 4096);
   if (exact('ratio', t.ratio, tokenSchema.ratio)) {
