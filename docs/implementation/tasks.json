@@ -1318,7 +1318,8 @@
         "Bounded F2 increment25October2026: owned2c70e44/0f4c564/2404eef integrated62ba357/92a0810/cc7384b; actual data-settings workspace80beb75. 44package checks plus8owner checks and6export/preload checks =58mappedF2 security checks pass;44shell security checks pass. Actual Electron45/private-Xvfb app test passes (3.49s): separate settings window, exact preload boundary, category filtering, cancelled/confirmed clear, actual-owner exports and real private JSON files, keyboardHide/second-invocation/Quit. Native save/confirmation choices are test-instrumented, not physical desktop interaction. Settled dark/light screenshots inspected; axe same-page checks pass. Both application review findings resolved/re-reviewed; no new proof work assigned.",
         "Integrated25October2026 in PR25 https://github.com/ianwijma/linuxcast/pull/25, merge9fe897698faf457a4625dd2c1ce78d5c6b791a67. Current-head CI40186678031 passed; independent package/application review findings resolved and re-reviewed. F2-02 remains in-progress with listed missing UI, native desktop and release acceptance. Author manifest_review reassigned only after merge to the bounded actual L1-01 launcher flow.",
         "Runtime provenance correction25October2026: earlier coordinator runs used host Node26.11.1/Bun1.3.9 despite pinned-version labels. Exact merged PR27 primary checkout was rerun with verified Node24.22.1/Bun1.4.4:58mapped F2-02 security checks (including6actual child-owner persistence cases) passed. This rerun does not repeat or expand the isolated Electron/keyring backend smoke or establish native desktop acceptance.",
-        "31October2026 diagnostics management on codex/f2-02-diagnostic-controls, base developf461a87. Production Local data export/reset, main-owned XDG diagnostics lifecycle, no dependency/migration/channel. Final68security and1actual private-Xvfb Electron flow5.93s,5captures/axe0, typecheck/lint/plan/21Python regressions pass. Initial independent Standards review clean; SpecP2 idle retention fixed with serialized minute maintenance/shutdown drain and real-file fake-clock checks; additional actual FIFO regression guards against blocked special-file reads. Follow-ups coordinator validated. Signed publication blocked by1Password failure; unlock request pending. Native/credential/full task acceptance unchanged. apps/desktop/evidence/diagnostics-application.md."
+        "31October2026 diagnostics management on codex/f2-02-diagnostic-controls, base developf461a87. Production Local data export/reset, main-owned XDG diagnostics lifecycle, no dependency/migration/channel. Final68security and1actual private-Xvfb Electron flow5.93s,5captures/axe0, typecheck/lint/plan/21Python regressions pass. Initial independent Standards review clean; SpecP2 idle retention fixed with serialized minute maintenance/shutdown drain and real-file fake-clock checks; additional actual FIFO regression guards against blocked special-file reads. Follow-ups coordinator validated. Signed publication blocked by1Password failure; unlock request pending. Native/credential/full task acceptance unchanged. apps/desktop/evidence/diagnostics-application.md.",
+        "1November2026 bounded diagnostics PR82 merged into develop at e568b4d61b88cdb48bd5a5626bb18ba1284edb4e after reviewed signed e31b3e5,68security/actualElectron5.93s/5captures/type/lint/plan/21Python and currenthead CI41198787692 passed; no requested GitHub reviews/comments/rulesets. Task remains in-progress and all credential/native/UI/release gates remain pending. Bounded integration is distinct from task acceptance."
       ],
       "owner": "coordinator",
       "branch": "codex/f2-02-diagnostic-controls",
@@ -1388,7 +1389,14 @@
           "status": "pending",
           "conditional": null,
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "bun run test:security -- F3-01; private Xvfb mapped integration F3-01",
+              "outcome": "Supporting partial evidence:72 security and2 actual Electron integration checks pass. Actual waiting workflow and utility cancel on removal, clipboard sentinel unchanged; failed late-write cleanup quarantines future brokers. Final independent security recheck is clean; applicable supported desktop evidence remains pending.",
+              "platform": "Pop!_OS22.04 amd64 private owned Xvfb; pinned Node24.22.1/Bun1.4.4/Electron45. No supported Debian desktop or native AT acceptance inferred.",
+              "reference": "apps/desktop/evidence/permissions-application.md; packages/permissions/tests/registry.security.test.ts; apps/desktop/tests/permissions.integration.test.ts"
+            }
+          ]
         },
         {
           "id": "F3-01-UI",
@@ -1396,7 +1404,14 @@
           "status": "pending",
           "conditional": "This task introduces or changes user-facing behaviour.",
           "justification": "",
-          "evidence": []
+          "evidence": [
+            {
+              "command": "private Xvfb mapped integration F3-01; visual inspection of9 captures",
+              "outcome": "Supporting partial evidence:dark/light, confirmation,200% native zoom, keyboard focus/Escape, empty, actual storage unavailable and fixture pending-read loading;9 states have zero axe violations. Forced colours/reduced motion emulated. Final independent review is clean; native AT/supported-session acceptance remains pending.",
+              "platform": "Pop!_OS22.04 amd64 private owned Xvfb; pinned Node24.22.1/Bun1.4.4/Electron45. No supported Debian desktop or native AT acceptance inferred.",
+              "reference": "apps/desktop/evidence/permissions-application.md"
+            }
+          ]
         },
         {
           "id": "F3-01-PRIVACY",
@@ -1421,12 +1436,14 @@
       "evidence": [
         "Implementation started24October2026 from merged application foundation PR23/6601c1c after F0-01 and F2-01 acceptance. No criterion completion is inferred from starting work; shared schemas/migrations/manifests remain coordinator-owned.",
         "24October2026: broker6cdce53 with reviewed race fixes9ae9af6/fc11f9e and storage40a5502 integrated on codex/application-services. Required mapped F3 suite58/58 passes, including three actual child-owner persistence/restart checks. Independent review resolved revocation/reconnection and stale-inventory races. Typecheck/lint pass; unfinished UI explicitly retained.",
-        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending."
+        "Integrated via PR24 https://github.com/ianwijma/linuxcast/pull/24, merge17b7c3a on24October2026UTC. Current-head CI40096260133 passed; independent review findings resolved, no requested GitHub reviews/comments remained. F3 UI gaps remain explicitly pending.",
+        "31October2026: coordinator Saved permissions implementation and evidence on codex/f3-01-permissions-ui, initial signed3d127ea plus reviewed fixes.75unit/2contract/72security/2actual private-Xvfb integration checks, typecheck/lint/frozen install pass;9 screenshots inspected. Initial review focus/label findings fixed; blocking late-write cleanup defect reproduced and fixed with shared session quarantine, including concurrent broker release. Final independent security recheck/publication pending; see apps/desktop/evidence/permissions-application.md. No criterion status advanced.",
+        "Final independent security/spec and standards/design review of staged tree c6b83bc5f3e7711298743d0bc736bb20a6544eb6 found no new blocker and confirmed initial P1/P2 fixes; independently72security/75unit/2contract and extra lifecycle/admission probes pass,9captures inspected. Source/captures unchanged by subsequent evidence notes. Normal1Password signing failed; final changes staged and unpublished. PR and supported native acceptance remain pending."
       ],
-      "owner": "manifest_review",
-      "branch": "codex/application-services",
+      "owner": "coordinator",
+      "branch": "codex/f3-01-permissions-ui",
       "limitations": [
-        "Host permission approval/management/remediation UI remains unimplemented. F3-01-UI and the user-visible portion of AC02 remain pending; typed remediation is not visible UI acceptance.",
+        "Saved permissions and existing workflow clipboard approvals are implemented with private-Xvfb evidence. Final independent source review is clean; publication and applicable Debian/native accessibility checks remain; F3-01 AC02/UI stay pending. D1-03 generic consent/settings surfaces and other effect integrations remain separately pending.",
         "Actual file/network/window effects must provide fresh validation and durable preparation through the broker; this package does not claim desktop backend success."
       ]
     },

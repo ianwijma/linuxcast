@@ -1,7 +1,8 @@
 # Capability and permission brokers — F3-01
 
-Implementation in progress. This package owns trusted broker policy, not desktop
-backend success, an approval UI, credential storage or privileged input access.
+Implementation in progress. This package owns trusted broker policy and the
+Saved permissions administration screen, not desktop backend success, credential
+storage or privileged input access.
 Only trusted main registers connections/operations and receives the controller
 that decides prompts. Submission data cannot supply identity or approve itself.
 
@@ -94,10 +95,42 @@ time, principal kind, outcome and permission IDs. No identity IDs, paths, origin
 arguments, output, prompt text, tokens, credentials or raw exception details are
 included. Tests use synthetic IDs/content; no real private material is needed.
 
-The two host packages introduce no visual surface. Their typed prompts,
-capability states and remediation actions are inputs to shared host UI. The actual
-host approval/remediation UI is still an F3-01 acceptance gap: F3-01-UI and the
-user-visible portion of F3-01-AC02 remain pending until that integration and its
-keyboard/accessibility evidence exist. This is not a transfer to another task or
-a not-applicable UI claim. Backend-specific desktop validation remains with the
-relevant capability feature. Unit tests do not establish user-facing acceptance.
+## Shared administration owner
+
+Production features obtain brokers from the single main-owned
+`PermissionRegistry.createBroker`. The product workflow controller receives that
+registry; direct standalone brokers remain useful in controlled library tests.
+Do not create an independent production grant cache. Release a broker through
+`registry.release`; it waits for outstanding mutation cleanup. Close the registry
+before closing its storage owner.
+
+Revocation blocks admission for the exact principal, cancels every matching
+broker and notifies the owning feature so pending UI/worker waits also stop. It
+waits for late grant writes and their deletion before compare-deleting the full
+selected record. A failed write or cleanup quarantines that principal in the
+shared registry, including after the old broker is released; no fresh broker can
+read a surviving late grant as successful approval. Failed removal remains
+unconfirmed and requires storage recovery, application restart and review.
+Cancellation never claims an already sent external action was undone.
+
+The owner-only `permissions.inventory` pages stored decisions across principals.
+`permissions.revokeSelected` compares the complete validated record inside the
+SQLite transaction and reports removed/changed/missing. A stale screen cannot
+delete a newer choice. No schema migration is needed. The main window keeps
+records private and gives its dedicated narrow preload only opaque per-snapshot
+selectors and display metadata. Complete source/version labels survive bounded
+IPC pages; truncation is visual, with complete accessible names/tooltips and a
+scrollable full-source review. This API cannot approve access or choose a caller
+principal.
+
+Current workflow clipboard approval already offers once/persistent/deny in its
+debugger and now shares this administration owner. Saved permissions adds
+confirmation, paging, remembered-denial removal, stale/unknown remediation and
+focus restoration using shared host primitives. D1-03's generic settings routes
+and reusable consent surfaces remain separately owned and pending. Other feature
+effect adapters and their future approval integration are not claimed here.
+
+F3-01-AC02/UI remain pending until final review/integration and applicable native
+keyboard/accessibility evidence. Unit tests and private Xvfb do not establish
+the supported Debian desktop matrix, native AT or backend effects. See
+`apps/desktop/evidence/permissions-application.md` for bounded product evidence.
