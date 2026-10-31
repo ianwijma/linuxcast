@@ -407,3 +407,43 @@ custody control stays passing.12extractor/65full offline tests pass11.944s,
 syntax/2hashes/plan/whitespace pass. Entire helper still unintegrated/unused and
 requires independent review; no new PR or guest/build/native action. UI priority
 and full97-task/R1-03 objective remain unchanged.
+
+Fresh final PR87review c542a57a completed/read on exactaca7c0b: shortcuts/480px
+row/unclassifiedUnavailable resolved; token parity partly unresolved. P2 exact()
+compares comma-joined keys, accepting fontWeight{"medium,regular":500,"semibold":600}
+with required weights missing; Python rejects. Independent4289case sweep found
+fiveaffectedgroups.134/28/52/33unit/validator/type/lint/plan passed, all22PNGs
+inspected, no edits or acceptance promotion. Route the bounded exact-key fix and
+shared collision fixtures to original Opusmedium thread; APIs/canonical values
+stay frozen, renderer72448bb9 continues independent composition. PR87 watch active,
+currentACA planningCI41221811515 green but cannot merge until correction/recheck.
+
+Coordinator reserves a separate bounded F2-02 Local data UI lane for Opus5.5medium,
+branchcodex/f2-02-instrument-local-data. Own only data-settings renderer/CSS/local
+component tests and diagnostics product test/new instrument-local-data evidence.
+No main/preload/storage/credential/permission/contract changes. State API exposes
+appearance only; don't infer category readiness/backend status. Native action
+confirmations and category outcomes remain authoritative. Fixed window URL cannot
+gain hashes/query navigation because sender attestation is exact. Preserve current
+category action names/filter/close, no replay and confirmed effect semantics.
+This disjoint UI lane may develop against frozen corrected foundation APIs;
+integration waits for upstreamPR87. Renderer lane must not edit its reserved files.
+
+Opus original implementation follow-up6180c9d2 completed/read: unsignedb965cf8ed96e615dc02f345a1ec08d98b7048fef,
+parentecfd891, tree551de4d4e5c235eebc4c356c9126e04880a28fa3, clean original
+checkout. Normal signing timed out30s; per-command authorized fallback, no config
+change. Exact token keys now compare array lengths and individual names.18shared
+collision cases added (15fail on oldecfdTS,3already value-rejected),125sharedcases
+20valid/105invalid,152token and33Python checks pass. Root integrated unchanged as
+unsignedeeca81a and independently152token/33Python/type/lint plus the actual
+reviewer fontWeight example/canonicalpositive check pass. Canonical values/APIs/
+controls/state/geometry unchanged, so no redundant product recapture. All earlier
+current4Electron and55F1security evidence applies to unchanged visual/runtime
+paths, with gate-specific coverage now extended. Fresh narrow independent final
+recheck/current-head CI are next before promptPR87merge; no criterion promotion.
+
+Active development: D1-02Opusmedium72448bb9 against frozen foundation, plus
+F2LocalDataOpusmediuma4c30760 against parent11cb8ed. Runtime settings confirmed
+claudeAgent/claude-opus-5-5/effortmedium for both. Root sourcehelperce13987 remains
+saved and unused/unintegrated; source-extractor reviews wait below UI priority.
+No guest/native/hostbus/keyring/provider/input actions or active root processes.
