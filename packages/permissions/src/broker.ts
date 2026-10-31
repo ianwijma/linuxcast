@@ -58,10 +58,12 @@ export class PermissionBroker {
   #unsubscribe: () => void;
   #closed = false;
   #canAdmit: (principalKey: string) => boolean;
+  #storageFailed: (principalKey: string) => void;
   #mutationWaiters = new Set<{key: string|undefined; resolve(): void}>();
-  constructor(options:{store:DecisionStore;capabilities:CapabilityBroker;operations:readonly Operation[];canAdmit?:(principalKey:string)=>boolean}) {
+  constructor(options:{store:DecisionStore;capabilities:CapabilityBroker;operations:readonly Operation[];canAdmit?:(principalKey:string)=>boolean;onStorageFailure?:(principalKey:string)=>void}) {
     this.#store=options.store; this.#capabilities=options.capabilities;
     this.#canAdmit = key => { try { return options.canAdmit?.(key) ?? true; } catch { return false; } };
+    this.#storageFailed=key=>{try{options.onStorageFailure?.(key);}catch{/* Storage quarantine cannot be vetoed. */}};
     if(options.operations.length>256) throw new Error('Too many operations.');
     for(const operation of options.operations) {
       const contract=parseContract(hostOperationContractSchema,operation.contract);
@@ -214,7 +216,7 @@ export class PermissionBroker {
       this.#mutationWaiters.delete(waiter); waiter.resolve();
     }
   }
-  #quarantine(key:string):void {this.#quarantined.add(key);for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'retry-storage');}
+  #quarantine(key:string):void {this.#quarantined.add(key);this.invalidatePrincipal(key,'retry-storage');this.#storageFailed(key);}
   /** Remove access immediately, before waiting on durable deletion. Failed
    * deletion quarantines the principal for this broker lifetime. */
   async revoke(identity:object,recordId:string):Promise<boolean> {
@@ -244,6 +246,12 @@ export class PermissionBroker {
       for(const [requirement,cached] of connection.records)if(cached.id===record.id)connection.records.delete(requirement);
     }
     for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,'request-permission-again');
+    return matched;
+  }
+  invalidatePrincipal(key:string,remediation:Remediation):boolean {
+    let matched=false;
+    for(const connection of this.#connections.values())if(connection.key===key){matched=true;connection.epoch++;connection.records.clear();}
+    for(const invocation of this.#invocations)if(invocation.connection.key===key)this.#cancel(invocation,remediation);
     return matched;
   }
   waitForMutations(principal?:Principal):Promise<void> {

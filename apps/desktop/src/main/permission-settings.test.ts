@@ -51,3 +51,22 @@ it('invalidates old snapshots on refresh and returns only fixed failures without
   const failure=await f.invoke('list');expect(failure).toMatchObject({ok:false,error:{code:'unavailable'}});
   expect(JSON.stringify(failure)).not.toContain('SYNTHETIC_PRIVATE');expect(f.registry.revoke).not.toHaveBeenCalled();
 });
+it('retains complete long names so identities with the same visible prefix remain distinguishable',async()=>{
+  const f=fixture();const prefix='public.'+'x'.repeat(300);
+  f.record.principal={kind:'builtin',id:prefix+'-one'};
+  f.registry.inventory.mockResolvedValueOnce({records:[f.record,{...f.record,id:randomUUID(),principal:{kind:'builtin',id:prefix+'-two'}}],nextCursor:null});
+  await f.service.open();const result=await f.invoke('list') as {value:{records:{sourceLabel:string}[]}};
+  expect(result.value.records.map(row=>row.sourceLabel)).toEqual([prefix+'-one',prefix+'-two']);
+});
+it('pages projected long workflow labels within the wire budget without dropping a stored row',async()=>{
+  const f=fixture(),large='Public workflow '+'x'.repeat(63000);
+  const rows=Array.from({length:30},(_,i)=>({...f.record,id:`00000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`,principal:{kind:'workflow' as const,id:'public.workflow',version:'1.0.0',integrity:'a'.repeat(64)}}));
+  f.registry.inventory.mockResolvedValueOnce({records:rows,nextCursor:null});
+  await f.service.stop();
+  const workflowName=vi.fn(async()=>large),service=createPermissionSettings({resourcesDirectory:'/public-resources',registry:f.registry as unknown as PermissionRegistry,isReady:()=>true,workflowName});services.push(service);await service.open();
+  const result=await f.invoke('list') as {value:{records:{sourceLabel:string}[];nextCursor:string}};
+  expect(result.value.records.length).toBeGreaterThan(0);expect(result.value.records.length).toBeLessThan(30);
+  expect(result.value.records.every(row=>row.sourceLabel===large)).toBe(true);
+  expect(Buffer.byteLength(JSON.stringify(result))).toBeLessThan(1024*1024);
+  expect(result.value.nextCursor).toBe(rows[result.value.records.length-1]!.id);expect(workflowName).toHaveBeenCalledTimes(1);
+});

@@ -10,19 +10,23 @@ export const permissionPrincipalKey = (record: DecisionRecord) => digest(princip
 const keys = (record: DecisionRecord) => [permissionPrincipalKey(record), record.declarationHash, record.permissionId, digest(scopeKeyMaterial(record.scope))] as const;
 const parse = (row: { record: string }) => permissionDecisionRecordSchema.parse(JSON.parse(row.record));
 
-/** Only the trusted owner calls these methods after request-schema validation. */
-export function listPermissionDecisions(db: Database.Database, params: { principalKey: string; afterId?: string; limit: number }) {
-  const rows = db.prepare('SELECT record FROM permission_decisions WHERE principal_key=? AND id>? ORDER BY id LIMIT ?')
-    .all(params.principalKey, params.afterId ?? '', params.limit + 1) as { record: string }[];
+function permissionPage(rows: {record: string}[], limit: number) {
   const records: DecisionRecord[] = [];
   let bytes = 0;
-  for (const row of rows.slice(0, params.limit)) {
+  for (const row of rows.slice(0, limit)) {
     const record = parse(row), size = Buffer.byteLength(JSON.stringify(record)) + 1;
     if (bytes + size > MAX_ENVELOPE_BYTES - 8192) break;
     records.push(record); bytes += size;
   }
   if (rows.length && !records.length) throw new StorageError('invalid-request');
   return { records, nextCursor: rows.length > records.length ? records.at(-1)!.id : null };
+}
+
+/** Only the trusted owner calls these methods after request-schema validation. */
+export function listPermissionDecisions(db: Database.Database, params: { principalKey: string; afterId?: string; limit: number }) {
+  const rows = db.prepare('SELECT record FROM permission_decisions WHERE principal_key=? AND id>? ORDER BY id LIMIT ?')
+    .all(params.principalKey, params.afterId ?? '', params.limit + 1) as { record: string }[];
+  return permissionPage(rows, params.limit);
 }
 
 export function putPermissionDecision(db: Database.Database, input: DecisionRecord): DecisionRecord {
@@ -53,15 +57,7 @@ export function revokePermissionDecision(db: Database.Database, id: string): boo
 export function inventoryPermissionDecisions(db: Database.Database, params: {afterId?: string; limit: number}) {
   const rows = db.prepare('SELECT record FROM permission_decisions WHERE id>? ORDER BY id LIMIT ?')
     .all(params.afterId ?? '', params.limit + 1) as {record: string}[];
-  const records: DecisionRecord[] = [];
-  let bytes = 0;
-  for (const row of rows.slice(0, params.limit)) {
-    const record = parse(row), size = Buffer.byteLength(JSON.stringify(record)) + 1;
-    if (bytes + size > MAX_ENVELOPE_BYTES - 8192) break;
-    records.push(record); bytes += size;
-  }
-  if (rows.length && !records.length) throw new StorageError('invalid-request');
-  return {records, nextCursor: rows.length > records.length ? records.at(-1)!.id : null};
+  return permissionPage(rows, params.limit);
 }
 
 /** Compare the whole validated selection inside the writer transaction. A newer

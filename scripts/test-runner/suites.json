@@ -124,7 +124,9 @@
       "packages/builtins/dictionary/tests/spelling-wrapper.test.ts"
     ],
     "F3-01": [
-      "packages/permissions/tests/screen-controller.test.ts"
+      "packages/permissions/tests/screen-controller.test.ts",
+      "apps/desktop/src/main/launcher-ipc.test.ts",
+      "apps/desktop/src/features/launcher/tests/permission-catalogue.test.ts"
     ]
   },
   "contracts": {
@@ -354,6 +356,10 @@
       "apps/desktop/tests/emoji-frecency.integration.test.ts",
       "apps/desktop/tests/dictionary-spelling.integration.test.ts",
       "packages/builtins/dictionary/tests/spelling-native.integration.test.ts"
+    ],
+    "F3-01": [
+      "apps/desktop/tests/permissions.integration.test.ts",
+      "apps/desktop/tests/workflow-run.integration.test.ts"
     ]
   },
   "security": {

@@ -97,3 +97,17 @@ it('preserves newer choices and quarantines failed revocation across future brok
   const fresh=f.registry.createBroker({capabilities:new CapabilityBroker([]),operations:[operation()]});
   await expect(fresh.connect({},principal,[read])).rejects.toThrow('recovery');
 });
+it.each([false,true])('keeps failed late-write cleanup quarantined globally, including concurrent release=%s',async(release)=>{
+  const f=fixture(),writing=deferred<DecisionRecord>();let finishPut!:()=>void;
+  const old:DecisionRecord={schemaVersion:1,id:randomUUID(),principal,declarationHash:'b'.repeat(64),...read,decision:'allow',createdAt:'2026-01-01T00:00:00.000Z',updatedAt:'2026-01-01T00:00:00.000Z'};
+  f.records.set(old.id,old);
+  f.put.mockImplementation(record=>{writing.resolve(record);return new Promise(done=>{finishPut=()=>{f.records.set(record.id,record);done(record);};});});
+  f.revoke.mockRejectedValueOnce(new Error('SYNTHETIC_PRIVATE_CLEANUP_FAILURE'));
+  const broker=f.registry.createBroker({capabilities:new CapabilityBroker([]),operations:[operation()]}),a=await approval(broker,{});
+  const deciding=broker.decide(a.prompt.id,'persistent');await writing.promise;
+  const removing=f.registry.revoke(old),releasing=release?f.registry.release(broker):Promise.resolve();
+  finishPut();expect(await deciding).toEqual({outcome:'unavailable',remediationAction:'retry-storage'});
+  await releasing;expect(await removing).toBe('unavailable');expect(f.selected).not.toHaveBeenCalled();
+  const fresh=f.registry.createBroker({capabilities:new CapabilityBroker([]),operations:[operation()]});
+  await expect(fresh.connect({},principal,[read])).rejects.toThrow('recovery');
+});

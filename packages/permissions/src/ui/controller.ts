@@ -50,7 +50,7 @@ export class PermissionScreenController {
       if(!reply.ok){this.#set({error:reply.error.message,unconfirmed:true});return false;}
       if(reply.value==='requested')throw new Error('Unexpected removal receipt.');
       const removed=reply.value==='removed';
-      this.#set({message:removed?'Saved decision removed. Pending requests for this source were cancelled; an action already sent may still need checking. Nothing is replayed.':reply.value==='changed'?'The saved decision changed. Its newer choice was kept. Review the refreshed list.':'This saved decision was already absent. Review the refreshed list.'});
+      this.#set({message:removed?'Saved decision removed. New access requires a fresh check. Check any action already sent before starting another operation. Nothing is replayed.':reply.value==='changed'?'The saved decision changed. Its newer choice was kept. Review the refreshed list.':'This saved decision was already absent. Review the refreshed list.'});
       await this.#load(this.#cursors[this.#state.page],this.#state.page);
       return removed;
     } catch {this.#set({error:'Removal could not be confirmed. Refresh and inspect the decision before another action. Nothing is replayed.',unconfirmed:true});return false;}

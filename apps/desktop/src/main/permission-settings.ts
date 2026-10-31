@@ -5,16 +5,14 @@ import { PERMISSION_SETTINGS_CHANNELS,PERMISSION_SETTINGS_APPEARANCE,permissionS
 import type { PermissionSettingsRow } from '../../../../packages/platform-contracts/src/permission-settings.ts';
 import type { PermissionRegistry } from '../../../../packages/permissions/src/registry.ts';
 import type { DecisionRecord } from '../../../../packages/permissions/src/types.ts';
+import { MAX_ENVELOPE_BYTES } from '../../../../packages/contracts/src/index.ts';
 import tokens from '../../../../docs/design/tokens.json' with {type:'json'};
 import { PERMISSION_SETTINGS_URL } from './assets.ts';
 import { trustedAppSender } from './ipc.ts';
 import { restrictContents,securePreferences } from './security.ts';
 import type { ResidentService } from './lifecycle.ts';
 
-function label(value:string,limit=256):string {
-  const characters=Array.from(value.replace(/[\p{Cc}\p{Cf}]/gu,''));
-  return characters.length>limit ? characters.slice(0,limit-1).join('')+'…' : characters.join('')||'Unnamed source';
-}
+const label=(value:string)=>value||'Unnamed source';
 function scope(record:DecisionRecord):string {
   const value=record.scope;
   if(value.kind==='origin')return value.origin;
@@ -36,22 +34,31 @@ export function createPermissionSettings(options:{
     const schema=channel===PERMISSION_SETTINGS_CHANNELS.list?permissionSettingsListSchema:channel===PERMISSION_SETTINGS_CHANNELS.revoke?permissionSettingsRevokeSchema:permissionSettingsRequestSchema;
     const parsed=schema.safeParse(payload);if(!parsed.success)return fail('invalid-request','Invalid saved permission request.');
     if(channel===PERMISSION_SETTINGS_CHANNELS.close){setImmediate(()=>{if(alive(owner))owner.close();});return {ok:true,value:'requested'};}
-    if(!options.isReady())return fail('unavailable','Saved permissions are unavailable. Wait for local data, then refresh.');
+    if(!options.isReady())return fail('unavailable','Saved permissions are unavailable. Refresh after local data opens, or quit and reopen Linuxcast to reconnect.');
     if(active)return fail('conflict','Another permission action is still running. Refresh when it finishes.');
     const perform=async()=>{
       try {
         if(channel===PERMISSION_SETTINGS_CHANNELS.list) {
           const {afterId}=permissionSettingsListSchema.parse(payload),page=await options.registry.inventory(afterId);
           const next=new Map<string,DecisionRecord>(),records:PermissionSettingsRow[]=[];
-          for(const record of page.records) {
-            const selectionId=randomUUID(),name=record.principal.kind==='workflow'?await options.workflowName?.(record.principal):undefined;
-            next.set(selectionId,structuredClone(record));
-            records.push({selectionId,sourceKind:record.principal.kind,sourceLabel:label(name??record.principal.id),
-              version:record.principal.kind==='builtin'?null:label(record.principal.version),
-              permissionId:record.permissionId,scopeLabel:label(scope(record),2200),decision:record.decision,updatedAt:record.updatedAt});
+          const names=new Map<string,Promise<string|undefined>>();
+          for(const record of page.records)if(record.principal.kind==='workflow'&&options.workflowName) {
+            const key=JSON.stringify(record.principal);if(!names.has(key))names.set(key,options.workflowName(record.principal));
           }
+          const resolved=new Map(await Promise.all([...names].map(async([key,name])=>[key,await name] as const)));
+          let bytes=0,nextCursor=page.nextCursor;
+          for(const record of page.records) {
+            const selectionId=randomUUID(),name=resolved.get(JSON.stringify(record.principal));
+            const row={selectionId,sourceKind:record.principal.kind,sourceLabel:label(name??record.principal.id),
+              version:record.principal.kind==='builtin'?null:label(record.principal.version),
+              permissionId:record.permissionId,scopeLabel:label(scope(record)),decision:record.decision,updatedAt:record.updatedAt};
+            const size=Buffer.byteLength(JSON.stringify(row))+1;
+            if(bytes+size>MAX_ENVELOPE_BYTES-8192){if(!records.length)throw new Error('Permission page exceeds limit.');break;}
+            bytes+=size;next.set(selectionId,structuredClone(record));records.push(row);nextCursor=record.id;
+          }
+          if(records.length===page.records.length)nextCursor=page.nextCursor;
           if(!alive(owner))return fail('conflict','This permission window closed. Open it again to refresh.');
-          const value=permissionSettingsStateSchema.parse({snapshotId:randomUUID(),appearance:nativeTheme.shouldUseDarkColors?'dark':'light',records,nextCursor:page.nextCursor});
+          const value=permissionSettingsStateSchema.parse({snapshotId:randomUUID(),appearance:nativeTheme.shouldUseDarkColors?'dark':'light',records,nextCursor});
           selections=next;snapshotId=value.snapshotId;return {ok:true as const,value};
         }
         const input=permissionSettingsRevokeSchema.parse(payload),record=selections.get(input.selectionId);

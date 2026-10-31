@@ -15,8 +15,10 @@ export function SavedPermissions({api}:{api:PermissionSettingsApi}) {
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot,controller.getSnapshot);
   const [review,setReview]=useState<string|null>(null),refresh=useRef<HTMLButtonElement>(null),keep=useRef<HTMLButtonElement>(null),opener=useRef<HTMLElement|null>(null);
   const restore=useRef<HTMLElement|null>(null);
+  const initializedFocus=useRef(false);
   const selected=state.snapshot?.records.find(row=>row.selectionId===review),busy=state.loading||state.removing;
   useEffect(()=>{void controller.refresh();return()=>controller.dispose();},[controller]);
+  useLayoutEffect(()=>{if(!initializedFocus.current){initializedFocus.current=true;refresh.current?.focus();}},[]);
   useEffect(()=>{if(review)keep.current?.focus();},[review]);
   useEffect(()=>{if(review&&!selected){restore.current=refresh.current;setReview(null);}},[review,selected]);
   useLayoutEffect(()=>{if(!review&&!busy&&restore.current){const target=restore.current.isConnected?restore.current:refresh.current;restore.current=null;target?.focus();}},[review,busy]);
@@ -37,13 +39,13 @@ export function SavedPermissions({api}:{api:PermissionSettingsApi}) {
       {!state.loading&&!state.error&&state.snapshot?.records.length===0&&<EmptyState title="No saved decisions on this page" description="Allow once is never saved. A source asks again when it needs access without a remembered choice."/>}
       {selected&&<section className="permission-review" aria-label="Remove saved decision" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();event.preventDefault();if(!state.removing)closeReview();}}}>
         <h2>Remove this saved {selected.decision==='allow'?'allow':'deny'} choice?</h2>
-        <p><strong>{selected.sourceLabel}</strong> · {operations[selected.permissionId]}</p><p>{selected.scopeLabel}</p>
+        <p className="permission-review-source" role="region" tabIndex={0} aria-label="Complete requesting source" dir="auto"><strong>{selected.sourceLabel}</strong>{selected.version?' · version '+selected.version:''}</p><p>{operations[selected.permissionId]}</p><p>{selected.scopeLabel}</p>
         <p>{selected.decision==='deny'?'Removing a denial permits a new request. It does not approve or rerun anything.':'Future operations will need a new approval. Pending requests for this source will be cancelled; an action already sent cannot be undone.'}</p>
         <div className="permission-actions"><Button ref={keep} disabled={state.removing} onClick={closeReview}>Keep decision</Button><Button variant="danger" busy={state.removing} disabled={state.loading||state.unconfirmed} onClick={()=>{restore.current=refresh.current;void controller.revoke(selected.selectionId).then(()=>{setReview(null);});}}>Remove decision</Button></div>
       </section>}
       <ul className="permission-list" aria-label="Saved permission decisions">
         {state.snapshot?.records.map(row=><li key={row.selectionId} className="permission-row">
-          <div><p className="permission-source"><strong dir="auto">{row.sourceLabel}</strong><span className="lc-muted">{sourceKinds[row.sourceKind]}{row.version?' · version '+row.version:''}</span></p>
+          <div><p className="permission-source"><strong dir="auto" title={row.sourceLabel}>{row.sourceLabel}</strong><span className="lc-muted" title={row.version??undefined}>{sourceKinds[row.sourceKind]}{row.version?' · version '+row.version:''}</span></p>
             <h2>{operations[row.permissionId]}</h2><p dir="auto">{row.scopeLabel}</p><p className="lc-muted">{row.decision==='allow'?'Remembered: allow':'Remembered: deny'} · Updated <time dateTime={row.updatedAt}>{new Date(row.updatedAt).toLocaleString()}</time></p></div>
           <Button disabled={busy||state.unconfirmed||!!review} aria-label={'Review removal: '+row.sourceLabel+' · '+operations[row.permissionId]} onClick={event=>{opener.current=event.currentTarget;setReview(row.selectionId);}}>Review removal</Button>
         </li>)}

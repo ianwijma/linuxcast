@@ -29,7 +29,13 @@ export class PermissionRegistry {
   createBroker(options:{capabilities:CapabilityBroker;operations:readonly Operation[];onRevoked?:()=>void}):PermissionBroker {
     if(this.#closed)throw new Error('Permissions unavailable.');
     const broker=new PermissionBroker({...options,store:this.#store,
-      canAdmit:key=>!this.#closed&&!this.#blocked.has(key)&&!this.#quarantined.has(key)});
+      canAdmit:key=>!this.#closed&&!this.#blocked.has(key)&&!this.#quarantined.has(key),
+      onStorageFailure:key=>{
+        this.#quarantined.add(key);
+        for(const [current,notify] of this.#brokers)if(current.invalidatePrincipal(key,'retry-storage')) {
+          try{notify();}catch{/* A UI owner cannot veto quarantine. */}
+        }
+      }});
     this.#brokers.set(broker,options.onRevoked??(()=>{}));return broker;
   }
   async release(broker:PermissionBroker):Promise<void> {
@@ -53,6 +59,7 @@ export class PermissionRegistry {
     const pending=(async():Promise<RevokeResult>=>{
       try {
         await Promise.all(brokers.map(([broker])=>broker.waitForMutations(record.principal)));
+        if(this.#quarantined.has(key))return 'unavailable';
         const result=await this.#repository.request('permissions.revokeSelected',{record});
         if(!['removed','changed','missing'].includes(result))throw new Error();
         return result;

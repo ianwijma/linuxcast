@@ -10,6 +10,9 @@
 .permission-row > div { flex: 1; min-inline-size: min(100%, calc(var(--lc-space-32) * 8)); display: grid; gap: var(--lc-space-8); }
 .permission-source { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-8); }
 .permission-source span { font-size: var(--lc-text-caption); }
+.permission-source strong { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.permission-source span { max-inline-size: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.permission-review-source { max-block-size: calc(var(--lc-space-32) * 6); overflow: auto; }
 .permission-review { padding: var(--lc-space-16); display: grid; gap: var(--lc-space-12); background: var(--lc-raised); border: 1px solid var(--lc-border); border-radius: var(--lc-radius-popover); }
 .permission-message { color: var(--lc-text); border-inline-start: 2px solid var(--lc-focus); padding-inline-start: var(--lc-space-12); }
 @media (forced-colors: active) { .permission-row, .permission-review { border-color: CanvasText; } }

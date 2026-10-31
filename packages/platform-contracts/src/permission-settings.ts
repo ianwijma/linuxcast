@@ -1,13 +1,14 @@
 import * as z from 'zod';
 import { permissionIdSchema } from './permissions.ts';
+import { uiTextSchema } from '../../contracts/src/scalars.ts';
 export const PERMISSION_SETTINGS_CHANNELS={list:'permission-settings:list',revoke:'permission-settings:revoke',close:'permission-settings:close'} as const;
 export const PERMISSION_SETTINGS_APPEARANCE='permission-settings:appearance';
 export const permissionSettingsRequestSchema=z.strictObject({protocolVersion:z.literal(1)});
 export const permissionSettingsListSchema=permissionSettingsRequestSchema.extend({afterId:z.uuid().optional()});
 export const permissionSettingsRevokeSchema=permissionSettingsRequestSchema.extend({snapshotId:z.uuid(),selectionId:z.uuid()});
 export const permissionSettingsRowSchema=z.strictObject({
-  selectionId:z.uuid(),sourceKind:z.enum(['builtin','extension','workflow']),sourceLabel:z.string().min(1).max(512),
-  version:z.string().max(512).nullable(),permissionId:permissionIdSchema,scopeLabel:z.string().min(1).max(2300),
+  selectionId:z.uuid(),sourceKind:z.enum(['builtin','extension','workflow']),sourceLabel:uiTextSchema.min(1),
+  version:uiTextSchema.nullable(),permissionId:permissionIdSchema,scopeLabel:z.string().min(1).max(2300),
   decision:z.enum(['allow','deny']),updatedAt:z.iso.datetime(),
 });
 const failed=z.strictObject({ok:z.literal(false),error:z.strictObject({
