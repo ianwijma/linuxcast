@@ -1,5 +1,38 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Current coordinator state — after PR92
+
+Goal ACTIVE: all97 tasks/full local1.0 throughR1-03; no native/physical/release
+acceptance waived. Registry8done/20inprogress/69planned;56passed/325pending/8N/A.
+PR91 renderer merged432fa6a; PR92 sourcehelper merged8de8612 (CI41234204280
+SUCCESS, head92e56c0, reviews[], normal exactheadmerge31Oct19:27:11UTC). Tiny
+mergeblurbs sent immediately. No openPRwatch/rootprocess; no lab/native runs.
+
+Root branch codex/u1-01-instrument-notes-integration, sourceec55310 (Opus
+e896a13 unchanged on approved8de8612). Current482units/36contracts/258security/
+97browser70+27/40integration47.75s/type/full-lint/plan pass; actualNotes31.262s,
+Trash5.558s/import5.555s. PR91 fixes both oldbase search-limit assertions and
+mechanicalcombobox selectors;166incidentalPNGs restored,25newauthorcaptures
+unchanged, actualdark/light/native200focus inspected. Initial Standards00e3b125-
+c8a2-46fb-a64a-281300a9a058 and SecuritySpecfa38a7fc-d6b3-4265-af9b-5737420468fe
+run on exactec55310/base8de8612, freshSOLhigh read-only; do notpoll.
+
+Original workflow Opusmedium author8e4a9591 finished8e3d1116, cleanownedlane
+t3-93b7f756/codex/w2-instrument-workflow. Followup7b821f60-5231-49e4-a1c9-
+ca111012637d ACTIVE sameOpusmedium: fix200%canvas overlap and restoretypededge
+labels with inertUIgeometry mapping, no controller/engine/owner edits without
+concreteAPIapproval. Parentreproduced7-case storage migration suite1failure at
+oldfixture calling currentquicklinks.save on schema7; allrelevant production
+files byte-identical to approvedparent. Fix that test separately before workflow
+integration; don't mix storagechange intoNotes. Reactchecklist exactpath supplied.
+
+Saved ATadaptera9bbb33 remains separate/unreviewed/unexecuted; no newreview
+started to preserve Notesreview capacity. Sourcehelper accepted inPR92; small
+SpecP2 corrected and Standardsindependentlyconfirmednegativecontrol, no second
+cleanSpecclaim. Legacyarchive/build/procPID1/outerowner/nativeidentity/AT gates
+remain open. No arbitrary namespaceprivilege/witness or gate change.
+
+
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported
 native desktop/AT, performance, packaging and publication gates remain required.
 Registry8done/20inprogress/69planned;56passed/325pending/8justifiedN/A unchanged.

@@ -36,3 +36,22 @@ ran for each themed capture.
 Limits: a private Xvfb X11 display on Pop!_OS 22.04 amd64 (Linux 7.1.1). This is not Debian 13, GNOME or KDE
 on Wayland or X11, Orca, native high contrast or release acceptance. U1-01 task, native, desktop, AT and
 release acceptance remain pending.
+
+## Coordinator integration on approved PR91/PR92
+
+Opus source `e896a13` is integrated unchanged at `ec55310` on approved
+`8de8612` (PR92), including the PR91 renderer. All five root-query selectors
+retain the merged combobox role. The two old-base search-limit unit failures
+are resolved by PR91's existing test-only5614-command boundary correction;
+no Notes controller or search behavior changes were needed.
+
+Current coordinator checks pass:482 units,36 contracts,258 security,97 browser
+cases in two batches (70/51.2s and27/18.6s),40 integrations47.75s, fulltype/lint/
+plan/whitespace. Actual sandboxed private-Xvfb Notes31.262s, EmptyTrash5.558s
+and MarkdownImport5.555s retain original owner/restart/crash/receipt/no-replay/
+privacy assertions. All166 incidental tracked screenshot recaptures were restored.
+All25 new component/product captures remain author-identical; the coordinator
+directly inspected actual dark/light saved and native200% focused captures.
+
+Initial independent Standards and Security/Spec reviews are active on frozen
+`ec55310`; no clean conclusion, publication or additional acceptance is inferred.
