@@ -358,3 +358,21 @@ The private synthetic reproduction creates no processes or guest/native actions.
 This helper remains UNINTEGRATED/UNUSED on codex/f1-02-native-build-staging; do not
 invoke it before a corrected retained-directory cleanup boundary and independent
 review. Fix deferred below active UI priority; no affected product operation exists.
+
+Foundation PR87 https://github.com/ianwijma/linuxcast/pull/87 published/linked,
+head signedeb74e81a540aa3db7b52acc66299b1d9f702c680. Planning CI41219468364
+SUCCESS, no GitHub reviews/comments/requests. Watch active; do not re-watch/poll.
+Independent Standards805a4294 and Security/Spec34f55577 completed/read on exact
+eb74/baseae4c; both inspect all16component/product PNGs and independently26/27/30
+unit/validator/type/lint/plan checks, authorindex/files/captures unchanged.
+Four distinct P2 findings: inherited shortcut dictionary properties (__proto__/
+constructor/toString) can crash/mislabel validated actions; Row trailing group
+overflows480px at200% text; Python token bounds/finite checks diverge fromruntime;
+legacy UnavailableState invents unsupported capability for credential needs-review.
+Existing L1fallback fixture failure remains honestly partial and baseline-reproduced.
+Route these UI corrections to original Opus5.5medium implementation thread; no
+parent-authored UI changes. Do not begin D1-02 against known-broken primitives;
+the provisional API development freeze preserves API names, but integration and
+downstream implementation now wait for this bounded correction checkpoint.
+Next: fixes/regressions, fresh independent final recheck, current-head CI/merge
+promptly, then Opusmedium renderer lane. Full97task/R1-03 scope/status unchanged.
