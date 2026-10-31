@@ -141,7 +141,7 @@ Use `unsupported` only for a probed missing backend or session capability and `d
 
 A **block** plate centres in an empty region (520 px measure). A **band** fills the width of a list or document on the matching tint and never replaces results that still work. Content is eyebrow, title, muted body, an optional monospace detail naming the backend or error code (never secrets or user content), and at most one primary and one secondary action plus an optional ghost. Plates present caller-owned copy and actions only: they never retry, grant, cancel or claim an effect. Success appears only after the backend confirms a real result. Colour is never the only signal.
 
-Use short opacity/background transitions with the standard easing; panels fade in 160 ms with a 4 px rise, opacity-only under reduced motion. Avoid theatrical scaling, spinning gradients or continuous idle animation. Respect OS reduced-motion and text scaling. Provide opaque rendering if transparency harms contrast or is unsupported.
+Use short opacity/background transitions with the standard easing; panels fade in 160 ms with a 4 px rise, opacity-only under reduced motion. Accessibility exception: an interactive panel that takes focus as it opens (the action panel) enters with the 160 ms, 4 px rise at full opacity, so its text never drops below AA contrast while usable, and does not move under reduced motion; state and background transitions elsewhere are unchanged. Avoid theatrical scaling, spinning gradients or continuous idle animation. Respect OS reduced-motion and text scaling. Provide opaque rendering if transparency harms contrast or is unsupported.
 
 ## Accessibility
 
