@@ -667,3 +667,14 @@ caveats verified baseline with non-StrictMode production entry. Security/Spec
 6bbb20cf still pending; don't poll. Concrete PR body is prepared privately at
 /tmp/linuxcast-instrument-permissions-pr.md with that pending state explicit;
 do not publish until its final review result is incorporated. No PR open/watch.
+
+F3 Security/Spec6bbb20cf completed/read PASS, no actionable findings. Independently
+83mappedunits/2contracts/63syntheticsecurity and12component probes (4additional
+missing/unavailable/thrown/malformed removal cases), type/lint/plan/whitespace;
+all21captures inspected and27author blobs match e1db203. Exactfad2135/base63c9581
+clean before/after. Both axes now clean; baseline caveats confirmed unchanged.
+Parent actual72security/2Electron24.42s evidence distinguished accurately. PRbody
+updated with final results, UIadoption/registry reflect reviewed preparation and
+all acceptance remains unchanged. Publish focused F3 PR now, check currentCI and
+merge promptly; exclude D1/sourcehelper/ATadapter code. D1Opusmedium9c84499d
+continues four scoped P2 corrections. No active root process or PRwatch.
