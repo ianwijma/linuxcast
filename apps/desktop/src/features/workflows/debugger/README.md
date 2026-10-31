@@ -96,3 +96,32 @@ full palette/configuration, packages and all ten examples remain required.
 W2-02/W1-03 and broader prerequisite/native GNOME/KDE Wayland/X11, physical-device,
 assistive-technology and release gates remain pending. Complete local 1.0 scope
 is unchanged; this increment does not complete the task or any full criterion.
+
+## Instrument presentation refresh (existing UI, no new features)
+
+The panel now follows the selected Instrument workspace rhythm (DESIGN.md: Workflows, States and motion,
+List/grid/detail/form, Controls, Accessibility) with shared `Button`, `LineIcon`, `StatePlate` and state
+primitives and token-only `run-panel.css`. Controller, run, broker, journal and request semantics are
+unchanged; the editor wraps it in the same workspace header (tile + `Workflow editor`).
+
+- Header: eyebrow, `Run saved workflow` focus target, exact saved identity line, ghost **Back to editor**
+  with its bound `Escape` keycap.
+- Main column: New run card (unchanged chooser, 16 KiB textarea, explicit Run, Refresh, scoped review),
+  approval card with a `tintInfo` header (approval shield + "Approval needed"), exact plain proposed
+  text and only the offered monochrome secondary choices (none preselected, Cancel focused), and the
+  bounded plain Result card.
+- Side column (300): status with a shape-coded glyph from `ui/presentation.ts` beside the existing state
+  word, metadata facts (workflow, revision, run ID, clipboard effect) and the last-50 step list with glyph
+  plus word plus duration. Classification follows the typed host snapshot only: success shape only for
+  host `succeeded`; `waiting-ui` approval shape; denied → denied shape; unknown outcome / deadline →
+  interrupted shape; `unavailable`/`storage-unavailable`/unconfirmed → unclassified info shape; validation
+  codes → error. Unknown is never success. Main-reported `requiresReview` is an interrupted band
+  "Inspect your clipboard" (eyebrow "Outcome unknown"), with no retry/replay copy.
+
+Verification: `bun run test:ui -- W2-03` 24 passed (20 existing unchanged plus 4 new: host-state shape
+classification incl. unknown/denied never success, bound-only Escape and unshortcut secondary choices,
+dark/light forced colors with focused Cancel). `test:unit -- W2-03` 37 and `test:security -- W2-03` 2
+passed. Actual Electron `tests/workflow-run.integration.test.ts` and `tests/workflow-launcher.integration.test.ts`
+(`test:integration -- W2-03`) passed on owned private Xvfb; captures in
+`apps/desktop/evidence/instrument-workflows/`, component captures in `evidence/instrument/README.md`.
+New cases live in the mapped `tests/run-panel.ui.test.ts`; no runner mapping change needed.

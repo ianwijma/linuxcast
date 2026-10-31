@@ -1,30 +1,23 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — Notes publication
+## Current coordinator state — workflow verification after PR93
 
-Goal ACTIVE: all97 tasks/full local1.0 throughR1-03; registry8done/20inprogress/
-69planned and56passed/325pending/8N/A unchanged. Approved develop8de8612(PR92).
-Root codex/u1-01-instrument-notes-integration integrates original Opus e5a5b8c
-at041f723. Initial Specfa38a7fc clear; Standards00e3b125 sole slash-menu P2
-parent-verified resolved: each100/150/200/narrow test fails on original e896a13,
-all four pass fixed source. Current482unit/36contract/258security/101browser/
-40integration46.54s/type/lint/plan pass. Actual Notes30.564s/Trash5.557s/import
-5.512s;28newauthor-identical captures, incidental recaptures restored. Publishing
-focused Notes PR next, then current-head CI/reviews/normal exact-head merge.
-No second independent final review or native/full-task acceptance claimed.
+Goal ACTIVE: full97/local1.0 throughR1-03, registry states unchanged.
+PR93 Notes merged279a3a41ccbd5290ac0517c01f29082781401f3b from901226b;
+CI41237501043 SUCCESS, GitHub reviews/requests/comments empty, normal exact-head
+merge. Tiny merge blurb sent immediately and watch removed. Notes sourcee5a5b8c
+and all28captures retained; all native/full-task gates remain pending.
 
-Workflow initial Standards7e116647 clear; Spec2ef28b07 sole P2 held-drag resize
-coordinate corruption. Original Opus fix0fa31fcb on069669e is completed; read
-terminal report and integrate into saved codex/w2-instrument-workflow-integration
-(e7d54fb). Includes parent test-only legacy v7 migration fixture fixf94df0d.
-Verify focused old-source negative controls/current regressions and publish next.
-No current workflow PR, no source/controller/owner change authorized by this fix.
-
-AT adapter9c77978 saved on codex/f1-02-instrument-at-integration: initial Spec
-0098261d clear(37mapped+44synthetic/type/lint/plan/hashes), initial Standards
-still required. No driver/native execution; actual native/Orca runs0. Fresh
-approved source/archive/build/pins, native query identity, PID1 feasibility and
-outer ownership remain pending; lab stopped, no native gate changes.
+Root codex/w2-instrument-workflow-integration integrates original Opus0fa31fc
+on069669e and approvedPR93. Initial Standards7e116647 clear; Spec2ef28b07 sole
+held-drag/text-resize coordinate P2 corrected by locking the display and inverse
+frame for the entire gesture, including final release. Parent verification passes: both new cases fail original069669e and pass fixed;
+current24+24browser/61unit/5contract/17security/type/lint/plan, three actual
+Electron flows(6.140s/5.245s/8.93s) pass. Publishing focused workflow PR next;
+no second independent final clean review claimed. Parent test-only v7 fixture
+fix60667ab retained, no production storage/controller/engine/shared changes.
+AT adapter9c77978 separatebranch Spec0098261d clear; initial Standards pending.
+Actual native/Orca runs0; no guest/namespace/hostbus/keyring/provider actions.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 test.describe.configure({ mode: 'serial' });
 let server: ViteDevServer, url: string;
-const evidence = fileURLToPath(new URL('../evidence/', import.meta.url));
+const evidence = fileURLToPath(new URL('../evidence/instrument/', import.meta.url));
 test.beforeAll(async () => { server = await createServer({ configFile: false, root: fileURLToPath(new URL('../fixtures/', import.meta.url)), esbuild: { jsx: 'automatic' }, server: { host: '127.0.0.1', port: 0, fs: { allow: [fileURLToPath(new URL('../../../../../../../../', import.meta.url))] } }, logLevel: 'silent' }); await server.listen(); const address = server.httpServer!.address(); if (!address || typeof address === 'string') throw new Error(); url = `http://127.0.0.1:${address.port}`; await mkdir(evidence, { recursive: true }); });
 test.afterAll(async () => { await server?.close(); });
 async function ready(page: Page, suffix = '') { await page.emulateMedia({ reducedMotion: 'reduce' }); await page.setViewportSize({ width: 1000, height: 1000 }); await page.goto(url + suffix); await expect(page.getByRole('heading', { name: 'Run saved workflow', exact: true })).toBeVisible(); await expect(page.getByText('Connecting to workflow run…', { exact: true })).toHaveCount(0); await page.evaluate(() => document.fonts.ready); }
@@ -53,4 +53,31 @@ test('changed launcher intent keeps pending host approval and only a later expli
 });
 test('changed unavailable intent keeps host approval inspectable and cancellable without any fallback', async ({page}) => {
   await ready(page, '?entryIntent=1&entry=second'); await run(page, 'PUBLIC PENDING SECOND'); await page.getByRole('button', {name: 'Present unavailable Keyword', exact: true}).click(); await expect(page.getByRole('heading', {name: 'Selected Keyword unavailable', exact: true})).toBeVisible(); await expect(page.getByRole('region', {name: 'Clipboard approval', exact: true})).toBeVisible(); await expect(page.getByRole('button', {name: 'Cancel run', exact: true})).toBeFocused(); await expect(page.getByRole('form', {name: 'New text run', exact: true})).toHaveCount(0); await page.getByRole('button', {name: 'Refresh run', exact: true}).click(); await expect(page.locator('output').last()).toHaveText('Observed requests: 1 starts, 0 decisions, 0 cancellations, 0 scoped resets.'); await page.getByRole('button', {name: 'Cancel run', exact: true}).click(); await expect(page.getByRole('heading', {name: 'Cancelled', exact: true})).toBeVisible(); await expect(page.getByRole('button', {name: 'Start new run', exact: true})).toHaveCount(0); await expect(page.getByLabel('Observed entry intent', {exact: true})).toHaveText('Last explicit entry: second'); await expect(page.locator('output').last()).toHaveText('Observed requests: 1 starts, 0 decisions, 1 cancellations, 0 scoped resets.');
+});
+
+// Instrument run-state classification follows actual typed host state; unknown is never success.
+const statusTone = (page: Page) => page.getByRole('region', { name: 'Run status', exact: true }).locator('.wr-glyph').first().getAttribute('data-tone');
+test('status shapes follow host state: succeeded only after host success, denied and unknown never success', async ({ page }) => {
+  await ready(page); await run(page, 'PUBLIC CLASSIFY'); expect(await statusTone(page)).toBe('focus');
+  await page.getByRole('button', { name: 'Allow once', exact: true }).click(); await expect(page.getByRole('heading', { name: 'Succeeded', exact: true })).toBeVisible();
+  expect(await statusTone(page)).toBe('success'); await expect(page.getByText('Completed with host receipt', { exact: true })).toBeVisible();
+  await ready(page, '?state=unknown'); await run(page, 'PUBLIC UNKNOWN CLASSIFY'); await page.getByRole('button', { name: 'Allow once', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Inspect your clipboard', exact: true })).toBeVisible(); expect(await statusTone(page)).toBe('warning');
+  await expect(page.locator('[data-kind="interrupted"]')).toHaveCount(1); await expect(page.locator('[data-kind="success"]')).toHaveCount(0);
+  await expect(page.getByText(/nothing changed|rolled back|undone/i)).toHaveCount(0);
+  await ready(page); await run(page, 'PUBLIC DENIED CLASSIFY'); await page.getByRole('button', { name: 'Don’t allow', exact: true }).click();
+  await expect(page.getByText('Not dispatched', { exact: true })).toBeVisible(); expect(await statusTone(page)).toBe('warning'); await expect(page.getByText('Completed with host receipt', { exact: true })).toHaveCount(0);
+  await expect(page.locator('output')).toHaveText('Observed requests: 1 starts, 1 decisions, 0 cancellations, 0 scoped resets.');
+});
+test('Back to editor advertises its bound Escape key and choices carry no shortcut or preselection', async ({ page }) => {
+  await ready(page, '?state=attached'); await expect(page.getByRole('button', { name: 'Back to editor', exact: true })).toHaveAttribute('aria-keyshortcuts', 'Escape');
+  for (const name of ['Allow once', 'Always allow for this saved version', 'Don’t allow', 'Cancel run']) { const button = page.getByRole('button', { name, exact: true }); expect(await button.getAttribute('aria-keyshortcuts')).toBeNull(); expect(await button.getAttribute('data-variant')).toBe('secondary'); }
+  await expect(page.locator('output')).toHaveText('Observed requests: 0 starts, 0 decisions, 0 cancellations, 0 scoped resets.');
+});
+for (const theme of ['dark', 'light']) test(`${theme} forced colors keep approval, focus and status shapes visible`, async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' }); await ready(page, `?state=attached&theme=${theme}`);
+  const cancel = page.getByRole('button', { name: 'Cancel run', exact: true }); await expect(cancel).toBeFocused();
+  expect(await cancel.evaluate(element => getComputedStyle(element).outlineStyle)).toBe('solid');
+  expect(await page.getByRole('region', { name: 'Clipboard approval', exact: true }).evaluate(element => getComputedStyle(element).borderTopStyle)).toBe('solid');
+  /* axe compares authored colours with the forced canvas; forced-colour checks use computed system styles. */ await page.screenshot({ path: `${evidence}/${theme}-workflow-run-forced-colors-focus.png`, fullPage: true });
 });

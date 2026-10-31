@@ -1,42 +1,152 @@
-.wf-editor { padding:var(--lc-space-24); min-inline-size:0; }
-.wf-editor select { font:inherit; }
-.wf-editor h1 { font-size:var(--lc-text-workspace-title); margin:0; }
-.wf-editor h2 { font-size:var(--lc-text-emphasis); margin:0 0 var(--lc-space-12); }
-.wf-editor h3 { font-size:var(--lc-text-body); margin:0 0 var(--lc-space-8); }
-.wf-editor p { margin-block:var(--lc-space-8); overflow-wrap:anywhere; }
-.wf-header,.wf-name,.wf-section-heading { display:flex; gap:var(--lc-space-16); justify-content:space-between; align-items:center; flex-wrap:wrap; }
-.wf-header { padding-block-end:var(--lc-space-16); border-block-end:1px solid var(--lc-border); }
-.wf-actions { display:flex; gap:var(--lc-space-8); flex-wrap:wrap; align-items:center; }
-.wf-caption { color:var(--lc-muted); font-size:var(--lc-text-caption); }
-.wf-save-state { color:var(--lc-muted); padding-block:var(--lc-space-8); }
-.wf-notice { border-inline-start:var(--lc-space-4) solid var(--lc-warning); padding:var(--lc-space-12); background:var(--lc-surface); margin-block:var(--lc-space-8); overflow-wrap:anywhere; }
-.wf-name { padding-block:var(--lc-space-16); }
-.wf-name>.lc-field { flex:1; max-inline-size:32rem; }
-.wf-workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2.5fr) minmax(0,1.2fr); gap:var(--lc-space-16); align-items:start; }
-.wf-panel { padding:var(--lc-space-16); background:var(--lc-surface); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); min-inline-size:0; }
-.wf-category { margin-block-start:var(--lc-space-20); }
-.wf-palette-item { inline-size:100%; justify-content:start; text-align:start; margin-block-end:var(--lc-space-8); }
-.wf-palette-item span,.wf-node { display:grid; gap:var(--lc-space-4); }
-.wf-center { min-inline-size:0; }
-.wf-canvas { block-size:24rem; border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); overflow:hidden; background:var(--lc-background); }
-.wf-node { padding:var(--lc-space-12); border:1px solid var(--lc-border); border-radius:var(--lc-radius-row); background:var(--lc-surface); color:var(--lc-text); inline-size:12rem; overflow-wrap:anywhere; }
-.wf-editor .react-flow__node.selected .wf-node { outline:calc(var(--lc-space-4) / 2) solid var(--lc-focus); background:var(--lc-selection); }
-.wf-editor .react-flow__handle { background:var(--lc-text); border-color:var(--lc-surface); }
-.wf-editor .react-flow__edge-path { stroke:var(--lc-muted); }
-.wf-editor .react-flow__controls-button { color:var(--lc-text); background:var(--lc-raised); border-color:var(--lc-border); }
-.wf-editor .react-flow__controls-button svg { fill:currentColor; }
-.wf-editor .react-flow__attribution { background:var(--lc-surface); }
-.wf-editor .react-flow__attribution a { color:var(--lc-muted); }
-.wf-editor .react-flow { --xy-background-color:var(--lc-background); --xy-edge-stroke:var(--lc-muted); --xy-node-color:var(--lc-text); }
-.wf-node-list,.wf-edge-list { list-style:none; padding:0; display:grid; gap:var(--lc-space-8); }
-.wf-node-list .lc-button { inline-size:100%; justify-content:start; }
-.wf-node-list [aria-pressed='true'] { background:var(--lc-selection); border-color:var(--lc-focus); }
-.wf-edge-list li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--lc-space-8); padding:var(--lc-space-8); border-block-end:1px solid var(--lc-border); overflow-wrap:anywhere; }
-.wf-inspector,.wf-connections { display:grid; gap:var(--lc-space-12); }
-.wf-check { display:flex; align-items:center; gap:var(--lc-space-8); }
-.wf-modal-backdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:var(--lc-background); padding:var(--lc-space-24); }
-.wf-dialog { max-inline-size:32rem; }
-@media(max-width:1100px) { .wf-workspace { grid-template-columns:minmax(0,1fr) minmax(0,2fr); } .wf-workspace>aside:last-child { grid-column:1/-1; } }
-@media(max-width:720px) { .wf-workspace { grid-template-columns:minmax(0,1fr); } .wf-editor { padding:var(--lc-space-16); } .wf-name>.lc-field { max-inline-size:none; flex-basis:100%; } }
+/* Workflow workspace — selected Instrument composition (docs/design/DESIGN.md: Workflows, Shell and navigation,
+   Results and actions, Controls, List/grid/detail/form, States and motion, Accessibility). Semantic tokens only;
+   React Flow chrome is adapted, no separate visual system is introduced. */
+.wf-editor, .wf-run-shell { min-block-size: 100vh; min-inline-size: 0; background: var(--lc-surface); color: var(--lc-text); }
+.wf-editor select, .wf-run-shell select { font: inherit; }
+.wf-editor p, .wf-editor h2, .wf-editor h3 { margin: 0; overflow-wrap: anywhere; }
 
-.wf-run-workspace-title { margin:0; padding:var(--lc-space-24) var(--lc-space-24) 0; font-size:var(--lc-text-panel-title); }
+/* Workspace header: tile, title, quiet save state, actions. In flow (never sticky) so nothing is occluded. */
+.wf-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--lc-space-8) var(--lc-space-12);
+  min-block-size: var(--lc-workspace-header-height); padding: var(--lc-space-8) var(--lc-space-16);
+  background: var(--lc-background); border-block-end: var(--lc-hairline) solid var(--lc-divider); box-shadow: var(--lc-elevation-highlight);
+}
+.wf-header-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-4) var(--lc-space-12); min-inline-size: 0; flex: 1 1 auto; }
+.wf-header h1 { margin: 0; font-size: var(--lc-text-emphasis); line-height: var(--lc-leading-emphasis); font-weight: var(--lc-weight-semibold); }
+.wf-header-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-4) var(--lc-space-8); margin: 0; min-inline-size: 0; color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
+.wf-header-name { color: var(--lc-text); font-weight: var(--lc-weight-medium); overflow-wrap: anywhere; }
+.wf-save-state[data-state='dirty'], .wf-save-state[data-state='blocked'] { color: var(--lc-text); }
+.wf-save-state[data-state='blocked'] { font-weight: var(--lc-weight-semibold); }
+.wf-header-actions { margin-inline-start: auto; }
+.wf-actions { display: flex; flex-wrap: wrap; gap: var(--lc-space-8); align-items: center; }
+
+.wf-body { display: grid; gap: var(--lc-space-12); padding: var(--lc-space-16); min-inline-size: 0; }
+.wf-caption { color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
+.wf-run-reason { max-inline-size: var(--lc-prose-measure); }
+.wf-eyebrow, .wf-section-caption { margin: 0; color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); font-weight: var(--lc-weight-medium); letter-spacing: var(--lc-tracking-group-caption); text-transform: uppercase; }
+.wf-notice { min-inline-size: 0; }
+.wf-receipt { display: flex; align-items: flex-start; gap: var(--lc-space-8); padding: var(--lc-space-12) var(--lc-space-16); border: var(--lc-hairline) solid var(--lc-divider); border-inline-start: var(--lc-selection-rail-width) solid var(--lc-focus); border-radius: var(--lc-radius-row); background: var(--lc-raised); }
+.wf-receipt .lc-line-icon, .wf-note > .lc-line-icon, .wf-palette-empty .lc-line-icon { flex: none; margin-block-start: var(--lc-space-4); color: var(--lc-muted); }
+
+.wf-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--lc-space-12) var(--lc-space-16); justify-content: space-between; }
+.wf-toolbar > .lc-field { flex: 1 1 18rem; max-inline-size: 32rem; }
+
+/* Palette 240 | canvas | inspector 300. Hairline gaps over a divider fill separate the opaque panels.
+   Panels wrap (rather than overflow) when text scaling or a narrow window cannot fit all three; a wrapped
+   panel then grows to the full line, while in the wide layout nearly all free space goes to the canvas. */
+.wf-workspace { display: flex; flex-wrap: wrap; gap: var(--lc-hairline); align-items: stretch; min-inline-size: 0; background: var(--lc-divider); border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-row); overflow: hidden; }
+.wf-workspace > * { min-inline-size: 0; max-inline-size: 100%; }
+.wf-palette { flex: 1 1 var(--lc-workspace-sidebar-width); display: grid; align-content: start; gap: var(--lc-space-8); padding: var(--lc-space-12) var(--lc-space-8); background: var(--lc-background); }
+.wf-center { flex: 1000 1 calc(var(--lc-workspace-sidebar-width) * 2); display: grid; align-content: start; background: var(--lc-surface); }
+.wf-inspector-panel { flex: 1 1 var(--lc-workspace-inspector-width); display: grid; align-content: start; gap: var(--lc-space-12); padding: var(--lc-space-16); background: var(--lc-surface); }
+.wf-panel-title { font-size: var(--lc-text-body); line-height: var(--lc-leading-body); font-weight: var(--lc-weight-semibold); }
+.wf-palette > .wf-panel-title, .wf-palette > .lc-field { padding-inline: var(--lc-space-4); }
+
+/* Palette rows: glyph track | name + description | add verb. Scoped grid so a 240 px sidebar never overflows. */
+.wf-category { display: grid; gap: var(--lc-space-4); }
+.wf-category .lc-group-caption { padding-inline-end: var(--lc-space-8); }
+.lc-button.wf-palette-item {
+  display: grid; grid-template-columns: var(--lc-glyph-track) minmax(0, 1fr) auto; align-items: center; justify-items: start; column-gap: var(--lc-space-8);
+  inline-size: 100%; justify-content: stretch; min-block-size: var(--lc-action-row-height); padding: var(--lc-space-4) var(--lc-space-8) var(--lc-space-4) 0; text-align: start; font-weight: var(--lc-weight-regular);
+}
+.wf-palette-item .lc-glyph-tile { justify-self: center; }
+.wf-palette-item > .lc-line-icon { color: var(--lc-muted); }
+.wf-palette-text { display: grid; gap: 0; min-inline-size: 0; }
+.wf-palette-name { font-weight: var(--lc-weight-medium); overflow-wrap: anywhere; }
+.wf-palette-empty { display: flex; gap: var(--lc-space-8); padding: var(--lc-space-4) var(--lc-space-12); color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
+
+/* Canvas: canvas fill with decorative canvasDot grid; positions/viewport are presentation only. */
+.wf-canvas-toolbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-4) var(--lc-space-12); padding: var(--lc-space-12) var(--lc-space-16); border-block-end: var(--lc-hairline) solid var(--lc-divider); }
+.wf-count { color: var(--lc-muted); font: var(--lc-text-caption)/var(--lc-leading-caption) var(--lc-font-mono); font-variant-numeric: var(--lc-font-numeric); }
+.wf-canvas-toolbar .wf-caption { flex: 1 1 100%; }
+.wf-canvas { position: relative; display: grid; place-items: center; block-size: calc(var(--lc-space-24) * 16); background: var(--lc-canvas); border-block-end: var(--lc-hairline) solid var(--lc-divider); overflow: hidden; }
+.wf-canvas > .react-flow { position: absolute; inset: 0; }
+.wf-canvas > .lc-plate { background: var(--lc-surface); border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-row); margin: var(--lc-space-16); }
+.wf-editor .react-flow { --xy-background-color: var(--lc-canvas); --xy-edge-stroke: var(--lc-control-border); --xy-edge-stroke-selected: var(--lc-focus); --xy-node-color: var(--lc-text); --xy-node-border-radius: var(--lc-radius-row); --xy-handle-background-color: var(--lc-surface); --xy-handle-border-color: var(--lc-control-border); background: var(--lc-canvas); }
+.wf-editor .react-flow__node-workflow { padding: 0; border: 0; background: transparent; border-radius: var(--lc-radius-row); }
+.wf-editor .react-flow__node-workflow:focus-visible { outline: var(--lc-focus-width) solid var(--lc-focus); outline-offset: var(--lc-focus-width); }
+.wf-node {
+  position: relative; display: grid; gap: var(--lc-space-4); inline-size: var(--lc-workflow-node-width); padding: var(--lc-space-8) var(--lc-space-12) var(--lc-space-8) var(--lc-space-16);
+  border: var(--lc-hairline) solid var(--lc-border); border-radius: var(--lc-radius-row); background: var(--lc-raised); color: var(--lc-text); box-shadow: var(--lc-elevation-highlight);
+}
+.wf-node:hover { border-color: var(--lc-control-border); }
+.wf-node[data-selected] { background: var(--lc-selection); border-color: var(--lc-control-border); }
+.wf-node[data-selected]::before { content: ''; position: absolute; inset-inline-start: var(--lc-selection-rail-inset); inset-block: var(--lc-space-8); inline-size: var(--lc-selection-rail-width); border-radius: var(--lc-hairline); background: var(--lc-selection-rail); }
+.wf-node-head { display: flex; align-items: center; gap: var(--lc-space-8); color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); font-weight: var(--lc-weight-medium); letter-spacing: var(--lc-tracking-group-caption); text-transform: uppercase; }
+.wf-node-title { font-weight: var(--lc-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf-node-line { color: var(--lc-muted); font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf-node-ports { font-family: var(--lc-font-mono); }
+.wf-editor .react-flow__handle { inline-size: var(--lc-workflow-port-size); block-size: var(--lc-workflow-port-size); min-inline-size: 0; min-block-size: 0; border: var(--lc-stroke-edge) solid var(--lc-control-border); background: var(--lc-surface); }
+.wf-editor .react-flow__edge-path { stroke: var(--lc-control-border); stroke-width: var(--lc-stroke-edge); }
+.wf-editor .react-flow__edge.selected .react-flow__edge-path, .wf-editor .react-flow__edge:focus-visible .react-flow__edge-path { stroke: var(--lc-focus); }
+.wf-edge-label {
+  position: absolute; pointer-events: none; padding: 0 var(--lc-space-4); white-space: nowrap;
+  border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-keycap); background: var(--lc-canvas); color: var(--lc-muted);
+  font: var(--lc-weight-medium) var(--lc-text-caption)/var(--lc-leading-caption) var(--lc-font-mono);
+}
+/* Hidden measurement probe for the UI-only layout projection (ui/projection.ts): one token-width card and
+   one typed-label slot (label plus spacing either side). It never takes layout space or focus. */
+.wf-canvas-probe { position: absolute; inset-block-start: 0; inset-inline-start: 0; visibility: hidden; pointer-events: none; display: grid; justify-items: start; }
+.wf-canvas-probe [data-probe='card'] { display: block; inline-size: var(--lc-workflow-node-width); block-size: 0; }
+.wf-edge-label-slot { display: inline-block; padding-inline: var(--lc-space-8); }
+.wf-edge-label-slot .wf-edge-label { position: static; display: inline-block; }
+.wf-editor .react-flow__controls { box-shadow: var(--lc-elevation-popover); border-radius: var(--lc-radius-row); overflow: hidden; }
+.wf-editor .react-flow__controls-button { color: var(--lc-text); background: var(--lc-raised); border-color: var(--lc-divider); }
+.wf-editor .react-flow__controls-button:hover { background: var(--lc-selection); }
+.wf-editor .react-flow__controls-button:focus-visible { outline: var(--lc-focus-width) solid var(--lc-focus); outline-offset: calc(var(--lc-focus-width) * -1); }
+.wf-editor .react-flow__controls-button svg { fill: currentColor; }
+.wf-editor .react-flow__attribution { background: var(--lc-surface); }
+.wf-editor .react-flow__attribution a { color: var(--lc-muted); }
+
+/* Structured (non-drag) path stays prominent directly under the canvas. */
+.wf-structured { display: grid; gap: var(--lc-space-20); padding: var(--lc-space-16); }
+.wf-structured > section { display: grid; gap: var(--lc-space-8); min-inline-size: 0; }
+.wf-steps, .wf-edge-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--lc-space-4); }
+.wf-step { position: relative; display: grid; grid-template-columns: var(--lc-space-24) var(--lc-glyph-track) minmax(0, 1fr); align-items: center; column-gap: var(--lc-space-4); padding-inline-start: var(--lc-space-4); border-radius: var(--lc-radius-row); }
+.wf-step[data-current] { background: var(--lc-selection); }
+.wf-step[data-current]::before { content: ''; position: absolute; inset-inline-start: var(--lc-selection-rail-inset); inset-block: var(--lc-space-12); inline-size: var(--lc-selection-rail-width); border-radius: var(--lc-hairline); background: var(--lc-selection-rail); }
+.wf-step .lc-glyph-tile { justify-self: center; }
+.wf-step-index { color: var(--lc-muted); font: var(--lc-weight-medium) var(--lc-text-caption)/1 var(--lc-font-mono); font-variant-numeric: var(--lc-font-numeric); text-align: end; }
+.lc-button.wf-step-select { display: grid; justify-content: stretch; justify-items: start; gap: 0; inline-size: 100%; min-block-size: var(--lc-row-height); padding: var(--lc-space-4) var(--lc-space-8); text-align: start; }
+.lc-button.wf-step-select:hover:not(:disabled) { background: transparent; }
+.wf-step-title { font-weight: var(--lc-weight-semibold); overflow-wrap: anywhere; }
+.wf-connections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--lc-space-12); align-items: end; }
+.wf-edge-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--lc-space-8); padding-block: var(--lc-space-8); border-block-end: var(--lc-hairline) solid var(--lc-divider); overflow-wrap: anywhere; }
+.wf-edge-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--lc-space-8); min-inline-size: 0; }
+.wf-edge-type { color: var(--lc-muted); font: var(--lc-text-caption)/var(--lc-leading-caption) var(--lc-font-mono); }
+
+/* Inspector: tile + name, facts, configuration, destructive verb last. */
+.wf-inspector { display: grid; gap: var(--lc-space-12); min-inline-size: 0; }
+.wf-inspector-head { display: grid; grid-template-columns: var(--lc-glyph-tile) minmax(0, 1fr); align-items: center; column-gap: var(--lc-space-8); padding-block-end: var(--lc-space-12); border-block-end: var(--lc-hairline) solid var(--lc-divider); }
+.wf-inspector-name { font-weight: var(--lc-weight-semibold); overflow-wrap: anywhere; }
+.wf-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: var(--lc-space-12); margin: 0; font-size: var(--lc-text-caption); line-height: var(--lc-leading-caption); }
+.wf-facts > div { display: contents; }
+.wf-facts dt, .wf-facts dd { padding-block: var(--lc-space-4); border-block-end: var(--lc-hairline) solid var(--lc-divider); min-inline-size: 0; }
+.wf-facts dt { color: var(--lc-muted); }
+.wf-facts dd { margin: 0; text-align: end; font-family: var(--lc-font-mono); overflow-wrap: anywhere; }
+.wf-check { display: flex; align-items: center; gap: var(--lc-space-8); min-block-size: var(--lc-control-height); }
+.wf-check input { accent-color: var(--lc-accent); margin: 0; }
+.wf-note { display: flex; gap: var(--lc-space-8); padding: var(--lc-space-12); border: var(--lc-hairline) solid var(--lc-divider); border-radius: var(--lc-radius-row); background: var(--lc-raised); }
+.wf-note h3 { font-size: var(--lc-text-body); line-height: var(--lc-leading-body); font-weight: var(--lc-weight-semibold); }
+.wf-inspector-actions { padding-block-start: var(--lc-space-12); border-block-start: var(--lc-hairline) solid var(--lc-divider); }
+
+/* Modal confirmation on the scrim (the only alpha role), popover surface. */
+.wf-modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow: auto; background: var(--lc-scrim); padding: var(--lc-space-24); }
+.wf-dialog { display: grid; gap: var(--lc-space-8); max-inline-size: var(--lc-state-plate-max-width); padding: var(--lc-space-20); background: var(--lc-raised); color: var(--lc-text); border: var(--lc-hairline) solid var(--lc-border); border-radius: var(--lc-radius-popover); box-shadow: var(--lc-elevation-popover); overflow-wrap: anywhere; }
+.wf-dialog h2 { margin: 0; font-size: var(--lc-text-emphasis); line-height: var(--lc-leading-emphasis); font-weight: var(--lc-weight-semibold); }
+.wf-dialog p { margin: 0; }
+.wf-dialog p:not(.wf-eyebrow) { color: var(--lc-muted); }
+.wf-dialog .wf-actions { justify-content: flex-end; margin-block-start: var(--lc-space-8); }
+
+@media (forced-colors: active) {
+  .wf-workspace { background: CanvasText; }
+  .wf-node, .wf-receipt, .wf-note, .wf-dialog { border-color: CanvasText; }
+  .wf-node[data-selected], .wf-step[data-current] { outline: var(--lc-focus-width) solid Highlight; outline-offset: calc(var(--lc-focus-width) * -1); }
+  .wf-node[data-selected]::before, .wf-step[data-current]::before { forced-color-adjust: none; background: Highlight; }
+  .wf-editor .react-flow__handle { border-color: CanvasText; background: Canvas; }
+  .wf-editor .react-flow__edge-path { stroke: CanvasText; }
+  .wf-edge-label { border-color: CanvasText; background: Canvas; color: CanvasText; }
+  .wf-canvas, .wf-editor .react-flow, .wf-editor .react-flow__pane, .wf-editor .react-flow__background { --xy-background-color: Canvas; background: Canvas; }
+}
+/* Accessible verb prefix for palette rows whose visible label is the noun ("Add" + "Keyword"). */
+.wf-visually-hidden { position: absolute; inline-size: var(--lc-hairline); block-size: var(--lc-hairline); margin: calc(var(--lc-hairline) * -1); padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
