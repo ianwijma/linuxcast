@@ -67,3 +67,15 @@ wire enabled, no independent review yet. Next two read-only review delegates cov
 AT final safety and the native credential observer while coordinator resumes the
 Nodeclient/freshness/lifecycle and missingcredentialUI work. All previous delegates
 completed/read; no active one is being polled or replaced.
+
+Final native-preparation source a170c5896351df4abf1238334f4c27d46f758ada now pushed
+and linked immediately to PR80; normal signature verified, as is nativecredential
+worker d89d05e. This docs-only checkpoint does not alter code/artifact hashes.
+Final AT:23unit/55security (48Python) and2actualElectron17.76s/type/lint/plan pass;
+all historical PNGs unchanged. No native product/Orca runs. Fresh independent
+ATsecurity recheck and nativecredential observer security review are next, using
+immutable commits, while coordinator resumes missingNodeclient/credentialflow.
+PR81/82 remain drafts with accepted local checks and current-head planningCI as
+recorded; no requested/submitted reviews/comments or develop protection/rulesets.
+No merge before outstanding native/task acceptance. Published progress is a
+checkpoint, not completion of any unfinished task or the full local1.0 goal.
