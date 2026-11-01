@@ -1,37 +1,57 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — outer owner corrections ready for publication
+## Current coordinator state — two reviewed prerequisites ready for focused PRs
 
-Goal ACTIVE, all97/local1.0 throughR1-03; no status/criterion promotion. Approved
-b3bea80/PR96, seven Instrument surfaces retained. No real native/guest/build runs.
-Both initial owner reviews on40adf937 completed/read: Standards1e654a49 soleP2
-FIFO preflight; Security/Spec80f02ab5 same plus final-close dispatch/first-failure
-loss. Parent fixes both directly: nonblocking source/permit opens, preflight hard
-alarm/shared budget, final descriptor errors retain known result/first cause.
-88owner tests4.480s; four actual behavioral cases fail old40adf937/passcurrent.
-55mapped security17.76s includes208Python/payload16.686s under unchanged18s bound.
-AST/hash/plan/whitespace pass, no second independent clean-review claim. Publish
-focused owner PR/currentCI/review inspection/normal merge next. Actual permit,
-transport, graceful/forced shutdown/recovery and native proof remain outstanding;
-historical two-timeout fixture absence remains honestly unverified.
+Full97/local1.0 Goal ACTIVE, incomplete; task/criterion statuses unchanged.
+The account-wide quota claim was wrong: successful same-model Codex reviews
+followed user98% report. No provider/model switch or private credential read.
 
-Independent AI author ef66ad7c continues GPT6.1SOL/high from8b0b88e; no polling.
-Coordinator configuration work saved clean on codex/a1-01-global-configuration,
-95d9f185: atomic SQLite profile/model/CAS record with dedicated contracts/client,
-no migration/new writer/renderer/export access.15contracts/10privateSQLite/7client
-and43existing storage regressions/type/scopedlint/plan pass. No integration/review
-or production credential snapshot wiring claimed. A1staysplanned. Parent sent
-material note about existing private session-only references and use/fresh seam;
-worker must propose exact captured-credential glue without importing parent work.
+Inventory sourcea744b7b072a950d178c684987009d4aeca2ecf6e on
+codex/f1-02-inventory-owner-preparation is now independently clear. Initial
+Standards002b32cf found malformed-stanzaP2; Specf502bf17 found interrupted reply
+accountingP2 plus full Python18s timeout (inherited208 also timed out). Parent
+fixed both, and only two TEST clocks now advance after real owned-child reaping
+instead of waiting5s each; runtime5s/fixture9s/mapped18s limits unchanged. Existing
+assertions retained and suppressed termination is detected. No production
+SessionOwner/native/controller/parser/staging/observer/namespace source change.
 
-Host public build inputs are pinned outsideGit: BBBE source/archive,152locked
-Cargo crates and124upstream-verifiedElectron headers; five Rust1.95 archives
-127772720B with official manifest checksums and263-member nonexecuting layout
-inventory. No extraction/install/compiler/guest execution.13GiBfree, no further
-cleanup. Separate reviewed build-provisioning ownership remains necessary: native
-owner requires an actual receipt, never a placeholder. Old wrapper tree, PID1
-metadata, native combo identity, four desktop sessions/AT/physical/performance/
-release and all remaining tasks remain pending.
+Fresh finaldc86be7a exacta744/baseabff closes bothP2s, Standards+Security/Spec clear;
+independently55mappedF1security/all265Python11.759s/no skips under18s;57inventory/
+88owner/9SessionOwner,2old-source failing methods,2termination-fault controls,
+4publication-cleanup combinations,14package probes,4AST/24inventoryhashes/
+legacytestpin/plan/whitespace pass. Metadata-only publication commit follows;
+code remains byte-identicaltoa744. Prepare focused PR now, then current CI/GitHub
+review checks and prompt merge. All native/UI/full-task gates remain pending.
+
+Initial public host-only source copyfromabff is renamed
+private-lab/f102-inventory-candidate-abff18a-rejected; originalpath retired,
+bytes/inode retained. Fresh read-only Docker configuration/identity/stoppedPID0/
+exit0 matched while preparing it, no start/exec/SSH/guest. Do not reuse it.
+Fresh immutable reviewed sources plus strict13field permit required after merge.
+User confirms linuxcast UID1000, keyauth/passwordlesssudo, root/passwordSSHdisabled;
+actual login/sudo/poweroff still unproved. Historical timeout absence gaps unknown.
+
+F2 capture candidatea411f88202541ada057662da7863ab6cae21af6d, source2aa405e,
+codex/f2-02-captured-credential-leases: both initial reviews completed/read clear.
+Security/Spec47865d99 independently165security/86units/3contracts,12extra probes,
+3failing faults/static/6hashes; Standards03715988 independently38settings/86units/
+3contracts/fulltype/scopedlint/plan/whitespace/6hashes, no hardrule/materialsmell.
+No actual keyring/provider/native acceptance. Its focused PR follows inventory
+merge and develop integration, with tested package sources preserved. Temp draft
+PR body /tmp/linuxcast-f2-captured-credentials-pr.md awaits final review text.
+
+AI correctionb7f291218d4fb4910e4cf6340d9decda7af3e0f3 saved separately on
+codex/a1-01-broker-integration:184checks/staticvalidation pass. Fresh final
+reviewbf157bdd was launched on Codex/SOLhigh and has no returned result yet.
+Do not poll running child. A1 preparations stay local/unmerged/planned until
+whole F2/F3 accepted; configurationc78228e retains original clear reviews.
+
+No active root tests or PRwatches before publication. Next: publish inventory,
+inspect current CI/review requirements, watch if pending, merge and send tiny
+blurb. Rebase/merge approved develop into F2, preserve source, publish/merge next.
+Then actual reviewed inventory with fresh source custody/permit and separate
+real transport/cleanup evidence; immutable Debian product build/receipt, UID20000/
+PID1/namespace/nativeAT/four-session/physical/performance/package/R1-03 still pending.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

@@ -87,6 +87,11 @@ class FakeChildren:
 
 
 class FakeLab:
+    job_seconds = owner.JOB_SECONDS
+
+    def validate_job_reply(self, raw, code, result):
+        return owner.validate_transport(raw, code)
+
     def __init__(self, lease, check=lambda: None, fail=None, cleanup=('none', True, True, True)):
         self.lease, self.check = lease, check
         self.fail, self.cleanup_value = fail, cleanup

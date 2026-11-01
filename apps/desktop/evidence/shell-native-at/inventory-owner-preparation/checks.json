@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "scope": "offline-inventory-owner-preparation-not-execution-permit",
+  "checkout": "/home/ian/.t3/worktrees/linuxcast/t3-6b25aa19",
+  "branch": "codex/f1-02-inventory-owner",
+  "baseCommit": "cc0e1eeca8fc028b2ae068b0139128c89df3b97e",
+  "baseTree": "9d93f82714221911fd359f3cd8d7d455221ace0e",
+  "configBeforeSha256": "730ffbdff81f1747f1cd78d683bc52a7d6bec4609bbe18cd0beec466d4888a58",
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_inventory_owner.py -q",
+      "count": 55,
+      "seconds": 0.766,
+      "result": "pass",
+      "skipped": 0
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_owner.py -q",
+      "count": 88,
+      "seconds": 4.31,
+      "result": "pass",
+      "skipped": 0
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py' -q",
+      "count": 253,
+      "seconds": 17.397,
+      "result": "pass",
+      "scope": "intermediate 45-inventory-test checkpoint; final count below",
+      "skipped": 0
+    },
+    {
+      "command": "exact at-preparation.security.test.ts Python payload via /usr/bin/python3 -B -c; subprocess.run timeout=18",
+      "count": 261,
+      "pythonSeconds": 17.323,
+      "wallSeconds": 17.43,
+      "timeoutSeconds": 18,
+      "result": "pass",
+      "complete": true,
+      "nativeRun": false,
+      "skipped": 0,
+      "scope": "intermediate53-inventory-test checkpoint; final result below"
+    },
+    {
+      "command": "Python3.10 AST parse four changed/new modules plus embedded guest source data",
+      "count": 5,
+      "result": "pass"
+    },
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "result": "pass",
+      "sources": 279,
+      "features": 57,
+      "tasks": 97
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "result": "pass"
+    },
+    {
+      "command": "compare every non-owned existing AT/evidence file byte-for-byte against coordinator base",
+      "count": 49,
+      "result": "pass"
+    },
+    {
+      "command": "final exact at-preparation.security.test.ts Python payload via /usr/bin/python3 -B -c; subprocess.run timeout=18",
+      "count": 263,
+      "pythonSeconds": 17.244,
+      "wallSeconds": 17.35,
+      "timeoutSeconds": 18,
+      "result": "pass",
+      "complete": true,
+      "nativeRun": false,
+      "skipped": 0,
+      "expectedFailures": 0,
+      "unexpectedSuccesses": 0
+    },
+    {
+      "command": "two final metadata regressions against checkpoint9b2a253 AST-extracted guest definitions with mocked adapters",
+      "count": 2,
+      "result": "both fail as intended; both pass in final55 owned suite",
+      "scope": "negative control, separate from complete no-skip mapped suite"
+    }
+  ],
+  "signing": {
+    "configuredAttempt": "timeout --signal=TERM --kill-after=2s 30s git commit",
+    "configuredResult": "exit124; no commit",
+    "checkpointFallback": "git -c commit.gpgsign=false commit; succeeded",
+    "evidenceFallback": "same authorized per-command fallback after the failed configured attempt; no repeated attempt or config writes",
+    "status": "unsigned preparation; normal Git/release/tag signing settings unchanged"
+  },
+  "finalCommitAndTree": "final handoff; this tree cannot contain its own full identity",
+  "platform": {
+    "python": "3.10.12",
+    "architecture": "x86_64",
+    "kernel": "7.1.1-76070101-generic",
+    "desktopEvidence": false
+  },
+  "executed": {
+    "realOwnerCli": false,
+    "realLabPermitCreated": false,
+    "docker": false,
+    "ssh": false,
+    "guestProgram": false,
+    "hostDropOrNamespace": false,
+    "build": false,
+    "native": false,
+    "displayBusReaderDeviceProviderKeyring": false,
+    "privateUserDataOrKeyReads": false,
+    "ordinaryUnprivilegedPythonFixtures": "independent FixtureGuard custody; five new fixtures; no guest child/drop implementation invoked",
+    "mockedProbeDefinitions": "AST definitions only, injected guest metadata/kernel adapters; no real guest main or host collection"
+  },
+  "inherited": {
+    "uid1000Debian13_7PreviousShutdown": true,
+    "currentAccountName": "unverified; no guessing",
+    "currentTransportPrivilegePoweroffRecovery": "unverified",
+    "historicalTwoTimeoutFixtureAbsences": "unknown; no retrospective cleanup",
+    "nativeAcceptedAC01AC02Privacy": "unchanged",
+    "uiFullNativeSessionPhysicalReleaseAll97Local1_0": "pending"
+  },
+  "contractKeyCount": {
+    "requestText": 15,
+    "frozenProtocolEnumerated": 13,
+    "implementation": "exact enumerated key set; no invented keys"
+  },
+  "sharedChangesNeeded": [
+    "Coordinator refresh only the owner/test entries in old outer-owner-preparation hash evidence; old evidence left unchanged",
+    "Coordinator reconcile 15-key wording against 13 enumerated keys before authority/invocation",
+    "Independent review and current verified account/transport/root/sudo/poweroff authority; no real permit or invocation in this work",
+    "Existing native wrapper approved tree/UID20000/proc1 feasibility/source/archive/actual receipt and native AT gates remain coordinator-owned"
+  ],
+  "codeCheckpoint": {
+    "commit": "9b2a2538306ac02ac535e7b1c15466f0fd282a80",
+    "tree": "f7e28f9997c53d262ae484e9981ce7166c2e3791",
+    "signed": false
+  },
+  "configAfterSha256": "730ffbdff81f1747f1cd78d683bc52a7d6bec4609bbe18cd0beec466d4888a58",
+  "configFingerprintUnchanged": true,
+  "headerPins": {
+    "/usr/include/linux/prctl.h": "87e50dc83d684b8d78087b8a0ff0e5100c453ac1bba4480853374049362702dc",
+    "/usr/include/linux/capability.h": "7b351dd906edb3609e1242cdcc23c8cf490bf7118e1c2a1938cfb623034f6114"
+  },
+  "parentOwnedHashRefreshRequired": {
+    "apps/desktop/tests/at/lab_owner.py": {
+      "old": "fbebe2fb0907e76a31a5507a0767c9cc9f4d31dc999054b8cc49957ac7429ed6",
+      "current": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+    },
+    "apps/desktop/tests/at/test_lab_owner.py": {
+      "old": "4a0711cc7ceb8d830174ce6ed2e0e49c84774ab792c4879921f46670cfa46620",
+      "current": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e"
+    }
+  },
+  "unchangedExistingAtAndEvidenceFiles": 49,
+  "postCheckpointCorrection": "Refuse selected package records without valid dpkg status, retain held installed package versions, refuse missing OS ID and empty proc directory; no lifecycle/native change.",
+  "coordinatorReviewCorrections": {
+    "reviewedHead": "abff18ac26666daa3f4382d54ec2a08182a91e51",
+    "initialReviews": {
+      "standards": "002b32cf: no separate standards/smell findings; P2 malformed package identity",
+      "securitySpec": "f502bf17: P2 interruption/reply accounting; mapped Python timed out twice, baseline208 also timed out"
+    },
+    "parentBeforeClockFix": {
+      "inventoryTests": 57,
+      "diagnosticPythonTests": 265,
+      "diagnosticSeconds": 20.866,
+      "diagnosticIsMappedPass": false,
+      "mappedSecurity": "54/55; Python18s timeout"
+    },
+    "current": {
+      "inventoryTests": 57,
+      "sessionOwnerTests": 9,
+      "mappedSecurity": 55,
+      "mappedPythonTests": 265,
+      "mappedPythonSeconds": 11.86,
+      "mappedPythonBoundSeconds": 18,
+      "skips": 0,
+      "expectedFailures": 0,
+      "astParses": 4,
+      "fixtureTerminationFaultControls": 2,
+      "originalFindingRegressions": "both fail reviewed source; pass fixed source"
+    },
+    "changes": "Inventory parser/reply atomic publication; test-only monotonic advance after real owned reaping; production SessionOwner and all runtime/test timeouts unchanged",
+    "stagedCandidate": "abff18a exact public host source copy; rejected directory renamed under retained existing lock; no permit or owner/guest invocation",
+    "finalIndependentRecheck": "clear at a744b7b; see finalIndependentRecheck; actual acceptance remains pending",
+    "nativeAcceptance": "pending"
+  },
+  "finalIndependentRecheck": {
+    "review": "dc86be7a",
+    "head": "a744b7b072a950d178c684987009d4aeca2ecf6e",
+    "base": "abff18ac26666daa3f4382d54ec2a08182a91e51",
+    "standards": "clear",
+    "securitySpec": "both P2s closed; no new actionable findings",
+    "mappedSecurity": 55,
+    "pythonCases": 265,
+    "pythonSeconds": 11.759,
+    "pythonBoundSeconds": 18,
+    "focusedInventory": 57,
+    "focusedOwner": 88,
+    "focusedSessionOwner": 9,
+    "oldSourceRegressionMethodsFail": 2,
+    "suppressedTerminationControlsDetect": 2,
+    "extraPublicationCleanupCombinations": 4,
+    "extraPackageNameProbes": 14,
+    "cleanBeforeAfter": true,
+    "nativeExecuted": false
+  }
+}

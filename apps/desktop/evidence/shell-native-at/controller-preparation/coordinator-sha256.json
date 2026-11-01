@@ -16,7 +16,7 @@
     "apps/desktop/tests/at/test_observations.py": "49a1d35212c0cd16289717cf57c99621acbc130ef4652ee76f8fb459a42a6ac3",
     "apps/desktop/tests/at/test_orca_output.py": "d1689b4d41c2b788cf6a7632441c2ea3fff7355d9610cfeaa4775ea1182f9da8",
     "apps/desktop/tests/at/test_product_staging.py": "0dc5118b54200aa87809c05da48f0dd2be4fa7bab6e0f483f0d8691b826767d1",
-    "apps/desktop/tests/at/test_session_owner.py": "af0907e48e13f7bfab10730043dcf6aaace67d0eeb5af4dfac77ca0bd7f1b86c",
+    "apps/desktop/tests/at/test_session_owner.py": "561a2b4fcbfd69a6e1dbb95282de2304c6228c4b96b4ad48efa1d9a7ab3dffcf",
     "apps/desktop/tests/at/driver_guards.test.ts": "9896c045a5ec576941ccf24295021b22f330e49461e4a0fa0d0e8b7d7607401a",
     "apps/desktop/tests/at/driver_guards.ts": "d59ad54cba9dff0177e49a9d4f012ab14ae9e7beed74eb5e3d0a189f18000cd2",
     "apps/desktop/tests/at/product_driver.ts": "09b6fc9256d25e75de1e901f784c2513546d338522cf0eb008ebebbe053c924f",
