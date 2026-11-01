@@ -1,3 +1,4 @@
+import * as z from 'zod';
 import { credentialPreferenceSchema,parseCredentialPreference } from '../../platform-contracts/src/credential-preferences.ts';
 import type { CredentialPreference } from '../../platform-contracts/src/credential-preferences.ts';
 import { credentialSettingsSaveSchema,credentialSettingsRemoveSchema,credentialSettingsPolicySchema,credentialSettingsStateSchema } from '../../platform-contracts/src/credential-settings.ts';
@@ -13,6 +14,18 @@ export interface CredentialPreferences {
   read():Promise<{revision:number;value:string}|null>;
   write(expectedRevision:number,value:string):Promise<{revision:number;value:string}>;
 }
+const capturedCredentialSchema=z.strictObject({reference:z.strictObject({id:z.uuid(),mode:z.enum(['secure-persistent','session-only'])}),
+  generation:z.number().int().positive().max(Number.MAX_SAFE_INTEGER)});
+const providerRunId=z.uuid();
+// Process-local and never reused across service lifetimes. Captures are not
+// persisted or accepted from IPC; a process restart destroys their owners.
+let lastCredentialGeneration=0;
+const nextCredentialGeneration=():number|null=>lastCredentialGeneration===Number.MAX_SAFE_INTEGER?null:++lastCredentialGeneration;
+/** Trusted host metadata only. Never add this to the renderer wire or exports. */
+export interface CredentialCapture {readonly reference:Readonly<SecretReference>;readonly generation:number}
+/** Eligibility is separate from SecretStore.use, permissions and content consent.
+ * Call valid immediately before each dispatch; release does not signal revocation. */
+export interface CredentialEligibilityLease {readonly signal:AbortSignal;valid():boolean;release():Promise<void>}
 interface Model {preference:CredentialPreference;preferenceRevision:number;records:SecretReferenceRecord[];reference:SecretReference|undefined;state:CredentialSettingsState}
 type Outcome=Extract<CredentialSettingsActionReply,{ok:true}>['value']['outcome'];
 const result=(outcome:Outcome):CredentialSettingsActionReply=>({ok:true,value:{outcome}});
@@ -35,6 +48,9 @@ export class CredentialSettingsService {
   #reading:Promise<Model>|undefined;
   #mutating=false;
   #uses=new Set<AbortController>();
+  #credentialGeneration=nextCredentialGeneration();
+  #credentialBinding:string|undefined;
+  #credentialRuns=new Map<string,{controller:AbortController;release:()=>void}>();
   #revision=0;
   #fingerprint:string|undefined;
   #active:Promise<CredentialSettingsActionReply>|undefined;
@@ -44,7 +60,7 @@ export class CredentialSettingsService {
   #unsubscribe:()=>void;
   constructor(options:{runtime:CredentialRuntime;preferences:CredentialPreferences;references:SecretReferences;appearance:()=> 'dark'|'light'}) {
     this.#runtime=options.runtime;this.#preferences=options.preferences;this.#references=options.references;this.#appearance=options.appearance;
-    this.#unsubscribe=this.#runtime.subscribe(()=>{this.#eligibilityEpoch++;this.#advance();});
+    this.#unsubscribe=this.#runtime.subscribe(()=>{this.#eligibilityEpoch++;this.#invalidateCredentialCaptures();this.#advance();});
   }
   #advance():void {
     this.#revision++;this.#fingerprint=undefined;
@@ -88,6 +104,12 @@ export class CredentialSettingsService {
     const storage:CredentialSettingsState['storage']=status.state==='available'?'available':
       status.reason==='insecure-backend'?'insecure-backend':status.reason==='encryption-failed'?'encryption-failed':status.reason==='storage-failed'?'storage-failed':'unavailable';
     const stored:CredentialSettingsState['stored']=invalidPreference||!consistent||this.#review?'needs-review':reference?.mode??'none';
+    // Detect independently changed pointer/owner/status metadata as well as
+    // service-owned mutations. Appearance and UI snapshot revisions grant no lease.
+    const binding=JSON.stringify([row?.revision??0,row?.value,reference,stored,storage,
+      records.map(record=>[record.id,record.createdAt,record.updatedAt])]);
+    if(this.#credentialBinding!==undefined&&this.#credentialBinding!==binding)this.#invalidateCredentialCaptures();
+    this.#credentialBinding=binding;
     const fingerprint=JSON.stringify([row?.revision??0,row?.value,preference,records.map(record=>record.id),reference,session,storage,stored]);
     if(this.#fingerprint!==undefined&&this.#fingerprint!==fingerprint)this.#revision++;
     this.#fingerprint=fingerprint;
@@ -102,7 +124,7 @@ export class CredentialSettingsService {
     // metadata; one bounded read-only refresh can cross a completed mutation.
     const reading=this.#load().catch(error=>{
       if(error instanceof SnapshotChanged&&!this.#closed)return this.#load();
-      throw error;
+      this.#invalidateCredentialCaptures();throw error;
     });this.#reading=reading;
     const clear=()=>{if(this.#reading===reading)this.#reading=undefined;};
     void reading.then(clear,clear);return reading;
@@ -117,8 +139,8 @@ export class CredentialSettingsService {
   #run(perform:()=>Promise<CredentialSettingsActionReply>):Promise<CredentialSettingsActionReply> {
     if(this.#closed)return Promise.resolve(result('unavailable'));
     if(this.#active)return Promise.resolve({ok:false,error:{code:'conflict'}});
-    this.#modelGeneration++;
-    const operation=Promise.resolve().then(perform).catch(()=>{this.#review=true;return result('unknown');}).finally(()=>{this.#mutating=false;this.#modelGeneration++;});
+    this.#modelGeneration++;this.#invalidateCredentialCaptures();
+    const operation=Promise.resolve().then(perform).catch(()=>{this.#review=true;return result('unknown');}).finally(()=>{this.#mutating=false;this.#modelGeneration++;this.#invalidateCredentialCaptures();});
     this.#active=operation;
     for(const listener of [...this.#listeners]){try{listener();}catch{/* Views remain independent. */}}
     void operation.then(()=>{if(this.#active===operation)this.#active=undefined;this.#advance();});return operation;
@@ -206,7 +228,64 @@ export class CredentialSettingsService {
       const store=await this.#runtime.store();store?.recheckKeyring();return result('refreshing');
     });
   }
-  #invalidateUses():void {this.#mutating=true;this.#targetEpoch++;for(const use of [...this.#uses])use.abort();}
+  #invalidateUses():void {this.#invalidateCredentialCaptures();this.#mutating=true;this.#targetEpoch++;for(const use of [...this.#uses])use.abort();}
+  #invalidateCredentialCaptures():void {
+    this.#credentialGeneration=nextCredentialGeneration();
+    this.#credentialBinding=undefined;
+    for(const entry of [...this.#credentialRuns.values()])entry.controller.abort();
+  }
+  #credentialEligible():boolean {
+    if(this.#closed||this.#active||this.#mutating||this.#review||this.#credentialGeneration===null)return false;
+    if(this.#runtime.sessionState()!=='observed-unlocked') {this.#invalidateCredentialCaptures();return false;}
+    return true;
+  }
+  /** Captures the actual selected memory/persistent reference, never key material.
+   * A session transition or mutation during IO requires a new explicit capture. */
+  async captureCredential():Promise<CredentialCapture|null> {
+    if(this.#closed||this.#active||this.#mutating||this.#review||this.#credentialGeneration===null)return null;
+    try {
+      if(!await this.#runtime.store()||!this.#credentialEligible())return null;
+      const generation=this.#credentialGeneration;
+      const model=await this.#model();
+      if(generation===null||!this.#credentialEligible()||generation!==this.#credentialGeneration||!model.reference||
+        model.state.stored==='needs-review'||model.state.session!=='observed-unlocked'||
+        model.reference.mode==='secure-persistent'&&model.state.storage!=='available')return null;
+      return Object.freeze({reference:Object.freeze({...model.reference}),generation});
+    }catch{this.#invalidateCredentialCaptures();return null;}
+  }
+  /** Bounded main-only admission for one captured route's credential. No permission,
+   * provider authentication, secret read or silent current-reference substitution.
+   * Pending metadata IO retains its slot until it actually returns. */
+  async authorizeCapturedCredential(input:unknown,runId:string,signal:AbortSignal):Promise<CredentialEligibilityLease|null> {
+    const parsed=capturedCredentialSchema.safeParse(input);
+    if(!parsed.success||!providerRunId.safeParse(runId).success||signal.aborted||!this.#credentialEligible()||
+      parsed.data.generation!==this.#credentialGeneration||this.#credentialRuns.has(runId)||this.#credentialRuns.size>=128)return null;
+    const capture=parsed.data,controller=new AbortController();let released=false,transferred=false;
+    const abort=()=>{controller.abort();};
+    const release=()=>{
+      if(released)return;released=true;signal.removeEventListener('abort',abort);
+      if(this.#credentialRuns.get(runId)?.controller===controller)this.#credentialRuns.delete(runId);
+    };
+    this.#credentialRuns.set(runId,{controller,release});
+    signal.addEventListener('abort',abort,{once:true});if(signal.aborted)abort();
+    try {
+      const model=await this.#model();
+      if(controller.signal.aborted||!this.#credentialEligible()||capture.generation!==this.#credentialGeneration)return null;
+      const store=await this.#runtime.store();
+      if(!store||controller.signal.aborted||!this.#credentialEligible()||capture.generation!==this.#credentialGeneration||
+        model.state.stored==='needs-review'||model.reference?.id!==capture.reference.id||model.reference.mode!==capture.reference.mode)return null;
+      const valid=()=>{
+        if(released||controller.signal.aborted||!this.#credentialEligible()||capture.generation!==this.#credentialGeneration)return false;
+        const present=capture.reference.mode==='session-only'?store.hasSessionReference(capture.reference,OWNER):store.status().state==='available';
+        if(!present)this.#invalidateCredentialCaptures();
+        return present&&!controller.signal.aborted&&capture.generation===this.#credentialGeneration&&this.#credentialEligible();
+      };
+      if(!valid())return null;
+      transferred=true;
+      return Object.freeze({signal:controller.signal,valid,release:async()=>{release();}});
+    }catch{this.#invalidateCredentialCaptures();return null;}
+    finally{if(!transferred)release();}
+  }
   /** Main-only provider seam. A real effect adapter must call fresh immediately
    * before every dispatch, including after any intervening asynchronous work. */
   async use(consumer:(secret:string,signal:AbortSignal,fresh:()=>boolean)=>Promise<void>):Promise<{outcome:'used'|'unavailable'}> {
@@ -221,5 +300,5 @@ export class CredentialSettingsService {
       return {outcome:used.outcome==='used'&&fresh()?'used':'unavailable'};
     }catch{return {outcome:'unavailable'};}finally{this.#uses.delete(owned);}
   }
-  async close():Promise<void> {this.#closed=true;this.#invalidateUses();this.#unsubscribe();this.#listeners.clear();await Promise.allSettled([this.#reading,this.#active]);}
+  async close():Promise<void> {this.#closed=true;this.#invalidateUses();this.#unsubscribe();this.#listeners.clear();for(const entry of [...this.#credentialRuns.values()])entry.release();await Promise.allSettled([this.#reading,this.#active]);}
 }

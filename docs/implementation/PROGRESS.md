@@ -1,37 +1,69 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — outer owner corrections ready for publication
+## Current coordinator state — F2 exact credential capture and eligibility
 
-Goal ACTIVE, all97/local1.0 throughR1-03; no status/criterion promotion. Approved
-b3bea80/PR96, seven Instrument surfaces retained. No real native/guest/build runs.
-Both initial owner reviews on40adf937 completed/read: Standards1e654a49 soleP2
-FIFO preflight; Security/Spec80f02ab5 same plus final-close dispatch/first-failure
-loss. Parent fixes both directly: nonblocking source/permit opens, preflight hard
-alarm/shared budget, final descriptor errors retain known result/first cause.
-88owner tests4.480s; four actual behavioral cases fail old40adf937/passcurrent.
-55mapped security17.76s includes208Python/payload16.686s under unchanged18s bound.
-AST/hash/plan/whitespace pass, no second independent clean-review claim. Publish
-focused owner PR/currentCI/review inspection/normal merge next. Actual permit,
-transport, graceful/forced shutdown/recovery and native proof remain outstanding;
-historical two-timeout fixture absence remains honestly unverified.
+Previous goal turn made progress: inventory checkpoint e1fa9b9 and AI first-failure
+correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 were committed. This turn adds
+one bounded F2-02 backend increment on codex/f2-02-captured-credential-leases,
+base freshly fetched approved develop b23a3cc650f98238c1190b6136889c5117266694.
+No task/acceptance promotion; full97/local1.0 throughR1-03 remains ACTIVE.
 
-Independent AI author ef66ad7c continues GPT6.1SOL/high from8b0b88e; no polling.
-Coordinator configuration work saved clean on codex/a1-01-global-configuration,
-95d9f185: atomic SQLite profile/model/CAS record with dedicated contracts/client,
-no migration/new writer/renderer/export access.15contracts/10privateSQLite/7client
-and43existing storage regressions/type/scopedlint/plan pass. No integration/review
-or production credential snapshot wiring claimed. A1staysplanned. Parent sent
-material note about existing private session-only references and use/fresh seam;
-worker must propose exact captured-credential glue without importing parent work.
+CredentialSettingsService now provides captureCredential() with the actual selected
+memory/persistent reference and process-local generation, and
+ authorizeCapturedCredential(capture, UUIDrunId, signal) with a revocable eligibility
+lease. Exact current reference/mode/generation checked after metadata IO; immutable
+capture, copied strict admission; no silent later-current-reference substitution.
+Generations are not reused across service lifetimes in a process, never persisted
+or accepted from renderer IPC. Native session/runtime, UI, main IPC, repository,
+SecretStore implementation, shared wire and dependency versions are unchanged.
+Mutation admission/confirmation, close, observed session/storage loss and changed
+metadata revoke captures. Normal release is idempotent without aborting its signal.
+At most128 pending/live admissions; aborted metadata IO retains its slot until
+actual return. Existing IO cancellation/latency limitations remain explicit.
 
-Host public build inputs are pinned outsideGit: BBBE source/archive,152locked
-Cargo crates and124upstream-verifiedElectron headers; five Rust1.95 archives
-127772720B with official manifest checksums and263-member nonexecuting layout
-inventory. No extraction/install/compiler/guest execution.13GiBfree, no further
-cleanup. Separate reviewed build-provisioning ownership remains necessary: native
-owner requires an actual receipt, never a placeholder. Old wrapper tree, PID1
-metadata, native combo identity, four desktop sessions/AT/physical/performance/
-release and all remaining tasks remain pending.
+Executed pinned Node24.22.1/Bun1.4.4 development-host validation:
+165 mapped F2security (38settings =17existing+21new),86units,3contracts pass;
+fulltype/scopedlint/plan/whitespace pass. Five controlled faults independently
+make focused tests fail: removed revocation, valid-after-release, caller metadata
+alias,129vs128 capacity, reused service generation. Exact fixed source restored
+before final complete checks. Initial persistent capture test counted the setup
+save's legitimate round-trip decrypt; corrected to reset the spy after setup.
+No actual provider, native/keyring, guest, bus, display/input/audio or screenshot.
+Evidence: packages/secrets/evidence/captured-credentials/. F2AC01/UI stay pending,
+historical AC02/privacy unchanged. All97criteria remain intact. Independent initial
+Standards and Security/Spec reviews still required; no PR published or merged.
+
+Saved inventory preparation e1fa9b9a8462c90997ecee20f7a51eb2f16f6285 on
+codex/f1-02-inventory-owner-preparation includes author a87058dc, two old owner/test
+hash refreshes and coordinator evidence.55mappedF1security passes, Python payload
+16.986s under unchanged18s. Frozen protocol enumerates13 keys; assignment15 was a
+counting error. Native admission/receipt gates unchanged. Both initial independent
+inventory reviews NOT STARTED. Actual account is still unverified; coordinator
+asked the user for the provisioned v4 SSH username and root/passwordless-sudo route.
+No account guessing/private user-data or key read, permit creation or guest action.
+Historical two timeout-fixture absences remain unknown; no retroactive clean claim.
+
+Saved A1 broker correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 on
+codex/a1-01-broker-integration:184unique checks (108security/66contracts/10SQLite)
+plus fulltype/scopedlint/plan pass; seven first-failure/cleanup regressions fail
+03d6b409 and pass fixed source. Preserves known normalized operation reasons and
+makes rejected SSE iterator cleanup visible after parser errors. Initial review
+954c9c19 failed from Codex quota with no final conclusion after independently
+reporting167mapped cases/staticchecks passing and finding that diagnostic defect.
+Fresh independent final review required. Atomic-config preparation c78228e remains
+saved codex/a1-01-configuration-integration; its original two reviews clear.
+A1 stays local/unpublished/unmerged/planned until whole-task F2-02/F3-01 acceptance.
+Main-only production composition must atomically match one global route/profile/
+credential capture and use actual SecretStore plus eligibility and authority leases;
+this F2 API is not production AI routing or a permission grant.
+
+Codex review quota remains the observed review blocker; no provider/model fallback
+or repeat failing delegation attempted. No active delegates/test processes/PRwatches
+after this checkpoint. No new PR. Next: required independent F2/inventory reviews
+and fresh AI final review when the prescribed model can run; prompt focused F2/
+inventory PRs on passing reviews/CI, preserving all native/full-task gates. Continue
+actual guest account/build/provenance/UID/PID1/outer/native work only under reviewed
+owners and accurate permits. Current product/Orca native runs remain zero.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

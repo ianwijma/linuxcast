@@ -11,4 +11,4 @@ export { CredentialRuntime } from './runtime.ts';
 export type { CredentialRuntimeOptions,OwnedSecretSession,SessionRestart } from './runtime.ts';
 
 export { CredentialSettingsService } from './settings.ts';
-export type { CredentialPreferences } from './settings.ts';
+export type { CredentialPreferences,CredentialCapture,CredentialEligibilityLease } from './settings.ts';
