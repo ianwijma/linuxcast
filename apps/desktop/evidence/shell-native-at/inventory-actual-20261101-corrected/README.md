@@ -28,7 +28,7 @@ Xvfb21.1.16-1.3+deb13u4, systemd257.13-1~deb13u1 and
 util-linux2.41.5-0+deb13u1. The exact fixed package versions are in the JSON;
 these are package metadata, not executable/source hash or ABI verification.
 
-gcc, g++, make, pkg-config and all seven selected development packages are
+gcc, g++, make, pkg-config and all six selected development packages are
 confirmed absent in that metadata. UID/GID20000 accounts are absent and no
 process uses the UID. The snapshot counted101 processes, with zero fixed-name
 graphical/test candidates. It is not a historical or exhaustive process proof.

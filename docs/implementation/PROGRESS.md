@@ -23,7 +23,7 @@ Exact prior failing guest field not collected/identified, so do not claim it.
 
 Debian13amd64 actual Python3.13.5-1/Orca48.1-1+deb13u2/AT-SPI2.56.2-1+deb13u2/
 D-Bus1.16.2-2/speech0.12.0-5/Xvfb21.1.16-1.3+deb13u4. gcc/g++/make/pkg-config/
-sevenselecteddevpackages absent. UID/GID20000 absent and idle;101boundedprocesses,
+sixselecteddevpackages absent. UID/GID20000 absent and idle;101boundedprocesses,
 zero fixed graphical/test candidates. Self net/PID metadata allowed, PID1both
 denied, equalityunknown, exact feasibility-child cleanuptrue. No namespacecreated.
 Owner ownedChildrenAbsent/stoppedVerified/reservationCleantrue; separate fresh
