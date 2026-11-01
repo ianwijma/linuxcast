@@ -1,5 +1,50 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Namespace integration frozen for initial review — 2November2026 Sydney
+
+Root codex/f1-02-namespace-attestation integrates signed authorca103865/96b42643
+via8f153e1/8fb1a1c, four ownedcode/testfiles byte-identical toauthor96b42643.
+Contract namespace-attestation-protocol.md is coordinator-owned; no execution
+permission or acceptance follows. Parent55mappedsecurity passes14.92s total,
+all290offlinePython/zero skips within existing18s (inner12.915s). Author53wrapper/
+19controller/290Python12.059s/55mapped10.64s; parentall30sourcepins/AST/count/plan/
+whitespace pass. Parent replay ofthree behavioral regressions against exactbd587
+base fails for expected PID1denial/missingproof reasons, fixed source passes full
+mapped suite. No host drop/unshare/mount/chroot or new guest/native operation.
+
+Boundary: root parent retains genuine typednsfs initial references; childcloses
+outside/nsfds, rootworker seals readonly anonymous subject-bound dataFD3; worker
+and controller compare currentownnamespaces with initial/isolation pairs and
+identityUID/GIDmaps. Genuineproc root/mountID anchors reject fake/individualbind
+mapfiles. Controller consumes/closes proof before staging/native construction;
+capabilities/groups/NNP/receipt/loopback/devices/cgroups/deadlines remain. Historical
+APPROVED_TREE/source/archive/build/receipt/permit/manifests intentionallyunchanged;
+coordinator reconciliation and realstatx/map/namespace/handoff/containment proof
+still required. Newprep evidence clearly offline. Initial fresh independent
+Standards and Security/Spec reviews next; no PR published for this increment yet.
+
+Research543b145 integrated viafc5388f, exactly5newdocs/metadatafiles, normal signing.
+Source audit confirms onlyplatformcrate build, directGIO/GObject/GLib links;
+minimalcandidate g++/make/libgio-2.0-dev plus authenticatedclosure (not the8probed
+missing dev/build candidates). SQLite uses bundledamalgamation, no systemSQLite
+headers fordefaultbuild. Rust PATHreset gap and extractor randomchild→finalstaging
+promotion beforeinstall found. Fullguestdpkg baseline/holds/foreignarch/pending
+state required before exact offline transaction; source/helper/profile authority
+not yet implemented. Next coordinator-owned closed read-only buildfacts contract.
+No .deb, guest install/build/native claim. Other registeredfull1.0libsnotexcluded.
+
+Publicsignature/index staging alreadyrecordedbelow. Two exploratory isolated
+hostAPTempty-status simulations did NOT establish a resolved closure: harness/
+empty-cache/acquisition interactions stopped them. All temporaryprofiles removed,
+partial public diagnostics preserved outsideGit; no .deb download or host/guest
+package mutation. No successfulAPTplan is claimed or included as acceptance.
+Actual guestbaseline and DebianAPT3 validation remain required; do not replay an
+incomplete hostAPT2.4 hypothetical plan as a guest install transaction.
+
+All finisheddelegate callbacks consumed, sourcecheckouts clean. No live root
+command/test or PRwatch at this checkpoint. Previous nativeat4desktop/physical/
+release/historicalabsence/full97 scope remains untouched; independent review next.
+
 ## Host public Debian metadata staging — 2November2026 Sydney
 
 Current codex/f1-02-namespace-attestation follows approvedPR100/69decac; namespace
