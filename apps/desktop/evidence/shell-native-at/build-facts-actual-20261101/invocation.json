@@ -1,0 +1,17 @@
+{
+  "approvedCommit": "40bac5ccf903feace841515ab52f29879cf62471",
+  "automaticRetries": 0,
+  "captureId": "dba36bd7-5894-424b-9658-672c44d89467",
+  "elapsedSeconds": 42.676,
+  "endedAt": "2026-11-01T16:06:12.053985+00:00",
+  "exactCallerReaped": true,
+  "exitCode": 3,
+  "nativeRuns": 0,
+  "permitSha256": "71c29d20661aa67ee8e52cdf1ff9e9001fc844beaee199224856952c7d38c15a",
+  "reviewedCommit": "c512d5f581f67b8f7096863b317a547554dc7d92",
+  "schema": 1,
+  "sourceManifestSha256": "07bd93e42bc750fe3d0af68388ce5ec79a9c53e75f8c3bdf36f94e21616aba38",
+  "startedAt": "2026-11-01T16:05:29.368544+00:00",
+  "stderrBytes": 0,
+  "stdoutSha256": "fff73f33783639d55809e74bc33979f0b39fbc1f893de58d2eb4900b79ed091b"
+}

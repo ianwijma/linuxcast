@@ -1,5 +1,29 @@
 # Coordinator checkpoint — 2 November 2026
 
+## First actual build-facts capture unavailable at a bound; cleanup verified
+
+After PR102 merge40bac5c, protected source f102-build-facts-approved-c512d5f
+(0500/files0400) matches approved/reviewed c512d5f code. New14-key0400 permit
+SHA71c29d20661aa67ee8e52cdf1ff9e9001fc844beaee199224856952c7d38c15a binds capture
+dba36bd7-5894-424b-9658-672c44d89467. Source manifest07bd93e42bc750fe3d0af68388ce5ec79a9c53e75f8c3bdf36f94e21616aba38;
+owner15584fa8bff607b7d38a5bfbd0083d0ba2f3f380cfa586f008d8980e300eecf3,
+base d3b5c60d, embedded6b1a383c/18055bytes. Root/lock identities unchanged and
+fresh baseline exactly stopped/exit0 before start. One fixed coordinator CLI ran
+16:05:29.368544→16:06:12.053985UTC,42.676s/exit3,0retries: valid unavailable/bounds
+guest reply, incomplete/transport owner result, cleanupnone, no private artifact.
+Which status/field/record/snapshot/packet bound failed is not exposed; do not
+guess or raise caps without evidence/review.
+
+Independent exact caller reaping and subreaper ECHILD; fresh full pinned container
+exited/runningfalse/PID0/exit0; marker absent, original0664 lock reacquired; source/
+permit unchanged, stderr0. Current failure cleanup succeeds; arbitrary recovery
+and historical old timeout absence remain unproved. Protected sources, used permit
+and0600 run outputs preserved under private lab; no automatic replay. Public
+sanitized evidence apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/.
+No package baseline/build/provision/native/Orca acceptance; all97/status/criteria
+unchanged. Next offline locate possible bounds and define minimal reviewed fixed
+diagnostic with no broader read/command/limit authority before fresh capture.
+
 ## PR102 merged; first read-only build-facts capture next
 
 PR102 https://github.com/ianwijma/linuxcast/pull/102 merged normally at

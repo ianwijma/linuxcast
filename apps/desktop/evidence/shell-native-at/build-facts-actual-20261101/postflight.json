@@ -1,0 +1,13 @@
+{
+  "captureId": "dba36bd7-5894-424b-9658-672c44d89467",
+  "exactCallerReaped": true,
+  "freshPinnedContainerStoppedExit0": true,
+  "markerAbsent": true,
+  "nativeRuns": 0,
+  "originalLockReacquired": true,
+  "ownedCallerDescendantsAbsentECHILD": true,
+  "privateArtifact": null,
+  "schema": 1,
+  "sourceAndPermitUnchanged": true,
+  "stderrBytes": 0
+}
