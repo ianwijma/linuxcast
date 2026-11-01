@@ -77,7 +77,7 @@ Final focused results: 53 wrapper tests and19 controller-failure tests pass.
 expected failures. [Mapped security](mapped-security.txt):55 checks pass;
 the original18000ms spawn bound and20000ms Vitest bound are unchanged. Its
 Python discovery result also requires no skips/expected failures. Final mapped
-wall time and inner Python duration are retained in that log.
+wall time10.64s; inner Python wrapper9.251s. Both are retained in that log.
 
 The [base control](base-regressions.txt) is explicitly expected to fail:
 the same positive wrapper/controller tests encounter synthetic PID1 denial;
@@ -146,7 +146,14 @@ These are API evidence, not runtime proof.
 
 ## Signing
 
-Normal configured commit signing will be attempted with a30-second bound.
-The final handoff records the actual result; the authorized per-command unsigned
-fallback is available only after a1Password error or timeout. Persistent Git
-configuration and signed/tagged release rules remain unchanged.
+Implementation commit `ca10386585f28f854ba7102142b24471395e251c` succeeded
+with normal configured SSH signing under the30-second bound (exit0); no fallback
+was used. [Attempt output](signing-attempt.txt) and
+[cryptographic verification](signature-verification.txt) are retained here.
+Default `git verify-commit` could not verify because no allowed-signers file is
+configured. A temporary allowed-signers file containing only the configured
+inline public Ed25519 key verified the signature (exit0); it was removed on
+completion. No key file was read and no persistent configuration changed.
+The evidence-only follow-up uses the same normal signing and30-second bound;
+its exact HEAD/tree and signature verification are reported in the handoff.
+Signed/tagged release requirements remain unchanged.

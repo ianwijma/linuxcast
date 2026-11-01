@@ -1,0 +1,12 @@
+[codex/f1-02-namespace-proof ca10386] fix(at): attest namespaces across privilege drop
+ 14 files changed, 1886 insertions(+), 30 deletions(-)
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/README.md
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/all-python.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/base-regressions.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/check-base-regressions.py
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/controller-tests.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/integrity.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/mapped-security.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/plan-validation.txt
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/source-hashes.json
+ create mode 100644 apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/wrapper-tests.txt

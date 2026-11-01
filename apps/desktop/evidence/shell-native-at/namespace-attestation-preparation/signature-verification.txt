@@ -1,0 +1,5 @@
+Implementation commit ca10386585f28f854ba7102142b24471395e251c
+Default git verify-commit refused verification because gpg.ssh.allowedSignersFile is not configured.
+Ephemeral allowed-signers file containing only the configured inline public Ed25519 key; no key file read, no persistent configuration change.
+Exit 0
+Good "git" signature for preparation with ED25519 key SHA256:izd3tAxNjVzQP/GI/Qg1dDwbJyroHLxZBCvx7jUWbfY
