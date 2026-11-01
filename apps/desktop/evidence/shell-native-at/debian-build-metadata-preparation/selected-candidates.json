@@ -1,0 +1,102 @@
+{
+  "packages": [
+    {
+      "architecture": "amd64",
+      "bytes": 4624,
+      "depends": "libc6-dev | libc-dev, gcc (>= 4:14.2), g++ (>= 4:14.2), make, dpkg-dev (>= 1.22.11)",
+      "filename": "pool/main/b/build-essential/build-essential_12.12_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "build-essential",
+      "preDepends": null,
+      "sha256": "a45159aebea0d98d6652ac5a56b7fff164a7733a7dc736b9f8715ca504519d3a",
+      "suite": "trixie",
+      "version": "12.12"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 214548,
+      "depends": "libdbus-1-3 (= 1.16.2-2), libsystemd-dev, pkgconf, xml-core (>= 0.14)",
+      "filename": "pool/main/d/dbus/libdbus-1-dev_1.16.2-2_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libdbus-1-dev",
+      "preDepends": null,
+      "sha256": "83767cf52f88de6d6f370cee30e717828c6fd22cb55d1fb84b38a3e911742887",
+      "suite": "trixie",
+      "version": "1.16.2-2"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 57744,
+      "depends": "girepository-tools (= 2.84.4-3~deb13u5), libgio-2.0-dev (= 2.84.4-3~deb13u5), libglib2.0-bin (= 2.84.4-3~deb13u5), libglib2.0-dev-bin (= 2.84.4-3~deb13u5)",
+      "filename": "pool/main/g/glib2.0/libglib2.0-dev_2.84.4-3~deb13u5_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libglib2.0-dev",
+      "preDepends": null,
+      "sha256": "ad98b1a769da55a8007ea9953306b0deb6092205d4fac8d915e2bd83d4ecc8a5",
+      "suite": "trixie",
+      "version": "2.84.4-3~deb13u5"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 1994660,
+      "depends": "libc6 (= 2.41-12+deb13u4), libc-dev-bin (= 2.41-12+deb13u4), linux-libc-dev, libcrypt-dev, rpcsvc-proto",
+      "filename": "pool/main/g/glibc/libc6-dev_2.41-12+deb13u4_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libc6-dev",
+      "preDepends": null,
+      "sha256": "1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2",
+      "suite": "trixie",
+      "version": "2.41-12+deb13u4"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 894476,
+      "depends": "libx11-6 (= 2:1.8.12-1), libxau-dev, libxdmcp-dev, x11proto-dev (>= 2019.2-1), xtrans-dev, libxcb1-dev",
+      "filename": "pool/main/libx/libx11/libx11-dev_1.8.12-1_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libx11-dev",
+      "preDepends": null,
+      "sha256": "530de60c9c6dadd997ae7d74eca2a41b25e849373a5ad5dcdb619aa05713d6e0",
+      "suite": "trixie",
+      "version": "2:1.8.12-1"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 30024,
+      "depends": "libxtst6 (= 2:1.2.5-1), libx11-dev, libxext-dev, libxi-dev, x11proto-dev",
+      "filename": "pool/main/libx/libxtst/libxtst-dev_1.2.5-1_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libxtst-dev",
+      "preDepends": null,
+      "sha256": "a2e96a14e0d5eebf186bd374e9a828799055fe6a07d14d32268f4a9795d01002",
+      "suite": "trixie",
+      "version": "2:1.2.5-1"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 13968,
+      "depends": "pkgconf (>= 1.8.1-4)",
+      "filename": "pool/main/p/pkgconf/pkg-config_1.8.1-4_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "pkg-config",
+      "preDepends": null,
+      "sha256": "385209ba52e5c97808bbdc2fc4da22aea9020f96fbab6fbfb144921c4a31d400",
+      "suite": "trixie",
+      "version": "1.8.1-4"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 1109400,
+      "depends": "libsqlite3-0 (= 3.46.1-7+deb13u2), libc-dev",
+      "filename": "pool/main/s/sqlite3/libsqlite3-dev_3.46.1-7+deb13u2_amd64.deb",
+      "indexSha256": "4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940",
+      "package": "libsqlite3-dev",
+      "preDepends": null,
+      "sha256": "56e1945d52292b506c1f0bcb77543fea289ccee857c478dcddded40226e1594d",
+      "suite": "trixie",
+      "version": "3.46.1-7+deb13u2"
+    }
+  ],
+  "schemaVersion": 1,
+  "scope": "selected-package-candidates-not-resolved-dependency-closure"
+}

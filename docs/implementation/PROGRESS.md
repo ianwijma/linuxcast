@@ -1,5 +1,37 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Host public Debian metadata staging — 2November2026 Sydney
+
+Current codex/f1-02-namespace-attestation follows approvedPR100/69decac; namespace
+implementation ad854267 and build-provisioning research749ca910 are independent
+SOLhigh T3 isolated tasks frombd587382, no polling. Their exact source/evidence
+handoffs and independent implementation review remain pending. No root process,
+real guest operation or PRwatch is live at this checkpoint. Goal/full97 unchanged.
+
+Coordinator staged public keys/three signed InRelease documents outsideGit in
+f102-public-debian13-metadata-20261101; same-name indexes sibling holds three
+content-addressed main/amd64 Packages.xz and verified Release payloads, private
+0500/0400 single-link files. Host has no Debian archive keyring; five12/13 keys
+match HTTPS-published FTP-master fingerprints (explicit TLS bootstrap, not an
+independent installed-keyring or guest trust anchor). GnuPG2.2.27 validates all
+three Release signatures with only this explicit candidate ring:3stable,
+2updates,2security. Onechangedcleartextbyte rejects (oneBADSIG/zeroVALIDSIG).
+All compressed AND expanded index SHA256/size verify against signed payloads.
+No .deb downloaded, dependency closure resolved, package/hostAPT mutation,
+private-lab read, guest install/build/native action or acceptance promotion.
+
+Signed candidates: trixie13.7 dated12Sept; updates expiry8Nov08:09:02UTC and
+security8Nov12:12:11UTC, checkedcurrent; basehasnoexplicitexpiry. No trust/expiry
+bypass, freshness and guest packaged-keyring reconciliation before installation.
+Initial collector assumption maincomponent failed on signedsecurityupdates/main
+label while its signed paths are main/; partialfiles retained/reverified before
+content-addressed downloads. No production/parser change or weakenedappguard.
+Eight selected build/dev package facts extracted, not recursive dependency closure.
+Committed smallmetadata/evidence report at
+apps/desktop/evidence/shell-native-at/debian-build-metadata-preparation/; actual
+publickey/index payloads remainoutsideGit. Native/package/ABI/receipt/containment/
+AT/fourdesktop/physical/release gates remain. Next act on isolated handoffs.
+
 ## Current coordinator state — PR100 merged; complete corrected guest inventory
 
 PR100 https://github.com/ianwijma/linuxcast/pull/100 MERGED at
