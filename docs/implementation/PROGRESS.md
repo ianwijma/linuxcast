@@ -1,4 +1,38 @@
-# Coordinator checkpoint — 1 November 2026
+# Coordinator checkpoint — 2 November 2026
+
+## PR101 merged; read-only build facts next — 2November2026 Sydney
+
+PR101 https://github.com/ianwijma/linuxcast/pull/101 MERGED normally at
+4f47e531437b9f15501afc4de79309d74c5f2c29, exacthead2f417506, PlanningCI41315901723
+SUCCESS. Currenthead MERGEABLE/CLEAN, no requested/submittedreviews; CodeRabbit
+terminalSKIPPED below10stars/noactionablefeedback, rulesets[]/protection404.
+Initial Standards68e794e0 andSecuritySpecb0cccb33 soleP2 custodygap parentfixed;
+final7d36eb95 bothaxesclear on6aafb140 with295Python/55mapped/21extraprobes and
+oldsource/fault controls. Metadata-onlyfinalhead preserves all4code/testfiles.
+Immediate tinymergeblurb sent, unwatchconfirmedfalse; no watch retained.
+
+Root now codex/f1-02-build-facts fromapproved4f47e53. Coordinator freezes
+apps/desktop/tests/at/build-facts-protocol.md before isolatedimplementation.
+Read-onlynew lab_build_facts module/tests/evidence only; oldbaseowner/native/
+inventory/namespace/protocol/manifests/receipt/pins remainunchanged. Separate14key
+permit binds source/probe/lab/captureUUID andmetadataauthority, notinstaller.
+NonblockingexistingDPKGreadlocks, strictprivateprojectedstatus/holds/architecture/
+pendingstate/resource/locale/publickeyring facts. Canonical2MiB private JSON
+compressedclosedpacket<=60000 fits old65536 cap; guardian/public<=4096 carries
+only fixedenums/counts/digests. Privateexclusive0400 artifact publication and
+interruptedjob recovery preserve custody/accounting. Job30/guest25/start120/
+cleanup45/owner600 unchanged, no genericrunner/installation/newnative authority.
+
+Need independentlyreviewed implementation before newactualpermit/firstcapture.
+Completefacts then exactsignedoffline transaction (minimal g++/make/libgio-dev
+plusclosure), root/unprivileged fixedprep phases, currentarchive/cache/toolchain/
+RustPATH/finalstaging/actualbuild/receipt andnativepinreconciliation. Actual
+namespacehandoff/statx/rootdrop/containment/nativeAT/fourdesktop/physical/package/
+release work remains. Full97GoalACTIVE/incomplete,8done/20inprogress/69planned,
+56passed/325pending/8justifiedN/A unchanged; source integration is not acceptance.
+Currentno rootprocess/test/delegate/PRwatch before the implementation assignment.
+Old twoactual inventories/cleanstoppedguest andhistoricalunknownabsence gaps
+remainexactly as recorded, no additional guest/provision/native action.
 
 ## Namespace FD3 custody correction — final recheck clear, publish next
 
