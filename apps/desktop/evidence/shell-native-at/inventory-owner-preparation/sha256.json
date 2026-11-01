@@ -6,7 +6,7 @@
     "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
     "apps/desktop/tests/at/lab_inventory_owner.py": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
     "apps/desktop/tests/at/test_lab_inventory_owner.py": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108",
-    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "502cb6f43f88d75e191c43627778b7b116400cd612868d6b143ab9fcdbec7ff3",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "93d72f1786b047c44ef7e63974abd79ab31065c41774b110b3e4752ef9337874",
     "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/checks.json": "7655e23b11f8a0e4e8ec2fc9d25dffbcdcd8197f9c7c33f43caf52daac322879",
     "apps/desktop/tests/at/test_session_owner.py": "561a2b4fcbfd69a6e1dbb95282de2304c6228c4b96b4ad48efa1d9a7ab3dffcf",
     "apps/desktop/evidence/shell-native-at/controller-preparation/coordinator-sha256.json": "bb06ba23f3d27fce386c7da596cc3a35f3cc359de5c64c41bea7fe1e65e7e103",
