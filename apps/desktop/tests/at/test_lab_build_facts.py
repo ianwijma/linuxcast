@@ -865,6 +865,21 @@ class Files(unittest.TestCase):
         self.assertTrue(result['reservationClean'])
         self.assertFalse((self.root / self.lease.artifact_name()).exists())
 
+    def test_unavailable_relay_requires_the_permit_capture_identity(self):
+        lab = FakeLab(self.lease)
+        lab.reply, lab.code = owner.encoded(PROBE['unavailable']('packages')), 3
+        value = owner.transact(self.lease, lab)
+        self.assertEqual(self.lease.validate_reply(copy.deepcopy(value)), value)
+        changed = copy.deepcopy(value)
+        changed['buildFacts']['captureId'] = '12345678-1234-4234-8234-123456789abd'
+        with self.assertRaisesRegex(owner.Rejected, 'custody'):
+            self.lease.validate_reply(changed)
+        with patch.object(self.lease, 'pin', None):
+            with self.assertRaisesRegex(owner.Rejected, 'custody'):
+                self.lease.validate_reply(copy.deepcopy(value))
+            self.assertEqual(self.lease.validate_reply(self.lease.result()), self.lease.result())
+        self.assertFalse((self.root / self.lease.artifact_name()).exists())
+
     def test_short_writes_loop_and_zero_write_retains_partial_without_claim(self):
         real = os.pwrite
         artifact = self.lease.artifact_name()

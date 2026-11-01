@@ -1,5 +1,23 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts initial Standards complete; capture binding corrected
+
+Initial Standards30922b61 complete and final report read on exactaafd1bf/base393f9da:
+no Standards/material-smell findings, separate soleP2 Spec finding: unavailable
+reply captureUUID was not checked against retainedpermit outside artifact branch.
+Coordinator directly moves check beforebranch for all received replies; new real
+synthetic unavailable-transaction regression fails reviewedsource (1behavioral
+failure/0errors), passesfixed, covers correctbinding/mismatch/no-permit and
+not-received preadmission without creatingartifact.83focused pass1.156s; actual
+55mapped pass11.98s, full378Python payload10.686s under unchanged18s. Plan and
+whitespace pass; no schema/guest/probe/authority/deadline/shared-source changes.
+Author5evidencefiles remain historical5067676/e4ba89b, current two-file correction
+and evidence tracked separately in coordinator-capture-correction.md/manifest.
+Initial independent SecuritySpeccd58456c still running on frozenaafd1bf; no
+polling or replacement, no clean Spec/final review claimed. Fresh final recheck
+after all initial findings. No PR/watch/permit/capture/guest/build/native action.
+All97 task/criterion/dependency states and historical cleanup gaps unchanged.
+
 ## Build-facts preparation integrated for initial independent review
 
 Read-only build-facts author e4ba89b57c7866f8e2430f2228ca9b5edd8d1185 is

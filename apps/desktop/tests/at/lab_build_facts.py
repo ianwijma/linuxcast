@@ -772,9 +772,10 @@ class BuildFactsReservation(owner.Reservation):
 
     def validate_reply(self, value):
         validate_relay(value)
+        if value['buildFacts']['status'] != 'not-received':
+            owner.require(self.pin is not None and value['buildFacts']['captureId'] == self.pin['captureId'], 'custody')
         if value['artifact'] is not None:
             try:
-                owner.require(self.pin is not None and value['buildFacts']['captureId'] == self.pin['captureId'], 'custody')
                 if self.artifactfd is None:
                     # Caller independently reopens the guardian's exact identity.
                     self.artifact_raw = None
