@@ -1,48 +1,64 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — inventory-only ownership preparation
+## Current coordinator state — inventory validation and pending reviews
 
-Full97/local1.0 Goal ACTIVE; no task/acceptance promotion. PR97 merged at
-b23a3cc650f98238c1190b6136889c5117266694 fromfe78d059, PlanningCI41245660272 SUCCESS,
-no requested/submittedreviews/comments, normalexpectedheadmerge, tinyblurb sent,
-watch removed. Base outer owner88tests/208offline/55mappedsecurity pass; actual
-transport/shutdown/recovery/native/build remains unproved. Historical two early
-probe timeouts still lack verified absence, never retroactively claimed clean.
+Full 97-task/local 1.0 Goal remains ACTIVE. Registry unchanged: 8 done,
+20 in-progress, 69 planned; 56 passed, 325 pending, 8 justified N/A criteria.
+PR97 merged at b23a3cc650f98238c1190b6136889c5117266694. No new PR, watch,
+real lab invocation or acceptance promotion in this checkpoint.
 
-Root codex/f1-02-inventory-owner-preparation from approvedPR97 freezes
-apps/desktop/tests/at/inventory-owner-protocol.md. A separate inventory-only
-permit/closed SSH job reuses the reviewed outer owner without fake native receipt.
-Read-only guest facts plus one bounded no-new-privileges dedicated-UID namespace
-metadata child, fixed poweroff/verified shutdown; no install/build/native action.
-Implementation and independent review required before invocation. Historical
-UID1000/Debian13.7/prior shutdown facts are leads only; current account/transport
-must be reconciled without private user-data/key reads or account guessing.
-All existing native admission/source/receipt/wrapper/PID1 checks stay intact.
+Root branch codex/f1-02-inventory-owner-preparation fast-forwarded to returned
+checkpoint a87058dc692deefc3094a310533b8154974ea04f (tree
+0b9c3c8491866a2626c5e1d4be804922f55cf742). Author checkout t3-6b25aa19,
+codex/f1-02-inventory-owner, from frozen coordinator cc0e1ee. Five new owned
+source/test/evidence files and only authorized base-owner seams were delivered.
+Coordinator refreshed exactly the two owner/test hashes in the old outer-owner
+manifest. The protocol enumerates exactly 13 fields; the earlier assignment's
+15-key wording was a counting error, not permission to invent fields. Protocol
+and all native admission requirements remain unchanged.
 
-A1 configuration is saved unchanged atc78228e43607f0c85b3da8329c1e84bae14e06e0 on
-codex/a1-01-configuration-integration, baseb23a3cc. Initial independent Standards
-0d0375fd and Security/Specab97a261 completed/read clear:15contracts/10SQLite/7client
-plus type/scopedlint/plan independently pass; Spec adds14 controlled probes.
-Authorized public Node SQLite addon reuse/hash/distinctinode provenance is stated,
-not Debian/Electron proof.43older regressionchecks inherited. Keep preparation
-unpublished/unmerged until A1's accepted F2-02/F3-01 dependency gate is satisfied.
+Coordinator validation: mapped test:security F1-02 passes 55/55, including the
+complete no-skip offline Python payload in 16.986s under its unchanged 18s bound.
+Author reports 263 offline Python tests and 55 inventory tests; coordinator ran
+the actual mapped payload, not a separate native job. Four Python AST parses,
+new inventory file/input hashes, refreshed old owner/test hashes, plan validation
+and whitespace checks pass. Old outer manifest unchangedInputs protocol hash
+b005609e is historical: approved b23a3cc and current protocol both hash
+3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a,
+also recorded under that manifest's coordinatorContract. No blanket current-hash
+claim is made for historical manifest sections. See inventory coordinator.md.
 
-Backend author ef66ad7c completed/read clean0252f471d4bffbb4bda50116ec6838d43e689cee,
-treed5d8278063ade67259301928cfa145949bd5ee4b, worktreet3-9dbd8c05/branch
-codex/a1-01-openrouter-broker from8b0b88e:14owned additions only,132synthetictests/
-fulltype/scopedlint/plan/whitespace pass. Mapped contracts command unavailable in
-its frozenbase, exit3 honestly reported. Unsigned after bounded signing timeout,
-no config change. Parent has not integrated/reviewed source yet. Atomicconfig,
-private session-only captured-reference/eligibility lease, authenticated authority/
-content/tool ports, persistence/main utility/routing/mapping remain coordinator
-work. SharedSecretStore admission lacks caller cancellation; dispatch stops but
-cleanup waits for actual admission retirement. No real provider/keyring/desktop
-proof; all four A1criteria remain pending and integration prerequisites intact.
+Inventory initial independent Standards and Security/Spec reviews remain NOT
+STARTED. The prescribed Codex review provider hit its usage limit during the AI
+recheck; capabilities were refreshed after this error, but listing a model does
+not establish available quota. No substitute provider/model or repeated failing
+delegation was used. Review is required before inventory invocation/publication.
+Current guest account, actual transport/root/sudo/poweroff, UID20000/PID1
+feasibility, source authority, immutable build/receipt and native gates remain
+unproved. Historical two timeout-fixture absences remain unknown. No permit made.
 
-Public source/header/Cargo/Rust candidates stay read-only outsideGit; no guest,
-compiler, downloaded toolchain extraction/installation or native execution. Root
-has no active test process or PRwatch. Inventory implementation assignment next;
-no other delegates active after three known-completed finals were fully read.
+A1 configuration remains local c78228e43607f0c85b3da8329c1e84bae14e06e0 on
+codex/a1-01-configuration-integration. Combined broker correction remains local
+03d6b409cff051ac4f389fd17bb1b57c06d7a2bb on
+codex/a1-01-broker-integration: retained actual acquisition/release/transport/
+reader retirement, pre-schema choice errors, structural tool JSON equality;
+parent validation 66 contracts/101 security/10 SQLite = 177 checks passed.
+Fresh final recheck 954c9c19 FAILED from usage limit, no final review conclusion.
+Its completed messages independently report 66 contracts/101 security/type/
+scoped lint/plan/whitespace passing, then identify a remaining diagnostic issue:
+HTTP401 followed by rejected body cleanup reports operationReason=retirement,
+losing authentication as the known first operation failure. Confirm/fix directly
+with a regression before a fresh independent final recheck. Do not treat the
+partial run as clean or assume its unfinished concurrency probes passed.
+
+A1 preparations stay unpublished/unmerged/planned, all criteria pending until
+accepted F2-02/F3-01 prerequisites. Main-only captured actual credential-reference
+and eligibility leases remain unimplemented; empty codex/f2-02-captured-credential-
+leases branch is saved at b23a3cc. Public source/header/Cargo/Rust artifacts remain
+outside Git and unexecuted. Actual product/Orca native runs remain zero. No active
+review delegates, root tests or PR watches after this checkpoint. Next: finish AI
+first-failure regression; obtain both inventory initial reviews and fresh AI final
+review when prescribed-model quota is available, then focused inventory PR.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

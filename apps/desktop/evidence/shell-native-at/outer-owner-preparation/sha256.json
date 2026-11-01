@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "kind": "offline-graceful-shutdown-and-independent-fixture-custody-not-permit",
   "files": {
-    "apps/desktop/tests/at/lab_owner.py": "fbebe2fb0907e76a31a5507a0767c9cc9f4d31dc999054b8cc49957ac7429ed6",
-    "apps/desktop/tests/at/test_lab_owner.py": "4a0711cc7ceb8d830174ce6ed2e0e49c84774ab792c4879921f46670cfa46620",
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
     "apps/desktop/evidence/shell-native-at/outer-owner-preparation/README.md": "ef763f4d80ee726e68f942e70ec65b57a699dbe017bf1f5050aa9fe5c1009fcc",
     "apps/desktop/evidence/shell-native-at/outer-owner-preparation/checks.json": "c806d26f1b78d3f9225d3795f8f14b531cfdfa185ca56afd04a352d38ce226a1"
   },
