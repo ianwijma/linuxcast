@@ -1,5 +1,28 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts final independent review clear; publication next
+
+Final065a6691 completed/read at c512d5f581f67b8f7096863b317a547554dc7d92,
+base8cf1b32. Both Standards and Security/Spec clear; reader setter P2 resolved.
+Reviewer independently reproduces all four old leaks with os.open unchanged,
+fixed exact readers EBADF,22 additional current probes pass.93focused1.356s,
+actual55mapped11.56s/all388Python10.303s under unchanged18s/no skips; all11
+current controls green, original11/writer2/reader4 historical failures each0errors;
+fourASTs/17current70historical13input bindings/embedded18055bytes/plan/whitespace
+pass. Type/lint inherited for unchanged TS. Checkout clean/fingerprints unchanged,
+no reviewer source edits or real execution. Earlier intermediate findings remain
+historical; current code/test/helper exactly reviewed c512d5f. New final-review
+record/publication hashes and append-only F1 evidence metadata do not change
+task statuses/dependencies/acceptance or execution authority. Normal SSH signing
+has succeeded throughout coordinator corrections; configuration unchanged.
+
+Focused PR publication/current-head CI and GitHub bot/review inspection then
+prompt normal merge next. No PR/watch/delegate/command live at this checkpoint;
+no permit/capture/CLI/lab/guest/provision/build/native action. Next actual work
+after merge is protected source custody, same-domain permit and one bounded
+coordinator capture, then exact authenticated package resolution. All97/local1.0
+scope, F1-02/UI pending and historical unknown cleanup gaps remain unchanged.
+
 ## Build-facts reader setter correction ready for final recheck
 
 Independent9a318340 completed/read at8cf1b32: writer P2 resolved and Standards

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "kind": "reviewed-publication-not-permit",
+  "reviewedCommit": "c512d5f581f67b8f7096863b317a547554dc7d92",
+  "finalIndependentReview": "065a6691-e81d-4551-b647-059052e9dcb9",
+  "files": {
+    "apps/desktop/tests/at/lab_build_facts.py": "15584fa8bff607b7d38a5bfbd0083d0ba2f3f380cfa586f008d8980e300eecf3",
+    "apps/desktop/tests/at/test_lab_build_facts.py": "98e50c8d77b92ce815023dcc13105a68701a57e343026cb9eec9ba575e644d88",
+    "apps/desktop/evidence/shell-native-at/build-facts-preparation/check-review-regressions.py": "ff95054806b256206950d82625009c263c9387d7b208c26b05b1d54dcc863697",
+    "apps/desktop/evidence/shell-native-at/build-facts-preparation/coordinator-final-review.md": "857869063a971e36dfeff925a5e7a00d02c21817522704e3d03b5caa59432640"
+  },
+  "embeddedGuestSource": {
+    "sha256": "6b1a383c8144f3d84fa8da61316f0f66f6cec38d4cf4c1958a308291f4093d54",
+    "bytes": 18055
+  },
+  "historicalInputBindingsCommit": "c512d5f581f67b8f7096863b317a547554dc7d92",
+  "note": "Earlier manifests and their unchangedInputs are historical at their named Git snapshots; publication changes only metadata, not reviewed source/tests/helper.",
+  "acceptance": "pending",
+  "actualCapture": false
+}
