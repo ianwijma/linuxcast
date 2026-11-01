@@ -1,5 +1,32 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts preparation integrated for initial independent review
+
+Read-only build-facts author e4ba89b57c7866f8e2430f2228ca9b5edd8d1185 is
+integrated as 5067676e6de18802cbefe1c6359859b6f8e6d9c4 on frozen coordinator
+393f9da0a3e384ed6a15e18a1973d111494f19c8. Exactly seven additive owned files:
+lab_build_facts.py, test_lab_build_facts.py and five preparation evidence files.
+No existing owner/native/namespace/inventory/pins/manifests/contracts changed.
+Author reports82focused/all377Python cases (295baseline),55mapped security,
+type/lint/AST/33inherited+19new-input hashes/plan/whitespace; no skips or expected
+failures. Coordinator independently reran actual mapped55security successfully
+in11.30s, Python child10.032s under unchanged18s. Normal SSH signing succeeded
+for author and integration; signature headers present, local signer verification
+still requires allowed-signers configuration. No unsigned fallback used.
+
+Closed separate14-key metadata permit, strict nine-key private snapshot,
+seven-key compressed packet<=60000, snapshot<=2MiB and guardian/public<=4096;
+shared transport/deadlines unchanged. Existing POSIX read locks and fixed inputs,
+projected packages/holds/pending/architecture and bounded resource/locale/public
+keyring facts only. Exclusive0400 artifact, interruption-safe reply accounting,
+recovery-before-collision and first-failure/cleanup custody require review.
+Two fresh independent axes next on exact committed integration, with no actual
+permit, CLI, Docker/SSH/guest/provision/build/native operation authorized to them.
+No PR/push/watch, task/criterion/dependency changes or acceptance promotion.
+First actual capture remains coordinator-only after review and sealed custody.
+All97/full-local1.0 gates remain intact; earlier actual inventory/clean shutdown
+and historical unknown timeout-descendant absence remain unchanged.
+
 ## PR101 merged; read-only build facts next — 2November2026 Sydney
 
 PR101 https://github.com/ianwijma/linuxcast/pull/101 MERGED normally at
