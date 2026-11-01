@@ -91,9 +91,18 @@ from session_owner import SessionOwner
 owner=SessionOwner(); root=owner.root
 child=owner.spawn([sys.executable,'-c',"import os,time; p=os.fork(); (os.setsid(),os.fork()) if p==0 else None; time.sleep(30)"])
 time.sleep(.1);owner.refresh(); retained=list(owner.handles)
-raised=False;clean=True
+raised=False;clean=True;clock_calls=0;expired_after_reap=False
+real_clock=time.monotonic;started=real_clock()
+def after_owned_reap():
+ global clock_calls,expired_after_reap
+ clock_calls+=1
+ # Do not reap on behalf of production cleanup. Advance only after its Popen
+ # poll and kernel absence prove every retained fixture child is already gone.
+ if clock_calls>1 and child.returncode is not None and all(not os.path.exists(f'/proc/{pid}') for pid in retained):
+  expired_after_reap=True;return started+6
+ return real_clock()
 try:
- with mock.patch.object(owner,'refresh',side_effect=OSError('SYNTHETIC_DISCOVERY_FAILURE')):
+ with mock.patch.object(owner,'refresh',side_effect=OSError('SYNTHETIC_DISCOVERY_FAILURE')),mock.patch('session_owner.time.monotonic',side_effect=after_owned_reap):
   try: clean=owner.cleanup()
   except Exception: raised=True
  dead=all(not os.path.exists(f'/proc/{pid}') for pid in retained)
@@ -108,7 +117,7 @@ finally:
   try: os.waitpid(-1,0)
   except ChildProcessError: break
  shutil.rmtree(root,ignore_errors=True)
-print(json.dumps({'reportedFailure':not clean,'noRaise':not raised,'allRetainedReaped':dead,'directReaped':child.returncode is not None,'unverifiedRootPreserved':preserved}))
+print(json.dumps({'reportedFailure':not clean,'noRaise':not raised,'allRetainedReaped':dead,'directReaped':child.returncode is not None,'unverifiedRootPreserved':preserved,'deadlineAfterOwnedReap':expired_after_reap}))
 '''
         result = subprocess.run([sys.executable, "-B", "-c", program], cwd=HERE,
                                 env={"PATH": "/usr/bin:/bin"}, capture_output=True, timeout=9)
@@ -117,7 +126,7 @@ print(json.dumps({'reportedFailure':not clean,'noRaise':not raised,'allRetainedR
 
     def test_cleanup_reaps_a_popen_child_when_pidfd_acquisition_failed(self):
         program = r'''
-import json,shutil,sys
+import json,shutil,sys,time
 from unittest import mock
 from session_owner import SessionOwner
 owner=SessionOwner();root=owner.root;calls=0
@@ -127,13 +136,20 @@ def fail_after_spawn():
  calls+=1
  if calls>1: raise OSError('SYNTHETIC_PIDFD_EXHAUSTION')
  refresh()
+clock_calls=0;expired_after_reap=False;real_clock=time.monotonic;started=real_clock()
+def after_owned_reap():
+ global clock_calls,expired_after_reap
+ clock_calls+=1
+ if clock_calls>1 and child.returncode is not None:
+  expired_after_reap=True;return started+6
+ return real_clock()
 try:
- with mock.patch.object(owner,'refresh',side_effect=fail_after_spawn):
+ with mock.patch.object(owner,'refresh',side_effect=fail_after_spawn),mock.patch('session_owner.time.monotonic',side_effect=after_owned_reap):
   try: owner.spawn([sys.executable,'-c','import time;time.sleep(30)'])
   except OSError: pass
   child=owner.children[-1]
   clean=owner.cleanup()
- print(json.dumps({'reportedFailure':not clean,'directReaped':child.returncode is not None,'noPidfd':not owner.handles,'unverifiedRootPreserved':root.exists()}))
+ print(json.dumps({'reportedFailure':not clean,'directReaped':child.returncode is not None,'noPidfd':not owner.handles,'unverifiedRootPreserved':root.exists(),'deadlineAfterOwnedReap':expired_after_reap}))
 finally:
  if child.poll() is None: child.kill()
  child.wait(timeout=2);shutil.rmtree(root,ignore_errors=True)

@@ -60,3 +60,30 @@ before inventory execution. No real permit, SSH command, guest start or native j
 was created/executed by this account update. Native/build/receipt/full-task gates
 remain unchanged. The closed inventory implementation and frozen protocol were
 not edited.
+
+
+## Initial reviews received; corrected source requires final recheck
+
+Standards002b32cf and Security/Specf502bf17 completed onabff18ac. Their distinct
+P2s (malformed package identity and cancellation during reply publication) are
+coordinator-fixed with old-source failing regressions. The default5s production
+cleanup and18s mapped timeout remain unchanged; two test-only clocks advance only
+after actual owned-child reaping, preserving all failure/absence assertions.
+Current57inventory/9session-owner/55mapped checks pass;265 Python cases11.860s.
+A fresh independent recheck must cover both corrections and the test-clock change.
+F2 capture Security/Spec47865d99 separately completed clear ona411f882 with165/86/3
+checks,12extra probes and three failing controlled faults; separate Standards is
+still required. These successful Codex runs invalidate the earlier account-wide
+quota assumption; no provider change occurred.
+
+The prepared host candidate from exactabff comprised lab_owner.py (SHA d3b5c60d...),
+lab_inventory_owner.py (56c12732...) and fixed inventory (a7f1095d...), each0400
+under a0500 private directory. Source bytes were copied from Git, independently
+hashed and synced; the existing lock inode/mode were retained. Fresh host-only
+Docker metadata matched pinned Config/HostConfig/Mounts/container/image and exited
+PID0/exit0. This establishes no guest/SSH/probe/native proof. On review findings,
+that exact directory was renamed to
+`/home/ian/Projects/ianwijma/linuxcast/.worktrees/private-lab/f102-inventory-candidate-abff18a-rejected`
+with inode/bytes preserved and its former path retired. No real permit was created
+or owner invoked. Do not reuse it; corrected reviewed source needs fresh pins and
+custody. Private user-data/key files stayed unread.

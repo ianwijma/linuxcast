@@ -78,6 +78,8 @@ def package_versions(raw):
     seen = set()
     for paragraph in raw.split('\n\n'):
         need(len(paragraph) <= 131072)
+        if not paragraph.strip():
+            continue
         fields = {}
         for line in paragraph.splitlines():
             need(len(line) <= 16384)
@@ -86,7 +88,10 @@ def package_versions(raw):
             key, sep, value = line.partition(': ')
             need(sep and key not in fields)
             fields[key] = value
-        package = fields.get('Package')
+        package = fields.get('Package', '')
+        # Validate identity before filtering: a malformed foreign/unnamed stanza
+        # cannot be represented as known absence of the selected packages.
+        need(re.fullmatch(r'[a-z0-9][a-z0-9+.-]+', package))
         if package in versions:
             need(package not in seen)
             seen.add(package)
@@ -557,7 +562,9 @@ class InventoryLab(owner.NativeLab):
         expected = 'uid1000' if route == 'sudo-noninteractive' else 'absent'
         owner.require(reply['facts']['identity']['sudoIdentity'] == expected, 'protocol')
         owner.require(len(owner.encoded(dict(result, inventoryReply=reply, transportResultValid=True))) <= 4096, 'output')
-        result['inventoryReply'] = reply
+        # One plain-dict publication keeps reply and validity consistent across
+        # cancellation before returning to the shared transaction owner.
+        result.update(inventoryReply=reply, transportResultValid=True)
         return reply['firstFailure'] == 'none'
 
 

@@ -188,3 +188,61 @@ remain byte-identical to the exact coordinator base.
 F1-02/full task, native/session/physical/audio/delivery, packaging/release and all97
 complete-local1.0 gates remain pending. No screenshot or containment, transport,
 receipt, real inventory or native acceptance claim follows from this preparation.
+
+
+## Coordinator review corrections after abff18ac
+
+Initial Standards002b32cf found no separate documented-rule or material Fowler
+smell issue, and reported a P2 Spec defect: unnamed dpkg stanzas became known
+package absence. Initial Security/Specf502bf17 found a different P2: cancellation
+after reply publication but before validity publication caused final protocol
+validation to replace the original interrupted outcome. Both reviewed all11 paths
+atabff18ac/baseb23a3cc, independently55inventory/88owner tests, AST/hashes/plan and
+clean state. Spec additionally exercised six combined synthetic faults. It failed
+the mapped55-check command twice at its18s Python bound; an inherited208-case
+subset also timed out, so attribution to the new inventory code was unproved.
+No complete263-case independent mapped pass was claimed.
+
+Coordinator fixes directly validate a nonempty stanza's package identity before
+filtering and publish reply plus validity in one plain-dict update. Missing,
+empty, invalid or orphan continuation identities now leave package facts unknown
+and return the packages failure; unrelated valid names and blank separators stay
+valid. The name grammar follows [Debian Policy5.6.1/5.6.7](https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-source).
+A trace-injected interruption immediately before or after publication preserves
+firstFailure=interrupted and successful cleanup, with internally consistent reply
+and validity. Both new regression methods fail reviewedabff source and pass fixed
+source. No shared native owner or production SessionOwner code changed.
+
+The coordinator reproduced the mapped timeout. An explicit diagnostic run completed
+all265 tests in20.866s, not a mapped-gate pass. Two inherited persistent-discovery
+fault fixtures each waited5s after real termination/reaping. Only those tests now
+advance their injected monotonic clock after production sets Popen.returncode and,
+for retained descendants, the kernel confirms their known proc entries are absent.
+The injected clock never reaps or kills a child. All original failure, root
+preservation, termination and reaping assertions remain; an added assertion requires
+deadline advance after actual reaping. With termination deliberately suppressed,
+both negative controls still detect failure, do not advance early and complete
+their existing fallback cleanup. The first private control initially confused a
+post-fallback directReaped field with the pre-fallback assertion; it was corrected
+to inspect the latter. This was a probe assumption, not a production/test relaxation.
+
+Current validation:57inventory tests,9SessionOwner tests and55mapped F1security
+pass. The complete265-case Python payload now takes11.860s, below the unchanged18s
+limit; no skips or expected failures. Four changed/embedded AST parses, current
+inventory hashes, the one affected legacy test-fixture hash, plan and whitespace
+pass. Only that test hash was refreshed in the older controller manifest; its
+production source pins and all runtime/native deadlines stay unchanged. The
+aborted mapped runs establish neither complete-run success nor retrospective
+absence of any interrupted fixture descendants. Historical absence uncertainty is
+not replaced by the later successful runs.
+
+Before findings arrived, the coordinator copied three exact public host inputs
+fromabff into private0500/0400 candidate storage under the existing retained lab
+lock. A fresh read-only Docker inspect matched pinned identities/configuration and
+stopped PID0/exit0; no start/exec/SSH or guest source ran. After findings, the exact
+candidate directory was renamed under the same unchanged lock to
+`f102-inventory-candidate-abff18a-rejected`, preserving its inode/bytes. Its previous
+path is retired, no permit exists, and it must not be used. A corrected immutable
+bundle/source/embedded pin and real permit require the final reviewed source.
+See coordinator.md for custody and current review status. No native acceptance or
+real guest, provider, device, bus, keyring, compiler/build action follows.

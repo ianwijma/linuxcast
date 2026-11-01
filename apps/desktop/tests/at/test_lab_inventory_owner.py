@@ -9,6 +9,7 @@ import contextlib
 import copy
 import errno
 import io
+import inspect
 import json
 import os
 from pathlib import Path
@@ -230,6 +231,36 @@ class Files(unittest.TestCase):
         self.assertNotIn('nativeRuns', owner.encoded(public).decode())
         self.assertFalse((self.root / owner.MARKER).exists())
 
+    def test_interruption_before_and_after_reply_publication_preserves_first_failure(self):
+        method = inventory.InventoryLab.validate_job_reply
+        lines, start = inspect.getsourcelines(method)
+        for after in (False, True):
+            needle = "return reply['firstFailure']" if after else 'owner.require(len(owner.encoded'
+            boundary = start + next(i for i, line in enumerate(lines) if needle in line)
+            fired = []
+            def interrupt(frame, event, _arg):
+                if event == 'line' and frame.f_code is method.__code__ and frame.f_lineno == boundary:
+                    fired.append(True)
+                    sys.settrace(None)
+                    raise owner.Rejected('interrupted')
+                return interrupt
+            previous = sys.gettrace()
+            try:
+                sys.settrace(interrupt)
+                result = owner.transact(self.lease, FakeLab(self.lease))
+            finally:
+                sys.settrace(previous)
+            with self.subTest(after=after):
+                self.assertEqual(fired, [True])
+                self.assertEqual(result['firstFailure'], 'interrupted')
+                self.assertEqual(result['cleanupFailure'], 'none')
+                self.assertTrue(result['reservationClean'])
+                self.assertFalse((self.root / owner.MARKER).exists())
+                self.assertEqual(result['transportResultValid'], after)
+                self.assertEqual(result['inventoryReply'], reply() if after else None)
+                inventory.InventoryReservation.validate_reply(result)
+            self.renew()
+
     def test_partial_metadata_keeps_facts_and_first_failure_after_cleanup_fault(self):
         lab = FakeLab(self.lease, cleanup=('poweroff', True, True, True))
         value = reply()
@@ -417,6 +448,25 @@ class GuestFacts(unittest.TestCase):
             with self.subTest(size=len(raw)), self.assertRaises(PROBE['Fault']):
                 parse(raw)
 
+    def test_missing_or_invalid_package_identity_remains_unknown_before_filtering(self):
+        valid = 'Package: python3\nStatus: install ok installed\nVersion: 3.13.5\n'
+        for raw in ('Status: install ok installed\nVersion: 3.13.5\n',
+                    'Package: \nStatus: install ok installed\n',
+                    'Package: InvalidName\nStatus: install ok installed\n',
+                    'Package: unrelated name\nStatus: install ok installed\n',
+                    ' orphan continuation\n', valid + '\nStatus: install ok installed\n'):
+            with self.subTest(raw=raw):
+                with self.assertRaises(PROBE['Fault']):
+                    PROBE['package_versions'](raw)
+                value, _ = self.collect(package_text=raw)
+                self.assertEqual(value['firstFailure'], 'packages')
+                self.assertEqual(value['facts']['packages'], {'status': 'unknown', 'versions': dict.fromkeys(inventory.PACKAGES)})
+                inventory.validate_inventory(owner.encoded(value), 3)
+                with self.assertRaises(owner.Rejected):
+                    inventory.validate_inventory(owner.encoded(value), 0)
+        # Empty separators and unrelated well-formed package names remain valid.
+        self.assertEqual(PROBE['package_versions']('\n\n' + valid + '\n\n')['python3'], '3.13.5')
+
     def test_incomplete_package_or_os_identity_metadata_is_unknown_not_absence(self):
         for status in ('', 'private', 'install ok mystery'):
             with self.assertRaises(PROBE['Fault']):
@@ -442,7 +492,7 @@ class GuestFacts(unittest.TestCase):
         inventory.validate_inventory(owner.encoded(value), 3)
         self.assertIn('/var/lib/dpkg/status', touched)
 
-    def collect(self, fail=None, collision=False, unknown_proc=False):
+    def collect(self, fail=None, collision=False, unknown_proc=False, package_text=None):
         paths = []
         def text(path, limit):
             paths.append(path)
@@ -451,7 +501,7 @@ class GuestFacts(unittest.TestCase):
             if path == '/var/lib/dpkg/status':
                 if fail == 'packages':
                     raise OSError('private error body')
-                return 'Package: python3\nStatus: install ok installed\nVersion: 3.13.5\n'
+                return package_text if package_text is not None else 'Package: python3\nStatus: install ok installed\nVersion: 3.13.5\n'
             if path == '/sys/fs/cgroup/cgroup.controllers':
                 return 'cpu memory pids\n'
             if path == '/etc/passwd':

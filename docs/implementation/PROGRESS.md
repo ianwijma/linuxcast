@@ -1,83 +1,74 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — correcting quota inference; retrying Codex review
+## Current coordinator state — inventory P2 corrections; final recheck next
 
-Previous goal turn made progress: inventory checkpoint e1fa9b9 and AI first-failure
-correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 were committed. This turn adds
-one bounded F2-02 backend increment on codex/f2-02-captured-credential-leases,
-base freshly fetched approved develop b23a3cc650f98238c1190b6136889c5117266694.
-F2 checkpoint is committed at2aa405ee48b0abcffb1b39793c2e162a7dd7d736 with an
-SSH signature header; local signer identity verification lacks allowedSignersFile.
-No task/acceptance promotion. Prior Goal blockage relied too broadly on one delegated usage-limit error;
-that does not establish current account-wide quota exhaustion. The user reports
-98% GPT quota remaining. The same Codex review route will be retried; full97/local1.0 scope throughR1-03 remains unchanged.
+Previous turn made progress: same Codex/GPT-6.1 SOL/high review route was retried
+successfully. The account-wide quota claim was WRONG; user98% report contradicted
+that inference. All three initial review delegates completed normally. No provider
+switch; do not infer present account quota from one historical child error/date.
+Full97/local1.0 remains ACTIVE/incomplete; all task/criterion statuses unchanged.
 
-CredentialSettingsService now provides captureCredential() with the actual selected
-memory/persistent reference and process-local generation, and
- authorizeCapturedCredential(capture, UUIDrunId, signal) with a revocable eligibility
-lease. Exact current reference/mode/generation checked after metadata IO; immutable
-capture, copied strict admission; no silent later-current-reference substitution.
-Generations are not reused across service lifetimes in a process, never persisted
-or accepted from renderer IPC. Native session/runtime, UI, main IPC, repository,
-SecretStore implementation, shared wire and dependency versions are unchanged.
-Mutation admission/confirmation, close, observed session/storage loss and changed
-metadata revoke captures. Normal release is idempotent without aborting its signal.
-At most128 pending/live admissions; aborted metadata IO retains its slot until
-actual return. Existing IO cancellation/latency limitations remain explicit.
+Inventory initial reviews on exactabff18ac/baseb23a3cc completed/read:
+Standards002b32cf no separate rule/smell finding, but P2 malformed unnamed dpkg
+stanza became known absence. Specf502bf17 P2 interruption between inventoryReply
+and transportResultValid publication replaced original interrupted with protocol.
+Both independently55inventory/88owner/AST/hash/plan/whitespace; Spec6additional
+synthetic faults. Its mapped check failed twice at18s and inherited208-case subset
+also timed out; no complete263-case independent mapped pass. Preserve that result.
 
-Executed pinned Node24.22.1/Bun1.4.4 development-host validation:
-165 mapped F2security (38settings =17existing+21new),86units,3contracts pass;
-fulltype/scopedlint/plan/whitespace pass. Five controlled faults independently
-make focused tests fail: removed revocation, valid-after-release, caller metadata
-alias,129vs128 capacity, reused service generation. Exact fixed source restored
-before final complete checks. Initial persistent capture test counted the setup
-save's legitimate round-trip decrypt; corrected to reset the spy after setup.
-No actual provider, native/keyring, guest, bus, display/input/audio or screenshot.
-Evidence: packages/secrets/evidence/captured-credentials/. F2AC01/UI stay pending,
-historical AC02/privacy unchanged. All97criteria remain intact. Independent initial
-Standards and Security/Spec reviews still required; no PR published or merged.
+Coordinator fixes directly validate stanza identity before filtering and publish
+reply/validity in one plain-dict update. New two regression methods fail reviewed
+source and pass corrected code, covering before/after-publication interruption and
+malformed collection/host validation. No production SessionOwner/base-owner or
+native/controller/observer/parser/staging/namespace source changed. Current source
+and probe hashes are in inventory-owner-preparation/sha256.json (9files+15inputs).
 
-Saved inventory preparation e1fa9b9a8462c90997ecee20f7a51eb2f16f6285 on
-codex/f1-02-inventory-owner-preparation includes author a87058dc, two old owner/test
-hash refreshes and coordinator evidence.55mappedF1security passes, Python payload
-16.986s under unchanged18s. Frozen protocol enumerates13 keys; assignment15 was a
-counting error. Native admission/receipt gates unchanged. Both initial independent
-inventory reviews NOT STARTED. User now confirms v4 SSH account linuxcast, UID1000, key authentication and
-passwordless sudo (ALL=(ALL) NOPASSWD:ALL); root login and password authentication
-are disabled. Future inventory permit must use guestAccount=linuxcast and
-guestPrivilege=sudo-noninteractive. The cited private provisioning file was not
-read. Actual login/sudo/poweroff remains unexecuted, not inferred from provisioning.
-No account guessing/private user-data or key read, permit creation or guest action.
-Historical two timeout-fixture absences remain unknown; no retroactive clean claim.
+Parent also reproduced mapped timeout. One explicit diagnostic completed265 tests
+in20.866s, not a mapped pass. Profiling found two inherited persistent-discovery
+fault tests each spent5s retrying after actual owned termination/reaping. Only those
+test clocks now advance after production sets returncode and, for retained children,
+known proc entries disappear. They do not reap/kill on production's behalf. All
+original assertions retained; added deadline-after-reap assertions. Deliberately
+suppressed termination still fails both controls, clock does not advance early,
+and existing fallback cleanup completes. One private negative-control assumption
+was corrected to use pre-fallback absence rather than post-fallback returncode.
+Production5s cleanup,9s fixture bounds and mapped18s timeout are UNCHANGED.
 
-Saved A1 broker correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 on
-codex/a1-01-broker-integration:184unique checks (108security/66contracts/10SQLite)
-plus fulltype/scopedlint/plan pass; seven first-failure/cleanup regressions fail
-03d6b409 and pass fixed source. Preserves known normalized operation reasons and
-makes rejected SSE iterator cleanup visible after parser errors. Initial review
-954c9c19 failed from Codex quota with no final conclusion after independently
-reporting167mapped cases/staticchecks passing and finding that diagnostic defect.
-Fresh independent final review required. Atomic-config preparation c78228e remains
-saved codex/a1-01-configuration-integration; its original two reviews clear.
-A1 stays local/unpublished/unmerged/planned until whole-task F2-02/F3-01 acceptance.
-Main-only production composition must atomically match one global route/profile/
-credential capture and use actual SecretStore plus eligibility and authority leases;
-this F2 API is not production AI routing or a permission grant.
+Current validation:57inventory tests1.304s;9SessionOwner tests2.657s; all55mapped
+F1security pass with complete265Python/no skips in11.860s under18s. Four changed/
+embeddedAST parses,24inventory hashes, one affected legacy test hash, plan and
+whitespace pass. Prior aborted checks prove no retrospective fixture absence;
+historical two early-timeout absences remain unknown. Final fresh independent
+recheck must cover both P2s plus explicitly coordinator-owned test-clock/hash change.
 
-The user initially selected waiting rather than an alternate provider, then
-reported98% GPT quota remaining and challenged the account-wide exhaustion claim.
-Retract that claim: only one prior delegated provider-session error is verified;
-its cause and relationship to the displayed account quota are unknown. Retry a
-fresh independent review on the SAME Codex provider/GPT-6.1 SOL/high. Do not switch
-provider, read credentials or infer current quota from the historical reset date.
-Account identity uncertainty is resolved by supplied provisioning evidence. No active delegates/test processes/PRwatches
-after this checkpoint. No new PR. Next: required independent F2/inventory reviews
-and fresh AI final review when the prescribed model can run; prompt focused F2/
-inventory PRs on passing reviews/CI, preserving all native/full-task gates. Continue
-actual guest account/build/provenance/UID/PID1/outer/native work only under reviewed
-owners and accurate permits. Current product/Orca native runs remain zero. Current checkout branch is
-codex/f1-02-inventory-owner-preparation for this documentation-only account update;
-F2/API and AI corrections remain saved separately at the refs above.
+Public host candidate copy fromabff was prepared under existing lock with3 exact
+Git source inputs0400/dir0500. Fresh read-only Docker metadata matched pinned
+container/image/config/mounts and stopped PID0/exit0. No start/exec/SSH/guest action.
+On finding arrival, exact directory renamed with bytes/inode preserved to
+private-lab/f102-inventory-candidate-abff18a-rejected; former path retired. Do not
+reuse. No permit exists; corrected reviewed code needs a fresh immutable bundle.
+User confirms linuxcast UID1000, key authentication/passwordless sudo; root/password
+SSH disabled. Actual login/sudo/poweroff unproved; no private user-data/key read.
+
+F2 capture candidate a411f88202541ada057662da7863ab6cae21af6d on
+codex/f2-02-captured-credential-leases retains exact signed2aa405e package sources.
+Initial Security/Spec47865d99 completed/read CLEAR: independently165security,
+86units/3contracts,12extra private probes,3behavioral fault controls, fulltype/
+scopedlint/plan/whitespace and6hashes. Separate initial Standards remains needed.
+F2AC01/UI/whole/native pending; historicalAC02/privacy unchanged. A1 preparation
+stays local planned/unmerged behind whole F2/F3 prerequisites.
+
+AI correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 remains saved on
+codex/a1-01-broker-integration,184checks/staticvalidation pass, seven regressions
+fail03d6/passfixed. Fresh final independent recheck remains needed. Atomicconfig
+c78228e retains earlier clear reviews. No production/provider/keyring/native proof.
+
+Root codex/f1-02-inventory-owner-preparation, approved baselineb23a3cc. Source
+correction commit next, then fresh bounded final review. Next capacity also serves
+F2 Standards and AI final review; only completed callbacks were read, no running
+child polls. No active delegates, PRwatches or root test process after current
+checks. No PR yet. Resolve current reviews/CI then prompt focused PR merges; preserve
+full native/four-session/AT/physical/performance/package/R1-03 scope and all97tasks.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

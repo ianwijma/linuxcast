@@ -151,5 +151,36 @@
     }
   },
   "unchangedExistingAtAndEvidenceFiles": 49,
-  "postCheckpointCorrection": "Refuse selected package records without valid dpkg status, retain held installed package versions, refuse missing OS ID and empty proc directory; no lifecycle/native change."
+  "postCheckpointCorrection": "Refuse selected package records without valid dpkg status, retain held installed package versions, refuse missing OS ID and empty proc directory; no lifecycle/native change.",
+  "coordinatorReviewCorrections": {
+    "reviewedHead": "abff18ac26666daa3f4382d54ec2a08182a91e51",
+    "initialReviews": {
+      "standards": "002b32cf: no separate standards/smell findings; P2 malformed package identity",
+      "securitySpec": "f502bf17: P2 interruption/reply accounting; mapped Python timed out twice, baseline208 also timed out"
+    },
+    "parentBeforeClockFix": {
+      "inventoryTests": 57,
+      "diagnosticPythonTests": 265,
+      "diagnosticSeconds": 20.866,
+      "diagnosticIsMappedPass": false,
+      "mappedSecurity": "54/55; Python18s timeout"
+    },
+    "current": {
+      "inventoryTests": 57,
+      "sessionOwnerTests": 9,
+      "mappedSecurity": 55,
+      "mappedPythonTests": 265,
+      "mappedPythonSeconds": 11.86,
+      "mappedPythonBoundSeconds": 18,
+      "skips": 0,
+      "expectedFailures": 0,
+      "astParses": 4,
+      "fixtureTerminationFaultControls": 2,
+      "originalFindingRegressions": "both fail reviewed source; pass fixed source"
+    },
+    "changes": "Inventory parser/reply atomic publication; test-only monotonic advance after real owned reaping; production SessionOwner and all runtime/test timeouts unchanged",
+    "stagedCandidate": "abff18a exact public host source copy; rejected directory renamed under retained existing lock; no permit or owner/guest invocation",
+    "finalIndependentRecheck": "pending",
+    "nativeAcceptance": "pending"
+  }
 }
