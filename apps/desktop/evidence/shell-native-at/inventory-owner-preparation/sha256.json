@@ -32,5 +32,7 @@
     "apps/desktop/tests/at/controller-protocol.md": "676cf91a4f63cf9152eb9c42b8201c165948bf61bf2c5788f4b6eeeb189c0dad",
     "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410",
     "apps/desktop/tests/at/product_controller.py": "c089c03e1e44e3bdca8b1db56c61050daeabae18b9513d1fa79118f3599a7fa8"
-  }
+  },
+  "unchangedInputsCommit": "fbb1d203fa3d0d354d72fc5e06d35c267f08d9d6",
+  "unchangedInputsNote": "Exact reviewed input snapshot; later task-record/card integration evidence does not change acceptance wording/status/dependencies. Code and embedded-source hashes remain current."
 }
