@@ -6,11 +6,11 @@
     "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
     "apps/desktop/tests/at/lab_inventory_owner.py": "667465b6263b8beca17e48fb9b67070ae4586b6123f01babca245b17f8ac396c",
     "apps/desktop/tests/at/test_lab_inventory_owner.py": "17942e7e112fc52eb9d2c427494d4343449bd10de9fb8ecd31629d10cb5f1b37",
-    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "71a63ce1dffd3bd4ec5e8bb987edbda8e4f0a52f46137a16b9d304726f5ca710",
-    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/checks.json": "2e1e01819877ab7d4e279f22a947c554625ff82d71f40af85f6b63e97747e8fc",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "7f09834b874e5b8c6ada4bee9e0cb0f3a2dd27dd14bc21e7afb1899bec1fc3eb",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/checks.json": "7655e23b11f8a0e4e8ec2fc9d25dffbcdcd8197f9c7c33f43caf52daac322879",
     "apps/desktop/tests/at/test_session_owner.py": "561a2b4fcbfd69a6e1dbb95282de2304c6228c4b96b4ad48efa1d9a7ab3dffcf",
     "apps/desktop/evidence/shell-native-at/controller-preparation/coordinator-sha256.json": "bb06ba23f3d27fce386c7da596cc3a35f3cc359de5c64c41bea7fe1e65e7e103",
-    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/coordinator.md": "b70c326b581ca6fa6471eeff6dd83d5a134440e5bd25ed9fe8d32ee5253d2091"
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/coordinator.md": "b38b204c1daf8fd4630ba7be8c1c398b12a0e81ee3e203309aa0e6d24ba2e401"
   },
   "embeddedGuestSource": {
     "sha256": "e871579786dbdc4925233f95145396c168c89ed4d4a749950387bb918e5818c2",

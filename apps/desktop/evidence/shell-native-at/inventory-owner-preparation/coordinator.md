@@ -87,3 +87,15 @@ that exact directory was renamed to
 with inode/bytes preserved and its former path retired. No real permit was created
 or owner invoked. Do not reuse it; corrected reviewed source needs fresh pins and
 custody. Private user-data/key files stayed unread.
+
+
+## Publication readiness
+
+Fresh final reviewer dc86be7a completed at exacta744b7b/baseabff18ac: Standards and
+Security/Spec clear, bothP2s closed, no new actionable findings. Independently
+55mapped/265Python11.759s under18s,57inventory/88owner/9SessionOwner, both old-source
+negative controls, both suppressed-termination controls,4publication/cleanup and
+14grammar probes,4AST/24inventory hashes/legacy test pin/plan/whitespace pass.
+The code reviewed at a744b7b is unchanged by publication metadata. Actual public
+host source candidate remains rejected; fresh approved immutable custody and exact
+permit are still required before a first real inventory invocation.

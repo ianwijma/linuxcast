@@ -180,7 +180,27 @@
     },
     "changes": "Inventory parser/reply atomic publication; test-only monotonic advance after real owned reaping; production SessionOwner and all runtime/test timeouts unchanged",
     "stagedCandidate": "abff18a exact public host source copy; rejected directory renamed under retained existing lock; no permit or owner/guest invocation",
-    "finalIndependentRecheck": "pending",
+    "finalIndependentRecheck": "clear at a744b7b; see finalIndependentRecheck; actual acceptance remains pending",
     "nativeAcceptance": "pending"
+  },
+  "finalIndependentRecheck": {
+    "review": "dc86be7a",
+    "head": "a744b7b072a950d178c684987009d4aeca2ecf6e",
+    "base": "abff18ac26666daa3f4382d54ec2a08182a91e51",
+    "standards": "clear",
+    "securitySpec": "both P2s closed; no new actionable findings",
+    "mappedSecurity": 55,
+    "pythonCases": 265,
+    "pythonSeconds": 11.759,
+    "pythonBoundSeconds": 18,
+    "focusedInventory": 57,
+    "focusedOwner": 88,
+    "focusedSessionOwner": 9,
+    "oldSourceRegressionMethodsFail": 2,
+    "suppressedTerminationControlsDetect": 2,
+    "extraPublicationCleanupCombinations": 4,
+    "extraPackageNameProbes": 14,
+    "cleanBeforeAfter": true,
+    "nativeExecuted": false
   }
 }

@@ -246,3 +246,21 @@ path is retired, no permit exists, and it must not be used. A corrected immutabl
 bundle/source/embedded pin and real permit require the final reviewed source.
 See coordinator.md for custody and current review status. No native acceptance or
 real guest, provider, device, bus, keyring, compiler/build action follows.
+
+
+## Final independent correction recheck
+
+Reviewer dc86be7a reviewed exacta744b7b/baseabff18ac and relevant full13-path
+increment. Standards clear; Security/Spec closes both originalP2s with no new
+P1/P2/P3. Independently55mapped checks pass, all265Python/no skips in11.759s under
+unchanged18s, focused57inventory/88owner/9SessionOwner pass. Both regressions fail
+reviewedBASE and passfixedHEAD in private copies; both termination-suppression
+controls detect missing reaping without advancing early and complete fallback.
+Four extra publication/cleanup combinations and14package probes pass after one
+extra fixture corrected its missing selected-package Status. FourAST/24inventory
+hashes/embedded pin+size/affected legacy test hash/unchanged production pins/plan/
+whitespace pass, exactcleanbeforeafter. No lab/native actions in that review.
+These checks close this bounded correction only; actual inventory transport,
+privilege/poweroff, immutable source/permit/build and full native/UI/release gates
+remain pending. Subsequent coordinator publication metadata leaves tested code
+byte-identical toa744b7b.
