@@ -1,6 +1,6 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — account confirmed; waiting for Codex review quota
+## Current coordinator state — correcting quota inference; retrying Codex review
 
 Previous goal turn made progress: inventory checkpoint e1fa9b9 and AI first-failure
 correction b7f291218d4fb4910e4cf6340d9decda7af3e0f3 were committed. This turn adds
@@ -8,8 +8,9 @@ one bounded F2-02 backend increment on codex/f2-02-captured-credential-leases,
 base freshly fetched approved develop b23a3cc650f98238c1190b6136889c5117266694.
 F2 checkpoint is committed at2aa405ee48b0abcffb1b39793c2e162a7dd7d736 with an
 SSH signature header; local signer identity verification lacks allowedSignersFile.
-No task/acceptance promotion. Persistent Goal is BLOCKED on unavailable independent
-review quota; full97/local1.0 scope throughR1-03 remains unchanged.
+No task/acceptance promotion. Prior Goal blockage relied too broadly on one delegated usage-limit error;
+that does not establish current account-wide quota exhaustion. The user reports
+98% GPT quota remaining. The same Codex review route will be retried; full97/local1.0 scope throughR1-03 remains unchanged.
 
 CredentialSettingsService now provides captureCredential() with the actual selected
 memory/persistent reference and process-local generation, and
@@ -63,10 +64,13 @@ Main-only production composition must atomically match one global route/profile/
 credential capture and use actual SecretStore plus eligibility and authority leases;
 this F2 API is not production AI routing or a permission grant.
 
-The user explicitly selected WAIT FOR CODEX QUOTA. Keep prescribed GPT-6.1
-SOL/high and do not switch provider or retry known quota-failing delegates. Account
-identity uncertainty is resolved by supplied provisioning evidence; review quota
-remains the observed external blocker. No active delegates/test processes/PRwatches
+The user initially selected waiting rather than an alternate provider, then
+reported98% GPT quota remaining and challenged the account-wide exhaustion claim.
+Retract that claim: only one prior delegated provider-session error is verified;
+its cause and relationship to the displayed account quota are unknown. Retry a
+fresh independent review on the SAME Codex provider/GPT-6.1 SOL/high. Do not switch
+provider, read credentials or infer current quota from the historical reset date.
+Account identity uncertainty is resolved by supplied provisioning evidence. No active delegates/test processes/PRwatches
 after this checkpoint. No new PR. Next: required independent F2/inventory reviews
 and fresh AI final review when the prescribed model can run; prompt focused F2/
 inventory PRs on passing reviews/CI, preserving all native/full-task gates. Continue

@@ -50,8 +50,11 @@ transport must use `-l linuxcast` and the existing `/usr/bin/sudo -n --` prefix.
 No account guessing, password prompt or root-login fallback is introduced.
 
 The user explicitly chose **wait for Codex quota**, declining the proposed alternate
-provider. Keep GPT-6.1 SOL/high for non-UI independent reviews; no new review run or
-provider substitution while quota remains unavailable. Initial Standards and
+provider. The later user report of98% remaining GPT quota corrects the coordinator
+inference: the historical delegated usage-limit error did not establish current
+account-wide exhaustion. Keep GPT-6.1 SOL/high on the same Codex provider and retry
+a fresh review; no alternate provider/model or authentication change is authorized
+or needed for that retry. The provider-session error cause remains unknown. Initial Standards and
 Security/Spec reviews, reviewed-source custody and permit binding remain required
 before inventory execution. No real permit, SSH command, guest start or native job
 was created/executed by this account update. Native/build/receipt/full-task gates
