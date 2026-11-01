@@ -1,5 +1,28 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR102 merged; first read-only build-facts capture next
+
+PR102 https://github.com/ianwijma/linuxcast/pull/102 merged normally at
+40bac5ccf903feace841515ab52f29879cf62471 from1e9943e26ec58a2418489388a23cb04ff366d1ec.
+Current-head Planning CI41323704410 SUCCESS; MERGEABLE/CLEAN, no requested or
+submitted GitHub reviews, terminal CodeRabbit SKIPPED/no actionable feedback.
+Fresh rulesets[] and develop protection404; no override. Exact-head normal merge
+confirmed, immediate tiny merge blurb sent, watch removed (wasWatching=true).
+Final independent065a6691 Standards/Security-Spec clear atc512d5f,93focused/
+55mapped/all388Python10.303s under18s plus22 probes, current/historical controls
+and hashes/AST/plan passed. Publication only added metadata; reviewed code exact.
+
+Root now codex/f1-02-build-facts-capture from approved40bac5c. Next prepare protected
+byte-identical approved source, fresh same-domain14-key metadata permit and one
+fixed coordinator-only capture, retaining exact private artifact/output custody.
+Verify original root/lock identity and fresh exact stopped/PID0/exit0 baseline;
+same linuxcast UID1000/passwordless sudo, start/guardian/30s job/45s cleanup/600s
+owner budgets unchanged. No package operation, native permit, account/resource
+provisioning, source/build/receipt/native dispatch or effect adapter permitted.
+No actual build-facts invocation yet at this checkpoint. Prior inventory facts,
+actual clean shutdown and historical unknown timeout-descendant absence unchanged.
+F1-02 in-progress/UI pending; all97 task/criterion/dependency states unchanged.
+
 ## Build-facts final independent review clear; publication next
 
 Final065a6691 completed/read at c512d5f581f67b8f7096863b317a547554dc7d92,
