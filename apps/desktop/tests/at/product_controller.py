@@ -5,6 +5,7 @@ dependency, product executable, catalogue, timeout extension or input retry.
 """
 import argparse
 import ctypes
+import errno
 import hashlib
 import fcntl
 import stat
@@ -136,8 +137,31 @@ def proof_descriptor():
     return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid, info.st_nlink, info.st_size)
 
 
-def consume_attestation():
+class ProofCustody:
+    """One close attempt across CLI, run, preflight and consumption boundaries."""
+    def __init__(self):
+        self.attempted = False
+        self.uncertain = False
+
+    def close(self):
+        if self.attempted:
+            return
+        # Linux may release a descriptor before close reports an error. Never
+        # retry that number: later staging/session work can reuse it.
+        self.uncertain = True
+        self.attempted = True
+        try:
+            os.close(3)
+        except OSError as error:
+            if error.errno != errno.EBADF:
+                raise
+        self.uncertain = False
+
+
+def consume_attestation(proof=None):
     """FD3 is consumed even for invalid proof; closure precedes any stage work."""
+    if proof is None:
+        proof = ProofCustody()
     try:
         try:
             os.set_inheritable(3, False)
@@ -179,7 +203,7 @@ def consume_attestation():
             identity_maps()
             proof_require(proof_descriptor() == before)
         finally:
-            os.close(3)  # including malformed/absent proof and failed close-on-exec
+            proof.close()  # same owner remains live across function-entry cancellation
     except BaseException:
         raise ControllerRejected('prerequisite') from None
 
@@ -194,8 +218,8 @@ def validate(*args, **kwargs):
     return validate_stage(*args, **kwargs)
 
 
-def preflight(staging, node, total):
-    consume_attestation()
+def preflight(staging, node, total, proof=None):
+    consume_attestation(proof)
     # The network namespace is prepared by the reviewed lab wrapper. Refuse to
     # create it here or to run on the normal guest/host network as a fallback.
     release = platform.freedesktop_os_release()
@@ -426,14 +450,15 @@ def sequence(owner, total, staging, node, reader, log, report):
         report.add(step, flags)
 
 
-def run(staging, node, destination, display):
+def run(staging, node, destination, display, proof=None):
     report = Report()
     owner = None
-    proof_pending = True
+    proof_uncertain = False
     try:
+        if proof is None:
+            proof = ProofCustody()
         total = Deadline(240)
-        proof_pending = False  # preflight now owns consumption on every exit
-        receipt_pin = preflight(staging, node, total)
+        receipt_pin = preflight(staging, node, total, proof=proof)
         owner = SessionOwner()
         reader, log = infrastructure(owner, total, display, report)
         sequence(owner, total, staging, node, reader, log, report)
@@ -446,11 +471,12 @@ def run(staging, node, destination, display):
     except BaseException:
         report.fail("prerequisite", report.failed_step)
     finally:
-        if proof_pending:
-            try:
-                os.close(3)  # even an early clock/deadline-construction fault
-            except OSError:
-                report.fail('prerequisite', report.failed_step)
+        try:
+            if proof is None:
+                proof = ProofCustody()  # construction failed before any close attempt
+            proof.close()
+        except BaseException:
+            proof_uncertain = True
         signal.setitimer(signal.ITIMER_REAL, 0)
         # A second termination signal cannot interrupt verification halfway.
         for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
@@ -465,6 +491,7 @@ def run(staging, node, destination, display):
             report.cleaned = False
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
+        report.cleaned = report.cleaned and not proof_uncertain and proof is not None and not proof.uncertain
         if not report.cleaned:
             report.fail("cleanup", report.failed_step)
     publish(destination, report.public())
@@ -472,6 +499,21 @@ def run(staging, node, destination, display):
 
 
 def main():
+    proof = ProofCustody()
+    result = 3
+    try:
+        result = _main(proof)
+    except BaseException:
+        pass  # fixed failure result; the shared custody guard still closes
+    finally:
+        try:
+            proof.close()
+        except BaseException:
+            result = 3
+    return 3 if proof.uncertain else result
+
+
+def _main(proof):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviewed-controller", action="store_true", required=True)
     parser.add_argument("--staging", type=Path, required=True)
@@ -488,13 +530,9 @@ def main():
         signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(ControllerRejected("deadline")))
         signal.setitimer(signal.ITIMER_REAL, 240)
     except BaseException:
-        try:
-            os.close(3)
-        except OSError:
-            pass  # failure still returns3; never retry an ambiguously closed fd
         return 3
     try:
-        result = run(staging, node, args.new_evidence, args.display)
+        result = run(staging, node, args.new_evidence, args.display, proof=proof)
     except BaseException:
         print("Controller incomplete: private publication or cleanup unavailable. Review the protocol prerequisites.")
         return 3

@@ -1,5 +1,6 @@
 """Operational error boundaries with injected adapters, never a native run."""
 import json
+import inspect
 import copy
 import builtins
 import ctypes
@@ -32,10 +33,22 @@ class FakeOwner:
         return self.clean_result
 
 
+class FakeProof:
+    uncertain = False
+
+    def close(self):
+        pass
+
+
 class FailureTests(unittest.TestCase):
     def setUp(self):
         self.signals = {sig: signal.getsignal(sig) for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGALRM)}
         self.addCleanup(lambda: [signal.signal(sig, handler) for sig, handler in self.signals.items()])
+        # These older lifecycle fixtures replace preflight entirely and have no
+        # inherited proof. Keep their fake custody separate from any host FD3.
+        custody = patch.object(controller, 'ProofCustody', return_value=FakeProof())
+        custody.start()
+        self.addCleanup(custody.stop)
 
     def test_each_failure_stops_and_cleans_without_publishing_private_payload(self):
         for error, reason in ((ControllerRejected("deadline"), "deadline"), (OutputRejected("private canary"), "orca"),
@@ -229,6 +242,121 @@ class ProofHarness:
 
 
 class AttestationTests(unittest.TestCase):
+    def test_interruption_at_deadline_and_preflight_consumption_handoffs_closes_proof(self):
+        call_codes = {'deadline': controller.Deadline.__init__.__code__,
+                      'preflight': controller.preflight.__code__,
+                      'consume': controller.consume_attestation.__code__}
+        source, first = inspect.getsourcelines(controller.run)
+        call_line = first + next(i for i, line in enumerate(source) if 'receipt_pin = preflight(' in line)
+        for boundary in (*call_codes, 'before-preflight'):
+            h = ProofHarness()
+            fired = []
+            def interrupt(frame, event, _arg):
+                match = (event == 'call' and frame.f_code is call_codes.get(boundary))
+                match = match or (boundary == 'before-preflight' and event == 'line'
+                                  and frame.f_code is controller.run.__code__ and frame.f_lineno == call_line)
+                if match:
+                    fired.append(boundary)
+                    sys.settrace(None)
+                    raise ControllerRejected('child')
+                return interrupt
+            with self.subTest(boundary=boundary), h.preflight() as (digest, validate), \
+                 patch.object(controller, 'SessionOwner') as owner, patch.object(controller, 'publish') as publish, \
+                 patch('signal.signal'), patch('signal.setitimer'):
+                previous = sys.gettrace()
+                try:
+                    sys.settrace(interrupt)
+                    code = controller.run(Path('/stage'), Path('/node'), Path('/unused'), 193)
+                finally:
+                    sys.settrace(previous)
+                self.assertEqual(fired, [boundary])
+                self.assertEqual(code, 3)
+                self.assertEqual(h.closed.count(3), 1)
+                owner.assert_not_called()
+                digest.assert_not_called()
+                validate.assert_not_called()
+                result = publish.call_args.args[1]
+                self.assertEqual((result['firstFailure'], result['nativeRuns'], result['cleanup']), ('child', 0, True))
+
+    def test_main_interruption_at_run_entry_retains_cleanup_ownership(self):
+        fired = []
+        def interrupt(frame, event, _arg):
+            if event == 'call' and frame.f_code is controller.run.__code__:
+                fired.append(True)
+                sys.settrace(None)
+                raise ControllerRejected('child')
+            return interrupt
+        argv = ['controller', '--reviewed-controller', '--staging', '/stage', '--node', '/node',
+                '--new-evidence', '/unused', '--display', '193']
+        with patch.object(sys, 'argv', argv), patch.object(Path, 'resolve', lambda p: p), \
+             patch('signal.signal'), patch('signal.setitimer'), patch('os.close') as close, \
+             patch.object(controller, 'SessionOwner') as owner, patch.object(controller, 'publish') as publish, \
+             patch('builtins.print'):
+            previous = sys.gettrace()
+            try:
+                sys.settrace(interrupt)
+                self.assertEqual(controller.main(), 3)
+            finally:
+                sys.settrace(previous)
+        self.assertEqual(fired, [True])
+        close.assert_called_once_with(3)
+        owner.assert_not_called()
+        publish.assert_not_called()
+
+    def test_ambiguous_proof_close_is_not_retried_and_cleanup_stays_unknown(self):
+        h = ProofHarness()
+        h.close_fault = 3
+        with h.preflight(), patch.object(controller, 'SessionOwner') as owner, \
+             patch.object(controller, 'publish') as publish, patch('signal.signal'), patch('signal.setitimer'):
+            self.assertEqual(controller.run(Path('/stage'), Path('/node'), Path('/unused'), 193), 3)
+        self.assertEqual(h.closed.count(3), 1)
+        self.assertFalse(publish.call_args.args[1]['cleanup'])
+        owner.assert_not_called()
+
+    def test_closed_proof_number_reused_by_later_owner_is_not_closed_again(self):
+        h = ProofHarness()
+        fresh = {'alive': False}
+        def close(fd):
+            h.closed.append(fd)
+            if fd == 3 and fresh['alive']:
+                fresh['alive'] = False
+        def owner():
+            self.assertEqual(h.closed.count(3), 1)
+            fresh['alive'] = True  # synthetic FD3 now belongs to a different resource
+            return FakeOwner()
+        with h.preflight(), patch('os.close', side_effect=close), \
+             patch.object(controller, 'SessionOwner', side_effect=owner), \
+             patch.object(controller, 'infrastructure', side_effect=ControllerRejected('child')), \
+             patch.object(controller, 'publish'), patch('signal.signal'), patch('signal.setitimer'):
+            self.assertEqual(controller.run(Path('/stage'), Path('/node'), Path('/unused'), 193), 3)
+        self.assertTrue(fresh['alive'])
+        self.assertEqual(h.closed.count(3), 1)
+
+    def test_interruption_at_close_attempt_cannot_advertise_verified_cleanup(self):
+        h = ProofHarness()
+        source, first = inspect.getsourcelines(controller.ProofCustody.close)
+        attempt = first + next(i for i, line in enumerate(source) if 'os.close(3)' in line)
+        fired = []
+        def interrupt(frame, event, _arg):
+            if (event == 'line' and frame.f_code is controller.ProofCustody.close.__code__
+                    and frame.f_lineno == attempt):
+                fired.append(True)
+                sys.settrace(None)
+                raise ControllerRejected('child')
+            return interrupt
+        with h.preflight(), patch.object(controller, 'publish') as publish, \
+             patch.object(controller, 'SessionOwner') as owner, patch('signal.signal'), patch('signal.setitimer'):
+            previous = sys.gettrace()
+            try:
+                sys.settrace(interrupt)
+                self.assertEqual(controller.run(Path('/stage'), Path('/node'), Path('/unused'), 193), 3)
+            finally:
+                sys.settrace(previous)
+        self.assertEqual(fired, [True])
+        self.assertFalse(publish.call_args.args[1]['cleanup'])
+        self.assertEqual(h.closed.count(3), 0)  # no retry of an uncertain close attempt
+        owner.assert_not_called()
+
     def test_valid_proof_allows_pid1_denial_and_is_closed_before_stage(self):
         h = ProofHarness()
         with h.preflight() as (digest, validate):

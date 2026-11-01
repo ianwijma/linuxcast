@@ -1,5 +1,46 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Namespace FD3 custody correction — final independent recheck next
+
+Both initial reviews completed/read at00e261702eb70a66ca4a2320ae7a02fa437aadfb:
+Standards68e794e0 and SecuritySpecb0cccb33 each found one sameP2: proof_pending
+cleared beforepreflight/consume entryguard couldtakeownership. Traceinterruption
+left FD3 open/inheritable with cleanuptrue/nativeRuns0. No other actionable
+finding; deliberate root/stage boundaryduplication accepted. Eachindependent
+53wrapper/19controller/290Python/55mapped security (8.951/9.037Python) passes.
+No actualguest/native/provision action; sourcecheckouts clean, callbacks consumed.
+
+Coordinator directly fixes smallfinding with one ProofCustody object spanning
+CLI→run→preflight→consume. Unknown state is recorded beforecloseattempt, confirmed
+close/EBADF clears it; no retry of ambiguous/reusedFD3. Real closeuncertainty makes
+report.cleanupfalse without changing firstcause/nativecount. Outer custodycovers
+Deadline construction, preflight/consume entries and CLI/run entry. Same proof/
+namespace/maps/capability/receipt/child lifecycle gates; no CLInewauthority.
+Five meaningful newmethods cover these cancellation boundaries, ambiguousclose,
+reusednumericdescriptor and interruptionatcloseattempt. Originalthree regression
+methods fail exactreviewed00e2617 (5failures/0errors) and passfixed; duplicateclose
+and untrackeduncertainty privatefault controls eachfail theirbehavioraltest.
+No trackedsource mutation. FirsthelperROOTparentindeximporterror corrected before
+behavioral controls, notproductfailure. Oldlifecyclemocks nowuse fakeproofcustody.
+
+Current24controller/55mappedsecurity/all295Python no skips pass; finalmapped9.22s,
+Python8.129s underunchanged18s. Both30historical/currenthashsets and allAST/plan/
+whitespace pass. Current two files intentionallydifferfromauthor96b42643; old
+source-hashes.json remains historical. Newcoordinator-custody-sha256.json and
+coordinator-custody-correction.md distinguish currentcorrection/evidence. Installed
+wrapper/tree/source/archive/receipt/permit/pins stillhistorical pendingreconcile.
+No new operational/root/guest/provisioning/build/native action or acceptance.
+Finalfresh independent boundedrecheck next; no namespacePR yet.
+
+Read-only buildfacts design continues separately: full bounded projectedDPKG
+status/holds/architecture/pending/locks and resource facts neededbefore exact
+offline resolution; no installauthority. Officialdpkg1.22.22 arch/dbmodify sources
+read, confirms POSIX frontend/database locksequence and package DB journal reads;
+no host/guest dpkg invoked. All97/full1.0 remainsACTIVE/incomplete. No rootcommand,
+test, delegate or PRwatch live at this checkpoint; originaltwo actual inventories
+and cleanshutdown results remain as recorded. No unknowncleanupgap retrospectively
+closed by currenttests; no product/Orca run occurred.
+
 ## Namespace integration frozen for initial review — 2November2026 Sydney
 
 Root codex/f1-02-namespace-attestation integrates signed authorca103865/96b42643

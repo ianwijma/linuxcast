@@ -1,5 +1,11 @@
 # F1-02 namespace attestation — offline prerequisite preparation
 
+The initial author evidence below is historical at96b42643/00e2617. Both
+independent initial reviews found an FD3 cleanup handoff gap; the coordinator
+correction and current source hashes are recorded in
+[coordinator-custody-correction.md](coordinator-custody-correction.md).
+Final independent recheck remains pending; no actual native execution follows.
+
 Prepared 2 November 2026 Sydney in
 `/home/ian/.t3/worktrees/linuxcast/t3-456ef112`, branch
 `codex/f1-02-namespace-proof`, exact assigned base
