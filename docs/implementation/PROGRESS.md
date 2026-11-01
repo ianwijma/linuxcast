@@ -1,64 +1,71 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — PR98 merged; captured credentials publication
+## Current coordinator state — first actual inventory returned partial facts
 
-Full97/local1.0 Goal ACTIVE, incomplete; task/criterion statuses unchanged.
-The account-wide quota claim was wrong: successful same-model Codex reviews
-followed user98% report. No provider/model switch or private credential read.
+Full97/local1.0 Goal ACTIVE and incomplete. Registry remains8done/20inprogress/
+69planned;56passed/325pending/8justifiedN/A. PR98 merged4cdf978, PR99 mergedc71ef81;
+independent reviews/CI and tiny merge blurbs completed as recorded below. No
+whole-task or criterion promotion. Current branch codex/f1-02-live-inventory.
 
-Inventory sourcea744b7b072a950d178c684987009d4aeca2ecf6e on
-codex/f1-02-inventory-owner-preparation is now independently clear. Initial
-Standards002b32cf found malformed-stanzaP2; Specf502bf17 found interrupted reply
-accountingP2 plus full Python18s timeout (inherited208 also timed out). Parent
-fixed both, and only two TEST clocks now advance after real owned-child reaping
-instead of waiting5s each; runtime5s/fixture9s/mapped18s limits unchanged. Existing
-assertions retained and suppressed termination is detected. No production
-SessionOwner/native/controller/parser/staging/observer/namespace source change.
+FIRST REAL reviewed inventory ran 2026-11-01T13:02:14.587652Z through
+13:03:21.511290Z (2November Sydney), 66.924s, exit3. Exact reviewed sourcea744b7b
+copied from approvedc71ef81 into private0500/0400 directory; exact13-field0400
+permit bound source/probe and retained root. User-confirmed linuxcast UID1000/
+key auth/noninteractive sudo reached root with expected sudo identity. No private
+user-data/key reads, account guessing, automatic retry, installation or build.
+The three fixed source/manifest bytes and retained root/lock custody verified.
 
-Fresh finaldc86be7a exacta744/baseabff closes bothP2s, Standards+Security/Spec clear;
-independently55mappedF1security/all265Python11.759s/no skips under18s;57inventory/
-88owner/9SessionOwner,2old-source failing methods,2termination-fault controls,
-4publication-cleanup combinations,14package probes,4AST/24inventoryhashes/
-legacytestpin/plan/whitespace pass. Metadata-only publication commit follows;
-code remains byte-identicaltoa744. PR98 merged at4cdf97876af63efbeac62690c7621922c997619c fromfbb1d203 after
-currenthead PlanningCI41307709636 SUCCESS, independent final review clear, no
-requested/submitted GitHub reviews or rulesets/protection. CodeRabbit terminal
-skip (repository below automatic-review threshold), no actionable feedback.
-Expected-head normal merge; tiny merge blurb sent immediately; watch absent. All native/UI/full-task gates remain pending.
+Owner schema validates: incomplete/firstFailuretransport, transportResultValidtrue;
+guest firstFailurepackages and packagesunknown. Other actual facts: Debian13
+amd64; compiler/make/pkg-config executables absent; UID/GID20000 absent and idle;
+98bounded processes, zero graphical/test candidates. Dropped-privilege child
+self net/PID metadata allowed, both PID1 metadata denied, cleanuptrue. This now
+establishes the prior native-wrapper feasibility blocker; equality staysunknown.
+No namespace created/changed and no wrapper checks relaxed.
 
-Initial public host-only source copyfromabff is renamed
-private-lab/f102-inventory-candidate-abff18a-rejected; originalpath retired,
-bytes/inode retained. Fresh read-only Docker configuration/identity/stoppedPID0/
-exit0 matched while preparing it, no start/exec/SSH/guest. Do not reuse it.
-Fresh immutable reviewed sources plus strict13field permit required after merge.
-User confirms linuxcast UID1000, keyauth/passwordlesssudo, root/passwordSSHdisabled;
-actual login/sudo/poweroff still unproved. Historical timeout absence gaps unknown.
+Actual cleanup succeeds independently of the inventory failure: owner reports
+ownedChildrenAbsent/containerStoppedVerified/reservationCleantrue, cleanupnone.
+Fresh exactDocker configuration and exited/runningfalse/PID0/exit0 verified;
+marker absent, original lock inode/mode reacquired, exact caller reaped, stderr0.
+New evidence apps/desktop/evidence/shell-native-at/inventory-actual-20261101/.
+Private original output and immutable old sources/permit preserved separately;
+no current corrected-source permit or second invocation. Historical timeout
+absence gaps remainunknown; no retrospective proof follows. Product/Orca runs0.
 
-F2 capture candidatea411f88202541ada057662da7863ab6cae21af6d, source2aa405e,
-codex/f2-02-captured-credential-leases: both initial reviews completed/read clear.
-Security/Spec47865d99 independently165security/86units/3contracts,12extra probes,
-3failing faults/static/6hashes; Standards03715988 independently38settings/86units/
-3contracts/fulltype/scopedlint/plan/whitespace/6hashes, no hardrule/materialsmell.
-No actual keyring/provider/native acceptance. Its branch now merges approveddevelop4cdf978 after PR98. Only PROGRESS conflicted;
-resolved from merged checkpoint while preserving both feature sources. All five
-reviewed package source/contract/README paths remain byte-identicaltoa411.
-Post-integration55F1security (265Python11.504s),165F2security/3contracts, fulltype/
-scopedlint/plan/whitespace pass. Focused PR publication next; no task/native promotion. Temp draft
-PR body /tmp/linuxcast-f2-captured-credentials-pr.md awaits final review text.
+Offline parser fixture proves valid deb822 multiline Conffiles colon-only first
+line and optional horizontal padding fail the old literal-colon-space parser.
+Small correction uses colon plus stripped horizontal value padding, retaining
+strict package identity/status/version/duplicates/size limits. Four whitespace
+cases fail oldsource/passfixed;58inventory/55mappedsecurity includingall266Python
+underexisting18s pass (Python11.050s). Exact private guest input not collected:
+this is a plausible cause of packagesunknown, not confirmed guest diagnosis.
+Embedded source nowe0daca440dde220277820e4d300ee2fb804244b8d37c1d8b44b9aa5caefebd08,
+19170bytes; old actual-run pinse871... remain historical in postflight. Source/
+evidence hashes refreshed, unchanged normative snapshot remainsfbb1d203. Initial
+independent Standards39f1c16c and SecuritySpec004b1237 are clear on084e7dc;
+both independently58inventory/55mapped/all266Python under18s, old-source
+negative controls, malformed/bounds/strict-publication controls, typecheck/
+AST/hash/plan/whitespace. Both exact clean checkouts; live run inherited.
 
-AI correctionb7f291218d4fb4910e4cf6340d9decda7af3e0f3 saved separately on
-codex/a1-01-broker-integration:184checks/staticvalidation pass. Fresh finalbf157bdd completed/read clear atb7f2912/base4e4c63c: all original
-retirement/choice/tool-order/first-failure findings closed; independently184mapped
-checks/staticvalidation and8private probe groups,7old-source failing regressions
-pass. No new actionable Security/Spec/Standards findings. No native/provider proof. A1 preparations stay local/unmerged/planned until
-whole F2/F3 accepted; configurationc78228e retains original clear reviews.
+Next authorized work: integrate reviewed correction, fresh reviewed inventory
+only if needed; narrowly reviewed provisioning/build owner and source/receipt;
+attest namespace identity across privilege drop without CAP_SYS_PTRACE or weaker
+isolation. Actual compiler/toolchain/install/recovery/nativeAT/fourdesktop/
+physical/performance/package/release gates still required. Never reuse oldnative
+wrapper approved-tree or fake a native receipt/permit to provision prerequisites.
 
-No active delegates or PRwatches after all known-completed results read. Next:
-finish merged-develop F2 checks, publish/CI/merge and tiny blurb; then fresh immutable
-inventory source custody/strict permit and first real bounded metadata attempt.
-Then actual reviewed inventory with fresh source custody/permit and separate
-real transport/cleanup evidence; immutable Debian product build/receipt, UID20000/
-PID1/namespace/nativeAT/four-session/physical/performance/package/R1-03 still pending.
+AI backend b7f2912 and configurationc78228e remain reviewed, local/unpublished/
+unmerged/PLANNED behind fullF2/F3 dependency gates. Finalbf157bdd cleared all
+originalretirement/choice-error/tool-order/first-failure issues with184mapped,
+8privateprobe groups and7negativecontrols. NewF2capture API exists ondevelop;
+actual main/utility/caller/UI/persistence composition still required.
+
+No active real owner, tests or delegates at this checkpoint. Parser PR publication
+and currentCI/GitHub-review inspection next. Separate saved namespace-contract
+branch bdae18d freezes root-observed sealed-data handoff, not executable native
+proof; implementation/review still required. No PRwatch yet. Future
+UI uses Opus5.5medium; nonUI delegates SOLhigh. Prior account-wide quota inference
+was false: same-provider fresh reviews completed. All97/full1.0 scope preserved.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

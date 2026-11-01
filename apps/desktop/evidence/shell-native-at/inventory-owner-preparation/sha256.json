@@ -4,17 +4,17 @@
   "files": {
     "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
     "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
-    "apps/desktop/tests/at/lab_inventory_owner.py": "667465b6263b8beca17e48fb9b67070ae4586b6123f01babca245b17f8ac396c",
-    "apps/desktop/tests/at/test_lab_inventory_owner.py": "17942e7e112fc52eb9d2c427494d4343449bd10de9fb8ecd31629d10cb5f1b37",
-    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "7f09834b874e5b8c6ada4bee9e0cb0f3a2dd27dd14bc21e7afb1899bec1fc3eb",
+    "apps/desktop/tests/at/lab_inventory_owner.py": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108",
+    "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/README.md": "93d72f1786b047c44ef7e63974abd79ab31065c41774b110b3e4752ef9337874",
     "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/checks.json": "7655e23b11f8a0e4e8ec2fc9d25dffbcdcd8197f9c7c33f43caf52daac322879",
     "apps/desktop/tests/at/test_session_owner.py": "561a2b4fcbfd69a6e1dbb95282de2304c6228c4b96b4ad48efa1d9a7ab3dffcf",
     "apps/desktop/evidence/shell-native-at/controller-preparation/coordinator-sha256.json": "bb06ba23f3d27fce386c7da596cc3a35f3cc359de5c64c41bea7fe1e65e7e103",
     "apps/desktop/evidence/shell-native-at/inventory-owner-preparation/coordinator.md": "b38b204c1daf8fd4630ba7be8c1c398b12a0e81ee3e203309aa0e6d24ba2e401"
   },
   "embeddedGuestSource": {
-    "sha256": "e871579786dbdc4925233f95145396c168c89ed4d4a749950387bb918e5818c2",
-    "bytes": 19004
+    "sha256": "e0daca440dde220277820e4d300ee2fb804244b8d37c1d8b44b9aa5caefebd08",
+    "bytes": 19170
   },
   "unchangedInputs": {
     "AGENTS.md": "178cc4ac29d12d854e6960f3bfcf0925882c6dda86cbeb3440c669d7bed25ee8",
@@ -32,5 +32,7 @@
     "apps/desktop/tests/at/controller-protocol.md": "676cf91a4f63cf9152eb9c42b8201c165948bf61bf2c5788f4b6eeeb189c0dad",
     "apps/desktop/tests/at/lab_namespace.py": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410",
     "apps/desktop/tests/at/product_controller.py": "c089c03e1e44e3bdca8b1db56c61050daeabae18b9513d1fa79118f3599a7fa8"
-  }
+  },
+  "unchangedInputsCommit": "fbb1d203fa3d0d354d72fc5e06d35c267f08d9d6",
+  "unchangedInputsNote": "Exact reviewed input snapshot; later task-record/card integration evidence does not change acceptance wording/status/dependencies. Code and embedded-source hashes remain current."
 }

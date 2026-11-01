@@ -435,6 +435,23 @@ class Protocols(unittest.TestCase):
 
 
 class GuestFacts(unittest.TestCase):
+    def test_deb822_colon_and_horizontal_whitespace_are_not_literal_space_delimiters(self):
+        # dpkg's multiline Conffiles field starts with an empty first line;
+        # the value follows on a continuation. Only selected versions escape.
+        for whitespace in ('', ' ', '\t', ' \t'):
+            raw = ('Package:' + whitespace + 'python3\n'
+                   'Status:' + whitespace + 'install ok installed\n'
+                   'Version:' + whitespace + '3.13.5-1\t \n'
+                   'Conffiles:\n /etc/public 0123456789abcdef0123456789abcdef\n')
+            with self.subTest(whitespace=whitespace):
+                versions = PROBE['package_versions'](raw)
+                self.assertEqual(versions['python3'], '3.13.5-1')
+                self.assertIsNone(versions['orca'])
+                value, _ = self.collect(package_text=raw)
+                self.assertEqual(value['firstFailure'], 'none')
+                self.assertEqual(value['facts']['packages']['status'], 'known')
+                inventory.validate_inventory(owner.encoded(value), 0)
+
     def test_bounded_packages_selected_versions_only_and_absence(self):
         parse = PROBE['package_versions']
         value = parse('Package: python3\nStatus: install ok installed\nVersion: 3.13.5-1\nDescription: public\n continuation\n\nPackage: unrelated\nStatus: install ok installed\nVersion: private\n')

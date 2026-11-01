@@ -1,0 +1,10 @@
+{
+  "automaticRetries": 0,
+  "elapsedSeconds": 66.924,
+  "exactCallerReaped": true,
+  "exitCode": 3,
+  "finishedAtUtc": "2026-11-01T13:03:21.511290+00:00",
+  "jobKind": "inventory-only",
+  "schemaVersion": 1,
+  "startedAtUtc": "2026-11-01T13:02:14.587652+00:00"
+}
