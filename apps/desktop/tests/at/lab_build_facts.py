@@ -678,7 +678,7 @@ class BuildFactsReservation(owner.Reservation):
     def __init__(self, root=owner.LAB):
         super().__init__(root)
         self.artifact_writer = None
-        self.artifactfd = None
+        self._artifactfd = None
         self.artifact_id = self.artifact_raw = None
         self.artifact_uncertain = False
 
@@ -687,10 +687,6 @@ class BuildFactsReservation(owner.Reservation):
         if self.artifact_writer is not None and not self.artifact_writer.closed:
             return self.artifact_writer.fileno()
         return self._artifactfd
-
-    @artifactfd.setter
-    def artifactfd(self, value):
-        self._artifactfd = value
 
     def permit(self, base_sha, source_sha, probe_sha):
         pin = self.read_permit()
@@ -771,7 +767,7 @@ class BuildFactsReservation(owner.Reservation):
             # No Python finally handoff and no alarm masking/retry are needed.
             self.artifact_writer.close()
             owner.require(self.artifact_writer.closed, 'custody')
-            self.artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK,
+            self._artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK,
                                       dir_fd=self.rootfd)
             self.artifact_uncertain = False
             self.check()
@@ -810,7 +806,7 @@ class BuildFactsReservation(owner.Reservation):
                     # Caller independently reopens the guardian's exact identity.
                     self.artifact_raw = None
                     self.artifact_id = (value['artifact']['device'], value['artifact']['inode'])
-                    self.artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
+                    self._artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
                                               dir_fd=self.rootfd)
                     raw = owner.read_fd(self.artifactfd, MAX_SNAPSHOT)
                     owner.require(len(raw) == value['buildFacts']['bytes']
@@ -842,7 +838,7 @@ class BuildFactsReservation(owner.Reservation):
             except BaseException:
                 success = False
         elif self.artifactfd is not None:
-            fd, self.artifactfd = self.artifactfd, None
+            fd, self._artifactfd = self._artifactfd, None
             try:
                 self.check_artifact_closed(fd)
             except BaseException:

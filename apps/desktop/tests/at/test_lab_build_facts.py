@@ -1124,6 +1124,71 @@ class Files(unittest.TestCase):
     def test_hard_alarm_after_writer_close_preserves_a_reused_unrelated_descriptor(self):
         self.alarm_at_writer_close(True)
 
+    def reader_acquisition_signals(self, route):
+        for signum in (signal.SIGALRM, signal.SIGTERM):
+            with self.subTest(route=route, signal=signum), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                prepare(root)
+                lease = reserved(root)
+                if route == 'caller':
+                    value = owner.transact(lease, FakeLab(lease))
+                    lease.close()
+                    lease = reserved(root)
+                method = build.BuildFactsReservation.publish if route == 'publish' else build.BuildFactsReservation.validate_reply
+                lines, start = inspect.getsourcelines(method)
+                acquired = start + next(i for i, line in enumerate(lines) if
+                                        'self.artifactfd = os.open' in line or 'self._artifactfd = os.open' in line) + 2
+                setter = build.BuildFactsReservation.artifactfd.fset
+                captured, fired = [], []
+                real_open = os.open
+                def opened(path, flags, *args, **kwargs):
+                    fd = real_open(path, flags, *args, **kwargs)
+                    if path == lease.artifact_name() and not flags & os.O_CREAT:
+                        captured.append((fd, owner.identity(os.fstat(fd))))
+                    return fd
+                def interrupted(*_):
+                    raise owner.Rejected('deadline' if signum == signal.SIGALRM else 'interrupted')
+                def trace(frame, event, _arg):
+                    if event == 'line' and captured and not fired:
+                        in_setter = setter is not None and frame.f_code is setter.__code__ and frame.f_locals.get('value') == captured[0][0]
+                        retained_directly = setter is None and frame.f_code is method.__code__ and frame.f_lineno == acquired
+                        if in_setter or retained_directly:
+                            fired.append(True)
+                            signal.raise_signal(signum)
+                    return trace
+                previous = signal.signal(signum, interrupted)
+                try:
+                    with patch.object(owner.os, 'open', opened):
+                        try:
+                            sys.settrace(trace)
+                            result = owner.transact(lease, FakeLab(lease)) if route == 'publish' else lease.validate_reply(value)
+                        finally:
+                            sys.settrace(None)
+                            signal.signal(signum, previous)
+                    self.assertEqual(fired, [True])
+                    self.assertEqual(len(captured), 1)
+                    self.assertFalse(result['transportResultValid'] or result['reservationClean'])
+                    self.assertFalse(lease.close())
+                    with self.assertRaises(OSError) as caught:
+                        os.fstat(captured[0][0])
+                    self.assertEqual(caught.exception.errno, errno.EBADF)
+                finally:
+                    sys.settrace(None)
+                    signal.signal(signum, previous)
+                    lease.close()
+                    for fd, identity in captured:
+                        try:
+                            if owner.identity(os.fstat(fd)) == identity:
+                                os.close(fd)
+                        except OSError:
+                            pass
+
+    def test_reader_acquisition_signals_during_publish_retain_exact_reader(self):
+        self.reader_acquisition_signals('publish')
+
+    def test_reader_acquisition_signals_during_caller_validation_retain_exact_reader(self):
+        self.reader_acquisition_signals('caller')
+
     def test_artifact_replacement_during_write_is_preserved_and_never_adopted(self):
         path = self.root / self.lease.artifact_name()
         real = os.pwrite

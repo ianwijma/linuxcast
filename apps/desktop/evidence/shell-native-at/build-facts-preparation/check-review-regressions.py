@@ -27,6 +27,11 @@ CLOSE_METHODS = (
     'Files.test_hard_alarm_before_writer_close_retires_the_exact_open_writer',
     'Files.test_hard_alarm_after_writer_close_preserves_a_reused_unrelated_descriptor',
 )
+READER_BASE = '8cf1b32afdf342e75831dab2effadf1bf25bad9f'
+READER_METHODS = (
+    'Files.test_reader_acquisition_signals_during_publish_retain_exact_reader',
+    'Files.test_reader_acquisition_signals_during_caller_validation_retain_exact_reader',
+)
 
 
 def run(source, methods=METHODS):
@@ -58,9 +63,17 @@ if __name__ == '__main__':
     green_close, green_log = run((AT / 'lab_build_facts.py').read_bytes(), CLOSE_METHODS)
     assert red_close == 1 and 'failures=2' in red_log and 'errors=' not in red_log, red_log
     assert green_close == 0 and 'Ran 2 tests' in green_log and green_log.rstrip().endswith('OK'), green_log
+    old_reader = subprocess.check_output(['git', 'show', READER_BASE + ':apps/desktop/tests/at/lab_build_facts.py'], cwd=ROOT)
+    red_reader, red_log = run(old_reader, READER_METHODS)
+    green_reader, green_log = run((AT / 'lab_build_facts.py').read_bytes(), READER_METHODS)
+    assert red_reader == 1 and 'failures=4' in red_log and 'errors=' not in red_log, red_log
+    assert green_reader == 0 and 'Ran 2 tests' in green_log and green_log.rstrip().endswith('OK'), green_log
     print(json.dumps({'baseline': BASE, 'methods': len(METHODS),
                       'reviewed': {'exit': old_code, 'failures': 11, 'errors': 0},
                       'fixed': {'exit': new_code, 'failures': 0, 'errors': 0},
                       'closeBaseline': CLOSE_BASE, 'closeMethods': len(CLOSE_METHODS),
                       'reviewedClose': {'exit': red_close, 'failures': 2, 'errors': 0},
-                      'fixedClose': {'exit': green_close, 'failures': 0, 'errors': 0}}))
+                      'fixedClose': {'exit': green_close, 'failures': 0, 'errors': 0},
+                      'readerBaseline': READER_BASE, 'readerMethods': len(READER_METHODS),
+                      'reviewedReader': {'exit': red_reader, 'failures': 4, 'errors': 0},
+                      'fixedReader': {'exit': green_reader, 'failures': 0, 'errors': 0}}))

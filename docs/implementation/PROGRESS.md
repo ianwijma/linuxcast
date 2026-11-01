@@ -1,5 +1,22 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts reader setter correction ready for final recheck
+
+Independent9a318340 completed/read at8cf1b32: writer P2 resolved and Standards
+clear, new reader P2 from Python property setter receiving an unowned rawFD.
+Real SIGALRM/SIGTERM at setter entry leak readers in publication/caller routes.
+Coordinator removes setter; both opens and initialization/retirement now use
+direct reader backing field. Read-only accessor and C FileIO writer unchanged.
+Two new tests cover four real route/signal cases:4behavioral failures/0errors on
+exact8cf1b32, fixedgreen; exact identity-checked fallback closes fixture leaks.
+Historical controls retain original11fail, writer2fail and reader4fail/0errors
+with current11methods green.93focused pass1.366s; actual55mapped11.49s, Python
+388cases10.222s under unchanged18s. Current/historical manifests/AST/plan kept
+distinct; type/lint inherited unchanged-TS. No cleanfinal claim, PR, watch,
+permit, capture, guest/build/native action or acceptance promotion. All97/task/
+criterion/dependency states and historical unknown absence unchanged. Fresh final
+recheck next; evidence build-facts-preparation/coordinator-reader-custody.md.
+
 ## Build-facts writer hard-alarm correction ready for fresh recheck
 
 Final9ed544ac review complete/read atf15abda: Standards clear; four original P2s
