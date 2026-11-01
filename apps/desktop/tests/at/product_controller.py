@@ -4,7 +4,10 @@ CLI refuses host/nonisolated environments. No fallback display, bus, reader,
 dependency, product executable, catalogue, timeout extension or input retry.
 """
 import argparse
+import ctypes
 import hashlib
+import fcntl
+import stat
 import json
 import os
 from pathlib import Path
@@ -15,7 +18,6 @@ import time
 
 from controller_protocol import ControllerRejected, FAILURES, Report, STEPS, decode, publish, snapshot
 from orca_output import FreshOutput, OutputRejected
-from product_staging import receipt_digest, validate
 from session_owner import Channel, Deadline, SessionOwner, socket_ready
 
 HERE = Path(__file__).resolve().parent
@@ -46,15 +48,166 @@ TARGETS = {
 }
 
 
+# Independent, closed verifier for the root wrapper's data-only handoff. No
+# wrapper import, namespace FD, caller path, environment override or fallback.
+NS_TYPES = {'net': 0x40000000, 'mnt': 0x20000, 'pid': 0x20000000, 'user': 0x10000000}
+PROOF_SEALS = fcntl.F_SEAL_WRITE | fcntl.F_SEAL_GROW | fcntl.F_SEAL_SHRINK | fcntl.F_SEAL_SEAL
+
+
+def proof_require(condition):
+    if not condition:
+        raise ControllerRejected('prerequisite')
+
+
+
+def proc_mount(fd, lib):
+    # Linux amd64 ABI: statfs.f_type at0; statx mask at0, mount ID at0x90.
+    # Require the returned STATX_MNT_ID bit: unavailable is never equivalent.
+    fs = ctypes.create_string_buffer(256)
+    proof_require(lib.fstatfs(fd, ctypes.byref(fs)) == 0)
+    proof_require(ctypes.c_long.from_buffer(fs).value == 0x9fa0)  # PROC_SUPER_MAGIC
+    sx = ctypes.create_string_buffer(256)
+    proof_require(lib.statx(fd, b'', 0x1000, 0x1000, ctypes.byref(sx)) == 0)  # AT_EMPTY_PATH, STATX_MNT_ID
+    proof_require(ctypes.c_uint32.from_buffer(sx).value & 0x1000)
+    mount = ctypes.c_uint64.from_buffer(sx, 0x90).value
+    proof_require(mount > 0)
+    return mount
+
+
+def proc_text(name):
+    """Read only current maps/stat from genuine proc, with no file bind overlay.
+
+    Anchoring to proc root inode1 plus equal kernel mount IDs defeats both a
+    fabricated mapping file and a real proc file bound from a different task.
+    There is no fdinfo/mountinfo text whose authority could itself be overlaid.
+    """
+    proof_require(name in ('uid_map', 'gid_map', 'stat'))
+    lib = ctypes.CDLL(None, use_errno=True)
+    root = os.open('/proc', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    try:
+        base = os.fstat(root)
+        proof_require(stat.S_ISDIR(base.st_mode) and base.st_ino == 1)
+        mount = proc_mount(root, lib)
+        fd = os.open('self/' + name, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=root)
+        try:
+            info = os.fstat(fd)
+            proof_require(stat.S_ISREG(info.st_mode) and info.st_dev == base.st_dev and proc_mount(fd, lib) == mount)
+            raw = b''
+            while True:
+                chunk = os.pread(fd, 4097 - len(raw), len(raw))
+                proof_require(type(chunk) is bytes and len(raw) + len(chunk) <= 4096)
+                if not chunk:
+                    break
+                raw += chunk
+            return raw.decode('ascii')
+        finally:
+            os.close(fd)
+    finally:
+        os.close(root)
+
+
+def identity_maps():
+    for name in ('uid_map', 'gid_map'):
+        proof_require([row.split() for row in proc_text(name).splitlines()]
+                      == [['0', '0', '4294967295']])
+
+
+def own_namespaces():
+    pairs = {}
+    for name, kind in NS_TYPES.items():
+        fd = os.open('/proc/self/ns/' + name, os.O_RDONLY | os.O_CLOEXEC)
+        try:
+            info = os.fstat(fd)
+            proof_require(fcntl.ioctl(fd, 0xb703) == kind)  # NS_GET_NSTYPE
+            pairs[name] = [info.st_dev, info.st_ino]
+        finally:
+            os.close(fd)
+    return pairs
+
+
+def proof_descriptor():
+    info = os.fstat(3)
+    proof_require(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode) == 0o400
+                  and info.st_uid == info.st_gid == 0 and info.st_nlink == 0
+                  and 0 < info.st_size <= 4096)
+    proof_require(fcntl.fcntl(3, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY)
+    proof_require(fcntl.fcntl(3, fcntl.F_GET_SEALS) == PROOF_SEALS)
+    proof_require(os.readlink('/proc/self/fd/3') == '/memfd:linuxcast-f102-namespace (deleted)')
+    return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid, info.st_nlink, info.st_size)
+
+
+def consume_attestation():
+    """FD3 is consumed even for invalid proof; closure precedes any stage work."""
+    try:
+        try:
+            os.set_inheritable(3, False)
+            identity_maps()  # root ownership alone is spoofable inside a userns
+            before = proof_descriptor()
+            raw = b''
+            while len(raw) < before[-1]:
+                part = os.pread(3, before[-1] - len(raw), len(raw))
+                proof_require(type(part) is bytes and 0 < len(part) <= before[-1] - len(raw))
+                raw += part
+            proof_require(os.pread(3, 1, len(raw)) == b'' and proof_descriptor() == before)
+
+            def unique(items):
+                value = {}
+                for key, item in items:
+                    proof_require(key not in value)
+                    value[key] = item
+                return value
+
+            value = json.loads(raw, object_pairs_hook=unique)
+            proof_require(type(value) is dict and set(value) == {'schema', 'initial', 'isolated', 'subject'}
+                          and value['schema'] == 'f102-namespace-v1')
+            for field in ('initial', 'isolated'):
+                proof_require(type(value[field]) is dict and set(value[field]) == set(NS_TYPES))
+                for pair in value[field].values():
+                    proof_require(type(pair) is list and len(pair) == 2
+                                  and all(type(n) is int and 0 < n < 2 ** 64 for n in pair))
+            for name in NS_TYPES:
+                proof_require((value['initial'][name] == value['isolated'][name]) is (name in ('pid', 'user')))
+            subject = value['subject']
+            proof_require(type(subject) is dict and set(subject) == {'pid', 'startTicks'}
+                          and type(subject['pid']) is int and 0 < subject['pid'] < 2 ** 31
+                          and type(subject['startTicks']) is int and 0 < subject['startTicks'] < 2 ** 64)
+            process = proc_text('stat')
+            pid, tail = process.split(' (', 1)
+            proof_require(subject == {'pid': os.getpid(), 'startTicks': int(tail.rsplit(')', 1)[1].split()[19])}
+                          and int(pid) == os.getpid())
+            proof_require(own_namespaces() == value['isolated'])
+            identity_maps()
+            proof_require(proof_descriptor() == before)
+        finally:
+            os.close(3)  # including malformed/absent proof and failed close-on-exec
+    except BaseException:
+        raise ControllerRejected('prerequisite') from None
+
+
+def receipt_digest(*args, **kwargs):
+    from product_staging import receipt_digest as digest
+    return digest(*args, **kwargs)
+
+
+def validate(*args, **kwargs):
+    from product_staging import validate as validate_stage
+    return validate_stage(*args, **kwargs)
+
+
 def preflight(staging, node, total):
+    consume_attestation()
     # The network namespace is prepared by the reviewed lab wrapper. Refuse to
     # create it here or to run on the normal guest/host network as a fallback.
     release = platform.freedesktop_os_release()
     if (release.get("ID") != "debian" or release.get("VERSION_ID") != "13" or platform.machine() != "x86_64"
-            or os.getuid() == 0 or Path("/proc/self/ns/net").stat().st_ino == Path("/proc/1/ns/net").stat().st_ino
+            or os.getresuid() != (20000,) * 3 or os.getresgid() != (20000,) * 3 or os.getgroups()
             or set(p.name for p in Path("/sys/class/net").iterdir()) != {"lo"}
             or Path("/dev/input").exists() or Path("/dev/snd").exists() or Path("/dev/uinput").exists()):
         raise ControllerRejected("prerequisite")
+    status = dict(line.split(':', 1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
+    if (any(int(status[key].strip(), 16) != 0 for key in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb'))
+            or status['NoNewPrivs'].strip() != '1'):
+        raise ControllerRejected('prerequisite')
     if HERE != staging / "apps/desktop/tests/at":
         raise ControllerRejected("prerequisite")
     expected = {"native_at.py": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b",
@@ -276,8 +429,10 @@ def sequence(owner, total, staging, node, reader, log, report):
 def run(staging, node, destination, display):
     report = Report()
     owner = None
-    total = Deadline(240)
+    proof_pending = True
     try:
+        total = Deadline(240)
+        proof_pending = False  # preflight now owns consumption on every exit
         receipt_pin = preflight(staging, node, total)
         owner = SessionOwner()
         reader, log = infrastructure(owner, total, display, report)
@@ -291,6 +446,11 @@ def run(staging, node, destination, display):
     except BaseException:
         report.fail("prerequisite", report.failed_step)
     finally:
+        if proof_pending:
+            try:
+                os.close(3)  # even an early clock/deadline-construction fault
+            except OSError:
+                report.fail('prerequisite', report.failed_step)
         signal.setitimer(signal.ITIMER_REAL, 0)
         # A second termination signal cannot interrupt verification halfway.
         for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
@@ -318,15 +478,23 @@ def main():
     parser.add_argument("--node", type=Path, required=True)
     parser.add_argument("--new-evidence", type=Path, required=True)
     parser.add_argument("--display", type=int, default=193)
-    args = parser.parse_args()
-    if not 100 <= args.display <= 99999:
-        return 3
-    for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
-        signal.signal(sig, lambda *_: (_ for _ in ()).throw(ControllerRejected("child")))
-    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(ControllerRejected("deadline")))
-    signal.setitimer(signal.ITIMER_REAL, 240)
     try:
-        result = run(args.staging.resolve(), args.node.resolve(), args.new_evidence, args.display)
+        args = parser.parse_args()
+        if not 100 <= args.display <= 99999:
+            raise ControllerRejected('prerequisite')
+        staging, node = args.staging.resolve(), args.node.resolve()
+        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            signal.signal(sig, lambda *_: (_ for _ in ()).throw(ControllerRejected("child")))
+        signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(ControllerRejected("deadline")))
+        signal.setitimer(signal.ITIMER_REAL, 240)
+    except BaseException:
+        try:
+            os.close(3)
+        except OSError:
+            pass  # failure still returns3; never retry an ambiguously closed fd
+        return 3
+    try:
+        result = run(staging, node, args.new_evidence, args.display)
     except BaseException:
         print("Controller incomplete: private publication or cleanup unavailable. Review the protocol prerequisites.")
         return 3

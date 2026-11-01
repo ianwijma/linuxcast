@@ -1,0 +1,44 @@
+test_post_drop_valid_root_memory_allows_pid1_denial_before_staging (test_lab_namespace.NamespaceAttestation) ... ERROR
+test_valid_proof_allows_pid1_denial_and_is_closed_before_stage (test_controller_failures.AttestationTests) ... ERROR
+test_missing_proof_stops_real_preflight_before_stage (test_controller_failures.AttestationTests) ... FAIL
+
+======================================================================
+ERROR: test_post_drop_valid_root_memory_allows_pid1_denial_before_staging (test_lab_namespace.NamespaceAttestation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ian/.t3/worktrees/linuxcast/t3-456ef112/apps/desktop/tests/at/test_lab_namespace.py", line 836, in test_post_drop_valid_root_memory_allows_pid1_denial_before_staging
+    setup.verify()
+  File "<assigned-base>/lab_namespace.py", line 742, in verify
+    require(Path('/proc/self/ns/net').stat().st_ino != Path('/proc/1/ns/net').stat().st_ino)
+  File "/home/ian/.t3/worktrees/linuxcast/t3-456ef112/apps/desktop/tests/at/test_lab_namespace.py", line 825, in meta
+    raise PermissionError('synthetic PID1 denial')
+PermissionError: synthetic PID1 denial
+
+======================================================================
+ERROR: test_valid_proof_allows_pid1_denial_and_is_closed_before_stage (test_controller_failures.AttestationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ian/.t3/worktrees/linuxcast/t3-456ef112/apps/desktop/tests/at/test_controller_failures.py", line 236, in test_valid_proof_allows_pid1_denial_and_is_closed_before_stage
+    self.assertEqual(controller.preflight(Path('/stage'), Path('/node'), None), 'public-pin')
+  File "<assigned-base>/product_controller.py", line 54, in preflight
+    or os.getuid() == 0 or Path("/proc/self/ns/net").stat().st_ino == Path("/proc/1/ns/net").stat().st_ino
+  File "/home/ian/.t3/worktrees/linuxcast/t3-456ef112/apps/desktop/tests/at/test_controller_failures.py", line 211, in metadata
+    raise PermissionError('synthetic PID1 denial')
+PermissionError: synthetic PID1 denial
+
+======================================================================
+FAIL: test_missing_proof_stops_real_preflight_before_stage (test_controller_failures.AttestationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ian/.t3/worktrees/linuxcast/t3-456ef112/apps/desktop/tests/at/test_controller_failures.py", line 249, in test_missing_proof_stops_real_preflight_before_stage
+    digest.assert_not_called()
+  File "/usr/lib/python3.10/unittest/mock.py", line 890, in assert_not_called
+    raise AssertionError(msg)
+AssertionError: Expected 'receipt_digest' to not have been called. Called 1 times.
+Calls: [call(PosixPath('/stage'), None)].
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.012s
+
+FAILED (failures=1, errors=2)
+Expected behavioral red control: True ; base: bd5873823d4ca4a6919e4ad3eace9aa6610feef7
