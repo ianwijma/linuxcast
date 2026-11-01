@@ -27,6 +27,33 @@ hash `3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a`.
 Historical snapshots are retained; this is no claim all old sections describe
 current files.
 
-Current account/transport/privilege/poweroff, dedicated-UID/PID1 feasibility,
+Actual transport/privilege/poweroff, dedicated-UID/PID1 feasibility,
 immutable Debian build/receipt, actual containment/native AT, supported sessions
 and full local1.0/release acceptance remain pending. No real permit was created.
+
+
+## Provisioned account — user-confirmed 1 November 2026
+
+The user confirmed the exact v4 guest account and requested its use for the
+reviewed inventory command:
+
+- `guestAccount`: `linuxcast`, provisioned UID1000.
+- `guestPrivilege`: `sudo-noninteractive` (passwordless sudo,
+  `ALL=(ALL) NOPASSWD:ALL`).
+- SSH uses key authentication. Root login and SSH password authentication are
+  disabled; neither is an alternate route.
+
+The user cites their provisioning user-data line3 as verification. The coordinator
+did not read that private file, SSH key material or a guest home. This is supplied
+provisioning evidence, not an executed authentication/sudo/poweroff test. The fixed
+transport must use `-l linuxcast` and the existing `/usr/bin/sudo -n --` prefix.
+No account guessing, password prompt or root-login fallback is introduced.
+
+The user explicitly chose **wait for Codex quota**, declining the proposed alternate
+provider. Keep GPT-6.1 SOL/high for non-UI independent reviews; no new review run or
+provider substitution while quota remains unavailable. Initial Standards and
+Security/Spec reviews, reviewed-source custody and permit binding remain required
+before inventory execution. No real permit, SSH command, guest start or native job
+was created/executed by this account update. Native/build/receipt/full-task gates
+remain unchanged. The closed inventory implementation and frozen protocol were
+not edited.
