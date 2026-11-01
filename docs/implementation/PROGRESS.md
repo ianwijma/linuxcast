@@ -1,6 +1,6 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Namespace FD3 custody correction — final independent recheck next
+## Namespace FD3 custody correction — final recheck clear, publish next
 
 Both initial reviews completed/read at00e261702eb70a66ca4a2320ae7a02fa437aadfb:
 Standards68e794e0 and SecuritySpecb0cccb33 each found one sameP2: proof_pending
@@ -30,7 +30,12 @@ source-hashes.json remains historical. Newcoordinator-custody-sha256.json and
 coordinator-custody-correction.md distinguish currentcorrection/evidence. Installed
 wrapper/tree/source/archive/receipt/permit/pins stillhistorical pendingreconcile.
 No new operational/root/guest/provisioning/build/native action or acceptance.
-Finalfresh independent boundedrecheck next; no namespacePR yet.
+Finalfresh7d36eb95 recheck CLEAR at6aafb140 on bothaxes: originalP2resolved,
+no newfindings; independent24controller/53wrapper/55mapped/all295Python8.233s
+under18s,21extra synthetic/owned-memfd probes, old/current/fault controls,30old/
+30current/3extrahashes/24AST/plan/whitespace pass. Cleanbefore/after, no edits or
+privilegedactions. Actualfacts inherited. No namespacePR yet; publication and
+currentCI/GitHubinspection then promptmerge next.
 
 Read-only buildfacts design continues separately: full bounded projectedDPKG
 status/holds/architecture/pending/locks and resource facts neededbefore exact

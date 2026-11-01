@@ -49,7 +49,12 @@ recorded separately in `coordinator-custody-sha256.json`; the author's original
 `source-hashes.json` remains the historical96b42643/00e2617 snapshot, not a claim
 that the two corrected files still have their original bytes.
 
-Independent final recheck is pending. No new guest, wrapper/controller CLI,
+Independent final7d36eb95 Standards and Security/Spec recheck is clear at
+6aafb140 against00e2617. Original P2 resolved with no new findings; independently
+24controller/53wrapper/55mapped/all295Python8.233s under18s, both negative-control
+groups,21additional synthetic/owned-memfd probes, historical/current/extra hashes,
+24AST/plan/whitespace pass. No source/evidence changes or privileged execution
+during review; actual inventory/public metadata remain inherited evidence. No new guest, wrapper/controller CLI,
 provisioning, build, native/Orca operation, installation, source/archive/receipt/
 permit reconciliation or acceptance promotion occurred. Full97/local1.0 and
 historical cleanup limitations remain unchanged.

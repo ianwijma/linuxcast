@@ -4,7 +4,9 @@ The initial author evidence below is historical at96b42643/00e2617. Both
 independent initial reviews found an FD3 cleanup handoff gap; the coordinator
 correction and current source hashes are recorded in
 [coordinator-custody-correction.md](coordinator-custody-correction.md).
-Final independent recheck remains pending; no actual native execution follows.
+Final independent7d36eb95 recheck is clear on6aafb140: original P2 resolved,
+no new findings on either axis. All295Python/55mapped and21extra probes pass.
+No actual native execution follows.
 
 Prepared 2 November 2026 Sydney in
 `/home/ian/.t3/worktrees/linuxcast/t3-456ef112`, branch

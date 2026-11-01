@@ -1,8 +1,8 @@
 {
   "additionalEvidence": {
-    "apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/README.md": "6b7679f8c0182628372a3b3d860b90b8e7e61e1d1dfa6b8f7e01e0a8a20f8544",
+    "apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/README.md": "3ac1f73abff6e61e5146b712d028153a2771c9b51b512748c4e46a671da6443d",
     "apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/check-custody-regressions.py": "37d2b9a961e69132091ac023628493637f4d8bbf827b593d88a6db08f67a6741",
-    "apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/coordinator-custody-correction.md": "d57b063003ece741ce7188640985cc44f152e084b4b537e48b279c5ea37b69cd"
+    "apps/desktop/evidence/shell-native-at/namespace-attestation-preparation/coordinator-custody-correction.md": "fce7137cef50cffee46810950ead8547b55c7f24707ef2736c67b97e0c6b85d4"
   },
   "authorSnapshot": "96b42643a686b3acb9d60cf4eec5e4a57e28dd53",
   "files": {
