@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "scope": "Availability only; not authenticity, signatures, future availability or package verification. Raw source bytes and fallback failures are separately recorded in primary-sources.json.",
+  "links": [
+    {
+      "url": "https://bun.sh/docs/pm/cli/install.md",
+      "checkedUtc": "2026-11-01T13:39:46.431816+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://bun.sh/docs/pm/cli/install.md"
+    },
+    {
+      "url": "https://bun.sh/docs/pm/global-cache",
+      "checkedUtc": "2026-11-01T13:39:46.432782+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://bun.sh/docs/pm/global-cache"
+    },
+    {
+      "url": "https://ftp-master.debian.org/keys.html",
+      "checkedUtc": "2026-11-01T13:39:46.433130+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://ftp-master.debian.org/keys.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/apt/apt-get.8.en.html",
+      "checkedUtc": "2026-11-01T13:39:46.435289+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/apt/apt-get.8.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/apt/apt-secure.8.en.html",
+      "checkedUtc": "2026-11-01T13:39:46.435653+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/apt/apt-secure.8.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/apt/apt.conf.5.en.html",
+      "checkedUtc": "2026-11-01T13:39:46.435971+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/apt/apt.conf.5.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/apt/apt_preferences.5.en.html",
+      "checkedUtc": "2026-11-01T13:39:46.497695+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/apt/apt_preferences.5.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/dpkg-dev/deb-version.7.en.html",
+      "checkedUtc": "2026-11-01T13:39:46.501180+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/dpkg-dev/deb-version.7.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/dpkg/dpkg-query.1.en.html",
+      "checkedUtc": "2026-11-01T13:39:47.130676+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/dpkg/dpkg-query.1.en.html"
+    },
+    {
+      "url": "https://manpages.debian.org/trixie/dpkg/dpkg.1.en.html",
+      "checkedUtc": "2026-11-01T13:39:47.424339+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://manpages.debian.org/trixie/dpkg/dpkg.1.en.html"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/amd64/g%2B%2B",
+      "checkedUtc": "2026-11-01T13:39:47.438489+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/amd64/g%2B%2B"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/amd64/libgio-2.0-dev/filelist",
+      "checkedUtc": "2026-11-01T13:39:47.446473+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/amd64/libgio-2.0-dev/filelist"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/amd64/libstdc%2B%2B-14-dev",
+      "checkedUtc": "2026-11-01T13:39:47.503180+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/amd64/libstdc%2B%2B-14-dev"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/libc6-dev",
+      "checkedUtc": "2026-11-01T13:39:47.569564+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/libc6-dev"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/libgio-2.0-dev",
+      "checkedUtc": "2026-11-01T13:39:48.139472+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/libgio-2.0-dev"
+    },
+    {
+      "url": "https://packages.debian.org/trixie/make",
+      "checkedUtc": "2026-11-01T13:39:48.321901+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://packages.debian.org/trixie/make"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WiseLibs/better-sqlite3/v13.0.3/binding.gyp",
+      "checkedUtc": "2026-11-01T13:39:48.456857+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://raw.githubusercontent.com/WiseLibs/better-sqlite3/v13.0.3/binding.gyp"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WiseLibs/better-sqlite3/v13.0.3/deps/sqlite3.gyp",
+      "checkedUtc": "2026-11-01T13:39:48.464611+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://raw.githubusercontent.com/WiseLibs/better-sqlite3/v13.0.3/deps/sqlite3.gyp"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/electron/electron/v45.0.0/npm/install.js",
+      "checkedUtc": "2026-11-01T13:39:48.507818+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://raw.githubusercontent.com/electron/electron/v45.0.0/npm/install.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/nodejs/node-gyp/v12.4.0/README.md",
+      "checkedUtc": "2026-11-01T13:39:48.508489+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://raw.githubusercontent.com/nodejs/node-gyp/v12.4.0/README.md"
+    },
+    {
+      "url": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/acquire-item.cc/#L1501",
+      "checkedUtc": "2026-11-01T13:39:48.732354+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/acquire-item.cc/"
+    },
+    {
+      "url": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/deb/debsystem.cc/#L269",
+      "checkedUtc": "2026-11-01T13:39:48.746922+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/deb/debsystem.cc/"
+    },
+    {
+      "url": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/init.cc/#L231",
+      "checkedUtc": "2026-11-01T13:39:49.230477+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://sources.debian.org/src/apt/3.0.3/apt-pkg/init.cc/"
+    },
+    {
+      "url": "https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html",
+      "checkedUtc": "2026-11-01T13:39:49.329075+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html"
+    },
+    {
+      "url": "https://www.debian.org/doc/debian-policy/ch-relationships.html",
+      "checkedUtc": "2026-11-01T13:39:49.379542+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://www.debian.org/doc/debian-policy/ch-relationships.html"
+    },
+    {
+      "url": "https://www.electronjs.org/docs/latest/tutorial/using-native-node-modules",
+      "checkedUtc": "2026-11-01T13:39:49.407215+00:00",
+      "method": "HEAD; no response body download",
+      "status": 200,
+      "finalUrl": "https://www.electronjs.org/docs/latest/tutorial/using-native-node-modules"
+    }
+  ]
+}

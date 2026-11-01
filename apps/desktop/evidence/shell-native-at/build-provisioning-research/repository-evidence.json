@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "baseCommit": "bd5873823d4ca4a6919e4ad3eace9aa6610feef7",
+  "baseTree": "ab3d17aea5f41f4027ddc4c3bf9a9dd74bbbc288",
+  "branch": "codex/f1-02-offline-build-provisioning-research",
+  "kind": "read-only repository evidence inventory; no executable/build proof",
+  "files": {
+    "AGENTS.md": {
+      "sha256": "178cc4ac29d12d854e6960f3bfcf0925882c6dda86cbeb3440c669d7bed25ee8",
+      "lines": 32
+    },
+    "CONTRIBUTING.md": {
+      "sha256": "40bc2c7a403ae55b46aec575d0a63b5b548805e9a96917acb4a5724abfe0fcdb",
+      "lines": 28
+    },
+    "docs/PLAN.md": {
+      "sha256": "4b8e437d470074a3ca11b57cd0bb01c7e745d250b3812a4a7b3b255f0bd74181",
+      "lines": 49
+    },
+    "docs/implementation/GOAL.md": {
+      "sha256": "55abf4584c46f03b1bb6b5b77f986824fa896f9849f6503ccc76d19cc9c4d670",
+      "lines": 236
+    },
+    "docs/implementation/tasks/F1-02.md": {
+      "sha256": "1ebd6ef989f2490f8e0de58ba70a5e1707d8459af796755966f6f68b79cfa810",
+      "lines": 108
+    },
+    "docs/implementation/tasks.json": {
+      "sha256": "d5f20288fd39e475f7a18ac804c990232f96b9339c84f2b844453f9bd99427cc",
+      "lines": 9741
+    },
+    "docs/architecture/security.md": {
+      "sha256": "1ae6030431544477f0bdd63b4ec4550df7a48bde3617196b98f85db9dbf6578b",
+      "lines": 139
+    },
+    "docs/architecture/overview.md": {
+      "sha256": "4e1eac6f454b651e3444261bbf4759f2cc8846c3f2353b5a9c2a0d6ca4ccdc25",
+      "lines": 176
+    },
+    "docs/architecture/stack.md": {
+      "sha256": "f90483bc25c76fb745861efa7b6a7063abcf27dab4e6acbfeb7931a7ca2dfbc3",
+      "lines": 140
+    },
+    "docs/implementation/testing-release.md": {
+      "sha256": "75207dcb25d1584a320711be25d613e05dcd8ce53fa4a7f70dcfd1847abe22fb",
+      "lines": 71
+    },
+    "apps/desktop/tests/at/controller-protocol.md": {
+      "sha256": "676cf91a4f63cf9152eb9c42b8201c165948bf61bf2c5788f4b6eeeb189c0dad",
+      "lines": 265
+    },
+    "apps/desktop/tests/at/outer-owner-protocol.md": {
+      "sha256": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+      "lines": 164
+    },
+    "apps/desktop/tests/at/inventory-owner-protocol.md": {
+      "sha256": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f",
+      "lines": 125
+    },
+    "apps/desktop/tests/at/namespace-attestation-protocol.md": {
+      "sha256": "5c99f9389d07fbc7fe091d1f8b7e20bc811c944492fb26124a277eab6f15fa4f",
+      "lines": 106
+    },
+    "apps/desktop/tests/at/product_staging.py": {
+      "sha256": "fc84a7215b48a9c3553653fa0c34f28b6be03d31007326e0ae547f95ca8b0a7b",
+      "lines": 296
+    },
+    "apps/desktop/tests/at/test_product_staging.py": {
+      "sha256": "0b13dab0ef5c609e36a83e7087c8eabde2627ae2697a6d67073e7bbfe7fce979",
+      "lines": 326
+    },
+    "apps/desktop/tests/at/source_bundle.py": {
+      "sha256": "d8f9d359349293761f59cba32858e17dfb3222cb25377cdcf9e47249889054f8",
+      "lines": 336
+    },
+    "apps/desktop/tests/at/session_owner.py": {
+      "sha256": "9088d873055eeab34916bbc7dcd6b42226142ba0c05dd8974913a019c2bfc03a",
+      "lines": 323
+    },
+    "apps/desktop/tests/at/lab_namespace.py": {
+      "sha256": "16f16d0d574a9e8bdc1d371ba85ba3611fc2157ef9bc16f1f4a0b6fc856db410",
+      "lines": 790
+    },
+    "apps/desktop/build.ts": {
+      "sha256": "a6271467173cabe4d76ec7d083fb65827e90eb3ca69915640cb8ed54d1884f92",
+      "lines": 44
+    },
+    "apps/desktop/setup-sqlite.ts": {
+      "sha256": "ce7aef895275d93e56746582bff0094af9f20f835eb85c8b0db909424153915d",
+      "lines": 13
+    },
+    "package.json": {
+      "sha256": "d822dd26c0c1d73394f4620099fbe6b25afe2af059940b03564cf677547aee76",
+      "lines": 66
+    },
+    "bun.lock": {
+      "sha256": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+      "lines": 2302
+    },
+    "Cargo.lock": {
+      "sha256": "07693a75d13e9d180b86583aee18c5946fe9eedfc67eb74ba52fe1c8b8fe3031",
+      "lines": 1521
+    },
+    "Cargo.toml": {
+      "sha256": "439da7a54a69492ba4bf8e767c8124842881dc385ce7e91b4a598a7568c06a1d",
+      "lines": 15
+    },
+    "rust-toolchain.toml": {
+      "sha256": "24ef3b9d3edbd850aa386cb0a98e10450b0030991a4537cb359f54d49dbbb33a",
+      "lines": 4
+    },
+    "native/platform/Cargo.toml": {
+      "sha256": "236f78c97cfb84eb0cc8e59f2323e0b0239efbf6793b41792df246897e112534",
+      "lines": 13
+    },
+    "native/protocol/Cargo.toml": {
+      "sha256": "45c0fbc3d6b8c30c098c308f15afc8ada3c1a5fd53adf529da80409004e2aceb",
+      "lines": 11
+    },
+    "native/platform/src/applications.rs": {
+      "sha256": "a4f89ceaec4886ef2ee6ef833b1c5938951fc2a85d934a484cbec6a762caf6c7",
+      "lines": 785
+    },
+    "native/platform/src/dictionary_spelling.rs": {
+      "sha256": "b5fd1fb65112454624cfd9f1dcfd9e094f7fa41212f0691167bec76e671571ff",
+      "lines": 603
+    },
+    "scripts/test-runner/setup-electron.ts": {
+      "sha256": "e27419ef79373bec1550be1db51c899407c0845ddf590ac619e3e99faac9f4cb",
+      "lines": 12
+    },
+    "scripts/test-runner/package-deb.ts": {
+      "sha256": "591a69bdd07f05d886b102f16329d7b81662a2113441fdd7f5bc2d4943866b7d",
+      "lines": 2
+    },
+    "scripts/test-runner/Dockerfile.debian": {
+      "sha256": "4e74c0c458167568508888cffaf4ebe7ae2fa346eeb3bbea5307ffaa006928ec",
+      "lines": 11
+    },
+    "scripts/test-runner/Dockerfile.rust-debian": {
+      "sha256": "3d62d7883cb24a183a6994d67220f49326a823a3243de5d77978697b17c3466e",
+      "lines": 4
+    },
+    "scripts/test-runner/Dockerfile.input-debian": {
+      "sha256": "07509432fb90efddc8aa8e507f800c448796e9bef62e32b3ad9c985068e8fe4c",
+      "lines": 3
+    },
+    "spikes/input/build.rs": {
+      "sha256": "09678107b916ddde8e73f40ba9bf521b7132be6c139b48e0509d67937e5785c2",
+      "lines": 129
+    },
+    "packages/storage/package.json": {
+      "sha256": "3a688cb99be2ab7956f7a0fccca9964426732e24d616e5a0f86c11c3ab10b74b",
+      "lines": 20
+    },
+    "apps/desktop/evidence/shell-native-at/offline-build-preparation/README.md": {
+      "sha256": "02409647d25ad3c03d8c36777751e3115194b88d245729e81f835490830ec9f0",
+      "lines": 180
+    },
+    "apps/desktop/evidence/shell-native-at/source-build-preparation/README.md": {
+      "sha256": "3fe5abc80855e08124d0d7dc5e83447f0e11ef0eb6474fbc72d7db60de8a8a73",
+      "lines": 212
+    },
+    "apps/desktop/evidence/shell-native-at/lab-wrapper-preparation/README.md": {
+      "sha256": "de2c5b4b41a723ae81b532737db0f622947d082a944a8274202ecf109302d6fa",
+      "lines": 267
+    },
+    "apps/desktop/evidence/shell-native-at/inventory-actual-20261101-corrected/README.md": {
+      "sha256": "3954a812231495b39ef27d4a4574eaa1683b111f10074d0982e97dd23d1f8361",
+      "lines": 59
+    },
+    "apps/desktop/evidence/shell-native-at/inventory-actual-20261101-corrected/owner-result.json": {
+      "sha256": "4ec4de4531d46d60b54ff36bee72865bb797bb1d7366c6f5e506992041570714",
+      "lines": 1
+    }
+  },
+  "staticSelectedCargoGraph": {
+    "method": "name-edge traversal of committed Cargo.lock, not Cargo metadata or compilation",
+    "root": "linuxcast-platform",
+    "packages": [
+      "itoa",
+      "libc",
+      "linuxcast-platform",
+      "linuxcast-protocol",
+      "memchr",
+      "proc-macro2",
+      "quote",
+      "serde",
+      "serde_core",
+      "serde_derive",
+      "serde_json",
+      "syn",
+      "unicode-ident",
+      "zmij"
+    ],
+    "count": 14,
+    "fullRegistryPackageCount": 152
+  }
+}

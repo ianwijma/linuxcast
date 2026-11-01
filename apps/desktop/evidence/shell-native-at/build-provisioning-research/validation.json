@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "checkedUtc": "2026-11-01T13:40:55.562992+00:00",
+  "baseCommit": "bd5873823d4ca4a6919e4ad3eace9aa6610feef7",
+  "baseTree": "ab3d17aea5f41f4027ddc4c3bf9a9dd74bbbc288",
+  "branch": "codex/f1-02-offline-build-provisioning-research",
+  "scope": "research documentation only; no compiler/build/guest/native/AT acceptance",
+  "checks": [
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "exitCode": 0,
+      "output": "Planning validation passed: 279 sources, 57 features, 97 tasks, 135 Markdown files, 7 SVG assets.\nLocal integrity only; external URL availability and future application behaviour are not validated."
+    },
+    {
+      "command": "python3 scripts/plan_status.py",
+      "exitCode": 0,
+      "output": "Status: done=8, in-progress=20, planned=69\nAcceptance: not-applicable=8, passed=56, pending=325\nReady tasks (all prerequisites done):\nApplication features are planned until real acceptance evidence is recorded."
+    },
+    {
+      "command": "git diff --cached --check",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "markdown": {
+    "standardPlanValidatorDoesNotScanEvidenceDirectory": true,
+    "focusedReadmeChecks": "all relative links resolve; final newline; no trailing whitespace; balanced fences; manual CommonMark table/list inspection",
+    "localLinks": 22
+  },
+  "json": "all JSON files parsed successfully",
+  "repositoryInputs": "all recorded input hashes unchanged from base",
+  "changeOwnership": "exactly five additive files in assigned new directory; no shared source/registry/lock/protocol changes",
+  "externalLinks": {
+    "checksFile": "source-link-checks.json",
+    "total": 26,
+    "http200": 26,
+    "meaning": "availability only; no cryptographic authenticity claim"
+  },
+  "applicationTests": "not run: report only, no application changes",
+  "limitations": [
+    "No package index, deb closure, artifact or signature verification performed.",
+    "No measured compiler timing, resource capacity, receipt, namespace, ABI, native/AT/desktop/release proof.",
+    "Research report has no independent implementation review."
+  ]
+}
