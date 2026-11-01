@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-preparation-not-acceptance",
+  "base": "393f9da0a3e384ed6a15e18a1973d111494f19c8",
+  "baseTree": "cfb200fb63f181c551b1d85a24a9ad1f62d3753c",
+  "approvedParent": "4f47e531437b9f15501afc4de79309d74c5f2c29",
+  "branch": "codex/f1-02-build-facts-owner",
+  "checkout": "/home/ian/.t3/worktrees/linuxcast/t3-51c711b5",
+  "platform": {
+    "system": "linux",
+    "machine": "x86_64",
+    "kernel": "7.1.1-76070101-generic",
+    "python": "3.10.12",
+    "node": "24.22.1",
+    "bun": "1.4.4",
+    "rust": "not-executed; pinned1.95 inherited"
+  },
+  "executed": [
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_build_facts.py",
+      "exit": 0,
+      "tests": 82,
+      "seconds": 1.161,
+      "skipped": 0,
+      "expectedFailures": 0
+    },
+    {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p 'test_*.py'",
+      "exit": 0,
+      "tests": 377,
+      "skipped": 0,
+      "expectedFailures": 0,
+      "seconds": 10.124,
+      "baselineTests": 295,
+      "newTests": 82
+    },
+    {
+      "command": "PATH=/home/ian/Projects/ianwijma/linuxcast/.worktrees/tools:$PATH bun run test:security -- F1-02",
+      "exit": 0,
+      "testFiles": 6,
+      "tests": 55,
+      "seconds": 12.03,
+      "pythonChildMilliseconds": 10717,
+      "pythonDeadlineMilliseconds": 18000,
+      "automaticDiscovery": true
+    },
+    {
+      "command": "AST parse all apps/desktop/tests/at/*.py and embedded guest",
+      "exit": 0,
+      "pythonFiles": 24,
+      "embeddedSources": 1
+    },
+    {
+      "command": "Check files/additionalEvidence SHA256 from namespace-attestation-preparation/coordinator-custody-sha256.json",
+      "exit": 0,
+      "hashes": 33,
+      "note": "Current coordinator manifest, no historical digest rewritten."
+    },
+    {
+      "command": "bun run typecheck",
+      "exit": 0
+    },
+    {
+      "command": "bun run lint",
+      "exit": 0
+    },
+    {
+      "command": "python3 scripts/validate_plan.py",
+      "exit": 0,
+      "tasks": 97
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "exit": 0
+    },
+    {
+      "command": "bun install --offline --frozen-lockfile --backend=copyfile --ignore-scripts",
+      "exit": 0,
+      "note": "Dependency cache materialization only; no scripts/Electron setup/native build."
+    }
+  ],
+  "faultControls": [
+    "isolated duplicate-guard deletion admits duplicate case-insensitive fields",
+    "isolated unused-stream-check deletion admits concatenated zlib stream",
+    "isolated readback-check deletion admits lying write and empty private artifact",
+    "line-trace cancellation before/after atomic summary publication",
+    "injected lock contention/missing/denied/replacement/status mutation/journal/resource faults",
+    "short/zero/lying writes, fsync/close ambiguity and foreign replacement preservation",
+    "independent exact-child supervisor verifies real POSIX writer exclusion and guardian success/unavailable/partial-custody relay"
+  ],
+  "inheritedOnly": [
+    "F0-01 accepted",
+    "F1-02 existing AC01/AC02/PRIVACY evidence; UI pending",
+    "Two earlier actual read-only inventories; current linuxcastUID1000/sudo route",
+    "PR101 namespace proof review; actual rootdrop/statx integration pending",
+    "Old native source/archive/receipt/permit authority deliberately unreconciled"
+  ],
+  "notExecuted": [
+    "real owner CLI",
+    "Docker/SSH/guest or lab request",
+    "guest probe entry point",
+    "host package DB/locale/resource/keyring probe",
+    "privileged/drop/namespace/device/input/audio adapter",
+    "service/provisioning/package install/build",
+    "product/Orca/native/desktop integration",
+    "permit creation",
+    "push/PR/publication/watch",
+    "acceptance/status update"
+  ],
+  "acceptance": "pending",
+  "independentReview": "next; not performed by implementation child"
+}

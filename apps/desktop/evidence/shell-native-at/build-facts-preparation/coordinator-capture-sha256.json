@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "coordinator-capture-correction-not-permit",
+  "historicalCommit": "aafd1bf7ff60e637d25a414633988a1287cd912b",
+  "historicalManifest": "sha256.json",
+  "files": {
+    "apps/desktop/tests/at/lab_build_facts.py": "455967ad48f076ddc1edb90ad7547a6a6ba6a76fece8f6203af648da0afc573a",
+    "apps/desktop/tests/at/test_lab_build_facts.py": "9b43c910bddda53f0c0881a2cee1f9954eb37702afb5697968dd86ca16cf49fa",
+    "apps/desktop/evidence/shell-native-at/build-facts-preparation/coordinator-capture-correction.md": "74919de1c153c7e3d028888ee74ac12cbec23f040b2faccba1ed700bce4b3b2d"
+  },
+  "unchangedInputs": {
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
+    "apps/desktop/tests/at/lab_inventory_owner.py": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108",
+    "apps/desktop/tests/at/build-facts-protocol.md": "3f109d19a3e20b5d92ee4d6beb23da44188274a56aaaa29a8eb4e5b47a0f7fea",
+    "apps/desktop/tests/at/outer-owner-protocol.md": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "apps/desktop/tests/at/inventory-owner-protocol.md": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at-preparation.security.test.ts": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c",
+    "docs/implementation/tasks.json": "aa4f686f4ce3f43c86c5cfe6acc71808b3668acd74ac3299a99964b5c8199246",
+    "docs/implementation/tasks/F1-02.md": "1ccf5da9e8d421f2213c54cc3e3672db91eea2f0260cb66f6a8dd1c2493052e3",
+    "bun.lock": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+    "package.json": "d822dd26c0c1d73394f4620099fbe6b25afe2af059940b03564cf677547aee76"
+  },
+  "embeddedGuestSource": {
+    "sha256": "a50e94a11e1ac4ccb5fc3e01b284842e4c2ff5aeba012aba6c0499fdb6280df2",
+    "bytes": 17949
+  },
+  "validation": {
+    "focusedTests": 83,
+    "mappedSecurityChecks": 55,
+    "pythonPayloadCases": 378,
+    "pythonPayloadMilliseconds": 10686,
+    "pythonDeadlineMilliseconds": 18000,
+    "originalSourceRegression": {
+      "failures": 1,
+      "errors": 0
+    },
+    "acceptance": "pending",
+    "actualCapture": false
+  }
+}

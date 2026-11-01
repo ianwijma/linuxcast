@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "writer-custody-correction-not-permit",
+  "reviewedBase": "f15abda86b71acfd1736b41def4b100571f01968",
+  "historicalManifests": {
+    "sha256.json": "aafd1bf7ff60e637d25a414633988a1287cd912b",
+    "coordinator-capture-sha256.json": "9c768cf3915b9eb97bf20a5053e11fcb6ea5b544",
+    "coordinator-security-sha256.json": "f15abda86b71acfd1736b41def4b100571f01968"
+  },
+  "files": {
+    "apps/desktop/tests/at/lab_build_facts.py": "eb7d47513478dcf1958d55e3730ec26f90bdbd0f37dbc2d7a6bba0bc194cfe1e",
+    "apps/desktop/tests/at/test_lab_build_facts.py": "e1829ead4e529eccdbd434a0125dd7bc38d8cbddfdc5250f61e6268dd145a607",
+    "apps/desktop/evidence/shell-native-at/build-facts-preparation/check-review-regressions.py": "a6a94a1033d02f57fd445baeb2695aba401dafe5fa570a4310eb577dd032319b",
+    "apps/desktop/evidence/shell-native-at/build-facts-preparation/coordinator-writer-custody.md": "f988e90118a2e04d758ad07c40b829f5196b0f7b9f8b793fb1d85d2328920519"
+  },
+  "embeddedGuestSource": {
+    "sha256": "6b1a383c8144f3d84fa8da61316f0f66f6cec38d4cf4c1958a308291f4093d54",
+    "bytes": 18055
+  },
+  "unchangedInputs": {
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
+    "apps/desktop/tests/at/lab_inventory_owner.py": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108",
+    "apps/desktop/tests/at/build-facts-protocol.md": "3f109d19a3e20b5d92ee4d6beb23da44188274a56aaaa29a8eb4e5b47a0f7fea",
+    "apps/desktop/tests/at/outer-owner-protocol.md": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "apps/desktop/tests/at/inventory-owner-protocol.md": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at-preparation.security.test.ts": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c",
+    "docs/implementation/tasks.json": "aa4f686f4ce3f43c86c5cfe6acc71808b3668acd74ac3299a99964b5c8199246",
+    "docs/implementation/tasks/F1-02.md": "1ccf5da9e8d421f2213c54cc3e3672db91eea2f0260cb66f6a8dd1c2493052e3",
+    "bun.lock": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+    "package.json": "d822dd26c0c1d73394f4620099fbe6b25afe2af059940b03564cf677547aee76"
+  },
+  "validation": {
+    "focusedTests": 91,
+    "mappedSecurityChecks": 55,
+    "pythonPayloadCases": 386,
+    "pythonPayloadMilliseconds": 10184,
+    "pythonDeadlineMilliseconds": 18000,
+    "signalControls": {
+      "oldFailures": 2,
+      "oldErrors": 0,
+      "fixedFailures": 0,
+      "fixedErrors": 0
+    },
+    "originalControls": {
+      "oldFailures": 11,
+      "oldErrors": 0,
+      "fixedFailures": 0,
+      "fixedErrors": 0
+    },
+    "acceptance": "pending",
+    "actualCapture": false
+  }
+}

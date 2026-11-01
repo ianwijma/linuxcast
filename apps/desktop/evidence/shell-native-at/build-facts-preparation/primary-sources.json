@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/guillemj/dpkg/1.22.22/lib/dpkg/arch.c",
+    "bytes": 8698,
+    "sha256": "82a86c037f57ad407407f71937a61b334b8773588f94bfac02ae4b570368cb29"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/guillemj/dpkg/1.22.22/lib/dpkg/dbmodify.c",
+    "bytes": 14188,
+    "sha256": "b12cc4fc7985a790744953773e76cc6be4ed8ce2a0de83ae3e00aef9bf0d3026"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/guillemj/dpkg/1.22.22/lib/dpkg/parsehelp.c",
+    "bytes": 9424,
+    "sha256": "6a0e0ec86ca87cee59d0a826bc443364109c9065c093ec74a96eb08840267b43"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/bminor/glibc/glibc-2.41/locale/locale.h",
+    "bytes": 7675,
+    "sha256": "54aaf5745fb69ed99930781bbeb42b925e9a5523b912834e6987da0c7d88a5a4"
+  }
+]

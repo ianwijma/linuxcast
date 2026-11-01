@@ -1,4 +1,167 @@
-# Coordinator checkpoint — 1 November 2026
+# Coordinator checkpoint — 2 November 2026
+
+## Build-facts final independent review clear; publication next
+
+Final065a6691 completed/read at c512d5f581f67b8f7096863b317a547554dc7d92,
+base8cf1b32. Both Standards and Security/Spec clear; reader setter P2 resolved.
+Reviewer independently reproduces all four old leaks with os.open unchanged,
+fixed exact readers EBADF,22 additional current probes pass.93focused1.356s,
+actual55mapped11.56s/all388Python10.303s under unchanged18s/no skips; all11
+current controls green, original11/writer2/reader4 historical failures each0errors;
+fourASTs/17current70historical13input bindings/embedded18055bytes/plan/whitespace
+pass. Type/lint inherited for unchanged TS. Checkout clean/fingerprints unchanged,
+no reviewer source edits or real execution. Earlier intermediate findings remain
+historical; current code/test/helper exactly reviewed c512d5f. New final-review
+record/publication hashes and append-only F1 evidence metadata do not change
+task statuses/dependencies/acceptance or execution authority. Normal SSH signing
+has succeeded throughout coordinator corrections; configuration unchanged.
+
+Focused PR publication/current-head CI and GitHub bot/review inspection then
+prompt normal merge next. No PR/watch/delegate/command live at this checkpoint;
+no permit/capture/CLI/lab/guest/provision/build/native action. Next actual work
+after merge is protected source custody, same-domain permit and one bounded
+coordinator capture, then exact authenticated package resolution. All97/local1.0
+scope, F1-02/UI pending and historical unknown cleanup gaps remain unchanged.
+
+## Build-facts reader setter correction ready for final recheck
+
+Independent9a318340 completed/read at8cf1b32: writer P2 resolved and Standards
+clear, new reader P2 from Python property setter receiving an unowned rawFD.
+Real SIGALRM/SIGTERM at setter entry leak readers in publication/caller routes.
+Coordinator removes setter; both opens and initialization/retirement now use
+direct reader backing field. Read-only accessor and C FileIO writer unchanged.
+Two new tests cover four real route/signal cases:4behavioral failures/0errors on
+exact8cf1b32, fixedgreen; exact identity-checked fallback closes fixture leaks.
+Historical controls retain original11fail, writer2fail and reader4fail/0errors
+with current11methods green.93focused pass1.366s; actual55mapped11.49s, Python
+388cases10.222s under unchanged18s. Current/historical manifests/AST/plan kept
+distinct; type/lint inherited unchanged-TS. No cleanfinal claim, PR, watch,
+permit, capture, guest/build/native action or acceptance promotion. All97/task/
+criterion/dependency states and historical unknown absence unchanged. Fresh final
+recheck next; evidence build-facts-preparation/coordinator-reader-custody.md.
+
+## Build-facts writer hard-alarm correction ready for fresh recheck
+
+Final9ed544ac review complete/read atf15abda: Standards clear; four original P2s
+resolved, remaining writer P2 reproduces real SIGALRM before close (openFD lost)
+and after close (reused unrelatedFD closed). Coordinator replaces raw writer
+handoff with a single C FileIO owner and C partial(os.open) opener. No alarm or
+cancellation masking; FileIO closed state owns retirement, preventing stale
+writer-number cleanup. Exclusive0400 relative creation retains no-follow via
+O_CREAT|O_EXCL; independent reader still explicitO_NOFOLLOW. CPython3.10.12 and
+3.13.5 primary implementation plus Linux open(2) semantics independently read.
+Both new signal regressions fail exact f15abda2behavioral failures/0errors and
+passfixed; canary identity/content survives. Original7controls still11fail/0error
+onAafd and passfixed.91focused pass1.291s, actual55mapped11.49s/Python386cases
+10.184s under unchanged18s. Previous TS type/lint results inherited unchanged.
+Historical/current hashes/AST/plan/whitespace kept distinct. Fresh independent
+writer recheck next; no clean finalreview, PR, watch, permit, capture, lab/guest,
+build or native action. All97/status/criteria and unknown historical cleanup
+gaps unchanged. Evidence: build-facts-preparation/coordinator-writer-custody.md.
+
+## Build-facts initial reviews complete; bounded corrections ready for recheck
+
+Security/Spec cd58456c and Standards 30922b61 are complete and their final reports
+are read, both on aafd1bf/base393f9da. Standards has no Standards/material-smell
+findings and one separate capture-binding P2 fixed in9c768cf. Security/Spec has
+four P2s: guardian close failure retained observation, malformed Multi-Arch state
+accepted, legitimate partial half-installed records rejected, and cancellation
+lost writer FD custody before close. Coordinator fixes both validators, the
+subclass caller validation and publication close scope; base owner remains
+unchanged. Snapshot elaboration is reconciled with primary protocol/dpkg source
+for partial broken state, without accepting a broken installation baseline.
+
+Six new methods fail old source with10behavioral failures/0errors, passfixed;
+repeatable private source control includes capture test and produces11failures/
+0errors on exact reviewed aafd1bf, all7methods passfixed. One initial helper
+sanitized-import setup error corrected before those results. Independent guard
+owns/reaps real ordinary-Python guardian fixture; no lab/native process starts.
+89focused pass1.297s, actual55mapped pass11.65s, all384Python payload10.376s under
+unchanged18s. Full typecheck/lint pass. Current/historical hashes and embedded
+AST/size/probe pin kept distinct. Author and9c768cf manifests remain historical;
+coordinator-security-correction.md/current manifest record these changes.
+Fresh final independent recheck next; no clean Spec/final claim, PR, watch,
+permit, capture, provisioning, build or native execution. All97 task/criterion/
+dependency states and historical unknown cleanup gaps remain unchanged.
+
+## Build-facts initial Standards complete; capture binding corrected
+
+Initial Standards30922b61 complete and final report read on exactaafd1bf/base393f9da:
+no Standards/material-smell findings, separate soleP2 Spec finding: unavailable
+reply captureUUID was not checked against retainedpermit outside artifact branch.
+Coordinator directly moves check beforebranch for all received replies; new real
+synthetic unavailable-transaction regression fails reviewedsource (1behavioral
+failure/0errors), passesfixed, covers correctbinding/mismatch/no-permit and
+not-received preadmission without creatingartifact.83focused pass1.156s; actual
+55mapped pass11.98s, full378Python payload10.686s under unchanged18s. Plan and
+whitespace pass; no schema/guest/probe/authority/deadline/shared-source changes.
+Author5evidencefiles remain historical5067676/e4ba89b, current two-file correction
+and evidence tracked separately in coordinator-capture-correction.md/manifest.
+Initial independent SecuritySpeccd58456c still running on frozenaafd1bf; no
+polling or replacement, no clean Spec/final review claimed. Fresh final recheck
+after all initial findings. No PR/watch/permit/capture/guest/build/native action.
+All97 task/criterion/dependency states and historical cleanup gaps unchanged.
+
+## Build-facts preparation integrated for initial independent review
+
+Read-only build-facts author e4ba89b57c7866f8e2430f2228ca9b5edd8d1185 is
+integrated as 5067676e6de18802cbefe1c6359859b6f8e6d9c4 on frozen coordinator
+393f9da0a3e384ed6a15e18a1973d111494f19c8. Exactly seven additive owned files:
+lab_build_facts.py, test_lab_build_facts.py and five preparation evidence files.
+No existing owner/native/namespace/inventory/pins/manifests/contracts changed.
+Author reports82focused/all377Python cases (295baseline),55mapped security,
+type/lint/AST/33inherited+19new-input hashes/plan/whitespace; no skips or expected
+failures. Coordinator independently reran actual mapped55security successfully
+in11.30s, Python child10.032s under unchanged18s. Normal SSH signing succeeded
+for author and integration; signature headers present, local signer verification
+still requires allowed-signers configuration. No unsigned fallback used.
+
+Closed separate14-key metadata permit, strict nine-key private snapshot,
+seven-key compressed packet<=60000, snapshot<=2MiB and guardian/public<=4096;
+shared transport/deadlines unchanged. Existing POSIX read locks and fixed inputs,
+projected packages/holds/pending/architecture and bounded resource/locale/public
+keyring facts only. Exclusive0400 artifact, interruption-safe reply accounting,
+recovery-before-collision and first-failure/cleanup custody require review.
+Two fresh independent axes next on exact committed integration, with no actual
+permit, CLI, Docker/SSH/guest/provision/build/native operation authorized to them.
+No PR/push/watch, task/criterion/dependency changes or acceptance promotion.
+First actual capture remains coordinator-only after review and sealed custody.
+All97/full-local1.0 gates remain intact; earlier actual inventory/clean shutdown
+and historical unknown timeout-descendant absence remain unchanged.
+
+## PR101 merged; read-only build facts next — 2November2026 Sydney
+
+PR101 https://github.com/ianwijma/linuxcast/pull/101 MERGED normally at
+4f47e531437b9f15501afc4de79309d74c5f2c29, exacthead2f417506, PlanningCI41315901723
+SUCCESS. Currenthead MERGEABLE/CLEAN, no requested/submittedreviews; CodeRabbit
+terminalSKIPPED below10stars/noactionablefeedback, rulesets[]/protection404.
+Initial Standards68e794e0 andSecuritySpecb0cccb33 soleP2 custodygap parentfixed;
+final7d36eb95 bothaxesclear on6aafb140 with295Python/55mapped/21extraprobes and
+oldsource/fault controls. Metadata-onlyfinalhead preserves all4code/testfiles.
+Immediate tinymergeblurb sent, unwatchconfirmedfalse; no watch retained.
+
+Root now codex/f1-02-build-facts fromapproved4f47e53. Coordinator freezes
+apps/desktop/tests/at/build-facts-protocol.md before isolatedimplementation.
+Read-onlynew lab_build_facts module/tests/evidence only; oldbaseowner/native/
+inventory/namespace/protocol/manifests/receipt/pins remainunchanged. Separate14key
+permit binds source/probe/lab/captureUUID andmetadataauthority, notinstaller.
+NonblockingexistingDPKGreadlocks, strictprivateprojectedstatus/holds/architecture/
+pendingstate/resource/locale/publickeyring facts. Canonical2MiB private JSON
+compressedclosedpacket<=60000 fits old65536 cap; guardian/public<=4096 carries
+only fixedenums/counts/digests. Privateexclusive0400 artifact publication and
+interruptedjob recovery preserve custody/accounting. Job30/guest25/start120/
+cleanup45/owner600 unchanged, no genericrunner/installation/newnative authority.
+
+Need independentlyreviewed implementation before newactualpermit/firstcapture.
+Completefacts then exactsignedoffline transaction (minimal g++/make/libgio-dev
+plusclosure), root/unprivileged fixedprep phases, currentarchive/cache/toolchain/
+RustPATH/finalstaging/actualbuild/receipt andnativepinreconciliation. Actual
+namespacehandoff/statx/rootdrop/containment/nativeAT/fourdesktop/physical/package/
+release work remains. Full97GoalACTIVE/incomplete,8done/20inprogress/69planned,
+56passed/325pending/8justifiedN/A unchanged; source integration is not acceptance.
+Currentno rootprocess/test/delegate/PRwatch before the implementation assignment.
+Old twoactual inventories/cleanstoppedguest andhistoricalunknownabsence gaps
+remainexactly as recorded, no additional guest/provision/native action.
 
 ## Namespace FD3 custody correction — final recheck clear, publish next
 
