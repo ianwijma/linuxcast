@@ -110,6 +110,23 @@ Exit0 iff observed/none; exit3 otherwise. No raw exception/stderr/private data.
 Allowed non-none codes: identity, os, package-lock, packages, package-state,
 architecture, resources, locale, keyring, bounds, deadline, output, custody.
 
+After the first actual capture returned only `bounds`, permit these additional
+closed diagnostic codes without changing packet/public shapes, read scope,
+limits, deadlines, authority or private-data handling:
+`bounds-status-input`, `bounds-status-line`, `bounds-status-stanza`,
+`bounds-status-field`, `bounds-status-records`, `bounds-os-input`,
+`bounds-architecture-input`, `bounds-trigger-input`, `bounds-keyring-input`,
+`bounds-updates-entries`, `bounds-snapshot`, `bounds-packet`.
+They identify the fixed guard/invariant that refused the input/output, not a raw
+value, exception, path or readiness claim. Input guards include empty/invalid
+type or inconsistent bounded reads where already checked, not only upper size.
+Existing `bounds` remains accepted for historical replies. Existing unknown/error
+wrappers retain their behavior; no new diagnosis may turn an unavailable fact
+into a snapshot. No code includes caller text, counts or package contents.
+Synthetic guard cases must fail the prior generic-only implementation and pass
+the scoped diagnostic source. A fresh independent review, approved source hash
+and new permit precede any next capture; no automatic retry of the first run.
+
 Host decoding must bound allocation before decompression, require exact declared
 length/SHA256/canonical snapshot, zlib EOF and no trailing/concatenated stream,
 strict base64/JSON and closed fields. Reject oversized/compression bombs. A

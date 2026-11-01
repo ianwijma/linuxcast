@@ -1,5 +1,18 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Freeze bounded refusal diagnostics after first actual capture
+
+First actual capture is safely stopped and evidence committed933b838. Protocol
+now explicitly allows12 additional fixed bounds-* refusal codes identifying the
+existing guard (status input/line/stanza/field/record, other fixed read inputs,
+update-entry count, snapshot or packet). No numeric/raw diagnostics, new fields,
+read/command scope, capacity or deadline change. Historical generic bounds remains
+valid; wrappers still preserve unavailable states. This is a coordinator contract
+change for offline implementation/tests/review next, not permission to replay the
+used permit or change limits. Real culprit remains unknown until a future fresh
+reviewed capture. Current used source/permit/private outputs preserved, no live
+guest/native/owner process, PR watch or delegate. All97/status/criteria unchanged.
+
 ## First actual build-facts capture unavailable at a bound; cleanup verified
 
 After PR102 merge40bac5c, protected source f102-build-facts-approved-c512d5f
