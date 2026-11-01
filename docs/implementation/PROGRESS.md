@@ -1,6 +1,6 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — two reviewed prerequisites ready for focused PRs
+## Current coordinator state — PR98 merged; captured credentials publication
 
 Full97/local1.0 Goal ACTIVE, incomplete; task/criterion statuses unchanged.
 The account-wide quota claim was wrong: successful same-model Codex reviews
@@ -20,8 +20,11 @@ independently55mappedF1security/all265Python11.759s/no skips under18s;57inventor
 88owner/9SessionOwner,2old-source failing methods,2termination-fault controls,
 4publication-cleanup combinations,14package probes,4AST/24inventoryhashes/
 legacytestpin/plan/whitespace pass. Metadata-only publication commit follows;
-code remains byte-identicaltoa744. Prepare focused PR now, then current CI/GitHub
-review checks and prompt merge. All native/UI/full-task gates remain pending.
+code remains byte-identicaltoa744. PR98 merged at4cdf97876af63efbeac62690c7621922c997619c fromfbb1d203 after
+currenthead PlanningCI41307709636 SUCCESS, independent final review clear, no
+requested/submitted GitHub reviews or rulesets/protection. CodeRabbit terminal
+skip (repository below automatic-review threshold), no actionable feedback.
+Expected-head normal merge; tiny merge blurb sent immediately; watch absent. All native/UI/full-task gates remain pending.
 
 Initial public host-only source copyfromabff is renamed
 private-lab/f102-inventory-candidate-abff18a-rejected; originalpath retired,
@@ -36,19 +39,23 @@ codex/f2-02-captured-credential-leases: both initial reviews completed/read clea
 Security/Spec47865d99 independently165security/86units/3contracts,12extra probes,
 3failing faults/static/6hashes; Standards03715988 independently38settings/86units/
 3contracts/fulltype/scopedlint/plan/whitespace/6hashes, no hardrule/materialsmell.
-No actual keyring/provider/native acceptance. Its focused PR follows inventory
-merge and develop integration, with tested package sources preserved. Temp draft
+No actual keyring/provider/native acceptance. Its branch now merges approveddevelop4cdf978 after PR98. Only PROGRESS conflicted;
+resolved from merged checkpoint while preserving both feature sources. All five
+reviewed package source/contract/README paths remain byte-identicaltoa411.
+Post-integration55F1security (265Python11.504s),165F2security/3contracts, fulltype/
+scopedlint/plan/whitespace pass. Focused PR publication next; no task/native promotion. Temp draft
 PR body /tmp/linuxcast-f2-captured-credentials-pr.md awaits final review text.
 
 AI correctionb7f291218d4fb4910e4cf6340d9decda7af3e0f3 saved separately on
-codex/a1-01-broker-integration:184checks/staticvalidation pass. Fresh final
-reviewbf157bdd was launched on Codex/SOLhigh and has no returned result yet.
-Do not poll running child. A1 preparations stay local/unmerged/planned until
+codex/a1-01-broker-integration:184checks/staticvalidation pass. Fresh finalbf157bdd completed/read clear atb7f2912/base4e4c63c: all original
+retirement/choice/tool-order/first-failure findings closed; independently184mapped
+checks/staticvalidation and8private probe groups,7old-source failing regressions
+pass. No new actionable Security/Spec/Standards findings. No native/provider proof. A1 preparations stay local/unmerged/planned until
 whole F2/F3 accepted; configurationc78228e retains original clear reviews.
 
-No active root tests or PRwatches before publication. Next: publish inventory,
-inspect current CI/review requirements, watch if pending, merge and send tiny
-blurb. Rebase/merge approved develop into F2, preserve source, publish/merge next.
+No active delegates or PRwatches after all known-completed results read. Next:
+finish merged-develop F2 checks, publish/CI/merge and tiny blurb; then fresh immutable
+inventory source custody/strict permit and first real bounded metadata attempt.
 Then actual reviewed inventory with fresh source custody/permit and separate
 real transport/cleanup evidence; immutable Debian product build/receipt, UID20000/
 PID1/namespace/nativeAT/four-session/physical/performance/package/R1-03 still pending.

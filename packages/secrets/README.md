@@ -100,3 +100,25 @@ F2-02 remains incomplete until final application integration, independent review
 and shared host secret/data-control UI (including keyboard/accessibility
 and affected light/dark states) are verified. Typed statuses are not substitute
 UI evidence, and F2-02-UI is not marked not-applicable.
+
+
+## Captured credential admission for trusted providers
+
+`CredentialSettingsService.captureCredential()` returns the actual selected
+memory/persistent reference plus a process-local generation. The main-only
+`authorizeCapturedCredential()` lease checks that exact captured binding after
+metadata IO and immediately before dispatch. It never substitutes the credential
+selected later. Captures are immutable opaque metadata, never renderer status,
+exports, durable configuration or proof of network/provider permission. The
+existing `use` method continues to target the current settings credential;
+it must not be used to impersonate an earlier captured reference.
+
+Trusted provider composition must use `SecretStore.use(capture.reference, owner,
+callback)` plus the captured eligibility lease, its abort signal and fresh valid
+check, while independently enforcing caller/content/tool/network authority and
+one atomic provider/model configuration. Releases are idempotent and normal
+release does not abort the lease signal. Admission slots remain owned through
+actual pending IO; this API does not make the existing shared IO cancellation
+bound disappear. Production AI wiring and native/keyring/provider acceptance are
+still outstanding. See [the capture contract](CREDENTIAL-SETTINGS-CONTRACT.md#main-only-captured-credential-eligibility)
+and [preparation evidence](evidence/captured-credentials/README.md).

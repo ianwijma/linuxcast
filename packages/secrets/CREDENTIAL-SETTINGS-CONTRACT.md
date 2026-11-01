@@ -56,3 +56,44 @@ restoration of that stronger value. This protective compensation never repeats
 the requested weakening; failed/unconfirmed restoration is unknown/needs-review
 and keeps the conservative in-memory floor. Save success is checked again after
 pointer persistence/deletion, including memory-reference existence.
+
+
+## Main-only captured credential eligibility
+
+`CredentialSettingsService.captureCredential()` returns an immutable actual selected
+reference and process-local generation, or null. It initializes the trusted runtime
+before reading metadata. It never returns a stored key, authenticates a provider,
+changes a route or silently converts persistence. The existing renderer wire and
+portable exports remain unchanged; neither captures nor generations are accepted
+from those sources or persisted. The generation is never reused across settings
+service instances within the owning process; exhaustion denies new captures.
+
+`authorizeCapturedCredential(capture, authenticatedRunId, signal)` admits only the
+exact current reference/mode/generation and fixed OpenRouter owner after fresh
+metadata/session checks. It copies and strictly validates its argument before IO.
+A stale capture cannot be exchanged for the current credential or reopened after
+lock/unlock, replacement, removal, retry, uncertainty or service restart. Session-
+only eligibility checks the actual retained memory reference independently of
+persistent keyring availability. Persistent eligibility still requires secure
+storage. Observed independent pointer/owner/storage changes and failed metadata
+reads invalidate prior captures; a snapshot is not atomic external filesystem
+attestation and does not replace the SecretStore use lease.
+
+The returned eligibility lease has `signal`, `valid()` and idempotent asynchronous
+`release()`. Main calls valid immediately before every credential-bearing dispatch,
+including after each await, alongside the independent SecretStore use signal,
+caller/content/network/permission checks. Invalidation aborts leases. Normal release
+ends eligibility without falsely signalling revocation. Invalid, duplicate or
+non-UUID run IDs deny; at most128 pending or live admissions exist per service.
+Aborted metadata admission retains its slot until actual IO returns. Do not claim
+this supplies cancellation of existing repository/filesystem IO or proves bounded
+credential retirement; those operations keep their existing owners and limits.
+
+Mutation admission invalidates earlier captures before native confirmation, even
+if that confirmation is later cancelled. Close and observed storage/session loss
+also revoke them. Reacquisition requires a fresh explicit capture; there is no
+network, authentication or effect retry. The API is trusted main composition only,
+not a new renderer, extension, workflow or generic repository capability. Actual
+AI composition must atomically match one configured provider/model/profile with
+this captured credential and retain the captured generation for that run. All
+native/provider/desktop/AT and whole-task acceptance requirements remain.

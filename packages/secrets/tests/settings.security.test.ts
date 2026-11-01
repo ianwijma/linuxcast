@@ -13,6 +13,7 @@ afterEach(async()=>{await Promise.all(services.splice(0).map(service=>service.cl
 const confirm=async()=>true,signal=()=>new AbortController().signal;
 async function fixture(secure=false){
   const root=await mkdtemp(join(tmpdir(),'linuxcast-credential-settings-'));roots.push(root);
+  let storageReady=true;
   let session:SecretSessionState='observed-unlocked';const listeners=new Set<(state:SecretSessionState)=>void>();
   const records=new Map<string,SecretReferenceRecord>();
   const references:SecretReferences={get:async id=>records.get(id)??null,put:async record=>{records.set(record.id,record);return record;},delete:async id=>records.delete(id),list:async({afterId,limit})=>{const all=[...records.values()].sort((a,b)=>a.id.localeCompare(b.id)).filter(row=>!afterId||row.id>afterId),page=all.slice(0,limit);return {records:page,nextCursor:all.length>page.length?page.at(-1)!.id:null};}};
@@ -21,9 +22,9 @@ async function fixture(secure=false){
   // Synthetic keyring adapter, never OS-backed evidence or real key material.
   const safeStorage:ElectronSafeStorage={getSelectedStorageBackend:()=>secure?'gnome_libsecret':'basic_text',isEncryptionAvailable:()=>secure,
     encryptString:vi.fn(value=>Buffer.concat([Buffer.from('v11'),Buffer.from(value)])),decryptString:vi.fn(value=>value.subarray(3).toString())};
-  const runtime=new CredentialRuntime({dataDirectory:root,helperPath:'/fixed/unused-helper',safeStorage,references,isStorageReady:()=>true,createSession:()=>({state:()=>session,subscribe(listener){listeners.add(listener);listener(session);return()=>{listeners.delete(listener);};},invalidate(){},async stop(){}})});runtimes.push(runtime);
+  const runtime=new CredentialRuntime({dataDirectory:root,helperPath:'/fixed/unused-helper',safeStorage,references,isStorageReady:()=>storageReady,createSession:()=>({state:()=>session,subscribe(listener){listeners.add(listener);listener(session);return()=>{listeners.delete(listener);};},invalidate(){},async stop(){}})});runtimes.push(runtime);
   const service=new CredentialSettingsService({runtime,preferences,references,appearance:()=> 'dark'});services.push(service);
-  return {runtime,service,preferences,references,records,safeStorage,row:()=>row,emit(value:SecretSessionState){session=value;for(const listener of listeners)listener(value);}};
+  return {runtime,service,preferences,references,records,safeStorage,setStorageReady(value:boolean,notify=true){storageReady=value;if(notify)runtime.notifyStorageState();},row:()=>row,emit(value:SecretSessionState){session=value;for(const listener of listeners)listener(value);}};
 }
 async function save(f:Awaited<ReturnType<typeof fixture>>,persistence:'persistent'|'session-only'='session-only',value='SYNTHETIC_ENTRY_ONLY'){
   const state=await f.service.state();return f.service.save({protocolVersion:1,expectedRevision:state.revision,persistence,value},confirm,signal());
@@ -156,4 +157,142 @@ it('keeps a conservative floor and explicit uncertainty if protective policy com
   const changing=f.service.setPolicy({protocolVersion:1,expectedRevision:state.revision,clearSessionOnLock:false},signal());while(!finish)await new Promise(resolve=>setImmediate(resolve));f.emit('inactive');finish();
   expect(await changing).toMatchObject({value:{outcome:'unknown'}});expect(calls).toBe(2);expect(await f.service.state()).toMatchObject({stored:'needs-review',clearSessionOnLock:true,session:'inactive'});
   f.emit('observed-unlocked');expect(await f.service.state()).toMatchObject({clearSessionOnLock:true});
+});
+
+
+it.each(['session-only','persistent'] as const)('captures the actual %s reference without reading or exporting its value',async persistence=>{
+  const f=await fixture(persistence==='persistent');await save(f,persistence);vi.mocked(f.safeStorage.decryptString).mockClear();
+  const capture=await f.service.captureCredential();expect(capture).not.toBeNull();
+  expect(capture!.reference.mode).toBe(persistence==='persistent'?'secure-persistent':'session-only');
+  expect(Object.isFrozen(capture)).toBe(true);expect(Object.isFrozen(capture!.reference)).toBe(true);
+  expect(f.safeStorage.decryptString).not.toHaveBeenCalled();
+  const lease=await f.service.authorizeCapturedCredential(capture,randomUUID(),signal());expect(lease!.valid()).toBe(true);expect(f.safeStorage.decryptString).not.toHaveBeenCalled();
+  const store=(await f.runtime.store())!,consumer=vi.fn(async(value:string)=>{expect(value).toBe('SYNTHETIC_ENTRY_ONLY');});
+  expect(await store.use(capture!.reference,{ownerKind:'provider',ownerId:'openrouter-default'},consumer)).toMatchObject({outcome:'used'});
+  expect(consumer).toHaveBeenCalledOnce();expect(JSON.stringify(await f.service.state())).not.toContain(capture!.reference.id);
+  await lease!.release();expect(lease!.valid()).toBe(false);expect(lease!.signal.aborted).toBe(false);await lease!.release();
+});
+it.each(['locked','inactive','unavailable'] as const)('irrevocably revokes captured eligibility on %s even if the same key is retained',async denied=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!;
+  const lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  f.emit(denied);expect(lease.signal.aborted).toBe(true);expect(lease.valid()).toBe(false);expect(await f.service.captureCredential()).toBeNull();
+  f.emit('observed-unlocked');expect(lease.valid()).toBe(false);expect(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal())).toBeNull();
+  const next=(await f.service.captureCredential())!;expect(next.reference).toEqual(capture.reference);expect(next.generation).toBeGreaterThan(capture.generation);await lease.release();
+});
+it('revokes captures before a pending confirmation and never silently adopts a replacement reference',async()=>{
+  const f=await fixture();await save(f);const old=(await f.service.captureCredential())!,runId=randomUUID();
+  const lease=(await f.service.authorizeCapturedCredential(old,runId,signal()))!;
+  const state=await f.service.state();let finish!:(value:boolean)=>void;
+  const saving=f.service.save({protocolVersion:1,expectedRevision:state.revision,persistence:'session-only',value:'SYNTHETIC_REPLACEMENT'},()=>new Promise(resolve=>{finish=resolve;}),signal());
+  expect(lease.signal.aborted).toBe(true);expect(lease.valid()).toBe(false);
+  while(!finish)await new Promise(resolve=>setImmediate(resolve));expect(await f.service.captureCredential()).toBeNull();
+  finish(true);expect(await saving).toMatchObject({value:{outcome:'saved'}});
+  expect(await f.service.authorizeCapturedCredential(old,randomUUID(),signal())).toBeNull();
+  const next=(await f.service.captureCredential())!;expect(next.reference.id).not.toBe(old.reference.id);await lease.release();
+});
+it('keeps a cancelled confirmation from reopening an earlier capture and allows fresh capture afterwards',async()=>{
+  const f=await fixture();await save(f);const old=(await f.service.captureCredential())!,state=await f.service.state();
+  await f.service.remove({protocolVersion:1,expectedRevision:state.revision},async()=>false,signal());
+  expect(await f.service.authorizeCapturedCredential(old,randomUUID(),signal())).toBeNull();
+  const next=(await f.service.captureCredential())!;expect(next.reference).toEqual(old.reference);expect(next.generation).toBeGreaterThan(old.generation);
+});
+it('copies caller capture metadata before admission IO and denies cancellation without late authority',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,copy={reference:{...capture.reference},generation:capture.generation},read=f.preferences.read;
+  let resume!:()=>void;f.preferences.read=async()=>{await new Promise<void>(resolve=>{resume=resolve;});return read();};
+  const abort=new AbortController(),pending=f.service.authorizeCapturedCredential(copy,randomUUID(),abort.signal);
+  while(!resume)await new Promise(resolve=>setImmediate(resolve));copy.reference.id=randomUUID();copy.generation++;
+  abort.abort();resume();expect(await pending).toBeNull();
+  f.preferences.read=read;const lease=await f.service.authorizeCapturedCredential(capture,randomUUID(),signal());expect(lease!.valid()).toBe(true);await lease!.release();
+});
+it('does not admit an old capture after lock/unlock during asynchronous metadata admission',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,read=f.preferences.read;let resume!:()=>void;
+  f.preferences.read=async()=>{await new Promise<void>(resolve=>{resume=resolve;});return read();};
+  const pending=f.service.authorizeCapturedCredential(capture,randomUUID(),signal());while(!resume)await new Promise(resolve=>setImmediate(resolve));
+  f.emit('locked');f.emit('observed-unlocked');resume();expect(await pending).toBeNull();f.preferences.read=read;
+  expect((await f.service.captureCredential())!.generation).toBeGreaterThan(capture.generation);
+});
+it('rejects forged, stale, foreign or extra captured metadata and duplicate live run IDs',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,runId=randomUUID();
+  for(const input of [null,{}, {...capture,generation:0},{...capture,generation:Number.MAX_SAFE_INTEGER+1},{...capture,ownerId:'foreign'},
+    {...capture,reference:{...capture.reference,id:randomUUID()}},{...capture,reference:{...capture.reference,mode:'secure-persistent'}},
+    {...capture,reference:{...capture.reference,ownerId:'foreign'}}])expect(await f.service.authorizeCapturedCredential(input,randomUUID(),signal())).toBeNull();
+  expect(await f.service.authorizeCapturedCredential(capture,'arbitrary-run',signal())).toBeNull();
+  const first=(await f.service.authorizeCapturedCredential(capture,runId,signal()))!;expect(first.valid()).toBe(true);
+  expect(await f.service.authorizeCapturedCredential(capture,runId,signal())).toBeNull();await first.release();
+  const reused=(await f.service.authorizeCapturedCredential(capture,runId,signal()))!;expect(reused.valid()).toBe(true);await reused.release();
+});
+it('invalidates old captures when a fresh read observes out-of-band owner or preference changes',async()=>{
+  const f=await fixture(true);await save(f,'persistent');const capture=(await f.service.captureCredential())!;
+  const lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  const record=f.records.get(capture.reference.id)!;f.records.set(record.id,{...record,ownerId:'another-provider'});
+  expect(await f.service.state()).toMatchObject({stored:'needs-review'});expect(lease.signal.aborted).toBe(true);expect(lease.valid()).toBe(false);
+  expect(await f.service.captureCredential()).toBeNull();expect(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal())).toBeNull();await lease.release();
+});
+it('fails closed on metadata read errors and permanently revokes existing captured leases',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  f.preferences.read=async()=>{throw new Error('SYNTHETIC_PRIVATE_METADATA_ERROR');};expect(await f.service.captureCredential()).toBeNull();
+  expect(lease.valid()).toBe(false);expect(lease.signal.aborted).toBe(true);await lease.release();
+});
+it('retains pending admission slots through actual IO and bounds all live/pending runs at128',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,read=f.preferences.read;let resume!:()=>void;
+  f.preferences.read=async()=>{await new Promise<void>(resolve=>{resume=resolve;});return read();};
+  const aborts=Array.from({length:128},()=>new AbortController());
+  const pending=aborts.map(abort=>f.service.authorizeCapturedCredential(capture,randomUUID(),abort.signal));
+  while(!resume)await new Promise(resolve=>setImmediate(resolve));for(const abort of aborts)abort.abort();
+  let overflowSettled=false;const overflow=f.service.authorizeCapturedCredential(capture,randomUUID(),signal()).then(value=>{overflowSettled=true;return value;});
+  try {await new Promise(resolve=>setImmediate(resolve));expect(overflowSettled).toBe(true);expect(await overflow).toBeNull();}
+  finally {resume();for(const lease of await Promise.all([...pending,overflow]))await lease?.release();}
+  expect(await Promise.all(pending)).toEqual(Array(128).fill(null));
+  f.preferences.read=read;const lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;expect(lease.valid()).toBe(true);await lease.release();
+});
+it('revokes eligibility on runtime close and service close without granting a new lease',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  await f.runtime.close();expect(lease.signal.aborted).toBe(true);expect(lease.valid()).toBe(false);
+  await f.service.close();expect(await f.service.captureCredential()).toBeNull();expect(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal())).toBeNull();await lease.release();
+});
+
+it('never accepts a prior service lifetime generation for an otherwise identical persistent reference',async()=>{
+  const f=await fixture(true);await save(f,'persistent');const old=(await f.service.captureCredential())!;
+  await f.service.close();
+  const replacement=new CredentialSettingsService({runtime:f.runtime,preferences:f.preferences,references:f.references,appearance:()=> 'dark'});services.push(replacement);
+  const capture=(await replacement.captureCredential())!;expect(capture.reference).toEqual(old.reference);expect(capture.generation).toBeGreaterThan(old.generation);
+  expect(await replacement.authorizeCapturedCredential(old,randomUUID(),signal())).toBeNull();
+  const lease=(await replacement.authorizeCapturedCredential(capture,randomUUID(),signal()))!;expect(lease.valid()).toBe(true);await lease.release();
+});
+
+it('observes storage loss immediately before dispatch even if its notification is delayed',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  f.setStorageReady(false,false);expect(lease.valid()).toBe(false);expect(lease.signal.aborted).toBe(true);
+  f.setStorageReady(true,false);expect(lease.valid()).toBe(false);expect(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal())).toBeNull();await lease.release();
+});
+it('copies an admitted capture before caller mutation without silently selecting the changed reference',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,copy={reference:{...capture.reference},generation:capture.generation},read=f.preferences.read;
+  let resume!:()=>void;f.preferences.read=async()=>{await new Promise<void>(resolve=>{resume=resolve;});return read();};
+  const pending=f.service.authorizeCapturedCredential(copy,randomUUID(),signal());while(!resume)await new Promise(resolve=>setImmediate(resolve));
+  copy.reference.id=randomUUID();copy.reference.mode='secure-persistent';copy.generation++;resume();
+  const lease=(await pending)!;expect(lease.valid()).toBe(true);f.preferences.read=read;await lease.release();
+});
+it('closes while metadata admission is pending and refuses its late result',async()=>{
+  const f=await fixture();await save(f);const capture=(await f.service.captureCredential())!,read=f.preferences.read;let resume!:()=>void;
+  f.preferences.read=async()=>{await new Promise<void>(resolve=>{resume=resolve;});return read();};
+  const pending=f.service.authorizeCapturedCredential(capture,randomUUID(),signal());while(!resume)await new Promise(resolve=>setImmediate(resolve));
+  const closing=f.service.close();resume();expect(await pending).toBeNull();await closing;
+});
+
+it('refuses a persistent capture after keyring loss while an explicit memory key remains independent',async()=>{
+  const f=await fixture(true);await save(f,'persistent');const capture=(await f.service.captureCredential())!,lease=(await f.service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;
+  vi.spyOn(f.safeStorage,'getSelectedStorageBackend').mockReturnValue('basic_text');expect(lease.valid()).toBe(false);expect(lease.signal.aborted).toBe(true);
+  expect(await f.service.captureCredential()).toBeNull();await lease.release();
+  const memory=await fixture();await save(memory);const saved=(await memory.service.captureCredential())!,allowed=(await memory.service.authorizeCapturedCredential(saved,randomUUID(),signal()))!;
+  expect(allowed.valid()).toBe(true);expect(await memory.service.state()).toMatchObject({storage:'insecure-backend',stored:'session-only'});await allowed.release();
+});
+it('initializes the trusted runtime before capturing an already persisted key after a restart',async()=>{
+  const f=await fixture(true);expect(await f.service.captureCredential()).toBeNull();await save(f,'persistent');
+  const old=(await f.service.captureCredential())!;await f.service.close();await f.runtime.close();
+  const runtime=new CredentialRuntime({dataDirectory:roots.at(-1)!,helperPath:'/fixed/unused-helper',safeStorage:f.safeStorage,references:f.references,isStorageReady:()=>true,
+    createSession:()=>({state:()=> 'observed-unlocked',subscribe(listener){listener('observed-unlocked');return()=>{};},invalidate(){},async stop(){}})});runtimes.push(runtime);
+  const service=new CredentialSettingsService({runtime,preferences:f.preferences,references:f.references,appearance:()=> 'dark'});services.push(service);
+  const capture=(await service.captureCredential())!;expect(capture.reference).toEqual(old.reference);expect(capture.generation).toBeGreaterThan(old.generation);
+  const lease=(await service.authorizeCapturedCredential(capture,randomUUID(),signal()))!;expect(lease.valid()).toBe(true);await lease.release();
+  expect(await service.authorizeCapturedCredential(old,randomUUID(),signal())).toBeNull();
 });
