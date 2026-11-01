@@ -1,0 +1,22 @@
+{
+  "acceptance": "pending",
+  "actualProductOrcaRuns": 0,
+  "approvedDevelop": "69decac2bd695de53d24e5595770b2e546d362be",
+  "checkedAtUtc": "2026-11-01T13:22:26.551461+00:00",
+  "containerStatus": "exited",
+  "embeddedProbeSha256": "e0daca440dde220277820e4d300ee2fb804244b8d37c1d8b44b9aa5caefebd08",
+  "exitCode": 0,
+  "inventoryOwnerSha256": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
+  "markerAbsent": true,
+  "ownerReportedOwnedChildrenAbsent": true,
+  "ownerSha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+  "permitSha256": "a9e812e06502a087eb93f249dc6ebeff995dbc0dc3ef9b04eccd887760c51d2a",
+  "pidIsZero": true,
+  "pinnedConfigurationMatches": true,
+  "running": false,
+  "sameExistingLockReacquired": true,
+  "schemaVersion": 1,
+  "scope": "coordinator-postflight-not-replacement-for-owned-child-proof",
+  "sourceCommit": "084e7dc81a2e3f7a333bba6b83cbe7b205566264",
+  "stderrBytes": 0
+}

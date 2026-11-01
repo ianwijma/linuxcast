@@ -1,0 +1,13 @@
+{
+  "cachedSourcesChanged": false,
+  "hostGuestOrPackageOperations": 0,
+  "schemaVersion": 1,
+  "scope": "public-metadata-staging-controls-not-production-tests",
+  "tamperedCleartext": {
+    "badSignatureCount": 1,
+    "changedBytes": 1,
+    "exitCode": 1,
+    "rejected": true,
+    "validSignatureCount": 0
+  }
+}

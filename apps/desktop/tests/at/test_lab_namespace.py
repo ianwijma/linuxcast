@@ -5,6 +5,9 @@ Patching a Python object is test injection; the real CLI has no test switch.
 """
 import ast
 import copy
+import errno
+import fcntl
+from contextlib import ExitStack
 import importlib
 import io
 import json
@@ -508,24 +511,24 @@ class FaultBoundaries(unittest.TestCase):
                 read.assert_not_called()
                 execute.assert_not_called()
 
-    def test_proc_pid1_denial_or_same_network_stops_before_any_staging_import(self):
-        setup = lab.Setup(SimpleNamespace(kernel=Mock(), root_name='synthetic'))
+    def test_post_drop_without_root_memory_proof_stops_before_staging(self):
+        setup = lab.Setup(SimpleNamespace(kernel=Mock(), root_name='synthetic', initial_namespaces={}))
         status = '\n'.join(key + ': 00000000' for key in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb')) + '\nNoNewPrivs: 1'
-        for fault in (True, False):
-            with self.subTest(denied=fault), patch('os.getresuid', return_value=(lab.UID,) * 3), \
-                 patch('os.getresgid', return_value=(lab.GID,) * 3), patch('os.getgroups', return_value=[]), \
-                 patch.object(Path, 'read_text', return_value=status), \
-                 patch.object(Path, 'stat', side_effect=PermissionError if fault else None, return_value=SimpleNamespace(st_ino=123)), \
-                 patch('os.execve') as execute, patch('product_staging.validate') as validate:
-                with self.assertRaises((lab.Rejected, PermissionError)):
-                    setup.verify()
-                execute.assert_not_called()
-                validate.assert_not_called()
+        with patch('os.getresuid', return_value=(lab.UID,) * 3), \
+             patch('os.getresgid', return_value=(lab.GID,) * 3), patch('os.getgroups', return_value=[]), \
+             patch.object(Path, 'read_text', lambda p: '0 0 4294967295' if p.name.endswith('_map') else status), \
+             patch.object(lab, 'proc_text', lambda name: Path('/proc/self/' + name).read_text()), \
+             patch('os.execve') as execute, patch('product_staging.validate') as validate:
+            with self.assertRaises((lab.Rejected, AttributeError)):
+                setup.verify()
+            execute.assert_not_called()
+            validate.assert_not_called()
 
     def test_exec_has_no_shell_or_inherited_environment_even_if_unavailable(self):
         setup = lab.Setup(SimpleNamespace(kernel=Mock(), root_name='synthetic'))
         with patch.dict(os.environ, {'SSH_AUTH_SOCK': '/private', 'NODE_OPTIONS': '--inspect', 'DISPLAY': ':0'}), \
-             patch('os.execve', side_effect=FileNotFoundError) as execute:
+             patch('os.execve', side_effect=FileNotFoundError) as execute, \
+             patch.object(lab, 'proof_metadata'), patch('os.set_inheritable'), patch('os.listdir', return_value=[]):
             with self.assertRaises(FileNotFoundError):
                 setup.exec()
         execute.assert_called_once_with('/usr/bin/python3', lab.CONTROLLER_ARGV, lab.ENV)
@@ -690,6 +693,279 @@ class FaultBoundaries(unittest.TestCase):
             with self.subTest(field=field), self.assertRaises(lab.Rejected):
                 lab.project_report(changed, 0)
 
+
+
+class NamespaceAttestation(unittest.TestCase):
+    def kernel(self):
+        # Never instantiate the real ctypes adapter in an offline test.
+        kernel = object.__new__(lab.Kernel)
+        kernel.filesystem_type = Mock(return_value=0x6e736673)
+        return kernel
+
+    def namespaces(self):
+        initial = {n: [4, 100 + i] for i, n in enumerate(('net', 'mnt', 'pid', 'user'))}
+        isolated = copy.deepcopy(initial)
+        isolated['net'][1] += 10
+        isolated['mnt'][1] += 10
+        return initial, isolated
+
+    def test_root_preflight_observes_kernel_types_device_and_inode_and_retains(self):
+        kernel = self.kernel()
+        g = lab.Guest()
+        opened, closed = {}, []
+        def open_ns(path, flags):
+            self.assertTrue(flags & os.O_CLOEXEC)
+            fd = 40 + len(opened)
+            opened[fd] = path
+            return fd
+        def info(fd):
+            name = opened[fd].rsplit('/', 1)[1]
+            return SimpleNamespace(st_dev=4, st_ino=100 + list(lab.NS_TYPES).index(name))
+        with patch('os.open', side_effect=open_ns), patch('os.fstat', side_effect=info), \
+             patch('fcntl.ioctl', side_effect=lambda fd, _: lab.NS_TYPES[opened[fd].rsplit('/', 1)[1]]), \
+             patch('os.close', side_effect=closed.append), patch('os.getresuid', return_value=(0,) * 3), \
+             patch('os.getresgid', return_value=(0,) * 3), patch.object(Path, 'read_text', return_value='0 0 4294967295\n'), \
+             patch.object(lab, 'proc_text', lambda name: Path('/proc/self/' + name).read_text()):
+            result = kernel.initial_namespaces(g.keep)
+        self.assertEqual(result, self.namespaces()[0])
+        self.assertEqual(g.fds, [40, 42, 44, 46])
+        self.assertEqual(closed, [41, 43, 45, 47])
+        self.assertTrue(all(opened[fd].startswith('/proc/1/ns/') for fd in g.fds))
+        # The retained references outlive worker termination/absence verification.
+        events = []
+        g.fork_attempted = True
+        with patch('signal.signal'), patch('signal.setitimer'), \
+             patch('os.waitpid', side_effect=lambda *_: events.append('reaped') or (_ for _ in ()).throw(ChildProcessError)), \
+             patch.object(g, 'remove_owned', side_effect=lambda: events.append('remove')), \
+             patch('os.close', side_effect=lambda fd: events.append(fd)):
+            self.assertTrue(g.cleanup())
+        self.assertEqual(events, ['reaped', 'remove', 40, 42, 44, 46])
+
+    def test_actual_guest_preflight_namespace_fault_precedes_permit_or_stage(self):
+        import sys
+        for fault in ('open', 'stat', 'fs', 'type', 'device', 'inode', 'close', 'map'):
+            kernel = self.kernel()
+            g = lab.Guest()
+            opened = {}
+            closed = []
+            def opened_ns(path, flags):
+                if fault == 'open':
+                    raise PermissionError
+                fd = 40 + len(opened)
+                opened[fd] = path
+                return fd
+            def info(fd):
+                own = '/self/' in opened[fd]
+                return SimpleNamespace(st_dev=5 if own and fault == 'device' else 4,
+                                       st_ino=101 if own and fault == 'inode' else 100)
+            def close(fd):
+                closed.append(fd)
+                if fault == 'close':
+                    raise OSError
+            with ExitStack() as stack:
+                for target, kwargs in (('os.open', {'side_effect': opened_ns}),
+                    ('os.fstat', {'side_effect': OSError if fault == 'stat' else info}),
+                    ('os.close', {'side_effect': close}), ('os.getresuid', {'return_value': (0,) * 3}),
+                    ('os.getresgid', {'return_value': (0,) * 3}),
+                    ('fcntl.ioctl', {'return_value': 0 if fault == 'type' else lab.NEWNET})):
+                    stack.enter_context(patch(target, **kwargs))
+                kernel.filesystem_type.return_value = 0 if fault == 'fs' else 0x6e736673
+                stack.enter_context(patch.object(lab, 'Kernel', return_value=kernel))
+                stack.enter_context(patch.object(lab, 'INSTALLED', Path(lab.__file__).absolute()))
+                stack.enter_context(patch.object(sys, 'flags', SimpleNamespace(isolated=1)))
+                stack.enter_context(patch.object(lab, 'proc_text', lambda name: Path('/proc/self/' + name).read_text()))
+                stack.enter_context(patch.object(Path, 'read_text', return_value='0 20000 1' if fault == 'map' else '0 0 4294967295'))
+                stage = stack.enter_context(patch.object(lab, 'open_chain'))
+                start = stack.enter_context(patch.object(g, 'reserve'))
+                stack.enter_context(patch('signal.signal'))
+                stack.enter_context(patch('signal.setitimer'))
+                result = lab.transact(g)
+                self.assertNotEqual(result['firstFailure'], 'none')
+                stage.assert_not_called()
+                start.assert_not_called()
+            self.assertTrue(set(g.fds) <= set(closed))
+
+    def test_child_closes_all_parent_namespace_and_outside_handles_before_setup(self):
+        g = lab.Guest()
+        g.kernel = Mock()
+        g.fds = [50, 51, 52, 53, 70]
+        calls = []
+        class ExitChild(BaseException):
+            pass
+        def work(_):
+            self.assertTrue(set(g.fds) <= set(calls))
+            self.assertIn(90, calls)
+            raise lab.Rejected('setup')
+        with patch('os.pipe2', return_value=(41, 42)), patch('os.fork', return_value=0), \
+             patch('os.read', return_value=b'G'), patch('os.close', side_effect=calls.append), \
+             patch('os.listdir', return_value=['0', '1', '2', *map(str, g.fds)]), \
+             patch('os.setsid'), patch('os.open', return_value=90), patch('os.dup2'), \
+             patch('os.getppid', return_value=g.parent_pid), patch.object(lab, 'worker', side_effect=work) as worker, \
+             patch('os._exit', side_effect=ExitChild):
+            with self.assertRaises(ExitChild):
+                g.start()
+        worker.assert_called_once()
+        self.assertEqual(calls, [42, 41, 50, 51, 52, 53, 70, 90])
+
+    def test_post_drop_valid_root_memory_allows_pid1_denial_before_staging(self):
+        initial, isolated = self.namespaces()
+        kernel = Mock()
+        kernel.own_namespaces.return_value = isolated
+        guest = SimpleNamespace(kernel=kernel, root_name='synthetic', initial_namespaces=initial,
+                                pin={'receiptSha256': 'receipt', 'archiveSha256': 'archive', 'nodeSha256': 'node'})
+        setup = lab.Setup(guest)
+        setup.isolated_namespaces = isolated
+        status = '\n'.join(k + ': 0' for k in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb')) + '\nNoNewPrivs: 1'
+        def read(path, *args, **kwargs):
+            if path.name in ('uid_map', 'gid_map'):
+                return '0 0 4294967295\n'
+            return '1' if path.name == 'flags' else status
+        def meta(path, *args, **kwargs):
+            if str(path).startswith('/proc/1/'):
+                raise PermissionError('synthetic PID1 denial')
+            return SimpleNamespace(st_ino=10)
+        with patch('os.getresuid', return_value=(lab.UID,) * 3), \
+             patch('os.getresgid', return_value=(lab.GID,) * 3), patch('os.getgroups', return_value=[]), \
+             patch.object(Path, 'read_text', read), patch.object(lab, 'proc_text', lambda name: Path('/proc/self/' + name).read_text(), create=True), patch.object(Path, 'stat', meta), \
+             patch.object(Path, 'exists', return_value=False), \
+             patch.object(Path, 'iterdir', side_effect=lambda: iter([Path('lo')])), \
+             patch.object(Path, 'open', return_value=io.BytesIO(b'\x7fELF')), \
+             patch.object(lab, 'proof_metadata', create=True) as proof, \
+             patch('product_staging.validate', return_value={'sourceTree': lab.APPROVED_TREE,
+                    'archiveSha256': 'archive', 'nodeSha256': 'node'}) as validate:
+            setup.verify()
+        proof.assert_called_once_with(3)
+        validate.assert_called_once()
+
+    def test_worker_attests_relationships_and_maps_before_drop(self):
+        initial, isolated = self.namespaces()
+        kernel = Mock()
+        kernel.own_namespaces.return_value = isolated
+        setup = lab.Setup(SimpleNamespace(kernel=kernel, root_name='synthetic', initial_namespaces=initial))
+        with patch.object(lab, 'make_proof') as make:
+            setup.attest()
+        make.assert_called_once_with(initial, isolated)
+        for name in lab.NS_TYPES:
+            changed = copy.deepcopy(isolated)
+            changed[name] = initial[name] if name in ('net', 'mnt') else [4, 999]
+            kernel.own_namespaces.return_value = changed
+            with patch.object(lab, 'make_proof') as make, self.assertRaises(lab.Rejected):
+                setup.attest()
+            make.assert_not_called()
+        self.assertLess(lab.SETUP.index('chroot'), lab.SETUP.index('attest'))
+        self.assertLess(lab.SETUP.index('attest'), lab.SETUP.index('drop'))
+
+    def test_post_drop_rejects_changed_namespace_or_map_before_validation(self):
+        initial, isolated = self.namespaces()
+        for name in (*lab.NS_TYPES, 'uid_map', 'gid_map', 'proof'):
+            kernel = Mock()
+            current = copy.deepcopy(isolated)
+            if name in lab.NS_TYPES:
+                current[name][0] += 1
+            kernel.own_namespaces.return_value = current
+            setup = lab.Setup(SimpleNamespace(kernel=kernel, root_name='synthetic', initial_namespaces=initial))
+            setup.isolated_namespaces = isolated
+            status = '\n'.join(k + ': 0' for k in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb')) + '\nNoNewPrivs: 1'
+            def read(path, *args, **kwargs):
+                if path.name in ('uid_map', 'gid_map'):
+                    return '0 20000 1' if path.name == name else '0 0 4294967295'
+                return status
+            with patch('os.getresuid', return_value=(lab.UID,) * 3), \
+                 patch('os.getresgid', return_value=(lab.GID,) * 3), patch('os.getgroups', return_value=[]), \
+                 patch.object(Path, 'read_text', read), patch.object(lab, 'proc_text', lambda name: Path('/proc/self/' + name).read_text()), patch.object(lab, 'proof_metadata', side_effect=OSError), \
+                 patch('product_staging.validate') as validate, self.assertRaises((lab.Rejected, OSError)):
+                setup.verify()
+            validate.assert_not_called()
+
+    def test_proof_writer_short_zero_and_descriptor_faults_are_conservative(self):
+        initial, isolated = self.namespaces()
+        for fault in ('none', 'occupied', 'create', 'owner', 'write', 'zero', 'chmod', 'seal', 'open',
+                      'metadata', 'close-write', 'dup', 'wrong-dup', 'close-read', 'read', 'inherit'):
+            closed = []
+            writes = []
+            def info(fd):
+                if fd == 3 and not writes:
+                    if fault == 'occupied':
+                        return SimpleNamespace()
+                    raise OSError(errno.EBADF, 'synthetic')
+                return SimpleNamespace(st_uid=20000 if fault == 'owner' else 0, st_gid=0,
+                    st_mode=stat.S_IFREG | 0o400, st_nlink=0, st_dev=4, st_ino=123)
+            def write(fd, data):
+                if fault == 'write':
+                    raise OSError
+                if fault == 'zero':
+                    return 0
+                writes.append(data[:7])
+                return min(7, len(data))
+            def close(fd):
+                closed.append(fd)
+                if (fault == 'close-write' and fd == 10) or (fault == 'close-read' and fd == 11):
+                    raise OSError
+            def flags(fd, cmd, *args):
+                if cmd == fcntl.F_ADD_SEALS:
+                    if fault == 'seal':
+                        raise OSError
+                    return 0
+                if fault == 'dup':
+                    raise OSError
+                return 12 if fault == 'wrong-dup' else 3
+            with ExitStack() as stack:
+                for target, kwargs in (
+                    ('os.fstat', {'side_effect': info}),
+                    ('os.memfd_create', {'side_effect': OSError if fault == 'create' else None, 'return_value': 10}),
+                    ('os.write', {'side_effect': write}), ('os.close', {'side_effect': close}),
+                    ('os.fchmod', {'side_effect': OSError if fault == 'chmod' else None}),
+                    ('os.open', {'side_effect': OSError if fault == 'open' else None, 'return_value': 11}),
+                    ('fcntl.fcntl', {'side_effect': flags}),
+                    ('os.pread', {'side_effect': lambda *_: b'' if fault == 'read' else b''.join(writes)}),
+                    ('os.get_inheritable', {'side_effect': OSError if fault == 'inherit' else None, 'return_value': False})):
+                    stack.enter_context(patch(target, **kwargs))
+                stack.enter_context(patch.object(lab, 'initial_maps'))
+                stack.enter_context(patch.object(lab, 'subject_identity', return_value={'pid': 123, 'startTicks': 456}))
+                stack.enter_context(patch.object(lab, 'proof_metadata', side_effect=OSError if fault == 'metadata' else None,
+                    return_value=((4, 123, stat.S_IFREG, 0, 0), stat.S_IFREG | 0o400, 0, 350)))
+                with self.subTest(fault=fault):
+                    if fault == 'none':
+                        lab.make_proof(initial, isolated)
+                        self.assertEqual(closed, [10, 11])
+                        self.assertGreater(len(writes), 10)
+                        valid_raw = b''.join(writes)
+                    else:
+                        with self.assertRaises((OSError, lab.Rejected)):
+                            lab.make_proof(initial, isolated)
+                        if fault in ('occupied', 'create'):
+                            self.assertEqual(closed, [])
+                        elif fault == 'wrong-dup':
+                            self.assertIn(12, closed)
+                        else:
+                            self.assertIn(10, closed)
+            self.assertNotIn('dup2', closed)
+        # Actual writer bytes must pass the independently implemented verifier.
+        from test_controller_failures import ProofHarness, controller
+        proof = ProofHarness()
+        proof.raw = valid_raw
+        with proof.active():
+            controller.consume_attestation()
+        self.assertEqual(proof.closed.count(3), 1)
+
+    def test_proof_metadata_requires_exact_immutable_anonymous_authority(self):
+        from test_controller_failures import ProofHarness
+        h = ProofHarness()
+        with h.active():
+            lab.proof_metadata(3)
+        for change in ({'st_uid': 1}, {'st_gid': 1}, {'st_nlink': 1}, {'st_mode': stat.S_IFREG | 0o600}, {'st_size': 4097}):
+            h = ProofHarness()
+            h.meta = change
+            with h.active(), self.assertRaises(lab.Rejected):
+                lab.proof_metadata(3)
+
+    def test_descriptor_closure_fault_blocks_exec(self):
+        setup = lab.Setup(SimpleNamespace(kernel=Mock(), root_name='synthetic'))
+        with patch.object(lab, 'proof_metadata'), patch('os.listdir', return_value=['0', '1', '2', '3', '9']), \
+             patch('os.close', side_effect=OSError(errno.EIO, 'synthetic')), patch('os.execve') as execute:
+            with self.assertRaises(OSError):
+                setup.exec()
+        execute.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

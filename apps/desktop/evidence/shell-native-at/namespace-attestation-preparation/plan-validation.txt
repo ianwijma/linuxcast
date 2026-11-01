@@ -1,0 +1,2 @@
+Planning validation passed: 279 sources, 57 features, 97 tasks, 135 Markdown files, 7 SVG assets.
+Local integrity only; external URL availability and future application behaviour are not validated.

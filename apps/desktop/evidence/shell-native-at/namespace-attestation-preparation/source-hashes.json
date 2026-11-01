@@ -1,0 +1,125 @@
+{
+  "base": "bd5873823d4ca4a6919e4ad3eace9aa6610feef7",
+  "files": {
+    "apps/desktop/tests/at/README.md": {
+      "changedFromBase": false,
+      "sha256": "2bdfc2be96912d23083df914d017b9319d6dec9287a844db5a590cb3f1935d95"
+    },
+    "apps/desktop/tests/at/controller-protocol.md": {
+      "changedFromBase": false,
+      "sha256": "676cf91a4f63cf9152eb9c42b8201c165948bf61bf2c5788f4b6eeeb189c0dad"
+    },
+    "apps/desktop/tests/at/controller_protocol.py": {
+      "changedFromBase": false,
+      "sha256": "614e27681673f9d6b6891ec294431b911bcaf2bc056eb887100ac6985b064f4b"
+    },
+    "apps/desktop/tests/at/driver_guards.test.ts": {
+      "changedFromBase": false,
+      "sha256": "8f310cb1fc3ce77fd6b698d3e1028ed9629bb0fffd2769cf8a323d55d1e45a99"
+    },
+    "apps/desktop/tests/at/driver_guards.ts": {
+      "changedFromBase": false,
+      "sha256": "0819a50a0827dbb015f885b054a531b524b0fc31ca2b52968626614852a02dc6"
+    },
+    "apps/desktop/tests/at/inventory-owner-protocol.md": {
+      "changedFromBase": false,
+      "sha256": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f"
+    },
+    "apps/desktop/tests/at/lab_inventory_owner.py": {
+      "changedFromBase": false,
+      "sha256": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278"
+    },
+    "apps/desktop/tests/at/lab_namespace.py": {
+      "changedFromBase": true,
+      "sha256": "d2e09697cd9e4e05cdf112f88cbe3b9c9e0209f5377ca8abb405cc693d73315e"
+    },
+    "apps/desktop/tests/at/lab_owner.py": {
+      "changedFromBase": false,
+      "sha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+    },
+    "apps/desktop/tests/at/namespace-attestation-protocol.md": {
+      "changedFromBase": false,
+      "sha256": "5c99f9389d07fbc7fe091d1f8b7e20bc811c944492fb26124a277eab6f15fa4f"
+    },
+    "apps/desktop/tests/at/native_at.py": {
+      "changedFromBase": false,
+      "sha256": "43621e33f07e165ad29a17bc2e23860ecafeb8f40a5537f201413aadb9600d5b"
+    },
+    "apps/desktop/tests/at/observations.py": {
+      "changedFromBase": false,
+      "sha256": "93e618b4cd2d9a0405c75f7b9ab4779707a6eb1194a5889978b32694dcdc29c6"
+    },
+    "apps/desktop/tests/at/orca_output.py": {
+      "changedFromBase": false,
+      "sha256": "3401047ac6f92bdb648958e909bc4a647e50c75b2e320374395a6d7dc07db75a"
+    },
+    "apps/desktop/tests/at/outer-owner-protocol.md": {
+      "changedFromBase": false,
+      "sha256": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a"
+    },
+    "apps/desktop/tests/at/private_discovery.py": {
+      "changedFromBase": false,
+      "sha256": "40cacc7d964158d0fdae8c42c4509f096fc62025fb2ae1241ae95d1d4f12e2ae"
+    },
+    "apps/desktop/tests/at/product_controller.py": {
+      "changedFromBase": true,
+      "sha256": "bced6e7fd4e39099fb2dea5514dc12fac7b7f6c961726d21c651aaa00ed35650"
+    },
+    "apps/desktop/tests/at/product_driver.ts": {
+      "changedFromBase": false,
+      "sha256": "b81a4149c861d1961a0adca0a81ee1f336c81a8566cbaab67ac4d4346c18d083"
+    },
+    "apps/desktop/tests/at/product_staging.py": {
+      "changedFromBase": false,
+      "sha256": "fc84a7215b48a9c3553653fa0c34f28b6be03d31007326e0ae547f95ca8b0a7b"
+    },
+    "apps/desktop/tests/at/session_owner.py": {
+      "changedFromBase": false,
+      "sha256": "9088d873055eeab34916bbc7dcd6b42226142ba0c05dd8974913a019c2bfc03a"
+    },
+    "apps/desktop/tests/at/source_bundle.py": {
+      "changedFromBase": false,
+      "sha256": "d8f9d359349293761f59cba32858e17dfb3222cb25377cdcf9e47249889054f8"
+    },
+    "apps/desktop/tests/at/test_controller_failures.py": {
+      "changedFromBase": true,
+      "sha256": "645667aa8bcf1f0b629d332cfb6487dfaaec76e938766d20a6a5a668e3b51640"
+    },
+    "apps/desktop/tests/at/test_controller_protocol.py": {
+      "changedFromBase": false,
+      "sha256": "833866ec879337e73b3ece00768a4da8ca56a88be83c3b529a923347b161bad1"
+    },
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": {
+      "changedFromBase": false,
+      "sha256": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108"
+    },
+    "apps/desktop/tests/at/test_lab_namespace.py": {
+      "changedFromBase": true,
+      "sha256": "dfc624a666383d4911f608fae82dd323e1ca86083bbda600b38283af58bbbf66"
+    },
+    "apps/desktop/tests/at/test_lab_owner.py": {
+      "changedFromBase": false,
+      "sha256": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e"
+    },
+    "apps/desktop/tests/at/test_observations.py": {
+      "changedFromBase": false,
+      "sha256": "49a1d35212c0cd16289717cf57c99621acbc130ef4652ee76f8fb459a42a6ac3"
+    },
+    "apps/desktop/tests/at/test_orca_output.py": {
+      "changedFromBase": false,
+      "sha256": "d1689b4d41c2b788cf6a7632441c2ea3fff7355d9610cfeaa4775ea1182f9da8"
+    },
+    "apps/desktop/tests/at/test_product_staging.py": {
+      "changedFromBase": false,
+      "sha256": "0b13dab0ef5c609e36a83e7087c8eabde2627ae2697a6d67073e7bbfe7fce979"
+    },
+    "apps/desktop/tests/at/test_session_owner.py": {
+      "changedFromBase": false,
+      "sha256": "561a2b4fcbfd69a6e1dbb95282de2304c6228c4b96b4ad48efa1d9a7ab3dffcf"
+    },
+    "apps/desktop/tests/at/test_source_bundle.py": {
+      "changedFromBase": false,
+      "sha256": "23be2d956f55ce1df91565bf5e2091a16d5e42aeb3b6162973dd47ecf43f9827"
+    }
+  }
+}

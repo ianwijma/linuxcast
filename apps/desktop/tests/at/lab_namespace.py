@@ -48,7 +48,7 @@ SAFE = NOSUID | NODEV | NOEXEC
 RO = RDONLY | NOSUID | NODEV
 STEPS = ("preflight", "reserve", "cgroup", "start", "admit", "release", "wait", "report")
 SETUP = ("unshare", "private", "root", "layout", "binds", "proc", "sys", "devices",
-         "writable", "loopback", "seal", "chroot", "drop", "verify", "exec")
+         "writable", "loopback", "seal", "chroot", "attest", "drop", "verify", "exec")
 REASONS = {"none", "prerequisite", "setup", "deadline", "controller", "cleanup", "interrupted"}
 
 
@@ -70,6 +70,149 @@ def unique_json(raw, maximum=65536):
         return value
     require(type(raw) is bytes and len(raw) <= maximum)
     return json.loads(raw, object_pairs_hook=pairs)
+
+
+# Data protocol deliberately implemented here and independently in the controller.
+# Root never imports the staged verifier (or any other staged module).
+NS_TYPES = {"net": NEWNET, "mnt": NEWNS, "pid": 0x20000000, "user": 0x10000000}
+PROOF_NAME = "linuxcast-f102-namespace"
+PROOF_SEALS = fcntl.F_SEAL_WRITE | fcntl.F_SEAL_GROW | fcntl.F_SEAL_SHRINK | fcntl.F_SEAL_SEAL
+
+
+
+def proc_mount(fd, lib):
+    # Linux amd64 ABI: statfs.f_type at0; statx mask at0, mount ID at0x90.
+    # Require the returned STATX_MNT_ID bit: unavailable is never equivalent.
+    fs = ctypes.create_string_buffer(256)
+    require(lib.fstatfs(fd, ctypes.byref(fs)) == 0)
+    require(ctypes.c_long.from_buffer(fs).value == 0x9fa0)  # PROC_SUPER_MAGIC
+    sx = ctypes.create_string_buffer(256)
+    require(lib.statx(fd, b'', 0x1000, 0x1000, ctypes.byref(sx)) == 0)  # AT_EMPTY_PATH, STATX_MNT_ID
+    require(ctypes.c_uint32.from_buffer(sx).value & 0x1000)
+    mount = ctypes.c_uint64.from_buffer(sx, 0x90).value
+    require(mount > 0)
+    return mount
+
+
+def proc_text(name):
+    """Read only current maps/stat from genuine proc, with no file bind overlay.
+
+    Anchoring to proc root inode1 plus equal kernel mount IDs defeats both a
+    fabricated mapping file and a real proc file bound from a different task.
+    There is no fdinfo/mountinfo text whose authority could itself be overlaid.
+    """
+    require(name in ('uid_map', 'gid_map', 'stat'))
+    lib = ctypes.CDLL(None, use_errno=True)
+    root = os.open('/proc', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    try:
+        base = os.fstat(root)
+        require(stat.S_ISDIR(base.st_mode) and base.st_ino == 1)
+        mount = proc_mount(root, lib)
+        fd = os.open('self/' + name, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=root)
+        try:
+            info = os.fstat(fd)
+            require(stat.S_ISREG(info.st_mode) and info.st_dev == base.st_dev and proc_mount(fd, lib) == mount)
+            raw = b''
+            while True:
+                chunk = os.pread(fd, 4097 - len(raw), len(raw))
+                require(type(chunk) is bytes and len(raw) + len(chunk) <= 4096)
+                if not chunk:
+                    break
+                raw += chunk
+            return raw.decode('ascii')
+        finally:
+            os.close(fd)
+    finally:
+        os.close(root)
+
+
+def initial_maps():
+    for name in ('uid_map', 'gid_map'):
+        rows = [line.split() for line in proc_text(name).splitlines()]
+        require(rows == [['0', '0', '4294967295']])
+
+
+def subject_identity():
+    raw = proc_text('stat')
+    pid, tail = raw.split(' (', 1)
+    fields = tail.rsplit(')', 1)[1].split()
+    ticks = int(fields[19])  # field22; comm can contain spaces and parentheses
+    require(int(pid) == os.getpid() and 0 < os.getpid() < 2 ** 31 and 0 < ticks < 2 ** 64)
+    return {'pid': os.getpid(), 'startTicks': ticks}
+
+
+def namespace_relationships(initial, isolated):
+    require(set(initial) == set(isolated) == set(NS_TYPES))
+    for name in NS_TYPES:
+        for pair in (initial[name], isolated[name]):
+            require(type(pair) is list and len(pair) == 2
+                    and all(type(n) is int and 0 < n < 2 ** 64 for n in pair))
+        require((initial[name] == isolated[name]) is (name in ('pid', 'user')))
+
+
+def proof_metadata(fd):
+    info = os.fstat(fd)
+    require(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode) == 0o400
+            and info.st_uid == info.st_gid == 0 and info.st_nlink == 0
+            and 0 < info.st_size <= 4096)
+    require(fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY)
+    require(fcntl.fcntl(fd, fcntl.F_GET_SEALS) == PROOF_SEALS)
+    require(os.readlink('/proc/self/fd/' + str(fd)) == '/memfd:' + PROOF_NAME + ' (deleted)')
+    return identity(info), info.st_mode, info.st_nlink, info.st_size
+
+
+def make_proof(initial, isolated):
+    """Only called in the freshly descriptor-cleared root worker, before drop.
+
+    F_DUPFD allocates rather than overwriting FD3. All fallible temporaries are
+    owned before the next operation and closed even on partial setup failure.
+    """
+    namespace_relationships(initial, isolated)
+    initial_maps()
+    value = {'schema': 'f102-namespace-v1', 'initial': initial, 'isolated': isolated,
+             'subject': subject_identity()}
+    raw = json.dumps(value, sort_keys=True, separators=(',', ':')).encode('ascii')
+    require(0 < len(raw) <= 4096)
+    writable = readonly = fixed = None
+    try:
+        try:
+            os.fstat(3)
+        except OSError as error:
+            require(error.errno == errno.EBADF)
+        else:
+            raise Rejected('setup')  # never overwrite an unrelated fixed descriptor
+        writable = os.memfd_create(PROOF_NAME, os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
+        # Kernel assigns root ownership; do not repair unexpected ownership.
+        info = os.fstat(writable)
+        require(info.st_uid == info.st_gid == 0 and stat.S_ISREG(info.st_mode) and info.st_nlink == 0)
+        offset = 0
+        while offset < len(raw):
+            count = os.write(writable, raw[offset:])
+            require(type(count) is int and 0 < count <= len(raw) - offset)
+            offset += count
+        os.fchmod(writable, 0o400)
+        fcntl.fcntl(writable, fcntl.F_ADD_SEALS, PROOF_SEALS)
+        readonly = os.open('/proc/self/fd/' + str(writable), os.O_RDONLY | os.O_CLOEXEC)
+        before = proof_metadata(readonly)
+        require(before[0] == identity(os.fstat(writable)))
+        fd, writable = writable, None
+        os.close(fd)  # close failure aborts; never retry an ambiguously closed fd
+        fixed = fcntl.fcntl(readonly, fcntl.F_DUPFD_CLOEXEC, 3)
+        require(fixed == 3)
+        fd, readonly = readonly, None
+        os.close(fd)
+        require(proof_metadata(fixed) == before and os.pread(fixed, 4097, 0) == raw)
+        require(not os.get_inheritable(fixed))
+        fixed = None  # sole read-only data descriptor now owned by worker/exec
+    finally:
+        failed = False
+        for fd in (writable, readonly, fixed):
+            if fd is not None:
+                try:
+                    os.close(fd)
+                except OSError:
+                    failed = True
+        require(not failed)
 
 
 def sha(raw):
@@ -344,6 +487,34 @@ class Kernel:
         self.call('fstatfs', fd, ctypes.byref(buffer))
         return ctypes.c_long.from_buffer(buffer).value
 
+    def namespace(self, process, name, keep=None):
+        require(process in ('self', '1') and name in NS_TYPES)
+        fd = os.open('/proc/' + process + '/ns/' + name, os.O_RDONLY | os.O_CLOEXEC)
+        if keep is not None:
+            keep(fd)  # root parent owns even a handle whose later validation fails
+        try:
+            info = os.fstat(fd)
+            require(self.filesystem_type(fd) == 0x6e736673)  # NSFS_MAGIC
+            require(fcntl.ioctl(fd, 0xb703) == NS_TYPES[name])  # NS_GET_NSTYPE
+            pair = [info.st_dev, info.st_ino]
+            require(all(type(n) is int and 0 < n < 2 ** 64 for n in pair))
+            return pair
+        finally:
+            if keep is None:
+                os.close(fd)
+
+    def own_namespaces(self):
+        return {name: self.namespace('self', name) for name in NS_TYPES}
+
+    def initial_namespaces(self, keep):
+        require(os.getresuid() == (0, 0, 0) and os.getresgid() == (0, 0, 0))
+        initial_maps()
+        result = {}
+        for name in NS_TYPES:
+            result[name] = self.namespace('1', name, keep)
+            require(self.namespace('self', name) == result[name])
+        return result
+
     def prctl(self, option, value):
         self.call("prctl", option, ctypes.c_ulong(value), 0, 0, 0)
 
@@ -362,6 +533,7 @@ class Guest:
         self.pin = None
         self.out_identity = None
         self.kernel = None
+        self.initial_namespaces = None
 
     def keep(self, fd):
         self.fds.append(fd)
@@ -371,6 +543,8 @@ class Guest:
         # Do not inspect unrelated user homes, SSH identities or guest endpoints.
         import sys
         require(sys.flags.isolated == 1 and Path(__file__).absolute() == INSTALLED)
+        self.kernel = Kernel()
+        self.initial_namespaces = self.kernel.initial_namespaces(self.keep)
         self.keep(open_chain(INSTALLED, immutable=True))
         permitfd = self.keep(open_chain(PERMIT, immutable=True))
         fcntl.flock(permitfd, fcntl.LOCK_EX | fcntl.LOCK_NB)  # serialize this exact permit
@@ -392,8 +566,7 @@ class Guest:
                  "product": Path("/sys/class/dmi/id/product_name").read_text().strip(),
                  "machineId": Path("/etc/machine-id").read_bytes(),
                  "productUuid": Path("/sys/class/dmi/id/product_uuid").read_bytes(),
-                 "sameInitialNamespaces": all(Path('/proc/self/ns/' + n).stat().st_ino == Path('/proc/1/ns/' + n).stat().st_ino
-                                              for n in ('net', 'mnt', 'pid', 'user'))}
+                 "sameInitialNamespaces": True}
         validate_permit(self.pin, facts)
         require(file_hash(INSTALLED) == self.pin["wrapperSha256"])
         require(file_hash(NODE) == self.pin["nodeSha256"])
@@ -415,7 +588,6 @@ class Guest:
         pinned_infrastructure(self.stagefd, self.pin)
         self.basefd = self.keep(open_chain('/run', directory=True))
         self.cgbase = self.keep(open_chain('/sys/fs/cgroup', directory=True))
-        self.kernel = Kernel()
         require(self.kernel.filesystem_type(self.cgbase) == 0x63677270)  # CGROUP2_SUPER_MAGIC
         require({'memory', 'pids', 'cpu'} <= set(Path('/sys/fs/cgroup/cgroup.subtree_control').read_text().split()))
         require(Path('/sys/fs/cgroup/cgroup.controllers').is_file())
@@ -714,6 +886,11 @@ class Setup:
         os.chroot(self.root_path)
         os.chdir('/')
 
+    def attest(self):
+        self.isolated_namespaces = self.k.own_namespaces()
+        namespace_relationships(self.guest.initial_namespaces, self.isolated_namespaces)
+        make_proof(self.guest.initial_namespaces, self.isolated_namespaces)
+
     def drop(self):
         # Empty bounding set, groups, ambient/permitted/effective caps; no setuid
         # regain. RLIMITs and cgroup limits apply to all subsequent children.
@@ -739,8 +916,11 @@ class Setup:
         status = dict(line.split(':', 1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
         require(all(int(status[key].strip(), 16) == 0 for key in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb')))
         require(status['NoNewPrivs'].strip() == '1')
-        require(Path('/proc/self/ns/net').stat().st_ino != Path('/proc/1/ns/net').stat().st_ino)
-        require(Path('/proc/self/ns/pid').stat().st_ino == Path('/proc/1/ns/pid').stat().st_ino)
+        initial_maps()
+        current = self.k.own_namespaces()
+        require(current == self.isolated_namespaces)
+        namespace_relationships(self.guest.initial_namespaces, current)
+        proof_metadata(3)
         require({p.name for p in Path('/sys/class/net').iterdir()} == {'lo'})
         require(not any(Path(p).exists() for p in ('/dev/input', '/dev/uinput', '/dev/snd', '/run/dbus', '/tmp/.X11-unix')))
         require(int(Path('/sys/class/net/lo/flags').read_text(), 16) & 1)
@@ -756,6 +936,16 @@ class Setup:
             require(stream.read(4) == b'\x7fELF')
 
     def exec(self):
+        proof_metadata(3)
+        # Nothing opened by receipt validation may accompany the sealed proof.
+        for name in os.listdir('/proc/self/fd'):
+            if name.isdecimal() and int(name) > 3:
+                try:
+                    os.close(int(name))
+                except OSError as error:
+                    if error.errno != errno.EBADF:
+                        raise
+        os.set_inheritable(3, True)
         os.execve(CONTROLLER_ARGV[0], CONTROLLER_ARGV, ENV)
 
 

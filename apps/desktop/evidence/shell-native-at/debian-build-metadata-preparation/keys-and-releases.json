@@ -1,0 +1,149 @@
+{
+  "createdAtUtc": "2026-11-01T13:30:16.449256+00:00",
+  "downloads": {
+    "archive-key-12-security.asc": {
+      "actualPrimaryFingerprint": "05AB90340C0C5E797F44A8C8254CF3B5AEC0A8F0",
+      "bytes": 11873,
+      "expectedPrimaryFingerprint": "05AB90340C0C5E797F44A8C8254CF3B5AEC0A8F0",
+      "fingerprintMatches": true,
+      "sha256": "74f81645b4e3156d1e9a88c8dd9259271b89c7099d64af89a2a6996b592faa1f",
+      "status": "downloaded",
+      "url": "https://ftp-master.debian.org/keys/archive-key-12-security.asc"
+    },
+    "archive-key-12.asc": {
+      "actualPrimaryFingerprint": "B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8",
+      "bytes": 11861,
+      "expectedPrimaryFingerprint": "B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8",
+      "fingerprintMatches": true,
+      "sha256": "c2a9a16fde95e037bafd0fa6b7e31f41b4ff1e85851de5558f19a2a2f0e955e2",
+      "status": "downloaded",
+      "url": "https://ftp-master.debian.org/keys/archive-key-12.asc"
+    },
+    "archive-key-13-security.asc": {
+      "actualPrimaryFingerprint": "5E04A1E3223A19A20706E20F9904613D4CCE68C6",
+      "bytes": 11873,
+      "expectedPrimaryFingerprint": "5E04A1E3223A19A20706E20F9904613D4CCE68C6",
+      "fingerprintMatches": true,
+      "sha256": "844c07d242db37f283afab9d5531270a0550841e90f9f1a9c3bd599722b808b7",
+      "status": "downloaded",
+      "url": "https://ftp-master.debian.org/keys/archive-key-13-security.asc"
+    },
+    "archive-key-13.asc": {
+      "actualPrimaryFingerprint": "04B54C3CDCA79751B16BC6B5225629DF75B188BD",
+      "bytes": 11861,
+      "expectedPrimaryFingerprint": "04B54C3CDCA79751B16BC6B5225629DF75B188BD",
+      "fingerprintMatches": true,
+      "sha256": "6f1d277429dd7ffedcc6f8688a7ad9a458859b1139ffa026d1eeaadcbffb0da7",
+      "status": "downloaded",
+      "url": "https://ftp-master.debian.org/keys/archive-key-13.asc"
+    },
+    "release-13.asc": {
+      "actualPrimaryFingerprint": "41587F7DB8C774BCCF131416762F67A0B2C39DE4",
+      "bytes": 1384,
+      "expectedPrimaryFingerprint": "41587F7DB8C774BCCF131416762F67A0B2C39DE4",
+      "fingerprintMatches": true,
+      "sha256": "4d097bb93f83d731f475c5b92a0c2fcf108cfce1d4932792fca72d00b48d198b",
+      "status": "downloaded",
+      "url": "https://ftp-master.debian.org/keys/release-13.asc"
+    },
+    "trixie-InRelease": {
+      "bytes": 140421,
+      "sha256": "0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675",
+      "status": "downloaded",
+      "url": "https://deb.debian.org/debian/dists/trixie/InRelease"
+    },
+    "trixie-security-InRelease": {
+      "bytes": 43409,
+      "sha256": "6f64e49b0c96174839bc6ba03d22d97ffe96c746602b9a413779324673e098fc",
+      "status": "downloaded",
+      "url": "https://security.debian.org/debian-security/dists/trixie-security/InRelease"
+    },
+    "trixie-updates-InRelease": {
+      "bytes": 47340,
+      "sha256": "878f891a824d2420ad5a386c2b7d6ef79cd89e961f48c7a9a1db1bca7ed02bfe",
+      "status": "downloaded",
+      "url": "https://deb.debian.org/debian/dists/trixie-updates/InRelease"
+    }
+  },
+  "fingerprintSource": "https://ftp-master.debian.org/keys.html",
+  "guestOperations": 0,
+  "packageInstalls": 0,
+  "schemaVersion": 1,
+  "scope": "public-metadata-candidate-not-guest-provisioning",
+  "signatureChecks": {
+    "trixie-InRelease": {
+      "exitCode": 0,
+      "statusCodes": [
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE",
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE",
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG"
+      ],
+      "success": true,
+      "validSignaturePrimaryFingerprints": [
+        "B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8",
+        "04B54C3CDCA79751B16BC6B5225629DF75B188BD",
+        "41587F7DB8C774BCCF131416762F67A0B2C39DE4"
+      ]
+    },
+    "trixie-security-InRelease": {
+      "exitCode": 0,
+      "statusCodes": [
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE",
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE"
+      ],
+      "success": true,
+      "validSignaturePrimaryFingerprints": [
+        "05AB90340C0C5E797F44A8C8254CF3B5AEC0A8F0",
+        "5E04A1E3223A19A20706E20F9904613D4CCE68C6"
+      ]
+    },
+    "trixie-updates-InRelease": {
+      "exitCode": 0,
+      "statusCodes": [
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE",
+        "NEWSIG",
+        "KEY_CONSIDERED",
+        "SIG_ID",
+        "GOODSIG",
+        "VALIDSIG",
+        "VERIFICATION_COMPLIANCE_MODE"
+      ],
+      "success": true,
+      "validSignaturePrimaryFingerprints": [
+        "B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8",
+        "04B54C3CDCA79751B16BC6B5225629DF75B188BD"
+      ]
+    }
+  },
+  "status": "fingerprints-and-signatures-verified-candidate",
+  "trustBootstrap": "HTTPS-published key fingerprints; no host Debian keyring or guest trust anchor read"
+}

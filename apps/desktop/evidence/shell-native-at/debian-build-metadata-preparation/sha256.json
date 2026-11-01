@@ -1,0 +1,11 @@
+{
+  "files": {
+    "README.md": "5278ca8871654754bac4908abe511256cb017d91a3e6fd01ac7c6886df7b9b1a",
+    "indexes.json": "51118a88a5859511c1918b2ee78205a16e8ac33e7e54cdc42874c004f2f8c1eb",
+    "keys-and-releases.json": "8f07290651a32255962762cc6984807478573031f2c7b54967932d5637a7c742",
+    "selected-candidates.json": "a4c34a0dd1eaf9657919504b0fe8c0a3f258b12dd2409344a559749f00cadc21",
+    "signature-control.json": "529815b64fd1df8385ef380de1ef02a669b387235810a065ea377c729d2c50eb"
+  },
+  "schemaVersion": 1,
+  "scope": "metadata-evidence-not-package-install-or-native-acceptance"
+}

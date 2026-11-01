@@ -1,0 +1,24 @@
+test_closed_schema_subject_pairs_and_maps (test_controller_failures.AttestationTests) ... ok
+test_descriptor_authority_and_snapshot_faults_never_construct_native (test_controller_failures.AttestationTests) ... ok
+test_early_cli_setup_faults_close_once_without_staging (test_controller_failures.AttestationTests) ... ok
+test_existing_os_identity_capability_and_device_gates_survive_proof (test_controller_failures.AttestationTests) ... ok
+test_import_and_failed_preflight_never_import_staging (test_controller_failures.AttestationTests) ... ok
+test_initial_deadline_failure_closes_proof_before_any_work (test_controller_failures.AttestationTests) ... ok
+test_invalid_cli_closes_proof_without_native_work (test_controller_failures.AttestationTests) ... ok
+test_missing_proof_stops_real_preflight_before_stage (test_controller_failures.AttestationTests) ... ok
+test_namespace_read_and_type_denial_never_falls_back (test_controller_failures.AttestationTests) ... ok
+test_post_read_authority_changes_and_proc_denials_close_proof (test_controller_failures.AttestationTests) ... ok
+test_proof_closed_before_session_and_any_native_construction (test_controller_failures.AttestationTests) ... ok
+test_real_proc_map_reader_rejects_fabrication_and_bind_overlays (test_controller_failures.AttestationTests) ... ok
+test_real_unprivileged_memfd_with_synthetic_root_ownership (test_controller_failures.AttestationTests) ... ok
+test_short_reads_succeed_but_zero_errors_and_close_faults_stop (test_controller_failures.AttestationTests) ... ok
+test_valid_proof_allows_pid1_denial_and_is_closed_before_stage (test_controller_failures.AttestationTests) ... ok
+test_cleanup_failure_preserves_original_failure_and_cannot_publish_success (test_controller_failures.FailureTests) ... ok
+test_each_failure_stops_and_cleans_without_publishing_private_payload (test_controller_failures.FailureTests) ... ok
+test_missing_precondition_never_constructs_session_or_starts_product (test_controller_failures.FailureTests) ... ok
+test_post_spawn_identity_failure_records_launch_before_report_publication (test_controller_failures.FailureTests) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.823s
+
+OK

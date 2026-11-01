@@ -1,5 +1,179 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Namespace FD3 custody correction — final recheck clear, publish next
+
+Both initial reviews completed/read at00e261702eb70a66ca4a2320ae7a02fa437aadfb:
+Standards68e794e0 and SecuritySpecb0cccb33 each found one sameP2: proof_pending
+cleared beforepreflight/consume entryguard couldtakeownership. Traceinterruption
+left FD3 open/inheritable with cleanuptrue/nativeRuns0. No other actionable
+finding; deliberate root/stage boundaryduplication accepted. Eachindependent
+53wrapper/19controller/290Python/55mapped security (8.951/9.037Python) passes.
+No actualguest/native/provision action; sourcecheckouts clean, callbacks consumed.
+
+Coordinator directly fixes smallfinding with one ProofCustody object spanning
+CLI→run→preflight→consume. Unknown state is recorded beforecloseattempt, confirmed
+close/EBADF clears it; no retry of ambiguous/reusedFD3. Real closeuncertainty makes
+report.cleanupfalse without changing firstcause/nativecount. Outer custodycovers
+Deadline construction, preflight/consume entries and CLI/run entry. Same proof/
+namespace/maps/capability/receipt/child lifecycle gates; no CLInewauthority.
+Five meaningful newmethods cover these cancellation boundaries, ambiguousclose,
+reusednumericdescriptor and interruptionatcloseattempt. Originalthree regression
+methods fail exactreviewed00e2617 (5failures/0errors) and passfixed; duplicateclose
+and untrackeduncertainty privatefault controls eachfail theirbehavioraltest.
+No trackedsource mutation. FirsthelperROOTparentindeximporterror corrected before
+behavioral controls, notproductfailure. Oldlifecyclemocks nowuse fakeproofcustody.
+
+Current24controller/55mappedsecurity/all295Python no skips pass; finalmapped9.22s,
+Python8.129s underunchanged18s. Both30historical/currenthashsets and allAST/plan/
+whitespace pass. Current two files intentionallydifferfromauthor96b42643; old
+source-hashes.json remains historical. Newcoordinator-custody-sha256.json and
+coordinator-custody-correction.md distinguish currentcorrection/evidence. Installed
+wrapper/tree/source/archive/receipt/permit/pins stillhistorical pendingreconcile.
+No new operational/root/guest/provisioning/build/native action or acceptance.
+Finalfresh7d36eb95 recheck CLEAR at6aafb140 on bothaxes: originalP2resolved,
+no newfindings; independent24controller/53wrapper/55mapped/all295Python8.233s
+under18s,21extra synthetic/owned-memfd probes, old/current/fault controls,30old/
+30current/3extrahashes/24AST/plan/whitespace pass. Cleanbefore/after, no edits or
+privilegedactions. Actualfacts inherited. No namespacePR yet; publication and
+currentCI/GitHubinspection then promptmerge next.
+
+Read-only buildfacts design continues separately: full bounded projectedDPKG
+status/holds/architecture/pending/locks and resource facts neededbefore exact
+offline resolution; no installauthority. Officialdpkg1.22.22 arch/dbmodify sources
+read, confirms POSIX frontend/database locksequence and package DB journal reads;
+no host/guest dpkg invoked. All97/full1.0 remainsACTIVE/incomplete. No rootcommand,
+test, delegate or PRwatch live at this checkpoint; originaltwo actual inventories
+and cleanshutdown results remain as recorded. No unknowncleanupgap retrospectively
+closed by currenttests; no product/Orca run occurred.
+
+## Namespace integration frozen for initial review — 2November2026 Sydney
+
+Root codex/f1-02-namespace-attestation integrates signed authorca103865/96b42643
+via8f153e1/8fb1a1c, four ownedcode/testfiles byte-identical toauthor96b42643.
+Contract namespace-attestation-protocol.md is coordinator-owned; no execution
+permission or acceptance follows. Parent55mappedsecurity passes14.92s total,
+all290offlinePython/zero skips within existing18s (inner12.915s). Author53wrapper/
+19controller/290Python12.059s/55mapped10.64s; parentall30sourcepins/AST/count/plan/
+whitespace pass. Parent replay ofthree behavioral regressions against exactbd587
+base fails for expected PID1denial/missingproof reasons, fixed source passes full
+mapped suite. No host drop/unshare/mount/chroot or new guest/native operation.
+
+Boundary: root parent retains genuine typednsfs initial references; childcloses
+outside/nsfds, rootworker seals readonly anonymous subject-bound dataFD3; worker
+and controller compare currentownnamespaces with initial/isolation pairs and
+identityUID/GIDmaps. Genuineproc root/mountID anchors reject fake/individualbind
+mapfiles. Controller consumes/closes proof before staging/native construction;
+capabilities/groups/NNP/receipt/loopback/devices/cgroups/deadlines remain. Historical
+APPROVED_TREE/source/archive/build/receipt/permit/manifests intentionallyunchanged;
+coordinator reconciliation and realstatx/map/namespace/handoff/containment proof
+still required. Newprep evidence clearly offline. Initial fresh independent
+Standards and Security/Spec reviews next; no PR published for this increment yet.
+
+Research543b145 integrated viafc5388f, exactly5newdocs/metadatafiles, normal signing.
+Source audit confirms onlyplatformcrate build, directGIO/GObject/GLib links;
+minimalcandidate g++/make/libgio-2.0-dev plus authenticatedclosure (not the8probed
+missing dev/build candidates). SQLite uses bundledamalgamation, no systemSQLite
+headers fordefaultbuild. Rust PATHreset gap and extractor randomchild→finalstaging
+promotion beforeinstall found. Fullguestdpkg baseline/holds/foreignarch/pending
+state required before exact offline transaction; source/helper/profile authority
+not yet implemented. Next coordinator-owned closed read-only buildfacts contract.
+No .deb, guest install/build/native claim. Other registeredfull1.0libsnotexcluded.
+
+Publicsignature/index staging alreadyrecordedbelow. Two exploratory isolated
+hostAPTempty-status simulations did NOT establish a resolved closure: harness/
+empty-cache/acquisition interactions stopped them. All temporaryprofiles removed,
+partial public diagnostics preserved outsideGit; no .deb download or host/guest
+package mutation. No successfulAPTplan is claimed or included as acceptance.
+Actual guestbaseline and DebianAPT3 validation remain required; do not replay an
+incomplete hostAPT2.4 hypothetical plan as a guest install transaction.
+
+All finisheddelegate callbacks consumed, sourcecheckouts clean. No live root
+command/test or PRwatch at this checkpoint. Previous nativeat4desktop/physical/
+release/historicalabsence/full97 scope remains untouched; independent review next.
+
+## Host public Debian metadata staging — 2November2026 Sydney
+
+Current codex/f1-02-namespace-attestation follows approvedPR100/69decac; namespace
+implementation ad854267 and build-provisioning research749ca910 are independent
+SOLhigh T3 isolated tasks frombd587382, no polling. Their exact source/evidence
+handoffs and independent implementation review remain pending. No root process,
+real guest operation or PRwatch is live at this checkpoint. Goal/full97 unchanged.
+
+Coordinator staged public keys/three signed InRelease documents outsideGit in
+f102-public-debian13-metadata-20261101; same-name indexes sibling holds three
+content-addressed main/amd64 Packages.xz and verified Release payloads, private
+0500/0400 single-link files. Host has no Debian archive keyring; five12/13 keys
+match HTTPS-published FTP-master fingerprints (explicit TLS bootstrap, not an
+independent installed-keyring or guest trust anchor). GnuPG2.2.27 validates all
+three Release signatures with only this explicit candidate ring:3stable,
+2updates,2security. Onechangedcleartextbyte rejects (oneBADSIG/zeroVALIDSIG).
+All compressed AND expanded index SHA256/size verify against signed payloads.
+No .deb downloaded, dependency closure resolved, package/hostAPT mutation,
+private-lab read, guest install/build/native action or acceptance promotion.
+
+Signed candidates: trixie13.7 dated12Sept; updates expiry8Nov08:09:02UTC and
+security8Nov12:12:11UTC, checkedcurrent; basehasnoexplicitexpiry. No trust/expiry
+bypass, freshness and guest packaged-keyring reconciliation before installation.
+Initial collector assumption maincomponent failed on signedsecurityupdates/main
+label while its signed paths are main/; partialfiles retained/reverified before
+content-addressed downloads. No production/parser change or weakenedappguard.
+Eight selected build/dev package facts extracted, not recursive dependency closure.
+Committed smallmetadata/evidence report at
+apps/desktop/evidence/shell-native-at/debian-build-metadata-preparation/; actual
+publickey/index payloads remainoutsideGit. Native/package/ABI/receipt/containment/
+AT/fourdesktop/physical/release gates remain. Next act on isolated handoffs.
+
+## Current coordinator state — PR100 merged; complete corrected guest inventory
+
+PR100 https://github.com/ianwijma/linuxcast/pull/100 MERGED at
+69decac2bd695de53d24e5595770b2e546d362be, exactheadcdd1153, current PlanningCI
+41310579644 SUCCESS. Independent Standards39f1c16c and SecuritySpec004b1237 clear
+at084e7dc, latermetadataonly; each58inventory/55mapped/all266Python under18s,
+old-source negative controls, malformed/strict-output/hash/type/plan checks.
+GitHub no requested/submitted reviews; CodeRabbit terminalskip below10stars,
+no actionable feedback; rulesets empty/protection404. Normal exacthead merge,
+immediate tinyblurb sent, no watch retained. Task/criteria unchanged.
+
+SECOND REAL inventory used fresh immutable approved084e7dc source/three inputs
+and new exact13-field0400 permit under existing retained root/lock. Previous
+permit renamed to used-source name preserving inode/bytes; original result,
+source and rejectedcandidate preserved. No private user-data/key reads. Fixed
+closed CLI only, same linuxcast key/noninteractive sudo; no automatic retry.
+Actual2026-11-01T13:20:48.713730Z→13:21:30.411073Z (2NovSydney),41.697s/exit0.
+Strict result validates completed/firstFailure none/cleanup none, all metadata
+known. Package versions now collected; first run stays incomplete historical.
+Exact prior failing guest field not collected/identified, so do not claim it.
+
+Debian13amd64 actual Python3.13.5-1/Orca48.1-1+deb13u2/AT-SPI2.56.2-1+deb13u2/
+D-Bus1.16.2-2/speech0.12.0-5/Xvfb21.1.16-1.3+deb13u4. gcc/g++/make/pkg-config/
+sixselecteddevpackages absent. UID/GID20000 absent and idle;101boundedprocesses,
+zero fixed graphical/test candidates. Self net/PID metadata allowed, PID1both
+denied, equalityunknown, exact feasibility-child cleanuptrue. No namespacecreated.
+Owner ownedChildrenAbsent/stoppedVerified/reservationCleantrue; separate fresh
+pinned exited/PID0/exit0, markerabsence/originallockreacquired, stderr0, exact
+callerreaped. No interruption/crash recovery proof. Historical absence gaps remain.
+Evidence apps/desktop/evidence/shell-native-at/inventory-actual-20261101-corrected/.
+
+Root codex/f1-02-namespace-attestation includes approvedPR100 plus frozen
+namespace-attestation-protocol.md frombdae18d. Contract resolves measured PID1
+access failure without weaker isolation: root initial nsfs/type/device+inode
+observation retained in parent, child closes namespace handles, exact initial
+UID/GID maps; root worker seals bounded anonymous root-owned read-only dataFD3
+with subject and initial/isolated namespace pairs. Wrapper and controller check
+own identities/empty privileges; controller consumes/closes FD3 before any stage
+validation/nativechild. No NEWPID/NEWUSER/CAP_SYS_PTRACE/fakeproc/normalnetwork
+fallback. Implementation limited to wrapper/controller/two testfiles/new evidence;
+all old infrastructure pins, actualbuild/receipt and execution remain coordinator
+owned. Offline implementation assignment next; no new native permit/install/run.
+
+Full97/local1.0 remains ACTIVE/incomplete,8done/20inprogress/69planned and56passed/
+325pending/8justifiedN/A unchanged. Product/Orca runs0. Next actual missingtoolchain/
+UID provisioning requires separate reviewed bounded owner/current source/archive/
+cache/receipt; fourdesktop/nativeAT/physical/performance/package/release gates
+remain. AI b7f2912/c78228e preparations stilllocal/unpublished/unmerged/PLANNED
+behind wholeF2/F3 dependencies. FutureUI Opus5.5medium, nonUI SOLhigh.
+No live owner/test or PRwatch. Namespace implementation/review still pending.
+
 ## Current coordinator state — first actual inventory returned partial facts
 
 Full97/local1.0 Goal ACTIVE and incomplete. Registry remains8done/20inprogress/
