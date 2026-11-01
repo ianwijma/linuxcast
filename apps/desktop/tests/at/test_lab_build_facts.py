@@ -992,21 +992,30 @@ class Files(unittest.TestCase):
         self.assertTrue((self.root / self.lease.artifact_name()).exists())
 
     def test_close_ambiguity_never_retries_or_claims_publication(self):
-        real = os.close
+        original = build.open_artifact_writer
         attempted = []
-        def fail(fd):
-            # Target the retained writer while its publication is uncertain.
-            if self.lease.artifact_uncertain and fd == self.lease.artifactfd and not attempted:
-                attempted.append(fd)
-                real(fd)
+        class AmbiguousClose:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
+            @property
+            def closed(self):
+                return self.wrapped.closed
+            def fileno(self):
+                return self.wrapped.fileno()
+            def close(self):
+                attempted.append(self.wrapped.fileno())
+                self.wrapped.close()
                 raise OSError('synthetic close after actual close')
-            return real(fd)
-        with patch.object(owner.os, 'close', fail):
+        def writer(rootfd, name):
+            return AmbiguousClose(original(rootfd, name))
+        with patch.object(build, 'open_artifact_writer', writer):
             result = owner.transact(self.lease, FakeLab(self.lease))
         self.assertEqual(len(attempted), 1)
         self.assertFalse(result['transportResultValid'])
         self.assertFalse(result['reservationClean'])
         self.assertTrue((self.root / self.lease.artifact_name()).exists())
+        self.assertFalse(self.lease.close())
+        self.assertEqual(len(attempted), 1)
 
     def test_cancellation_before_writer_close_retains_exact_descriptor_for_cleanup(self):
         method = build.BuildFactsReservation.publish
@@ -1047,6 +1056,73 @@ class Files(unittest.TestCase):
                         real_close(fd)
                 except OSError:
                     pass
+
+    def alarm_at_writer_close(self, after):
+        method = build.BuildFactsReservation.publish
+        lines, start = inspect.getsourcelines(method)
+        close_index = next(i for i, line in enumerate(lines) if
+                           'os.close(fd)' in line or 'self.artifact_writer.close()' in line)
+        close_line = start + close_index
+        after_line = start + next(i for i in range(close_index + 1, len(lines)) if
+                                 'self.artifactfd = None' in lines[i] or
+                                 'owner.require(self.artifact_writer.closed' in lines[i])
+        writer, canary, fired = [], [], []
+        def alarm(*_):
+            if after:
+                fd = os.open(self.root / 'unrelated-canary', os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+                canary.append((fd, owner.identity(os.fstat(fd))))
+                os.write(fd, b'unrelated')
+            raise owner.Rejected('deadline')
+        def trace(frame, event, _arg):
+            if frame.f_code is method.__code__ and event == 'line':
+                if frame.f_lineno == close_line:
+                    writer.append((self.lease.artifactfd, self.lease.artifact_id))
+                if frame.f_lineno == (after_line if after else close_line) and not fired:
+                    fired.append(True)
+                    signal.raise_signal(signal.SIGALRM)
+            return trace
+        previous = signal.signal(signal.SIGALRM, alarm)
+        try:
+            try:
+                sys.settrace(trace)
+                result = owner.transact(self.lease, FakeLab(self.lease))
+            finally:
+                sys.settrace(None)
+                signal.signal(signal.SIGALRM, previous)
+            self.assertEqual(fired, [True])
+            self.assertEqual(len(writer), 1)
+            self.assertIsNotNone(writer[0][0])
+            self.assertEqual(result['firstFailure'], 'deadline')
+            self.assertFalse(result['transportResultValid'] or result['reservationClean'])
+            self.assertFalse(self.lease.close())
+            if after:
+                self.assertEqual(canary[0][0], writer[0][0])
+                try:
+                    info = os.fstat(canary[0][0])
+                except OSError:
+                    self.fail('cleanup closed an unrelated descriptor reusing the writer number')
+                self.assertEqual(owner.identity(info), canary[0][1])
+                self.assertEqual(os.pread(canary[0][0], 9, 0), b'unrelated')
+            else:
+                with self.assertRaises(OSError) as caught:
+                    os.fstat(writer[0][0])
+                self.assertEqual(caught.exception.errno, errno.EBADF)
+        finally:
+            sys.settrace(None)
+            signal.signal(signal.SIGALRM, previous)
+            # Exact independent cleanup also runs on historical behavioral reds.
+            for fd, identity in writer + canary:
+                try:
+                    if fd is not None and owner.identity(os.fstat(fd)) == identity:
+                        os.close(fd)
+                except OSError:
+                    pass
+
+    def test_hard_alarm_before_writer_close_retires_the_exact_open_writer(self):
+        self.alarm_at_writer_close(False)
+
+    def test_hard_alarm_after_writer_close_preserves_a_reused_unrelated_descriptor(self):
+        self.alarm_at_writer_close(True)
 
     def test_artifact_replacement_during_write_is_preserved_and_never_adopted(self):
         path = self.root / self.lease.artifact_name()

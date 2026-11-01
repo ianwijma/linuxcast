@@ -6,6 +6,8 @@ start/child/guardian/recovery/shutdown authority; this module grants none.
 import base64
 import binascii
 import hashlib
+from functools import partial
+import io
 import os
 from pathlib import Path
 import re
@@ -662,14 +664,33 @@ def facts_argv(pin, readiness=False):
     return owner.fixed_ssh_argv(pin, remote)
 
 
+def open_artifact_writer(rootfd, name):
+    # FileIO owns open/close in C, including its closed state on syscall errors.
+    # The C partial avoids a Python opener handing an unowned descriptor back.
+    # x+ supplies O_CREAT|O_EXCL, which refuses existing symlinks as well as all
+    # other existing objects; the retained directory and mode remain fixed.
+    return io.FileIO(name, 'x+', opener=partial(os.open, mode=0o400, dir_fd=rootfd))
+
+
 class BuildFactsReservation(owner.Reservation):
     permit_name = PERMIT
 
     def __init__(self, root=owner.LAB):
         super().__init__(root)
+        self.artifact_writer = None
         self.artifactfd = None
         self.artifact_id = self.artifact_raw = None
         self.artifact_uncertain = False
+
+    @property
+    def artifactfd(self):
+        if self.artifact_writer is not None and not self.artifact_writer.closed:
+            return self.artifact_writer.fileno()
+        return self._artifactfd
+
+    @artifactfd.setter
+    def artifactfd(self, value):
+        self._artifactfd = value
 
     def permit(self, base_sha, source_sha, probe_sha):
         pin = self.read_permit()
@@ -731,8 +752,7 @@ class BuildFactsReservation(owner.Reservation):
         # unlinks/adopts a replacement or reports rollback.
         self.artifact_raw = raw
         try:
-            self.artifactfd = os.open(self.artifact_name(), os.O_CREAT | os.O_EXCL | os.O_RDWR
-                                      | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK, 0o400, dir_fd=self.rootfd)
+            self.artifact_writer = open_artifact_writer(self.rootfd, self.artifact_name())
             self.artifact_id = owner.identity(os.fstat(self.artifactfd))
             offset = 0
             while offset < len(raw):
@@ -746,16 +766,11 @@ class BuildFactsReservation(owner.Reservation):
             self.check()
             self.check_artifact()
             self.artifact_uncertain = True
-            # Keep custody across cancellation before the close scope. Once the
-            # close call starts, mask cancellation through retirement bookkeeping
-            # (the hard alarm remains deliverable) and
-            # discard its number even on an ambiguous Linux close error.
-            fd = self.artifactfd
-            with owner.blocked_signals():
-                try:
-                    os.close(fd)
-                finally:
-                    self.artifactfd = None
+            # Before this C call the object owns an open writer; after it the
+            # object's closed state retires the number even if a signal raises.
+            # No Python finally handoff and no alarm masking/retry are needed.
+            self.artifact_writer.close()
+            owner.require(self.artifact_writer.closed, 'custody')
             self.artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK,
                                       dir_fd=self.rootfd)
             self.artifact_uncertain = False
@@ -817,7 +832,16 @@ class BuildFactsReservation(owner.Reservation):
 
     def close(self):
         success = not self.artifact_uncertain
-        if self.artifactfd is not None:
+        if self.artifact_writer is not None and not self.artifact_writer.closed:
+            try:
+                self.check_artifact_closed(self.artifact_writer.fileno())
+            except BaseException:
+                success = False
+            try:
+                self.artifact_writer.close()
+            except BaseException:
+                success = False
+        elif self.artifactfd is not None:
             fd, self.artifactfd = self.artifactfd, None
             try:
                 self.check_artifact_closed(fd)

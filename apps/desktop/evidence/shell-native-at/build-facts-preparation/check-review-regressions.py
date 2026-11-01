@@ -22,9 +22,14 @@ METHODS = (
     'Files.test_cancellation_before_writer_close_retains_exact_descriptor_for_cleanup',
     'OrdinaryProcesses.test_guardian_final_close_failure_invalidates_handed_off_observation',
 )
+CLOSE_BASE = 'f15abda86b71acfd1736b41def4b100571f01968'
+CLOSE_METHODS = (
+    'Files.test_hard_alarm_before_writer_close_retires_the_exact_open_writer',
+    'Files.test_hard_alarm_after_writer_close_preserves_a_reused_unrelated_descriptor',
+)
 
 
-def run(source):
+def run(source, methods=METHODS):
     with tempfile.TemporaryDirectory(prefix='f102-review-regression-') as directory:
         private = Path(directory)
         (private / 'lab_build_facts.py').write_bytes(source)
@@ -36,7 +41,7 @@ def run(source):
         environment = dict(PATH='/usr/bin:/bin', LANG='C', LC_ALL='C', HOME='/nonexistent',
                            PYTHONPATH=str(private) + os.pathsep + str(AT), PYTHONDONTWRITEBYTECODE='1')
         result = subprocess.run([sys.executable, '-B', '-m', 'unittest',
-                                 *('test_lab_build_facts.' + method for method in METHODS)],
+                                 *('test_lab_build_facts.' + method for method in methods)],
                                 cwd=private, env=environment, stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10, check=False)
         return result.returncode, result.stderr.decode('utf-8')
@@ -48,6 +53,14 @@ if __name__ == '__main__':
     new_code, new_log = run((AT / 'lab_build_facts.py').read_bytes())
     assert old_code == 1 and 'failures=11' in old_log and 'errors=' not in old_log, old_log
     assert new_code == 0 and 'Ran 7 tests' in new_log and new_log.rstrip().endswith('OK'), new_log
+    old_close = subprocess.check_output(['git', 'show', CLOSE_BASE + ':apps/desktop/tests/at/lab_build_facts.py'], cwd=ROOT)
+    red_close, red_log = run(old_close, CLOSE_METHODS)
+    green_close, green_log = run((AT / 'lab_build_facts.py').read_bytes(), CLOSE_METHODS)
+    assert red_close == 1 and 'failures=2' in red_log and 'errors=' not in red_log, red_log
+    assert green_close == 0 and 'Ran 2 tests' in green_log and green_log.rstrip().endswith('OK'), green_log
     print(json.dumps({'baseline': BASE, 'methods': len(METHODS),
                       'reviewed': {'exit': old_code, 'failures': 11, 'errors': 0},
-                      'fixed': {'exit': new_code, 'failures': 0, 'errors': 0}}))
+                      'fixed': {'exit': new_code, 'failures': 0, 'errors': 0},
+                      'closeBaseline': CLOSE_BASE, 'closeMethods': len(CLOSE_METHODS),
+                      'reviewedClose': {'exit': red_close, 'failures': 2, 'errors': 0},
+                      'fixedClose': {'exit': green_close, 'failures': 0, 'errors': 0}}))

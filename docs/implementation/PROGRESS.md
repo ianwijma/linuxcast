@@ -1,5 +1,24 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts writer hard-alarm correction ready for fresh recheck
+
+Final9ed544ac review complete/read atf15abda: Standards clear; four original P2s
+resolved, remaining writer P2 reproduces real SIGALRM before close (openFD lost)
+and after close (reused unrelatedFD closed). Coordinator replaces raw writer
+handoff with a single C FileIO owner and C partial(os.open) opener. No alarm or
+cancellation masking; FileIO closed state owns retirement, preventing stale
+writer-number cleanup. Exclusive0400 relative creation retains no-follow via
+O_CREAT|O_EXCL; independent reader still explicitO_NOFOLLOW. CPython3.10.12 and
+3.13.5 primary implementation plus Linux open(2) semantics independently read.
+Both new signal regressions fail exact f15abda2behavioral failures/0errors and
+passfixed; canary identity/content survives. Original7controls still11fail/0error
+onAafd and passfixed.91focused pass1.291s, actual55mapped11.49s/Python386cases
+10.184s under unchanged18s. Previous TS type/lint results inherited unchanged.
+Historical/current hashes/AST/plan/whitespace kept distinct. Fresh independent
+writer recheck next; no clean finalreview, PR, watch, permit, capture, lab/guest,
+build or native action. All97/status/criteria and unknown historical cleanup
+gaps unchanged. Evidence: build-facts-preparation/coordinator-writer-custody.md.
+
 ## Build-facts initial reviews complete; bounded corrections ready for recheck
 
 Security/Spec cd58456c and Standards 30922b61 are complete and their final reports
