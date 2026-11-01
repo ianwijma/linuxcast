@@ -124,7 +124,7 @@ def validate_record(p):
     need(len(parts) == 3 and parts[0] in ('unknown', 'install', 'hold', 'deinstall', 'purge')
          and parts[1] in ('ok', 'reinstreq') and parts[2] in ('not-installed', 'config-files',
          'half-installed', 'unpacked', 'half-configured', 'triggers-awaited', 'triggers-pending', 'installed'))
-    need(parts[2] == 'not-installed' or 'Architecture' in p and 'Version' in p)
+    need(parts[2] in ('not-installed', 'half-installed') or 'Architecture' in p and 'Version' in p)
     if 'Architecture' in p:
         need(re.fullmatch(r'[a-z0-9][a-z0-9-]{0,63}', p['Architecture'])
              and p['Architecture'] != 'unknown')
@@ -134,6 +134,7 @@ def validate_record(p):
         need(key not in p or p[key] in ('yes', 'no'))
     need('Priority' not in p or p['Priority'] in ('required', 'important', 'standard', 'optional', 'extra'))
     need('Multi-Arch' not in p or p['Multi-Arch'] in ('no', 'same', 'foreign', 'allowed'))
+    need(p.get('Multi-Arch') != 'same' or p.get('Architecture') not in (None, 'all'))
     need('Installed-Size' not in p or re.fullmatch(r'[0-9]{1,16}', p['Installed-Size']))
 
 def state_for(records, raw):
@@ -492,7 +493,7 @@ def validate_snapshot(value):
         owner.require(len(parts) == 3 and parts[0] in ('unknown', 'install', 'hold', 'deinstall', 'purge')
                       and parts[1] in ('ok', 'reinstreq') and parts[2] in ('not-installed', 'config-files',
                       'half-installed', 'unpacked', 'half-configured', 'triggers-awaited', 'triggers-pending', 'installed'), 'protocol')
-        owner.require(parts[2] == 'not-installed' or {'Architecture', 'Version'} <= set(record), 'protocol')
+        owner.require(parts[2] in ('not-installed', 'half-installed') or {'Architecture', 'Version'} <= set(record), 'protocol')
         if 'Architecture' in record:
             pattern(record['Architecture'], r'[a-z0-9][a-z0-9-]{0,63}')
             owner.require(record['Architecture'] != 'unknown', 'protocol')
@@ -504,6 +505,7 @@ def validate_snapshot(value):
             owner.require(key not in record or record[key] in ('yes', 'no'), 'protocol')
         owner.require('Priority' not in record or record['Priority'] in ('required', 'important', 'standard', 'optional', 'extra'), 'protocol')
         owner.require('Multi-Arch' not in record or record['Multi-Arch'] in ('no', 'same', 'foreign', 'allowed'), 'protocol')
+        owner.require(record.get('Multi-Arch') != 'same' or record.get('Architecture') not in (None, 'all'), 'protocol')
         if 'Installed-Size' in record:
             pattern(record['Installed-Size'], r'[0-9]{1,16}')
         order.append((record['Package'], record.get('Architecture', '')))
@@ -743,9 +745,17 @@ class BuildFactsReservation(owner.Reservation):
             os.fsync(self.rootfd)
             self.check()
             self.check_artifact()
-            fd, self.artifactfd = self.artifactfd, None
             self.artifact_uncertain = True
-            os.close(fd)  # a failed close is never retried/adopted
+            # Keep custody across cancellation before the close scope. Once the
+            # close call starts, mask cancellation through retirement bookkeeping
+            # (the hard alarm remains deliverable) and
+            # discard its number even on an ambiguous Linux close error.
+            fd = self.artifactfd
+            with owner.blocked_signals():
+                try:
+                    os.close(fd)
+                finally:
+                    self.artifactfd = None
             self.artifactfd = os.open(self.artifact_name(), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK,
                                       dir_fd=self.rootfd)
             self.artifact_uncertain = False
@@ -774,6 +784,11 @@ class BuildFactsReservation(owner.Reservation):
         validate_relay(value)
         if value['buildFacts']['status'] != 'not-received':
             owner.require(self.pin is not None and value['buildFacts']['captureId'] == self.pin['captureId'], 'custody')
+        # A sent packet precedes guardian retirement. A later lost guardian or
+        # cleanup failure cannot leave its earlier artifact observation valid.
+        if value['buildFacts']['status'] == 'observed' and (
+                value['firstFailure'] == 'guardian-lost' or value['cleanupFailure'] != 'none'):
+            self.invalidate(value)
         if value['artifact'] is not None:
             try:
                 if self.artifactfd is None:

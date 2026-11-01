@@ -3,6 +3,11 @@
 Frozen before implementation, 2 November 2026. Base
 `393f9da0a3e384ed6a15e18a1973d111494f19c8`. This elaborates the coordinator's
 [protocol](../../../tests/at/build-facts-protocol.md); it grants no authority.
+Coordinator correction after initial review: legitimate half-installed records
+may lack Architecture/Version, matching dpkg1.22.22 parse.c and the primary
+protocol's requirement to preserve broken states. See
+[the correction record](coordinator-security-correction.md). This reconciles an
+overly strict elaboration; it does not authorize installation from broken state.
 All objects below have exactly the listed keys, all integers exclude booleans,
 all arrays are bounded and sorted/unique where specified. Unknown keys fail.
 
@@ -22,7 +27,9 @@ Snapshot keys:
   Exact allowed fields: Package, Architecture, Version, Status, Essential,
   Protected, Priority, Multi-Arch, Depends, Pre-Depends, Provides, Conflicts,
   Breaks, Replaces, Installed-Size. Package/Status mandatory; Architecture and
-  Version mandatory except not-installed records. Every other field is optional;
+  Version mandatory except not-installed or half-installed records. A missing
+  field in either partial state remains absent; half-installed is always broken.
+  Multi-Arch:same requires a present architecture other than all. Every other field is optional;
   presence is retained, no null/synthesized version. All values are strings.
   Order is `(Package, Architecture or "")`, unique. At most4096 records.
   Identity fields are simple, folded relationship fields use single spaces.

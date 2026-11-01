@@ -194,6 +194,34 @@ class Parser(unittest.TestCase):
         with self.assertRaises(PROBE['Fault']):
             self.records(raw)
 
+    def test_multiarch_same_requires_a_concrete_architecture_on_host(self):
+        for architecture in ('all', None):
+            value = snapshot()
+            record = {'Package': 'partial-demo', 'Status': 'install reinstreq half-installed',
+                      'Multi-Arch': 'same', 'Version': '1'}
+            if architecture is not None:
+                record['Architecture'] = architecture
+            value['packages'].append(record)
+            value['packages'].sort(key=lambda p: (p['Package'], p.get('Architecture', '')))
+            value['packageState'] = PROBE['state_for'](value['packages'], RAW + b'x' * 200)
+            with self.subTest(architecture=architecture), self.assertRaises(owner.Rejected):
+                build.validate_snapshot(value)
+
+    def test_host_preserves_absent_half_installed_metadata_as_broken(self):
+        for fields in ({}, {'Architecture': 'amd64'}, {'Version': '1'}):
+            value = snapshot()
+            record = dict(Package='partial-demo', Status='install reinstreq half-installed', **fields)
+            value['packages'].append(record)
+            value['packages'].sort(key=lambda p: (p['Package'], p.get('Architecture', '')))
+            value['packageState'] = PROBE['state_for'](value['packages'], RAW + b'x' * 200)
+            with self.subTest(fields=fields):
+                try:
+                    build.validate_snapshot(value)
+                except owner.Rejected:
+                    self.fail('legitimate partial half-installed metadata was rejected by host')
+                self.assertEqual(value['packageState']['pending']['broken'], 1)
+                self.assertFalse(value['packageState']['pending']['clean'])
+
     def test_debian_version_epoch_upstream_revision_validation(self):
         for version in ('1', '1.0~rc1-2+deb13u1', '2:1.0-1', '2147483647:1.0', '1:2:3-4'):
             raw = RAW.replace(b'1.22.22', version.encode())
@@ -482,6 +510,30 @@ class Guest(unittest.TestCase):
         build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
         self.assertEqual(len(self.locks.call_args_list), 2)
         self.assertFalse(self.fs.fds)
+
+    def test_partial_half_installed_records_survive_collection_and_decode(self):
+        for fields in (b'', b'Architecture: amd64\n', b'Version: 1\n'):
+            raw = RAW + b'\nPackage: partial-demo\nStatus: install reinstreq half-installed\n' + fields
+            self.fs.path('/var/lib/dpkg/status').write_bytes(raw)
+            with self.subTest(fields=fields):
+                try:
+                    value = self.collect()
+                except self.scope['Fault']:
+                    self.fail('legitimate partial half-installed metadata was rejected during collection')
+                _, decoded, _ = build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
+                partial = next(p for p in decoded['packages'] if p['Package'] == 'partial-demo')
+                self.assertEqual('Version' in partial, b'Version:' in fields)
+                self.assertEqual('Architecture' in partial, b'Architecture:' in fields)
+                self.assertEqual(decoded['packageState']['pending']['broken'], 1)
+                self.assertFalse(decoded['packageState']['pending']['clean'])
+
+    def test_multiarch_same_with_all_or_missing_architecture_is_malformed(self):
+        for fields in (b'Architecture: all\n', b''):
+            raw = RAW + (b'\nPackage: partial-demo\nStatus: install ok half-installed\n'
+                         b'Version: 1\nMulti-Arch: same\n') + fields
+            self.fs.path('/var/lib/dpkg/status').write_bytes(raw)
+            with self.subTest(fields=fields), self.assertRaisesRegex(self.scope['Fault'], 'packages'):
+                self.collect()
 
     def test_existing_shared_nonblocking_readonly_locks_in_order(self):
         self.system.locks()
@@ -943,8 +995,8 @@ class Files(unittest.TestCase):
         real = os.close
         attempted = []
         def fail(fd):
-            # publish sets artifactfd=None and uncertain=True BEFORE close.
-            if self.lease.artifact_uncertain and self.lease.artifactfd is None and not attempted:
+            # Target the retained writer while its publication is uncertain.
+            if self.lease.artifact_uncertain and fd == self.lease.artifactfd and not attempted:
                 attempted.append(fd)
                 real(fd)
                 raise OSError('synthetic close after actual close')
@@ -955,6 +1007,46 @@ class Files(unittest.TestCase):
         self.assertFalse(result['transportResultValid'])
         self.assertFalse(result['reservationClean'])
         self.assertTrue((self.root / self.lease.artifact_name()).exists())
+
+    def test_cancellation_before_writer_close_retains_exact_descriptor_for_cleanup(self):
+        method = build.BuildFactsReservation.publish
+        lines, start = inspect.getsourcelines(method)
+        boundary = start + next(i for i, line in enumerate(lines) if 'self.artifact_uncertain = True' in line)
+        real_open, real_close = os.open, os.close
+        captured, fired = [], []
+        def opened(path, flags, *args, **kwargs):
+            fd = real_open(path, flags, *args, **kwargs)
+            if path == self.lease.artifact_name() and flags & os.O_CREAT:
+                captured.append((fd, owner.identity(os.fstat(fd))))
+            return fd
+        def trace(frame, event, _arg):
+            if event == 'line' and frame.f_code is method.__code__ and frame.f_lineno == boundary and not fired:
+                fired.append(True)
+                raise owner.Rejected('interrupted')
+            return trace
+        try:
+            with patch.object(owner.os, 'open', opened):
+                try:
+                    sys.settrace(trace)
+                    result = owner.transact(self.lease, FakeLab(self.lease))
+                finally:
+                    sys.settrace(None)
+            self.assertEqual(fired, [True])
+            self.assertEqual(result['firstFailure'], 'interrupted')
+            self.assertFalse(result['transportResultValid'] or result['reservationClean'])
+            self.assertEqual(len(captured), 1)
+            self.assertFalse(self.lease.close())
+            with self.assertRaises(OSError) as caught:
+                os.fstat(captured[0][0])
+            self.assertEqual(caught.exception.errno, errno.EBADF)
+        finally:
+            # Independently retire an exact leaked fixture FD on historical reds.
+            for fd, identity in captured:
+                try:
+                    if owner.identity(os.fstat(fd)) == identity:
+                        real_close(fd)
+                except OSError:
+                    pass
 
     def test_artifact_replacement_during_write_is_preserved_and_never_adopted(self):
         path = self.root / self.lease.artifact_name()
@@ -1276,9 +1368,26 @@ def supervise(mode):
                 else:
                     prepare(root)
                     lease = reserved(root)
+                    caller_pid = os.getpid()
+                    close_fault = root / 'synthetic-guardian-close-fault'
                     try:
                         def factory(held, check):
                             lab = FakeLab(held, check)
+                            if mode == 'guardian-close-failure' and os.getpid() != caller_pid:
+                                real_close = os.close
+                                real_check = held.check_artifact_closed
+                                target = []
+                                def checked(fd):
+                                    real_check(fd)
+                                    target.append(fd)
+                                def close(fd):
+                                    real_close(fd)
+                                    if target and fd == target[-1]:
+                                        target.clear()
+                                        close_fault.write_text('injected')
+                                        raise OSError('synthetic close after actual close')
+                                held.check_artifact_closed = checked
+                                os.close = close
                             if mode == 'publication-failure':
                                 actual_write = os.pwrite
                                 def write(fd, data, offset):
@@ -1289,6 +1398,8 @@ def supervise(mode):
                             return lab
                         result = owner.run_guarded(lease, factory)
                         value = {'result': build.public_result(result), 'cleanClose': lease.close()}
+                        if mode == 'guardian-close-failure':
+                            value['guardianCloseFaultInjected'] = close_fault.exists()
                     finally:
                         lease.close()
                 output.write(owner.encoded(value))
@@ -1344,6 +1455,16 @@ class OrdinaryProcesses(unittest.TestCase):
         self.assertTrue(lifecycle['mayHaveStarted'] and lifecycle['mayHaveDispatched'])
         self.assertTrue(lifecycle['ownedChildrenAbsent'] and lifecycle['containerStoppedVerified'])
         self.assertFalse(lifecycle['transportResultValid'] or lifecycle['reservationClean'])
+
+    def test_guardian_final_close_failure_invalidates_handed_off_observation(self):
+        value = self.fixture('guardian-close-failure')
+        lifecycle = value['result']['lifecycle']
+        self.assertTrue(value['guardianCloseFaultInjected'])
+        self.assertEqual(lifecycle['firstFailure'], 'guardian-lost')
+        self.assertTrue(lifecycle['mayHaveStarted'] and lifecycle['mayHaveDispatched'])
+        self.assertTrue(lifecycle['ownedChildrenAbsent'])
+        self.assertFalse(lifecycle['transportResultValid'] or lifecycle['reservationClean'])
+        self.assertEqual(value['result']['buildFacts'], build.empty_facts())
 
     def test_real_posix_writer_excludes_nonblocking_shared_reader(self):
         value = self.fixture('locks')

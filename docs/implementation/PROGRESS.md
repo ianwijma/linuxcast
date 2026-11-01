@@ -1,5 +1,30 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Build-facts initial reviews complete; bounded corrections ready for recheck
+
+Security/Spec cd58456c and Standards 30922b61 are complete and their final reports
+are read, both on aafd1bf/base393f9da. Standards has no Standards/material-smell
+findings and one separate capture-binding P2 fixed in9c768cf. Security/Spec has
+four P2s: guardian close failure retained observation, malformed Multi-Arch state
+accepted, legitimate partial half-installed records rejected, and cancellation
+lost writer FD custody before close. Coordinator fixes both validators, the
+subclass caller validation and publication close scope; base owner remains
+unchanged. Snapshot elaboration is reconciled with primary protocol/dpkg source
+for partial broken state, without accepting a broken installation baseline.
+
+Six new methods fail old source with10behavioral failures/0errors, passfixed;
+repeatable private source control includes capture test and produces11failures/
+0errors on exact reviewed aafd1bf, all7methods passfixed. One initial helper
+sanitized-import setup error corrected before those results. Independent guard
+owns/reaps real ordinary-Python guardian fixture; no lab/native process starts.
+89focused pass1.297s, actual55mapped pass11.65s, all384Python payload10.376s under
+unchanged18s. Full typecheck/lint pass. Current/historical hashes and embedded
+AST/size/probe pin kept distinct. Author and9c768cf manifests remain historical;
+coordinator-security-correction.md/current manifest record these changes.
+Fresh final independent recheck next; no clean Spec/final claim, PR, watch,
+permit, capture, provisioning, build or native execution. All97 task/criterion/
+dependency states and historical unknown cleanup gaps remain unchanged.
+
 ## Build-facts initial Standards complete; capture binding corrected
 
 Initial Standards30922b61 complete and final report read on exactaafd1bf/base393f9da:
