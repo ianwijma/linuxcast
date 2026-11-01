@@ -111,6 +111,16 @@ def read_fd(fd, maximum=MAX_BYTES):
 class Reservation:
     """Retained existing lock and descriptor-relative private marker custody."""
 
+    permit_name = PERMIT
+
+    @staticmethod
+    def result() -> dict:
+        return empty_result()
+
+    @staticmethod
+    def validate_reply(value: dict) -> dict:
+        return validate_result(value)
+
     def __init__(self, root=LAB):
         # root is an internal fixture seam, never an executable/CLI input.
         self.root = Path(root)
@@ -156,18 +166,22 @@ class Reservation:
         info = self.binding(LOCK, self.lockfd)
         regular(info, self.uid, self.lock_mode)
         if self.permitfd is not None:
-            regular(self.binding(PERMIT, self.permitfd), self.uid, 0o400)
+            regular(self.binding(self.permit_name, self.permitfd), self.uid, 0o400)
             require(read_fd(self.permitfd) == self.permit_raw, 'custody')
         if self.markerfd is not None:
             regular(self.binding(MARKER, self.markerfd), self.uid, 0o600)
             if self.marker_raw is not None:
                 require(read_fd(self.markerfd, 4096) == self.marker_raw, 'custody')
 
-    def permit(self, source_sha):
-        self.permitfd = os.open(PERMIT, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=self.rootfd)
+    def read_permit(self) -> dict:
+        self.permitfd = os.open(self.permit_name, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=self.rootfd)
         regular(os.fstat(self.permitfd), self.uid, 0o400)
         self.permit_raw = read_fd(self.permitfd)
-        pin = unique_json(self.permit_raw)
+        self.check()
+        return unique_json(self.permit_raw)
+
+    def permit(self, source_sha):
+        pin = self.read_permit()
         keys = {'schema', 'containerId', 'imageId', 'labRoot', 'labDevice', 'labInode',
                 'ownerSha256', 'sourceTree', 'archiveSha256', 'receiptSha256', 'nodeSha256',
                 'guestWrapperSha256', 'guestAccount', 'guestPrivilege', 'guestPrerequisitesReviewed'}
@@ -315,6 +329,16 @@ def baseline(state):
 
 def transport_argv(pin, probe='job'):
     require(probe in ('job', 'permit', 'wrapper-hash', 'poweroff'))
+    remote = {'permit': ('/usr/bin/cat', '/etc/linuxcast-f102-lab/permit.json'),
+              'wrapper-hash': ('/usr/bin/sha256sum', WRAPPER),
+              'poweroff': ('/usr/bin/systemctl', 'poweroff', '--no-block'),
+              'job': ('/usr/bin/python3', '-I', '-B', WRAPPER,
+                      '--reviewed-wrapper', '--reviewed-controller')}[probe]
+    return fixed_ssh_argv(pin, remote)
+
+
+def fixed_ssh_argv(pin: dict, remote: tuple[str, ...]) -> tuple[str, ...]:
+    """Trusted fixed source only; never exposed as a CLI-selected command."""
     ssh = ('/usr/bin/ssh', '-F', '/dev/null', '-T', '-n', '-p', '2222', '-l', pin['guestAccount'],
            '-i', '/lab/guest-key', '-o', 'UserKnownHostsFile=/lab/known_hosts',
            '-o', 'GlobalKnownHostsFile=/dev/null', '-o', 'StrictHostKeyChecking=yes',
@@ -323,11 +347,6 @@ def transport_argv(pin, probe='job'):
            '-o', 'PermitLocalCommand=no', '-o', 'ProxyCommand=none', '-o', 'ProxyJump=none',
            '-o', 'ConnectionAttempts=1', '-o', 'ConnectTimeout=5', '-o', 'ServerAliveInterval=5',
            '-o', 'ServerAliveCountMax=2', '127.0.0.1')
-    remote = {'permit': ('/usr/bin/cat', '/etc/linuxcast-f102-lab/permit.json'),
-              'wrapper-hash': ('/usr/bin/sha256sum', WRAPPER),
-              'poweroff': ('/usr/bin/systemctl', 'poweroff', '--no-block'),
-              'job': ('/usr/bin/python3', '-I', '-B', WRAPPER,
-                      '--reviewed-wrapper', '--reviewed-controller')}[probe]
     if pin['guestPrivilege'] == 'sudo-noninteractive':
         remote = ('/usr/bin/sudo', '-n', '--', *remote)
     return (*DOCKER, 'exec', '--user', '1000:1000', CONTAINER, '/usr/bin/env', '-i',
@@ -606,6 +625,14 @@ def validate_result(value):
 
 
 class NativeLab:
+    job_seconds = JOB_SECONDS
+
+    def validate_job_reply(self, raw: bytes, code: int, result: dict) -> bool:
+        return validate_transport(raw, code)
+
+    def cleanup_authorized(self) -> bool:
+        return self.lease.pin['guestPrerequisitesReviewed'] is True
+
     def __init__(self, lease, inventory, check=lambda: None):
         self.lease, self.inventory, self.check = lease, inventory, check
         self.children = Children(lease, check)
@@ -667,7 +694,7 @@ class NativeLab:
         self.lease.intent('mayHaveStarted')
         # guestPrerequisitesReviewed includes authority for this exact fixed
         # action under the updated contract; no permit/account is manufactured.
-        require(self.lease.pin['guestPrerequisitesReviewed'] is True)
+        require(self.cleanup_authorized())
         state = self.inspect(Budget(CLEAN_INSPECT_SECONDS, budget))
         if not state['Running']:
             return state  # a concurrent stop never justifies another guest action
@@ -762,7 +789,7 @@ class NativeLab:
 
 
 def transact(lease, lab, check=lambda: None):
-    result = empty_result()
+    result = lease.result()
     recovery = False
     admitted = False
     total = Budget(TOTAL_SECONDS - CLEAN_SECONDS)
@@ -789,8 +816,8 @@ def transact(lease, lab, check=lambda: None):
             check()
             lease.state['mayHaveDispatched'] = True
             lease.save()
-            code, raw = lab.dispatch(Budget(JOB_SECONDS, total))
-            success = validate_transport(raw, code)
+            code, raw = lab.dispatch(Budget(lab.job_seconds, total))
+            success = lab.validate_job_reply(raw, code, result)
             result['transportResultValid'] = True
             require(success, 'transport')
     except BaseException as error:
@@ -825,7 +852,7 @@ def transact(lease, lab, check=lambda: None):
                 result['status'] = 'completed'
             elif recovery and result['firstFailure'] == 'recovery':
                 result['status'] = 'recovered'
-    return validate_result(result)
+    return lease.validate_reply(result)
 
 
 @contextlib.contextmanager
@@ -912,12 +939,12 @@ def run_guarded(lease, lab_factory, deadline=None):
                     if key.fileobj is caller:
                         raw = caller.recv(4097)
                         require(bool(raw), 'guardian-lost')
-                        result = validate_result(unique_json(raw, 4096))
+                        result = lease.validate_reply(unique_json(raw, 4096))
                     elif result is None:
                         # A result and process exit can become ready together.
                         try:
                             raw = caller.recv(4097)
-                            result = validate_result(unique_json(raw, 4096))
+                            result = lease.validate_reply(unique_json(raw, 4096))
                         except (BlockingIOError, Rejected):
                             raise Rejected('guardian-lost') from None
         # Do not release a clean reservation until the exact guardian is reaped.
@@ -934,7 +961,7 @@ def run_guarded(lease, lab_factory, deadline=None):
         lease.check()
     except BaseException as error:
         if result is None:
-            result = empty_result()
+            result = lease.result()
             # Unknown guardian progress is conservative, never count0.
             result.update(mayHaveStarted=True, mayHaveDispatched=True)
         result.update(status='incomplete', reservationClean=False)
@@ -1005,14 +1032,14 @@ def run_guarded(lease, lab_factory, deadline=None):
                 close()
             except BaseException:
                 if result is None:
-                    result = empty_result()
+                    result = lease.result()
                     result.update(mayHaveStarted=True, mayHaveDispatched=True)
                 result.update(status='incomplete', reservationClean=False)
                 if result['cleanupFailure'] == 'none':
                     result['cleanupFailure'] = 'custody'
                 if result['firstFailure'] == 'none':
                     result['firstFailure'] = 'cleanup'
-    return validate_result(result)
+    return lease.validate_reply(result)
 
 
 @contextlib.contextmanager
