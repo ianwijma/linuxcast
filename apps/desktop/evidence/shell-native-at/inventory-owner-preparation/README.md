@@ -1,5 +1,26 @@
 # F1-02 inventory owner — offline preparation only
 
+## Subsequent live inventory and parser correction
+
+The historical offline evidence below retains its original scope. The first
+actual reviewed invocation is recorded separately in
+[inventory-actual-20261101](../inventory-actual-20261101/README.md): valid partial
+facts, package metadata unknown, denied unprivileged PID1 namespace metadata,
+and verified clean shutdown. No product/Orca run or native acceptance followed.
+
+A synthetic deb822 fixture reproduces rejection of `Conffiles:` with its value
+on continuation lines, and of colon fields without a literal following space.
+The narrow correction splits at the colon and strips horizontal value padding.
+Package identity/status/version validation, duplicate rejection, size bounds,
+source/permit pinning and all execution/cleanup authorities remain unchanged.
+The regression failed all four whitespace cases on the actual-run source and
+passes after correction; 58 focused inventory and 55 mapped security checks
+pass (all266 offline Python cases, no skips, existing18s bound). This exposes
+a valid-format defect, not a proven diagnosis of the private guest input.
+No second guest execution or replacement permit has occurred. Independent
+review of this correction is pending. Debian syntax reference:
+https://www.debian.org/doc/debian-policy/ch-controlfields#syntax-of-control-files
+
 This adds a separate inventory-only entry point to resolve the prerequisite cycle
 between guest preparation metadata and the native owner's mandatory actual build
 receipt. It creates no receipt, native permit, guest prerequisite approval or

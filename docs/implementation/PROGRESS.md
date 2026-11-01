@@ -1,70 +1,65 @@
 # Coordinator checkpoint — 1 November 2026
 
-## Current coordinator state — PR98/PR99 merged; first actual inventory next
+## Current coordinator state — first actual inventory returned partial facts
 
-Full97/local1.0 Goal ACTIVE and incomplete. Registry unchanged8done/20inprogress/
-69planned;56passed/325pending/8justifiedN/A. Both bounded integrations are now
-recorded in F1-02/F2-02 evidence and regenerated cards, without changing any task
-status/dependency/criterion text/state. Planning and status validation pass.
+Full97/local1.0 Goal ACTIVE and incomplete. Registry remains8done/20inprogress/
+69planned;56passed/325pending/8justifiedN/A. PR98 merged4cdf978, PR99 mergedc71ef81;
+independent reviews/CI and tiny merge blurbs completed as recorded below. No
+whole-task or criterion promotion. Current branch codex/f1-02-live-inventory.
 
-PR98 https://github.com/ianwijma/linuxcast/pull/98 MERGED at
-4cdf97876af63efbeac62690c7621922c997619c, expectedheadfbb1d203, PlanningCI41307709636
-SUCCESS; finaldc86be7a Standards+Security/Spec clear on codea744b7b.55mapped/all265
-Python11.759s under18s,57inventory/88owner/9SessionOwner/extra faults/hash/AST/plan
-pass. Metadata and interruption P2s resolved. Only test clocks advance after real
-owned-child reaping; production deadlines and native receipt/source gates unchanged.
-Tiny merge blurb sent immediately. No GitHub required/requested reviews or branch
-protection/rulesets; CodeRabbit terminalskip (below auto-review star threshold),
-no actionable feedback. No watch retained.
+FIRST REAL reviewed inventory ran 2026-11-01T13:02:14.587652Z through
+13:03:21.511290Z (2November Sydney), 66.924s, exit3. Exact reviewed sourcea744b7b
+copied from approvedc71ef81 into private0500/0400 directory; exact13-field0400
+permit bound source/probe and retained root. User-confirmed linuxcast UID1000/
+key auth/noninteractive sudo reached root with expected sudo identity. No private
+user-data/key reads, account guessing, automatic retry, installation or build.
+The three fixed source/manifest bytes and retained root/lock custody verified.
 
-PR99 https://github.com/ianwijma/linuxcast/pull/99 MERGED at
-c71ef81e2b06922fde635565523e4b57eee004a4, expectedhead5b49309, PlanningCI41308181307
-SUCCESS; independent47865d99 Security/Spec and03715988 Standards clear at same
-reviewed2aa405e/a411 package source.165security/86unit/3contract,12private probes,
-3failing review faults; parent5failing guard controls. MergePR98 into F2 had only
-PROGRESS conflict, resolved preserving both features; five reviewed source/
-contract/packageREADME paths stayed identical. Current55F1security (265Python
-11.504s),165F2security/3contracts, fulltype/scopedlint/plan/whitespace pass. Tiny
-merge blurb immediately sent; same no required/requested reviews, CodeRabbit
-terminalskip, no actionable feedback. No watch retained or full-task promotion.
+Owner schema validates: incomplete/firstFailuretransport, transportResultValidtrue;
+guest firstFailurepackages and packagesunknown. Other actual facts: Debian13
+amd64; compiler/make/pkg-config executables absent; UID/GID20000 absent and idle;
+98bounded processes, zero graphical/test candidates. Dropped-privilege child
+self net/PID metadata allowed, both PID1 metadata denied, cleanuptrue. This now
+establishes the prior native-wrapper feasibility blocker; equality staysunknown.
+No namespace created/changed and no wrapper checks relaxed.
 
-Root codex/f1-02-live-inventory from approveddevelopc71ef81. The inventory manifest
-now explicitly identifies fbb1d203 as its unchangedInputsCommit: those15 normative
-input hashes are the exact reviewed snapshot. Subsequent registry/card changes
-add integrated evidence only; source/embedded/file hashes remain current. This
-avoids falsely claiming the old normative-byte snapshot is every future task card.
+Actual cleanup succeeds independently of the inventory failure: owner reports
+ownedChildrenAbsent/containerStoppedVerified/reservationCleantrue, cleanupnone.
+Fresh exactDocker configuration and exited/runningfalse/PID0/exit0 verified;
+marker absent, original lock inode/mode reacquired, exact caller reaped, stderr0.
+New evidence apps/desktop/evidence/shell-native-at/inventory-actual-20261101/.
+Private original output and immutable old sources/permit preserved separately;
+no current corrected-source permit or second invocation. Historical timeout
+absence gaps remainunknown; no retrospective proof follows. Product/Orca runs0.
 
-Next authorized action is FIRST REAL inventory-only job after fresh immutable
-source custody and the exact13field private permit. Approved host owner/source
-are reviewed in PR98; use fresh copies of its three fixed inputs0400/private0500,
-verify hashes and root/existing lock custody, then bind permit to current bytes
-and retained root identity. User confirms linuxcast UID1000, SSH keys/passwordless
-sudo; root/password SSH disabled. Do not read private user-data/key contents or
-guess alternatives. Follow reviewed closed owner, independent hard deadline and
-fixed shutdown; retain result separately and inspect actual cleanup/exit0 evidence.
-A failed native-preparation fact remains failure/unknown; no weaker fallback.
+Offline parser fixture proves valid deb822 multiline Conffiles colon-only first
+line and optional horizontal padding fail the old literal-colon-space parser.
+Small correction uses colon plus stripped horizontal value padding, retaining
+strict package identity/status/version/duplicates/size limits. Four whitespace
+cases fail oldsource/passfixed;58inventory/55mappedsecurity includingall266Python
+underexisting18s pass (Python11.050s). Exact private guest input not collected:
+this is a plausible cause of packagesunknown, not confirmed guest diagnosis.
+Embedded source nowe0daca440dde220277820e4d300ee2fb804244b8d37c1d8b44b9aa5caefebd08,
+19170bytes; old actual-run pinse871... remain historical in postflight. Source/
+evidence hashes refreshed, unchanged normative snapshot remainsfbb1d203. Initial
+independent Standards and Security/Spec reviews of this increment are next.
 
-Earlier abff copy is retired at private-lab/f102-inventory-candidate-abff18a-rejected,
-bytes/inode preserved and former path absent. Do not reuse. Host-only Docker
-metadata previously matched pinned config/container/image and stoppedPID0/exit0;
-no guest/start/exec/SSH/privileged probe or real permit has run yet. Historical
-fixture timeout absence gaps remain unknown, not retroactively proved by later
-success. No actual product/Orca native runs:0, no speech/delivery/audible proof.
+Next authorized work: integrate reviewed correction, fresh reviewed inventory
+only if needed; narrowly reviewed provisioning/build owner and source/receipt;
+attest namespace identity across privilege drop without CAP_SYS_PTRACE or weaker
+isolation. Actual compiler/toolchain/install/recovery/nativeAT/fourdesktop/
+physical/performance/package/release gates still required. Never reuse oldnative
+wrapper approved-tree or fake a native receipt/permit to provision prerequisites.
 
-AI finalbf157bdd completed/read CLEAR atb7f291218d4fb4910e4cf6340d9decda7af3e0f3
-vs4e4c63cd: all original retirement/choice-error/tool-order/first-failure findings
-closed;184mapped checks,8extra private probe groups,7old-source failing cases and
-fulltype/scopedlint/plan pass. Saved codex/a1-01-broker-integration, UNPUBLISHED/
-UNMERGED/PLANNED behind whole-task F2/F3 acceptance. Configc78228e remains reviewed.
-Actual main/utility/caller/UI/persistence composition is still required; new F2
-capture API exists on develop but does not itself accept A1 prerequisites.
+AI backend b7f2912 and configurationc78228e remain reviewed, local/unpublished/
+unmerged/PLANNED behind fullF2/F3 dependency gates. Finalbf157bdd cleared all
+originalretirement/choice-error/tool-order/first-failure issues with184mapped,
+8privateprobe groups and7negativecontrols. NewF2capture API exists ondevelop;
+actual main/utility/caller/UI/persistence composition still required.
 
-All review callbacks consumed; no active delegates/root tests/PRwatches. Successful
-same-provider reviews corrected the prior account-wide quota inference; do not
-repeat that claim. FutureUI uses Opus5.5medium, nonUI delegates SOLhigh. Continue
-actual guest metadata → immutable current Debian build/receipt → source/namespace/
-UID20000/PID1 feasibility/nativeAT/four desktop sessions/physical/performance/
-package/release gates. None are waived by the two merged preparations.
+No active real owner, tests, delegates or PRwatches at this checkpoint. Future
+UI uses Opus5.5medium; nonUI delegates SOLhigh. Prior account-wide quota inference
+was false: same-provider fresh reviews completed. All97/full1.0 scope preserved.
 
 
 Full local1.0 goal ACTIVE: all97tasks through R1-03, physical recovery, supported

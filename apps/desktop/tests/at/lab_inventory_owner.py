@@ -85,9 +85,11 @@ def package_versions(raw):
             need(len(line) <= 16384)
             if line.startswith((' ', '\t')) or not line:
                 continue
-            key, sep, value = line.partition(': ')
+            # deb822 uses a colon, with optional horizontal whitespace. A
+            # multiline field such as Conffiles may start with no inline value.
+            key, sep, value = line.partition(':')
             need(sep and key not in fields)
-            fields[key] = value
+            fields[key] = value.strip(' \t')
         package = fields.get('Package', '')
         # Validate identity before filtering: a malformed foreign/unnamed stanza
         # cannot be represented as known absence of the selected packages.
