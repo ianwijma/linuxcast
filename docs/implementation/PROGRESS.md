@@ -1,5 +1,56 @@
 # Coordinator checkpoint — 1 November 2026
 
+## Current coordinator state — PR100 merged; complete corrected guest inventory
+
+PR100 https://github.com/ianwijma/linuxcast/pull/100 MERGED at
+69decac2bd695de53d24e5595770b2e546d362be, exactheadcdd1153, current PlanningCI
+41310579644 SUCCESS. Independent Standards39f1c16c and SecuritySpec004b1237 clear
+at084e7dc, latermetadataonly; each58inventory/55mapped/all266Python under18s,
+old-source negative controls, malformed/strict-output/hash/type/plan checks.
+GitHub no requested/submitted reviews; CodeRabbit terminalskip below10stars,
+no actionable feedback; rulesets empty/protection404. Normal exacthead merge,
+immediate tinyblurb sent, no watch retained. Task/criteria unchanged.
+
+SECOND REAL inventory used fresh immutable approved084e7dc source/three inputs
+and new exact13-field0400 permit under existing retained root/lock. Previous
+permit renamed to used-source name preserving inode/bytes; original result,
+source and rejectedcandidate preserved. No private user-data/key reads. Fixed
+closed CLI only, same linuxcast key/noninteractive sudo; no automatic retry.
+Actual2026-11-01T13:20:48.713730Z→13:21:30.411073Z (2NovSydney),41.697s/exit0.
+Strict result validates completed/firstFailure none/cleanup none, all metadata
+known. Package versions now collected; first run stays incomplete historical.
+Exact prior failing guest field not collected/identified, so do not claim it.
+
+Debian13amd64 actual Python3.13.5-1/Orca48.1-1+deb13u2/AT-SPI2.56.2-1+deb13u2/
+D-Bus1.16.2-2/speech0.12.0-5/Xvfb21.1.16-1.3+deb13u4. gcc/g++/make/pkg-config/
+sevenselecteddevpackages absent. UID/GID20000 absent and idle;101boundedprocesses,
+zero fixed graphical/test candidates. Self net/PID metadata allowed, PID1both
+denied, equalityunknown, exact feasibility-child cleanuptrue. No namespacecreated.
+Owner ownedChildrenAbsent/stoppedVerified/reservationCleantrue; separate fresh
+pinned exited/PID0/exit0, markerabsence/originallockreacquired, stderr0, exact
+callerreaped. No interruption/crash recovery proof. Historical absence gaps remain.
+Evidence apps/desktop/evidence/shell-native-at/inventory-actual-20261101-corrected/.
+
+Root codex/f1-02-namespace-attestation includes approvedPR100 plus frozen
+namespace-attestation-protocol.md frombdae18d. Contract resolves measured PID1
+access failure without weaker isolation: root initial nsfs/type/device+inode
+observation retained in parent, child closes namespace handles, exact initial
+UID/GID maps; root worker seals bounded anonymous root-owned read-only dataFD3
+with subject and initial/isolated namespace pairs. Wrapper and controller check
+own identities/empty privileges; controller consumes/closes FD3 before any stage
+validation/nativechild. No NEWPID/NEWUSER/CAP_SYS_PTRACE/fakeproc/normalnetwork
+fallback. Implementation limited to wrapper/controller/two testfiles/new evidence;
+all old infrastructure pins, actualbuild/receipt and execution remain coordinator
+owned. Offline implementation assignment next; no new native permit/install/run.
+
+Full97/local1.0 remains ACTIVE/incomplete,8done/20inprogress/69planned and56passed/
+325pending/8justifiedN/A unchanged. Product/Orca runs0. Next actual missingtoolchain/
+UID provisioning requires separate reviewed bounded owner/current source/archive/
+cache/receipt; fourdesktop/nativeAT/physical/performance/package/release gates
+remain. AI b7f2912/c78228e preparations stilllocal/unpublished/unmerged/PLANNED
+behind wholeF2/F3 dependencies. FutureUI Opus5.5medium, nonUI SOLhigh.
+No live owner/test or PRwatch. Namespace implementation/review still pending.
+
 ## Current coordinator state — first actual inventory returned partial facts
 
 Full97/local1.0 Goal ACTIVE and incomplete. Registry remains8done/20inprogress/

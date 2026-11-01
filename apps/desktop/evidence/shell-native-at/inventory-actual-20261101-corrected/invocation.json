@@ -1,0 +1,13 @@
+{
+  "approvedCommit": "69decac2bd695de53d24e5595770b2e546d362be",
+  "automaticRetries": 0,
+  "elapsedSeconds": 41.697,
+  "exactCallerReaped": true,
+  "exitCode": 0,
+  "finishedAtUtc": "2026-11-01T13:21:30.411073+00:00",
+  "jobKind": "inventory-only",
+  "permitSha256": "a9e812e06502a087eb93f249dc6ebeff995dbc0dc3ef9b04eccd887760c51d2a",
+  "reviewedSourceCommit": "084e7dc81a2e3f7a333bba6b83cbe7b205566264",
+  "schemaVersion": 1,
+  "startedAtUtc": "2026-11-01T13:20:48.713730+00:00"
+}
