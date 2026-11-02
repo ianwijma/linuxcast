@@ -1,5 +1,46 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Real install-metadata composition and framing correction ready for review
+
+Both initial collector reviews at cfa3813 were read in full: Standards
+12c56474 clear; Security/Spec 4ee8dec3 found one registry-framing P2. Guest and
+independent host now require final LF and <=1022 content bytes. Three new methods
+reproduce six behavioral failures/zero errors against exact cfa source, then
+pass fixed source; valid 1022 content still accepts. The historical control
+needed its fixture default bound to the old guest to expose both parsers.
+
+Host author 66b1c56 delivered six new files, imported as 5be5cfe. Root corrected
+its fail-closed API mismatch: actual collector FAILURES excludes none; the
+adapter adds the observed sentinel only to internal wire codes. Four actual
+source/six-hash closure/codec/private-artifact/public-summary tests pass and
+fail the original adapter with four behavioral assertions/zero errors. Tests
+use an explicit private source-parent profile, injected guest and fake Lab;
+external dispatch is forbidden. No actual lab/default guest collection.
+
+Coordinator: 53 collector, 67 owner, four composition, 55 mapped tests pass.
+The exact wrapper payload completes all 526 Python cases in 14.569s under18s.
+The evidence formatter initially labelled the performance.now delta as seconds;
+its units were corrected with raw milliseconds retained, without a rerun.
+Full typecheck/lint, AST/plan/whitespace, 23 historical and13 current bindings
+pass. Author evidence/hashes remain historical snapshots; current source/probe
+bindings are separate. Initial owner two-axis review and collector correction
+recheck are next. No PR.
+
+Pure hook verifier saved separately at720140c on
+codex/f1-02-install-hook-verifier, frozen contract9aae1bd, outside this review.
+20 synthetic tests, three mutation controls and55 mapped checks/472 Python pass;
+nonexecuting byte checks cover55 archives/77072036 bytes and four refusals. It
+adds no installer/CLI/source-custody authority; independent review is pending.
+Resume after current composition reviews and capture prerequisites.
+
+No real permit/capture/owner CLI/lab/guest/root/install/compiler/native operation,
+configuration change or acceptance promotion. Protected immutable source custody,
+a fresh17-key/six-hash permit, actual facts/helper/recursive closure, writer/
+capacity/containment/install/build/native-AT/session/release gates remain pending.
+Historical cleanup and unknown old timeout descendants remain inherited. All97
+task states/dependencies/criteria and full local1.0 remain intact; F0-01 accepted,
+F1-02 in progress/UI pending.
+
 ## Collector integrated; APT final-hook boundary exercised offline
 
 Root codex/f1-02-install-metadata-integration carries the frozen collector/targets

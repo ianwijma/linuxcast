@@ -386,6 +386,45 @@ class ParserTests(Case):
         f.put(m.BASE+'triggers/File', b'/usr/share/man man-db\n/usr/share/mann aa\n')
         self.assertEqual(f.collect()['handlers'], ['libc-bin', 'man-db'])
 
+    def test_registry_terminal_newline_required_by_guest(self):
+        for name, raw in (('File', b'/usr/share/man man-db/noawait'),
+                          ('ldconfig', b'libc-bin/await')):
+            with self.subTest(name=name):
+                f = self.fixture()
+                f.put(m.BASE + 'triggers/' + name, raw)
+                self.refusal(f, 'routing')
+
+    def test_registry_terminal_newline_required_by_independent_host(self):
+        for raw, explicit in ((b'/usr/share/man man-db/noawait', False),
+                              (b'libc-bin/await', True)):
+            with self.subTest(explicit=explicit):
+                with self.assertRaises(m.Rejected) as caught:
+                    m._host_interests(raw, explicit)
+                self.assertEqual(caught.exception.args, ('routing',))
+
+    def test_registry_content_limit_excludes_newline_and_c_terminator(self):
+        # dpkg fgets_checked uses a1024-byte buffer:1022 content + LF + NUL.
+        valid = b'/' + b'x' * 1018 + b' aa\n'
+        invalid = b'/' + b'x' * 1019 + b' aa\n'
+        self.assertEqual((len(valid) - 1, len(invalid) - 1), (1022, 1023))
+        for boundary in ('guest', 'host'):
+            with self.subTest(boundary=boundary):
+                if boundary == 'guest':
+                    f = self.fixture()
+                    f.put(m.BASE + 'triggers/File', invalid)
+                    self.refusal(f, 'routing')
+                else:
+                    with self.assertRaises(m.Rejected) as caught:
+                        m._host_interests(invalid)
+                    self.assertEqual(caught.exception.args, ('routing',))
+        f = self.fixture()
+        f.put(m.BASE + 'triggers/File', valid)
+        value = f.collect()
+        self.assertEqual(m.decode_packet(packet_raw(value), 0)[1], value)
+        for explicit in (False, True):
+            self.assertEqual(G.registrants(b'', not explicit), [])
+            self.assertEqual(m._host_interests(b'', explicit), [])
+
     def test_registry_and_handler_count_bounds(self):
         for raw, explicit in ((b'x'*65537, True), (b'x'*262145, False)):
             with self.assertRaises(G.Fault):

@@ -278,11 +278,12 @@ def registrants(raw, file_registry):
     need(raw is None or type(raw) is bytes and len(raw) <= (262144 if file_registry else 65536), 'bounds')
     if raw is None:
         return []
+    need(not raw or raw.endswith(b'\n'), 'routing')
     out, seen = [], set()
-    for line in raw.decode('ascii').split('\n'):
+    for line in raw.decode('ascii').split('\n')[:-1]:
         if line == '':
             continue
-        need(len(line) < 1024, 'routing')
+        need(len(line) <= 1022, 'routing')
         if file_registry:
             path, sep, value = line.partition(' ')
             need(sep, 'routing')
@@ -726,8 +727,9 @@ def _host_interests(raw, explicit=False):
     if raw is None:
         require(explicit)
         return []
+    require(type(raw) is bytes and (not raw or raw.endswith(b'\n')), 'routing')
     try:
-        lines = raw.decode('ascii').split('\n')
+        lines = raw.decode('ascii').split('\n')[:-1]
     except UnicodeError:
         raise Rejected('routing') from None
     records = []
@@ -735,7 +737,7 @@ def _host_interests(raw, explicit=False):
     for line in lines:
         if not line:
             continue
-        require(len(line) < 1024, 'routing')
+        require(len(line) <= 1022, 'routing')
         if explicit:
             key, specification = 'ldconfig', line
         else:

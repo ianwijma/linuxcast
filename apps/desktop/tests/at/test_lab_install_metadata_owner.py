@@ -38,7 +38,7 @@ FAILURES = ('none', 'custody', 'package-lock', 'deadline', 'bounds')
 CODEC_SOURCE = '''import base64
 import json
 import zlib
-FAILURES = ('none', 'custody', 'package-lock', 'deadline', 'bounds')
+FAILURES = ('custody', 'package-lock', 'deadline', 'bounds')
 def source_bytes():
     return b'print("synthetic fixture only")\\n'
 def validate_snapshot(value):

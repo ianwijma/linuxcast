@@ -161,8 +161,10 @@ class _Collector:
         failures = getattr(module, 'FAILURES', None)
         owner.require(type(failures) in (tuple, list) and 1 <= len(failures) <= 128
                       and all(type(v) is str and re.fullmatch('[a-z][a-z0-9-]{0,63}', v) for v in failures)
-                      and len(set(failures)) == len(failures) and 'none' in failures, 'configuration')
-        self.module, self.failures = module, tuple(failures)
+                      and len(set(failures)) == len(failures) and 'none' not in failures, 'configuration')
+        # The collector lists unavailable reasons only; the wire also has the
+        # independently checked observed sentinel. This is not an error code.
+        self.module, self.failures = module, ('none',) + tuple(failures)
         self.source = module.source_bytes()
         owner.require(type(self.source) is bytes and 0 < len(self.source) <= 60000, 'configuration')
         text = self.source.decode('utf-8')
