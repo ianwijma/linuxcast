@@ -1,5 +1,26 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR103 merged; fresh diagnostic capture next
+
+PR103 https://github.com/ianwijma/linuxcast/pull/103 merged normally at
+63118f1139314931117bf1d1015d1b4c42193bf2 from99ba19aae2896c95133f3d767215f633f108d914.
+Current Planning CI41367971960 SUCCESS; exact head MERGEABLE/CLEAN, no submitted
+or requested GitHub reviews, terminal CodeRabbit SKIPPED/no actionable feedback.
+Both independent480d0c5c/1c176209 initial axes clear on3536145; final publication
+changes metadata only. Immediate tiny merge blurb sent; watch removed. No caps,
+read/command scope, wire shapes, custody or deadlines changed.
+
+Root codex/f1-02-bounds-capture starts approved63118f1. Next seal exact reviewed
+3536145 diagnostic source (embedded5888b59d/18806bytes), preserve/archive used
+c512d5f metadata permit without replacement/permission changes under original
+lock, create fresh same-domain14-key permit/capture UUID, and perform one fixed
+reviewed coordinator capture. No automatic replay of old usedsource/permit.
+Fresh stopped/exit0/configuration and root/lock identity checks precede work;
+same fixed linuxcast/sudo route and guardian/shutdown budgets remain. No new
+diagnostic invocation yet. First failure's exact guard still unknown; no package
+snapshot/install/build/native/Orca evidence or acceptance promotion. All97/current
+criteria/dependencies and historical unknown cleanup gaps unchanged.
+
 ## Bounds diagnostics both initial reviews clear; focused PR next
 
 Standards480d0c5c and Security/Spec1c176209 completed/read in full on3536145,
