@@ -1,5 +1,32 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR109 merged; toolchain provenance prepared for independent review
+
+PR109 merged ef6630f1125ec37612d94b6f57dadd9a30d65dda from 0b6f941.
+Planning CI41392672980 passed; the head was CLEAN/MERGEABLE, with no requested
+or submitted GitHub reviews or inline threads. CodeRabbit completed with a skip
+and no actionable feedback. Both initial independent reviews were clear.
+The merge blurb was sent immediately and the watch removed. No task acceptance
+or application behavior changed.
+
+Root branch codex/f1-02-toolchain-provenance-integration starts at approved
+PR109 ef6630f. It copies only the seven new evidence files from saved 94cf68c;
+coordinator records preserve the current histories and append the new evidence.
+No production, test, protocol, dependency, lockfile, pin or authority changes.
+Tool signatures, archives, static reader data and existing host-byte matches
+are described in toolchain-distribution-provenance/. The earlier verifier
+harness failures remain retained and distinguished from the final passing
+signature/tamper results. First-party HTTPS key bootstrap remains explicit.
+
+Fresh initial Standards and Security/Spec reviews are next. Research2f1bcb73
+on APT/dpkg locks and trigger handlers remains asynchronous; do not poll.
+No actual installer, compiler, root, guest, namespace or native execution.
+Actual prefix/sysroot copying, input transfer, capacity, CPU/ABI, installation,
+build/receipt, supported sessions, native AT and release acceptance remain
+pending. All97 non-evidence task states, dependencies and criteria are unchanged.
+The last guest shutdown and historical timeout-descendant uncertainty remain
+inherited. No live root command or PR watch remains.
+
 ## Electron runtime input evidence: both initial reviews clear
 
 Initial Standards9f21a79c and SecuritySpec308c4d71 completed/read in full at

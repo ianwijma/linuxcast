@@ -1,0 +1,376 @@
+{
+  "contents": "First-party public source/key/signature/archives, own isolated verifier homes and static audit data. No private lab or user keyring material.",
+  "files": {
+    "archive-collector.py": {
+      "bytes": 5349,
+      "sha256": "87b7e93e9e7036b0ef0fb8fbb5733b29b0e2f7d537bbaa594aa6ae30c48ec2b7"
+    },
+    "archive-results.json": {
+      "bytes": 4039,
+      "sha256": "4a30247818c268ebcc6083e86b807ee0b150fccadf9ca5c04cb9b5d4ec102dee"
+    },
+    "archives/bun-linux-x64-baseline.zip": {
+      "bytes": 51794559,
+      "sha256": "e0446eb55995772eb9894bebae9a6be368d985a8b9271ee124486f9946eedd76"
+    },
+    "archives/bun-linux-x64.zip": {
+      "bytes": 51794595,
+      "sha256": "bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c"
+    },
+    "archives/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz": {
+      "bytes": 10984780,
+      "sha256": "e74edd2cf7d0f1f1383b4f00eb90c843750bc489e2ccf7214e6476678a907425"
+    },
+    "archives/clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz": {
+      "bytes": 4697128,
+      "sha256": "ac779bc9839dd47180806b133e4e2563c4a34716284cd5b8fede8ef289f452ca"
+    },
+    "archives/node-v24.22.1-linux-x64.tar.xz": {
+      "bytes": 32026916,
+      "sha256": "6c172a9ab6718f7b801fb5a7bd486af2ee5e32758086a04b84fcce2aa77095e6"
+    },
+    "archives/rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz": {
+      "bytes": 29573972,
+      "sha256": "047ea7098803d3500fa1072e9cee5392697e21525559e4458128a2bf874aa382"
+    },
+    "archives/rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz": {
+      "bytes": 80351960,
+      "sha256": "8426a3d170a5879f5682f5fbdd024a1779b3951e7baba685af2d6dc32a6dfc15"
+    },
+    "archives/rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz": {
+      "bytes": 2164880,
+      "sha256": "f1b2a7301513ffdd95ebf22ebbdd932e4d17fc806f748d93924740d0297b1396"
+    },
+    "bun-SHASUMS256.txt": {
+      "bytes": 3431,
+      "sha256": "86629f14fe256b487ceba5170217e13787c49d0cc0fe4bb6397ce5767d3b8f65"
+    },
+    "bun-SHASUMS256.txt.asc": {
+      "bytes": 3709,
+      "sha256": "e7247485e1d1271ba1975983742b26c34323ffbe1de6847f2205625f91c61e99"
+    },
+    "bun-key.asc": {
+      "bytes": 636,
+      "sha256": "cf0ec54ad2f5b74f3b03d98b426d473bf45d6458bcacc60df6e5caaff8ffcaea"
+    },
+    "bun-pinned-distroless-Dockerfile": {
+      "bytes": 3988,
+      "sha256": "4ad97a29e675e6cec9f70c68e8bb83b276d27c72a239798959fe5a5b9e6b9af2"
+    },
+    "bun-release-keys.gpg": {
+      "bytes": 409,
+      "sha256": "4b059d03abd9b1273a921d6ab815330630c603ee95dbf002968e16c6dc0b8d6e"
+    },
+    "bun-signature.status": {
+      "bytes": 371,
+      "sha256": "0becc44eca8cb38d7fc46164944e30a4047d91a10aa83c8871796589302b3ee7"
+    },
+    "bun-signature.stderr": {
+      "bytes": 359,
+      "sha256": "2090c335f021c1cc35c5e6d82ae0555a12ff09a6ee11a9ce2926d250586b7b8e"
+    },
+    "bun-v1.4.4-release.json": {
+      "bytes": 62721,
+      "sha256": "cfe3800b26b19f1cd24da72d57b27e9ca4ebfd357688f16652e434698f84cf1d"
+    },
+    "bun-verified-payload.txt": {
+      "bytes": 3432,
+      "sha256": "a433f455029bf028ab2a19a71b16ad3fa53d700237bbf834df3638b3f9bb8d71"
+    },
+    "channel-rust-1.95.0.toml": {
+      "bytes": 848342,
+      "sha256": "821ff14e4c4a1cbe1e8915f35aff0a3fbbdf8d293ad48ab8f31e3b0440c581f9"
+    },
+    "channel-rust-1.95.0.toml.asc": {
+      "bytes": 801,
+      "sha256": "3a675df488a0be0e110c99b8c944c2ff4b6a416f34a4862e600a8144e7152dc3"
+    },
+    "metadata-collector.py": {
+      "bytes": 3670,
+      "sha256": "104e6001d11c86e1f001e064f6d182f270e948297e7b0a910bd56b20c2c25296"
+    },
+    "metadata.json": {
+      "bytes": 3831,
+      "sha256": "2b7ccd6855bc4d83a9e3100e421fa52136c94385914adbdd97ed88b7208ee40b"
+    },
+    "node-SHASUMS256.txt.asc": {
+      "bytes": 3449,
+      "sha256": "458c81e98060760ddadc152cd6d2a06e1d5b8cc8018863758e9f64fe72abc809"
+    },
+    "node-release-keys-commit.json": {
+      "bytes": 10723,
+      "sha256": "fe387cec314d0a93a44cc4363629cae7c90f1d9fcc785db9c4741167525ca280"
+    },
+    "node-release-keys.kbx": {
+      "bytes": 95960,
+      "sha256": "610b8d249da3d5733f5a128def2dd0294dbbf5b5713e6ca2529db8db419dee00"
+    },
+    "node-signature.status": {
+      "bytes": 396,
+      "sha256": "9a1493a0c06cd2ece224bcdcb8581a1b971ce9dbc408f0a83691d05190370e83"
+    },
+    "node-signature.stderr": {
+      "bytes": 285,
+      "sha256": "84df802c83d89dc5dbc2f7f6a58688ef9b8e7a8af2ac261f408574d5f79358c4"
+    },
+    "node-tamper.status": {
+      "bytes": 193,
+      "sha256": "f3a119532e52f40a94b545471484a91b7afcf6f7030e67f1ff36ecf923ad85cb"
+    },
+    "node-tampered-data": {
+      "bytes": 3449,
+      "sha256": "bdbc6408b3ddf1a99df2f577b74acb6f7d04fefdd1aaf663886b48ab42e0e15b"
+    },
+    "node-tampered-payload.txt": {
+      "bytes": 3172,
+      "sha256": "ebc86109c9f0b8da49a59ea221a8e0a875cca5283243475a69a1d138522c3dcd"
+    },
+    "node-v24.22.1-README.md": {
+      "bytes": 41882,
+      "sha256": "66a4abdc81f9fc48e196aad4af434cc30aac77cb9a3bf74304f8da3fe80344da"
+    },
+    "node-verified-payload.txt": {
+      "bytes": 3172,
+      "sha256": "930cac6b5cb8104da3e841a517d9edf5f0ff9d2de62d248f8a7dd1357affc0c3"
+    },
+    "rust-key.gpg.ascii": {
+      "bytes": 5326,
+      "sha256": "e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b"
+    },
+    "rust-release-keys.gpg": {
+      "bytes": 3860,
+      "sha256": "97e694f136f8c106e8f94fdadf593d2fc10de3ff3f558536c41469aa5be7f635"
+    },
+    "signature-failure.json": {
+      "bytes": 48,
+      "sha256": "4c40c767c53262b42b65dab621ed60ca3afe12b16f4b4a01b2b41f762947b1b8"
+    },
+    "signature-verifier.py": {
+      "bytes": 6028,
+      "sha256": "3ce3955324fba99c713d90a2d02994ceef436ea4d47a0e2a1ebdfee5ba0982ef"
+    },
+    "signatures-v2/failure.json": {
+      "bytes": 48,
+      "sha256": "4c40c767c53262b42b65dab621ed60ca3afe12b16f4b4a01b2b41f762947b1b8"
+    },
+    "signatures-v2/node-signature.status": {
+      "bytes": 396,
+      "sha256": "9a1493a0c06cd2ece224bcdcb8581a1b971ce9dbc408f0a83691d05190370e83"
+    },
+    "signatures-v2/node-signature.stderr": {
+      "bytes": 285,
+      "sha256": "84df802c83d89dc5dbc2f7f6a58688ef9b8e7a8af2ac261f408574d5f79358c4"
+    },
+    "signatures-v2/node-verified-payload.txt": {
+      "bytes": 3172,
+      "sha256": "930cac6b5cb8104da3e841a517d9edf5f0ff9d2de62d248f8a7dd1357affc0c3"
+    },
+    "signatures-v2/verifier.py": {
+      "bytes": 5271,
+      "sha256": "3f69dd09ef088964392305d1b456dc2e6fe2bdb44691831b06c9b8c65e4290eb"
+    },
+    "signatures-v3/bun-signature.status": {
+      "bytes": 371,
+      "sha256": "0becc44eca8cb38d7fc46164944e30a4047d91a10aa83c8871796589302b3ee7"
+    },
+    "signatures-v3/bun-signature.stderr": {
+      "bytes": 359,
+      "sha256": "2090c335f021c1cc35c5e6d82ae0555a12ff09a6ee11a9ce2926d250586b7b8e"
+    },
+    "signatures-v3/bun-tamper.status": {
+      "bytes": 167,
+      "sha256": "eab2d6faefe3f526d8e4047ede12af46ae4c9100689ff436e9748775f835e4f2"
+    },
+    "signatures-v3/bun-tampered-data": {
+      "bytes": 3709,
+      "sha256": "43d898f277ab333acb0a3554c206b8f12dbe12b68676dbd75f5a0ea668095771"
+    },
+    "signatures-v3/bun-tampered-payload.txt": {
+      "bytes": 3432,
+      "sha256": "3e44fb82903b8ebd2679cbb184223837117296a67378a0d010e4ca4b052d7fce"
+    },
+    "signatures-v3/bun-verified-payload.txt": {
+      "bytes": 3432,
+      "sha256": "a433f455029bf028ab2a19a71b16ad3fa53d700237bbf834df3638b3f9bb8d71"
+    },
+    "signatures-v3/node-signature.status": {
+      "bytes": 396,
+      "sha256": "9a1493a0c06cd2ece224bcdcb8581a1b971ce9dbc408f0a83691d05190370e83"
+    },
+    "signatures-v3/node-signature.stderr": {
+      "bytes": 285,
+      "sha256": "84df802c83d89dc5dbc2f7f6a58688ef9b8e7a8af2ac261f408574d5f79358c4"
+    },
+    "signatures-v3/node-tamper.status": {
+      "bytes": 193,
+      "sha256": "f3a119532e52f40a94b545471484a91b7afcf6f7030e67f1ff36ecf923ad85cb"
+    },
+    "signatures-v3/node-tampered-data": {
+      "bytes": 3449,
+      "sha256": "bdbc6408b3ddf1a99df2f577b74acb6f7d04fefdd1aaf663886b48ab42e0e15b"
+    },
+    "signatures-v3/node-tampered-payload.txt": {
+      "bytes": 3172,
+      "sha256": "ebc86109c9f0b8da49a59ea221a8e0a875cca5283243475a69a1d138522c3dcd"
+    },
+    "signatures-v3/node-verified-payload.txt": {
+      "bytes": 3172,
+      "sha256": "930cac6b5cb8104da3e841a517d9edf5f0ff9d2de62d248f8a7dd1357affc0c3"
+    },
+    "signatures-v3/results.json": {
+      "bytes": 2722,
+      "sha256": "a55ea48ea598bb6633b8e1a059d9286cfb827a1a417cddda576348327986bb1e"
+    },
+    "signatures-v3/rust-signature.status": {
+      "bytes": 429,
+      "sha256": "ed92bd0f52bb50b1ab6e28f03ec3824c745aee014b77073d9fce7dc86beea0f6"
+    },
+    "signatures-v3/rust-signature.stderr": {
+      "bytes": 200,
+      "sha256": "e59ee3b0ab2f8b18b9c2c6096deee11399fd699a967d88d2d305b910c283dc04"
+    },
+    "signatures-v3/rust-tamper.status": {
+      "bytes": 226,
+      "sha256": "d3cecaae42af6f7ddbf89c48da687b262e0053505f925cb4be4c6e6bf6b75300"
+    },
+    "signatures-v3/rust-tampered-data": {
+      "bytes": 848342,
+      "sha256": "5043dfc85dcf8cadee3ab08c22097f101c2107c788cdedd5bfea13c837be0eb1"
+    },
+    "signatures-v3/verifier.py": {
+      "bytes": 5510,
+      "sha256": "474383ad51c07ae8819a62b3c8c812465eea12ab65c3dabb781aae44978cfa98"
+    },
+    "static-audit/auditor.py": {
+      "bytes": 7300,
+      "sha256": "83826212873be049bd858640cb4df826ce4fb3fced1d59be4469adf883205319"
+    },
+    "static-audit/bun-baseline-members.json": {
+      "bytes": 507,
+      "sha256": "d555347dae766b2f369281863cec41563faeb401575e2deb208515e53d8f6399"
+    },
+    "static-audit/bun-members.json": {
+      "bytes": 480,
+      "sha256": "2676be38f06c68f2ed483ef54c411fb39c03434254fb306a35969992b95277f3"
+    },
+    "static-audit/cargo-members.json": {
+      "bytes": 16078,
+      "sha256": "2bf853b291f3abfc14701ae0906d48a92172bbd954980757fcd83e25168de096"
+    },
+    "static-audit/clippy-preview-members.json": {
+      "bytes": 5011,
+      "sha256": "591b38ca6fdb08ea9103586f2d459e3aa0d77ef011849db88241b57a340cebdb"
+    },
+    "static-audit/elf.json": {
+      "bytes": 23190,
+      "sha256": "8817345eb79d532bb6821e37ea80b6dcc6e4de92859caa3732116e4f032fd5ae"
+    },
+    "static-audit/node-members.json": {
+      "bytes": 1502554,
+      "sha256": "b397a65b4538583117d39ea1b5bfcaeb63110da9d35087af88a2644e9e4b63e5"
+    },
+    "static-audit/readelf/00-node.txt": {
+      "bytes": 844588,
+      "sha256": "0e636cbcfcc23e4f5833b41f63b6c3aae1ac816e7572060c5d9a5fd1bc0e9121"
+    },
+    "static-audit/readelf/01-bun.txt": {
+      "bytes": 29282,
+      "sha256": "243e42fd2fec66b1996747d450b1d10740444d85e739d7d1275f67cf6a867191"
+    },
+    "static-audit/readelf/02-bun.txt": {
+      "bytes": 29282,
+      "sha256": "243e42fd2fec66b1996747d450b1d10740444d85e739d7d1275f67cf6a867191"
+    },
+    "static-audit/readelf/03-rustdoc.txt": {
+      "bytes": 38122,
+      "sha256": "74df1c73dd1ecc8ee8b2f456a136a9971e2e528aad0ce42437376bc7693fc348"
+    },
+    "static-audit/readelf/04-rustc.txt": {
+      "bytes": 8085,
+      "sha256": "46c615819f17133388929b14611ae5cb940eabd60c5ada15e1e0f00c761151a8"
+    },
+    "static-audit/readelf/05-wasm-ld.txt": {
+      "bytes": 8123,
+      "sha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56"
+    },
+    "static-audit/readelf/06-wasm-component-ld.txt": {
+      "bytes": 9461,
+      "sha256": "756984d50abdc0d3f17131186d9be4acf53fc355be72576dbcf15f13c5c35b72"
+    },
+    "static-audit/readelf/07-rust-lld.txt": {
+      "bytes": 28749,
+      "sha256": "5098f7559bfd21a2a411cce5a8fdf353cf249df43243ec013758f93a515c92b2"
+    },
+    "static-audit/readelf/08-ld64.lld.txt": {
+      "bytes": 8123,
+      "sha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56"
+    },
+    "static-audit/readelf/09-ld.lld.txt": {
+      "bytes": 8123,
+      "sha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56"
+    },
+    "static-audit/readelf/10-libLLVM.so.22.1-rust-1.95.0-stable.txt": {
+      "bytes": 790255,
+      "sha256": "57da14512f2ca460c7ef4c19f79d2cda04372fa4f079fd181b026e70d2b30dbc"
+    },
+    "static-audit/readelf/11-lld-link.txt": {
+      "bytes": 8123,
+      "sha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56"
+    },
+    "static-audit/readelf/12-librustc_driver-6108105cd7e839cf.so.txt": {
+      "bytes": 423810,
+      "sha256": "b77cca8f3f89a8a4c003f3f576ff81deb0bdd27e4c325da8358adcef30aa3bbe"
+    },
+    "static-audit/readelf/13-rust-analyzer-proc-macro-srv.txt": {
+      "bytes": 10990,
+      "sha256": "b57ac2214054bc836a5d9311364050bcfcfd9fa001dedd26e8992e6ed7eacb63"
+    },
+    "static-audit/readelf/14-rust-objcopy.txt": {
+      "bytes": 8065,
+      "sha256": "956d0b7a0a032819ed58a85d820a7fffde7a71e367abc63ad116c941106a4ccd"
+    },
+    "static-audit/readelf/15-cargo.txt": {
+      "bytes": 13505,
+      "sha256": "17c784412fb80a0d78686dac4eb88edb4accf1aa0cb6223de0d6bffa40044777"
+    },
+    "static-audit/readelf/16-libstd-d1237ef7159db0a2.so.txt": {
+      "bytes": 44750,
+      "sha256": "a0c4f0c1d9fe55db61a7a57b404fe6573b1dfa545843cf96d6bb5780810acba6"
+    },
+    "static-audit/readelf/17-clippy-driver.txt": {
+      "bytes": 33696,
+      "sha256": "cf50c82789cb182d52698537a849b7d070663886e54caef6f88f273d5fb13248"
+    },
+    "static-audit/readelf/18-cargo-clippy.txt": {
+      "bytes": 7750,
+      "sha256": "3963695a34c26c4902fd4ff3ef42e47b205bcfc18f7460a14f6f244bdf6970e4"
+    },
+    "static-audit/readelf/19-cargo-fmt.txt": {
+      "bytes": 8506,
+      "sha256": "7b0cdf6dde803bc105c9c7043313f8f14bef04cda05286ec236209371b1dd7ec"
+    },
+    "static-audit/readelf/20-rustfmt.txt": {
+      "bytes": 14765,
+      "sha256": "c09a5f6117e6da3a8eff61d607b379771d410833e39c453b2989e2f613834bcc"
+    },
+    "static-audit/results.json": {
+      "bytes": 4965,
+      "sha256": "4c1149d04e828c3ec21bf65fbb5230a5c2fcca09c3397b2866ccb081cabe5755"
+    },
+    "static-audit/rust-std-members.json": {
+      "bytes": 25160,
+      "sha256": "3ad952901d03338764d9f06048b064f8238220f9e688503cf83e830ac393e2b4"
+    },
+    "static-audit/rustc-members.json": {
+      "bytes": 16419,
+      "sha256": "5db18864ca3a64b4193066fd2d61adac97f985af897758d909d2e36dd410ebb7"
+    },
+    "static-audit/rustfmt-preview-members.json": {
+      "bytes": 5039,
+      "sha256": "2b1cf2de6d727cc295e1f80ef2c4997400da41acadb09e416d9efdf51ad8c307"
+    }
+  },
+  "root": "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-toolchain-provenance-20261102",
+  "schema": 1,
+  "sourceArchiveBodiesCommitted": false
+}

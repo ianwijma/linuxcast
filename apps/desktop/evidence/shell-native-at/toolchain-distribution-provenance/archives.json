@@ -1,0 +1,109 @@
+{
+  "atUtc": "2026-11-02T05:05:36.324445+00:00",
+  "automaticRetries": 0,
+  "bytes": 263388790,
+  "deadlineSeconds": 240,
+  "downloadedProgramsExecuted": 0,
+  "elapsedSeconds": 3.948,
+  "files": [
+    {
+      "binding": "node signed SHASUMS",
+      "bytes": 32026916,
+      "component": "node",
+      "name": "node-v24.22.1-linux-x64.tar.xz",
+      "redirectHosts": [],
+      "sha256": "6c172a9ab6718f7b801fb5a7bd486af2ee5e32758086a04b84fcce2aa77095e6",
+      "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-x64.tar.xz",
+      "version": "24.22.1"
+    },
+    {
+      "binding": "Bun signed SHASUMS and GitHub asset digest agree",
+      "bytes": 51794595,
+      "component": "bun",
+      "expectedBytes": 51794595,
+      "name": "bun-linux-x64.zip",
+      "redirectHosts": [
+        {
+          "host": "release-assets.githubusercontent.com",
+          "status": 302
+        }
+      ],
+      "sha256": "bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c",
+      "url": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip",
+      "variant": "standard",
+      "version": "1.4.4"
+    },
+    {
+      "binding": "Bun signed SHASUMS and GitHub asset digest agree",
+      "bytes": 51794559,
+      "component": "bun",
+      "expectedBytes": 51794559,
+      "name": "bun-linux-x64-baseline.zip",
+      "redirectHosts": [
+        {
+          "host": "release-assets.githubusercontent.com",
+          "status": 302
+        }
+      ],
+      "sha256": "e0446eb55995772eb9894bebae9a6be368d985a8b9271ee124486f9946eedd76",
+      "url": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64-baseline.zip",
+      "variant": "baseline-comparison-only",
+      "version": "1.4.4"
+    },
+    {
+      "binding": "GPG verified Rust channel manifest",
+      "bytes": 80351960,
+      "component": "rustc",
+      "name": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "redirectHosts": [],
+      "sha256": "8426a3d170a5879f5682f5fbdd024a1779b3951e7baba685af2d6dc32a6dfc15",
+      "url": "https://static.rust-lang.org/dist/2026-04-16/rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "version": "1.95.0"
+    },
+    {
+      "binding": "GPG verified Rust channel manifest",
+      "bytes": 10984780,
+      "component": "cargo",
+      "name": "cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "redirectHosts": [],
+      "sha256": "e74edd2cf7d0f1f1383b4f00eb90c843750bc489e2ccf7214e6476678a907425",
+      "url": "https://static.rust-lang.org/dist/2026-04-16/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "version": "1.95.0"
+    },
+    {
+      "binding": "GPG verified Rust channel manifest",
+      "bytes": 29573972,
+      "component": "rust-std",
+      "name": "rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "redirectHosts": [],
+      "sha256": "047ea7098803d3500fa1072e9cee5392697e21525559e4458128a2bf874aa382",
+      "url": "https://static.rust-lang.org/dist/2026-04-16/rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "version": "1.95.0"
+    },
+    {
+      "binding": "GPG verified Rust channel manifest",
+      "bytes": 4697128,
+      "component": "clippy-preview",
+      "name": "clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "redirectHosts": [],
+      "sha256": "ac779bc9839dd47180806b133e4e2563c4a34716284cd5b8fede8ef289f452ca",
+      "url": "https://static.rust-lang.org/dist/2026-04-16/clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "version": "1.95.0"
+    },
+    {
+      "binding": "GPG verified Rust channel manifest",
+      "bytes": 2164880,
+      "component": "rustfmt-preview",
+      "name": "rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "redirectHosts": [],
+      "sha256": "f1b2a7301513ffdd95ebf22ebbdd932e4d17fc806f748d93924740d0297b1396",
+      "url": "https://static.rust-lang.org/dist/2026-04-16/rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "version": "1.95.0"
+    }
+  ],
+  "guestOperations": 0,
+  "installersExecuted": 0,
+  "perFileLimitBytes": 134217728,
+  "schema": 1,
+  "totalLimitBytes": 402653184
+}
