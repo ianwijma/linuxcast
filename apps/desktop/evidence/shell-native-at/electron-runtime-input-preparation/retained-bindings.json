@@ -1,0 +1,80 @@
+{
+  "contents": "Public artifact/static reports and own host cache fixtures only; no private lab data",
+  "files": {
+    "f102-host-electron-cache-controls-20261102/api-controls.mjs": {
+      "bytes": 3475,
+      "sha256": "535b9514e190f3bbcdc0506e764a0b5217bc9f32cc91b9a68497484d5d3f22a5"
+    },
+    "f102-host-electron-cache-controls-20261102/api-results.json": {
+      "bytes": 653,
+      "sha256": "77d487dcd9b2bf36ed94f6eaab2b3a7ed1b3a66c9b2b6213203449e1b9e3e5f2"
+    },
+    "f102-host-electron-cache-controls-20261102/api.log": {
+      "bytes": 289,
+      "sha256": "0595cc90d8388c66159fddf8bf39d60ac78d9526e8ccfd9a198fd4f488942a49"
+    },
+    "f102-host-electron-cache-controls-20261102/result.json": {
+      "bytes": 5236,
+      "sha256": "d4e1d195f323fc4c6899c0af2d9efa6b8a9eb1ff956e2ba02e6a175493a57d12"
+    },
+    "f102-host-electron-cache-controls-20261102/supervisor.py": {
+      "bytes": 7431,
+      "sha256": "6d9f5a0615007f00ffb91a12cf96dc11f9d53b838ee4becf8aa74d619282b826"
+    },
+    "f102-public-electron45-audit-20261102/audit.json": {
+      "bytes": 1597,
+      "sha256": "fc0e1aff86ed9e062852df22928be25e33c2414cd28e8317673024b1bdda589f"
+    },
+    "f102-public-electron45-audit-20261102/auditor.py": {
+      "bytes": 6419,
+      "sha256": "d4a81b3c81df84beeaf96ff25b0fc7f07b5a5d7538ae580ddbc05169f03df7e1"
+    },
+    "f102-public-electron45-audit-20261102/elf.json": {
+      "bytes": 6451,
+      "sha256": "4b49078575791971eef8279ac553fd685229804f28d1e63bd734c43f7e17d76c"
+    },
+    "f102-public-electron45-audit-20261102/members.json": {
+      "bytes": 19277,
+      "sha256": "bf78070a17119c6b85f740cc461b28066d6dc736bd1b50cd3f80948fcf908e00"
+    },
+    "f102-public-electron45-audit-20261102/readelf/00-libffmpeg.so.txt": {
+      "bytes": 43663,
+      "sha256": "e2a0c5541788c51395c8ed976d669213818fa8690e89dea592345eac666bc4f2"
+    },
+    "f102-public-electron45-audit-20261102/readelf/01-electron.txt": {
+      "bytes": 279712,
+      "sha256": "8336dc65621ae3fade07c51176daf5858d642049c7bf36f13dba7a67d21f942c"
+    },
+    "f102-public-electron45-audit-20261102/readelf/02-libvk_swiftshader.so.txt": {
+      "bytes": 10135,
+      "sha256": "cf2d2495d7409e299ec06304bb61f4a73865f8dcacce841ddbd98188aba7c71f"
+    },
+    "f102-public-electron45-audit-20261102/readelf/03-libvulkan.so.1.txt": {
+      "bytes": 14186,
+      "sha256": "8b3e1307485de06d903112072473a5c701f983182a6e78f3ddec8eefc1f7fffc"
+    },
+    "f102-public-electron45-audit-20261102/readelf/04-chrome_crashpad_handler.txt": {
+      "bytes": 16456,
+      "sha256": "0394c9e491a9b457fa4d3311ca0f7189f2266348ef09e2dbdbf34781a5851aa1"
+    },
+    "f102-public-electron45-audit-20261102/readelf/05-chrome-sandbox.txt": {
+      "bytes": 6964,
+      "sha256": "11ee450d1bfcf327bd572fa17a6f0f7063f1b5ff688f0243ebfa702bf24cd6f9"
+    },
+    "f102-public-electron45-runtime-20261102/collector.py": {
+      "bytes": 4949,
+      "sha256": "79ea08ea7101a02680eb4a9d9f22729207670232f6068f313e71cc7354f2a29f"
+    },
+    "f102-public-electron45-runtime-20261102/electron-v45.0.0-linux-x64.zip": {
+      "bytes": 123909792,
+      "sha256": "22f6a10bd3f7fef987ddbb379d3375ce664ad0c98a9a50f80c89f1718a0c3e3a"
+    },
+    "f102-public-electron45-runtime-20261102/verification.json": {
+      "bytes": 3170,
+      "sha256": "f0c6590a62a2995a8e09720dee8743e4f206c317d46efad8bbfe76b756d75146"
+    }
+  },
+  "root": "/home/ian/Projects/ianwijma/linuxcast/.worktrees",
+  "schema": 1,
+  "sourceArchiveBodiesCommitted": false
+}

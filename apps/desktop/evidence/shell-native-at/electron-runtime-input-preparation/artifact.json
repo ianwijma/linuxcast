@@ -1,0 +1,76 @@
+{
+  "acceptance": false,
+  "archive": {
+    "bytes": 123909792,
+    "name": "electron-v45.0.0-linux-x64.zip",
+    "sha256": "22f6a10bd3f7fef987ddbb379d3375ce664ad0c98a9a50f80c89f1718a0c3e3a"
+  },
+  "atUtc": "2026-11-02T04:47:37.855344+00:00",
+  "automaticRetries": 0,
+  "checksumJsonSha256": "499f818a4a5e105778fdc5c83a51c5e473abcfb2b8c552e0a930ec9617517936",
+  "collectorSha256": "79ea08ea7101a02680eb4a9d9f22729207670232f6068f313e71cc7354f2a29f",
+  "compressedLimitBytes": 268435456,
+  "downloadedProgramsExecuted": 0,
+  "elapsedSeconds": 5.431,
+  "guestOperations": 0,
+  "independentAcquisitionDeadlineSeconds": 120,
+  "installersExecuted": 0,
+  "kind": "f102-electron45-public-runtime-acquisition",
+  "lockSha256": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+  "packageBindings": {
+    "@electron/get": {
+      "archive": "archives/sha512-de4481b46f0e6dc4d57d76a79b9bd527a52704b115995b1193533ebc6a82b8c055f972c26c962e5907ee97ec88cb41900ec4a52b490712b8841e7ed23e4e049c.tgz",
+      "bytes": 20211,
+      "lockedIntegrity": "sha512-3kSBtG8ObcTVfXanm5vVJ6UnBLEVmVsRk1M+vGqCuMBV+XLCbJYuWQful+yIy0GQDsSlK0kHEriEHn7SPk4EnA==",
+      "resolved": "@electron/get@5.1.0",
+      "sha256": "bdaedaeec759d5b41a20e4d3ae930a86f0406ecf07f28777d8c3c1e9c62182bf"
+    },
+    "electron": {
+      "archive": "archives/sha512-ca3cf8ba130170ee8be57ec25a044ca1b7f610c24f9dbf63e33b9ffa7bbf4d4ffa1384aa7f1edf9ff6b67800a8e2a9e08e697fd099eca1987162ba092f12dddb.tgz",
+      "bytes": 208744,
+      "lockedIntegrity": "sha512-yjz4uhMBcO6L5X7CWgRMobf2EMJPnb9j4zuf+nu/TU/6E4Sqfx7fn/a2eACo4qngjml/0JnsoZhxYroJLxLd2w==",
+      "resolved": "electron@45.0.0",
+      "sha256": "99cb34bfd34836bf32dde8c251e5df94bf95cbf21619608dd5d7bc97841bc194"
+    }
+  },
+  "redirectHosts": [
+    {
+      "host": "release-assets.githubusercontent.com",
+      "status": 302
+    }
+  ],
+  "schema": 1,
+  "signatureVerificationPerformed": false,
+  "socketTimeoutSeconds": 20,
+  "sourceMemberBindings": {
+    "@electron/get:package/dist/Cache.js": {
+      "bytes": 4088,
+      "sha256": "49dfbf8ae8a3ab565f0530605e3ed7b27ab578e5f3addfcb47ab913eedfdb2c1"
+    },
+    "@electron/get:package/dist/artifact-utils.js": {
+      "bytes": 2344,
+      "sha256": "90c0ba570fe50779c1c9239c60d22be73438c57e3cd718aeb8eb13b43f434a22"
+    },
+    "@electron/get:package/dist/index.js": {
+      "bytes": 9166,
+      "sha256": "32ccacd5ae478d80b64d1105153c878c2295f8f975bf6cd32bc27c0e68faa1b3"
+    },
+    "@electron/get:package/package.json": {
+      "bytes": 2058,
+      "sha256": "7db30e8ee1f97e3d45d6a1ebb7db7ad28fc193ba44399b94810119624f94b1a2"
+    },
+    "electron:package/checksums.json": {
+      "bytes": 7212,
+      "sha256": "499f818a4a5e105778fdc5c83a51c5e473abcfb2b8c552e0a930ec9617517936"
+    },
+    "electron:package/install.js": {
+      "bytes": 3564,
+      "sha256": "3b9e0c3c9070edbdb732dc05ed23c6f1c6b7a404bd623033a2f0b71052534e93"
+    },
+    "electron:package/package.json": {
+      "bytes": 744,
+      "sha256": "cd241e72c138eb61d8e074eb1d88eb6f20d9b5ac27bc93f48e57252fc98358d1"
+    }
+  },
+  "sourceUrl": "https://github.com/electron/electron/releases/download/v45.0.0/electron-v45.0.0-linux-x64.zip"
+}

@@ -1,5 +1,30 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Electron runtime inputs prepared; Rust routing reviews both clear
+
+Independent host preparation oncodex/f1-02-electron-runtime-inputs from approved
+PR107d5651a0: official Electron45linux-x64 ZIP123909792bytes matches SHA22f6a10b
+from lockednpm bundledchecksums, lockSRI reverified. Static72regularmembers/
+286798592expandedbytes/6ELF64x64 readelfdata audited; no downloadedbinary/installer
+execution. Actualpinnedget5.1.0 libraryJavaScript controls pass: validreadonlyseed
+checksumhit/0downloadcalls, empty+wrongchecksum each injecteddownloadrefusal1.
+No kernelnetworkdenial claim; defaultAPI hasdownloadfallback.39packagefiles/
+seedinode-mode-hash unchanged, exactownedchildreaped/ECHILD,0.593s. Rawarchives/
+staticreports/owncachefixtures sealedoutsideLAB, bindings retained. No real lab,
+root/guest/prefix/provision/build/native operation. Newruntimeevidence needs its
+own review; install/transfer/extractor/toolauth/capacity/CPU-ABI-sandbox/native
+acceptance remainpending. No task/criteria promotion.
+
+Both Rust routing INITIAL reviews completed and read in full at3493b3f/base
+approvedd5651a0,11paths/twocommits. Standards0f0af6b6 clear; Spec8726742c clear.
+Each independently15staging/expectedhistorical-mutantcontrols0errors/no skips/
+55mappedsecurity/fulltype-lint/plan/whitespace/47source+5evidence hashes. Standards
+standalone402Python9.110s; Spec9filesystemfaults and3syntheticowner cleanup paths.
+Eightauthorpaths match18c1b64; coordinatoronlymetadata. Preparefocused Rust PR
+next from preserved codex/f1-02-rust-routing-integration3493b3f. No PRwatch or live
+rootcommand/delegate remains. Last gueststopped/exit0 inherited; all97/local1.0
+and oldunknown timeout-descendant absence unchanged.
+
 ## Fixed Rust routing: both initial reviews clear; publication next
 
 Both INITIAL independent reviews completed/read fully at3493b3f/baseapproved
