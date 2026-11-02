@@ -8,7 +8,7 @@
     "apps/desktop/tests/at/test_lab_build_facts.py": "e99d4b08330bea5183c2c1509b8d4282a4ae0a6edcd3ee24f1f2735aa89e2abf",
     "apps/desktop/tests/at/build-facts-protocol.md": "1a7f68a8c55e542d8af927a5efdea399c6d93c44d004cfd457f32381c0ee4d08",
     "apps/desktop/evidence/shell-native-at/build-facts-preparation/snapshot-schema.md": "8165c87c6f80328193defa7b0f7a6efaca63f47cda01d157a41acc2d66d4de07",
-    "apps/desktop/evidence/shell-native-at/canonical-keyring-preparation/README.md": "8062f082fa8fa6ecb8adac520d8e3b52d9858dad327088c4772af1bf6e422ce5",
+    "apps/desktop/evidence/shell-native-at/canonical-keyring-preparation/README.md": "16e13ad4e293ee6e94b23c4f78a5d82816ac8183c2698b1404db6c6a024e8950",
     "apps/desktop/evidence/shell-native-at/canonical-keyring-preparation/check-regressions.py": "3b5a37a0c2b1ef1a33bb10ad748e8269438b688f4e34b2cf9d30ad0cbed29616"
   },
   "embeddedGuestSource": {
@@ -51,5 +51,11 @@
     "lint": "passed",
     "actualCorrectedCapture": false,
     "acceptance": "pending"
+  },
+  "reviewedSourceCommit": "cc158ab53f0fd30a0a46091d4f1bb9be7119a81d",
+  "initialIndependentReviews": {
+    "standards": "a86c6617-e1ed-41d4-9932-d78ee6d62d64",
+    "securitySpec": "3beb9a22-b33f-4452-9364-7449f42bb703",
+    "outcome": "both clear; actual capture remains inherited; publication preserves reviewed code"
   }
 }

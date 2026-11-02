@@ -63,8 +63,8 @@ unavailable; signing configuration and release requirements are unchanged.
 
 ## Acceptance and next gate
 
-Independent initial Standards and Security/Spec reviews are pending. No corrected
-source has been sealed, permitted or executed in the guest. The packaging defect
+Independent initial Standards and Security/Spec reviews are clear as recorded
+below. No corrected source has been sealed, permitted or executed in the guest. The packaging defect
 and synthetic reproduction do not prove this was the actual guest failure's
 cause, or that a fresh capture will succeed. Existing used sources, permits and
 results remain preserved; the lab was independently verified stopped after the
@@ -76,3 +76,23 @@ closure, installation/build/receipt, namespace/rootdrop/statx/containment/native
 product/Orca, supported desktop/session or release acceptance. Historical unknown
 timeout-descendant absence remains unknown. F1-02 stays in-progress/UI pending;
 all97 task/dependency/criterion states and complete local1.0 scope are preserved.
+
+
+## Initial independent reviews
+
+Both reviews covered exactcc158ab53f0fd30a0a46091d4f1bb9be7119a81d against
+approved0a363239473cfc81c2c3d4895d1d5c3df2f4fe87, all16 paths/four commits.
+The final reports were read in full. Standardsa86c6617 and Security/Spec3beb9a22
+found no introduced actionable findings. They independently verified the exact
+two-literal production change and all preserved guards, private fixture behavior,
+public evidence consistency, full97 registry invariants and honest limits.
+
+Each executed104 focused/55mapped/all399Python under unchanged18s, canonical
+4-old-failures/currentgreen and historical projection6/mutant3/diagnostic25/
+custody11/2/4 controls, typecheck/lint/plan/whitespace. Standards added8 synthetic
+probes and29 bindings; Security/Spec added12 probes and27 file/provenance plus2
+embedded bindings. Their isolated checkouts remained clean with unchanged
+fingerprints. Dependency setup used frozen copyfile with lifecycle scripts
+suppressed; manifests/lockfile stayed unchanged. Actual capture/cleanup remained
+inherited; neither accessed private lab state or ran a guest/native command.
+Publication metadata preserves reviewed production, tests, helper and contracts.
