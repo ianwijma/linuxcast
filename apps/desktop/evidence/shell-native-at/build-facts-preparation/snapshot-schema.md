@@ -33,7 +33,12 @@ Snapshot keys:
   presence is retained, no null/synthesized version. All values are strings.
   Order is `(Package, Architecture or "")`, unique. At most4096 records.
   Identity fields are simple, folded relationship fields use single spaces.
-  Every input field (also discarded ones) obeys duplicate/continuation/size rules.
+  Every input field obeys duplicate/continuation/syntax and16KiB physical-line/
+  128KiB stanza rules. Only projected values are assembled, with the existing
+  16KiB assembled-field limit; discarded values are never accumulated. This
+  coordinator refinement removes the earlier concatenated discarded-value
+  restriction after the actual bounds-status-field refusal. It does not identify
+  which field caused that refusal or change snapshot fields/read/output limits.
 - `packageState`: `{statusSha256: lowercase sha256, statusBytes: integer1..8388608,
   holds: [{package: string, architecture: string|null}], pending:
   {updates: 0, triggers: false, broken: integer0..4096, clean: boolean}}`.

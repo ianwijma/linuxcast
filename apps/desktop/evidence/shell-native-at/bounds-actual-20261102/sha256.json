@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "actual-fixed-diagnostic-not-acceptance",
+  "files": {
+    "apps/desktop/evidence/shell-native-at/bounds-actual-20261102/README.md": "1ef2e26296df107ec9deccbef79dfa1263e10564a8a35b302f652f5fe15f7139",
+    "apps/desktop/evidence/shell-native-at/bounds-actual-20261102/invocation.json": "d26b2fc36cd1fdb03358442623aeb5609f49a45620731599e997f091ceccdd99",
+    "apps/desktop/evidence/shell-native-at/bounds-actual-20261102/owner-result.json": "1ed3045171028e5996728a96d81db0623c3afe365e3e1fde00add216d5d84624",
+    "apps/desktop/evidence/shell-native-at/bounds-actual-20261102/postflight.json": "f6716603a98e06e757fea256fdf2b671c59ebcb973e672802c16f5422c400236",
+    "apps/desktop/evidence/shell-native-at/bounds-actual-20261102/source-provenance.json": "225783377829e4ecdba0fe5a5e7a1e7afc425ea03b2dd01fecd8fe81dffe78b9"
+  }
+}

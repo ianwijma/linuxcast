@@ -98,14 +98,17 @@ def package_records(raw):
             need(current is not None)
             # Simple projected fields cannot acquire a second physical line.
             need(current not in canonical or canonical[current] in FOLDED)
-            fields[current] += ' ' + line.strip(' \t')
-            need(len(fields[current].encode('utf-8')) <= 16384, 'bounds-status-field')
+            if current in canonical:
+                fields[current] += ' ' + line.strip(' \t')
+                need(len(fields[current].encode('utf-8')) <= 16384, 'bounds-status-field')
         else:
             key, sep, value = line.partition(':')
             need(sep and re.fullmatch(r'[!-9;-~]+', key) and not key.startswith(('#', '-')))
             key = key.lower()
             need(key not in fields)
-            fields[key] = value.strip(' \t')
+            # Discarded values are bounded by physical line/stanza checks above;
+            # retain presence only, so duplicate/continuation checks still apply.
+            fields[key] = value.strip(' \t') if key in canonical else None
             current = key
     finish()
     records.sort(key=lambda p: (p['Package'], p.get('Architecture', '')))

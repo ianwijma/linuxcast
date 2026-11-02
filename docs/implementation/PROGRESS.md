@@ -1,5 +1,127 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Status projection both initial reviews clear; publication next
+
+Security/Specbb7a5297 and Standards6a27b37d completed/read on27a9f73/base63118f1;
+both clear, no code findings. Independent100focused/55mapped/all395Python under
+unchanged18s; old projection6/mutant3/diagnostic25/custody11/2/4 failures with
+zero errors/currentgreen. Spec126extra boundary-semantic/172bindings-registry,
+Standards93extra probes/47bindings-publicschema checks; AST outside parser and
+integer constants/embedded795c8004/19044bytes/plan/whitespace passed. Clean
+fingerprints, no reviewer source or actual lab work; old actual/TS evidence
+inherited. Sixteen-path/fourcommit reviewed scope preserved. Publication metadata
+keeps code/test/helper/protocol/elaboration byte-identical to27a9f73.
+
+Publish focused projection plus actual field-refusal evidence PR, inspect
+current-headCI/GitHub reviews/bots, merge promptly after gates. Then fresh sealed
+source/new14-key permit and one changed-parser capture. No such capture/new
+baseline yet; field category unknown and previous artifacts/permits preserved.
+Lab stopped, no commands/delegates/watch. All97/status/deps/criteria and old
+unknown timeout-descendant gap unchanged. Known signing socket outage uses
+user-authorized per-command unsigned fallback; release rules/config unchanged.
+
+## Status projection initial Security/Spec clear; Standards still running
+
+Initial bb7a5297 completed/read on27a9f73/base63118f1: no P1/P2/P3 findings.
+Independent100focused/55mapped/all395Python under18s, projection6/mutant3/
+diagnostic25/custody11/2/4 historical failures-currentgreen;126extra semantic/
+boundary and172manifest/provenance/registry checks, AST/numeric constants/
+embedded795c8004/19044bytes/plan/syntax/whitespace pass. None storage and all
+remaining bounds/output/custody/authority confirmed; exact16paths/fourcommits,
+clean fingerprints. Actual facts and oldTS checks inherited, private state not
+accessed. Separate Standards6a27b37d still running on frozen27a9f73; no polling
+or cleanStandards claim. Metadata-only review record preserves code/test/helper/
+protocol. No PR/watch/new seal/permit/capture; lab stopped, both earlier actual
+runs unavailable, actual field category unknown. All97/state/criteria intact.
+
+## Bounded discarded-field projection implemented for review
+
+Frozen ef5549c contract is implemented only in package_records: unused field
+names/presence retain None; their values are never accumulated. Projected values
+retain16KiB; physical lines16KiB/stanzas128KiB/input8MiB remain bounded. Former
+concatenated discarded-value restriction is explicitly removed, without changing
+read scope/output caps/codec/commands/custody/deadlines. Actual offending field
+identity/category remains unknown; projected over-limit values still refuse.
+
+100 focused pass1.919s; actual55mapped13.61s includes395Python12.012s within18s,
+no skips. Three new methods fail pre-change source6behavioral assertions/0errors,
+fixedgreen. A private old-accumulator/high-cap mutant fails live-local None
+assertions3times, proving non-materialization. Existing diagnostic25 and custody
+11/2/4 historical controls remain red/currentgreen. Existing field-size fixture
+retargeted to projected Depends, duplicate-mutation guard retargeted and asserted
+changed after comment caused one initial harness error. No production guard loss.
+Host AST except embedded source and guest definitions outside parser unchanged;
+numeric bounds retained. Evidence status-projection-preparation/ with hashes/AST/
+plan/whitespace. Prior TS checks inherited. Known signer socket outage -> user
+authorized per-command unsigned fallback; configuration unchanged.
+
+Fresh initial two-axis review next; no new PR/watch, source seal/permit/capture,
+guest/native action or acceptance promotion. All97 states/deps/criteria intact;
+actual second capture records remain immutable and lab stopped. No live commands
+or delegates at this checkpoint. Historical unknown cleanup gap unchanged.
+
+## Freeze bounded projection refinement before implementation
+
+After actual bounds-status-field refusal, coordinator explicitly refines protocol
+and snapshot elaboration: only allowlisted projected fields are materialized.
+Discarded field names/presence still validate duplicates/continuations/syntax;
+discarded values are never accumulated. Former16KiB concatenated discarded-value
+restriction removed; their physical lines remain16KiB and whole stanza128KiB,
+input8MiB. Projected field16KiB/output2MiB/packet60000/transport65536 and all
+commands/deadlines/custody unchanged. This is a declared parser projection change,
+not a claim that real offending field is discarded, nor blanket limit increase.
+Long unused fields should project identically; malformed/duplicate/over-line/
+over-stanza remain denied. Implementation and fresh independent review precede
+new sealed source/permit/capture. Used diagnostic artifacts preserved; no new
+actual invocation/native or acceptance promotion. All97 scope/states unchanged.
+
+## Actual diagnostic capture identifies assembled status-field guard
+
+After PR103, sealed approved/reviewed3536145 source and fresh14-key0400 permit
+captured once00:41:23.406653→00:42:03.160761UTC2Nov,39.745s monotonic/exit3/0retries.
+Result valid unavailable/bounds-status-field, outer incomplete/transport,
+cleanupnone/reservationclean; no private snapshot/count/digest. The16KiB assembled
+field guard refused; package/field/category/content remain unknown. No blanket
+cap increase or specific unused-field cause inferred. Old generic run preserved.
+
+Captureeb93bc46-c5e1-40a6-97e6-2d7028b02f86; permit1b288995c62debc436beee182ff4c46f8c2518d582d13ab3ea71766af6f416ea;
+source manifest9125a74bd7d77c5bc387e6283e3b65fce30abfdaafd28ff87f061176042871b8,
+owner a3b6cc06f646b73a38cfa0a01076225b3dbf75f5e62ae594ae82ff974761cf46,
+embedded5888b59d/18806bytes. Oldc512 permit archived no-replace preservinginode/
+bytes/mode under same lock. Exact caller reaped/ownECHILD; fresh full pinned
+exited/runningfalse/PID0/exit0, markerabsent/original lockreacquired, source/permit
+unchanged/stderr0. Harness retained0400 and clock boundaries explicit inmetadata.
+Public sanitized evidence bounds-actual-20261102/. No package/native/AT acceptance
+or historical cleanup-gap promotion. All97/state/criteria unchanged.
+
+Next bounded parser projection: do not accumulate values excluded from snapshot;
+keep their duplicate/name/continuation/line/stanza validation. Physical lines and
+exported fields remain16KiB, complete stanza128KiB and input8MiB; no extra read or
+output authority. Coordinator contract/review precedes any changed source/permit/
+capture. It remains unknown whether actual offending field is discarded; exported
+over-limit fields still refuse. No processes/delegates/watches active.
+
+## PR103 merged; fresh diagnostic capture next
+
+PR103 https://github.com/ianwijma/linuxcast/pull/103 merged normally at
+63118f1139314931117bf1d1015d1b4c42193bf2 from99ba19aae2896c95133f3d767215f633f108d914.
+Current Planning CI41367971960 SUCCESS; exact head MERGEABLE/CLEAN, no submitted
+or requested GitHub reviews, terminal CodeRabbit SKIPPED/no actionable feedback.
+Both independent480d0c5c/1c176209 initial axes clear on3536145; final publication
+changes metadata only. Immediate tiny merge blurb sent; watch removed. No caps,
+read/command scope, wire shapes, custody or deadlines changed.
+
+Root codex/f1-02-bounds-capture starts approved63118f1. Next seal exact reviewed
+3536145 diagnostic source (embedded5888b59d/18806bytes), preserve/archive used
+c512d5f metadata permit without replacement/permission changes under original
+lock, create fresh same-domain14-key permit/capture UUID, and perform one fixed
+reviewed coordinator capture. No automatic replay of old usedsource/permit.
+Fresh stopped/exit0/configuration and root/lock identity checks precede work;
+same fixed linuxcast/sudo route and guardian/shutdown budgets remain. No new
+diagnostic invocation yet. First failure's exact guard still unknown; no package
+snapshot/install/build/native/Orca evidence or acceptance promotion. All97/current
+criteria/dependencies and historical unknown cleanup gaps unchanged.
+
 ## Bounds diagnostics both initial reviews clear; focused PR next
 
 Standards480d0c5c and Security/Spec1c176209 completed/read in full on3536145,
