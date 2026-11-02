@@ -1,5 +1,31 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Electron runtime input evidence: both initial reviews clear
+
+Initial Standards9f21a79c and SecuritySpec308c4d71 completed/read in full at
+cb1610a/baseapprovedPR108dea300a, exactly9paths/twocommits; bothclear, no
+introducedP1/P2/P3/material Fowler findings. Both independently5local/18retained
+bindings,6authorfiles byteidentical81b72e3, lockednpmSRIs/39packagefiles,72ZIP
+members286798592bytes/6ELFstaticrequirements, registry/cards/plan/whitespace pass.
+Standards ownbytelevelELFparser confirmsallrequirements; acquiredtiming/redirect/
+APIexecutioncleanup inherited. Spec2SRItamper+10archivemetadata controls andfresh
+verifiedget5.1.0 API validseed0downloads vs empty/wrongchecksum/corruptseed1injected
+refusaleach;9deps/342regularfiles beforeafter, exactchildrenreaped/ECHILD.
+Noinstaller/runtimebinary/addon/guestexecution; kernelnettechdenial unproved.
+Both cleanbeforeafter/publicinputfingerprints unchanged. All97non-evidence
+records/deps/criteria unchanged. Publicationmetadataonly, evidence/sourcefrozen.
+FocusedPR/currentheadCI/GitHubreview gates next; no actualinstall/native gate.
+
+Independent root toolchainprovenance work saved94cf68c on
+codex/f1-02-toolchain-provenance fromapproveddea300a (notincludedhere): verified
+Node24.22.1/Bun1.4.4/Rust1.95.0 signedmetadata1each/3tamperrefusals;8publicarchives
+263388790bytes and21ELFdata, exacthostNode/Bun bytes matchsignedmembers. Bunboth
+ZIPvariants haveidenticalbinary; strictchecksumparser corrections preserved.
+92publicbindingssealedoutsideLAB, no tool/installer/guestexecution, reviewpending.
+Research2f1bcb73 actualAPT/dpkg locking/trigger constraints remainsasync, no polls.
+No live rootcommand/guest/watch. Lastgueststoppedexit0 inherited; all97/local1.0
+and unknownhistoricaltimeoutdescendant absence remainpending/unchanged.
+
 ## PR108 merged; Electron input evidence reconciled for initial reviews
 
 PR108 merged dea300ade7fa211021daef1d4367f04754df2693 frome00435f; current
