@@ -1,8 +1,12 @@
 """Actual source/codec/owner composition; all OS effects use private fakes."""
+import copy
 import json
+import os
 from pathlib import Path
+import signal
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import install_metadata as collector
 import lab_install_metadata_owner as host
@@ -112,6 +116,109 @@ class Composition(unittest.TestCase):
         self.assertFalse((root / lease.artifact_name()).exists())
         public = host.public_result(result, lease.codec.failures)
         self.assertEqual(public['installMetadata']['firstFailure'], 'package-lock')
+
+    def test_cleanup_source_loss_retains_durable_marker(self):
+        root, lease = self.lease()
+        source = self.sources_fixture.root / 'install_metadata.py'
+        original = source.read_bytes()
+        class Changed(owner_fixtures.FakeLab):
+            def cleanup(inner, budget):
+                outcome = super().cleanup(budget)
+                source.write_bytes(original + b'\n# synthetic late source mutation\n')
+                return outcome
+        lab = Changed(lease)
+        lab.reply = collector.encode_packet(self.actual_snapshot())
+        result = owner.transact(lease, lab)
+        self.assertTrue((root / owner.MARKER).exists())
+        self.assertTrue((root / lease.artifact_name()).exists())
+        self.assertFalse(result['transportResultValid'] or result['reservationClean'])
+        self.assertEqual(result['cleanupFailure'], 'custody')
+        self.assertTrue(result['mayHaveStarted'] and result['mayHaveDispatched'])
+        self.assertEqual(lab.calls.count('start'), 1)
+        self.assertEqual(lab.calls.count('dispatch'), 1)
+
+    def test_prior_recovery_does_not_require_missing_collector(self):
+        root, lease = self.lease()
+        lease.create_marker()
+        lease.state.update(mayHaveStarted=True, mayHaveDispatched=True)
+        lease.save()
+        self.assertTrue(lease.close())
+        (self.sources_fixture.root / 'install_metadata.py').unlink()
+        resumed = host.InstallMetadataReservation(root)
+        self.addCleanup(resumed.close)
+        resumed.acquire()
+        resumed.permit()
+        lab = owner_fixtures.FakeLab(resumed)
+        with patch.object(resumed, 'check_sources', side_effect=AssertionError('collector used during prior recovery')):
+            result = owner.transact(resumed, lab)
+        self.assertEqual((result['status'], result['firstFailure']), ('recovered', 'recovery'))
+        self.assertTrue(result['reservationClean'])
+        self.assertEqual(lab.calls, ['recover', 'cleanup'])
+        self.assertFalse((root / owner.MARKER).exists())
+
+    def test_uncached_caller_rechecks_sources_before_marker_release(self):
+        root, lease = self.lease()
+        lease.create_marker()
+        self.assertTrue(lease.close())
+        caller = host.InstallMetadataReservation(root)
+        self.addCleanup(caller.close)
+        caller.acquire()
+        caller.permit()
+        self.assertIsNone(caller.codec)
+        self.assertFalse(caller.used)
+        self.assertTrue(caller.load_marker())
+        source = self.sources_fixture.root / 'install_metadata.py'
+        source.write_bytes(source.read_bytes() + b'\n# synthetic caller fallback mutation\n')
+        with self.assertRaises(owner.Rejected):
+            caller.remove_marker()
+        self.assertTrue((root / owner.MARKER).exists())
+
+    def validation_signals(self, artifact):
+        for sig, reason in ((signal.SIGALRM, 'deadline'), (signal.SIGTERM, 'interrupted')):
+            _, lease = self.lease()
+            lab = owner_fixtures.FakeLab(lease)
+            lab.reply = collector.encode_packet(self.actual_snapshot())
+            result = owner.transact(lease, lab)
+            self.assertEqual(result['status'], 'completed')
+            for earlier in ('none', 'transport'):
+                with self.subTest(signal=sig, earlier=earlier, artifact=artifact):
+                    # Reuse the invalidated lease only for the earlier-failure
+                    # control; never reset uncertainty or claim re-admission.
+                    value = copy.deepcopy(result)
+                    if earlier != 'none':
+                        value.update(status='incomplete', firstFailure=earlier)
+                    old = signal.getsignal(sig)
+                    fired = []
+                    def handler(*_):
+                        raise owner.Rejected(reason)
+                    original = host._source
+                    def source(path, maximum):
+                        if Path(path).name == 'install_metadata.py' and not fired:
+                            fired.append(True)
+                            os.kill(os.getpid(), sig)
+                        return original(path, maximum)
+                    def checked_artifact():
+                        fired.append(True)
+                        os.kill(os.getpid(), sig)
+                    signal.signal(sig, handler)
+                    try:
+                        target = patch.object(lease, 'check_artifact', checked_artifact) if artifact else patch.object(host, '_source', source)
+                        with target:
+                            lease.validate_reply(value)
+                    finally:
+                        signal.signal(sig, old)
+                    self.assertEqual(fired, [True])
+                    self.assertEqual(value['firstFailure'], reason if earlier == 'none' else earlier)
+                    self.assertEqual(value['cleanupFailure'], 'custody')
+                    self.assertFalse(value['transportResultValid'] or value['reservationClean'])
+                    self.assertTrue(value['mayHaveStarted'] and value['mayHaveDispatched'])
+                    self.assertEqual(value['installMetadata'], host.empty_metadata())
+
+    def test_source_validation_real_signals_preserve_known_first_failure(self):
+        self.validation_signals(artifact=False)
+
+    def test_artifact_validation_real_signals_preserve_known_first_failure(self):
+        self.validation_signals(artifact=True)
 
 
 if __name__ == '__main__':

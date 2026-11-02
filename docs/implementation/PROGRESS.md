@@ -1,5 +1,40 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Owner marker custody and known failure reasons corrected
+
+Initial owner Security/Spec7e2125e8 was read in full at c1783c9. Collector
+framing and actual codec adapter passed recheck. Two new owner P2s: source
+validation followed marker deletion; reply validation swallowed deadline/
+interrupted causes. Root now rechecks the admitted closure before fresh marker
+removal and records a prior-marker recovery mode from the existing transact
+used/load decision. Normal prior recovery still works with collector absent;
+an uncached caller after guardian loss conservatively requires the closure.
+No new preflight read, marker/domain schema, command or deadline.
+
+Both source/artifact validation retain fixed known first causes and invalidate
+observation/clean release separately. The same audit covered close's boolean
+boundary: first fixed close reason is retained internally, reported as cleanup
+when there was no earlier operation failure. Tiny masked invalidation is only
+reason selection and one C dictionary update, never I/O. FileIO custody and
+ambiguous-close/reuse behavior remain unchanged.
+
+69 owner and9 composition tests pass. Seven new methods yield14 behavioral
+failures/zero errors on exact c1783c9 owner source, fixed green; real ALRM/TERM
+across source/artifact validation/close, earlier transport, source mutation,
+marker retention and missing-collector prior recovery are covered. 55 mapped
+security passes with533 Python16.742s; exact payload533 complete/nativefalse
+16.782s under18s. Typecheck/lint, AST/plan/whitespace and13 historical/current
+bindings pass; other10 input bindings and collector/probe stay unchanged.
+Separate new current hashes preserve all earlier snapshots.
+
+Initial owner Standardsd2de0ad7 remains separate/pending; do not poll. Fresh
+bounded final recheck is next for the correction, no PR or watch. Both must be
+accounted for before publication/use. Pure hook verifier720140c remains held
+separately, unmerged and unreviewed. No real permit/owner CLI/capture/lab/guest/
+root/install/compiler/native operation or acceptance promotion. F1-02 stays in
+progress/UI pending; all97 states/dependencies/criteria/full local1.0 and old
+unknown timeout-descendant absence remain unchanged.
+
 ## Real install-metadata composition and framing correction ready for review
 
 Both initial collector reviews at cfa3813 were read in full: Standards

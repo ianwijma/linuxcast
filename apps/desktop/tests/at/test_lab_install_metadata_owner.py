@@ -546,6 +546,47 @@ class Files(Hermetic):
             self.assertEqual(value['installMetadata'], host.empty_metadata())
             self.assertTrue(value['mayHaveStarted'] and value['mayHaveDispatched'])
 
+    def close_signal_reason(self, artifact):
+        for sig, reason in ((signal.SIGALRM, 'deadline'), (signal.SIGTERM, 'interrupted')):
+            for earlier in ('none', 'transport'):
+                with self.subTest(signal=sig, earlier=earlier, artifact=artifact), tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    prepare(root)
+                    lease = reserved(root)
+                    try:
+                        value = owner.transact(lease, FakeLab(lease))
+                        self.assertEqual(value['status'], 'completed')
+                        if earlier != 'none':
+                            value.update(status='incomplete', firstFailure=earlier)
+                        old = signal.getsignal(sig)
+                        fired = []
+                        def handler(*_):
+                            raise owner.Rejected(reason)
+                        def interrupted(*_):
+                            fired.append(True)
+                            os.kill(os.getpid(), sig)
+                        signal.signal(sig, handler)
+                        try:
+                            with patch.object(lease, 'check_artifact_closed' if artifact else 'check_sources', interrupted):
+                                self.assertFalse(lease.close())
+                        finally:
+                            signal.signal(sig, old)
+                        lease.invalidate(value)
+                        self.assertEqual(fired, [True])
+                        self.assertEqual(value['firstFailure'], 'cleanup' if earlier == 'none' else earlier)
+                        self.assertEqual(value['cleanupFailure'], reason)
+                        self.assertFalse(value['transportResultValid'] or value['reservationClean'])
+                        self.assertTrue(value['mayHaveStarted'] and value['mayHaveDispatched'])
+                        host.public_result(value)
+                    finally:
+                        lease.close()
+
+    def test_close_source_signal_reason_survives_boolean_return(self):
+        self.close_signal_reason(artifact=False)
+
+    def test_close_artifact_signal_reason_survives_boolean_return(self):
+        self.close_signal_reason(artifact=True)
+
     def test_atomic_claim_interruption_before_after_commit_retains_true_reason(self):
         method = host.InstallMetadataLab.validate_job_reply
         lines, start = inspect.getsourcelines(method)

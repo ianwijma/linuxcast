@@ -279,6 +279,8 @@ class InstallMetadataReservation(custody.BuildFactsReservation):
         self.artifact_reader = None
         self.sources = _Sources()
         self.codec = None
+        self.recovering = False
+        self.close_failure = 'none'
 
     @property
     def artifactfd(self):
@@ -322,6 +324,19 @@ class InstallMetadataReservation(custody.BuildFactsReservation):
         self.check_sources()
         super().create_marker()
 
+    def load_marker(self):
+        found = super().load_marker()
+        # transact sets used before loading a prior marker. A caller handling
+        # guardian loss has not run transact: its uncertain closure must still
+        # be checked before release, even if its fork has no cached codec.
+        self.recovering = found and self.used
+        return found
+
+    def remove_marker(self):
+        if not self.recovering:
+            self.check_sources()
+        super().remove_marker()
+
     def _open_reader(self):
         with _acquisition_signals():
             self.artifact_reader = io.FileIO(self.artifact_name(), 'r', opener=partial(_reader_opener, rootfd=self.rootfd))
@@ -360,15 +375,19 @@ class InstallMetadataReservation(custody.BuildFactsReservation):
                 raise owner.Rejected('custody') from None
             raise
 
-    def invalidate(self, value):
-        value.update(status='incomplete', reservationClean=False)
-        # All custody loss invalidates the claim, including unavailable replies.
-        # Lifecycle first failure and durable attempts remain unchanged.
-        value.update(transportResultValid=False, installMetadata=empty_metadata(), artifact=None)
-        if value['firstFailure'] == 'none':
-            value['firstFailure'] = 'custody'
-        if value['cleanupFailure'] == 'none':
-            value['cleanupFailure'] = 'custody'
+    def invalidate(self, value, error=None):
+        # Only fixed reason selection and one C dict commit are masked; no I/O
+        # or cleanup work. Keep a known operation cause apart from custody loss.
+        with _acquisition_signals():
+            first = value['firstFailure']
+            cleanup = value['cleanupFailure']
+            if first == 'none':
+                first = 'cleanup' if self.close_failure != 'none' else owner.reason(error, 'custody')
+            if cleanup == 'none':
+                cleanup = self.close_failure if self.close_failure != 'none' else 'custody'
+            value.update(status='incomplete', reservationClean=False,
+                         transportResultValid=False, installMetadata=empty_metadata(), artifact=None,
+                         firstFailure=first, cleanupFailure=cleanup)
         return value
 
     def validate_reply(self, value):
@@ -383,10 +402,10 @@ class InstallMetadataReservation(custody.BuildFactsReservation):
         if value['installMetadata']['status'] in ('observed', 'unavailable'):
             try:
                 self.check_sources()
-            except BaseException:
+            except BaseException as error:
                 # Keep known attempts/first failure while rejecting the claim.
                 self.artifact_uncertain = True
-                self.invalidate(value)
+                self.invalidate(value, error)
         failures = () if self.codec is None else self.codec.failures
         validate_relay(value, failures)
         metadata = value['installMetadata']
@@ -414,37 +433,45 @@ class InstallMetadataReservation(custody.BuildFactsReservation):
                               and all(metadata[k] == counts[k] for k in COUNTS), 'custody')
                 self.check()
                 self.check_artifact()
-            except BaseException:
+            except BaseException as error:
                 self.artifact_uncertain = True
-                self.invalidate(value)
+                self.invalidate(value, error)
         return validate_relay(value, failures)
 
     def close(self):
         success = not self.artifact_uncertain
+        def failed(error=None):
+            if self.close_failure == 'none':
+                self.close_failure = owner.reason(error, 'custody')
         if self.codec is not None and self.pin is not None:
             try:
                 self.check_sources()
-            except BaseException:
+            except BaseException as error:
+                failed(error)
                 success = False
         for stream in (self.artifact_writer, self.artifact_reader):
             if stream is not None and not stream.closed:
                 try:
                     self.check_artifact_closed(stream.fileno())
-                except BaseException:
+                except BaseException as error:
+                    failed(error)
                     success = False
                 try:
                     with _acquisition_signals():
                         _close_stream(stream)
-                except BaseException:
+                except BaseException as error:
+                    failed(error)
                     success = False
         # Bypass the old raw-reader retirement; both readers and writers here
         # are owning C objects, whose closed state survives signal/close errors.
         try:
             with _acquisition_signals():
                 success = owner.Reservation.close(self) and success
-        except BaseException:
+        except BaseException as error:
+            failed(error)
             success = False
         if not success:
+            failed()
             self.artifact_uncertain = True
         return success
 
