@@ -1,5 +1,26 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Bounds diagnostics both initial reviews clear; focused PR next
+
+Standards480d0c5c and Security/Spec1c176209 completed/read in full on3536145,
+base40bac5c. Both clear, no code findings. Each independently confirms fixed
+reason-only AST scope and unchanged caps/read/shape/wrappers/custody/commands/
+deadlines. Standards97focused1.234s/55mapped10.06s/all392Python within18s,29extra
+probes; Spec97focused1.244s/55mapped10.01s/392Python8.965s,20differentialpairs/
+47positive/17public checks; both25old diagnostic failures/currentgreen,
+11/2/4historical custody controls,23bindings/embedded/plan/whitespace pass.
+Reviewed range15paths, not assignment16. Actual execution/type/lint inherited.
+Capture report preserves original42.676 elapsedSeconds and UTC interval42.685441
+without inferring clock basis from JSON. Metadata-only publication updates keep
+owner/test/helper/protocol exactly3536145. All97 states/deps/criteria unchanged.
+
+Publish focused diagnostics+actual-refusal evidence PR, inspect current-headCI/
+reviews/bots, merge promptly after gates. Then fresh protected diagnostic source/
+same-domain permit and one coordinator capture. No new actual invocation or
+limit change yet; old used source/permit/results preserved, guest stopped,
+cause unknown. No delegates/watch/processes live; existing acceptance and old
+unknown timeout-descendant absence unchanged.
+
 ## Bounds diagnostics initial Standards clear; Security/Spec still running
 
 Initial Standards480d0c5c completed/read on3536145/base40bac5c: no hard-rule or

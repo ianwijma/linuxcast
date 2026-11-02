@@ -69,10 +69,40 @@ unchanged. Earlier actual-run and contract checkpoints were signed normally.
 ## Acceptance and next action
 
 This is diagnostic preparation, not diagnosis of the real failure. Independent
-Standards and Security/Spec reviews are next. No new permit, actual capture,
+Standards and Security/Spec reviews are clear as recorded below. No new permit, actual capture,
 installation, build, privileged namespace/rootdrop/statx, native product/Orca,
 provider or release operation occurred. The previous capture remains unavailable
 with no package baseline; exact package resolution and all later build/native
 acceptance still need actual evidence. F0-01 accepted, F1-02 in-progress/UI
 pending and all97/full local1.0 scope remain unchanged. Historical unknown
 timeout-descendant absence is not closed by these current tests.
+
+## Independent review outcome
+
+Both initial independent reviews completed on exact source
+`3536145b0eb90dd34d5994ad4cae58791dd24c1f`, against approved PR102 merge
+`40bac5ccf903feace841515ab52f29879cf62471`. Both final reports were read in full.
+Standards480d0c5c found no hard-rule or material heuristic issues. Security/Spec
+1c176209 found no actionable P1/P2/P3 issues. Each independently confirmed the
+diagnostic-only host/guest AST scope, unchanged guard predicates/limits/reads/
+wrappers/commands/custody/deadlines, generic-bounds compatibility and fail-closed
+unknown reasons. The reviewed range has15 paths, correcting the brief's16.
+
+Standards independently passed97 focused1.234s,55 mapped10.06s/all392Python within
+18s,25 diagnostic historical failures/currentgreen, original11/2/4 controls,
+29 additional probes,23 hashes/embedded/public schema-provenance/plan/whitespace.
+Security/Spec independently passed97 focused1.244s,55 mapped10.01s with392Python
+8.965s under18s, the same historical controls,20 differential refusal pairs,
+47 positive checks,17 public-result checks, AST/23bindings/source provenance/
+public schema/plan/whitespace. No skips or expected failures. All97 task states,
+dependencies and acceptance records are unchanged. Typecheck/lint and actual
+execution/cleanup remain inherited and are not re-established by these reviews.
+
+Both review checkouts remained clean with matching tracked/index fingerprints;
+their own generated dependencies were removed. No real CLI, lab/guest, package,
+build, privileged/native or publication action occurred. Signature headers on
+earlier checkpoints are inherited metadata, not newly verified signer identity.
+Publication updates only documentation, evidence hashes and registry metadata;
+owner/test/helper/protocol bytes remain exactly the reviewed3536145 source.
+The next actual capture still requires fresh protected reviewed source and permit
+after normal integration gates. The real failed guard remains unknown today.

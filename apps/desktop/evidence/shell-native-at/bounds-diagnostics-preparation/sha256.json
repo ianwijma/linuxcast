@@ -11,7 +11,7 @@
     "apps/desktop/tests/at/lab_build_facts.py": "a3b6cc06f646b73a38cfa0a01076225b3dbf75f5e62ae594ae82ff974761cf46",
     "apps/desktop/tests/at/test_lab_build_facts.py": "f2ad65f66cb42e85f16b1ec703168dd11c78d0e528fa6c66fc3b63adee7518c5",
     "apps/desktop/tests/at/build-facts-protocol.md": "a0d981a5221c27f52139f34eda160bed8dcb11d911631cf7f833ace79e1b80af",
-    "apps/desktop/evidence/shell-native-at/bounds-diagnostics-preparation/README.md": "ad4ead0737e934d2a7348fd42a831117b3f27fb1f15880ecb261121548c0e2a6",
+    "apps/desktop/evidence/shell-native-at/bounds-diagnostics-preparation/README.md": "c1821f69fafd5d502a5f1c288165279399f3fac325b9f46c05b58bb21c30c521",
     "apps/desktop/evidence/shell-native-at/bounds-diagnostics-preparation/check-regressions.py": "c4e94b93efe71ba7cc6ac12ffdc16229694ad3529939a49dbe1847dfab2955bc"
   },
   "embeddedGuestSource": {
@@ -53,5 +53,11 @@
     "newActualCapture": false,
     "acceptance": "pending"
   },
-  "signing": "unsigned per-command authorized fallback after 1Password socket connection failed; configuration unchanged"
+  "signing": "unsigned per-command authorized fallback after 1Password socket connection failed; configuration unchanged",
+  "reviewedSourceCommit": "3536145b0eb90dd34d5994ad4cae58791dd24c1f",
+  "independentReviews": {
+    "standards": "480d0c5c-75e3-411e-82d4-22e840c67af4",
+    "securitySpec": "1c176209-4ca5-4a6d-8021-ee9c426a354d",
+    "outcome": "clear; source/test/helper/protocol unchanged by publication metadata"
+  }
 }
