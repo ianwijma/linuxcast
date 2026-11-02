@@ -75,7 +75,8 @@ release-signing requirements are unchanged.
 
 ## Acceptance and limitations
 
-Independent Standards and Security/Spec reviews are next. No changed parser or
+Initial independent Security/Spec review is clear as recorded below; the
+separate Standards review remains pending. No changed parser or
 permit has run in the guest. The actual failing field's identity/category remains
 unknown; a projected field over its bound would still refuse. Both actual runs
 remain unavailable with no package baseline. Used sources, permits and private
@@ -86,3 +87,22 @@ native product/Orca/session/physical/provider/release acceptance is established.
 F0-01 remains accepted, F1-02 in-progress/UI pending, and all97/full local1.0 scope
 and acceptance/dependency states remain intact. Current synthetic and actual
 cleanup cannot retrospectively close the old unknown timeout-descendant gap.
+
+## Initial independent Security/Spec review
+
+Review bb7a5297 completed on exact27a9f73873993439cddb8a8b5a50814f8bdc7991,
+base/merge-base63118f1139314931117bf1d1015d1b4c42193bf2. The final report was
+read in full: no actionable P1/P2/P3 findings. The reviewer independently confirmed
+discarded None storage, selected/line/stanza/input/record bounds, output typing/
+allowlist, codec/raw SHA, custody, cleanup and unchanged command authority.
+
+Executed100 focused,55 mapped/all395Python under18s; old projection6 failures,
+materializing mutant3, diagnostic25 and historical custody11/2/4 controls, all
+current green. Another126 boundary/semantic and172 manifest/provenance/registry
+checks passed, alongside host/guest AST/numeric constants/19044-byte embedded
+hash, plan/syntax/whitespace. Its checkout stayed clean with matching fingerprints;
+only its own generated dependencies were removed. No source or real lab action.
+Actual execution/cleanup and earlier TS checks remain inherited; private permit,
+harness and machine state were not accessed. All97 states/dependencies/criteria
+remain unchanged. Publication is pending the independent Standards outcome.
+This metadata addition preserves reviewed owner/test/helper/protocol bytes.
