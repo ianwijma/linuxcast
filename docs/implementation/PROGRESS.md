@@ -1,5 +1,29 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Toolchain provenance: both initial reviews clear; publication next
+
+Both initial independent reviews were completed and read in full at c0bfc1a,
+base approved PR109 ef6630f. Standards1754a822 and Security/Spec f920edad found
+no introduced actionable P1/P2/P3 or material Fowler concerns. Each verified
+all seven author files, six local hashes, 92 retained bindings, three signature
+chains and signer policies, three one-byte signature refusals, all eight archive
+digests, 6155 member records and 21 ELF requirements. Existing host Node/Bun byte
+matches and the identical Bun variant payloads were independently confirmed.
+Standards also passed12 malformed-checksum, one signer-policy and17 archive
+controls. Both preserved original fingerprints and all97 non-evidence records.
+
+Only publication metadata follows the reviewed checkpoint. No code, evidence,
+source pin or protocol bytes change. First-party HTTPS/fingerprint bootstrap
+remains explicit, and the evidence grants no root provisioning or guest ABI
+acceptance. Focused PR/current-head CI/GitHub review checks are next.
+
+Separate read-only collector contract4284ff0 is preserved on
+codex/f1-02-install-metadata-preparation. Implementation2da445bc runs asynchronously
+from that exact frozen base; do not poll. It owns only the new collector, test
+and preparation evidence. No guest invocation, host owner or permit is authorized.
+No live root command or PR watch. All97/full local1.0 requirements and historical
+timeout-descendant uncertainty remain unchanged.
+
 ## Install transaction research delivered; toolchain review boundary
 
 Research2f1bcb73 completed and was read in full, including its614-line report.
