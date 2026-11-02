@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "kind": "static-package-input-review-not-installation-approval",
+  "candidatePrivatePlanSha256": "495b3acfe8b4c6ed0af811decb84c776da7d4974388c4ca1b37a3e88713363f3",
+  "packages": 55,
+  "maintainerScriptFiles": 15,
+  "scriptRecords": [
+    {
+      "bytes": 272,
+      "markers": [],
+      "name": "preinst",
+      "readOnlyPath": "controls/6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb/preinst",
+      "sha256": "296be23f9c41deb5114c6fba7a03cc9ba8358a667ed3f3dd858f1f2ab5480394",
+      "tuple": "binutils:amd64=2.44-3"
+    },
+    {
+      "bytes": 306,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "postinst",
+      "readOnlyPath": "controls/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544/postinst",
+      "sha256": "41f5fe9ad126f4816e0f360f1dafd5c9d42d78c05c5a6dca4bd5e9f5a67075ae",
+      "tuple": "cpp:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 198,
+      "markers": [],
+      "name": "postrm",
+      "readOnlyPath": "controls/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544/postrm",
+      "sha256": "1fc802a5e8ad569c5fb3695ba63de7aaa316eb155de57bcc75e4b51474da193e",
+      "tuple": "cpp:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 198,
+      "markers": [],
+      "name": "preinst",
+      "readOnlyPath": "controls/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544/preinst",
+      "sha256": "1fc802a5e8ad569c5fb3695ba63de7aaa316eb155de57bcc75e4b51474da193e",
+      "tuple": "cpp:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 293,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "prerm",
+      "readOnlyPath": "controls/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544/prerm",
+      "sha256": "7b54703e8b59112e52b9f73a6bedbb9c608d79e4423d93c0b52ab7473df1e5dc",
+      "tuple": "cpp:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 176,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "postinst",
+      "readOnlyPath": "controls/f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c/postinst",
+      "sha256": "3f30a71243d28a15290c94c67305fd2ca6ab8482a4e376ad46c756c9338ec830",
+      "tuple": "g++:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 107,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "prerm",
+      "readOnlyPath": "controls/f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c/prerm",
+      "sha256": "5a1bb29bdc0b4d2002f2a3e9c3cfbd4a459d4c1e476f055ca2bd27ab3506a81f",
+      "tuple": "g++:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 687,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "postinst",
+      "readOnlyPath": "controls/eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d/postinst",
+      "sha256": "18bb49fb1cc9cf342c531baf05991d8c6f4c445ad980a2bd757154912055d16d",
+      "tuple": "gcc:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 238,
+      "markers": [
+        "update-alternatives"
+      ],
+      "name": "prerm",
+      "readOnlyPath": "controls/eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d/prerm",
+      "sha256": "97fc62ee856340af0e5ff46e5471aaaa1165966e8b6c699f659886ee4f38c49d",
+      "tuple": "gcc:amd64=4:14.2.0-1"
+    },
+    {
+      "bytes": 196,
+      "markers": [],
+      "name": "postinst",
+      "readOnlyPath": "controls/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09/postinst",
+      "sha256": "dbb838d3986d11b2f87f8bc57093bfd9dc679fd42bcd72eb94858b6bfa63f401",
+      "tuple": "libcrypt-dev:amd64=1:4.4.38-1"
+    },
+    {
+      "bytes": 196,
+      "markers": [],
+      "name": "postrm",
+      "readOnlyPath": "controls/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09/postrm",
+      "sha256": "dbb838d3986d11b2f87f8bc57093bfd9dc679fd42bcd72eb94858b6bfa63f401",
+      "tuple": "libcrypt-dev:amd64=1:4.4.38-1"
+    },
+    {
+      "bytes": 196,
+      "markers": [],
+      "name": "preinst",
+      "readOnlyPath": "controls/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09/preinst",
+      "sha256": "dbb838d3986d11b2f87f8bc57093bfd9dc679fd42bcd72eb94858b6bfa63f401",
+      "tuple": "libcrypt-dev:amd64=1:4.4.38-1"
+    },
+    {
+      "bytes": 196,
+      "markers": [],
+      "name": "prerm",
+      "readOnlyPath": "controls/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09/prerm",
+      "sha256": "dbb838d3986d11b2f87f8bc57093bfd9dc679fd42bcd72eb94858b6bfa63f401",
+      "tuple": "libcrypt-dev:amd64=1:4.4.38-1"
+    },
+    {
+      "bytes": 369,
+      "markers": [],
+      "name": "postinst",
+      "readOnlyPath": "controls/54efef2aef4db5fcb5e0f5b7746465000c6a779b06f3686d0ec3d2a901b20aeb/postinst",
+      "sha256": "84de581851b98c869967c3852496aad6694860347bb51d3dbe55bbfa3a5f2362",
+      "tuple": "pkgconf-bin:amd64=1.8.1-4"
+    },
+    {
+      "bytes": 807,
+      "markers": [],
+      "name": "preinst",
+      "readOnlyPath": "controls/f1fcad470ca3ac80b4a0f4af6f03cd215089473996b07e508b3ee342bbb11af7/preinst",
+      "sha256": "fed139681623d4dea19739f66b66e02af744c131aa76e07c0571dc5696927580",
+      "tuple": "pkgconf:amd64=1.8.1-4"
+    }
+  ],
+  "declaredTriggers": {
+    "libasan8:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libbinutils:amd64=2.44-3": [
+      "activate-noawait ldconfig"
+    ],
+    "libcc1-0:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libctf-nobfd0:amd64=2.44-3": [
+      "activate-noawait ldconfig"
+    ],
+    "libctf0:amd64=2.44-3": [
+      "activate-noawait ldconfig"
+    ],
+    "libgprofng0:amd64=2.44-3": [
+      "activate-noawait ldconfig"
+    ],
+    "libhwasan0:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libisl23:amd64=0.27-1": [
+      "activate-noawait ldconfig"
+    ],
+    "libitm1:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "liblsan0:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libmpc3:amd64=1.3.1-1+b3": [
+      "activate-noawait ldconfig"
+    ],
+    "libmpfr6:amd64=4.2.2-1": [
+      "activate-noawait ldconfig"
+    ],
+    "libpcre2-16-0:amd64=10.46-1~deb13u3": [
+      "activate-noawait ldconfig"
+    ],
+    "libpcre2-32-0:amd64=10.46-1~deb13u3": [
+      "activate-noawait ldconfig"
+    ],
+    "libpcre2-posix3:amd64=10.46-1~deb13u3": [
+      "activate-noawait ldconfig"
+    ],
+    "libpkgconf3:amd64=1.8.1-4": [
+      "activate-noawait ldconfig"
+    ],
+    "libquadmath0:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libsframe1:amd64=2.44-3": [
+      "activate-noawait ldconfig"
+    ],
+    "libtsan2:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "libubsan1:amd64=14.2.0-19": [
+      "activate-noawait ldconfig"
+    ],
+    "pkgconf-bin:amd64=1.8.1-4": [
+      "interest-noawait /lib/pkgconfig"
+    ]
+  },
+  "payloadTotals": {
+    "directories": 816,
+    "expandedFileBytes": 294754869,
+    "links": 1375,
+    "regularFiles": 4232
+  },
+  "activationPathObservations": [],
+  "coordinatorReadAll15SelectedScripts": true,
+  "directScriptEffects": "compiler alternatives, documentation-link helpers, pkgconf directory setup, conditional upgrade-only handling and dangling legacy f77 alias cleanup",
+  "baselineTriggerHandlersReviewPending": true,
+  "payloadExtractedToFilesystem": false,
+  "controlDataMaterializedReadOnly": true,
+  "maintainerScriptsExecuted": false,
+  "installationApproved": false,
+  "guestOperations": 0,
+  "acceptance": "pending"
+}

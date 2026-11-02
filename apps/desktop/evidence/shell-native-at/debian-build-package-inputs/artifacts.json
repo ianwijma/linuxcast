@@ -1,0 +1,801 @@
+{
+  "acceptance": "pending; body integrity only",
+  "allSelectedBodiesVerified": true,
+  "artifacts": [
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/binutils-common_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 2508768,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/binutils-common_2.44-3_amd64.deb",
+      "sha256": "002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9",
+      "tuple": "binutils-common:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/binutils-x86-64-linux-gnu_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1013844,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/binutils-x86-64-linux-gnu_2.44-3_amd64.deb",
+      "sha256": "e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53",
+      "tuple": "binutils-x86-64-linux-gnu:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/binutils_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 265400,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/binutils_2.44-3_amd64.deb",
+      "sha256": "6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb",
+      "tuple": "binutils:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/ef274b5379f5f97fc71619d39ecc84d039d3e184570d207b909c90afaa5d79e0.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 11047460,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+      "sha256": "ef274b5379f5f97fc71619d39ecc84d039d3e184570d207b909c90afaa5d79e0",
+      "tuple": "cpp-14-x86-64-linux-gnu:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/3bae5fe03c56c6d021900ab4fb79e35c6f75eee72a73fccc6f28a39db559d6a0.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/cpp-14_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1280,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/cpp-14_14.2.0-19_amd64.deb",
+      "sha256": "3bae5fe03c56c6d021900ab4fb79e35c6f75eee72a73fccc6f28a39db559d6a0",
+      "tuple": "cpp-14:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/d902f484e38bce59e82efc0df2fe20139a0932ca759ecafdfe6e5b6c72238eb8.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/cpp-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 4840,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/cpp-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+      "sha256": "d902f484e38bce59e82efc0df2fe20139a0932ca759ecafdfe6e5b6c72238eb8",
+      "tuple": "cpp-x86-64-linux-gnu:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/cpp_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1568,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/cpp_14.2.0-1_amd64.deb",
+      "sha256": "a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544",
+      "tuple": "cpp:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/c66b009fedd340520279d1af2f91d0668e9f64f0c08fe62179ca1c75e556be58.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 12114812,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+      "sha256": "c66b009fedd340520279d1af2f91d0668e9f64f0c08fe62179ca1c75e556be58",
+      "tuple": "g++-14-x86-64-linux-gnu:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/4706ab29eab3d81e93582b45b229fdedc71f1eec3071996a448cf2c8beb83f3a.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/g++-14_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 22544,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/g++-14_14.2.0-19_amd64.deb",
+      "sha256": "4706ab29eab3d81e93582b45b229fdedc71f1eec3071996a448cf2c8beb83f3a",
+      "tuple": "g++-14:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1200,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+      "sha256": "15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583",
+      "tuple": "g++-x86-64-linux-gnu:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/g++_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1344,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/g++_14.2.0-1_amd64.deb",
+      "sha256": "f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c",
+      "tuple": "g++:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/a17ef039f1ba482051c3efb5c2c24070002e60dd0bd09fd456ec31481a11b725.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 21389968,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb",
+      "sha256": "a17ef039f1ba482051c3efb5c2c24070002e60dd0bd09fd456ec31481a11b725",
+      "tuple": "gcc-14-x86-64-linux-gnu:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/21500408b5019d8d29f70ce58488e2eea469a1adb4b5fd7db45e819b5efcac4e.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/gcc-14_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 540064,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/gcc-14_14.2.0-19_amd64.deb",
+      "sha256": "21500408b5019d8d29f70ce58488e2eea469a1adb4b5fd7db45e819b5efcac4e",
+      "tuple": "gcc-14:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/04c28c2760b0094b3d7758154ac095303dd00599b63ebad4086a325b607308b7.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/gcc-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1436,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/gcc-x86-64-linux-gnu_14.2.0-1_amd64.deb",
+      "sha256": "04c28c2760b0094b3d7758154ac095303dd00599b63ebad4086a325b607308b7",
+      "tuple": "gcc-x86-64-linux-gnu:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-defaults/gcc_14.2.0-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 5136,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-defaults/gcc_14.2.0-1_amd64.deb",
+      "sha256": "eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d",
+      "tuple": "gcc:amd64=4:14.2.0-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/771899ade7310fe31aa538a509354c33d62bbe4e408b4e5fc1e513988dc42645.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libasan8_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 2725272,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libasan8_14.2.0-19_amd64.deb",
+      "sha256": "771899ade7310fe31aa538a509354c33d62bbe4e408b4e5fc1e513988dc42645",
+      "tuple": "libasan8:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/libbinutils_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 534440,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/libbinutils_2.44-3_amd64.deb",
+      "sha256": "4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679",
+      "tuple": "libbinutils:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/775bc91f7a265d21cdfc6b710813017b2366e5c5bb665cd2e6979af5dd8a03a8.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/u/util-linux/libblkid-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie"
+        },
+        {
+          "Filename": "pool/updates/main/u/util-linux/libblkid-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 208756,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/u/util-linux/libblkid-dev_2.41.5-0+deb13u1_amd64.deb",
+      "sha256": "775bc91f7a265d21cdfc6b710813017b2366e5c5bb665cd2e6979af5dd8a03a8",
+      "tuple": "libblkid-dev:amd64=2.41.5-0+deb13u1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/2c21175d6a8283ed566d154c0c0bc06f60836e53b0b9e1f74c14eac586b68c24.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/glibc/libc-dev-bin_2.41-12+deb13u4_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 59960,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/glibc/libc-dev-bin_2.41-12+deb13u4_amd64.deb",
+      "sha256": "2c21175d6a8283ed566d154c0c0bc06f60836e53b0b9e1f74c14eac586b68c24",
+      "tuple": "libc-dev-bin:amd64=2.41-12+deb13u4"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/glibc/libc6-dev_2.41-12+deb13u4_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1994660,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/glibc/libc6-dev_2.41-12+deb13u4_amd64.deb",
+      "sha256": "1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2",
+      "tuple": "libc6-dev:amd64=2.41-12+deb13u4"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/2d587e3bfba4aec701946b7ba0c1640b97b6d8dd0a34ba1c70ae85261ecedefa.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libcc1-0_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 42796,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libcc1-0_14.2.0-19_amd64.deb",
+      "sha256": "2d587e3bfba4aec701946b7ba0c1640b97b6d8dd0a34ba1c70ae85261ecedefa",
+      "tuple": "libcc1-0:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/libx/libxcrypt/libcrypt-dev_4.4.38-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 119040,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/libx/libxcrypt/libcrypt-dev_4.4.38-1_amd64.deb",
+      "sha256": "98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09",
+      "tuple": "libcrypt-dev:amd64=1:4.4.38-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/libctf-nobfd0_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 155672,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/libctf-nobfd0_2.44-3_amd64.deb",
+      "sha256": "e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657",
+      "tuple": "libctf-nobfd0:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/libctf0_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 88616,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/libctf0_2.44-3_amd64.deb",
+      "sha256": "120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5",
+      "tuple": "libctf0:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/76b2b80193a656733e1408ebec5371334be5fd48eb5f50ab99d6baf6081d0f1b.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/libf/libffi/libffi-dev_3.4.8-2_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 61136,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/libf/libffi/libffi-dev_3.4.8-2_amd64.deb",
+      "sha256": "76b2b80193a656733e1408ebec5371334be5fd48eb5f50ab99d6baf6081d0f1b",
+      "tuple": "libffi-dev:amd64=3.4.8-2"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/ca6f2d36d96b19b3eb71405b0b80134d8c89380b02204a2512e5c58ceb090628.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libgcc-14-dev_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 2672328,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libgcc-14-dev_14.2.0-19_amd64.deb",
+      "sha256": "ca6f2d36d96b19b3eb71405b0b80134d8c89380b02204a2512e5c58ceb090628",
+      "tuple": "libgcc-14-dev:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/a9bbd748ddd40a08b336e8d6b1755e698957ac640d081ddc4c330b716c6b89c3.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/glib2.0/libgio-2.0-dev_2.84.4-3~deb13u5_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1691796,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/glib2.0/libgio-2.0-dev_2.84.4-3~deb13u5_amd64.deb",
+      "sha256": "a9bbd748ddd40a08b336e8d6b1755e698957ac640d081ddc4c330b716c6b89c3",
+      "tuple": "libgio-2.0-dev:amd64=2.84.4-3~deb13u5"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/libgprofng0_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 807764,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/libgprofng0_2.44-3_amd64.deb",
+      "sha256": "0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648",
+      "tuple": "libgprofng0:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/2cdaf797cad8ac30a964ab081370682dd065ae1b0305a0be9d8e0e14cd0657d7.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libhwasan0_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1487768,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libhwasan0_14.2.0-19_amd64.deb",
+      "sha256": "2cdaf797cad8ac30a964ab081370682dd065ae1b0305a0be9d8e0e14cd0657d7",
+      "tuple": "libhwasan0:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/ac8518042e81c00de1effb72bba7e88ac4ecd488f7ea8b9e3ebc63159cb53b35.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/i/isl/libisl23_0.27-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 659152,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/i/isl/libisl23_0.27-1_amd64.deb",
+      "sha256": "ac8518042e81c00de1effb72bba7e88ac4ecd488f7ea8b9e3ebc63159cb53b35",
+      "tuple": "libisl23:amd64=0.27-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/febdb3c528cde1a3abe952e17a1d3cfa7ccaca5b6f506d983d34385dad199490.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libitm1_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 25956,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libitm1_14.2.0-19_amd64.deb",
+      "sha256": "febdb3c528cde1a3abe952e17a1d3cfa7ccaca5b6f506d983d34385dad199490",
+      "tuple": "libitm1:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/a0df07da76287a45e665d584363dc2a6a1c4e240aee41b8bbc0f67cdff97cd68.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/liblsan0_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1204164,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/liblsan0_14.2.0-19_amd64.deb",
+      "sha256": "a0df07da76287a45e665d584363dc2a6a1c4e240aee41b8bbc0f67cdff97cd68",
+      "tuple": "liblsan0:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/2bef03b918e927648c6552143e17e82aa7ed2a4ce180fabd07a7d1cac7ff8686.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/u/util-linux/libmount-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie"
+        },
+        {
+          "Filename": "pool/updates/main/u/util-linux/libmount-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 30740,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/u/util-linux/libmount-dev_2.41.5-0+deb13u1_amd64.deb",
+      "sha256": "2bef03b918e927648c6552143e17e82aa7ed2a4ce180fabd07a7d1cac7ff8686",
+      "tuple": "libmount-dev:amd64=2.41.5-0+deb13u1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/2af0a5c128e03694a41c0b011bd8a958b7297436cdb3a15ddad7866dae8c300b.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/m/mpclib3/libmpc3_1.3.1-1+b3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 52244,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/m/mpclib3/libmpc3_1.3.1-1+b3_amd64.deb",
+      "sha256": "2af0a5c128e03694a41c0b011bd8a958b7297436cdb3a15ddad7866dae8c300b",
+      "tuple": "libmpc3:amd64=1.3.1-1+b3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/75dddce11dabc7fc543712c33dc27b7f2ee66a111763eb5eac654d010b42cd92.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/m/mpfr4/libmpfr6_4.2.2-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 729320,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/m/mpfr4/libmpfr6_4.2.2-1_amd64.deb",
+      "sha256": "75dddce11dabc7fc543712c33dc27b7f2ee66a111763eb5eac654d010b42cd92",
+      "tuple": "libmpfr6:amd64=4.2.2-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/e25b12fcd1f62185962a81499388fb9c25a7614b9513b6017489275bc7011a51.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/updates/main/p/pcre2/libpcre2-16-0_10.46-1~deb13u3_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 281748,
+      "selectedUrl": "https://security.debian.org/debian-security/pool/updates/main/p/pcre2/libpcre2-16-0_10.46-1~deb13u3_amd64.deb",
+      "sha256": "e25b12fcd1f62185962a81499388fb9c25a7614b9513b6017489275bc7011a51",
+      "tuple": "libpcre2-16-0:amd64=10.46-1~deb13u3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/d6095c7eebb3e783243ec9784b9b6774434aa5c16aca8f179483215fadb4313c.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/updates/main/p/pcre2/libpcre2-32-0_10.46-1~deb13u3_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 268704,
+      "selectedUrl": "https://security.debian.org/debian-security/pool/updates/main/p/pcre2/libpcre2-32-0_10.46-1~deb13u3_amd64.deb",
+      "sha256": "d6095c7eebb3e783243ec9784b9b6774434aa5c16aca8f179483215fadb4313c",
+      "tuple": "libpcre2-32-0:amd64=10.46-1~deb13u3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/6740621a0062e4b4cdeaa12a51f03ed0a3de0a04b949c8fa6a92c5f4c3c6b127.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/updates/main/p/pcre2/libpcre2-dev_10.46-1~deb13u3_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 851360,
+      "selectedUrl": "https://security.debian.org/debian-security/pool/updates/main/p/pcre2/libpcre2-dev_10.46-1~deb13u3_amd64.deb",
+      "sha256": "6740621a0062e4b4cdeaa12a51f03ed0a3de0a04b949c8fa6a92c5f4c3c6b127",
+      "tuple": "libpcre2-dev:amd64=10.46-1~deb13u3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/4a7f75f6f3b7e67a9a7f1dcdfca6377db6564057bac2a225cbd0583fe878f7df.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/updates/main/p/pcre2/libpcre2-posix3_10.46-1~deb13u3_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 64104,
+      "selectedUrl": "https://security.debian.org/debian-security/pool/updates/main/p/pcre2/libpcre2-posix3_10.46-1~deb13u3_amd64.deb",
+      "sha256": "4a7f75f6f3b7e67a9a7f1dcdfca6377db6564057bac2a225cbd0583fe878f7df",
+      "tuple": "libpcre2-posix3:amd64=10.46-1~deb13u3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/85087cd04e57fd4ab7d6e816d348c335047823ab60c78878336b74f07b352ca1.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/p/pkgconf/libpkgconf3_1.8.1-4_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 36436,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/p/pkgconf/libpkgconf3_1.8.1-4_amd64.deb",
+      "sha256": "85087cd04e57fd4ab7d6e816d348c335047823ab60c78878336b74f07b352ca1",
+      "tuple": "libpkgconf3:amd64=1.8.1-4"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/f5b51cf0ece3ec3bb7494d0cdbff3ce715ae00cfb2b6ed787f7db91319d64a7b.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libquadmath0_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 145068,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libquadmath0_14.2.0-19_amd64.deb",
+      "sha256": "f5b51cf0ece3ec3bb7494d0cdbff3ce715ae00cfb2b6ed787f7db91319d64a7b",
+      "tuple": "libquadmath0:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/0107595c65dd5cfe7ce3643d400e7b2be2c2528bcd110ad5af8605711a858921.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/libs/libselinux/libselinux1-dev_3.8.1-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 169104,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/libs/libselinux/libselinux1-dev_3.8.1-1_amd64.deb",
+      "sha256": "0107595c65dd5cfe7ce3643d400e7b2be2c2528bcd110ad5af8605711a858921",
+      "tuple": "libselinux1-dev:amd64=3.8.1-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/c085881d0546f6d539909f5710d7a3243aeb24338f6dc455b0ef6199f45bd753.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/libs/libsepol/libsepol-dev_3.8.1-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 372908,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/libs/libsepol/libsepol-dev_3.8.1-1_amd64.deb",
+      "sha256": "c085881d0546f6d539909f5710d7a3243aeb24338f6dc455b0ef6199f45bd753",
+      "tuple": "libsepol-dev:amd64=3.8.1-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/b/binutils/libsframe1_2.44-3_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 78360,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/b/binutils/libsframe1_2.44-3_amd64.deb",
+      "sha256": "38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f",
+      "tuple": "libsframe1:amd64=2.44-3"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/4b962fac5f1af0bd8b1b3f97e0f47b9d8e9a79e88802143f00ebfbd78ad87a7b.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libstdc++-14-dev_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 2375760,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libstdc++-14-dev_14.2.0-19_amd64.deb",
+      "sha256": "4b962fac5f1af0bd8b1b3f97e0f47b9d8e9a79e88802143f00ebfbd78ad87a7b",
+      "tuple": "libstdc++-14-dev:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/3cb76e124187700f5977a0acb914b3f82b2bd28105fce6f1cf2a34497b234af2.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/s/sysprof/libsysprof-capture-4-dev_48.0-2_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 49864,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/s/sysprof/libsysprof-capture-4-dev_48.0-2_amd64.deb",
+      "sha256": "3cb76e124187700f5977a0acb914b3f82b2bd28105fce6f1cf2a34497b234af2",
+      "tuple": "libsysprof-capture-4-dev:amd64=48.0-2"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/529d7f68227d16975076c5f842e8b687faea1b5df8e0dcf62e436d5402844ca5.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libtsan2_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 2460216,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libtsan2_14.2.0-19_amd64.deb",
+      "sha256": "529d7f68227d16975076c5f842e8b687faea1b5df8e0dcf62e436d5402844ca5",
+      "tuple": "libtsan2:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/9205a1bef7d6a52ffc06548e0cde169ff303e688c12d9be3a98f734449077e22.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/g/gcc-14/libubsan1_14.2.0-19_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 1074340,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/g/gcc-14/libubsan1_14.2.0-19_amd64.deb",
+      "sha256": "9205a1bef7d6a52ffc06548e0cde169ff303e688c12d9be3a98f734449077e22",
+      "tuple": "libubsan1:amd64=14.2.0-19"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/b2d475e01aaf0030c72bd3a0300d311f8be64aa9e82d82eae5da1a04f4010071.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/updates/main/l/linux/linux-libc-dev_6.12.113-1_all.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 3021244,
+      "selectedUrl": "https://security.debian.org/debian-security/pool/updates/main/l/linux/linux-libc-dev_6.12.113-1_all.deb",
+      "sha256": "b2d475e01aaf0030c72bd3a0300d311f8be64aa9e82d82eae5da1a04f4010071",
+      "tuple": "linux-libc-dev:all=6.12.113-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/m/make-dfsg/make_4.4.1-2_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 463104,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/m/make-dfsg/make_4.4.1-2_amd64.deb",
+      "sha256": "70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6",
+      "tuple": "make:amd64=4.4.1-2"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/54efef2aef4db5fcb5e0f5b7746465000c6a779b06f3686d0ec3d2a901b20aeb.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/p/pkgconf/pkgconf-bin_1.8.1-4_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 30220,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/p/pkgconf/pkgconf-bin_1.8.1-4_amd64.deb",
+      "sha256": "54efef2aef4db5fcb5e0f5b7746465000c6a779b06f3686d0ec3d2a901b20aeb",
+      "tuple": "pkgconf-bin:amd64=1.8.1-4"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/f1fcad470ca3ac80b4a0f4af6f03cd215089473996b07e508b3ee342bbb11af7.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/p/pkgconf/pkgconf_1.8.1-4_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 26172,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/p/pkgconf/pkgconf_1.8.1-4_amd64.deb",
+      "sha256": "f1fcad470ca3ac80b4a0f4af6f03cd215089473996b07e508b3ee342bbb11af7",
+      "tuple": "pkgconf:amd64=1.8.1-4"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.3-1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 63268,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.3-1_amd64.deb",
+      "sha256": "32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3",
+      "tuple": "rpcsvc-proto:amd64=1.4.3-1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/cb7d7db20e5d91193c2c6629a3f4aa917e3bc558c72b7f2db7203bcfa9a3ba1b.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/u/util-linux/uuid-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie"
+        },
+        {
+          "Filename": "pool/updates/main/u/util-linux/uuid-dev_2.41.5-0+deb13u1_amd64.deb",
+          "suite": "trixie-security"
+        }
+      ],
+      "bytes": 49068,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/u/util-linux/uuid-dev_2.41.5-0+deb13u1_amd64.deb",
+      "sha256": "cb7d7db20e5d91193c2c6629a3f4aa917e3bc558c72b7f2db7203bcfa9a3ba1b",
+      "tuple": "uuid-dev:amd64=2.41.5-0+deb13u1"
+    },
+    {
+      "action": "candidate-install-not-approved",
+      "archive": "archives/76ed5c858e1aef38b7be93acce5910e457e77bd6271471b9d05fb42e78826224.deb",
+      "authenticatedLocations": [
+        {
+          "Filename": "pool/main/z/zlib/zlib1g-dev_1.3.dfsg+really1.3.1-1+b1_amd64.deb",
+          "suite": "trixie"
+        }
+      ],
+      "bytes": 919744,
+      "selectedUrl": "https://deb.debian.org/debian/pool/main/z/zlib/zlib1g-dev_1.3.dfsg+really1.3.1-1+b1_amd64.deb",
+      "sha256": "76ed5c858e1aef38b7be93acce5910e457e77bd6271471b9d05fb42e78826224",
+      "tuple": "zlib1g-dev:amd64=1:1.3.dfsg+really1.3.1-1+b1"
+    }
+  ],
+  "baselineSnapshotSha256": "4fc728c09b869f4cae66ed058adb32d1d92804ca2862cf42cc7fbbb285364196",
+  "candidatePrivatePlanSha256": "495b3acfe8b4c6ed0af811decb84c776da7d4974388c4ca1b37a3e88713363f3",
+  "failures": [],
+  "guestOperations": 0,
+  "kind": "authenticated-public-candidate-package-bodies-not-install-authority",
+  "maintainerScriptReviewComplete": false,
+  "maintainerScriptsExecuted": false,
+  "packageInstalls": 0,
+  "schema": 1,
+  "selectedCount": 55,
+  "verifiedAtUtc": "2026-11-02T03:46:03.604183+00:00",
+  "verifiedBytes": 77072036,
+  "verifiedCount": 55
+}

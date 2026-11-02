@@ -1,5 +1,49 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR106 merged; compiler plan and offline input preparation ready for review
+
+PR106 merged36629712ca936f9b88cea86f71b2cc66e610f84c fromc70846fc; CI41382782006
+SUCCESS/MERGEABLE-CLEAN/noGitHubreviewrequests-or-submissions/terminalbotskip.
+Initiala16ef09e/57698dc2 clear, actual13paths/3commits; immediateblurb/unwatch.
+Root codex/f1-02-offline-js-inputs starts approved3662971. No livecommand/guest/
+delegate/watch. Last guestpostflight b19313d2 stopped/exit0/clean, no laterdispatch.
+
+Resolvera1193cc1 completed/readfully, author105856d reportcherrypicked7ea5322:
+APT3.0.3 built-in3.0 with verifiedprivate16Debianruntime/loader and isolatedconfig,
+55install/767keep/0upgrade-downgrade-remove-heldchange; exacttuple Inst/Conf replay,
+allpreferredbaselineversions held. Private /tmp/f102-debian-resolution-haf7i667/
+full-plan.private.json213796bytes/SHA495b3acfe8b4c6ed0af811decb84c776da7d4974388c4ca1b37a3e88713363f3.
+Requestedg++/make/libgio-dev; existinglocale data onlyenUSgenerationneeded.
+NoQueue safely skipsarchiveacquisition in simulation, notauthenticationproof.
+55publicbodydownloads now independentlyauthenticated77072036bytes; immutable
+f102-public-debian-build-packages-20261102 outsideLAB. Staticmaintainerdata audit
+f102-public-debian-maintainer-audit-20261102:15scripts/4232files/294754869bytes,
+no serviceactivation/setID/special observed; compileralternatives/doclinkhelpers/
+pkgconfdir/f77danglingcleanup are real ifexecuted. Baseline ldconfig/pathtrigger
+handlers and exactprivilegedinstall/locale/transfer/recoveryauthority stillpending.
+New evidence debian-build-package-inputs/ and importedsolverreport: reviewnext.
+
+IndependentJSinputs:811SRIarchives91412138bytes/936eligible/68explicitexcludes,
+1003npm+1GitHub+20workspaces. Audit21602regular333503606bytes, no escapedpaths,
+18ELF/24addon names,89scriptdeclarations. Failedroot-nameassumption preserved,
+v2auditpasses. f102-public-js-artifacts-20261102 and audit-v2 sealedoutsideLAB.
+Host f102-host-bun-cache-preparation-20261102:approved366tar122306560bytes/
+2898blobIDs+execflagschecked; sourceunchangedhostBunignore-scripts0, cache21681
+regular329633297bytes;805absolutealiasesrebasedcontainedrelative. Seed500,
+files400/500; compactmanifest4058327bytes/26079nodes notoldcacheformat.
+Fresh warmofflineflag0/.362s vs emptycache1/.129s explicitcachemiss, bothsource
+unchanged and exactchildrenabsent viaexistingFixtureGuard. GNU4addonheadersx64,
+no loading. Not kernelnetdenial/guestABI/build/Electronruntime proof. New
+summary/bindings offline-js-input-preparation/; rawprototypeharnesses retained.
+
+Next fresh independent Standards+SecuritySpec of candidateplan/input evidence,
+plus disjoint tool/runtime CPU/ELF/cache acquisition audit. Freeze closedguest
+package+locale/stage/build protocol before any new authority or root operation.
+Need measuredcapacity, immutablefinalsource promotion, RustPATH routing, exact
+approved input transfer and reviewed partial-state recovery. All97/task/deps/
+criteria/full1.0 and historicalunknown timeout-descendant gap remain unchanged.
+
+
 ## Observed baseline/trust both reviews clear; evidence publication next
 
 Initial Standardsa16ef09e and SecuritySpec57698dc2 completed/read in full at

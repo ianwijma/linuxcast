@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "retained-host-input-record-bindings-not-authority",
+  "files": {
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifacts-20261102/inventory.json": {
+      "bytes": 538044,
+      "sha256": "72b04a00c1758757ae229234a5ed1c0689266024cb5089959b39b958cc4a2e53"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifacts-20261102/verification.json": {
+      "bytes": 433932,
+      "sha256": "19f5bea555f9d61890fb1e6201d361f56fbab4d3fdba3945a296a4faa2446fe3"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifacts-20261102/collector.py": {
+      "bytes": 8192,
+      "sha256": "7ea9f82ede627d20c73c2f639130c44499bcb871bbdcfdb7e3b28cbe47d846ac"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifacts-20261102/inventory-parser.mjs": {
+      "bytes": 3180,
+      "sha256": "e582b576caed8bfbc6221a0e149b10936f1e9a5d430a9f95a61f74e560f9bd25"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifact-audit-20261102-v2/audit.json": {
+      "bytes": 296073,
+      "sha256": "d669e01758acdd96636588607d0602cc53e4b8c8e348ce8b140eb69a8c41ca27"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-js-artifact-audit-20261102-v2/auditor.py": {
+      "bytes": 5808,
+      "sha256": "aa0c139bbcfbd130826ade2c5b4784b0837082e094fecbcf10a348ad40fc39dc"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/source-provenance.json": {
+      "bytes": 1355,
+      "sha256": "09d6211244358395262fe4a2336793f5dfd203911d0b3f88a0580bf3e5bcf29e"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/source-hashes.json": {
+      "bytes": 380159,
+      "sha256": "56139dd95f4b023ea09cfb4e85a237478720b9c5c980a29d7d9f2cf003361218"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/preparation-harness.py": {
+      "bytes": 6867,
+      "sha256": "22f2a31de9eb19844113ff12d59ef7ab6a1ecf94af7f0b7f4980a1830462d16f"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/online-result.json": {
+      "bytes": 1051,
+      "sha256": "db035f97431c51590ca91483784805f9400932c74f227905b1fd11573f725aa2"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/portable-cache-manifest.json": {
+      "bytes": 5080657,
+      "sha256": "60ba883fcfeaa31022db334abc0f06d561f5c8f2218a6b840ec5f48b1854cef3"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/portable-cache-manifest.compact.json": {
+      "bytes": 4058327,
+      "sha256": "ba7d52ad87949876068d7d858e4335d7aeb976f44188835082d740da7074eba8"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/portable-cache-test-harness.py": {
+      "bytes": 8487,
+      "sha256": "3fee50aef99f6e67bdadc675d10848a2debe4e2a51f0c6f8326ca15c47fb53f4"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/offline-warm-result.json": {
+      "bytes": 1618,
+      "sha256": "c4e8e45f63f176053a5014d5e447db2f7aa8c9336e3ed375ac9fc202ae90fb83"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/offline-empty-result.json": {
+      "bytes": 809,
+      "sha256": "db55eb73b0e2f280896e231b08bcdc9e127e92b981482b142c7fa5c6bdc29a6f"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/offline-summary.json": {
+      "bytes": 659,
+      "sha256": "041a71ba8c6485676784eee607cb98d28a96f9c54bb5321d3c9cd5d53a7898fe"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-host-bun-cache-preparation-20261102/supplemental-validation.json": {
+      "bytes": 1670,
+      "sha256": "d44cd7504a393e5ab029a4937bcc3b35b53d1ad02da897758e57e644e171ea73"
+    }
+  }
+}
