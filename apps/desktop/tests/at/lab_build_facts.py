@@ -193,7 +193,7 @@ class System:
         reason = {'/usr/lib/os-release': 'bounds-os-input', '/var/lib/dpkg/status': 'bounds-status-input',
                   '/var/lib/dpkg/arch': 'bounds-architecture-input',
                   '/var/lib/dpkg/triggers/Unincorp': 'bounds-trigger-input',
-                  '/usr/share/keyrings/debian-archive-keyring.gpg': 'bounds-keyring-input'}.get(path, 'bounds')
+                  '/usr/share/keyrings/debian-archive-keyring.pgp': 'bounds-keyring-input'}.get(path, 'bounds')
         need(row[2][6] <= maximum, reason)
         raw = os.pread(row[1], maximum + 1, 0)
         need(len(raw) <= maximum and len(raw) == row[2][6], reason)
@@ -304,7 +304,7 @@ class System:
 
     def keyring(self, version):
         try:
-            raw = self.read('/usr/share/keyrings/debian-archive-keyring.gpg', 262144, optional=True)
+            raw = self.read('/usr/share/keyrings/debian-archive-keyring.pgp', 262144, optional=True)
             need(raw is None or len(raw) > 0, 'keyring')
             return {'status': 'missing' if raw is None else 'known', 'sha256': None if raw is None else sha(raw),
                     'bytes': None if raw is None else len(raw), 'packageVersion': version}

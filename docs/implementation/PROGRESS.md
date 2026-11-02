@@ -1,5 +1,24 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Canonical keyring correction checked; fresh initial reviews next
+
+On codex/f1-02-projection-capture, frozen586045d contract now implemented by
+exactly2 production.gpg→.pgp fixed-path literals, byte-identical otherwise.
+104focused1.399s,55mapped10.56s/all399Python (wrappercase9.420s<18s), full type/
+lint,4canonical old behavioral failures/0errors/currentgreen, historical
+projection6/mutant3/diagnostic25/custody11/2/4 controls all pass. Canonical alias
+roundtrip/no alias open/no-fallback and unsafe file/replacement tests; current
+prep manifest binds source/tests/helper/contracts and13 unchanged inputs.
+
+Next fresh INITIAL Standards and Security/Spec reviews against approved0a36323,
+covering actual projection evidence, frozen contract and minimal correction.
+No further source seal/permit/guest attempt before review. Actual prior keyring
+cause remains unknown; public Debian packaging layout is independently sourced,
+synthetic defect proven. Lab stopped/normal refusal cleanup verified, no live
+owner/guest/delegate/watch. No complete baseline/install/build/native acceptance;
+all97/task/deps/criteria/full local1.0 and old unknown timeout gap unchanged.
+
+
 ## Projection capture unavailable/keyring; canonical path correction frozen
 
 Single reviewed27a9f73 capturecf7b7c11 on approvedPR104/0a36323 executed

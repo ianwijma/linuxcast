@@ -467,7 +467,8 @@ class SyntheticFiles:
         self.root, self.fds = root, set()
         self.paths = ('/var/lib/dpkg/lock-frontend', '/var/lib/dpkg/lock', '/var/lib/dpkg/status',
                       '/var/lib/dpkg/updates', '/var/lib/dpkg/triggers/Unincorp', '/var/lib/dpkg/arch',
-                      '/usr/lib/os-release', '/proc/meminfo', '/usr/share/keyrings/debian-archive-keyring.gpg',
+                      '/usr/lib/os-release', '/proc/meminfo', '/usr/share/keyrings/debian-archive-keyring.pgp',
+                      '/usr/share/keyrings/debian-archive-keyring.gpg',
                       '/', '/opt', '/var/cache/apt')
         for path in self.paths:
             p = self.path(path)
@@ -482,6 +483,7 @@ class SyntheticFiles:
         self.path('/var/lib/dpkg/arch').write_bytes(b'amd64\narm64\n')
         self.path('/usr/lib/os-release').write_bytes(b'ID=debian\nVERSION_ID="13.7"\n')
         self.path('/proc/meminfo').write_bytes(b'MemTotal:       8192 kB\nMemAvailable: 4096 kB\nOther: 9 kB\n')
+        self.path('/usr/share/keyrings/debian-archive-keyring.pgp').write_bytes(b'synthetic public keyring')
         self.path('/usr/share/keyrings/debian-archive-keyring.gpg').write_bytes(b'synthetic public keyring')
         self.environ = {'SUDO_UID': '1000', 'SUDO_GID': '1000'}
         self.errors, self.opens = {}, []
@@ -589,7 +591,7 @@ class Guest(unittest.TestCase):
             ('/var/lib/dpkg/status', 8388608, 'bounds-status-input'),
             ('/var/lib/dpkg/arch', 8192, 'bounds-architecture-input'),
             ('/var/lib/dpkg/triggers/Unincorp', 131072, 'bounds-trigger-input'),
-            ('/usr/share/keyrings/debian-archive-keyring.gpg', 262144, 'bounds-keyring-input'),
+            ('/usr/share/keyrings/debian-archive-keyring.pgp', 262144, 'bounds-keyring-input'),
         )
         for path, maximum, reason in examples:
             self.fs.path(path).write_bytes(b'x' * (maximum + 1))
@@ -770,15 +772,77 @@ class Guest(unittest.TestCase):
                                                      f_favail=0, f_ffree=0, f_files=1)
         self.assertEqual(self.system.resources()['filesystems']['/']['status'], 'unknown')
 
+    def test_debian_canonical_keyring_with_compatibility_alias_roundtrips(self):
+        canonical = '/usr/share/keyrings/debian-archive-keyring.pgp'
+        alias = '/usr/share/keyrings/debian-archive-keyring.gpg'
+        self.fs.path(alias).unlink()
+        self.fs.path(alias).symlink_to('debian-archive-keyring.pgp')
+        try:
+            value = self.collect()
+        except self.scope['Fault'] as error:
+            self.fail('documented Debian canonical keyring layout refused: ' + str(error))
+        _, decoded, expanded = build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
+        self.assertEqual(decoded['keyring'], dict(status='known', bytes=24,
+                         sha256=owner.digest(b'synthetic public keyring'), packageVersion='2025.1'))
+        self.assertIn(canonical, [p for p, _ in self.fs.opens])
+        self.assertNotIn(alias, [p for p, _ in self.fs.opens])
+        self.assertNotIn(b'synthetic public keyring', expanded)
+        self.assertFalse(self.fs.fds)
+
+    def test_missing_canonical_keyring_never_falls_back_to_regular_alias(self):
+        canonical = '/usr/share/keyrings/debian-archive-keyring.pgp'
+        alias = '/usr/share/keyrings/debian-archive-keyring.gpg'
+        self.fs.path(canonical).unlink()
+        self.fs.path(alias).write_bytes(b'SYNTHETIC_ALIAS_MUST_NOT_BE_READ')
+        self.assertEqual(self.system.keyring('2025.1'), dict(status='missing', sha256=None,
+                         bytes=None, packageVersion='2025.1'))
+        self.assertEqual([p for p, _ in self.fs.opens], [canonical])
+        self.system.verify()
+
+    def test_canonical_keyring_fifo_directory_empty_owner_and_mode_refuse(self):
+        path = self.fs.path('/usr/share/keyrings/debian-archive-keyring.pgp')
+        path.unlink()
+        os.mkfifo(path, 0o600)
+        self.assertEqual(self.system.keyring(None)['status'], 'unknown')
+        self.system.close()
+        path.unlink()
+        path.mkdir()
+        self.assertEqual(self.system.keyring(None)['status'], 'unknown')
+        self.system.close()
+        path.rmdir()
+        path.write_bytes(b'')
+        path.chmod(0o644)
+        self.assertEqual(self.system.keyring(None)['status'], 'unknown')
+        self.system.close()
+        path.write_bytes(b'synthetic public keyring')
+        actual_info = self.fs.info
+        for change in (dict(st_uid=1000), dict(st_mode=stat.S_IFREG | 0o666)):
+            def changed_info(info, change=change):
+                return SimpleNamespace(**dict(vars(actual_info(info)), **change))
+            self.fs.info = changed_info
+            with self.subTest(change=change):
+                self.assertEqual(self.system.keyring(None)['status'], 'unknown')
+                self.system.close()
+        self.fs.info = actual_info
+
+    def test_canonical_keyring_replacement_is_rejected_by_final_custody(self):
+        path = self.fs.path('/usr/share/keyrings/debian-archive-keyring.pgp')
+        self.assertEqual(self.system.keyring(None)['status'], 'known')
+        path.unlink()
+        path.write_bytes(b'synthetic public keyring')
+        path.chmod(0o644)
+        with self.assertRaisesRegex(self.scope['Fault'], '^custody$'):
+            self.system.verify()
+
     def test_missing_keyring_and_unreadable_public_keyring_are_distinct(self):
-        self.fs.path('/usr/share/keyrings/debian-archive-keyring.gpg').unlink()
+        self.fs.path('/usr/share/keyrings/debian-archive-keyring.pgp').unlink()
         missing = self.system.keyring('2025.1')
         self.assertEqual(missing, {'status': 'missing', 'sha256': None, 'bytes': None, 'packageVersion': '2025.1'})
-        self.fs.errors['/usr/share/keyrings/debian-archive-keyring.gpg'] = PermissionError()
+        self.fs.errors['/usr/share/keyrings/debian-archive-keyring.pgp'] = PermissionError()
         self.assertEqual(self.system.keyring('2025.1')['status'], 'unknown')
 
     def test_keyring_symlink_hardlink_and_oversize_are_unavailable(self):
-        path = self.fs.path('/usr/share/keyrings/debian-archive-keyring.gpg')
+        path = self.fs.path('/usr/share/keyrings/debian-archive-keyring.pgp')
         path.unlink()
         path.symlink_to(self.fs.path('/var/lib/dpkg/status'))
         self.assertEqual(self.system.keyring(None)['status'], 'unknown')
