@@ -1,5 +1,31 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Actual diagnostic capture identifies assembled status-field guard
+
+After PR103, sealed approved/reviewed3536145 source and fresh14-key0400 permit
+captured once00:41:23.406653→00:42:03.160761UTC2Nov,39.745s monotonic/exit3/0retries.
+Result valid unavailable/bounds-status-field, outer incomplete/transport,
+cleanupnone/reservationclean; no private snapshot/count/digest. The16KiB assembled
+field guard refused; package/field/category/content remain unknown. No blanket
+cap increase or specific unused-field cause inferred. Old generic run preserved.
+
+Captureeb93bc46-c5e1-40a6-97e6-2d7028b02f86; permit1b288995c62debc436beee182ff4c46f8c2518d582d13ab3ea71766af6f416ea;
+source manifest9125a74bd7d77c5bc387e6283e3b65fce30abfdaafd28ff87f061176042871b8,
+owner a3b6cc06f646b73a38cfa0a01076225b3dbf75f5e62ae594ae82ff974761cf46,
+embedded5888b59d/18806bytes. Oldc512 permit archived no-replace preservinginode/
+bytes/mode under same lock. Exact caller reaped/ownECHILD; fresh full pinned
+exited/runningfalse/PID0/exit0, markerabsent/original lockreacquired, source/permit
+unchanged/stderr0. Harness retained0400 and clock boundaries explicit inmetadata.
+Public sanitized evidence bounds-actual-20261102/. No package/native/AT acceptance
+or historical cleanup-gap promotion. All97/state/criteria unchanged.
+
+Next bounded parser projection: do not accumulate values excluded from snapshot;
+keep their duplicate/name/continuation/line/stanza validation. Physical lines and
+exported fields remain16KiB, complete stanza128KiB and input8MiB; no extra read or
+output authority. Coordinator contract/review precedes any changed source/permit/
+capture. It remains unknown whether actual offending field is discarded; exported
+over-limit fields still refuse. No processes/delegates/watches active.
+
 ## PR103 merged; fresh diagnostic capture next
 
 PR103 https://github.com/ianwijma/linuxcast/pull/103 merged normally at

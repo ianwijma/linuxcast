@@ -1,0 +1,20 @@
+{
+  "approvedCommit": "63118f1139314931117bf1d1015d1b4c42193bf2",
+  "automaticRetries": 0,
+  "captureId": "eb93bc46-c5e1-40a6-97e6-2d7028b02f86",
+  "elapsedClock": "time.monotonic; before Popen through wait return; rounded milliseconds",
+  "elapsedSeconds": 39.745,
+  "endedAt": "2026-11-02T00:42:03.160761+00:00",
+  "exactCallerReaped": true,
+  "exitCode": 3,
+  "harnessSha256": "19dd94f7c9fcfbc870aebd3b0dd66d2e15748ae3d417a98c9d2fd7f9a7c76496",
+  "nativeRuns": 0,
+  "permitSha256": "1b288995c62debc436beee182ff4c46f8c2518d582d13ab3ea71766af6f416ea",
+  "reviewedCommit": "3536145b0eb90dd34d5994ad4cae58791dd24c1f",
+  "schema": 1,
+  "sourceManifestSha256": "9125a74bd7d77c5bc387e6283e3b65fce30abfdaafd28ff87f061176042871b8",
+  "startedAt": "2026-11-02T00:41:23.406653+00:00",
+  "stderrBytes": 0,
+  "stdoutSha256": "1ed3045171028e5996728a96d81db0623c3afe365e3e1fde00add216d5d84624",
+  "utcTimestamps": "before monotonic start and after stdout/stderr fsync"
+}
