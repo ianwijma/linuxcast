@@ -1,5 +1,31 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Packaged trust anchor reconciled; exact Debian solver preparation ready
+
+Actual cc158ab capture remains observed767/247006/SHA4fc728c0, stopped/clean.
+Coordinator matched exact recorded guest keyring hash/55918bytes to authenticated
+Debian2025.1 package179244bytes/SHA9ea7778e. All3 cached indexes compressed/
+expanded hashes/sizes and dates/expiry rechecked; exact .deb inspected in memory,
+no install/extract. Matching public packaged keyring reverified InRelease3/2/2
+signatures and exactReleasebytes. Onebyte privatecopy tamper exit1/BADSIG1/
+VALIDSIG0, originalsunchanged. Rawpublic inputssealedoutsideLAB in
+f102-public-debian13-keyring-reconciled-20261102, small public evidence folder
+packaged-keyring-reconciliation-20261102/. No guest/hostAPT/keyring change.
+
+Private solverinputs: .worktrees/f102-private-solver-baseline-20261102/
+status,facts.json,provenance.json0400/root0500. ProjectedstatusSHA4786a2907757f76af0c1b01f36cb7f884b30cd36ef70d047fb2719d9be23c8b8,
+originalgueststatus and canonical snapshot hashes remain separatelyrecorded.
+NEVER writeprojectiontoguestdpkg. Clean/noholds/noforeign, enUS.UTF8missing;
+exactDebianAPT3 isolatedcompiler/dev/locale resolution and package phase review
+next. OldhostAPT2.4 attempts are failedexplorations, not closureproof. No
+npmarchives/cache downloaded/installed; prior lockaudit1004registry+20workspace.
+
+Next initial independent evidence Standards+SecuritySpec checks on this bounded
+metadata increment, plus disjoint exact offline resolver preparation. No live
+owner/guest/watch. No installation/provision/build/native/AT/session/release
+acceptance; all97/deps/criteria/full1.0 intact, old timeout absence unknown.
+
+
 ## Canonical capture observed; exact offline package/locale resolution next
 
 One reviewedcc158ab/approvedPR105bf4b492 metadata captureb19313d2 completed

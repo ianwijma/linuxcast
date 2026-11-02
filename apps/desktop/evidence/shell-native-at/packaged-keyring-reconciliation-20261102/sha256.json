@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "kind": "public-keyring-continuity-evidence-not-install-authority",
+  "files": {
+    "README.md": "6a4b2eea201071d417a72a60be7e8adc19b0fe6dcdb5e4fe52103330175713ef",
+    "signature-control.json": "d59e3ef4f1e383c2afa8c93fa61d7597c701621b4c5cd89b93223aa3ba2b1bfa",
+    "verification.json": "a2930b9d1e887395ac93e8812d6106069126599478456f8f94ea82814f0972d0"
+  }
+}
