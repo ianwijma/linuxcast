@@ -1,0 +1,742 @@
+{
+  "cpuRuntimeVerified": false,
+  "downloadedProgramsExecuted": 0,
+  "files": [
+    {
+      "archive": "node-v24.22.1-linux-x64.tar.xz",
+      "bytes": 126879696,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.28",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libstdc++.so.6"
+      ],
+      "path": "node-v24.22.1-linux-x64/bin/node",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/00-node.txt",
+      "readelfSha256": "0e636cbcfcc23e4f5833b41f63b6c3aae1ac816e7572060c5d9a5fd1bc0e9121",
+      "readelfStderrBytes": 1303,
+      "sha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+      "versionSymbols": [
+        "CXXABI_1.3",
+        "CXXABI_1.3.11",
+        "CXXABI_1.3.5",
+        "CXXABI_1.3.7",
+        "CXXABI_1.3.8",
+        "CXXABI_1.3.9",
+        "GLIBCXX_3.4",
+        "GLIBCXX_3.4.11",
+        "GLIBCXX_3.4.14",
+        "GLIBCXX_3.4.15",
+        "GLIBCXX_3.4.17",
+        "GLIBCXX_3.4.18",
+        "GLIBCXX_3.4.19",
+        "GLIBCXX_3.4.20",
+        "GLIBCXX_3.4.21",
+        "GLIBCXX_3.4.9",
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.23",
+        "GLIBC_2.25",
+        "GLIBC_2.27",
+        "GLIBC_2.28",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "bun-linux-x64.zip",
+      "bytes": 107308936,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "bun-linux-x64/bun",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/01-bun.txt",
+      "readelfSha256": "243e42fd2fec66b1996747d450b1d10740444d85e739d7d1275f67cf6a867191",
+      "readelfStderrBytes": 0,
+      "sha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "bun-linux-x64-baseline.zip",
+      "bytes": 107308936,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "bun-linux-x64-baseline/bun",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/02-bun.txt",
+      "readelfSha256": "243e42fd2fec66b1996747d450b1d10740444d85e739d7d1275f67cf6a867191",
+      "readelfStderrBytes": 0,
+      "sha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 13303096,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librt.so.1",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/bin/rustdoc",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/03-rustdoc.txt",
+      "readelfSha256": "74df1c73dd1ecc8ee8b2f456a136a9971e2e528aad0ce42437376bc7693fc348",
+      "readelfStderrBytes": 0,
+      "sha256": "e5144902aed6cf94280eae3ad7708da5bdd3819b5281728af432d0e70231439c",
+      "versionSymbols": [
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.6"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 644784,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libdl.so.2",
+        "libpthread.so.0",
+        "librt.so.1",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/bin/rustc",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/04-rustc.txt",
+      "readelfSha256": "46c615819f17133388929b14611ae5cb940eabd60c5ada15e1e0f00c761151a8",
+      "readelfStderrBytes": 0,
+      "sha256": "bff349e72704ff70bc08a234a3847338e797065bbedde5e556808bc87b7bf7c6",
+      "versionSymbols": [
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.6"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 376864,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/wasm-ld",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/05-wasm-ld.txt",
+      "readelfSha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56",
+      "readelfStderrBytes": 0,
+      "sha256": "e7d44b7571a8250326e99aa238aa4be7ddaa1fa696cf3c0e2ca829da5846b325",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 5156664,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librt.so.1"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wasm-component-ld",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/06-wasm-component-ld.txt",
+      "readelfSha256": "756984d50abdc0d3f17131186d9be4acf53fc355be72576dbcf15f13c5c35b72",
+      "readelfStderrBytes": 0,
+      "sha256": "e98e7723010374a083dc08d26037050a103fe76040f08ccc17087bb38cc32adc",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 11604688,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.14",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libLLVM.so.22.1-rust-1.95.0-stable",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0",
+        "libz.so.1"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/07-rust-lld.txt",
+      "readelfSha256": "5098f7559bfd21a2a411cce5a8fdf353cf249df43243ec013758f93a515c92b2",
+      "readelfStderrBytes": 0,
+      "sha256": "60f305b55da767671e895b231e0c78e87f4ccbf790d7181842039c53bb60281c",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 376864,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld64.lld",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/08-ld64.lld.txt",
+      "readelfSha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56",
+      "readelfStderrBytes": 0,
+      "sha256": "e7d44b7571a8250326e99aa238aa4be7ddaa1fa696cf3c0e2ca829da5846b325",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 376864,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/09-ld.lld.txt",
+      "readelfSha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56",
+      "readelfStderrBytes": 0,
+      "sha256": "e7d44b7571a8250326e99aa238aa4be7ddaa1fa696cf3c0e2ca829da5846b325",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 199603328,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0",
+        "librt.so.1",
+        "libz.so.1"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/libLLVM.so.22.1-rust-1.95.0-stable",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/10-libLLVM.so.22.1-rust-1.95.0-stable.txt",
+      "readelfSha256": "57da14512f2ca460c7ef4c19f79d2cda04372fa4f079fd181b026e70d2b30dbc",
+      "readelfStderrBytes": 0,
+      "sha256": "f6a654c837c51bc2fc00f83d58318607b6f30fec364a00f09b6172129e591fb5",
+      "versionSymbols": [
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.6"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 376864,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/lld-link",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/11-lld-link.txt",
+      "readelfSha256": "d47da5855e15e07a478d457f17a77ef3e44c2184edd804adb016ca06c7db7e56",
+      "readelfStderrBytes": 0,
+      "sha256": "e7d44b7571a8250326e99aa238aa4be7ddaa1fa696cf3c0e2ca829da5846b325",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 153621360,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libLLVM.so.22.1-rust-1.95.0-stable",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librt.so.1"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/librustc_driver-6108105cd7e839cf.so",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/12-librustc_driver-6108105cd7e839cf.so.txt",
+      "readelfSha256": "b77cca8f3f89a8a4c003f3f576ff81deb0bdd27e4c325da8358adcef30aa3bbe",
+      "readelfStderrBytes": 0,
+      "sha256": "ae69468875215df490fde685ec1f1b969743482ba7e0251f4074a222606a5484",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 1557840,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.14",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/libexec/rust-analyzer-proc-macro-srv",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/13-rust-analyzer-proc-macro-srv.txt",
+      "readelfSha256": "b57ac2214054bc836a5d9311364050bcfcfd9fa001dedd26e8992e6ed7eacb63",
+      "readelfStderrBytes": 0,
+      "sha256": "5ac4ddb2aaddef127a5a4d800494ea5a1d7599d7cc490992e8c020af2a1e9b29",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 281128,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.14",
+      "machine": "x86-64",
+      "needed": [
+        "libLLVM.so.22.1-rust-1.95.0-stable",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "rustc-1.95.0-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-objcopy",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/14-rust-objcopy.txt",
+      "readelfSha256": "956d0b7a0a032819ed58a85d820a7fffde7a71e367abc63ad116c941106a4ccd",
+      "readelfStderrBytes": 0,
+      "sha256": "211b1e47ef0078d91f33d5076e958bf40a65b0f634d59c9802f0b049b9662728",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "archive": "cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 42185192,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0",
+        "librt.so.1"
+      ],
+      "path": "cargo-1.95.0-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/15-cargo.txt",
+      "readelfSha256": "17c784412fb80a0d78686dac4eb88edb4accf1aa0cb6223de0d6bffa40044777",
+      "readelfStderrBytes": 0,
+      "sha256": "841072d1d92f9e841d9ba5b0814182a0adf064acf4527cd120967b7bc49dcb66",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 5418488,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librt.so.1"
+      ],
+      "path": "rust-std-1.95.0-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-d1237ef7159db0a2.so",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/16-libstd-d1237ef7159db0a2.so.txt",
+      "readelfSha256": "a0c4f0c1d9fe55db61a7a57b404fe6573b1dfa545843cf96d6bb5780810acba6",
+      "readelfStderrBytes": 0,
+      "sha256": "abca53e870629e3f9f97ae72897181dcc4db555d8e6ace00351b02a74ef77c81",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 20339280,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.17",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librt.so.1",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "clippy-1.95.0-x86_64-unknown-linux-gnu/clippy-preview/bin/clippy-driver",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/17-clippy-driver.txt",
+      "readelfSha256": "cf50c82789cb182d52698537a849b7d070663886e54caef6f88f273d5fb13248",
+      "readelfStderrBytes": 27379,
+      "sha256": "81bd985ee50d78e9d8c5810f6ca836614d1bf95e0e8142f1ec5f42eb250ed729",
+      "versionSymbols": [
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.6"
+      ]
+    },
+    {
+      "archive": "clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 1263912,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.14",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "clippy-1.95.0-x86_64-unknown-linux-gnu/clippy-preview/bin/cargo-clippy",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/18-cargo-clippy.txt",
+      "readelfSha256": "3963695a34c26c4902fd4ff3ef42e47b205bcfc18f7460a14f6f244bdf6970e4",
+      "readelfStderrBytes": 0,
+      "sha256": "b71b1263063707608daa1e9b231ad9d87507c11d6aa178ede2b01d8372d5effb",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "archive": "rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 3715584,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.16",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "rustfmt-1.95.0-x86_64-unknown-linux-gnu/rustfmt-preview/bin/cargo-fmt",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/19-cargo-fmt.txt",
+      "readelfSha256": "7b0cdf6dde803bc105c9c7043313f8f14bef04cda05286ec236209371b1dd7ec",
+      "readelfStderrBytes": 0,
+      "sha256": "cd554fed0211e007995a6a540a7fd67bf22354986ae64960c752bb943d8e1184",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "archive": "rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 5295560,
+      "class": "ELF64",
+      "endian": "little",
+      "highestGlibcReference": "GLIBC_2.14",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0",
+        "librustc_driver-6108105cd7e839cf.so"
+      ],
+      "path": "rustfmt-1.95.0-x86_64-unknown-linux-gnu/rustfmt-preview/bin/rustfmt",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/20-rustfmt.txt",
+      "readelfSha256": "c09a5f6117e6da3a8eff61d607b379771d410833e39c453b2989e2f613834bcc",
+      "readelfStderrBytes": 0,
+      "sha256": "56b31ad3ec8fe0277a2884a189e243b8f04e9b48e5fd22e547c1516c5f8fd34c",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    }
+  ],
+  "guestAbiVerified": false,
+  "reader": "/usr/bin/readelf",
+  "schema": 1
+}

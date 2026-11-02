@@ -1,0 +1,171 @@
+{
+  "acceptance": false,
+  "archives": [
+    {
+      "archive": "node-v24.22.1-linux-x64.tar.xz",
+      "component": "node",
+      "declaredExpandedBytes": 201757420,
+      "elfFiles": 1,
+      "memberReport": "node-members.json",
+      "memberReportSha256": "b397a65b4538583117d39ea1b5bfcaeb63110da9d35087af88a2644e9e4b63e5",
+      "members": 5888,
+      "setIdEntries": [],
+      "types": {
+        "directory": 1088,
+        "regular": 4797,
+        "symlink": 3
+      },
+      "variant": null
+    },
+    {
+      "archive": "bun-linux-x64.zip",
+      "component": "bun",
+      "declaredExpandedBytes": 107308936,
+      "elfFiles": 1,
+      "memberReport": "bun-members.json",
+      "memberReportSha256": "2676be38f06c68f2ed483ef54c411fb39c03434254fb306a35969992b95277f3",
+      "members": 2,
+      "setIdEntries": [],
+      "types": {
+        "directory": 1,
+        "regular": 1
+      },
+      "variant": "standard"
+    },
+    {
+      "archive": "bun-linux-x64-baseline.zip",
+      "component": "bun",
+      "declaredExpandedBytes": 107308936,
+      "elfFiles": 1,
+      "memberReport": "bun-baseline-members.json",
+      "memberReportSha256": "d555347dae766b2f369281863cec41563faeb401575e2deb208515e53d8f6399",
+      "members": 2,
+      "setIdEntries": [],
+      "types": {
+        "directory": 1,
+        "regular": 1
+      },
+      "variant": "baseline-comparison-only"
+    },
+    {
+      "archive": "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "component": "rustc",
+      "declaredExpandedBytes": 402253973,
+      "elfFiles": 12,
+      "memberReport": "rustc-members.json",
+      "memberReportSha256": "5db18864ca3a64b4193066fd2d61adac97f985af897758d909d2e36dd410ebb7",
+      "members": 70,
+      "setIdEntries": [],
+      "types": {
+        "directory": 17,
+        "regular": 53
+      },
+      "variant": null
+    },
+    {
+      "archive": "cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "component": "cargo",
+      "declaredExpandedBytes": 42814709,
+      "elfFiles": 1,
+      "memberReport": "cargo-members.json",
+      "memberReportSha256": "2bf853b291f3abfc14701ae0906d48a92172bbd954980757fcd83e25168de096",
+      "members": 68,
+      "setIdEntries": [],
+      "types": {
+        "directory": 12,
+        "regular": 56
+      },
+      "variant": null
+    },
+    {
+      "archive": "rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "component": "rust-std",
+      "declaredExpandedBytes": 166627394,
+      "elfFiles": 1,
+      "memberReport": "rust-std-members.json",
+      "memberReportSha256": "3ad952901d03338764d9f06048b064f8238220f9e688503cf83e830ac393e2b4",
+      "members": 81,
+      "setIdEntries": [],
+      "types": {
+        "directory": 7,
+        "regular": 74
+      },
+      "variant": null
+    },
+    {
+      "archive": "clippy-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "component": "clippy-preview",
+      "declaredExpandedBytes": 21687387,
+      "elfFiles": 2,
+      "memberReport": "clippy-preview-members.json",
+      "memberReportSha256": "591b38ca6fdb08ea9103586f2d459e3aa0d77ef011849db88241b57a340cebdb",
+      "members": 22,
+      "setIdEntries": [],
+      "types": {
+        "directory": 6,
+        "regular": 16
+      },
+      "variant": null
+    },
+    {
+      "archive": "rustfmt-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+      "component": "rustfmt-preview",
+      "declaredExpandedBytes": 9095052,
+      "elfFiles": 2,
+      "memberReport": "rustfmt-preview-members.json",
+      "memberReportSha256": "2b1cf2de6d727cc295e1f80ef2c4997400da41acadb09e416d9efdf51ad8c307",
+      "members": 22,
+      "setIdEntries": [],
+      "types": {
+        "directory": 6,
+        "regular": 16
+      },
+      "variant": null
+    }
+  ],
+  "atUtc": "2026-11-02T05:07:42.419345+00:00",
+  "deadlineSeconds": 180,
+  "declaredExpandedBytes": 1058853807,
+  "downloadedProgramsExecuted": 0,
+  "elapsedSeconds": 9.741,
+  "elfFiles": 21,
+  "existingHostTools": [
+    {
+      "bytes": 126879696,
+      "matchingSignedArchiveMembers": [
+        {
+          "archive": "node-v24.22.1-linux-x64.tar.xz",
+          "bytes": 126879696,
+          "path": "node-v24.22.1-linux-x64/bin/node"
+        }
+      ],
+      "sha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb",
+      "tool": "node",
+      "versionProbeExecutedHere": false
+    },
+    {
+      "bytes": 107308936,
+      "matchingSignedArchiveMembers": [
+        {
+          "archive": "bun-linux-x64.zip",
+          "bytes": 107308936,
+          "path": "bun-linux-x64/bun"
+        },
+        {
+          "archive": "bun-linux-x64-baseline.zip",
+          "bytes": 107308936,
+          "path": "bun-linux-x64-baseline/bun"
+        }
+      ],
+      "sha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+      "tool": "bun",
+      "versionProbeExecutedHere": false
+    }
+  ],
+  "guestAbiVerified": false,
+  "guestOperations": 0,
+  "installersExecuted": 0,
+  "members": 6155,
+  "readelfPerFileTimeoutSeconds": 12,
+  "schema": 1
+}

@@ -1,5 +1,79 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Toolchain provenance: both initial reviews clear; publication next
+
+Both initial independent reviews were completed and read in full at c0bfc1a,
+base approved PR109 ef6630f. Standards1754a822 and Security/Spec f920edad found
+no introduced actionable P1/P2/P3 or material Fowler concerns. Each verified
+all seven author files, six local hashes, 92 retained bindings, three signature
+chains and signer policies, three one-byte signature refusals, all eight archive
+digests, 6155 member records and 21 ELF requirements. Existing host Node/Bun byte
+matches and the identical Bun variant payloads were independently confirmed.
+Standards also passed12 malformed-checksum, one signer-policy and17 archive
+controls. Both preserved original fingerprints and all97 non-evidence records.
+
+Only publication metadata follows the reviewed checkpoint. No code, evidence,
+source pin or protocol bytes change. First-party HTTPS/fingerprint bootstrap
+remains explicit, and the evidence grants no root provisioning or guest ABI
+acceptance. Focused PR/current-head CI/GitHub review checks are next.
+
+Separate read-only collector contract4284ff0 is preserved on
+codex/f1-02-install-metadata-preparation. Implementation2da445bc runs asynchronously
+from that exact frozen base; do not poll. It owns only the new collector, test
+and preparation evidence. No guest invocation, host owner or permit is authorized.
+No live root command or PR watch. All97/full local1.0 requirements and historical
+timeout-descendant uncertainty remain unchanged.
+
+## Install transaction research delivered; toolchain review boundary
+
+Research2f1bcb73 completed and was read in full, including its614-line report.
+Saved author5df8747 on codex/debian-install-transaction-research, exactly one
+new README; not imported into this toolchain increment. It authenticates exact
+APT3.0.3/dpkg1.22.22 source and traces the inner-lock release before the final
+APT hook. The frontend lock excludes ordinary dpkg, but frontend-skipping dpkg
+and independent dpkg-trigger require a separately proved closed-writer envelope.
+Existing trigger registrations and installed postinst/helpers/config custody
+remain missing. Public libc-bin/man-db handlers have real cache effects; man-db
+can suppress mandb failure. Existing empty Unincorp must be observed for install
+admission; earlier allowance for absence cannot prove this stronger condition.
+
+Next coordinator work is a separately frozen, bounded read-only observation of
+those exact missing trigger/config/helper/state facts, then closed install/
+locale/stage/build authorities. Neither the report nor this metadata authorizes
+an actual capture or package mutation. Do not reuse native receipt-gated permits
+for preparation. All earlier actual package facts and cleanup remain inherited.
+Toolchain evidence at6f83141 stays byte-identical; this follow-up is coordinator
+checkpoint only. Start its fresh initial two-axis reviews, then work on the
+separate capture contract. No running root command or PR watch; all97 task and
+criterion states and historical timeout-descendant uncertainty remain unchanged.
+
+## PR109 merged; toolchain provenance prepared for independent review
+
+PR109 merged ef6630f1125ec37612d94b6f57dadd9a30d65dda from 0b6f941.
+Planning CI41392672980 passed; the head was CLEAN/MERGEABLE, with no requested
+or submitted GitHub reviews or inline threads. CodeRabbit completed with a skip
+and no actionable feedback. Both initial independent reviews were clear.
+The merge blurb was sent immediately and the watch removed. No task acceptance
+or application behavior changed.
+
+Root branch codex/f1-02-toolchain-provenance-integration starts at approved
+PR109 ef6630f. It copies only the seven new evidence files from saved 94cf68c;
+coordinator records preserve the current histories and append the new evidence.
+No production, test, protocol, dependency, lockfile, pin or authority changes.
+Tool signatures, archives, static reader data and existing host-byte matches
+are described in toolchain-distribution-provenance/. The earlier verifier
+harness failures remain retained and distinguished from the final passing
+signature/tamper results. First-party HTTPS key bootstrap remains explicit.
+
+Fresh initial Standards and Security/Spec reviews are next. Research2f1bcb73
+on APT/dpkg locks and trigger handlers remains asynchronous; do not poll.
+No actual installer, compiler, root, guest, namespace or native execution.
+Actual prefix/sysroot copying, input transfer, capacity, CPU/ABI, installation,
+build/receipt, supported sessions, native AT and release acceptance remain
+pending. All97 non-evidence task states, dependencies and criteria are unchanged.
+The last guest shutdown and historical timeout-descendant uncertainty remain
+inherited. No live root command or PR watch remains.
+
 ## Electron runtime input evidence: both initial reviews clear
 
 Initial Standards9f21a79c and SecuritySpec308c4d71 completed/read in full at

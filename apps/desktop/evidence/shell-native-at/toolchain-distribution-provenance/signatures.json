@@ -1,0 +1,70 @@
+{
+  "atUtc": "2026-11-02T05:04:46.355831+00:00",
+  "downloadedProgramsExecuted": 0,
+  "elapsedSeconds": 0.029,
+  "hostUserKeyringUsed": false,
+  "keyTrustBootstrap": "First-party HTTPS snapshots and checked primary fingerprints; no independent out-of-band/web-of-trust bootstrap claimed",
+  "keyserverUsed": false,
+  "previousHarnessFailures": [
+    "Original required byte equality for Bun plain/signed payload; only missing terminal LF differs.",
+    "Second strict parser rejected legitimate Node relative Windows checksum names and final empty line. All original scripts/failure/partial outputs preserved."
+  ],
+  "results": [
+    {
+      "checksumEntries": 34,
+      "gpgvVersion": "2.2.27",
+      "keyring": "node-release-keys.kbx",
+      "label": "node",
+      "payloadBytes": 3172,
+      "payloadSha256": "930cac6b5cb8104da3e841a517d9edf5f0ff9d2de62d248f8a7dd1357affc0c3",
+      "plainChecksumMapEqual": null,
+      "plainDifferenceOnlyTerminalLF": null,
+      "plainRawEqual": null,
+      "primaryFingerprint": "5BE8A3F6C8A5C01D106C0AD820B1A390B168D356",
+      "signature": "node-SHASUMS256.txt.asc",
+      "signingFingerprint": "5BE8A3F6C8A5C01D106C0AD820B1A390B168D356",
+      "tamperBadSignatures": 1,
+      "tamperExitCode": 1,
+      "tamperValidSignatures": 0,
+      "validSignatures": 1
+    },
+    {
+      "checksumEntries": 36,
+      "gpgvVersion": "2.2.27",
+      "keyring": "bun-release-keys.gpg",
+      "label": "bun",
+      "payloadBytes": 3432,
+      "payloadSha256": "a433f455029bf028ab2a19a71b16ad3fa53d700237bbf834df3638b3f9bb8d71",
+      "plainChecksumMapEqual": true,
+      "plainDifferenceOnlyTerminalLF": true,
+      "plainRawEqual": false,
+      "primaryFingerprint": "F3DCC08A8572C0749B3E18888EAB4D40A7B22B59",
+      "signature": "bun-SHASUMS256.txt.asc",
+      "signingFingerprint": "F3DCC08A8572C0749B3E18888EAB4D40A7B22B59",
+      "tamperBadSignatures": 1,
+      "tamperExitCode": 1,
+      "tamperValidSignatures": 0,
+      "validSignatures": 1
+    },
+    {
+      "checksumEntries": null,
+      "gpgvVersion": "2.2.27",
+      "keyring": "rust-release-keys.gpg",
+      "label": "rust",
+      "payloadBytes": 848342,
+      "payloadSha256": "821ff14e4c4a1cbe1e8915f35aff0a3fbbdf8d293ad48ab8f31e3b0440c581f9",
+      "plainChecksumMapEqual": null,
+      "plainDifferenceOnlyTerminalLF": null,
+      "plainRawEqual": null,
+      "primaryFingerprint": "108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE",
+      "signature": "channel-rust-1.95.0.toml.asc",
+      "signingFingerprint": "108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE",
+      "tamperBadSignatures": 1,
+      "tamperExitCode": 1,
+      "tamperValidSignatures": 0,
+      "validSignatures": 1
+    }
+  ],
+  "schema": 1,
+  "strictChecksumMaps": true
+}
