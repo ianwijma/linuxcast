@@ -1,5 +1,20 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Bounds diagnostics initial Standards clear; Security/Spec still running
+
+Initial Standards480d0c5c completed/read on3536145/base40bac5c: no hard-rule or
+material Fowler findings. Independent host/guest AST normalization confirms
+diagnostic-only scope;97focused1.234s/55mapped10.06s including392Python within18s,
+25original diagnostic failures/currentgreen, previous11/2/4controls,29extra
+synthetic probes/23hashes/embedded/public schema-provenance/plan/whitespace pass.
+Exact reviewed range has15paths, correcting the assignment's16-path count.
+Actual execution and prior type/lint remain inherited, no acceptance promotion.
+Capture README now distinguishes monotonic42.676s from recorded UTC interval
+42.685441s; original JSON measurements unchanged. This is metadata-only, current
+owner/test/helper code remains byte-identical to reviewed3536145. Separate fresh
+Security/Spec1c176209 still running on that frozen checkpoint; no polling or
+clean Spec claim. No PR/watch/new source/permit/capture; all97/criteria unchanged.
+
 ## Offline fixed bounds diagnostics ready for independent review
 
 After first actual unavailable/bounds run, frozen af55d28 contract permits twelve

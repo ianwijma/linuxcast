@@ -5,8 +5,10 @@ Executed1 November2026 UTC /2 November Sydney after approved PR102 merge
 `c512d5f581f67b8f7096863b317a547554dc7d92`. Independent final065a6691 was clear;
 current-head Planning CI41323704410 passed before the normal exact-head merge.
 
-**Outcome: unavailable, not a complete package baseline.** One invocation ran
-from16:05:29.368544 to16:06:12.053985 UTC,42.676s, exit3, no automatic retry.
+**Outcome: unavailable, not a complete package baseline.** One invocation returned
+exit3 with no automatic retry. Its recorded monotonic elapsed value is42.676s.
+The separately recorded UTC timestamps16:05:29.368544 and16:06:12.053985 span
+42.685441s; both original measurements are retained, not treated as identical.
 The valid closed guest reply reports `firstFailure=bounds`; the outer lifecycle
 reports incomplete/transport. The source deliberately exports no detailed bound
 diagnostic, so status-input, field, record, snapshot or packet bounds are not yet
