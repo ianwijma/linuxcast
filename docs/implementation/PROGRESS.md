@@ -1,5 +1,36 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Collector integrated; APT final-hook boundary exercised offline
+
+Root codex/f1-02-install-metadata-integration carries the frozen collector/targets
+and distinct host-owner contract plus six author c72cf01 additions, imported
+byte-identically as74459a4. Author reports50focused/all452Python/55mapped/type/
+lint/AST/hash/plan checks; coordinator independently50focused and55mapped pass,
+including the452-case payload in13.247s under unchanged18s. Quoted source48812B;
+no default guest collection occurred. Author/root integration commits are
+honestly unsigned using the authorised per-command fallback; signing config is
+unchanged. The separate host owner continues asynchronously; no polling or
+actual owner/permit/transport/capture occurs. Both initial independent review
+axes are next for the fixed collector/contract/research checkpoint.
+
+New coordinator host-only APT3 control runs non-simulated private state with a
+fixed refusing fake dpkg. Exit73 final hook receives all110 v3records matching
+55candidate archive/configure pairs and prevents every dpkg call. Passing the
+synthetic hook reaches only fake unpack refusal74. The hook's independent POSIX
+probes find frontend contended and inner database lock available. All124copied
+input fingerprints stay unchanged; exact children/descendants are reaped with
+ECHILD. The experiment establishes neither a final admission implementation nor
+writer exclusion or installation success. Its private baseline/raw streams stay
+outside Git; public55action trace, source and conservative result metadata are
+in apt-final-hook-preparation. Harness corrections/refusals are disclosed.
+
+No real dpkg, maintainer script, guest, compiler, installation, locale, build or
+native operation occurred. Trigger/config/handler actual facts, complete helper/
+recursive closure, writer/capacity/network/activation controls, composed source
+custody/permit and native/session/AT/release gates remain pending. Historical
+actual cleanup and unknown timeout-descendant absence remain inherited. All97
+non-evidence states/dependencies/criteria and complete local1.0 are unchanged.
+
 ## PR110 merged; distinct install-metadata host owner contract frozen
 
 PR110 merged 1f8f954082f9ea803b1e066c7bfd49b1527bbe5a from6458959.
