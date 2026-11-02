@@ -1,5 +1,40 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR111 merged; first read-only capture preparation begins
+
+PR111 merged1c39172dcd710f738c8eafc3be007656e4dfb7fc from7bc537c, current-head
+Planning CI41411258226 SUCCESS. MERGEABLE/CLEAN; rulesets empty/develop protection
+404, requested/submitted GitHub reviews and inline threads empty, CodeRabbit
+terminal skip/no actionables. Both initial axes and final253e2de0 clear; source/
+test/protocol bytes remain reviewed88a2e4d. Immediate merge blurb/watch removal.
+
+Root now codex/f1-02-install-metadata-first-capture on approved develop1c39172,
+clean before this coordinator checkpoint. No actual permit/capture or lab action.
+Use the protected candidate, never execute the owner from group-writable project
+or .t3 ancestry; no shared permissions were changed:
+/home/ian/.linuxcast-f102-preparations/install-metadata-candidate-88a2e4d
+Private report (beside candidate) SHA998a9fd433e28fa05f4e85fdbd246d1760e9aa4a16894c8c8cfdbe1b84d6fe85.
+All6 files0500-root/0400-regular, exact Git commit/tree/blob/SHA256 and actual
+source gate verified; identities unchanged, no bytecode. Report remains historical
+executionApproved=false, not a permit. Trusted preparation UID custody is not
+kernel immutability. Frozen six hashes/probe and protected ancestors must be
+rechecked at use; a fresh17-key permit and supervised closed invocation are next.
+Host imports/fixed source construction only so far, no returned guest program run.
+
+Read install-metadata-owner-protocol and existing actual-use/lifecycle evidence
+before the real invocation. Keep stdout/private artifact separate; no raw package,
+registry/config/handler bodies in public evidence. Do not run the tests-only
+FixtureGuard as a real lab owner. Actual owner main retains its reviewed caller/
+guardian/startup120/job30/guest25/total600/cleanup45 limits. Preserve independent
+caller custody, exact reaping/exit and fresh pinned stopped-exit0/marker/lock/source/
+permit postflight; do not replay failed input or infer cleanup from metadata alone.
+
+Pure hook verifier720140c remains held separately, unmerged/unreviewed. Actual
+helper/recursive closure, writer/capacity/network/activation, install/locale/
+build/containment/native/AT/session/release gates stay pending. No task/criterion
+promotion; all97/full local1.0, F1-02 in-progress/UI pending and historical unknown
+timeout-descendant absence remain unchanged. No active PR watch.
+
 ## PR111 opened; current-head CI and GitHub review gates pending
 
 https://github.com/ianwijma/linuxcast/pull/111 opened from4fc357b, base approved
