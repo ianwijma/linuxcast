@@ -1,5 +1,21 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR111 opened; current-head CI and GitHub review gates pending
+
+https://github.com/ianwijma/linuxcast/pull/111 opened from4fc357b, base approved
+PR110/develop1f8f954. Linked immediately; no merge yet. This follow-up records
+only PR state and preserves all reviewed88a2e4d source/test/protocol bytes.
+Internal initial/final reviews are complete and clear. Current-head CI,
+configured/requested GitHub reviews and review-bot completion must be inspected
+before expected-head merge. Watch follows the final metadata push; no polling.
+
+Protected six-file candidate and private QA report are unchanged. No actual
+permit, owner CLI, lab/guest/capture/install/native action; execution approval
+remains false. After merge, immediately report the merge and remove its watch,
+then prepare the fresh reviewed capture permit only within the closed domain.
+Pure hook verifier720140c remains held separately. All97/full local1.0 and
+F1-02 in-progress/UI pending states and historical timeout uncertainty stay.
+
 ## Install-metadata review loop clear; publication next
 
 Initial owner Standardsd2de0ad7 completed and was read in full: clear atc1783c9,
