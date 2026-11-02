@@ -96,7 +96,20 @@ Also collect only fixed capacity/locale/public trust facts: statvfs of `/`,
 `/opt`, `/var/cache/apt`; MemTotal/MemAvailable from bounded meminfo; own CPU
 affinity count; availability of en_US.UTF-8 without changing global settings;
 SHA256/size of the root-owned public Debian archive keyring at
-`/usr/share/keyrings/debian-archive-keyring.gpg` (<=256KiB). No private key bytes.
+`/usr/share/keyrings/debian-archive-keyring.pgp` (<=256KiB). This is the
+canonical regular file installed by Debian13's debian-archive-keyring2025.1;
+its compatibility `.gpg` name is a symlink and is not read or followed.
+The coordinator freezes this fixed-path correction after the reviewed projection
+capture returned unavailable/keyring. The documented packaging layout reproduces
+that refusal with injected files; the actual guest result does not independently
+identify a symlink as its cause. Read only the canonical `.pgp` path, with the
+existing no-follow, root-owner/mode, regular/single-link, retained identity,
+bounded read and final consistency checks. No fallback to `.gpg`, caller path,
+symlink resolution, extra read, trust assertion, limit or deadline change.
+Require the documented alias/canonical fixture to pass through collector/codec/
+host validation, and reject canonical symlinks, hardlinks, bad owner/mode, FIFO,
+replacement and oversized input. Fresh review, protected source and permit
+precede another guest capture. No private key bytes.
 Read dpkg/APT/keyring package versions from the projected status. Missing locale,
 keyring or fixed resource parent is a known missing fact, never invented bytes
 or readiness. Read failures remain unknown/unavailable. No resource quota bump.

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "actual-projection-public-evidence",
+  "files": {
+    "README.md": "a71f1f39b52bb237467f41b8d335d828229db60d15fa9d6f1ece793f3565cae3",
+    "invocation.json": "58f127ea4c41a8e72acec937a398639075ab0536c512b8547ff4cbc7492c60ef",
+    "owner-result.json": "9944899f3bd6b2868f4f5ebd2245c4fd41d2cbba2d0beeedf25bc5cd53b297d4",
+    "postflight.json": "f3a1710c64e2229e1c63dc6d9ace4b66e2d61eeec16a6d42eb1c6b252fa7cfd2",
+    "source-provenance.json": "b45b037b93ccfa0e9c4e4282ff072814ff813896a92579eeaeb333ac796f76aa"
+  }
+}

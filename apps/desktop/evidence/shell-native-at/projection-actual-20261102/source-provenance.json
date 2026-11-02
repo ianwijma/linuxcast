@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "approvedCommit": "0a363239473cfc81c2c3d4895d1d5c3df2f4fe87",
+  "reviewedCommit": "27a9f73873993439cddb8a8b5a50814f8bdc7991",
+  "captureId": "cf7b7c11-ea23-48e5-95a3-c86cd675e955",
+  "sourceManifestSha256": "e24bf321b70f32311beb6d8a6ab7b4e21d22a996277b878b629299b9e572156b",
+  "permitSha256": "7da0624c3aeb828c30213cc63cc57db8519aa92aec858ca2e14a1d7bb4fd7ace",
+  "sourceFiles": {
+    "lab_build_facts.py": {
+      "bytes": 47929,
+      "sha256": "f3893eac1b24724695ad3d42d6889b88119a329919fdd057ff911e3731d5b728"
+    },
+    "lab_owner.py": {
+      "bytes": 54043,
+      "sha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+    },
+    "outer-owner-inventory.json": {
+      "bytes": 1801,
+      "sha256": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d"
+    }
+  },
+  "embeddedGuestSource": {
+    "bytes": 19044,
+    "sha256": "795c80042ff12a8e330f9099aae6bc57112d04d3bb7cd8e0db5d2c58afca04fe"
+  },
+  "kind": "actual-fixed-projection-not-package-baseline",
+  "sourceDirectoryMode": "0500",
+  "sourceFileModes": "0400",
+  "permitMode": "0400",
+  "priorUsedPermitArchivedWithoutReplacement": true,
+  "priorPermitIdentityBytesModePreserved": true
+}

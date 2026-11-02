@@ -1,5 +1,27 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Projection capture unavailable/keyring; canonical path correction frozen
+
+Single reviewed27a9f73 capturecf7b7c11 on approvedPR104/0a36323 executed
+02:37:04.507860–02:37:39.161323UTC, monotonic34.644s/exit3/0retries. Valid
+unavailable/keyring; no snapshot/count/digest. Prior353 permit archived no-replace,
+source47929bytes/probe795c8004/19044 sealed, fresh14-key permit7da0624c.
+Exact caller reaped/ownECHILD, full pinned stopped/PID0/exit0, no marker,
+original0664 lock reacquired, unchanged source/permit/stderr0, cleanupnone.
+No live owner/guest/delegates/watch. Public projection-actual-20261102/ preserves
+curated actual output and provenance. Old timeout absence remains unknown.
+
+Offline Debian2025.1 Makefile/README show canonical regular.pgp plus.gpg symlink.
+Injected exact-layout collector probe gives1 behavioral red/0errors/FDs retired;
+actual guest cause still unknown (no metadata path type exposed). Protocol and
+schema freeze direct canonical.pgp before implementation; all no-follow/root/
+regular/single-link/bounds/custody/deadlines remain, no alias/fallback. Next add
+permanent regression, minimal source path change, full offline checks and fresh
+initial independent reviews before next protected source/permit/capture.
+All97/dependencies/criteria and full local1.0 unchanged; no package baseline,
+provision/build/native/AT/session/release acceptance.
+
+
 ## PR104 merged; fresh projection capture next
 
 PR104 https://github.com/ianwijma/linuxcast/pull/104 merged normally at
