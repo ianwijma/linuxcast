@@ -75,8 +75,8 @@ release-signing requirements are unchanged.
 
 ## Acceptance and limitations
 
-Initial independent Security/Spec review is clear as recorded below; the
-separate Standards review remains pending. No changed parser or
+Initial independent Security/Spec and Standards reviews are clear as recorded
+below. No changed parser or
 permit has run in the guest. The actual failing field's identity/category remains
 unknown; a projected field over its bound would still refuse. Both actual runs
 remain unavailable with no package baseline. Used sources, permits and private
@@ -104,5 +104,27 @@ hash, plan/syntax/whitespace. Its checkout stayed clean with matching fingerprin
 only its own generated dependencies were removed. No source or real lab action.
 Actual execution/cleanup and earlier TS checks remain inherited; private permit,
 harness and machine state were not accessed. All97 states/dependencies/criteria
-remain unchanged. Publication is pending the independent Standards outcome.
+remain unchanged. Publication follows the normal current-head CI/GitHub gates.
 This metadata addition preserves reviewed owner/test/helper/protocol bytes.
+
+## Initial independent Standards review
+
+Review6a27b37d completed on the same exact27a9f73/base63118f1; its final report
+was read in full. Standards and separate Spec observations both have zero
+findings. The reviewer confirmed None storage, retained selected-field/remaining
+guards and honest unknown-category evidence.
+
+Independently executed100 focused1.426s,55 mapped10.54s including395Python under
+18s/no skips; projection6/mutant3/diagnostic25/custody11/2/4 historical failures,
+zero errors/currentgreen;93 additional synthetic probes and47 hash/public-schema/
+provenance/AST/constant/plan/whitespace checks. All97 task states/dependencies/
+acceptance unchanged. All2879 tracked-content and index fingerprints matched;
+checkout clean and only its generated dependencies/cache removed. No source,
+private/lab, actual execution or publication changes. Earlier TS and real
+capture/cleanup evidence remain inherited. The actual field category remains
+unknown; no package/build/native/session/release or full-task acceptance follows.
+
+Both axes therefore clear the bounded preparation at27a9f73. Publication updates
+documentation/hashes/registry only; owner/tests/helper/protocol/elaboration stay
+byte-identical to reviewed source. Fresh sealed source and permit are still
+required after integration before any changed-parser capture.

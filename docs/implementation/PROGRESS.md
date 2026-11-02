@@ -1,5 +1,25 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Status projection both initial reviews clear; publication next
+
+Security/Specbb7a5297 and Standards6a27b37d completed/read on27a9f73/base63118f1;
+both clear, no code findings. Independent100focused/55mapped/all395Python under
+unchanged18s; old projection6/mutant3/diagnostic25/custody11/2/4 failures with
+zero errors/currentgreen. Spec126extra boundary-semantic/172bindings-registry,
+Standards93extra probes/47bindings-publicschema checks; AST outside parser and
+integer constants/embedded795c8004/19044bytes/plan/whitespace passed. Clean
+fingerprints, no reviewer source or actual lab work; old actual/TS evidence
+inherited. Sixteen-path/fourcommit reviewed scope preserved. Publication metadata
+keeps code/test/helper/protocol/elaboration byte-identical to27a9f73.
+
+Publish focused projection plus actual field-refusal evidence PR, inspect
+current-headCI/GitHub reviews/bots, merge promptly after gates. Then fresh sealed
+source/new14-key permit and one changed-parser capture. No such capture/new
+baseline yet; field category unknown and previous artifacts/permits preserved.
+Lab stopped, no commands/delegates/watch. All97/status/deps/criteria and old
+unknown timeout-descendant gap unchanged. Known signing socket outage uses
+user-authorized per-command unsigned fallback; release rules/config unchanged.
+
 ## Status projection initial Security/Spec clear; Standards still running
 
 Initial bb7a5297 completed/read on27a9f73/base63118f1: no P1/P2/P3 findings.
