@@ -1,5 +1,16 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR112 opened; current-head CI and GitHub gates pending
+
+https://github.com/ianwijma/linuxcast/pull/112 opened fromc5a0563 on approved
+PR111 merge1c39172; linked immediately. Initial evidence Standardsd8679dd1 and
+Security/Spec88e052b5 clear at2f4a1bf; publication changes review metadata only.
+Current-head checks/configured-requested reviews/bot completion must be inspected
+before exact-head normal merge. No runtime/source/pin or acceptance change.
+Public result and private snapshot remain the single actual successful capture,
+not a replay. Watch after final checkpoint push; no polling. Full97/local1.0,
+F1-02/UI and installation/build/native/session/release remain pending.
+
 ## Actual metadata evidence reviews clear; focused publication next
 
 Initial Standardsd8679dd1 and Security/Spec88e052b5 completed and final messages
