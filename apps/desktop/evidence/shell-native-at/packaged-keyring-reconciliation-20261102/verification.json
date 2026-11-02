@@ -1,0 +1,71 @@
+{
+  "acceptance": "pending",
+  "baselineCaptureId": "b19313d2-06eb-4077-b5cb-8075ee206a4e",
+  "baselineSnapshotSha256": "4fc728c09b869f4cae66ed058adb32d1d92804ca2862cf42cc7fbbb285364196",
+  "canonicalKeyringBytes": 55918,
+  "canonicalKeyringSha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017",
+  "canonicalRegularAndCompatibilitySymlinkVerifiedInPublicPackage": true,
+  "guestOperations": 0,
+  "initialAcquisitionBootstrap": "prior HTTPS-published fingerprints; final signatures verified with exact guest-matching packaged keyring",
+  "kind": "public-packaged-keyring-reconciled-not-install-authority",
+  "matchesRetainedGuestKeyringFact": true,
+  "packageExtractionToFilesystem": false,
+  "packageInstalls": 0,
+  "packageUrl": "https://deb.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2025.1_all.deb",
+  "publicPackage": {
+    "Architecture": "all",
+    "Filename": "pool/main/d/debian-archive-keyring/debian-archive-keyring_2025.1_all.deb",
+    "Package": "debian-archive-keyring",
+    "SHA256": "9ea7778e443144ca490668737a8ab22dd3e748bb99e805e22ec055abeb3c7fac",
+    "Size": "179244",
+    "Version": "2025.1",
+    "suite": "trixie"
+  },
+  "schema": 1,
+  "suitesReverifiedWithMatchingPackagedKeyring": {
+    "trixie": {
+      "date": "Sat, 12 Sep 2026 07:55:41 UTC",
+      "freshAtVerification": true,
+      "gpgvExitCode": 0,
+      "inReleaseSha256": "0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675",
+      "packagesSha256": "7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498",
+      "releaseSha256": "ed56aac47e7911e65ee63aae8d67e29f20e023f840e49f8ed037043a33de138a",
+      "signerFingerprints": [
+        "4CB50190207B4758A3F73A796ED0E7B82643E131",
+        "B8E5F13176D2A7A75220028078DBA3BC47EF2265",
+        "41587F7DB8C774BCCF131416762F67A0B2C39DE4"
+      ],
+      "validSignatures": 3,
+      "validUntil": null
+    },
+    "trixie-security": {
+      "date": "Sun, 01 Nov 2026 12:12:11 UTC",
+      "freshAtVerification": true,
+      "gpgvExitCode": 0,
+      "inReleaseSha256": "6f64e49b0c96174839bc6ba03d22d97ffe96c746602b9a413779324673e098fc",
+      "packagesSha256": "a05d49ec16890db9bdbbe25ecbcb9d106d06bbaf410b4420fb9f2575c777a7e6",
+      "releaseSha256": "9ca5555dfde56b42f06f2fdc707a5b07e49f086fe4552d79a99ac8dc7990dfbb",
+      "signerFingerprints": [
+        "B0CAB9266E8C3929798B3EEEBDE6D2B9216EC7A8",
+        "89C87ACEA5DD6B8E6A7068808E9F831205B4BA95"
+      ],
+      "validSignatures": 2,
+      "validUntil": "Sun, 08 Nov 2026 12:12:11 UTC"
+    },
+    "trixie-updates": {
+      "date": "Sun, 01 Nov 2026 08:09:02 UTC",
+      "freshAtVerification": true,
+      "gpgvExitCode": 0,
+      "inReleaseSha256": "878f891a824d2420ad5a386c2b7d6ef79cd89e961f48c7a9a1db1bca7ed02bfe",
+      "packagesSha256": "7b52592d46eb9bf694ffd99b90fb521064a6bfd1d0a9f69f22cabf31cb7ea38e",
+      "releaseSha256": "c522a15652467833de10a00482b9a0097fec07c77082e8a75d69205881be4814",
+      "signerFingerprints": [
+        "4CB50190207B4758A3F73A796ED0E7B82643E131",
+        "B8E5F13176D2A7A75220028078DBA3BC47EF2265"
+      ],
+      "validSignatures": 2,
+      "validUntil": "Sun, 08 Nov 2026 08:09:02 UTC"
+    }
+  },
+  "verifiedAtUtc": "2026-11-02T03:05:14.129597+00:00"
+}

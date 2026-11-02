@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "private-copy-one-byte-signature-rejection",
+  "verifiedAtUtc": "2026-11-02T03:08:45.648647+00:00",
+  "sourceInReleaseSha256": "0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675",
+  "tamperedCopySha256": "6395a17f2f94049afc10a7951d373563ac7a7c7b1fa84d698b2327d9f6407ba7",
+  "changedBytes": 1,
+  "gpgvExitCode": 1,
+  "badSignatures": 1,
+  "validSignatures": 0,
+  "originalMetadataUnchanged": true,
+  "guestOperations": 0,
+  "packageInstalls": 0
+}

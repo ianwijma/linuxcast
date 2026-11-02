@@ -1,5 +1,103 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Observed baseline/trust both reviews clear; evidence publication next
+
+Initial Standardsa16ef09e and SecuritySpec57698dc2 completed/read in full at
+d70ecc9/baseapprovedPR105bf4b492. Actualdiff13paths/3commits (brief14corrected),
+no code/test/protocol changes. Each independently publicpackage/keyring/alias,
+Release-index-artifact hashchain/sizes/freshness, signatures3/2/2/exactpayloads/
+onebytetamper reject. Standards35bindings+probe/25controls/registryregeneration;
+Spec10files/pins/19focusedtests/28extra malformedcrossrecord controls/all3tamper.
+Plan/whitespace, cleanworktrees/publiccache fingerprints, all97states unchanged.
+Private actual capture/cleanup/baseline/permitharness remain inherited. Final
+publicationmetadata preserves rawpublicJSON and reviewedsource. Publishfocused
+metadata PR/currentheadchecks-GitHubreviews gates thenpromptmerge.
+
+Solver preparation a1193cc1 remains delegated; no polling/restart. Labstopped,
+no liveowner/guest/watch. No install/build/native/AT/fulltask acceptance.
+
+Independent root sidepreparation (not reviewed/merged proof): exactBunlock42c4f163
+has1003npm+1GitHub+20workspace (earlier1004registry shorthand corrected).
+936linux/x64-eligible resolutions dedupe811archives, allSRIverified in9.035s,
+91412138compressedbytes,0failures/0retries. Sealed outsideLAB in
+f102-public-js-artifacts-20261102/{inventory.json,verification.json,collector.py,
+inventory-parser.mjs,archives/};0500dirs/0400files. Explicitplatformexcluded68;
+no packageinstall/lifecycle/extraction, Bunofflineinstall unverified, Electron
+runtime notincluded. Next audit archive/resource metadata and exactcachematerialization.
+All97/state/deps/criteria/full1.0 and oldunknown timeoutabsence unchanged.
+
+
+## Packaged trust anchor reconciled; exact Debian solver preparation ready
+
+Actual cc158ab capture remains observed767/247006/SHA4fc728c0, stopped/clean.
+Coordinator matched exact recorded guest keyring hash/55918bytes to authenticated
+Debian2025.1 package179244bytes/SHA9ea7778e. All3 cached indexes compressed/
+expanded hashes/sizes and dates/expiry rechecked; exact .deb inspected in memory,
+no install/extract. Matching public packaged keyring reverified InRelease3/2/2
+signatures and exactReleasebytes. Onebyte privatecopy tamper exit1/BADSIG1/
+VALIDSIG0, originalsunchanged. Rawpublic inputssealedoutsideLAB in
+f102-public-debian13-keyring-reconciled-20261102, small public evidence folder
+packaged-keyring-reconciliation-20261102/. No guest/hostAPT/keyring change.
+
+Private solverinputs: .worktrees/f102-private-solver-baseline-20261102/
+status,facts.json,provenance.json0400/root0500. ProjectedstatusSHA4786a2907757f76af0c1b01f36cb7f884b30cd36ef70d047fb2719d9be23c8b8,
+originalgueststatus and canonical snapshot hashes remain separatelyrecorded.
+NEVER writeprojectiontoguestdpkg. Clean/noholds/noforeign, enUS.UTF8missing;
+exactDebianAPT3 isolatedcompiler/dev/locale resolution and package phase review
+next. OldhostAPT2.4 attempts are failedexplorations, not closureproof. No
+npmarchives/cache downloaded/installed; prior lockaudit1004registry+20workspace.
+
+Next initial independent evidence Standards+SecuritySpec checks on this bounded
+metadata increment, plus disjoint exact offline resolver preparation. No live
+owner/guest/watch. No installation/provision/build/native/AT/session/release
+acceptance; all97/deps/criteria/full1.0 intact, old timeout absence unknown.
+
+
+## Canonical capture observed; exact offline package/locale resolution next
+
+One reviewedcc158ab/approvedPR105bf4b492 metadata captureb19313d2 completed
+02:55:29.447432–02:56:06.693582UTC,37.229s/exit0/0retries. Observed767records/
+247006privatecanonicalbytes/SHA4fc728c09b869f4cae66ed058adb32d1d92804ca2862cf42cc7fbbb285364196.
+Protectedsource47929/probe0d7cab8b/19044, fresh14keypermit29c3cd5b; old27a permit
+archived no-replace/inode/bytes/mode unchanged. Exactcallerreaped/ownECHILD,
+full pinned stopped/PID0/exit0, markerabsent, original0664lock reacquired,
+unchanged source/permit/stderr0, lifecyclecompleted/none/cleanupnone/clean.
+Public canonical-keyring-actual-20261102/ only closed result/hashes/provenance;
+private snapshot f102-build-facts-b19313d2-06eb-4077-b5cb-8075ee206a4e.json0400.
+
+Private fresh reservation/host validator revalidates snapshot. Clean package
+state/noholds/noforeignarch, knowncapacity/keyring; en_US.UTF-8 missing. Private
+baseline-consumer.json in f102-build-facts-actual-20261102-cc158ab contains needed
+downstream facts; not public. First localconsumer called nonexistent capture()
+then closedlease/no dispatch; corrected pin access succeeds, no capture replay.
+Next reconcile exact packaged-keyring digest with signed Debian public artifact,
+resolve exact compiler/dev/locale closure preserving installed baseline, freeze
+closed offline preparation/install/stage/build authority and custody before use.
+No live processes/delegates/watch, lab stopped. All97/task/deps/criteria/full1.0
+unchanged; no install/build/native/AT/session/release acceptance. Old unknown
+timeout absence and earlier refusal source/results/permits preserved.
+
+
+## PR105 merged; fresh canonical keyring capture next
+
+PR105 https://github.com/ianwijma/linuxcast/pull/105 merged normally at
+bf4b49261abab0ac3e8424fabc4afafdd5e93eda fromfec0ededd3cbc099e3be083e2ec554176b0b5f71.
+Current PlanningCI41380097525SUCCESS/MERGEABLE-CLEAN, no requested/submitted
+GitHub reviews, terminal CodeRabbit skip/no actionable feedback; rulesetsnone/
+develop protection404, no override. Both initial independenta86c6617/3beb9a22
+clear oncc158ab, each104focused/55mapped/all399Python under18s plus controls/
+extra probes/type/lint/plan/hash/whitespace. Publication preserves reviewed code.
+Immediate tiny merge blurb sent, watch removed. No live commands/delegates/watch.
+
+Root codex/f1-02-canonical-keyring-capture starts approvedbf4b492. Next seal exact
+reviewedcc158ab ownerd2cde7f3/probe0d7cab8b/19044bytes, archive used27a9f73 permit
+no-replace preserving identity/bytes/mode, fresh14-key permit and one fixed
+coordinator metadata capture. Verify same stoppedexit0/container/root/lock
+identities, no marker, exact linuxcast/sudo/guardian/deadlines; no such capture
+at this checkpoint. Actual last keyring cause still unknown, no packagebaseline.
+All97/dependencies/criteria/full1.0 and historical timeout absence unchanged.
+
+
 ## Canonical keyring both reviews clear; focused publication next
 
 Standardsa86c6617 and SecuritySpec3beb9a22 final reports completed/read in full
