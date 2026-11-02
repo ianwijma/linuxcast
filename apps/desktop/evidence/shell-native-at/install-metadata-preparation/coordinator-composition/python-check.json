@@ -1,0 +1,9 @@
+{
+  "complete": true,
+  "executed": 526,
+  "nativeRun": false,
+  "deadlineMs": 18000,
+  "elapsedMilliseconds": 14568.836,
+  "seconds": 14.569,
+  "measurementNote": "Original performance.now delta was milliseconds; corrected field units without repeating execution."
+}

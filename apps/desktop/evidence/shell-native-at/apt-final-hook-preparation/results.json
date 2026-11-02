@@ -1,0 +1,102 @@
+{
+  "schema": "f102-apt-final-hook-controls-v1",
+  "realInstallAuthorized": false,
+  "runs": [
+    {
+      "schema": "f102-private-apt-final-hook-control-v1",
+      "uid": 1000,
+      "simulate": false,
+      "noLocking": false,
+      "noQueue": false,
+      "syntheticDpkg": true,
+      "passSyntheticHook": false,
+      "realPackageMutationPossible": false,
+      "kernelNetworkDenialVerified": false,
+      "records": [
+        {
+          "name": "loader-list",
+          "exit": 0,
+          "seconds": 0.004,
+          "childrenAbsent": true
+        },
+        {
+          "name": "rejecting-hook",
+          "exit": 100,
+          "seconds": 0.557,
+          "childrenAbsent": true
+        }
+      ],
+      "hookReceived": true,
+      "mutatingDpkgRefused": false,
+      "hookLockProbe": {
+        "lock-frontend": "contended",
+        "lock": "acquired"
+      },
+      "statusUnchanged": true,
+      "extendedStatesUnchanged": true,
+      "originalInputsUnchanged": true,
+      "copiedInputCount": 124,
+      "hookProtocol": 3,
+      "hookBytes": 19896,
+      "hookSha256": "2222429d9f86ddd4ddd2dd3dde3c72b78018a68b9af16f0fa63e7c939cacce2e",
+      "actionCount": 110,
+      "archiveActions": 55,
+      "configureActions": 55,
+      "removeActions": 0,
+      "exactCandidateActions": true,
+      "privateFixtureRoot": "/tmp/f102-apt-final-hook-1bvztw0o",
+      "fakeDpkgRefusal": null
+    },
+    {
+      "schema": "f102-private-apt-final-hook-control-v1",
+      "uid": 1000,
+      "simulate": false,
+      "noLocking": false,
+      "noQueue": false,
+      "syntheticDpkg": true,
+      "passSyntheticHook": true,
+      "realPackageMutationPossible": false,
+      "kernelNetworkDenialVerified": false,
+      "records": [
+        {
+          "name": "loader-list",
+          "exit": 0,
+          "seconds": 0.004,
+          "childrenAbsent": true
+        },
+        {
+          "name": "passing-hook-control",
+          "exit": 100,
+          "seconds": 0.593,
+          "childrenAbsent": true
+        }
+      ],
+      "hookReceived": true,
+      "mutatingDpkgRefused": true,
+      "hookLockProbe": {
+        "lock-frontend": "contended",
+        "lock": "acquired"
+      },
+      "statusUnchanged": true,
+      "extendedStatesUnchanged": true,
+      "originalInputsUnchanged": true,
+      "copiedInputCount": 124,
+      "hookProtocol": 3,
+      "hookBytes": 19896,
+      "hookSha256": "198cc2ed1597391b3b807cbe69ca3e369f89871878f68ec6d2820498fbf254b5",
+      "actionCount": 110,
+      "archiveActions": 55,
+      "configureActions": 55,
+      "removeActions": 0,
+      "exactCandidateActions": true,
+      "privateFixtureRoot": "/tmp/f102-apt-final-hook-5a6u9bbi",
+      "fakeDpkgRefusal": {
+        "exit": 74,
+        "operation": "unpack",
+        "autoDeconfigureRequested": true,
+        "archiveCount": 55,
+        "statusFdPresent": true
+      }
+    }
+  ]
+}

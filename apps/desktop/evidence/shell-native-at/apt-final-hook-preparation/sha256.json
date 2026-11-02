@@ -1,0 +1,25 @@
+{
+  "schema": "f102-apt-final-hook-evidence-v1",
+  "files": {
+    "README.md": {
+      "bytes": 7171,
+      "sha256": "e4b55fc2b1a1fd27f3003bddf9c1adea21eb4a53aab4f0be6c9ce1b2327e1524"
+    },
+    "actions.json": {
+      "bytes": 35195,
+      "sha256": "91ccfd748ff9d680023f8b031a9946d29c2a9f938eedb0d49b0a49794cc28be8"
+    },
+    "fixture.py": {
+      "bytes": 10741,
+      "sha256": "6dc11d160ba4b85a253e0aec33db0b0b3b8673d39141e218c73cafa0f33b8d80"
+    },
+    "results.json": {
+      "bytes": 2870,
+      "sha256": "c1305dda85ac1fc4c4c915e8bc2f7955d90aa19cebf6161bbcb4300b2297db40"
+    },
+    "runtime-files.json": {
+      "bytes": 11691,
+      "sha256": "cffecb47bbb40726b1a3f366850d309eaf35cc35315f9368e57688152a5bf37e"
+    }
+  }
+}

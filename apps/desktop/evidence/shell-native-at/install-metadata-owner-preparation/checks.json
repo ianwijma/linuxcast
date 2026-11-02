@@ -1,0 +1,156 @@
+{
+  "schema": "f102-install-metadata-owner-preparation-checks-v1",
+  "preparedBase": "0f82f960d5ce0fb438f4bd119957d8b3585b4ffd",
+  "approvedContext": "1f8f954082f9ea803b1e066c7bfd49b1527bbe5a",
+  "platform": {
+    "kernel": "7.1.1-76070101-generic",
+    "architecture": "x86_64",
+    "node": "24.22.1",
+    "bun": "1.4.4",
+    "python": "3.10.12"
+  },
+  "executed": {
+    "focused": {
+      "command": "python3 -B -m unittest discover -s apps/desktop/tests/at -p test_lab_install_metadata_owner.py -q",
+      "tests": 67,
+      "seconds": 0.782,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "fullPython": {
+      "discovery": "apps/desktop/tests/at/test_*.py",
+      "tests": 469,
+      "existingTests": 402,
+      "newTests": 67,
+      "runnerSeconds": 10.429,
+      "includingDiscoverySeconds": 10.541,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "expectedFailures": 0,
+      "unexpectedSuccesses": 0
+    },
+    "mappedSecurity": {
+      "command": "bun run test:security -- F1-02",
+      "tests": 55,
+      "files": 6,
+      "durationSeconds": 11.11,
+      "pythonWrapperSeconds": 10.04,
+      "pythonTimeoutMs": 18000,
+      "passed": true
+    },
+    "typecheck": {
+      "command": "bun run typecheck",
+      "exit": 0,
+      "write": false
+    },
+    "lint": {
+      "command": "bun run lint",
+      "exit": 0,
+      "write": false,
+      "warnings": 0
+    },
+    "dependencies": {
+      "command": "bun install --frozen-lockfile --backend=copyfile --ignore-scripts",
+      "exit": 0,
+      "packages": 805,
+      "lifecycleScripts": false
+    },
+    "ast": {
+      "files": 2,
+      "passed": true
+    },
+    "plan": {
+      "command": "python3 scripts/validate_plan.py",
+      "exit": 0,
+      "tasks": 97
+    },
+    "mutants": {
+      "privateActualSourceCopies": 4,
+      "expectedAssertionFailures": 4,
+      "errors": 0,
+      "skips": 0,
+      "originalUntouched": true,
+      "guards": [
+        "trailing-zlib-stream",
+        "unavailable-capture-binding",
+        "artifact-readback",
+        "source-identity"
+      ]
+    },
+    "ordinaryFixtures": {
+      "cases": 5,
+      "supervisor": "unchanged test_lab_owner.FixtureGuard",
+      "exactPidfds": true,
+      "reapedAndECHILD": true,
+      "realExternalDispatchTrapped": true
+    }
+  },
+  "testGroups": {
+    "Files": 39,
+    "Wire": 12,
+    "Sources": 10,
+    "Ordinary": 5,
+    "MutationControls": 1
+  },
+  "limits": {
+    "startupSeconds": 120,
+    "jobSeconds": 30,
+    "guestSourceContractSeconds": 25,
+    "ownerSeconds": 600,
+    "cleanupSeconds": 45,
+    "transportBytes": 65536,
+    "packetBytes": 60000,
+    "snapshotBytes": 2097152,
+    "relayPublicBytes": 4096
+  },
+  "scope": {
+    "newHost": true,
+    "collectorAbsentOnBase": true,
+    "privateFixtureCodecOnly": true,
+    "finalCompositionProved": false,
+    "existingSourceEdits": false,
+    "registryEdits": false,
+    "realPermitCreated": false,
+    "actualCapture": false,
+    "guestOrNativeOperation": false,
+    "childrenDelegated": 0
+  },
+  "acceptance": {
+    "F0-01": "inherited-accepted",
+    "F1-02": "in-progress-unchanged",
+    "F1-02-AC01": "historical-passed-unchanged",
+    "F1-02-AC02": "historical-passed-unchanged",
+    "F1-02-PRIVACY": "historical-passed-unchanged",
+    "F1-02-UI": "pending-unchanged",
+    "allTasks": 97,
+    "completeLocal1_0Scope": "unchanged"
+  },
+  "requiredBeforeCapture": [
+    "actual collector composition and API/schema validation",
+    "combined tests within original bounds",
+    "independent complete-source and custody reviews",
+    "protected immutable source ancestry",
+    "fresh distinct permit binding all six actual hashes"
+  ],
+  "notEstablished": [
+    "helper/runtime custody",
+    "recursive effects",
+    "diversions",
+    "writer exclusion",
+    "install admission or rollback",
+    "locale/provisioning",
+    "build/receipt",
+    "native/AT/session/release",
+    "historical timeout descendant absence"
+  ],
+  "commitSigning": {
+    "normalAttemptBoundSeconds": 25,
+    "normalExit": 128,
+    "failure": "1Password socket unavailable",
+    "fallback": "git -c commit.gpgsign=false commit",
+    "persistentConfigurationChanged": false,
+    "signatureHeader": false
+  }
+}

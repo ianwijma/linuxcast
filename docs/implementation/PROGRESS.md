@@ -1,5 +1,186 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR111 opened; current-head CI and GitHub review gates pending
+
+https://github.com/ianwijma/linuxcast/pull/111 opened from4fc357b, base approved
+PR110/develop1f8f954. Linked immediately; no merge yet. This follow-up records
+only PR state and preserves all reviewed88a2e4d source/test/protocol bytes.
+Internal initial/final reviews are complete and clear. Current-head CI,
+configured/requested GitHub reviews and review-bot completion must be inspected
+before expected-head merge. Watch follows the final metadata push; no polling.
+
+Protected six-file candidate and private QA report are unchanged. No actual
+permit, owner CLI, lab/guest/capture/install/native action; execution approval
+remains false. After merge, immediately report the merge and remove its watch,
+then prepare the fresh reviewed capture permit only within the closed domain.
+Pure hook verifier720140c remains held separately. All97/full local1.0 and
+F1-02 in-progress/UI pending states and historical timeout uncertainty stay.
+
+## Install-metadata review loop clear; publication next
+
+Initial owner Standardsd2de0ad7 completed and was read in full: clear atc1783c9,
+53 collector/67 owner/four composition,55 mapped/526 Python15.207s; historical
+controls, hashes, type/lint/AST/plan/whitespace and clean fingerprints pass.
+Final bounded253e2de0 was read fully: Security/Spec and Standards of correction
+clear at88a2e4d. Both owner P2s closed;69 owner/nine composition,55 mapped and
+533 Python16.914s under18s, no skips. Four private guard mutants expose eight
+behavioral failures; seven regressions expose14 BASE failures, all zero errors;
+five extra probes pass.13 old+13 current bindings, unchanged probe/ten inputs,
+all97 records and exact clean fingerprints verified. Earlier review axes remain
+separate evidence, not replaced by the final correction review.
+
+Coordinator now has a six-file read-only candidate under protected home prefix:
+/home/ian/.linuxcast-f102-preparations/install-metadata-candidate-88a2e4d.
+Exact commit/tree/blob identities and reviewed SHA256/size bindings verified;
+root0500/files0400, actual unmodified source gate passes, six identities unchanged.
+Project/.t3 ancestry did not satisfy that gate; no shared modes changed. Private
+candidate reportSHA998a9fd433e28fa05f4e85fdbd246d1760e9aa4a16894c8c8cfdbe1b84d6fe85.
+Only host imports/fixed source construction ran; guest source was not executed.
+No permit or owner CLI, executionApproved=false; trusted preparation UID custody,
+not kernel immutability. Candidate can be reconsidered after publication gates.
+
+Publication changes coordinator metadata only, preserves88a2e4d code/tests/protocols.
+Focused PR/current-head CI/GitHub review-bot checks are next. No current PR/watch.
+Pure hook verifier720140c stays held separately, unreviewed/unmerged. No actual
+lab/guest/install/compiler/native capture or acceptance promotion; all97/full
+local1.0, F1-02 in-progress/UI pending and old timeout uncertainty remain intact.
+
+## Owner marker custody and known failure reasons corrected
+
+Initial owner Security/Spec7e2125e8 was read in full at c1783c9. Collector
+framing and actual codec adapter passed recheck. Two new owner P2s: source
+validation followed marker deletion; reply validation swallowed deadline/
+interrupted causes. Root now rechecks the admitted closure before fresh marker
+removal and records a prior-marker recovery mode from the existing transact
+used/load decision. Normal prior recovery still works with collector absent;
+an uncached caller after guardian loss conservatively requires the closure.
+No new preflight read, marker/domain schema, command or deadline.
+
+Both source/artifact validation retain fixed known first causes and invalidate
+observation/clean release separately. The same audit covered close's boolean
+boundary: first fixed close reason is retained internally, reported as cleanup
+when there was no earlier operation failure. Tiny masked invalidation is only
+reason selection and one C dictionary update, never I/O. FileIO custody and
+ambiguous-close/reuse behavior remain unchanged.
+
+69 owner and9 composition tests pass. Seven new methods yield14 behavioral
+failures/zero errors on exact c1783c9 owner source, fixed green; real ALRM/TERM
+across source/artifact validation/close, earlier transport, source mutation,
+marker retention and missing-collector prior recovery are covered. 55 mapped
+security passes with533 Python16.742s; exact payload533 complete/nativefalse
+16.782s under18s. Typecheck/lint, AST/plan/whitespace and13 historical/current
+bindings pass; other10 input bindings and collector/probe stay unchanged.
+Separate new current hashes preserve all earlier snapshots.
+
+Initial owner Standardsd2de0ad7 remains separate/pending; do not poll. Fresh
+bounded final recheck is next for the correction, no PR or watch. Both must be
+accounted for before publication/use. Pure hook verifier720140c remains held
+separately, unmerged and unreviewed. No real permit/owner CLI/capture/lab/guest/
+root/install/compiler/native operation or acceptance promotion. F1-02 stays in
+progress/UI pending; all97 states/dependencies/criteria/full local1.0 and old
+unknown timeout-descendant absence remain unchanged.
+
+## Real install-metadata composition and framing correction ready for review
+
+Both initial collector reviews at cfa3813 were read in full: Standards
+12c56474 clear; Security/Spec 4ee8dec3 found one registry-framing P2. Guest and
+independent host now require final LF and <=1022 content bytes. Three new methods
+reproduce six behavioral failures/zero errors against exact cfa source, then
+pass fixed source; valid 1022 content still accepts. The historical control
+needed its fixture default bound to the old guest to expose both parsers.
+
+Host author 66b1c56 delivered six new files, imported as 5be5cfe. Root corrected
+its fail-closed API mismatch: actual collector FAILURES excludes none; the
+adapter adds the observed sentinel only to internal wire codes. Four actual
+source/six-hash closure/codec/private-artifact/public-summary tests pass and
+fail the original adapter with four behavioral assertions/zero errors. Tests
+use an explicit private source-parent profile, injected guest and fake Lab;
+external dispatch is forbidden. No actual lab/default guest collection.
+
+Coordinator: 53 collector, 67 owner, four composition, 55 mapped tests pass.
+The exact wrapper payload completes all 526 Python cases in 14.569s under18s.
+The evidence formatter initially labelled the performance.now delta as seconds;
+its units were corrected with raw milliseconds retained, without a rerun.
+Full typecheck/lint, AST/plan/whitespace, 23 historical and13 current bindings
+pass. Author evidence/hashes remain historical snapshots; current source/probe
+bindings are separate. Initial owner two-axis review and collector correction
+recheck are next. No PR.
+
+Pure hook verifier saved separately at720140c on
+codex/f1-02-install-hook-verifier, frozen contract9aae1bd, outside this review.
+20 synthetic tests, three mutation controls and55 mapped checks/472 Python pass;
+nonexecuting byte checks cover55 archives/77072036 bytes and four refusals. It
+adds no installer/CLI/source-custody authority; independent review is pending.
+Resume after current composition reviews and capture prerequisites.
+
+No real permit/capture/owner CLI/lab/guest/root/install/compiler/native operation,
+configuration change or acceptance promotion. Protected immutable source custody,
+a fresh17-key/six-hash permit, actual facts/helper/recursive closure, writer/
+capacity/containment/install/build/native-AT/session/release gates remain pending.
+Historical cleanup and unknown old timeout descendants remain inherited. All97
+task states/dependencies/criteria and full local1.0 remain intact; F0-01 accepted,
+F1-02 in progress/UI pending.
+
+## Collector integrated; APT final-hook boundary exercised offline
+
+Root codex/f1-02-install-metadata-integration carries the frozen collector/targets
+and distinct host-owner contract plus six author c72cf01 additions, imported
+byte-identically as74459a4. Author reports50focused/all452Python/55mapped/type/
+lint/AST/hash/plan checks; coordinator independently50focused and55mapped pass,
+including the452-case payload in13.247s under unchanged18s. Quoted source48812B;
+no default guest collection occurred. Author/root integration commits are
+honestly unsigned using the authorised per-command fallback; signing config is
+unchanged. The separate host owner continues asynchronously; no polling or
+actual owner/permit/transport/capture occurs. Both initial independent review
+axes are next for the fixed collector/contract/research checkpoint.
+
+New coordinator host-only APT3 control runs non-simulated private state with a
+fixed refusing fake dpkg. Exit73 final hook receives all110 v3records matching
+55candidate archive/configure pairs and prevents every dpkg call. Passing the
+synthetic hook reaches only fake unpack refusal74. The hook's independent POSIX
+probes find frontend contended and inner database lock available. All124copied
+input fingerprints stay unchanged; exact children/descendants are reaped with
+ECHILD. The experiment establishes neither a final admission implementation nor
+writer exclusion or installation success. Its private baseline/raw streams stay
+outside Git; public55action trace, source and conservative result metadata are
+in apt-final-hook-preparation. Harness corrections/refusals are disclosed.
+
+No real dpkg, maintainer script, guest, compiler, installation, locale, build or
+native operation occurred. Trigger/config/handler actual facts, complete helper/
+recursive closure, writer/capacity/network/activation controls, composed source
+custody/permit and native/session/AT/release gates remain pending. Historical
+actual cleanup and unknown timeout-descendant absence remain inherited. All97
+non-evidence states/dependencies/criteria and complete local1.0 are unchanged.
+
+## PR110 merged; distinct install-metadata host owner contract frozen
+
+PR110 merged 1f8f954082f9ea803b1e066c7bfd49b1527bbe5a from6458959.
+Planning CI41395416085 passed; CLEAN/MERGEABLE, no requested/submitted GitHub
+reviews or inline threads, CodeRabbit terminal skip/no actionables. Both initial
+independent provenance reviews were clear; publication preserved reviewed bytes.
+The merge blurb was immediate and watch removed. No acceptance was promoted.
+
+Root codex/f1-02-install-metadata-host-owner starts approvedPR1101f8f954. It imports
+only the research report, collector protocol and targets from frozen4284ff0, then
+freezes install-metadata-owner-protocol.md before host implementation. Collector
+implementation2da445bc remains separate/async, no polling. An implementation
+steer clarified the internal source_bytes/decode_packet/validate_snapshot/FAILURES
+API without changing its original wire/read-scope contract or restarting it.
+
+The distinct host owner will own only two new Python files and evidence. It
+uses a separate17-key permit, pins all six source/data/probe dependencies,
+reuses existing lifecycle and artifact custody, and exposes only bounded digest/
+count results. No existing owner/collector/domain or execution pins change.
+Missing collector fails before dispatch; synthetic fixture codecs establish
+host behavior only. Fully composed independent review and immutable custody/
+fresh coordinator-only permit precede any actual read-only capture.
+
+Package/root install, helper/runtime and recursive trigger closure, writer
+exclusion, locale/provision/build/receipt, native/session/AT/release acceptance
+remain pending. No guest, real owner CLI, root, toolchain or native operation.
+Last guest shutdown and historical timeout-descendant uncertainty stay inherited.
+All97 non-evidence task states/dependencies/criteria/full local1.0 remain unchanged.
+
 ## Toolchain provenance: both initial reviews clear; publication next
 
 Both initial independent reviews were completed and read in full at c0bfc1a,

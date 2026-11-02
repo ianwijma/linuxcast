@@ -1,0 +1,68 @@
+{
+  "schema": "f102-install-metadata-owner-correction-bindings-v1",
+  "base": "c1783c931951a0b3729948790d4192090a4e3b36",
+  "changedCode": [
+    "apps/desktop/tests/at/lab_install_metadata_owner.py",
+    "apps/desktop/tests/at/test_install_metadata_composition.py",
+    "apps/desktop/tests/at/test_lab_install_metadata_owner.py"
+  ],
+  "files": {
+    "apps/desktop/tests/at/install_metadata.py": {
+      "bytes": 80729,
+      "sha256": "62af6f87d9d8038ed01bbc7ec50a982bb6ca80911bfe2f28ca0a350720965e3c"
+    },
+    "apps/desktop/tests/at/test_install_metadata.py": {
+      "bytes": 54650,
+      "sha256": "a084aeeea10255a5e3e1c32b190aec5a7ddb1272f47667e78749e89db130788f"
+    },
+    "apps/desktop/tests/at/lab_install_metadata_owner.py": {
+      "bytes": 29038,
+      "sha256": "f50eb18683a3080a3aa92eaa18b4fad7278cb5a2de996425944846a52d3bac68"
+    },
+    "apps/desktop/tests/at/test_lab_install_metadata_owner.py": {
+      "bytes": 73452,
+      "sha256": "9c3546ad2e219ffdbc26be473f7cf2344de9a118b863bf877b8e4a9aa65a6559"
+    },
+    "apps/desktop/tests/at/test_install_metadata_composition.py": {
+      "bytes": 10951,
+      "sha256": "06f7c8049aaa0b7e7464d924a5a7f9a6d22826c3a848d4a32ccf554c5ff3d6e5"
+    },
+    "apps/desktop/tests/at/lab_owner.py": {
+      "bytes": 54043,
+      "sha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+    },
+    "apps/desktop/tests/at/lab_build_facts.py": {
+      "bytes": 47929,
+      "sha256": "d2cde7f381e11cdc89075e94897a2d80b7a6fdf291d7c9bf6a859a3dade89b4b"
+    },
+    "apps/desktop/tests/at/install-metadata-protocol.md": {
+      "bytes": 12583,
+      "sha256": "22d5f0ac84c22b04775fe4b5c5a9980e8eaa25c86104512982f7c14bb089d349"
+    },
+    "apps/desktop/tests/at/install-metadata-owner-protocol.md": {
+      "bytes": 10752,
+      "sha256": "4aee0b96fa5668b92b5ccd517964d3c537254d8cf806beeaabfc60ac5b120ae0"
+    },
+    "apps/desktop/tests/at/install-metadata-targets.json": {
+      "bytes": 38966,
+      "sha256": "59e3967d9110c7b451a0ba5181382eef395967bdb4945ef1ceec9561f987f153"
+    },
+    "apps/desktop/tests/at/outer-owner-inventory.json": {
+      "bytes": 1801,
+      "sha256": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d"
+    },
+    "apps/desktop/tests/at-preparation.security.test.ts": {
+      "bytes": 1103,
+      "sha256": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c"
+    },
+    "scripts/test-runner/suites.json": {
+      "bytes": 22214,
+      "sha256": "0760584a36d10938b70ee041db9bb910a07130dc7fec35ec6d8edd797789d8bd"
+    }
+  },
+  "probe": {
+    "bytes": 48814,
+    "quotedBytes": 48848,
+    "sha256": "8de614aa1dc4fd4855bae2c18da19b1584c93a2f235d91986762bb5cc8eb7492"
+  }
+}

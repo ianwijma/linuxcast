@@ -1,0 +1,20 @@
+{
+  "files": {
+    "apps/desktop/tests/at/install_metadata.py": "3f6a80370f6a88017adccf44030737a88005b4cc99eeeb353e0e1a1e5a16cf9c",
+    "apps/desktop/tests/at/test_install_metadata.py": "cce0e1ebcdd63d0503332ccb4e5799916e536628d3a23bd9fa5c5af5151dfe0f",
+    "apps/desktop/tests/at/install-metadata-protocol.md": "22d5f0ac84c22b04775fe4b5c5a9980e8eaa25c86104512982f7c14bb089d349",
+    "apps/desktop/tests/at/install-metadata-targets.json": "59e3967d9110c7b451a0ba5181382eef395967bdb4945ef1ceec9561f987f153",
+    "apps/desktop/tests/at/build-facts-protocol.md": "1a7f68a8c55e542d8af927a5efdea399c6d93c44d004cfd457f32381c0ee4d08",
+    "apps/desktop/tests/at/lab_build_facts.py": "d2cde7f381e11cdc89075e94897a2d80b7a6fdf291d7c9bf6a859a3dade89b4b",
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "scripts/test-runner/suites.json": "0760584a36d10938b70ee041db9bb910a07130dc7fec35ec6d8edd797789d8bd",
+    "apps/desktop/tests/at-preparation.security.test.ts": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c",
+    "docs/implementation/tasks.json": "d935c5e263821ee909bf55eb728f983fe24c720ba0d38734bbdb35f94c4d87fd"
+  },
+  "sourceSha256": "db709aca20e72f58507500f6e6277d0b9564717f992fd69fb8ccaaf22c5edae2",
+  "sourceBytes": 48778,
+  "quotedSourceBytes": 48812,
+  "guestProgramBytes": 61250,
+  "targetCount": 5983,
+  "targetExpandedBytes": 257735
+}

@@ -1,0 +1,359 @@
+{
+  "schema": "f102-apt3-private-runtime-files-v1",
+  "packages": [
+    {
+      "package": "apt",
+      "version": "3.0.3",
+      "architecture": "amd64",
+      "bytes": 1452192,
+      "sha256": "55e341fbe92d7502c98faf1b3c235393ea0744db119cf2173603e965b658aef4"
+    },
+    {
+      "package": "libapt-pkg7.0",
+      "version": "3.0.3",
+      "architecture": "amd64",
+      "bytes": 1112916,
+      "sha256": "fdcc9f780c7de466c7f0038e6e242c73cb63c8f9fe2781a3185a2c810984ab0a"
+    },
+    {
+      "package": "libc6",
+      "version": "2.41-12+deb13u4",
+      "architecture": "amd64",
+      "bytes": 2846580,
+      "sha256": "967aa62605721081c3eb2a17650611a792aa802d76a6511d1840242623d204c9"
+    },
+    {
+      "package": "libstdc++6",
+      "version": "14.2.0-19",
+      "architecture": "amd64",
+      "bytes": 713628,
+      "sha256": "ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0"
+    },
+    {
+      "package": "libgcc-s1",
+      "version": "14.2.0-19",
+      "architecture": "amd64",
+      "bytes": 72772,
+      "sha256": "3c71917b490d1a17aed43196a2787a256ecf060526cdb20216a74bedc061b150"
+    },
+    {
+      "package": "libseccomp2",
+      "version": "2.6.0-2",
+      "architecture": "amd64",
+      "bytes": 51712,
+      "sha256": "89d5138e05fb6a86b9afd8b54dc0fb4b14f4c27c05e6c5f767c2132bdf808531"
+    },
+    {
+      "package": "libssl3t64",
+      "version": "3.5.7-1~deb13u2",
+      "architecture": "amd64",
+      "bytes": 2453872,
+      "sha256": "916f7f40b34a06e6ebfaefcdab331bff458328411da672598f126a760472467d"
+    },
+    {
+      "package": "libsystemd0",
+      "version": "257.13-1~deb13u1",
+      "architecture": "amd64",
+      "bytes": 454648,
+      "sha256": "ab0d4127b5e46e6f8c015a1db15a62ba9ae274cdefa150083adf90ada0600ea1"
+    },
+    {
+      "package": "libbz2-1.0",
+      "version": "1.0.8-6",
+      "architecture": "amd64",
+      "bytes": 37912,
+      "sha256": "cba4cda04244b5e481bb15524bc3c983a7d1b6f330013b9b381706a2fcb65310"
+    },
+    {
+      "package": "liblz4-1",
+      "version": "1.10.0-4",
+      "architecture": "amd64",
+      "bytes": 63900,
+      "sha256": "c31ec4c7c82755a38b2f3fe066fc0c5518cc91a601a268fbcd19bdacb1f22e1e"
+    },
+    {
+      "package": "liblzma5",
+      "version": "5.8.1-1+deb13u1",
+      "architecture": "amd64",
+      "bytes": 309492,
+      "sha256": "1cfcc6e0dc36f438a79b6e2189facdb9d150b08f57d190a60e01c98075c7f896"
+    },
+    {
+      "package": "libudev1",
+      "version": "257.13-1~deb13u1",
+      "architecture": "amd64",
+      "bytes": 152300,
+      "sha256": "5d41c284f5a93b05bc7d648b61a02dd2bb9ff05b2261ad1a8b7d96044a0cfa88"
+    },
+    {
+      "package": "libxxhash0",
+      "version": "0.8.3-2",
+      "architecture": "amd64",
+      "bytes": 27096,
+      "sha256": "81da7064d56fc044f5db4bb3c1e80ff50a4986dcbbf80d958eeca565b44c157f"
+    },
+    {
+      "package": "libzstd1",
+      "version": "1.5.7+dfsg-1",
+      "architecture": "amd64",
+      "bytes": 303836,
+      "sha256": "2f6a2aeacfc925eba8b00ac9139bc4bfccf8cacb09eb93de067074b26948eef9"
+    },
+    {
+      "package": "zlib1g",
+      "version": "1:1.3.dfsg+really1.3.1-1+b1",
+      "architecture": "amd64",
+      "bytes": 88892,
+      "sha256": "015be740d6236ad114582dea500c1d907f29e16d6db00566ca32fb68d71ac90d"
+    },
+    {
+      "package": "libcap2",
+      "version": "1:2.75-10+deb13u1+b3",
+      "architecture": "amd64",
+      "bytes": 28988,
+      "sha256": "89fc4d34fc7a28ad6f0fcd0c561ab253b9dedf6f77f5a000b47c276c8295bf67"
+    }
+  ],
+  "files": {
+    "apt-cache": {
+      "bytes": 92552,
+      "sha256": "b8fffaf4fd662ba887bc67d63d2f77490e8c33931090770e07698ae8a4df2f52"
+    },
+    "apt-config": {
+      "bytes": 31040,
+      "sha256": "a1175fcf1318063cc60e71902fa9473760eac2bcbdf65557fc8b99543a8e2d88"
+    },
+    "apt-get": {
+      "bytes": 59784,
+      "sha256": "67072be139e90c73ed25007ac92f0525909a7c6d6829aecc2ceff86f9568f98b"
+    },
+    "libapt-private.so.0.0.0": {
+      "bytes": 781480,
+      "sha256": "d9a9a398ac19538d02928003524039f9e737666750a2e76fcfdb3fc9d9268313"
+    },
+    "libapt-private.so.0.0": {
+      "bytes": 781480,
+      "sha256": "d9a9a398ac19538d02928003524039f9e737666750a2e76fcfdb3fc9d9268313"
+    },
+    "libapt-pkg.so.7.0.0": {
+      "bytes": 2580592,
+      "sha256": "d3dca8bc35a1addcc03808792768ce82ca59bb3623f8053e58b3402ac5898974"
+    },
+    "libapt-pkg.so.7.0": {
+      "bytes": 2580592,
+      "sha256": "d3dca8bc35a1addcc03808792768ce82ca59bb3623f8053e58b3402ac5898974"
+    },
+    "libCNS.so": {
+      "bytes": 473080,
+      "sha256": "59d40439986bad483c26989b5eae66f775f6a280130a31e8eb3209a9b96e1f2f"
+    },
+    "libGB.so": {
+      "bytes": 71672,
+      "sha256": "812b4dbd4c0a6ce993262dfefb2c84f418ce6a7656d502e7b9c4b5922f4bf273"
+    },
+    "libISOIR165.so": {
+      "bytes": 63480,
+      "sha256": "52a6bdb62b40bc0e09f55bb996434c1a93a98b263c12f088bdbbecb2a0fb8162"
+    },
+    "libJIS.so": {
+      "bytes": 108536,
+      "sha256": "57e54466909cc2e7b0f1103def7376e5666b081ccfc92a51c0d608f82042cbe7"
+    },
+    "libJISX0213.so": {
+      "bytes": 129016,
+      "sha256": "88b6bb839b182419e52dbe70ce66f2dd41a0a584a8b45c8262fa6cccca61ea06"
+    },
+    "libKSC.so": {
+      "bytes": 51192,
+      "sha256": "f92ec9e14b4e340c8d7bc639a4b9a2ceab898f1c9c23cacd1b09f2652d90defa"
+    },
+    "ld-linux-x86-64.so.2": {
+      "bytes": 225672,
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307"
+    },
+    "libBrokenLocale.so.1": {
+      "bytes": 14552,
+      "sha256": "8f8229e3a72a97b608673315a5b7eaffbc13549add9437ba9828974e83d38e81"
+    },
+    "libanl.so.1": {
+      "bytes": 14408,
+      "sha256": "f4d70be0af174f80a2c700f8a690b86ea3da867d10803e8641f7c11c11a4925d"
+    },
+    "libc.so.6": {
+      "bytes": 1995216,
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    "libc_malloc_debug.so.0": {
+      "bytes": 53904,
+      "sha256": "c9cad01c6334afa750c0b81b5818e3a643ff41860a4a4c802aa7f203c2372953"
+    },
+    "libdl.so.2": {
+      "bytes": 14408,
+      "sha256": "295fa521a03cd2faa99974f378c9e23dd622021ec7d32bcad4f8ea61aec8a872"
+    },
+    "libm.so.6": {
+      "bytes": 977112,
+      "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3"
+    },
+    "libmemusage.so": {
+      "bytes": 18640,
+      "sha256": "2ca7f9e467e94976217bee7805578a448f35c9d18dd7ddc74ca2f9eb5938f4cd"
+    },
+    "libmvec.so.1": {
+      "bytes": 1018072,
+      "sha256": "cd2f99df70ed0fa44f79bd6322396180d19eaa1fb527b1b6e2aec9cdfc034d9d"
+    },
+    "libnsl.so.1": {
+      "bytes": 96472,
+      "sha256": "559152811dc708d3626b1861bd6fb705f63ad36bc2360a1c678ef746a8042482"
+    },
+    "libnss_compat.so.2": {
+      "bytes": 43664,
+      "sha256": "1e3f5cf8f1a868301de80638546142205d90ea0e0606c9adae8254fd95ea6740"
+    },
+    "libnss_dns.so.2": {
+      "bytes": 14336,
+      "sha256": "d6ff05b8003825fbef5ad779b5e2f870f179953e4fb560697b6f261010efe8d4"
+    },
+    "libnss_files.so.2": {
+      "bytes": 14336,
+      "sha256": "8c93b2ae43dac3c2d688d227609d713f71620d3f0980ebf6bbb371c6eb542108"
+    },
+    "libnss_hesiod.so.2": {
+      "bytes": 26840,
+      "sha256": "8da91b801b5349aca633ffb8cb33e7b9f17cf949624623ea9882406c5779512f"
+    },
+    "libpcprofile.so": {
+      "bytes": 14472,
+      "sha256": "c2897cb6591f3cf50a43c0406d04bbcf665feec52e3b68eea5b3f23dd4e23e9b"
+    },
+    "libpthread.so.0": {
+      "bytes": 14408,
+      "sha256": "85e21f7dba0394411d00959176fd18b470e575b0b05f1f4f41e5636802ce0500"
+    },
+    "libresolv.so.2": {
+      "bytes": 63936,
+      "sha256": "d41dd4adacf5a35df426461dd8a92d7bdd5ba29bb61a1c3531bec0ada386f8dd"
+    },
+    "librt.so.1": {
+      "bytes": 14552,
+      "sha256": "7b7b84d1aedda0e0b2bdfc68844362782132180b8f02be1300e21e77572e514b"
+    },
+    "libthread_db.so.1": {
+      "bytes": 47840,
+      "sha256": "5becc66927b75fe505e93ece4bb42bbf919f35d2e8bd8d477bdaa40f3d21ea6e"
+    },
+    "libutil.so.1": {
+      "bytes": 14408,
+      "sha256": "e3981d10efd152a53f083e38f5f9ddde7a049c85d0ab388a5eec91b52fc98a11"
+    },
+    "libstdc++.so.6.0.33": {
+      "bytes": 2497768,
+      "sha256": "972bb2a18b71140dab0240f8a1f68ab3fb1d56bcd4c4f824a91b70888faf5a00"
+    },
+    "libstdc++.so.6": {
+      "bytes": 2497768,
+      "sha256": "972bb2a18b71140dab0240f8a1f68ab3fb1d56bcd4c4f824a91b70888faf5a00"
+    },
+    "libgcc_s.so.1": {
+      "bytes": 182856,
+      "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af"
+    },
+    "libseccomp.so.2.6.0": {
+      "bytes": 182560,
+      "sha256": "c851a2378b4ef3a42ada5f8ff1604ad38f6bbcafa2aeea3f6680160d628c2f27"
+    },
+    "libseccomp.so.2": {
+      "bytes": 182560,
+      "sha256": "c851a2378b4ef3a42ada5f8ff1604ad38f6bbcafa2aeea3f6680160d628c2f27"
+    },
+    "libcrypto.so.3": {
+      "bytes": 6517312,
+      "sha256": "8bb5f3fdffe280d4453eb79a4663c2c47af70b7c247fe2e94e2da703cee1fd3d"
+    },
+    "libssl.so.3": {
+      "bytes": 1101760,
+      "sha256": "4b34859318555bf96d518131bed5fc4d5e35fefa4e1729f49eaa26bd05263850"
+    },
+    "libsystemd.so.0.40.0": {
+      "bytes": 1131784,
+      "sha256": "c59f9015342de9c2dcb2decccb3d83218849fe3e4388c723a6528254fd7606f0"
+    },
+    "libsystemd.so.0": {
+      "bytes": 1131784,
+      "sha256": "c59f9015342de9c2dcb2decccb3d83218849fe3e4388c723a6528254fd7606f0"
+    },
+    "libbz2.so.1.0.4": {
+      "bytes": 74688,
+      "sha256": "c630f057efedc12f848710d71f40283895591e5b4608539f387895c64e0553da"
+    },
+    "libbz2.so.1.0": {
+      "bytes": 74688,
+      "sha256": "c630f057efedc12f848710d71f40283895591e5b4608539f387895c64e0553da"
+    },
+    "liblz4.so.1.10.0": {
+      "bytes": 154096,
+      "sha256": "67bf8b84af77e962e09be661944f7c61393c4806746734e36db9fbdaebc1de36"
+    },
+    "liblz4.so.1": {
+      "bytes": 154096,
+      "sha256": "67bf8b84af77e962e09be661944f7c61393c4806746734e36db9fbdaebc1de36"
+    },
+    "liblzma.so.5.8.1": {
+      "bytes": 198832,
+      "sha256": "01e05a4b5268805a10a2414a8904fb1fb45c60626dce53b5ea19c1d491049b99"
+    },
+    "liblzma.so.5": {
+      "bytes": 198832,
+      "sha256": "01e05a4b5268805a10a2414a8904fb1fb45c60626dce53b5ea19c1d491049b99"
+    },
+    "libudev.so.1.7.10": {
+      "bytes": 280936,
+      "sha256": "902fd5e300dacfd8f8292ce18fb8aca4775d67218cb44414a2a6fd89e09cc9a9"
+    },
+    "libudev.so.1": {
+      "bytes": 280936,
+      "sha256": "902fd5e300dacfd8f8292ce18fb8aca4775d67218cb44414a2a6fd89e09cc9a9"
+    },
+    "libxxhash.so.0.8.3": {
+      "bytes": 71592,
+      "sha256": "7dd49b353facbee50c371d0559ce29db5afee5ac33249ca5c7068420fb642762"
+    },
+    "libxxhash.so.0": {
+      "bytes": 71592,
+      "sha256": "7dd49b353facbee50c371d0559ce29db5afee5ac33249ca5c7068420fb642762"
+    },
+    "libzstd.so.1.5.7": {
+      "bytes": 825336,
+      "sha256": "27f07c9a49c2c956bcfb64cd4712976586a66facbf15fc7f09bc37413b5f2b21"
+    },
+    "libzstd.so.1": {
+      "bytes": 825336,
+      "sha256": "27f07c9a49c2c956bcfb64cd4712976586a66facbf15fc7f09bc37413b5f2b21"
+    },
+    "libz.so.1.3.1": {
+      "bytes": 125376,
+      "sha256": "85590dd58edf5445e18bc7193e5ebc01ac5841f1ae187e97705a662e90c6421e"
+    },
+    "libz.so.1": {
+      "bytes": 125376,
+      "sha256": "85590dd58edf5445e18bc7193e5ebc01ac5841f1ae187e97705a662e90c6421e"
+    },
+    "libcap.so.2.75": {
+      "bytes": 47288,
+      "sha256": "41217b0af128444f66dee8adda52b2ceaf19da00e5b0b155e2b87b857671286b"
+    },
+    "libcap.so.2": {
+      "bytes": 47288,
+      "sha256": "41217b0af128444f66dee8adda52b2ceaf19da00e5b0b155e2b87b857671286b"
+    },
+    "libpsx.so.2.75": {
+      "bytes": 18496,
+      "sha256": "47a190d58422fbb390db98623c8c97314f8965e0eeccbf3daf180920ada61226"
+    },
+    "libpsx.so.2": {
+      "bytes": 18496,
+      "sha256": "47a190d58422fbb390db98623c8c97314f8965e0eeccbf3daf180920ada61226"
+    }
+  }
+}
