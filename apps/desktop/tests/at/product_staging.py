@@ -19,6 +19,23 @@ OUTPUTS = ("apps/desktop/dist/main.cjs", "apps/desktop/dist/preload.cjs", "apps/
            "apps/desktop/dist/sqlite/better_sqlite3.node", "apps/desktop/dist/renderer/index.html")
 BUILD_INPUTS = "node_modules/.cache/f102-offline-build"
 BUILD_INPUT_LIMIT = 512 * 1024 * 1024
+RUST_BIN = Path("/opt/linuxcast-f102-lab/rust/bin")
+
+
+def require_rust_tools():
+    """Check fixed routing prerequisites, not toolchain identity or ABI.
+
+    The coordinator separately authenticates/provisions the distribution and
+    protects/pins its ancestry and payload before preparation is authorized.
+    """
+    try:
+        for path, directory in ((RUST_BIN, True), (RUST_BIN / "cargo", False), (RUST_BIN / "rustc", False)):
+            info = path.lstat()
+            ordinary = stat.S_ISDIR(info.st_mode) if directory else stat.S_ISREG(info.st_mode)
+            if not ordinary or not info.st_mode & 0o111 or not os.access(path, os.X_OK, effective_ids=True):
+                raise ControllerRejected("prerequisite")
+    except OSError:
+        raise ControllerRejected("prerequisite") from None
 
 
 def _read_offline_inputs(staging, deadline):
@@ -214,9 +231,10 @@ def prepare(staging, node, source_tree, archive_sha256):
     if {name[len(BUILD_INPUTS) + 1:]: hashed for name, hashed in before.items()
             if name.startswith(BUILD_INPUTS + "/")} != input_inventory:
         raise ControllerRejected("prerequisite")
+    require_rust_tools()
     # Product build uses the staging cwd/module resolution. No parent dist/addon.
     owner = SessionOwner()
-    owner.env.update(PATH=str(Path(node).parent) + ":/usr/bin:/bin", CARGO_NET_OFFLINE="true")
+    owner.env.update(PATH=str(Path(node).parent) + ":" + str(RUST_BIN) + ":/usr/bin:/bin", CARGO_NET_OFFLINE="true")
     try:
         seed_build_home(owner, inputs, input_files, total)
         if inventory(inputs, total, omit_receipt=False) != input_inventory:

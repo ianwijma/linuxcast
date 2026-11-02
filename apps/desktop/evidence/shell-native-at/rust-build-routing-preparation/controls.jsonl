@@ -1,0 +1,10 @@
+{"importInert": true, "reversedIncrementAstEqualsBase": true}
+{"control": "exact-base-new-routing", "errors": 0, "failures": 18, "skips": 0, "tests": 3}
+{"control": "exact-base-original-12", "errors": 0, "failures": 0, "skips": 0, "tests": 12}
+{"control": "current-all-staging", "errors": 0, "failures": 0, "skips": 0, "tests": 15}
+{"control": "old-cache-routing-bbbe813", "errors": 0, "failures": 1, "skips": 0, "tests": 1}
+{"control": "old-cache-receipt-alias-2312fbd", "errors": 0, "failures": 2, "skips": 0, "tests": 1}
+{"control": "removed-postbuild-cache-guard", "errors": 0, "failures": 1, "skips": 0, "tests": 1}
+{"control": "removed-source-addition-guard", "errors": 0, "failures": 2, "skips": 0, "tests": 1}
+{"control": "removed-usability-check", "errors": 0, "failures": 3, "skips": 0, "tests": 2}
+{"control": "removed-rust-path-routing", "errors": 0, "failures": 1, "skips": 0, "tests": 1}
