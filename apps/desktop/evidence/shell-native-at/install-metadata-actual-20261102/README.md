@@ -105,4 +105,11 @@ returned guest source hash/size, privacy allowlist checks, all local file hashes
 tasks. Plan validation, generated cards, status reporting and whitespace checks
 pass. These checks do not replay the real operation; historical 533 Python/55
 mapped security and type/lint results remain inherited for unchanged code.
-Independent review of this new evidence increment is pending.
+Initial independent Standards `d8679dd1` and Security/Spec `88e052b5` reviews
+are clear at `2f4a1bf` against approved PR111 merge `1c39172`. Both verified
+the ten-path/two-commit range, public schemas/source/probe/hash/privacy and
+cross-record bindings, generated cards and unchanged non-evidence task fields.
+Standards ran 34 corruption controls; Security/Spec ran 23 public-record and
+23 codec controls. Actual execution and private-artifact comparison remain
+inherited observations in those reviews. Publication updates only review
+metadata and hashes; it changes no result, source, contract or acceptance.
