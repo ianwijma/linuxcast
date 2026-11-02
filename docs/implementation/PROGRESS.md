@@ -1,5 +1,20 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Freeze bounded projection refinement before implementation
+
+After actual bounds-status-field refusal, coordinator explicitly refines protocol
+and snapshot elaboration: only allowlisted projected fields are materialized.
+Discarded field names/presence still validate duplicates/continuations/syntax;
+discarded values are never accumulated. Former16KiB concatenated discarded-value
+restriction removed; their physical lines remain16KiB and whole stanza128KiB,
+input8MiB. Projected field16KiB/output2MiB/packet60000/transport65536 and all
+commands/deadlines/custody unchanged. This is a declared parser projection change,
+not a claim that real offending field is discarded, nor blanket limit increase.
+Long unused fields should project identically; malformed/duplicate/over-line/
+over-stanza remain denied. Implementation and fresh independent review precede
+new sealed source/permit/capture. Used diagnostic artifacts preserved; no new
+actual invocation/native or acceptance promotion. All97 scope/states unchanged.
+
 ## Actual diagnostic capture identifies assembled status-field guard
 
 After PR103, sealed approved/reviewed3536145 source and fresh14-key0400 permit

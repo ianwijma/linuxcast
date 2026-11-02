@@ -55,7 +55,8 @@ is unavailable; no retry or bypass. Hold both through complete metadata read and
 source consistency checks. Snapshot `/var/lib/dpkg/status` through its retained
 bounded regular descriptor, checking path binding, device/inode, size/timestamps
 and bytes before/after. Maximum8MiB input,4096 nonempty stanzas,128KiB per stanza,
-16KiB per line/field. Fail on uncertain concurrency or malformed metadata.
+16KiB per physical line and assembled projected field. Fail on uncertain
+concurrency or malformed metadata.
 
 Correct deb822 colon/whitespace/continuation and case-insensitive duplicate rules
 apply. Never skip a malformed/unnamed nonempty stanza as absence. Project only
@@ -67,6 +68,18 @@ version fields to be valid. Package/Status are mandatory; installed/config-files
 records require Architecture/Version. Preserve holds and uninstalled records;
 do not synthesize missing package versions. Sort unique name/architecture records.
 Do not export descriptions, maintainers, conffiles, arbitrary fields or paths.
+After the actual assembled-field refusal, refine projection to retain only the
+names/presence of discarded fields for duplicate and continuation validation;
+never accumulate their values. Remove the former16KiB concatenated-value
+restriction for these unmaterialized fields; each of their physical lines stays
+within16KiB and the complete stanza stays within128KiB/input8MiB. This is an
+explicit projection refinement, not proof that the actual offending field was
+discarded. Projected fields keep their16KiB assembly guard and fixed refusal.
+All fields keep syntax/control-character/duplicate/orphan-continuation checks.
+No parser repair, description/conffile export, broader read, snapshot/packet size
+or deadline change. Legitimate long discarded fields must round-trip to identical
+projected facts, and invalid/duplicate/over-line/over-stanza inputs still refuse.
+New source/permit and independent review precede any next actual capture.
 
 Require no unapplied dpkg update journals or unincorporated triggers before
 claiming a complete package baseline. Read only bounded directory metadata and
