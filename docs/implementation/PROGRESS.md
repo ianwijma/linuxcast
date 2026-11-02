@@ -1,5 +1,31 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Bounded discarded-field projection implemented for review
+
+Frozen ef5549c contract is implemented only in package_records: unused field
+names/presence retain None; their values are never accumulated. Projected values
+retain16KiB; physical lines16KiB/stanzas128KiB/input8MiB remain bounded. Former
+concatenated discarded-value restriction is explicitly removed, without changing
+read scope/output caps/codec/commands/custody/deadlines. Actual offending field
+identity/category remains unknown; projected over-limit values still refuse.
+
+100 focused pass1.919s; actual55mapped13.61s includes395Python12.012s within18s,
+no skips. Three new methods fail pre-change source6behavioral assertions/0errors,
+fixedgreen. A private old-accumulator/high-cap mutant fails live-local None
+assertions3times, proving non-materialization. Existing diagnostic25 and custody
+11/2/4 historical controls remain red/currentgreen. Existing field-size fixture
+retargeted to projected Depends, duplicate-mutation guard retargeted and asserted
+changed after comment caused one initial harness error. No production guard loss.
+Host AST except embedded source and guest definitions outside parser unchanged;
+numeric bounds retained. Evidence status-projection-preparation/ with hashes/AST/
+plan/whitespace. Prior TS checks inherited. Known signer socket outage -> user
+authorized per-command unsigned fallback; configuration unchanged.
+
+Fresh initial two-axis review next; no new PR/watch, source seal/permit/capture,
+guest/native action or acceptance promotion. All97 states/deps/criteria intact;
+actual second capture records remain immutable and lab stopped. No live commands
+or delegates at this checkpoint. Historical unknown cleanup gap unchanged.
+
 ## Freeze bounded projection refinement before implementation
 
 After actual bounds-status-field refusal, coordinator explicitly refines protocol

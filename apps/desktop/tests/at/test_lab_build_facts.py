@@ -185,7 +185,7 @@ class Parser(unittest.TestCase):
 
     def test_input_stanza_line_field_and_record_bounds(self):
         for raw in (b'x' * 8388609, b'', RAW + b'X:' + b'x' * 16385,
-                    RAW.replace(b'Description: synthetic discarded\n text', b'Description:' + b'x' * 10000 + b'\n ' + b'y' * 10000),
+                    RAW.replace(b'Depends: libc6 (>= 2.38),\n libbz2-1.0', b'Depends:' + b'x' * 10000 + b'\n ' + b'y' * 10000),
                     RAW + b'\nPackage: other\nStatus: purge ok not-installed\n' +
                     b''.join(f'X-{i}:'.encode() + b'x' * 15000 + b'\n' for i in range(9)),
                     RAW + b'\0', RAW + b'\xff', RAW + b'\r\n'):
@@ -239,8 +239,8 @@ class Parser(unittest.TestCase):
         examples = (
             ('bounds-status-input', b'x' * 8388609),
             ('bounds-status-line', RAW + b'X:' + b'x' * 16385),
-            ('bounds-status-field', RAW.replace(b'Description: synthetic discarded\n text',
-                                              b'Description:' + b'x' * 10000 + b'\n ' + b'y' * 10000)),
+            ('bounds-status-field', RAW.replace(b'Depends: libc6 (>= 2.38),\n libbz2-1.0',
+                                              b'Depends:' + b'x' * 10000 + b'\n ' + b'y' * 10000)),
             ('bounds-status-stanza', RAW + b'\nPackage: other\nStatus: purge ok not-installed\n' +
              b''.join(f'X-{i}:'.encode() + b'x' * 15000 + b'\n' for i in range(9))),
             ('bounds-status-records', b'\n'.join(f'Package: p{i}\nStatus: purge ok not-installed\n'.encode()
@@ -251,11 +251,51 @@ class Parser(unittest.TestCase):
                 self.records(raw)
 
     def test_parser_fault_control_duplicate_guard_has_observable_effect(self):
-        source = build.PROBE_SOURCE.replace("need(key not in fields)\n            fields[key]", "need(True)\n            fields[key]", 1)
+        source = build.PROBE_SOURCE.replace('need(key not in fields)', 'need(True)', 1)
+        self.assertNotEqual(source, build.PROBE_SOURCE)
         bad = RAW.replace(b'Package: dpkg', b'Package: dpkg\npackage: dpkg')
         self.assertEqual(definitions(source)['package_records'](bad)[2]['Package'], 'dpkg')
         with self.assertRaises(PROBE['Fault']):
             self.records(bad)
+
+    def test_long_discarded_fields_are_not_materialized_and_projection_is_identical(self):
+        baseline = self.records(RAW)
+        for field in (b'Description', b'Conffiles', b'X-Unused'):
+            payload = b'UNEXPORTED_STATUS_CANARY_' + b'x' * 7970
+            large = field + b':\n' + b'\n'.join(b' ' + payload for _ in range(12))
+            raw = RAW.replace(b'Description: synthetic discarded\n text', large)
+            seen = []
+            def trace(frame, event, _arg):
+                if event == 'call' and frame.f_code.co_name == 'finish' and frame.f_globals is PROBE:
+                    seen.append(dict(frame.f_locals['fields']))
+                return trace
+            with self.subTest(field=field):
+                try:
+                    sys.settrace(trace)
+                    projected = self.records(raw)
+                except PROBE['Fault']:
+                    self.fail('bounded long discarded field was rejected')
+                finally:
+                    sys.settrace(None)
+                self.assertEqual(projected, baseline)
+                saved = next(fields for fields in seen if field.decode().lower() in fields)
+                self.assertTrue(saved[field.decode().lower()] is None, 'discarded value was materialized')
+                self.assertNotIn('UNEXPORTED_STATUS_CANARY_', owner.encoded(projected).decode())
+
+    def test_discarded_fields_keep_duplicate_syntax_line_and_stanza_guards(self):
+        large = b'Description:\n' + b'\n'.join(b' ' + b'x' * 8000 for _ in range(4))
+        valid = RAW.replace(b'Description: synthetic discarded\n text', large)
+        cases = (
+            (valid.replace(large, large + b'\ndEsCrIpTiOn: duplicate'), 'packages'),
+            (RAW.replace(b'Description: synthetic discarded\n text', b'Bad Key: value'), 'packages'),
+            (b' orphan continuation\n' + RAW, 'packages'),
+            (RAW.replace(b'Description: synthetic discarded\n text', b'Description:' + b'x' * 16385), 'bounds-status-line'),
+            (RAW.replace(b'Description: synthetic discarded\n text',
+                         b'Description:\n' + b'\n'.join(b' ' + b'x' * 15000 for _ in range(9))), 'bounds-status-stanza'),
+        )
+        for raw, reason in cases:
+            with self.subTest(reason=reason), self.assertRaisesRegex(PROBE['Fault'], '^' + reason + '$'):
+                self.records(raw)
 
 
 class Codec(unittest.TestCase):
@@ -526,6 +566,21 @@ class Guest(unittest.TestCase):
         self.assertEqual(value['architecture']['foreign'], ['arm64'])
         build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
         self.assertEqual(len(self.locks.call_args_list), 2)
+        self.assertFalse(self.fs.fds)
+
+    def test_long_discarded_metadata_roundtrips_without_exporting_its_value(self):
+        large = b'Description:\n' + b'\n'.join(b' UNEXPORTED_STATUS_CANARY_' + b'x' * 7970 for _ in range(12))
+        raw = RAW.replace(b'Description: synthetic discarded\n text', large)
+        self.fs.path('/var/lib/dpkg/status').write_bytes(raw)
+        try:
+            value = self.collect()
+        except self.scope['Fault']:
+            self.fail('bounded discarded metadata blocked the fixed collector')
+        _, decoded, expanded = build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
+        self.assertEqual(decoded['packages'], PROBE['package_records'](RAW))
+        self.assertEqual(decoded['packageState']['statusBytes'], len(raw))
+        self.assertEqual(decoded['packageState']['statusSha256'], owner.digest(raw))
+        self.assertNotIn(b'UNEXPORTED_STATUS_CANARY_', expanded)
         self.assertFalse(self.fs.fds)
 
     def test_fixed_read_bounds_identify_the_guard_without_exporting_path_or_values(self):
