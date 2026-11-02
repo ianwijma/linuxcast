@@ -1,5 +1,33 @@
 # Coordinator checkpoint — 2 November 2026
 
+## First read-only install metadata capture succeeded; evidence review next
+
+One actual supervised invocation from approved PR111 merge1c39172 and exact
+reviewed88a2e4d protected source closure completed exit0 in34.242s, capture
+ae9a03d8-76a7-4156-b813-b0c659ef94b4 (no retry). Fresh17-key/six-hash permit;
+owner result observed767 packages/14 file records/3 directories/3 handlers,
+private23547B SHAf462573e5a8e30eaebb46fa2279d883e9ef2c9fd1631b6e5fab02435dfcd4692.
+Independent exact caller reap/ECHILD, full pinned stopped-exit0/PID0 inspection,
+marker absence, original lock reacquisition, source identities and permit bytes
+unchanged verified. Actual snapshot remains private0400; public summaries only.
+
+Fresh host-only consumer revalidated current artifact under retained reservation
+and prior b19313d2 build-facts canonical snapshot: recorded original dpkg status
+size/digest match; current holds/broken/pending0. Matching status bytes is not
+whole-machine/capacity/locale/keyring revalidation or install admission. Public
+consumer excludes status digest, package names and all captured bodies. Six-file
+candidate report remains historical executionApproved=false; separate actual
+permit/public provenance records execution. No guest dispatch in the consumer.
+
+New evidence: apps/desktop/evidence/shell-native-at/install-metadata-actual-20261102/.
+Initial independent Standards and Security/Spec evidence reviews next, then focused
+PR/CI/GitHub gates. Source/test/protocol/pins unchanged. Pure hook verifier720140c
+held unmerged/unreviewed; first-order helper/recursive closure, closed writers,
+capacity/network/activation/install/locale/toolchain/build/containment/native/AT/
+session/release acceptance remain pending. No native/product/AT run or install.
+All97/full local1.0, F1-02 in-progress/UI pending and historical unknown timeout
+absence unchanged. No active PR/watch.
+
 ## PR111 merged; first read-only capture preparation begins
 
 PR111 merged1c39172dcd710f738c8eafc3be007656e4dfb7fc from7bc537c, current-head

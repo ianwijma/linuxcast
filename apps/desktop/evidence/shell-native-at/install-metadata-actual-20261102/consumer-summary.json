@@ -1,0 +1,19 @@
+{
+  "absentFileCount": 1,
+  "brokenCount": 0,
+  "captureId": "ae9a03d8-76a7-4156-b813-b0c659ef94b4",
+  "directoryCount": 3,
+  "fileCount": 14,
+  "fullMachineBaselineRevalidated": false,
+  "handlerCount": 3,
+  "holdCount": 0,
+  "noGuestDispatch": true,
+  "originalStatusMatchesPriorBuildFacts": true,
+  "packageCount": 767,
+  "pendingCount": 0,
+  "presentFileCount": 13,
+  "priorBuildFactsCaptureId": "b19313d2-06eb-4077-b5cb-8075ee206a4e",
+  "privateSnapshotValidated": true,
+  "schema": 1,
+  "selectedPackageCount": 5
+}
