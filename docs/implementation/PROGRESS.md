@@ -1,5 +1,24 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Offline fixed bounds diagnostics ready for independent review
+
+After first actual unavailable/bounds run, frozen af55d28 contract permits twelve
+fixed guard-specific refusal codes, preserving generic historical bounds. Owner
+changes only FAILURES and reason strings/local fixed-path reason mapping; no
+predicates/caps/read paths/shapes/commands/custody/deadlines/authority change.
+97 focused pass1.907s; actual55mapped13.10s includes392Python11.540s under18s.
+Five diagnostic methods fail exactaf55d28 code25behavioral assertions/0errors,
+currentgreen; earlier original11/writer2/reader4 historical controls still red
+and current11methods green. All new refusals remain unavailable with nullcounts,
+noartifact and one dispatch; invented reason rejected. Host/guest AST proof,
+source/input hashes and plan/whitespace recorded in bounds-diagnostics-preparation.
+Previous TS type/lint inherited unchanged. Fresh initial two-axis review next;
+Configured signer socket unavailable; diagnostic commit uses user-authorized
+per-command unsigned fallback, no signing configuration change.
+no clean review/PR/publication or new actual source/permit/capture. Old actual
+source/permit/results preserved and guest stopped; bound cause still unknown.
+No live process/delegate/watch. All97/status/criteria unchanged.
+
 ## Freeze bounded refusal diagnostics after first actual capture
 
 First actual capture is safely stopped and evidence committed933b838. Protocol
