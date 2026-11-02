@@ -1,6 +1,9 @@
 """Synthetic files only: no dependency installs, build, Electron or native run."""
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -8,6 +11,46 @@ from unittest.mock import patch
 from controller_protocol import ControllerRejected
 from product_staging import BUILD_INPUTS, OUTPUTS, digest, inventory, offline_inputs, prepare, receipt_digest, seed_build_home, validate
 from session_owner import Deadline
+
+
+class SyntheticSessionOwner:
+    """Only retained ordinary Python children; no host discovery or native CLI."""
+    def __init__(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        home = self.root / "home"
+        home.mkdir(mode=0o700)
+        self.env = {"HOME": str(home), "PATH": "/usr/bin:/bin"}
+        self.children = []
+
+    def run(self, arguments, deadline, cwd=None):
+        child = subprocess.Popen(arguments, cwd=cwd, env=self.env, stdin=subprocess.DEVNULL,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.children.append(child)
+        try:
+            code = child.wait(timeout=deadline.remaining())
+        except subprocess.TimeoutExpired:
+            raise ControllerRejected("deadline") from None
+        if code != 0:
+            raise ControllerRejected("child")
+
+    def cleanup(self):
+        for child in self.children:
+            if child.poll() is None:
+                child.kill()
+            child.wait(timeout=2)
+        self.temporary.cleanup()
+        return not self.root.exists() and all(child.returncode is not None for child in self.children)
+
+
+def rust_tools(parent):
+    directory = parent / "rust/bin"
+    directory.mkdir(parents=True)
+    for name in ("cargo", "rustc"):
+        path = directory / name
+        path.write_text("#!/usr/bin/python3\n# PUBLIC SYNTHETIC TOOL; never a compiler\n")
+        path.chmod(0o700)
+    return directory
 
 
 def build_inputs(root):
@@ -27,6 +70,131 @@ def build_inputs(root):
 
 
 class StagingTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.rust_bin = rust_tools(Path(temporary.name))
+        # create=True keeps original-source behavioral controls importable.
+        fixed = patch("product_staging.RUST_BIN", self.rust_bin, create=True)
+        fixed.start()
+        self.addCleanup(fixed.stop)
+        owner = patch("product_staging.SessionOwner", SyntheticSessionOwner)
+        owner.start()
+        self.addCleanup(owner.stop)
+
+    def test_fixed_rust_tools_resolve_and_execute_without_caller_path(self):
+        with tempfile.TemporaryDirectory() as temporary, tempfile.TemporaryDirectory() as tools:
+            root = Path(temporary)
+            build_inputs(root)
+            tools = Path(tools)
+            node = tools / "node/bin/node"
+            node.parent.mkdir(parents=True)
+            node.write_text("#!/usr/bin/python3\nimport runpy,sys\nrunpy.run_path(sys.argv[1],run_name='__main__')\n")
+            node.chmod(0o700)
+            # All candidates are private ordinary files. Never execute any
+            # resolved path until it equals our known synthetic cargo exactly.
+            for directory in (tools / "ambient", tools / "system"):
+                directory.mkdir()
+                for name in ("cargo", "rustc"):
+                    candidate = directory / name
+                    candidate.write_text("#!/usr/bin/python3\nraise AssertionError('POISON TOOL')\n")
+                    candidate.chmod(0o700)
+            (self.rust_bin / "cargo").write_text(
+                "#!/usr/bin/python3\nimport shutil,subprocess\n"
+                f"assert shutil.which('rustc') == {str(self.rust_bin / 'rustc')!r}\n"
+                f"subprocess.run([{str(self.rust_bin / 'rustc')!r}],check=True)\n"
+                "print('PUBLIC SYNTHETIC CARGO')\n")
+            (self.rust_bin / "rustc").write_text("#!/usr/bin/python3\nprint('PUBLIC SYNTHETIC RUSTC')\n")
+            expected_path = str(node.parent) + ":" + str(self.rust_bin) + ":/usr/bin:/bin"
+            script = '''import json,os,pathlib,shutil,subprocess
+root=pathlib.Path.cwd()
+resolved=shutil.which('cargo')
+assert resolved == ''' + repr(str(self.rust_bin / "cargo")) + '''
+assert os.environ['PATH'] == ''' + repr(expected_path) + '''
+# A private stand-in also proves the fallback candidate loses resolution.
+assert shutil.which('cargo',path=str(pathlib.Path(resolved).parent)+':'+''' + repr(str(tools / "system")) + ''') == resolved
+result=subprocess.run([resolved],check=True,capture_output=True,text=True)
+assert result.stdout == 'PUBLIC SYNTHETIC RUSTC\\nPUBLIC SYNTHETIC CARGO\\n'
+(root/'node_modules/rust-observed.json').write_text(json.dumps({'resolved':resolved,'path':os.environ['PATH']}))
+for name in ''' + repr(OUTPUTS) + ''':
+ p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'PUBLIC SYNTHETIC OUTPUT')
+'''
+            for name in ("apps/desktop/setup-sqlite.ts", "apps/desktop/build.ts"):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(script)
+            try:
+                with patch.dict(os.environ, {"PATH": str(tools / "ambient"), "CARGO_HOME": "POISON", "npm_config_nodedir": "POISON"}):
+                    try:
+                        prepare(root, node, "a" * 40, "b" * 64)
+                    except ControllerRejected as error:
+                        self.fail(f"synthetic fixed-prefix child rejected: {error}")
+                facts = json.loads((root / "node_modules/rust-observed.json").read_text())
+                self.assertEqual(facts, {"resolved": str(self.rust_bin / "cargo"), "path": expected_path})
+                validate(root, node, receipt_sha256=receipt_digest(root))
+            finally:
+                root.chmod(0o700)
+                for path in root.rglob("*"):
+                    if not path.is_symlink():
+                        path.chmod(0o700 if path.is_dir() else 0o600)
+
+    def test_invalid_rust_prefix_fails_before_any_build_child(self):
+        for fault in ("missing", "symlink", "file", "nonsearchable", "caller-denied"):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as temporary, tempfile.TemporaryDirectory() as tools:
+                root = Path(temporary)
+                build_inputs(root)
+                tools = Path(tools)
+                directory = rust_tools(tools)
+                if fault in ("missing", "symlink", "file"):
+                    shutil.rmtree(directory)
+                    if fault == "symlink":
+                        directory.symlink_to(self.rust_bin, target_is_directory=True)
+                    elif fault == "file":
+                        directory.write_text("PUBLIC SYNTHETIC NOT A DIRECTORY")
+                elif fault == "nonsearchable":
+                    directory.chmod(0o600)
+                access = os.access
+                def usable(path, mode, **kwargs):
+                    self.assertEqual((mode, kwargs), (os.X_OK, {"effective_ids": True}))
+                    return False if fault == "caller-denied" and path == directory else access(path, mode, **kwargs)
+                try:
+                    with patch("product_staging.RUST_BIN", directory, create=True), patch("product_staging.os.access", side_effect=usable), patch("product_staging.SessionOwner") as owner:
+                        with self.assertRaisesRegex(ControllerRejected, "^prerequisite$"):
+                            prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
+                        owner.assert_not_called()
+                    self.assertFalse((root / "f102-build-receipt.json").exists())
+                finally:
+                    if fault == "nonsearchable":
+                        directory.chmod(0o700)
+
+    def test_invalid_declared_rust_tools_fail_before_any_build_child(self):
+        for name in ("cargo", "rustc"):
+            for fault in ("missing", "symlink", "directory", "fifo", "nonexecutable", "caller-denied"):
+                with self.subTest(name=name, fault=fault), tempfile.TemporaryDirectory() as temporary, tempfile.TemporaryDirectory() as tools:
+                    root = Path(temporary)
+                    build_inputs(root)
+                    directory = rust_tools(Path(tools))
+                    tool = directory / name
+                    if fault in ("missing", "symlink", "directory", "fifo"):
+                        tool.unlink()
+                        if fault == "symlink":
+                            tool.symlink_to(self.rust_bin / name)
+                        elif fault == "directory":
+                            tool.mkdir()
+                        elif fault == "fifo":
+                            os.mkfifo(tool)
+                    elif fault == "nonexecutable":
+                        tool.chmod(0o600)
+                    access = os.access
+                    def usable(path, mode, **kwargs):
+                        self.assertEqual((mode, kwargs), (os.X_OK, {"effective_ids": True}))
+                        return False if fault == "caller-denied" and path == tool else access(path, mode, **kwargs)
+                    with patch("product_staging.RUST_BIN", directory, create=True), patch("product_staging.os.access", side_effect=usable), patch("product_staging.SessionOwner") as owner:
+                        with self.assertRaisesRegex(ControllerRejected, "^prerequisite$"):
+                            prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
+                        owner.assert_not_called()
+                    self.assertFalse((root / "f102-build-receipt.json").exists())
+
     def test_external_dependency_symlink_is_not_product_provenance(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -167,7 +335,10 @@ for name in ''' + repr(OUTPUTS) + ''':
             try:
                 # The ordinary Python runtime executes synthetic fixture text;
                 # none of these files is production TypeScript or a real build.
-                prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
+                try:
+                    prepare(root, Path("/usr/bin/python3"), "a" * 40, "b" * 64)
+                except ControllerRejected as error:
+                    self.fail(f"synthetic cache/header child rejected: {error}")
                 facts = json.loads((root / "node_modules/observed.json").read_text())
                 self.assertTrue(all(facts.values()))
                 receipt = validate(root, Path("/usr/bin/python3"), receipt_sha256=receipt_digest(root))
