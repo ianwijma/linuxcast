@@ -1,5 +1,33 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Offline inputs committed; review and fixed Rust routing implementation next
+
+Root codex/f1-02-offline-js-inputs has imported solver7ea5322, evidence25cb833
+and frozen Rust-routing contractdd997cd atop approvedPR1063662971. Fullinput
+checks/artifacts described below; no livecommand/guest/delegate/PRwatch. Last
+actual VMpostflightb19313d2 stopped/exit0/clean; no laterguestoperation.
+
+Frozen apps/desktop/tests/at/rust-build-routing-protocol.md selects separate
+/opt/linuxcast-f102-lab/rust/bin (Node-only native mount remains unchanged).
+Beforechild require declared cargo/rustc ordinaryexecutables, missing/symlink/
+nonregular/nonexec=>prerequisite, no systemRust fallback. Nodeparent:fixedRust:
+/usr/bin:/bin, no ambientPATH. Compiler provenance/version/hash/rootcustody stays
+separate mandatorycoordinatorpreflight. No prefixprovisioned/compilerexecuted.
+Next fresh independentStandards+SecuritySpec of14-path metadata/input increment,
+and disjoint implementation limitedproduct_staging.py/test_product_staging.py/
+newrust-routing evidence. Allothernative source/pins/contracts stayfrozen.
+
+Host portableBuncache positiveofflineflag0/.362s, emptynegative1/.129s with
+explicitofflinecachemiss, sourceunchanged/exactchildrenabsent. Original+seed
+26079entries reverified,805relativecontainedaliases,4requiredGNUaddonpackages
+ELF64x64headers withoutloading. Compactmanifest4058327bytesfits4MiB size but
+is NOT oldCargo/header schema; no reuseauthority. All55Debianbodies77072036bytes
+verified,15selectedscripts read asdata/no execution, baselinehandlers still
+pending. Independentinitialreview beforepublication/install authority. Exact
+privileged package/locale/input-transfer/build/recovery protocol remainsfuture.
+All97/task/deps/criteria/full1.0 and oldunknown timeoutabsence unchanged.
+
+
 ## PR106 merged; compiler plan and offline input preparation ready for review
 
 PR106 merged36629712ca936f9b88cea86f71b2cc66e610f84c fromc70846fc; CI41382782006
