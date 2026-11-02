@@ -1,0 +1,54 @@
+{
+  "approvedCommit": "1c39172dcd710f738c8eafc3be007656e4dfb7fc",
+  "candidateReportRetainedHistoricallyUnapproved": true,
+  "candidateReportSha256": "998a9fd433e28fa05f4e85fdbd246d1760e9aa4a16894c8c8cfdbe1b84d6fe85",
+  "captureId": "ae9a03d8-76a7-4156-b813-b0c659ef94b4",
+  "consumerScriptSha256": "c9a76fae3fc9918d02020c97c008a4696654f8848b643d2cbe1f820e162c238d",
+  "custodyTrust": "trusted preparation UID; not kernel immutability",
+  "embeddedGuestSource": {
+    "bytes": 48814,
+    "quotedBytes": 48848,
+    "sha256": "8de614aa1dc4fd4855bae2c18da19b1584c93a2f235d91986762bb5cc8eb7492"
+  },
+  "kind": "actual-read-only-first-order-install-metadata",
+  "permitMode": "0400",
+  "permitSha256": "547d277c8c917fcd7e89da012effd3085882ef29943dedf5660602b1e0c74170",
+  "reviewedCommit": "88a2e4d4db78e3e77a373e893eba5f85c447aeb9",
+  "schema": 1,
+  "sixPermitHashes": {
+    "artifactOwnerSha256": "d2cde7f381e11cdc89075e94897a2d80b7a6fdf291d7c9bf6a859a3dade89b4b",
+    "installMetadataCollectorSha256": "62af6f87d9d8038ed01bbc7ec50a982bb6ca80911bfe2f28ca0a350720965e3c",
+    "installMetadataOwnerSha256": "f50eb18683a3080a3aa92eaa18b4fad7278cb5a2de996425944846a52d3bac68",
+    "installMetadataProbeSha256": "8de614aa1dc4fd4855bae2c18da19b1584c93a2f235d91986762bb5cc8eb7492",
+    "installMetadataTargetsSha256": "59e3967d9110c7b451a0ba5181382eef395967bdb4945ef1ceec9561f987f153",
+    "ownerSha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+  },
+  "sourceDirectoryMode": "0500",
+  "sourceFileModes": "0400",
+  "sourceFiles": {
+    "install-metadata-targets.json": {
+      "bytes": 38966,
+      "sha256": "59e3967d9110c7b451a0ba5181382eef395967bdb4945ef1ceec9561f987f153"
+    },
+    "install_metadata.py": {
+      "bytes": 80729,
+      "sha256": "62af6f87d9d8038ed01bbc7ec50a982bb6ca80911bfe2f28ca0a350720965e3c"
+    },
+    "lab_build_facts.py": {
+      "bytes": 47929,
+      "sha256": "d2cde7f381e11cdc89075e94897a2d80b7a6fdf291d7c9bf6a859a3dade89b4b"
+    },
+    "lab_install_metadata_owner.py": {
+      "bytes": 29038,
+      "sha256": "f50eb18683a3080a3aa92eaa18b4fad7278cb5a2de996425944846a52d3bac68"
+    },
+    "lab_owner.py": {
+      "bytes": 54043,
+      "sha256": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399"
+    },
+    "outer-owner-inventory.json": {
+      "bytes": 1801,
+      "sha256": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d"
+    }
+  }
+}

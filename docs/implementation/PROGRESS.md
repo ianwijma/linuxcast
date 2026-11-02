@@ -1,5 +1,91 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR112 opened; current-head CI and GitHub gates pending
+
+https://github.com/ianwijma/linuxcast/pull/112 opened fromc5a0563 on approved
+PR111 merge1c39172; linked immediately. Initial evidence Standardsd8679dd1 and
+Security/Spec88e052b5 clear at2f4a1bf; publication changes review metadata only.
+Current-head checks/configured-requested reviews/bot completion must be inspected
+before exact-head normal merge. No runtime/source/pin or acceptance change.
+Public result and private snapshot remain the single actual successful capture,
+not a replay. Watch after final checkpoint push; no polling. Full97/local1.0,
+F1-02/UI and installation/build/native/session/release remain pending.
+
+## Actual metadata evidence reviews clear; focused publication next
+
+Initial Standardsd8679dd1 and Security/Spec88e052b5 completed and final messages
+read fully, clear at2f4a1bf/base approvedPR111merge1c39172. Ten paths/two commits;
+public hashes/six sources/probe/schema/privacy/cross-records/generated files and
+all97 unchanged non-evidence fields pass. Standards34 controls; Spec23 public
+plus23 codec corruptions pass. Actual capture, cleanup and private comparison
+remain inherited in their independent reports; historical533Python/55mapped/
+type/lint not rerun. Metadata-only publication preserves result/provenance bytes,
+source/test/protocol/pins and acceptance. Focused PR/current-head CI/GitHub review
+inspection next. No active watch yet. Full97/local1.0 and F1-02/UI remain pending.
+
+## First read-only install metadata capture succeeded; evidence review next
+
+One actual supervised invocation from approved PR111 merge1c39172 and exact
+reviewed88a2e4d protected source closure completed exit0 in34.242s, capture
+ae9a03d8-76a7-4156-b813-b0c659ef94b4 (no retry). Fresh17-key/six-hash permit;
+owner result observed767 packages/14 file records/3 directories/3 handlers,
+private23547B SHAf462573e5a8e30eaebb46fa2279d883e9ef2c9fd1631b6e5fab02435dfcd4692.
+Independent exact caller reap/ECHILD, full pinned stopped-exit0/PID0 inspection,
+marker absence, original lock reacquisition, source identities and permit bytes
+unchanged verified. Actual snapshot remains private0400; public summaries only.
+
+Fresh host-only consumer revalidated current artifact under retained reservation
+and prior b19313d2 build-facts canonical snapshot: recorded original dpkg status
+size/digest match; current holds/broken/pending0. Matching status bytes is not
+whole-machine/capacity/locale/keyring revalidation or install admission. Public
+consumer excludes status digest, package names and all captured bodies. Six-file
+candidate report remains historical executionApproved=false; separate actual
+permit/public provenance records execution. No guest dispatch in the consumer.
+
+New evidence: apps/desktop/evidence/shell-native-at/install-metadata-actual-20261102/.
+Initial independent Standards and Security/Spec evidence reviews next, then focused
+PR/CI/GitHub gates. Source/test/protocol/pins unchanged. Pure hook verifier720140c
+held unmerged/unreviewed; first-order helper/recursive closure, closed writers,
+capacity/network/activation/install/locale/toolchain/build/containment/native/AT/
+session/release acceptance remain pending. No native/product/AT run or install.
+All97/full local1.0, F1-02 in-progress/UI pending and historical unknown timeout
+absence unchanged. No active PR/watch.
+
+## PR111 merged; first read-only capture preparation begins
+
+PR111 merged1c39172dcd710f738c8eafc3be007656e4dfb7fc from7bc537c, current-head
+Planning CI41411258226 SUCCESS. MERGEABLE/CLEAN; rulesets empty/develop protection
+404, requested/submitted GitHub reviews and inline threads empty, CodeRabbit
+terminal skip/no actionables. Both initial axes and final253e2de0 clear; source/
+test/protocol bytes remain reviewed88a2e4d. Immediate merge blurb/watch removal.
+
+Root now codex/f1-02-install-metadata-first-capture on approved develop1c39172,
+clean before this coordinator checkpoint. No actual permit/capture or lab action.
+Use the protected candidate, never execute the owner from group-writable project
+or .t3 ancestry; no shared permissions were changed:
+/home/ian/.linuxcast-f102-preparations/install-metadata-candidate-88a2e4d
+Private report (beside candidate) SHA998a9fd433e28fa05f4e85fdbd246d1760e9aa4a16894c8c8cfdbe1b84d6fe85.
+All6 files0500-root/0400-regular, exact Git commit/tree/blob/SHA256 and actual
+source gate verified; identities unchanged, no bytecode. Report remains historical
+executionApproved=false, not a permit. Trusted preparation UID custody is not
+kernel immutability. Frozen six hashes/probe and protected ancestors must be
+rechecked at use; a fresh17-key permit and supervised closed invocation are next.
+Host imports/fixed source construction only so far, no returned guest program run.
+
+Read install-metadata-owner-protocol and existing actual-use/lifecycle evidence
+before the real invocation. Keep stdout/private artifact separate; no raw package,
+registry/config/handler bodies in public evidence. Do not run the tests-only
+FixtureGuard as a real lab owner. Actual owner main retains its reviewed caller/
+guardian/startup120/job30/guest25/total600/cleanup45 limits. Preserve independent
+caller custody, exact reaping/exit and fresh pinned stopped-exit0/marker/lock/source/
+permit postflight; do not replay failed input or infer cleanup from metadata alone.
+
+Pure hook verifier720140c remains held separately, unmerged/unreviewed. Actual
+helper/recursive closure, writer/capacity/network/activation, install/locale/
+build/containment/native/AT/session/release gates stay pending. No task/criterion
+promotion; all97/full local1.0, F1-02 in-progress/UI pending and historical unknown
+timeout-descendant absence remain unchanged. No active PR watch.
+
 ## PR111 opened; current-head CI and GitHub review gates pending
 
 https://github.com/ianwijma/linuxcast/pull/111 opened from4fc357b, base approved
