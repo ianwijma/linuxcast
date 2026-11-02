@@ -1,5 +1,28 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Offline package/input preparation: both initial reviews clear
+
+Both independent initial reviews completed and were read in full at89feb36,
+BASE3662971; exactly14 paths/four commits. Standards4d0480ea clear, no material
+Fowler findings; SecuritySpec07d5dd10 clear, no introducedP1/P2/P3. Both verified
+signed Release/index chains/current freshness/3-2-2 signatures/three tamper
+controls, all55 Debian bodies/tuple-location/control bindings and15 scripts as
+data, all811 lockedSRI archives,2898 source blobs/modes and26079 cache nodes
+including805 contained aliases. Spec independently replayed isolatedAPT3 in a
+fresh private workspace: identical55 Inst/Conf,767 preferred baseline versions
+preserved; NoQueue-off reproduced missing-method refusal. Standards retained
+solver/Bun executions as inherited and confirmed old cache schema refuses the
+new Bun manifest. All97 non-evidence task/acceptance fields unchanged.
+
+Publication metadata only follows reviewed89feb36; source/protocol/evidence
+bytes remain unchanged. Root branch codex/f1-02-offline-js-inputs, no guest/live
+rootcommand/PRwatch at this checkpoint. Disjoint Rust routing implementation
+fd6d0485 remains async; no polling. Trigger handlers, capacity, enforced offline
+worker, upstream tool custody/guest ABI, exact install/transfer/locale/recovery
+contract and build/native/UI/session/release acceptance remain pending. Prior
+actual guest capture/cleanup and hostBun operations remain inherited in reviews.
+Full97/local1.0 and historical unknown timeout-descendant absence unchanged.
+
 ## Offline inputs committed; review and fixed Rust routing implementation next
 
 Root codex/f1-02-offline-js-inputs has imported solver7ea5322, evidence25cb833
