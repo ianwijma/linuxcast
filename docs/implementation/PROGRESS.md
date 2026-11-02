@@ -1,5 +1,25 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR105 merged; fresh canonical keyring capture next
+
+PR105 https://github.com/ianwijma/linuxcast/pull/105 merged normally at
+bf4b49261abab0ac3e8424fabc4afafdd5e93eda fromfec0ededd3cbc099e3be083e2ec554176b0b5f71.
+Current PlanningCI41380097525SUCCESS/MERGEABLE-CLEAN, no requested/submitted
+GitHub reviews, terminal CodeRabbit skip/no actionable feedback; rulesetsnone/
+develop protection404, no override. Both initial independenta86c6617/3beb9a22
+clear oncc158ab, each104focused/55mapped/all399Python under18s plus controls/
+extra probes/type/lint/plan/hash/whitespace. Publication preserves reviewed code.
+Immediate tiny merge blurb sent, watch removed. No live commands/delegates/watch.
+
+Root codex/f1-02-canonical-keyring-capture starts approvedbf4b492. Next seal exact
+reviewedcc158ab ownerd2cde7f3/probe0d7cab8b/19044bytes, archive used27a9f73 permit
+no-replace preserving identity/bytes/mode, fresh14-key permit and one fixed
+coordinator metadata capture. Verify same stoppedexit0/container/root/lock
+identities, no marker, exact linuxcast/sudo/guardian/deadlines; no such capture
+at this checkpoint. Actual last keyring cause still unknown, no packagebaseline.
+All97/dependencies/criteria/full1.0 and historical timeout absence unchanged.
+
+
 ## Canonical keyring both reviews clear; focused publication next
 
 Standardsa86c6617 and SecuritySpec3beb9a22 final reports completed/read in full
