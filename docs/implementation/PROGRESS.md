@@ -1,5 +1,30 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Canonical capture observed; exact offline package/locale resolution next
+
+One reviewedcc158ab/approvedPR105bf4b492 metadata captureb19313d2 completed
+02:55:29.447432–02:56:06.693582UTC,37.229s/exit0/0retries. Observed767records/
+247006privatecanonicalbytes/SHA4fc728c09b869f4cae66ed058adb32d1d92804ca2862cf42cc7fbbb285364196.
+Protectedsource47929/probe0d7cab8b/19044, fresh14keypermit29c3cd5b; old27a permit
+archived no-replace/inode/bytes/mode unchanged. Exactcallerreaped/ownECHILD,
+full pinned stopped/PID0/exit0, markerabsent, original0664lock reacquired,
+unchanged source/permit/stderr0, lifecyclecompleted/none/cleanupnone/clean.
+Public canonical-keyring-actual-20261102/ only closed result/hashes/provenance;
+private snapshot f102-build-facts-b19313d2-06eb-4077-b5cb-8075ee206a4e.json0400.
+
+Private fresh reservation/host validator revalidates snapshot. Clean package
+state/noholds/noforeignarch, knowncapacity/keyring; en_US.UTF-8 missing. Private
+baseline-consumer.json in f102-build-facts-actual-20261102-cc158ab contains needed
+downstream facts; not public. First localconsumer called nonexistent capture()
+then closedlease/no dispatch; corrected pin access succeeds, no capture replay.
+Next reconcile exact packaged-keyring digest with signed Debian public artifact,
+resolve exact compiler/dev/locale closure preserving installed baseline, freeze
+closed offline preparation/install/stage/build authority and custody before use.
+No live processes/delegates/watch, lab stopped. All97/task/deps/criteria/full1.0
+unchanged; no install/build/native/AT/session/release acceptance. Old unknown
+timeout absence and earlier refusal source/results/permits preserved.
+
+
 ## PR105 merged; fresh canonical keyring capture next
 
 PR105 https://github.com/ianwijma/linuxcast/pull/105 merged normally at
