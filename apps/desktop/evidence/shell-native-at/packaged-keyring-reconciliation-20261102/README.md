@@ -65,3 +65,23 @@ simulation or a handwritten dependency selector as final proof.
 All97 tasks/dependencies/criteria and full local1.0 scope remain unchanged.
 Native/session/AT/build/release and historical timeout-descendant uncertainty
 remain outstanding. This preparation is not installation or acceptance.
+
+
+## Initial independent evidence reviews
+
+Both final reports were read in full. Standardsa16ef09e and Security/Spec57698dc2
+are clear at exactd70ecc9aea1764c7b4092c804ef5f812953e13e2 against approved
+bf4b49261abab0ac3e8424fabc4afafdd5e93eda: three commits,13 paths (the initial
+brief's14-path count was corrected from Git). No production/test/protocol change.
+
+Both independently verified public package/keyring/alias, signed index compressed/
+expanded hashes/sizes, freshness, all3 InRelease3/2/2 signatures, exact Release
+payloads and one-byte tamper rejection. Standards checked35 bindings plus probe,
+public relay/schema and25 malformed/privacy controls, full registry/regeneration.
+Security/Spec checked10 new evidence files and pins,19 focused synthetic tests,
+28 additional malformed/cross-record controls and tamper cases in all3 suites.
+Plan/whitespace pass, no private LAB/solver access, all97 definitions/criteria
+unchanged. Their isolated worktrees and public cache fingerprints stayed clean.
+Actual private capture/cleanup/baseline and permit/harness observations remain
+inherited; historical104/55/399 and type/lint were not rerun. No acceptance or
+new authority follows. Publication retains reviewed raw evidence/source bytes.

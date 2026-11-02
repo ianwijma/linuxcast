@@ -1,5 +1,32 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Observed baseline/trust both reviews clear; evidence publication next
+
+Initial Standardsa16ef09e and SecuritySpec57698dc2 completed/read in full at
+d70ecc9/baseapprovedPR105bf4b492. Actualdiff13paths/3commits (brief14corrected),
+no code/test/protocol changes. Each independently publicpackage/keyring/alias,
+Release-index-artifact hashchain/sizes/freshness, signatures3/2/2/exactpayloads/
+onebytetamper reject. Standards35bindings+probe/25controls/registryregeneration;
+Spec10files/pins/19focusedtests/28extra malformedcrossrecord controls/all3tamper.
+Plan/whitespace, cleanworktrees/publiccache fingerprints, all97states unchanged.
+Private actual capture/cleanup/baseline/permitharness remain inherited. Final
+publicationmetadata preserves rawpublicJSON and reviewedsource. Publishfocused
+metadata PR/currentheadchecks-GitHubreviews gates thenpromptmerge.
+
+Solver preparation a1193cc1 remains delegated; no polling/restart. Labstopped,
+no liveowner/guest/watch. No install/build/native/AT/fulltask acceptance.
+
+Independent root sidepreparation (not reviewed/merged proof): exactBunlock42c4f163
+has1003npm+1GitHub+20workspace (earlier1004registry shorthand corrected).
+936linux/x64-eligible resolutions dedupe811archives, allSRIverified in9.035s,
+91412138compressedbytes,0failures/0retries. Sealed outsideLAB in
+f102-public-js-artifacts-20261102/{inventory.json,verification.json,collector.py,
+inventory-parser.mjs,archives/};0500dirs/0400files. Explicitplatformexcluded68;
+no packageinstall/lifecycle/extraction, Bunofflineinstall unverified, Electron
+runtime notincluded. Next audit archive/resource metadata and exactcachematerialization.
+All97/state/deps/criteria/full1.0 and oldunknown timeoutabsence unchanged.
+
+
 ## Packaged trust anchor reconciled; exact Debian solver preparation ready
 
 Actual cc158ab capture remains observed767/247006/SHA4fc728c0, stopped/clean.

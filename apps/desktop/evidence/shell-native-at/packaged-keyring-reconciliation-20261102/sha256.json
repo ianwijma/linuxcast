@@ -2,8 +2,14 @@
   "schema": 1,
   "kind": "public-keyring-continuity-evidence-not-install-authority",
   "files": {
-    "README.md": "6a4b2eea201071d417a72a60be7e8adc19b0fe6dcdb5e4fe52103330175713ef",
+    "README.md": "510574b4b240953975759c2ed508aaabc979729b28bd346612b9367d993a4c34",
     "signature-control.json": "d59e3ef4f1e383c2afa8c93fa61d7597c701621b4c5cd89b93223aa3ba2b1bfa",
     "verification.json": "a2930b9d1e887395ac93e8812d6106069126599478456f8f94ea82814f0972d0"
+  },
+  "initialIndependentReviews": {
+    "reviewedHead": "d70ecc9aea1764c7b4092c804ef5f812953e13e2",
+    "standards": "a16ef09e-edfd-43b7-8883-7e2fe94279cf",
+    "securitySpec": "57698dc2-121d-42e0-bfce-78a482b30a2f",
+    "outcome": "both clear; actual private execution/cleanup remain inherited; source and raw public evidence unchanged"
   }
 }

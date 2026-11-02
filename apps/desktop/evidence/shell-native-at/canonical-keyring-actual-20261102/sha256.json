@@ -7,5 +7,11 @@
     "owner-result.json": "fe74d3c8d36c33fd22a3d7fd6c51db774e541e56c063b0c159c8b139ad284e46",
     "postflight.json": "fcf6d3b7b023622f7cb1d81aef03ffc0cfcccf622b27f90cac3aecbfe2552425",
     "source-provenance.json": "738b796249cd9eae7e89bd48d84e47d436cb335be59cf00e9048b29bb28c0d29"
+  },
+  "initialIndependentReviews": {
+    "reviewedHead": "d70ecc9aea1764c7b4092c804ef5f812953e13e2",
+    "standards": "a16ef09e-edfd-43b7-8883-7e2fe94279cf",
+    "securitySpec": "57698dc2-121d-42e0-bfce-78a482b30a2f",
+    "outcome": "both clear; actual private execution/cleanup remain inherited; source and raw public evidence unchanged"
   }
 }
