@@ -31,26 +31,26 @@ admission and all deadlines remain unchanged.
 
 Linux x86_64, Python3.10.12, pinned Node24.22.1/Bun1.4.4:
 
--104 focused tests pass in1.399s; no skips/expected failures.
--55 mapped F1-02 security checks pass in10.56s. The unchanged18s wrapper discovers
+- 104 focused tests pass in1.399s; no skips/expected failures.
+- 55 mapped F1-02 security checks pass in10.56s. The unchanged18s wrapper discovers
   and successfully executes all399 Python cases without skips/expected failures;
   its Vitest case takes9.420s. This is offline evidence, not guest execution.
--Full no-write TypeScript and whole-repository ESLint pass.
--The four new regression methods produce4 behavioral failures/zero errors with
+- Full no-write TypeScript and whole-repository ESLint pass.
+- The four new regression methods produce4 behavioral failures/zero errors with
   exact586045d source, then pass current source in private copies. The broader
   first red run produced7 failures, including3 existing tests retargeted to the
   canonical path; no failing production assertion was removed.
--The documented alias fixture uses a real relative symlink and private files,
+- The documented alias fixture uses a real relative symlink and private files,
   drives production collector→codec→independent host validation, checks the
   expected public-key hash/version and proves the alias was never opened.
--No-fallback, FIFO/directory/empty/wrong-owner/writable-mode and same-byte path
+- No-fallback, FIFO/directory/empty/wrong-owner/writable-mode and same-byte path
   replacement cases are covered. Existing symlink/hardlink/size/permission and
   read-bound tests now exercise the canonical path. All owned FDs are retired.
--The general synthetic filesystem also retains a regular compatibility-name
+- The general synthetic filesystem also retains a regular compatibility-name
   fixture so unrelated historical source controls continue to exercise their
   original defect. The dedicated Debian-layout case replaces it with the actual
   relative alias shape; it does not relax the production allowlist.
--Historical projection6 failures/materializing-mutant3, diagnostics25 and
+- Historical projection6 failures/materializing-mutant3, diagnostics25 and
   custody11/2/4 controls all retain their expected old failures/zero errors and
   current green results. Source-literal scope, AST/syntax, current/input hashes,
   plan validation and whitespace pass.
