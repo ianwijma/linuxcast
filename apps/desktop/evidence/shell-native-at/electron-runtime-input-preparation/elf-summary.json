@@ -1,0 +1,240 @@
+{
+  "cpuRuntimeVerified": false,
+  "downloadedProgramsExecuted": 0,
+  "files": [
+    {
+      "bytes": 2794080,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "libffmpeg.so",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/00-libffmpeg.so.txt",
+      "readelfSha256": "e2a0c5541788c51395c8ed976d669213818fa8690e89dea592345eac666bc4f2",
+      "readelfStderrBytes": 0,
+      "sha256": "c114673acfcf2910a3b95bd2fdf7e5a9527ff7e83c985d2233079b89567ce16d",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.6",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "bytes": 234483016,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libX11.so.6",
+        "libXcomposite.so.1",
+        "libXdamage.so.1",
+        "libXext.so.6",
+        "libXfixes.so.3",
+        "libXrandr.so.2",
+        "libasound.so.2",
+        "libatk-1.0.so.0",
+        "libatk-bridge-2.0.so.0",
+        "libatspi.so.0",
+        "libc.so.6",
+        "libcairo.so.2",
+        "libcups.so.2",
+        "libdbus-1.so.3",
+        "libdl.so.2",
+        "libexpat.so.1",
+        "libffmpeg.so",
+        "libgbm.so.1",
+        "libgcc_s.so.1",
+        "libgio-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libgobject-2.0.so.0",
+        "libgtk-3.so.0",
+        "libm.so.6",
+        "libnspr4.so",
+        "libnss3.so",
+        "libnssutil3.so",
+        "libpango-1.0.so.0",
+        "libpthread.so.0",
+        "libsmime3.so",
+        "libudev.so.1",
+        "libxcb.so.1",
+        "libxkbcommon.so.0"
+      ],
+      "path": "electron",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/01-electron.txt",
+      "readelfSha256": "8336dc65621ae3fade07c51176daf5858d642049c7bf36f13dba7a67d21f942c",
+      "readelfStderrBytes": 0,
+      "sha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.11",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.18",
+        "GLIBC_2.2.5",
+        "GLIBC_2.23",
+        "GLIBC_2.25",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.8",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "bytes": 4575144,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "libvk_swiftshader.so",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/02-libvk_swiftshader.so.txt",
+      "readelfSha256": "cf2d2495d7409e299ec06304bb61f4a73865f8dcacce841ddbd98188aba7c71f",
+      "readelfStderrBytes": 0,
+      "sha256": "85c95943b28750ef574e56f1825f6c92151e1bbfa4853342508510b5599801a3",
+      "versionSymbols": [
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.6",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "bytes": 2509496,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libpthread.so.0"
+      ],
+      "path": "libvulkan.so.1",
+      "programExecuted": false,
+      "properties": [],
+      "readelfOutput": "readelf/03-libvulkan.so.1.txt",
+      "readelfSha256": "8b3e1307485de06d903112072473a5c701f983182a6e78f3ddec8eefc1f7fffc",
+      "readelfStderrBytes": 5976,
+      "sha256": "29d0e0c13e533c07a8d52c70d9ac83de3fabda9de8859a96452b4d7c9ebd81a7",
+      "versionSymbols": [
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "bytes": 1683256,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libdl.so.2",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "chrome_crashpad_handler",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/04-chrome_crashpad_handler.txt",
+      "readelfSha256": "0394c9e491a9b457fa4d3311ca0f7189f2266348ef09e2dbdbf34781a5851aa1",
+      "readelfStderrBytes": 0,
+      "sha256": "cc41b019d3ed6f1687ae72fa5e0e9b1bf155db57a7cc0f3b42b873038542ad6b",
+      "versionSymbols": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "bytes": 15216,
+      "class": "ELF64",
+      "endian": "little",
+      "machine": "x86-64",
+      "needed": [
+        "libc.so.6",
+        "libpthread.so.0"
+      ],
+      "path": "chrome-sandbox",
+      "programExecuted": false,
+      "properties": [
+        "[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]"
+      ],
+      "readelfOutput": "readelf/05-chrome-sandbox.txt",
+      "readelfSha256": "11ee450d1bfcf327bd572fa17a6f0f7063f1b5ff688f0243ebfa702bf24cd6f9",
+      "readelfStderrBytes": 0,
+      "sha256": "f16e2562837856845cfc8ebf4aa7f78b57fdadc6b69130509b1db87ce5d2f869",
+      "versionSymbols": [
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    }
+  ],
+  "guestAbiVerified": false,
+  "reader": "/usr/bin/readelf",
+  "schema": 1
+}

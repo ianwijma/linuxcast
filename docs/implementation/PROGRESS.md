@@ -1,5 +1,82 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Electron runtime input evidence: both initial reviews clear
+
+Initial Standards9f21a79c and SecuritySpec308c4d71 completed/read in full at
+cb1610a/baseapprovedPR108dea300a, exactly9paths/twocommits; bothclear, no
+introducedP1/P2/P3/material Fowler findings. Both independently5local/18retained
+bindings,6authorfiles byteidentical81b72e3, lockednpmSRIs/39packagefiles,72ZIP
+members286798592bytes/6ELFstaticrequirements, registry/cards/plan/whitespace pass.
+Standards ownbytelevelELFparser confirmsallrequirements; acquiredtiming/redirect/
+APIexecutioncleanup inherited. Spec2SRItamper+10archivemetadata controls andfresh
+verifiedget5.1.0 API validseed0downloads vs empty/wrongchecksum/corruptseed1injected
+refusaleach;9deps/342regularfiles beforeafter, exactchildrenreaped/ECHILD.
+Noinstaller/runtimebinary/addon/guestexecution; kernelnettechdenial unproved.
+Both cleanbeforeafter/publicinputfingerprints unchanged. All97non-evidence
+records/deps/criteria unchanged. Publicationmetadataonly, evidence/sourcefrozen.
+FocusedPR/currentheadCI/GitHubreview gates next; no actualinstall/native gate.
+
+Independent root toolchainprovenance work saved94cf68c on
+codex/f1-02-toolchain-provenance fromapproveddea300a (notincludedhere): verified
+Node24.22.1/Bun1.4.4/Rust1.95.0 signedmetadata1each/3tamperrefusals;8publicarchives
+263388790bytes and21ELFdata, exacthostNode/Bun bytes matchsignedmembers. Bunboth
+ZIPvariants haveidenticalbinary; strictchecksumparser corrections preserved.
+92publicbindingssealedoutsideLAB, no tool/installer/guestexecution, reviewpending.
+Research2f1bcb73 actualAPT/dpkg locking/trigger constraints remainsasync, no polls.
+No live rootcommand/guest/watch. Lastgueststoppedexit0 inherited; all97/local1.0
+and unknownhistoricaltimeoutdescendant absence remainpending/unchanged.
+
+## PR108 merged; Electron input evidence reconciled for initial reviews
+
+PR108 merged dea300ade7fa211021daef1d4367f04754df2693 frome00435f; current
+PlanningCI41390968950 SUCCESS/CLEAN/MERGEABLE, no requested/submitted GitHub
+reviews/inline threads, CodeRabbit terminal skip/no actionables; no override.
+Both INITIAL Rust reviews clear, publication metadata only. Immediate tinymerge
+blurb sent; watch removed. All97 task/dependency/criterion states unchanged.
+
+Root codex/f1-02-electron-runtime-integration starts approvedPR108dea300a.
+Authored81b72e3 runtime evidence copied e5d5794: six evidence files byte-identical,
+only coordinatorPROGRESS/registry/card reconciled to preserve both histories;
+no production/test/protocol change. Five local hashes and18retained bindings,
+local links, author byteidentity, all97 non-evidence records, plan/whitespace
+pass. Artifact/rawcache/staticreport identities and prior host execution are
+preserved separately; no new download/library/runtime/guest invocation here.
+Next fresh INITIAL Standards+SecuritySpec on frozen integratedmetadata.
+
+Parallel primary-source research will settle actualAPT3/dpkg lock/hook and
+baseline-trigger review/capture prerequisites for a closed local55-install
+transaction. It may propose the smallest required read-only state capture;
+no guest/root/install/job authority or implementation is granted. Actualtrigger
+bytes/state, capacity, rootprotectedtool/input-transfer/localedef/build/receipt/
+containment/native AT/session/release gates remainpending. Last actualguest
+still inherited cleanstopped/exit0; no live rootcommand/watch. Full97/local1.0
+and historical unknown timeout-descendant absence remain unchanged.
+
+## Electron runtime inputs prepared; Rust routing reviews both clear
+
+Independent host preparation oncodex/f1-02-electron-runtime-inputs from approved
+PR107d5651a0: official Electron45linux-x64 ZIP123909792bytes matches SHA22f6a10b
+from lockednpm bundledchecksums, lockSRI reverified. Static72regularmembers/
+286798592expandedbytes/6ELF64x64 readelfdata audited; no downloadedbinary/installer
+execution. Actualpinnedget5.1.0 libraryJavaScript controls pass: validreadonlyseed
+checksumhit/0downloadcalls, empty+wrongchecksum each injecteddownloadrefusal1.
+No kernelnetworkdenial claim; defaultAPI hasdownloadfallback.39packagefiles/
+seedinode-mode-hash unchanged, exactownedchildreaped/ECHILD,0.593s. Rawarchives/
+staticreports/owncachefixtures sealedoutsideLAB, bindings retained. No real lab,
+root/guest/prefix/provision/build/native operation. Newruntimeevidence needs its
+own review; install/transfer/extractor/toolauth/capacity/CPU-ABI-sandbox/native
+acceptance remainpending. No task/criteria promotion.
+
+Both Rust routing INITIAL reviews completed and read in full at3493b3f/base
+approvedd5651a0,11paths/twocommits. Standards0f0af6b6 clear; Spec8726742c clear.
+Each independently15staging/expectedhistorical-mutantcontrols0errors/no skips/
+55mappedsecurity/fulltype-lint/plan/whitespace/47source+5evidence hashes. Standards
+standalone402Python9.110s; Spec9filesystemfaults and3syntheticowner cleanup paths.
+Eightauthorpaths match18c1b64; coordinatoronlymetadata. Preparefocused Rust PR
+next from preserved codex/f1-02-rust-routing-integration3493b3f. No PRwatch or live
+rootcommand/delegate remains. Last gueststopped/exit0 inherited; all97/local1.0
+and oldunknown timeout-descendant absence unchanged.
+
 ## Fixed Rust routing: both initial reviews clear; publication next
 
 Both INITIAL independent reviews completed/read fully at3493b3f/baseapproved
