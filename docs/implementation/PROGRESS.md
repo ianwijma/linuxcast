@@ -1,5 +1,34 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Install-metadata review loop clear; publication next
+
+Initial owner Standardsd2de0ad7 completed and was read in full: clear atc1783c9,
+53 collector/67 owner/four composition,55 mapped/526 Python15.207s; historical
+controls, hashes, type/lint/AST/plan/whitespace and clean fingerprints pass.
+Final bounded253e2de0 was read fully: Security/Spec and Standards of correction
+clear at88a2e4d. Both owner P2s closed;69 owner/nine composition,55 mapped and
+533 Python16.914s under18s, no skips. Four private guard mutants expose eight
+behavioral failures; seven regressions expose14 BASE failures, all zero errors;
+five extra probes pass.13 old+13 current bindings, unchanged probe/ten inputs,
+all97 records and exact clean fingerprints verified. Earlier review axes remain
+separate evidence, not replaced by the final correction review.
+
+Coordinator now has a six-file read-only candidate under protected home prefix:
+/home/ian/.linuxcast-f102-preparations/install-metadata-candidate-88a2e4d.
+Exact commit/tree/blob identities and reviewed SHA256/size bindings verified;
+root0500/files0400, actual unmodified source gate passes, six identities unchanged.
+Project/.t3 ancestry did not satisfy that gate; no shared modes changed. Private
+candidate reportSHA998a9fd433e28fa05f4e85fdbd246d1760e9aa4a16894c8c8cfdbe1b84d6fe85.
+Only host imports/fixed source construction ran; guest source was not executed.
+No permit or owner CLI, executionApproved=false; trusted preparation UID custody,
+not kernel immutability. Candidate can be reconsidered after publication gates.
+
+Publication changes coordinator metadata only, preserves88a2e4d code/tests/protocols.
+Focused PR/current-head CI/GitHub review-bot checks are next. No current PR/watch.
+Pure hook verifier720140c stays held separately, unreviewed/unmerged. No actual
+lab/guest/install/compiler/native capture or acceptance promotion; all97/full
+local1.0, F1-02 in-progress/UI pending and old timeout uncertainty remain intact.
+
 ## Owner marker custody and known failure reasons corrected
 
 Initial owner Security/Spec7e2125e8 was read in full at c1783c9. Collector
