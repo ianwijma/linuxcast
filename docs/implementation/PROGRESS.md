@@ -1,5 +1,31 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR108 merged; Electron input evidence reconciled for initial reviews
+
+PR108 merged dea300ade7fa211021daef1d4367f04754df2693 frome00435f; current
+PlanningCI41390968950 SUCCESS/CLEAN/MERGEABLE, no requested/submitted GitHub
+reviews/inline threads, CodeRabbit terminal skip/no actionables; no override.
+Both INITIAL Rust reviews clear, publication metadata only. Immediate tinymerge
+blurb sent; watch removed. All97 task/dependency/criterion states unchanged.
+
+Root codex/f1-02-electron-runtime-integration starts approvedPR108dea300a.
+Authored81b72e3 runtime evidence copied e5d5794: six evidence files byte-identical,
+only coordinatorPROGRESS/registry/card reconciled to preserve both histories;
+no production/test/protocol change. Five local hashes and18retained bindings,
+local links, author byteidentity, all97 non-evidence records, plan/whitespace
+pass. Artifact/rawcache/staticreport identities and prior host execution are
+preserved separately; no new download/library/runtime/guest invocation here.
+Next fresh INITIAL Standards+SecuritySpec on frozen integratedmetadata.
+
+Parallel primary-source research will settle actualAPT3/dpkg lock/hook and
+baseline-trigger review/capture prerequisites for a closed local55-install
+transaction. It may propose the smallest required read-only state capture;
+no guest/root/install/job authority or implementation is granted. Actualtrigger
+bytes/state, capacity, rootprotectedtool/input-transfer/localedef/build/receipt/
+containment/native AT/session/release gates remainpending. Last actualguest
+still inherited cleanstopped/exit0; no live rootcommand/watch. Full97/local1.0
+and historical unknown timeout-descendant absence remain unchanged.
+
 ## Electron runtime inputs prepared; Rust routing reviews both clear
 
 Independent host preparation oncodex/f1-02-electron-runtime-inputs from approved
