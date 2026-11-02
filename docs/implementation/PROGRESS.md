@@ -1,5 +1,25 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR104 merged; fresh projection capture next
+
+PR104 https://github.com/ianwijma/linuxcast/pull/104 merged normally at
+0a363239473cfc81c2c3d4895d1d5c3df2f4fe87 from5d262731a34cec758ae367124703ac38b05cda3e.
+Current PlanningCI41370128888SUCCESS, exact head MERGEABLE/CLEAN, no requested/
+submitted GitHub reviews, terminal CodeRabbit skip/no actionable feedback.
+Independentbb7a5297/6a27b37d both clear on27a9f73 with395Python and extra controls;
+publication metadata preserves reviewed code. Immediate tiny merge blurb sent,
+watch removed. Explicit discarded-value projection refinement is integrated;
+selected-field/line/stanza/input/output/command/custody/deadline bounds preserved.
+
+Root codex/f1-02-projection-capture from approved0a36323. Next seal exact reviewed
+27a9f73 source (embedded795c8004/19044bytes), preserve/archive used3536145 permit
+no-replace under same retained lock, create fresh14-key metadata permit and one
+coordinator-only capture. Fresh exact stopped/exit0/config/root/lock checks before
+start; same linuxcast/sudo and guardian/shutdown budgets. No such invocation yet
+at this checkpoint. Actual prior offending field category remains unknown; both
+prior captures unavailable. No package/native/AT/full-task acceptance promotion,
+all97/deps/criteria unchanged; old unknown timeout absence remains unknown.
+
 ## Status projection both initial reviews clear; publication next
 
 Security/Specbb7a5297 and Standards6a27b37d completed/read on27a9f73/base63118f1;
