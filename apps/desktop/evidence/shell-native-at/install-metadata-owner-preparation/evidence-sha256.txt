@@ -1,0 +1,3 @@
+c057952ba58078d73b7c221ef40d030332f9e31ce218312613b1b9051d3bb045  apps/desktop/evidence/shell-native-at/install-metadata-owner-preparation/README.md
+d92ec99369182e79aaa838fe71961b6900196b1f2f6fc9d50301b0190c74e53c  apps/desktop/evidence/shell-native-at/install-metadata-owner-preparation/checks.json
+14c2e49d0cfecf97e4e17fd963cd7d1abc6b24589fac0646fa0b91ced1753475  apps/desktop/evidence/shell-native-at/install-metadata-owner-preparation/source-sha256.txt
