@@ -1,5 +1,28 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Fixed Rust routing: both initial reviews clear; publication next
+
+Both INITIAL independent reviews completed/read fully at3493b3f/baseapproved
+PR107d5651a0: Standards0f0af6b6 and SecuritySpec8726742c clear, no introduced
+P1/P2/P3 or material Fowler finding. Exact11paths/twocommits; eightownedpaths
+byte-identical toauthor18c1b64. Each15staging/controlscript expectedreds0errors/
+0skips/original12green,55mapped/fulltype-lint/47source+5evidence/plan/whitespace
+pass. Standards standalone402Python9.110s; Spec9additionalfilesystemfaults
+pre-owner/pre-child/no-receipt and3syntheticowner cleanup controls pass. Both
+cleanbeforeafter, ownreviewdepsremoved. Compiler/provision/ABI/native facts stay
+inherited/unverified; separate rootprotectedtoolcustody/sysroot/hash/version/
+ELF/guestpreflight stillmandatory. Publicationmetadataonly preservesreviewed
+source/protocol/evidence. FocusedPR/currentheadCI/GitHubreview gates next.
+
+Separate newreadonlyElectron input work saved81b72e3 on
+codex/f1-02-electron-runtime-inputs fromapprovedd5651a0 (notincludedhere): official
+ZIP123909792bytes matchesbundled lockedchecksum,72regular/286798592bytes/6ELF
+staticreadelf; actualget5.1.0 APIseedhit0downloadcalls vs empty/wrongchecksum
+injectedrefusals.39packagefiles/seedunchanged, ownedchildabsent, nokernelnetdenial
+or installer/runtime/guestexecution. Its evidence independentreview pending.
+No livecommands/delegates/guest/watch; all97 state/deps/criteria/full1.0 and old
+unknown timeout-descendant absence unchanged.
+
 ## PR107 merged; fixed Rust routing integrated for initial review
 
 PR107 merged d5651a05aabb686ef3b6b3432d1ad076aaf90dc9 from5988bc4;
