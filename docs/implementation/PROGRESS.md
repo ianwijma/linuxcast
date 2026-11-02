@@ -1,5 +1,100 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Offline package/input preparation: both initial reviews clear
+
+Both independent initial reviews completed and were read in full at89feb36,
+BASE3662971; exactly14 paths/four commits. Standards4d0480ea clear, no material
+Fowler findings; SecuritySpec07d5dd10 clear, no introducedP1/P2/P3. Both verified
+signed Release/index chains/current freshness/3-2-2 signatures/three tamper
+controls, all55 Debian bodies/tuple-location/control bindings and15 scripts as
+data, all811 lockedSRI archives,2898 source blobs/modes and26079 cache nodes
+including805 contained aliases. Spec independently replayed isolatedAPT3 in a
+fresh private workspace: identical55 Inst/Conf,767 preferred baseline versions
+preserved; NoQueue-off reproduced missing-method refusal. Standards retained
+solver/Bun executions as inherited and confirmed old cache schema refuses the
+new Bun manifest. All97 non-evidence task/acceptance fields unchanged.
+
+Publication metadata only follows reviewed89feb36; source/protocol/evidence
+bytes remain unchanged. Root branch codex/f1-02-offline-js-inputs, no guest/live
+rootcommand/PRwatch at this checkpoint. Disjoint Rust routing implementation
+fd6d0485 remains async; no polling. Trigger handlers, capacity, enforced offline
+worker, upstream tool custody/guest ABI, exact install/transfer/locale/recovery
+contract and build/native/UI/session/release acceptance remain pending. Prior
+actual guest capture/cleanup and hostBun operations remain inherited in reviews.
+Full97/local1.0 and historical unknown timeout-descendant absence unchanged.
+
+## Offline inputs committed; review and fixed Rust routing implementation next
+
+Root codex/f1-02-offline-js-inputs has imported solver7ea5322, evidence25cb833
+and frozen Rust-routing contractdd997cd atop approvedPR1063662971. Fullinput
+checks/artifacts described below; no livecommand/guest/delegate/PRwatch. Last
+actual VMpostflightb19313d2 stopped/exit0/clean; no laterguestoperation.
+
+Frozen apps/desktop/tests/at/rust-build-routing-protocol.md selects separate
+/opt/linuxcast-f102-lab/rust/bin (Node-only native mount remains unchanged).
+Beforechild require declared cargo/rustc ordinaryexecutables, missing/symlink/
+nonregular/nonexec=>prerequisite, no systemRust fallback. Nodeparent:fixedRust:
+/usr/bin:/bin, no ambientPATH. Compiler provenance/version/hash/rootcustody stays
+separate mandatorycoordinatorpreflight. No prefixprovisioned/compilerexecuted.
+Next fresh independentStandards+SecuritySpec of14-path metadata/input increment,
+and disjoint implementation limitedproduct_staging.py/test_product_staging.py/
+newrust-routing evidence. Allothernative source/pins/contracts stayfrozen.
+
+Host portableBuncache positiveofflineflag0/.362s, emptynegative1/.129s with
+explicitofflinecachemiss, sourceunchanged/exactchildrenabsent. Original+seed
+26079entries reverified,805relativecontainedaliases,4requiredGNUaddonpackages
+ELF64x64headers withoutloading. Compactmanifest4058327bytesfits4MiB size but
+is NOT oldCargo/header schema; no reuseauthority. All55Debianbodies77072036bytes
+verified,15selectedscripts read asdata/no execution, baselinehandlers still
+pending. Independentinitialreview beforepublication/install authority. Exact
+privileged package/locale/input-transfer/build/recovery protocol remainsfuture.
+All97/task/deps/criteria/full1.0 and oldunknown timeoutabsence unchanged.
+
+
+## PR106 merged; compiler plan and offline input preparation ready for review
+
+PR106 merged36629712ca936f9b88cea86f71b2cc66e610f84c fromc70846fc; CI41382782006
+SUCCESS/MERGEABLE-CLEAN/noGitHubreviewrequests-or-submissions/terminalbotskip.
+Initiala16ef09e/57698dc2 clear, actual13paths/3commits; immediateblurb/unwatch.
+Root codex/f1-02-offline-js-inputs starts approved3662971. No livecommand/guest/
+delegate/watch. Last guestpostflight b19313d2 stopped/exit0/clean, no laterdispatch.
+
+Resolvera1193cc1 completed/readfully, author105856d reportcherrypicked7ea5322:
+APT3.0.3 built-in3.0 with verifiedprivate16Debianruntime/loader and isolatedconfig,
+55install/767keep/0upgrade-downgrade-remove-heldchange; exacttuple Inst/Conf replay,
+allpreferredbaselineversions held. Private /tmp/f102-debian-resolution-haf7i667/
+full-plan.private.json213796bytes/SHA495b3acfe8b4c6ed0af811decb84c776da7d4974388c4ca1b37a3e88713363f3.
+Requestedg++/make/libgio-dev; existinglocale data onlyenUSgenerationneeded.
+NoQueue safely skipsarchiveacquisition in simulation, notauthenticationproof.
+55publicbodydownloads now independentlyauthenticated77072036bytes; immutable
+f102-public-debian-build-packages-20261102 outsideLAB. Staticmaintainerdata audit
+f102-public-debian-maintainer-audit-20261102:15scripts/4232files/294754869bytes,
+no serviceactivation/setID/special observed; compileralternatives/doclinkhelpers/
+pkgconfdir/f77danglingcleanup are real ifexecuted. Baseline ldconfig/pathtrigger
+handlers and exactprivilegedinstall/locale/transfer/recoveryauthority stillpending.
+New evidence debian-build-package-inputs/ and importedsolverreport: reviewnext.
+
+IndependentJSinputs:811SRIarchives91412138bytes/936eligible/68explicitexcludes,
+1003npm+1GitHub+20workspaces. Audit21602regular333503606bytes, no escapedpaths,
+18ELF/24addon names,89scriptdeclarations. Failedroot-nameassumption preserved,
+v2auditpasses. f102-public-js-artifacts-20261102 and audit-v2 sealedoutsideLAB.
+Host f102-host-bun-cache-preparation-20261102:approved366tar122306560bytes/
+2898blobIDs+execflagschecked; sourceunchangedhostBunignore-scripts0, cache21681
+regular329633297bytes;805absolutealiasesrebasedcontainedrelative. Seed500,
+files400/500; compactmanifest4058327bytes/26079nodes notoldcacheformat.
+Fresh warmofflineflag0/.362s vs emptycache1/.129s explicitcachemiss, bothsource
+unchanged and exactchildrenabsent viaexistingFixtureGuard. GNU4addonheadersx64,
+no loading. Not kernelnetdenial/guestABI/build/Electronruntime proof. New
+summary/bindings offline-js-input-preparation/; rawprototypeharnesses retained.
+
+Next fresh independent Standards+SecuritySpec of candidateplan/input evidence,
+plus disjoint tool/runtime CPU/ELF/cache acquisition audit. Freeze closedguest
+package+locale/stage/build protocol before any new authority or root operation.
+Need measuredcapacity, immutablefinalsource promotion, RustPATH routing, exact
+approved input transfer and reviewed partial-state recovery. All97/task/deps/
+criteria/full1.0 and historicalunknown timeout-descendant gap remain unchanged.
+
+
 ## Observed baseline/trust both reviews clear; evidence publication next
 
 Initial Standardsa16ef09e and SecuritySpec57698dc2 completed/read in full at

@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "kind": "host-offline-input-preparation-not-Debian-build-or-acceptance",
+  "collection": {
+    "lockSha256": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+    "registryResolutions": 1003,
+    "githubSourceResolutions": 1,
+    "workspaceResolutions": 20,
+    "selectedResolutions": 936,
+    "explicitPlatformExcluded": 68,
+    "uniqueSelectedArchives": 811,
+    "verifiedArchives": 811,
+    "verifiedCompressedBytes": 91412138,
+    "completeForSelectedLockedArchives": true,
+    "automaticRetries": 0
+  },
+  "archiveAudit": {
+    "archivesInspected": 811,
+    "counts": {
+      "directories": 92,
+      "elfFiles": 18,
+      "executableModeFiles": 185,
+      "expandedFileBytes": 333503606,
+      "members": 21694,
+      "nodeAddonFiles": 24,
+      "regularFiles": 21602
+    },
+    "unsafePathOrLinkObservations": [],
+    "archiveExtractionPerformed": false
+  },
+  "declaredLifecyclePackageCount": 89,
+  "sourceArchive": {
+    "revision": "36629712ca936f9b88cea86f71b2cc66e610f84c",
+    "tree": "01053ba18a5561e74d9f173ed216d9e184ec6ef6",
+    "archiveSha256": "a6aef1867ddbec80e5908af232d831c7c213afa88553e0631dc774db8dea2f33",
+    "archiveBytes": 122306560,
+    "files": 2898,
+    "allBlobIdsAndExecutableFlagsVerified": true,
+    "sourceSignatureVerification": "not reverified here; approved merge provenance, no release-signing claim",
+    "bunSha256": "10702245766b225e70bbf6235fd6b47214fd94b4760d00ffaed8ab0df57ac235",
+    "nodeSha256": "e32e2d16081cf644f88392934288086e7662529d0d43277c34f7aad2207cfafb"
+  },
+  "onlinePreparation": {
+    "exitCode": 0,
+    "failureClass": null,
+    "elapsedSeconds": 1.661,
+    "exactChildrenReapedAndAbsent": true,
+    "sourceBytesUnchanged": true,
+    "bunVersion": "1.4.4",
+    "nodeVersion": "24.22.1",
+    "lifecycleScriptsDisabledByFlag": true,
+    "cacheRegularFiles": 21681,
+    "cacheRegularBytes": 329633297
+  },
+  "portableCacheChecks": {
+    "acceptance": "pending",
+    "aliasesRebasedToContainedRelativeTargets": true,
+    "electronRuntimePrepared": false,
+    "emptyOfflineExitCode": 1,
+    "exactOwnedChildrenAbsentBothCases": true,
+    "guestOperations": 0,
+    "kind": "host-cache-offline-flag-control-not-network-containment-or-guest-proof",
+    "lifecycleScriptsDisabledByFlag": true,
+    "networkDenialVerified": false,
+    "onlineCacheSourceUnmodified": true,
+    "portableSeedBytesUnchanged": true,
+    "portableSeedRegularFiles": 21681,
+    "portableSeedSymlinks": 805,
+    "productBuild": false,
+    "regularBytes": 329633297,
+    "schema": 1,
+    "sourceBytesUnchangedBothCases": true,
+    "warmOfflineExitCode": 0
+  },
+  "supplementalChecks": {
+    "schema": 1,
+    "originalAndSeedRegularBytesStillMatch": true,
+    "all805SeedAliasesRelativeContainedAndEquivalent": true,
+    "requiredLinuxGnuPackagesPresent": [
+      {
+        "name": "@rollup/rollup-linux-x64-gnu",
+        "version": "4.65.0",
+        "files": [
+          {
+            "name": "rollup.linux-x64-gnu.node",
+            "bytes": 2170248,
+            "sha256": "0b7f8d79e811d3a3e5a59be2bab617e4e1714a30ef8c32cafba33140750396d5",
+            "elfClass": 64,
+            "machine": "x86_64"
+          }
+        ]
+      },
+      {
+        "name": "@tailwindcss/oxide-linux-x64-gnu",
+        "version": "4.3.3",
+        "files": [
+          {
+            "name": "tailwindcss-oxide.linux-x64-gnu.node",
+            "bytes": 2997400,
+            "sha256": "cc1d852b9d8bdca43db28aff578de9628ca54a960e10297a3f100a32bf5a9be3",
+            "elfClass": 64,
+            "machine": "x86_64"
+          }
+        ]
+      },
+      {
+        "name": "lightningcss-linux-x64-gnu",
+        "version": "1.32.0",
+        "files": [
+          {
+            "name": "lightningcss.linux-x64-gnu.node",
+            "bytes": 10040456,
+            "sha256": "2024f99789a601c7438b387117032ba07594cbba9b784064b47cdc60a0972326",
+            "elfClass": 64,
+            "machine": "x86_64"
+          }
+        ]
+      },
+      {
+        "name": "@napi-rs/lzma-linux-x64-gnu",
+        "version": "1.5.1",
+        "files": [
+          {
+            "name": "lzma.linux-x64-gnu.node",
+            "bytes": 1445448,
+            "sha256": "1f62f0ff272b69f09dff7c867d840d407f2b43c5b6170fd6af0928ed0f542ed4",
+            "elfClass": 64,
+            "machine": "x86_64"
+          }
+        ]
+      }
+    ],
+    "dynamicLoadingPerformed": false,
+    "guestAbiProof": false,
+    "guestOperations": 0
+  },
+  "portableManifest": {
+    "prettyBytes": 5080657,
+    "compactBytes": 4058327,
+    "compactSha256": "ba7d52ad87949876068d7d858e4335d7aeb976f44188835082d740da7074eba8",
+    "oldCargoHeaderManifestFormatNotReused": true
+  },
+  "artifactExtractionFailure": {
+    "initialAudit": "stopped on incorrect package-root-name assumption; @types/keyv root is keyv",
+    "failedAttemptPreserved": true,
+    "fixedAuditOnlyRequiresOneContainedRelativeRoot": true
+  },
+  "electronRuntimePrepared": false,
+  "kernelNetworkDenialVerified": false,
+  "guestOperations": 0,
+  "productBuild": false,
+  "acceptance": "pending"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "offline-input-preparation-evidence-not-execution-authority",
+  "files": {
+    "README.md": "2374e438001c2c3d4181eaef043866890561973b513071a4530ab88b69be7641",
+    "artifacts.json": "4879e9fc3aa6f1544e51074284a679a795af3ae863325758cfcc623215b07933",
+    "control-summary.json": "22a23375b31fdaaf9a2e8891eb88e518caebe19cbeb03e2f550ea95179297ad6",
+    "retained-bindings.json": "e261e667543828ef15cd2e10f8e382fe2875fda0d586829c7c0ac31cd5119e22"
+  },
+  "acceptance": "pending"
+}

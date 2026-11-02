@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "retained-public-package-audit-bindings",
+  "files": {
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-debian-build-packages-20261102/verification.json": {
+      "bytes": 33864,
+      "sha256": "4879e9fc3aa6f1544e51074284a679a795af3ae863325758cfcc623215b07933"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-debian-build-packages-20261102/collector.py": {
+      "bytes": 6734,
+      "sha256": "9988ccd709ecdc90241bb7ca2662d7536be93ce9136fa2434e14723709253471"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-debian-maintainer-audit-20261102/audit.json": {
+      "bytes": 73683,
+      "sha256": "8995047f109f7e2e3c7ab580fd61929acdfacc256c9d19a43b00261262e6f1f5"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-debian-maintainer-audit-20261102/payload-files.json": {
+      "bytes": 1250446,
+      "sha256": "341b9d45b330b0cd8379d7861af72e269a9224c4189bc6ccefd8bad5907acc3a"
+    },
+    "/home/ian/Projects/ianwijma/linuxcast/.worktrees/f102-public-debian-maintainer-audit-20261102/auditor.py": {
+      "bytes": 5915,
+      "sha256": "4f1e6b1b327f3678514824e347d980e30c88d50d342cbe67dca2f388b7b717ad"
+    }
+  }
+}
