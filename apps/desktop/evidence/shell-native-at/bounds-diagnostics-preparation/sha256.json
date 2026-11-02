@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounds-diagnostics-offline-not-permit",
+  "base": "af55d289782b00c8e3e096a9c9c1cb04fb0ac85c",
+  "scopeChecks": {
+    "hostAstEqualExceptFailuresAndEmbeddedSource": true,
+    "guestAstEqualExceptFixedReasonsAndReadMap": true,
+    "guardPredicatesAndLimitsUnchanged": true
+  },
+  "files": {
+    "apps/desktop/tests/at/lab_build_facts.py": "a3b6cc06f646b73a38cfa0a01076225b3dbf75f5e62ae594ae82ff974761cf46",
+    "apps/desktop/tests/at/test_lab_build_facts.py": "f2ad65f66cb42e85f16b1ec703168dd11c78d0e528fa6c66fc3b63adee7518c5",
+    "apps/desktop/tests/at/build-facts-protocol.md": "a0d981a5221c27f52139f34eda160bed8dcb11d911631cf7f833ace79e1b80af",
+    "apps/desktop/evidence/shell-native-at/bounds-diagnostics-preparation/README.md": "c1821f69fafd5d502a5f1c288165279399f3fac325b9f46c05b58bb21c30c521",
+    "apps/desktop/evidence/shell-native-at/bounds-diagnostics-preparation/check-regressions.py": "c4e94b93efe71ba7cc6ac12ffdc16229694ad3529939a49dbe1847dfab2955bc"
+  },
+  "embeddedGuestSource": {
+    "sha256": "5888b59dd7efbcab75d114494a4f8527d80adc1b75f7cabfa7bf94695f8831dd",
+    "bytes": 18806
+  },
+  "historicalInputBindingsCommit": "af55d289782b00c8e3e096a9c9c1cb04fb0ac85c",
+  "unchangedInputs": {
+    "apps/desktop/tests/at/lab_owner.py": "d3b5c60dd50c4d380d5f9f4a5f6c69dc57dde4f1579edfe93244067be0814399",
+    "apps/desktop/tests/at/test_lab_owner.py": "5a8abaff21c8b20e2b50ef8e0d99506f9b9ab5f08c9231195e7f390a4d5c885e",
+    "apps/desktop/tests/at/lab_inventory_owner.py": "e9192e18f007858f0f72023b399f3e5f6568e39bbd39f6a869c58041c1613278",
+    "apps/desktop/tests/at/test_lab_inventory_owner.py": "34b354f52d0c40f0c9cde3c58001837ce2707c3c6ed7357057eec7d3da986108",
+    "apps/desktop/tests/at/outer-owner-inventory.json": "a7f1095d0ce26fd41f32a51b21b0743dde0a35c024b854c59d609f62ba032b3d",
+    "apps/desktop/tests/at/outer-owner-protocol.md": "3ce7f3293602b5539acd12dbad8db5f9ff6134e3e03cdf13d274ee09c174e18a",
+    "apps/desktop/tests/at/inventory-owner-protocol.md": "88d722c15212a6b37f3c467e3d660dcc9c42bc2b19b66c53f283834cf555c65f",
+    "apps/desktop/tests/at/product_controller.py": "a60474a3b5e930aa49db5b2035fb7da48fa06007557a12e5ec73788dc0a770a4",
+    "apps/desktop/tests/at/lab_namespace.py": "d2e09697cd9e4e05cdf112f88cbe3b9c9e0209f5377ca8abb405cc693d73315e",
+    "apps/desktop/tests/at/product_staging.py": "fc84a7215b48a9c3553653fa0c34f28b6be03d31007326e0ae547f95ca8b0a7b",
+    "apps/desktop/tests/at-preparation.security.test.ts": "9858618a5045d2e0e69f57c7e9fa6c40d8d543ba9fd83f3ec800d7dd2149f07c",
+    "bun.lock": "42c4f16359d53c21beaa08ae5568c55808fedd0adfad45f6ad012cfef6528c93",
+    "package.json": "d822dd26c0c1d73394f4620099fbe6b25afe2af059940b03564cf677547aee76"
+  },
+  "validation": {
+    "focusedTests": 97,
+    "mappedSecurityChecks": 55,
+    "pythonPayloadCases": 392,
+    "pythonPayloadMilliseconds": 11540,
+    "pythonDeadlineMilliseconds": 18000,
+    "historicalDiagnosticControls": {
+      "methods": 5,
+      "failures": 25,
+      "errors": 0
+    },
+    "currentDiagnosticControls": {
+      "methods": 5,
+      "failures": 0,
+      "errors": 0
+    },
+    "newActualCapture": false,
+    "acceptance": "pending"
+  },
+  "signing": "unsigned per-command authorized fallback after 1Password socket connection failed; configuration unchanged",
+  "reviewedSourceCommit": "3536145b0eb90dd34d5994ad4cae58791dd24c1f",
+  "independentReviews": {
+    "standards": "480d0c5c-75e3-411e-82d4-22e840c67af4",
+    "securitySpec": "1c176209-4ca5-4a6d-8021-ee9c426a354d",
+    "outcome": "clear; source/test/helper/protocol unchanged by publication metadata"
+  }
+}

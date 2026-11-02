@@ -1,5 +1,120 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Bounds diagnostics both initial reviews clear; focused PR next
+
+Standards480d0c5c and Security/Spec1c176209 completed/read in full on3536145,
+base40bac5c. Both clear, no code findings. Each independently confirms fixed
+reason-only AST scope and unchanged caps/read/shape/wrappers/custody/commands/
+deadlines. Standards97focused1.234s/55mapped10.06s/all392Python within18s,29extra
+probes; Spec97focused1.244s/55mapped10.01s/392Python8.965s,20differentialpairs/
+47positive/17public checks; both25old diagnostic failures/currentgreen,
+11/2/4historical custody controls,23bindings/embedded/plan/whitespace pass.
+Reviewed range15paths, not assignment16. Actual execution/type/lint inherited.
+Capture report preserves original42.676 elapsedSeconds and UTC interval42.685441
+without inferring clock basis from JSON. Metadata-only publication updates keep
+owner/test/helper/protocol exactly3536145. All97 states/deps/criteria unchanged.
+
+Publish focused diagnostics+actual-refusal evidence PR, inspect current-headCI/
+reviews/bots, merge promptly after gates. Then fresh protected diagnostic source/
+same-domain permit and one coordinator capture. No new actual invocation or
+limit change yet; old used source/permit/results preserved, guest stopped,
+cause unknown. No delegates/watch/processes live; existing acceptance and old
+unknown timeout-descendant absence unchanged.
+
+## Bounds diagnostics initial Standards clear; Security/Spec still running
+
+Initial Standards480d0c5c completed/read on3536145/base40bac5c: no hard-rule or
+material Fowler findings. Independent host/guest AST normalization confirms
+diagnostic-only scope;97focused1.234s/55mapped10.06s including392Python within18s,
+25original diagnostic failures/currentgreen, previous11/2/4controls,29extra
+synthetic probes/23hashes/embedded/public schema-provenance/plan/whitespace pass.
+Exact reviewed range has15paths, correcting the assignment's16-path count.
+Actual execution and prior type/lint remain inherited, no acceptance promotion.
+Capture README now distinguishes monotonic42.676s from recorded UTC interval
+42.685441s; original JSON measurements unchanged. This is metadata-only, current
+owner/test/helper code remains byte-identical to reviewed3536145. Separate fresh
+Security/Spec1c176209 still running on that frozen checkpoint; no polling or
+clean Spec claim. No PR/watch/new source/permit/capture; all97/criteria unchanged.
+
+## Offline fixed bounds diagnostics ready for independent review
+
+After first actual unavailable/bounds run, frozen af55d28 contract permits twelve
+fixed guard-specific refusal codes, preserving generic historical bounds. Owner
+changes only FAILURES and reason strings/local fixed-path reason mapping; no
+predicates/caps/read paths/shapes/commands/custody/deadlines/authority change.
+97 focused pass1.907s; actual55mapped13.10s includes392Python11.540s under18s.
+Five diagnostic methods fail exactaf55d28 code25behavioral assertions/0errors,
+currentgreen; earlier original11/writer2/reader4 historical controls still red
+and current11methods green. All new refusals remain unavailable with nullcounts,
+noartifact and one dispatch; invented reason rejected. Host/guest AST proof,
+source/input hashes and plan/whitespace recorded in bounds-diagnostics-preparation.
+Previous TS type/lint inherited unchanged. Fresh initial two-axis review next;
+Configured signer socket unavailable; diagnostic commit uses user-authorized
+per-command unsigned fallback, no signing configuration change.
+no clean review/PR/publication or new actual source/permit/capture. Old actual
+source/permit/results preserved and guest stopped; bound cause still unknown.
+No live process/delegate/watch. All97/status/criteria unchanged.
+
+## Freeze bounded refusal diagnostics after first actual capture
+
+First actual capture is safely stopped and evidence committed933b838. Protocol
+now explicitly allows12 additional fixed bounds-* refusal codes identifying the
+existing guard (status input/line/stanza/field/record, other fixed read inputs,
+update-entry count, snapshot or packet). No numeric/raw diagnostics, new fields,
+read/command scope, capacity or deadline change. Historical generic bounds remains
+valid; wrappers still preserve unavailable states. This is a coordinator contract
+change for offline implementation/tests/review next, not permission to replay the
+used permit or change limits. Real culprit remains unknown until a future fresh
+reviewed capture. Current used source/permit/private outputs preserved, no live
+guest/native/owner process, PR watch or delegate. All97/status/criteria unchanged.
+
+## First actual build-facts capture unavailable at a bound; cleanup verified
+
+After PR102 merge40bac5c, protected source f102-build-facts-approved-c512d5f
+(0500/files0400) matches approved/reviewed c512d5f code. New14-key0400 permit
+SHA71c29d20661aa67ee8e52cdf1ff9e9001fc844beaee199224856952c7d38c15a binds capture
+dba36bd7-5894-424b-9658-672c44d89467. Source manifest07bd93e42bc750fe3d0af68388ce5ec79a9c53e75f8c3bdf36f94e21616aba38;
+owner15584fa8bff607b7d38a5bfbd0083d0ba2f3f380cfa586f008d8980e300eecf3,
+base d3b5c60d, embedded6b1a383c/18055bytes. Root/lock identities unchanged and
+fresh baseline exactly stopped/exit0 before start. One fixed coordinator CLI ran
+16:05:29.368544→16:06:12.053985UTC,42.676s/exit3,0retries: valid unavailable/bounds
+guest reply, incomplete/transport owner result, cleanupnone, no private artifact.
+Which status/field/record/snapshot/packet bound failed is not exposed; do not
+guess or raise caps without evidence/review.
+
+Independent exact caller reaping and subreaper ECHILD; fresh full pinned container
+exited/runningfalse/PID0/exit0; marker absent, original0664 lock reacquired; source/
+permit unchanged, stderr0. Current failure cleanup succeeds; arbitrary recovery
+and historical old timeout absence remain unproved. Protected sources, used permit
+and0600 run outputs preserved under private lab; no automatic replay. Public
+sanitized evidence apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/.
+No package baseline/build/provision/native/Orca acceptance; all97/status/criteria
+unchanged. Next offline locate possible bounds and define minimal reviewed fixed
+diagnostic with no broader read/command/limit authority before fresh capture.
+
+## PR102 merged; first read-only build-facts capture next
+
+PR102 https://github.com/ianwijma/linuxcast/pull/102 merged normally at
+40bac5ccf903feace841515ab52f29879cf62471 from1e9943e26ec58a2418489388a23cb04ff366d1ec.
+Current-head Planning CI41323704410 SUCCESS; MERGEABLE/CLEAN, no requested or
+submitted GitHub reviews, terminal CodeRabbit SKIPPED/no actionable feedback.
+Fresh rulesets[] and develop protection404; no override. Exact-head normal merge
+confirmed, immediate tiny merge blurb sent, watch removed (wasWatching=true).
+Final independent065a6691 Standards/Security-Spec clear atc512d5f,93focused/
+55mapped/all388Python10.303s under18s plus22 probes, current/historical controls
+and hashes/AST/plan passed. Publication only added metadata; reviewed code exact.
+
+Root now codex/f1-02-build-facts-capture from approved40bac5c. Next prepare protected
+byte-identical approved source, fresh same-domain14-key metadata permit and one
+fixed coordinator-only capture, retaining exact private artifact/output custody.
+Verify original root/lock identity and fresh exact stopped/PID0/exit0 baseline;
+same linuxcast UID1000/passwordless sudo, start/guardian/30s job/45s cleanup/600s
+owner budgets unchanged. No package operation, native permit, account/resource
+provisioning, source/build/receipt/native dispatch or effect adapter permitted.
+No actual build-facts invocation yet at this checkpoint. Prior inventory facts,
+actual clean shutdown and historical unknown timeout-descendant absence unchanged.
+F1-02 in-progress/UI pending; all97 task/criterion/dependency states unchanged.
+
 ## Build-facts final independent review clear; publication next
 
 Final065a6691 completed/read at c512d5f581f67b8f7096863b317a547554dc7d92,

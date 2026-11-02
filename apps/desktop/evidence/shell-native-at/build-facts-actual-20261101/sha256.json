@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "actual-metadata-evidence-not-native-acceptance",
+  "files": {
+    "apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/README.md": "ec2691b3410893a1e7aed04a644d635742e5d0f52772ce5fe323b8464253cf41",
+    "apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/invocation.json": "104d0ff07e558e351d11def0efa2a3301d94e92efa2e467692320b8db57928a7",
+    "apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/owner-result.json": "fff73f33783639d55809e74bc33979f0b39fbc1f893de58d2eb4900b79ed091b",
+    "apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/postflight.json": "e7efbbcde7605ca38fea60d98443f2123b841271478d529a21212d7d50191f7b",
+    "apps/desktop/evidence/shell-native-at/build-facts-actual-20261101/source-provenance.json": "9256859e83d623dfedb545c4cfc2e7f97ff31e546586ab0216d18eb1b2cc74fe"
+  }
+}

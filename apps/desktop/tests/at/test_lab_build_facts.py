@@ -6,6 +6,7 @@ probe, Docker/SSH, privileged adapter, install/build/native or lab private files
 import ast
 import base64
 import copy
+import contextlib
 import errno
 import inspect
 import io
@@ -234,6 +235,21 @@ class Parser(unittest.TestCase):
             with self.subTest(host=version), self.assertRaises(owner.Rejected):
                 build.validate_version(version)
 
+    def test_status_bounds_identify_only_the_fixed_failing_guard(self):
+        examples = (
+            ('bounds-status-input', b'x' * 8388609),
+            ('bounds-status-line', RAW + b'X:' + b'x' * 16385),
+            ('bounds-status-field', RAW.replace(b'Description: synthetic discarded\n text',
+                                              b'Description:' + b'x' * 10000 + b'\n ' + b'y' * 10000)),
+            ('bounds-status-stanza', RAW + b'\nPackage: other\nStatus: purge ok not-installed\n' +
+             b''.join(f'X-{i}:'.encode() + b'x' * 15000 + b'\n' for i in range(9))),
+            ('bounds-status-records', b'\n'.join(f'Package: p{i}\nStatus: purge ok not-installed\n'.encode()
+                                               for i in range(4097))),
+        )
+        for reason, raw in examples:
+            with self.subTest(reason=reason), self.assertRaisesRegex(PROBE['Fault'], '^' + reason + '$'):
+                self.records(raw)
+
     def test_parser_fault_control_duplicate_guard_has_observable_effect(self):
         source = build.PROBE_SOURCE.replace("need(key not in fields)\n            fields[key]", "need(True)\n            fields[key]", 1)
         bad = RAW.replace(b'Package: dpkg', b'Package: dpkg\npackage: dpkg')
@@ -276,6 +292,7 @@ class Codec(unittest.TestCase):
         self.reject(p, True)
         for change in ({'expandedBytes': False}, {'sha256': '0' * 64}, {'data': ''}, {'extra': 0}):
             self.reject(dict(PROBE['unavailable']('packages'), **change), 3)
+        self.reject(PROBE['unavailable']('bounds-unreviewed-private-path'), 3)
 
     def test_strict_json_duplicate_nonfinite_and_bounded_packets(self):
         raw = owner.encoded(packet())
@@ -317,11 +334,11 @@ class Codec(unittest.TestCase):
         self.assertEqual(calls, [101])
 
     def test_guest_snapshot_and_compressed_packet_limits(self):
-        with self.assertRaises(PROBE['Fault']):
+        with self.subTest(bound='snapshot'), self.assertRaisesRegex(PROBE['Fault'], '^bounds-snapshot$'):
             PROBE['packet']({'data': 'x' * build.MAX_SNAPSHOT})
         # Deterministic poorly compressing data, no resource/randomness probe.
         text = ''.join(owner.digest(str(i).encode()) for i in range(1800))
-        with self.assertRaises(PROBE['Fault']):
+        with self.subTest(bound='packet'), self.assertRaisesRegex(PROBE['Fault'], '^bounds-packet$'):
             PROBE['packet']({'data': text})
 
     def test_independent_schema_rejects_every_nested_unknown_and_bad_integer(self):
@@ -510,6 +527,27 @@ class Guest(unittest.TestCase):
         build.decode_packet(owner.encoded(self.scope['packet'](value)), 0)
         self.assertEqual(len(self.locks.call_args_list), 2)
         self.assertFalse(self.fs.fds)
+
+    def test_fixed_read_bounds_identify_the_guard_without_exporting_path_or_values(self):
+        examples = (
+            ('/usr/lib/os-release', 8192, 'bounds-os-input'),
+            ('/var/lib/dpkg/status', 8388608, 'bounds-status-input'),
+            ('/var/lib/dpkg/arch', 8192, 'bounds-architecture-input'),
+            ('/var/lib/dpkg/triggers/Unincorp', 131072, 'bounds-trigger-input'),
+            ('/usr/share/keyrings/debian-archive-keyring.gpg', 262144, 'bounds-keyring-input'),
+        )
+        for path, maximum, reason in examples:
+            self.fs.path(path).write_bytes(b'x' * (maximum + 1))
+            with self.subTest(reason=reason), self.assertRaisesRegex(self.scope['Fault'], '^' + reason + '$'):
+                self.system.read(path, maximum)
+            self.system.close()
+
+    def test_update_entry_bound_is_a_fixed_reason(self):
+        info = self.fs.path('/var/lib/dpkg/updates').stat()
+        entry = SimpleNamespace(name='synthetic', stat=lambda **_: info)
+        self.fs.scandir = Mock(return_value=contextlib.nullcontext(iter([entry] * 4097)))
+        with self.assertRaisesRegex(self.scope['Fault'], '^bounds-updates-entries$'):
+            self.system.pending()
 
     def test_partial_half_installed_records_survive_collection_and_decode(self):
         for fields in (b'', b'Architecture: amd64\n', b'Version: 1\n'):
@@ -931,6 +969,28 @@ class Files(unittest.TestCase):
                 self.lease.validate_reply(copy.deepcopy(value))
             self.assertEqual(self.lease.validate_reply(self.lease.result()), self.lease.result())
         self.assertFalse((self.root / self.lease.artifact_name()).exists())
+
+    def test_diagnostic_codes_remain_unavailable_without_snapshot_or_replay(self):
+        reasons = ('bounds-status-input', 'bounds-status-line', 'bounds-status-stanza', 'bounds-status-field',
+                   'bounds-status-records', 'bounds-os-input', 'bounds-architecture-input', 'bounds-trigger-input',
+                   'bounds-keyring-input', 'bounds-updates-entries', 'bounds-snapshot', 'bounds-packet')
+        for reason in reasons:
+            self.renew()
+            lab = FakeLab(self.lease)
+            lab.reply, lab.code = owner.encoded(PROBE['unavailable'](reason)), 3
+            result = owner.transact(self.lease, lab)
+            with self.subTest(reason=reason):
+                self.assertEqual(result['firstFailure'], 'transport')
+                self.assertEqual(result['buildFacts']['firstFailure'], reason)
+                self.assertEqual(result['buildFacts']['status'], 'unavailable')
+                self.assertTrue(result['transportResultValid'] and result['reservationClean'])
+                self.assertIsNone(result['artifact'])
+                self.assertFalse((self.root / self.lease.artifact_name()).exists())
+                self.assertEqual(lab.calls.count('dispatch'), 1)
+                public = build.public_result(result)
+                self.assertIsNone(public['buildFacts']['packageCount'])
+                self.assertIsNone(public['buildFacts']['bytes'])
+                self.assertIsNone(public['buildFacts']['sha256'])
 
     def test_short_writes_loop_and_zero_write_retains_partial_without_claim(self):
         real = os.pwrite

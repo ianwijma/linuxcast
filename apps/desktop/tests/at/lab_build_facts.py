@@ -27,7 +27,10 @@ FIELDS = ('Package', 'Architecture', 'Version', 'Status', 'Essential', 'Protecte
           'Breaks', 'Replaces', 'Installed-Size')
 FOLDED = ('Depends', 'Pre-Depends', 'Provides', 'Conflicts', 'Breaks', 'Replaces')
 FAILURES = ('none', 'identity', 'os', 'package-lock', 'packages', 'package-state',
-            'architecture', 'resources', 'locale', 'keyring', 'bounds', 'deadline', 'output', 'custody')
+            'architecture', 'resources', 'locale', 'keyring', 'bounds', 'deadline', 'output', 'custody',
+            'bounds-status-input', 'bounds-status-line', 'bounds-status-stanza', 'bounds-status-field',
+            'bounds-status-records', 'bounds-os-input', 'bounds-architecture-input', 'bounds-trigger-input',
+            'bounds-keyring-input', 'bounds-updates-entries', 'bounds-snapshot', 'bounds-packet')
 FILESYSTEMS = ('/', '/opt', '/var/cache/apt')
 CAPACITY = ('availableBytes', 'freeBytes', 'totalBytes', 'availableInodes', 'freeInodes', 'totalInodes')
 
@@ -63,7 +66,7 @@ def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 def package_records(raw):
-    need(type(raw) is bytes and 0 < len(raw) <= 8388608, 'bounds')
+    need(type(raw) is bytes and 0 < len(raw) <= 8388608, 'bounds-status-input')
     try:
         text = raw.decode('utf-8')
     except UnicodeError:
@@ -82,21 +85,21 @@ def package_records(raw):
         need(all(all(32 <= ord(c) < 127 for c in v) for v in projected.values()))
         validate_record(projected)
         records.append(projected)
-        need(len(records) <= 4096, 'bounds')
+        need(len(records) <= 4096, 'bounds-status-records')
     for line in text.split('\n'):
-        need(len(line.encode('utf-8')) <= 16384, 'bounds')
+        need(len(line.encode('utf-8')) <= 16384, 'bounds-status-line')
         if not line.strip(' \t'):
             finish()
             fields, current, stanza = {}, None, 0
             continue
         stanza += len(line.encode('utf-8')) + 1
-        need(stanza <= 131072, 'bounds')
+        need(stanza <= 131072, 'bounds-status-stanza')
         if line[0] in ' \t':
             need(current is not None)
             # Simple projected fields cannot acquire a second physical line.
             need(current not in canonical or canonical[current] in FOLDED)
             fields[current] += ' ' + line.strip(' \t')
-            need(len(fields[current].encode('utf-8')) <= 16384, 'bounds')
+            need(len(fields[current].encode('utf-8')) <= 16384, 'bounds-status-field')
         else:
             key, sep, value = line.partition(':')
             need(sep and re.fullmatch(r'[!-9;-~]+', key) and not key.startswith(('#', '-')))
@@ -184,9 +187,13 @@ class System:
         row = self.open(path, optional=optional)
         if row is None:
             return None
-        need(row[2][6] <= maximum, 'bounds')
+        reason = {'/usr/lib/os-release': 'bounds-os-input', '/var/lib/dpkg/status': 'bounds-status-input',
+                  '/var/lib/dpkg/arch': 'bounds-architecture-input',
+                  '/var/lib/dpkg/triggers/Unincorp': 'bounds-trigger-input',
+                  '/usr/share/keyrings/debian-archive-keyring.gpg': 'bounds-keyring-input'}.get(path, 'bounds')
+        need(row[2][6] <= maximum, reason)
         raw = os.pread(row[1], maximum + 1, 0)
-        need(len(raw) <= maximum and len(raw) == row[2][6], 'bounds')
+        need(len(raw) <= maximum and len(raw) == row[2][6], reason)
         row[3] = raw
         need(stamp(os.fstat(row[1])) == row[2], 'custody')
         return raw
@@ -201,7 +208,7 @@ class System:
         names = []
         with os.scandir(row[1]) as entries:
             for entry in entries:
-                need(len(names) < 4096, 'bounds')
+                need(len(names) < 4096, 'bounds-updates-entries')
                 names.append((entry.name, stamp(entry.stat(follow_symlinks=False))))
         row[4] = sorted(names)
         need(not names, 'package-state')
@@ -317,7 +324,7 @@ class System:
                 after = []
                 with os.scandir(fd) as entries:
                     for entry in entries:
-                        need(len(after) < 4096, 'bounds')
+                        need(len(after) < 4096, 'bounds-updates-entries')
                         after.append((entry.name, stamp(entry.stat(follow_symlinks=False))))
                 need(sorted(after) == names, 'custody')
         # Metadata and path binding are checked again AFTER all byte/entry reads.
@@ -391,11 +398,11 @@ def unavailable(failure):
 
 def packet(value):
     raw = encode(value)
-    need(0 < len(raw) <= 2097152, 'bounds')
+    need(0 < len(raw) <= 2097152, 'bounds-snapshot')
     out = {'schema': 'f102-build-facts-packet-v1', 'status': 'observed', 'firstFailure': 'none',
            'encoding': 'zlib-base64', 'expandedBytes': len(raw), 'sha256': sha(raw),
            'data': base64.b64encode(zlib.compress(raw, 9)).decode('ascii')}
-    need(len(encode(out)) <= 60000, 'bounds')
+    need(len(encode(out)) <= 60000, 'bounds-packet')
     return out
 
 def main():
