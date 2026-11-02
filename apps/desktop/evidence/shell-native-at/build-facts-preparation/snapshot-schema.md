@@ -65,7 +65,9 @@ Snapshot keys:
   sha256 and size1..262144 and installed debian-archive-keyring version (string
   or null if package absent). missing/unknown have null digest/bytes; packageVersion
   still exactly derived from packages. Only the fixed public root-owned regular
-  single-link no-follow keyring is hashed, never exported. No trust verification
+  single-link no-follow canonical `/usr/share/keyrings/debian-archive-keyring.pgp`
+  is hashed, never exported. The Debian13 compatibility `.gpg` symlink is not
+  opened or followed; no fallback path or symlink exception is admitted. No trust verification
   or keyring readiness is inferred. dpkg/APT/keyring versions are in packages.
 
 An observed packet needs no unknown facts; known missing resources/locale/keyring

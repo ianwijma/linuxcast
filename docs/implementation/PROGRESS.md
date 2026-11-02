@@ -1,5 +1,89 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Canonical keyring both reviews clear; focused publication next
+
+Standardsa86c6617 and SecuritySpec3beb9a22 final reports completed/read in full
+atcc158ab/base0a36323, all16paths/fourcommits: no actionable findings. Each
+104focused/55mapped/all399Python under18s, canonical4old behavioral failures/
+currentgreen, historicalprojection6/mutant3/diagnostic25/custody11/2/4 controls,
+type/lint/plan/whitespace. Standards8extra probes/29bindings; Spec12probes/
+27file+2embeddedbindings. Clean unchanged fingerprints; no real/private lab work.
+Publication metadata preserves reviewedsource/test/helper/protocol/elaboration.
+
+Publish focused keyring correction plus actual projection-failure evidence PR,
+inspect current-head checks/reviews/bots, merge promptly after applicable gates.
+Then fresh sealedsource and14-key permit for one canonical-keyring capture.
+Actual prior keyring cause remains unknown, no complete packagebaseline yet.
+Lab stopped after verified normal cleanup; no live commands/delegates/watch.
+
+Independent artifact audit parsed locked1004registry+20workspace resolutions,
+77platform-tagged entries. No npmarchive/cache created/downloaded/installed yet;
+that side work yields to the now-ready merge. Source preparation/build/runtime/
+Debian/native/AT/full1.0 gates and all97 task/deps/criteria remain unchanged.
+Historical old timeout-descendant uncertainty remains unknown.
+
+
+## Canonical keyring correction checked; fresh initial reviews next
+
+On codex/f1-02-projection-capture, frozen586045d contract now implemented by
+exactly2 production.gpg→.pgp fixed-path literals, byte-identical otherwise.
+104focused1.399s,55mapped10.56s/all399Python (wrappercase9.420s<18s), full type/
+lint,4canonical old behavioral failures/0errors/currentgreen, historical
+projection6/mutant3/diagnostic25/custody11/2/4 controls all pass. Canonical alias
+roundtrip/no alias open/no-fallback and unsafe file/replacement tests; current
+prep manifest binds source/tests/helper/contracts and13 unchanged inputs.
+
+Next fresh INITIAL Standards and Security/Spec reviews against approved0a36323,
+covering actual projection evidence, frozen contract and minimal correction.
+No further source seal/permit/guest attempt before review. Actual prior keyring
+cause remains unknown; public Debian packaging layout is independently sourced,
+synthetic defect proven. Lab stopped/normal refusal cleanup verified, no live
+owner/guest/delegate/watch. No complete baseline/install/build/native acceptance;
+all97/task/deps/criteria/full local1.0 and old unknown timeout gap unchanged.
+
+
+## Projection capture unavailable/keyring; canonical path correction frozen
+
+Single reviewed27a9f73 capturecf7b7c11 on approvedPR104/0a36323 executed
+02:37:04.507860–02:37:39.161323UTC, monotonic34.644s/exit3/0retries. Valid
+unavailable/keyring; no snapshot/count/digest. Prior353 permit archived no-replace,
+source47929bytes/probe795c8004/19044 sealed, fresh14-key permit7da0624c.
+Exact caller reaped/ownECHILD, full pinned stopped/PID0/exit0, no marker,
+original0664 lock reacquired, unchanged source/permit/stderr0, cleanupnone.
+No live owner/guest/delegates/watch. Public projection-actual-20261102/ preserves
+curated actual output and provenance. Old timeout absence remains unknown.
+
+Offline Debian2025.1 Makefile/README show canonical regular.pgp plus.gpg symlink.
+Injected exact-layout collector probe gives1 behavioral red/0errors/FDs retired;
+actual guest cause still unknown (no metadata path type exposed). Protocol and
+schema freeze direct canonical.pgp before implementation; all no-follow/root/
+regular/single-link/bounds/custody/deadlines remain, no alias/fallback. Next add
+permanent regression, minimal source path change, full offline checks and fresh
+initial independent reviews before next protected source/permit/capture.
+All97/dependencies/criteria and full local1.0 unchanged; no package baseline,
+provision/build/native/AT/session/release acceptance.
+
+
+## PR104 merged; fresh projection capture next
+
+PR104 https://github.com/ianwijma/linuxcast/pull/104 merged normally at
+0a363239473cfc81c2c3d4895d1d5c3df2f4fe87 from5d262731a34cec758ae367124703ac38b05cda3e.
+Current PlanningCI41370128888SUCCESS, exact head MERGEABLE/CLEAN, no requested/
+submitted GitHub reviews, terminal CodeRabbit skip/no actionable feedback.
+Independentbb7a5297/6a27b37d both clear on27a9f73 with395Python and extra controls;
+publication metadata preserves reviewed code. Immediate tiny merge blurb sent,
+watch removed. Explicit discarded-value projection refinement is integrated;
+selected-field/line/stanza/input/output/command/custody/deadline bounds preserved.
+
+Root codex/f1-02-projection-capture from approved0a36323. Next seal exact reviewed
+27a9f73 source (embedded795c8004/19044bytes), preserve/archive used3536145 permit
+no-replace under same retained lock, create fresh14-key metadata permit and one
+coordinator-only capture. Fresh exact stopped/exit0/config/root/lock checks before
+start; same linuxcast/sudo and guardian/shutdown budgets. No such invocation yet
+at this checkpoint. Actual prior offending field category remains unknown; both
+prior captures unavailable. No package/native/AT/full-task acceptance promotion,
+all97/deps/criteria unchanged; old unknown timeout absence remains unknown.
+
 ## Status projection both initial reviews clear; publication next
 
 Security/Specbb7a5297 and Standards6a27b37d completed/read on27a9f73/base63118f1;
