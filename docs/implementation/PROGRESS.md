@@ -1,5 +1,34 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR110 merged; distinct install-metadata host owner contract frozen
+
+PR110 merged 1f8f954082f9ea803b1e066c7bfd49b1527bbe5a from6458959.
+Planning CI41395416085 passed; CLEAN/MERGEABLE, no requested/submitted GitHub
+reviews or inline threads, CodeRabbit terminal skip/no actionables. Both initial
+independent provenance reviews were clear; publication preserved reviewed bytes.
+The merge blurb was immediate and watch removed. No acceptance was promoted.
+
+Root codex/f1-02-install-metadata-host-owner starts approvedPR1101f8f954. It imports
+only the research report, collector protocol and targets from frozen4284ff0, then
+freezes install-metadata-owner-protocol.md before host implementation. Collector
+implementation2da445bc remains separate/async, no polling. An implementation
+steer clarified the internal source_bytes/decode_packet/validate_snapshot/FAILURES
+API without changing its original wire/read-scope contract or restarting it.
+
+The distinct host owner will own only two new Python files and evidence. It
+uses a separate17-key permit, pins all six source/data/probe dependencies,
+reuses existing lifecycle and artifact custody, and exposes only bounded digest/
+count results. No existing owner/collector/domain or execution pins change.
+Missing collector fails before dispatch; synthetic fixture codecs establish
+host behavior only. Fully composed independent review and immutable custody/
+fresh coordinator-only permit precede any actual read-only capture.
+
+Package/root install, helper/runtime and recursive trigger closure, writer
+exclusion, locale/provision/build/receipt, native/session/AT/release acceptance
+remain pending. No guest, real owner CLI, root, toolchain or native operation.
+Last guest shutdown and historical timeout-descendant uncertainty stay inherited.
+All97 non-evidence task states/dependencies/criteria/full local1.0 remain unchanged.
+
 ## Toolchain provenance: both initial reviews clear; publication next
 
 Both initial independent reviews were completed and read in full at c0bfc1a,
