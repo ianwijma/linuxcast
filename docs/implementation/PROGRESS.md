@@ -1,5 +1,28 @@
 # Coordinator checkpoint — 2 November 2026
 
+## Install transaction research delivered; toolchain review boundary
+
+Research2f1bcb73 completed and was read in full, including its614-line report.
+Saved author5df8747 on codex/debian-install-transaction-research, exactly one
+new README; not imported into this toolchain increment. It authenticates exact
+APT3.0.3/dpkg1.22.22 source and traces the inner-lock release before the final
+APT hook. The frontend lock excludes ordinary dpkg, but frontend-skipping dpkg
+and independent dpkg-trigger require a separately proved closed-writer envelope.
+Existing trigger registrations and installed postinst/helpers/config custody
+remain missing. Public libc-bin/man-db handlers have real cache effects; man-db
+can suppress mandb failure. Existing empty Unincorp must be observed for install
+admission; earlier allowance for absence cannot prove this stronger condition.
+
+Next coordinator work is a separately frozen, bounded read-only observation of
+those exact missing trigger/config/helper/state facts, then closed install/
+locale/stage/build authorities. Neither the report nor this metadata authorizes
+an actual capture or package mutation. Do not reuse native receipt-gated permits
+for preparation. All earlier actual package facts and cleanup remain inherited.
+Toolchain evidence at6f83141 stays byte-identical; this follow-up is coordinator
+checkpoint only. Start its fresh initial two-axis reviews, then work on the
+separate capture contract. No running root command or PR watch; all97 task and
+criterion states and historical timeout-descendant uncertainty remain unchanged.
+
 ## PR109 merged; toolchain provenance prepared for independent review
 
 PR109 merged ef6630f1125ec37612d94b6f57dadd9a30d65dda from 0b6f941.
