@@ -1,5 +1,33 @@
 # Coordinator checkpoint — 2 November 2026
 
+## PR107 merged; fixed Rust routing integrated for initial review
+
+PR107 merged d5651a05aabb686ef3b6b3432d1ad076aaf90dc9 from5988bc4;
+PlanningCI41389985621 SUCCESS, MERGEABLE/CLEAN, no requested/submitted GitHub
+reviews or inline threads, CodeRabbit terminal skip/no actionables. Both initial
+reviews clear, metadata-only publication preserves reviewed source. Immediate
+merge blurb sent; watch removed. All97 states/dependencies/criteria unchanged.
+
+Root codex/f1-02-rust-routing-integration starts approvedPR107d5651a0 and imports
+author18c1b64 as a542b92, exactly eight owned paths byte-identical. Fixed Rust
+ordinary-executable checks before owner/child, scrubbed separate-prefix PATH;
+Node-only native tree, cache/source/receipt/timeout boundaries unchanged. Root
+15 staging tests, all routing/cache/source/usability old-source/fault controls
+with zero errors,55 mapped security10.87s (402 Python wrapper9.519s under18s),
+plan/whitespace and47source+5evidence bindings pass. Two registry/card bindings
+are correctly historical toauthor18c1b64 because PR107 added review metadata;
+implementation/evidence unchanged. Author full type/lint/402Python9.086s remain
+reported, not additional root reruns. Normal signing remains unavailable;
+authorized per-command unsigned cherry-pick, no persistent config change.
+
+Fresh INITIAL Standards and SecuritySpec reviews next on this frozen integration
+checkpoint, approvedBASEd5651a0. No real compiler, prefix probe/provisioning,
+root/guest/namespace/build/native operation. Independent provisioning/toolchain
+custody, trigger-handler/capacity/offline/input-transfer/locale/recovery and all
+native/session/AT/release gates remain pending. Last guest still inherited clean
+stopped exit0. No active PRwatch or root process. Full97/local1.0 and historical
+unknown timeout-descendant absence unchanged.
+
 ## Offline package/input preparation: both initial reviews clear
 
 Both independent initial reviews completed and were read in full at89feb36,
